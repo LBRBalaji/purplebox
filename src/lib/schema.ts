@@ -37,3 +37,18 @@ export const propertySchema = z.object({
 });
 
 export type PropertySchema = z.infer<typeof propertySchema>;
+
+export const demandSchema = z.object({
+  demandId: z.string(),
+  companyName: z.string().min(1, 'Company name is required.'),
+  userName: z.string().min(1, 'User name is required.'),
+  userEmail: z.string().email('Invalid email address.'),
+  userPhone: z.string().min(1, 'Phone number is required.'),
+  propertyType: z.enum(['Industrial Building', 'Warehouse', 'Retail Showroom', 'Office Space'], {
+    required_error: "Property type is required.",
+  }),
+  location: z.string().min(1, 'Location is required.'),
+  radius: z.string().min(1, 'Radius is required.').regex(/^\d+(\.\d+)?$/, "Radius must be a number."),
+});
+
+export type DemandSchema = z.infer<typeof demandSchema>;
