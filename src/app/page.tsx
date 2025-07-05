@@ -40,7 +40,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="your@email.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -66,11 +66,11 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-4 w-full">
                 <Button type="button" variant="outline" onClick={() => login('admin@example.com')}>
                     <UserCog className="mr-2 h-4 w-4" />
-                    Admin
+                    Property Provider
                 </Button>
                 <Button type="button" variant="outline" onClick={() => login('user@example.com')}>
                     <UserIcon className="mr-2 h-4 w-4" />
-                    User
+                    Demand Customer
                 </Button>
             </div>
           </CardFooter>
