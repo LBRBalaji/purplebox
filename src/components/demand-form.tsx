@@ -40,6 +40,7 @@ import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { logAndImproveDemandAction } from "@/lib/actions";
 import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send } from 'lucide-react';
+import DemandMapWrapper from "./demand-map";
 
 export function DemandForm() {
   const { toast } = useToast();
@@ -193,38 +194,15 @@ export function DemandForm() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2"><MapPinned className="w-5 h-5 text-primary" /> Location</CardTitle>
-                  <CardDescription>Specify the desired location and search radius.</CardDescription>
+                  <CardDescription>Search for a location or click on the map, then specify the search radius.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="relative aspect-[2/1] w-full rounded-md bg-secondary flex items-center justify-center overflow-hidden border">
-                      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 h-full w-full stroke-current text-muted-foreground/20">
-                        <defs>
-                            <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-                            <path d="M 30 0 L 0 0 0 30" fill="none" strokeWidth="0.5"/>
-                            </pattern>
-                        </defs>
-                        <rect width="100%" height="100%" fill="url(#grid)" />
-                        <path d="M 10,100 Q 150,20 300,100 T 600,100" strokeWidth="1" fill="none" className="stroke-current text-muted-foreground/30" />
-                        <path d="M 10,150 Q 200,80 400,150 T 800,150" strokeWidth="1" fill="none" className="stroke-current text-muted-foreground/30" />
-                      </svg>
-                      
-                      <div className="relative z-10 flex flex-col items-center">
-                        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-lg">
-                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" fill="hsl(var(--primary))"/>
-                        </svg>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                            <div 
-                              className="border-2 border-dashed border-primary rounded-full animate-pulse"
-                              style={{ width: '120px', height: '120px' }}>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
+                  <DemandMapWrapper />
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField control={form.control} name="location" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Location</FormLabel>
-                          <FormControl><Input placeholder="e.g. Chennai, India" {...field} /></FormControl>
+                          <FormLabel>Location Coordinates</FormLabel>
+                          <FormControl><Input placeholder="e.g. 13.0827, 80.2707" {...field} readOnly /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
