@@ -22,12 +22,15 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto flex items-center gap-2 mb-4">
-            <div className="relative">
-              <Building className="h-10 w-10 text-primary" />
-              <Sparkles className="h-5 w-5 text-accent absolute -top-2 -right-2" />
+          <div className="mx-auto flex flex-col items-center mb-4">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Building className="h-10 w-10 text-primary" />
+                <Sparkles className="h-5 w-5 text-accent absolute -top-2 -right-2" />
+              </div>
+              <h1 className="text-3xl font-bold font-headline text-primary">DryAxs</h1>
             </div>
-            <h1 className="text-3xl font-bold font-headline text-primary">DryAxs</h1>
+            <p className="text-xs text-muted-foreground mt-1">Lease Properties, Sourced On Demand</p>
           </div>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>

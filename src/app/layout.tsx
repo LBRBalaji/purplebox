@@ -5,7 +5,7 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { DataProvider } from '@/contexts/data-context';
 
 export const metadata: Metadata = {
-  title: 'DryAxs',
+  title: 'DryAxs: Lease Properties, Sourced On Demand',
   description: 'Lease Properties, Sourced On Demand',
 };
 
