@@ -383,7 +383,7 @@ export function DemandForm() {
             <DialogHeader>
                 <DialogTitle>AI-Improved Demand Description</DialogTitle>
                 <DialogDescription>
-                    We've enhanced your demand description using AI. You can copy it or use it to find matches.
+                    We've enhanced your demand description using AI. Your demand has been logged and circulated. You can copy the description below for your records.
                 </DialogDescription>
             </DialogHeader>
             <div className="relative mt-4">
@@ -396,13 +396,7 @@ export function DemandForm() {
             </div>
             <DialogFooter className="sm:justify-between items-center gap-4">
                 <p className="text-xs text-muted-foreground">ID: {form.getValues("demandId")}</p>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Close</Button>
-                  <Button variant="default" disabled>
-                      <Send className="mr-2 h-4 w-4" />
-                      Find Matches (Coming Soon)
-                  </Button>
-                </div>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Close</Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>
