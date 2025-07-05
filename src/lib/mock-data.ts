@@ -6,11 +6,11 @@ export const mockDemands = [
     propertyType: 'Warehouse',
     location: 'Mumbai, India',
     size: '100,000 Sq. Ft.',
+    ceilingHeight: '40',
+    docks: '12',
     description: 'Urgent requirement for a large warehouse with high ceilings and 10+ docks near the port.',
     preferences: {
-      isPropertyTypeNonCompromisable: true,
-      isSizeNonCompromisable: true,
-      isLocationNonCompromisable: false,
+      nonCompromisable: ['propertyType', 'size'],
     },
   },
   {
@@ -18,11 +18,11 @@ export const mockDemands = [
     propertyType: 'Office Space',
     location: 'Bangalore, India',
     size: '25,000 Sq. Ft.',
+    ceilingHeight: '12',
+    docks: '0',
     description: 'A-grade office building with modern amenities, good connectivity, and parking for 50 cars.',
     preferences: {
-      isPropertyTypeNonCompromisable: true,
-      isSizeNonCompromisable: false,
-      isLocationNonCompromisable: true,
+      nonCompromisable: ['propertyType', 'location'],
     },
   },
   {
@@ -30,11 +30,11 @@ export const mockDemands = [
     propertyType: 'Retail Showroom',
     location: 'Delhi, India',
     size: '5,000 Sq. Ft.',
+    ceilingHeight: '15',
+    docks: '0',
     description: 'High-street retail location with heavy footfall, large glass frontage, and high visibility.',
     preferences: {
-      isPropertyTypeNonCompromisable: true,
-      isSizeNonCompromisable: true,
-      isLocationNonCompromisable: true,
+      nonCompromisable: ['propertyType', 'size', 'location'],
     },
   },
     {
@@ -42,11 +42,11 @@ export const mockDemands = [
     propertyType: 'Industrial Building',
     location: 'Chennai, India',
     size: '250,000 Sq. Ft.',
+    ceilingHeight: '50',
+    docks: '20',
     description: 'Industrial facility for manufacturing, requiring heavy power load and effluent treatment plant.',
     preferences: {
-      isPropertyTypeNonCompromisable: false,
-      isSizeNonCompromisable: true,
-      isLocationNonCompromisable: false,
+      nonCompromisable: ['size'],
     },
   },
 ];

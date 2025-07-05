@@ -41,10 +41,18 @@ const prompt = ai.definePrompt({
 You must provide an overall score, a breakdown for location, size, and features, and a justification. The scores must be between 0.0 and 1.0.
 
 CRUCIAL INSTRUCTIONS:
-The user has specified certain criteria as "Non-Compromisable".
-- If 'isPropertyTypeNonCompromisable' is true, and the property types do not match, the 'features' score and 'overallScore' must be very low (less than 0.2).
-- If 'isSizeNonCompromisable' is true, and the property size is not within a 10% tolerance of the demanded size, the 'size' score and 'overallScore' must be very low (less than 0.2).
-- If 'isLocationNonCompromisable' is true, you must assume the provided property is outside the required radius. The 'location' score and 'overallScore' must be very low (less than 0.2). I will not provide geo-coordinates for the property, so you must trust this instruction if the flag is set.
+The user has specified certain criteria as "Non-Compromisable". You must strictly adhere to these.
+{{#if demand.preferences.nonCompromisable}}
+The following items are non-compromisable: {{#each demand.preferences.nonCompromisable}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}.
+
+- If 'propertyType' is non-compromisable and the property types do not match, the 'features' score and 'overallScore' must be very low (less than 0.2).
+- If 'size' is non-compromisable and the property size is not within a 10% tolerance of the demanded size, the 'size' score and 'overallScore' must be very low (less than 0.2).
+- If 'location' is non-compromisable, you must assume the provided property is outside the required radius. The 'location' score and 'overallScore' must be very low (less than 0.2).
+- If 'ceilingHeight' is non-compromisable and the property's ceiling height is less than what is demanded, the 'features' score and 'overallScore' must be very low (less than 0.2).
+- If 'docks' is non-compromisable and the property has fewer docks than demanded, the 'features' score and 'overallScore' must be very low (less than 0.2).
+{{else}}
+There are no non-compromisable items. Evaluate the match based on a holistic assessment of all factors.
+{{/if}}
 
 Analyze the following data:
 
@@ -53,11 +61,10 @@ Analyze the following data:
 - Property Type: {{{demand.propertyType}}}
 - Location: Within {{{demand.radius}}} km of {{{demand.location}}}
 - Size: {{{demand.size}}} Sq. Ft.
+- Required Ceiling Height (ft): {{{demand.ceilingHeight}}}
+- Required Docks: {{{demand.docks}}}
 - Description: {{{demand.description}}}
-- Preferences:
-  - Property Type Non-Compromisable: {{{demand.preferences.isPropertyTypeNonCompromisable}}}
-  - Size Non-Compromisable: {{{demand.preferences.isSizeNonCompromisable}}}
-  - Location Non-Compromisable: {{{demand.preferences.isLocationNonCompromisable}}}
+- Non-Compromisable Items: {{#if demand.preferences.nonCompromisable}}{{#each demand.preferences.nonCompromisable}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None{{/if}}
 
 **SUBMITTED PROPERTY**
 - Property ID: {{{property.propertyId}}}

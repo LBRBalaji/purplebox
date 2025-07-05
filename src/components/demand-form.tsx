@@ -42,7 +42,15 @@ import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { logAndImproveDemandAction } from "@/lib/actions";
 import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send, Star } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
-import { Switch } from "./ui/switch";
+import { Checkbox } from "./ui/checkbox";
+
+const priorityItems = [
+    { id: 'propertyType', label: 'Property Type' },
+    { id: 'size', label: 'Size' },
+    { id: 'location', label: 'Location & Radius' },
+    { id: 'ceilingHeight', label: 'Ceiling Height' },
+    { id: 'docks', label: 'Number of Docks' },
+];
 
 export function DemandForm() {
   const { toast } = useToast();
@@ -64,11 +72,11 @@ export function DemandForm() {
       location: "",
       radius: "",
       size: "",
+      ceilingHeight: "",
+      docks: "",
       description: "",
       preferences: {
-        isPropertyTypeNonCompromisable: false,
-        isSizeNonCompromisable: false,
-        isLocationNonCompromisable: false,
+        nonCompromisable: [],
       }
     },
   });
@@ -148,7 +156,7 @@ export function DemandForm() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2"><ClipboardList className="w-5 h-5 text-primary" /> Demand Details</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <FormField control={form.control} name="demandId" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Demand ID</FormLabel>
@@ -176,6 +184,22 @@ export function DemandForm() {
                       <FormItem>
                           <FormLabel>Size Required (Sq. Ft.)</FormLabel>
                           <FormControl><Input placeholder="e.g. 50000" {...field} /></FormControl>
+                          <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Min. Ceiling Height (ft)</FormLabel>
+                          <FormControl><Input placeholder="e.g. 30" {...field} /></FormControl>
+                          <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField control={form.control} name="docks" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Min. Number of Docks</FormLabel>
+                          <FormControl><Input placeholder="e.g. 4" {...field} /></FormControl>
                           <FormMessage />
                       </FormItem>
                   )}
@@ -241,36 +265,52 @@ export function DemandForm() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2"><Star className="w-5 h-5 text-primary" /> Requirement Priorities</CardTitle>
-                  <CardDescription>Set your non-negotiable requirements.</CardDescription>
+                  <CardDescription>Select items that are non-negotiable for your demand.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField control={form.control} name="preferences.isPropertyTypeNonCompromisable" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel>Property Type</FormLabel>
-                        <FormDescription>Must match exactly.</FormDescription>
-                      </div>
-                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="preferences.isSizeNonCompromisable" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel>Size</FormLabel>
-                        <FormDescription>Must be very close to what is required.</FormDescription>
-                      </div>
-                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="preferences.isLocationNonCompromisable" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel>Location & Radius</FormLabel>
-                        <FormDescription>Must be within the specified area.</FormDescription>
-                      </div>
-                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                    </FormItem>
-                  )} />
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="preferences.nonCompromisable"
+                    render={() => (
+                      <FormItem className="space-y-3">
+                        {priorityItems.map((item) => (
+                          <FormField
+                            key={item.id}
+                            control={form.control}
+                            name="preferences.nonCompromisable"
+                            render={({ field }) => {
+                              return (
+                                <FormItem
+                                  key={item.id}
+                                  className="flex flex-row items-center space-x-3 space-y-0"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(item.id)}
+                                      onCheckedChange={(checked) => {
+                                        const currentValue = field.value || [];
+                                        return checked
+                                          ? field.onChange([...currentValue, item.id])
+                                          : field.onChange(
+                                              currentValue.filter(
+                                                (value) => value !== item.id
+                                              )
+                                            );
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">
+                                    {item.label}
+                                  </FormLabel>
+                                </FormItem>
+                              );
+                            }}
+                          />
+                        ))}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </CardContent>
               </Card>
               
