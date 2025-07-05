@@ -115,23 +115,39 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
   const handleShare = async () => {
     const data = form.getValues();
-    const text = `Property Demand Alert!\n\nLooking for: ${data.propertyType}\nSize: ${data.size} Sq. Ft.\nLocation: ${data.location} (within ${data.radius} km)\n\nDescription: ${data.description}`;
-    const shareData = {
-      title: `Property Demand: ${data.propertyType} in ${data.location}`,
-      text: text,
-      url: window.location.href,
+    // Ensure all required fields for sharing are filled before proceeding
+    if (!data.propertyType || !data.size || !data.location || !data.radius || !data.description) {
+        toast({
+            variant: "destructive",
+            title: "Cannot Share Yet",
+            description: "Please fill in all demand details before sharing.",
+        });
+        return;
     }
+
+    const text = `*Property Demand Alert!* 📣\n\n*Demand ID:* ${data.demandId}\n*Looking for:* ${data.propertyType}\n*Size:* ${data.size} Sq. Ft.\n*Location:* Near ${data.location} (within a ${data.radius} km radius)\n\n*Description:* ${data.description}`;
+
+    const shareData = {
+      title: `PropSource AI Demand: ${data.propertyType} in ${data.location}`,
+      text: text,
+      url: window.location.href, // This URL will just point to the dashboard for now
+    };
     try {
+      // The Web Share API is mostly for mobile devices
       if (navigator.share) {
         await navigator.share(shareData);
         toast({ title: 'Demand shared successfully!' });
       } else {
-        await navigator.clipboard.writeText(`${shareData.text}\nURL: ${shareData.url}`);
+        // Fallback for desktop: copy to clipboard
+        await navigator.clipboard.writeText(`${shareData.text}\n\nView this demand: ${shareData.url}`);
         toast({ title: 'Demand details copied to clipboard!' });
       }
     } catch (err) {
-      console.error(err);
-      toast({ variant: "destructive", title: 'Error sharing', description: 'Could not share the demand.' });
+      console.error('Sharing failed:', err);
+      // Don't show an error if user cancels the share dialog
+      if ((err as Error).name !== 'AbortError') {
+        toast({ variant: "destructive", title: 'Error sharing', description: 'Could not share the demand.' });
+      }
     }
   };
   
