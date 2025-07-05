@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -112,10 +113,10 @@ export function MySubmissions() {
                                         </div>
                                         <div className="flex items-center gap-4">
                                             {property.matchResult && (
-                                              <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                                                <Percent className="w-4 h-4" />
+                                              <Badge variant="outline" className="border-primary/80 bg-primary/10 text-primary font-semibold">
+                                                <Percent className="mr-1.5 h-4 w-4" />
                                                 <span>{(property.matchResult.overallScore * 100).toFixed(0)}% Match</span>
-                                              </div>
+                                              </Badge>
                                             )}
                                             <StatusIndicator status={property.status} />
                                         </div>

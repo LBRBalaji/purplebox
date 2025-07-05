@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -368,9 +369,9 @@ export function PropertyForm() {
            {isMatchingMode ? (
               <>
                 <DialogHeader>
-                  <DialogTitle>AI Property Match Analysis</DialogTitle>
+                  <DialogTitle>AI Match Score Calculated!</DialogTitle>
                   <DialogDescription>
-                    Here is the AI-generated match score for the property against the demand. This has now been submitted to the customer.
+                    The AI has analyzed this property against the demand. The calculated match score below has been sent to the customer for review.
                   </DialogDescription>
                 </DialogHeader>
                 {isLoading || !aiResult?.matchResult ? (

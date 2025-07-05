@@ -84,7 +84,7 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                         </div>
                         <CardTitle>{match.property.userCompanyName}</CardTitle>
                         <CardDescription>
-                          <div className="flex items-center gap-2 text-primary font-semibold">
+                          <div className="inline-flex items-center gap-2 text-primary font-semibold border border-primary/50 bg-primary/10 px-2 py-1 rounded-md text-sm">
                             <Percent className="w-4 h-4" /> 
                             <span>{(match.matchResult.overallScore * 100).toFixed(0)}% Match</span>
                           </div>
