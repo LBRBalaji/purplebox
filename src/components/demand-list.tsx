@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/auth-context';
 import { List, MapPin, Box, ArrowRight } from 'lucide-react';
 
 // Mock data until a database is connected
@@ -42,12 +41,10 @@ const mockDemands = [
 
 export function DemandList() {
   const router = useRouter();
-  const { user } = useAuth();
-  const isSuperAdmin = user?.role === 'SuperAdmin';
 
   const handleSubmitMatch = (demandId: string) => {
     // Navigate to the 'Submit Match' tab and pass the demandId as a query parameter
-    router.push(`/dashboard?tab=property&demandId=${demandId}`);
+    router.push(`/dashboard?tab=submit-property&demandId=${demandId}`);
   };
 
   return (
@@ -81,13 +78,9 @@ export function DemandList() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        {isSuperAdmin ? (
-                            <Button onClick={() => handleSubmitMatch(demand.demandId)} className="w-full">
-                                Submit Match <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        ) : (
-                           <p className="text-xs text-muted-foreground text-center w-full">Only property providers can submit a match.</p>
-                        )}
+                        <Button onClick={() => handleSubmitMatch(demand.demandId)} className="w-full">
+                            Submit Match <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
                     </CardFooter>
                 </Card>
             ))}
