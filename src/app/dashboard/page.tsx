@@ -18,11 +18,14 @@ export default function DashboardPage() {
   // Determine default tab for SuperAdmin when navigating from demand list
   const propertyDefaultTab = searchParams.get('tab') || 'view-demands';
   
+  // State to control the active tab for the User role
+  const [userActiveTab, setUserActiveTab] = React.useState('log-demand');
+
   if (user?.role === 'User') {
     return (
       <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <Tabs defaultValue="log-demand" className="w-full">
+          <Tabs value={userActiveTab} onValueChange={setUserActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="log-demand">Log New Demand</TabsTrigger>
               <TabsTrigger value="my-demands">My Demands & Matches</TabsTrigger>
@@ -34,7 +37,7 @@ export default function DashboardPage() {
                   <h2 className="text-3xl font-bold font-headline tracking-tight">Log a Property Demand</h2>
                   <p className="text-muted-foreground mt-2">Describe your property requirements to Get the best matches.</p>
                 </div>
-                <DemandForm />
+                <DemandForm onDemandLogged={() => setUserActiveTab('my-demands')} />
               </div>
             </TabsContent>
             <TabsContent value="my-demands">

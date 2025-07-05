@@ -39,7 +39,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { logAndImproveDemandAction } from "@/lib/actions";
-import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send, Star, ClipboardPlus, CalendarClock } from 'lucide-react';
+import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send, Star, ClipboardPlus, CalendarClock, List } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
@@ -57,7 +57,7 @@ const priorityItems = [
     { id: 'fireSafety', label: 'Fire Safety Compliance' },
 ];
 
-export function DemandForm() {
+export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { addDemand } = useData();
@@ -183,6 +183,11 @@ export function DemandForm() {
     setIsCopied(true);
     toast({ title: 'Description copied to clipboard!' });
     setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const handleViewMyDemands = () => {
+    setIsDialogOpen(false);
+    onDemandLogged();
   };
 
   return (
@@ -400,9 +405,9 @@ export function DemandForm() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
-                <DialogTitle>AI-Improved Demand Description</DialogTitle>
+                <DialogTitle>Demand Logged & Improved!</DialogTitle>
                 <DialogDescription>
-                    We've enhanced your demand description using AI. Your demand has been logged and circulated. You can copy the description below for your records.
+                    We've enhanced your demand description using AI and circulated it to the market. What would you like to do next?
                 </DialogDescription>
             </DialogHeader>
             <div className="relative mt-4">
@@ -413,9 +418,15 @@ export function DemandForm() {
                       {improvedDescription}
                   </p>
             </div>
-            <DialogFooter className="sm:justify-between items-center gap-4">
-                <p className="text-xs text-muted-foreground">ID: {form.getValues("demandId")}</p>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Close</Button>
+            <DialogFooter className="sm:justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <ClipboardPlus className="mr-2 h-4 w-4" />
+                  Log Another Demand
+                </Button>
+                <Button onClick={handleViewMyDemands}>
+                  <List className="mr-2 h-4 w-4" />
+                  View My Demands
+                </Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>
