@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as React from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -40,7 +39,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { logAndImproveDemandAction } from "@/lib/actions";
-import { ClipboardList, User, MapPinned, Share2, MessageSquare, Search, Sparkles, Copy, Check, Info } from 'lucide-react';
+import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send } from 'lucide-react';
 
 export function DemandForm() {
   const { toast } = useToast();
@@ -78,9 +77,11 @@ export function DemandForm() {
   }, [companyNameValue, form]);
 
   const handleShare = async () => {
+    const data = form.getValues();
+    const text = `Property Demand Alert!\n\nLooking for: ${data.propertyType}\nSize: ${data.size} Sq. Ft.\nLocation: ${data.location} (within ${data.radius} km)\n\nDescription: ${data.description}`;
     const shareData = {
-      title: 'Property Demand',
-      text: `Looking for ${form.getValues('propertyType') || 'a property'} in ${form.getValues('location') || 'a specific area.'}`,
+      title: `Property Demand: ${data.propertyType} in ${data.location}`,
+      text: text,
       url: window.location.href,
     }
     try {
@@ -88,19 +89,13 @@ export function DemandForm() {
         await navigator.share(shareData);
         toast({ title: 'Demand shared successfully!' });
       } else {
-        await navigator.clipboard.writeText(`${shareData.text} URL: ${shareData.url}`);
-        toast({ title: 'Link copied to clipboard!' });
+        await navigator.clipboard.writeText(`${shareData.text}\nURL: ${shareData.url}`);
+        toast({ title: 'Demand details copied to clipboard!' });
       }
     } catch (err) {
       console.error(err);
       toast({ variant: "destructive", title: 'Error sharing', description: 'Could not share the demand.' });
     }
-  };
-
-  const handleWhatsAppShare = () => {
-    const text = `Looking for ${form.getValues('propertyType') || 'a property'} in ${form.getValues('location') || 'a specific area.'}`;
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
   };
   
   async function onSubmit(data: DemandSchema) {
@@ -201,9 +196,33 @@ export function DemandForm() {
                   <CardDescription>Specify the desired location and search radius.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="relative">
-                    <Image src="https://placehold.co/800x400.png" alt="Map placeholder" width={800} height={400} className="rounded-md object-cover" data-ai-hint="map location" />
-                  </div>
+                    <div className="relative aspect-[2/1] w-full rounded-md bg-secondary flex items-center justify-center overflow-hidden border">
+                      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 h-full w-full stroke-current text-muted-foreground/20">
+                        <defs>
+                            <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                            <path d="M 30 0 L 0 0 0 30" fill="none" strokeWidth="0.5"/>
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+                        <path d="M 10,100 Q 150,20 300,100 T 600,100" strokeWidth="1" fill="none" className="stroke-current text-muted-foreground/30" />
+                        <path d="M 10,150 Q 200,80 400,150 T 800,150" strokeWidth="1" fill="none" className="stroke-current text-muted-foreground/30" />
+                      </svg>
+                      
+                      <div className="relative z-10 flex flex-col items-center">
+                        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-lg">
+                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" fill="hsl(var(--primary))"/>
+                        </svg>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <div 
+                              className="border-2 border-dashed border-primary rounded-full animate-pulse"
+                              style={{ width: '120px', height: '120px' }}>
+                            </div>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-2 right-2 bg-background/80 p-1.5 rounded-md text-xs text-muted-foreground">
+                          Map functionality coming soon
+                      </div>
+                    </div>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField control={form.control} name="location" render={({ field }) => (
                         <FormItem>
@@ -242,11 +261,7 @@ export function DemandForm() {
                   <CardContent className="flex items-center gap-2">
                       <Button type="button" variant="outline" onClick={handleShare} className="w-full">
                           <Share2 className="mr-2 h-4 w-4" />
-                          Share
-                      </Button>
-                      <Button type="button" variant="outline" onClick={handleWhatsAppShare} className="w-full">
-                          <MessageSquare className="mr-2 h-4 w-4" />
-                          WhatsApp
+                          Share via Social Media
                       </Button>
                   </CardContent>
               </Card>
@@ -261,7 +276,7 @@ export function DemandForm() {
                 </>
               ) : (
                 <>
-                  <Search className="mr-2 h-4 w-4" />
+                  <Send className="mr-2 h-4 w-4" />
                   Submit Match
                 </>
               )}
@@ -290,7 +305,7 @@ export function DemandForm() {
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Close</Button>
                   <Button variant="default" disabled>
-                      <Search className="mr-2 h-4 w-4" />
+                      <Send className="mr-2 h-4 w-4" />
                       Find Matches (Coming Soon)
                   </Button>
                 </div>

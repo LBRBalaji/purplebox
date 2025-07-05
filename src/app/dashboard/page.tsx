@@ -31,7 +31,7 @@ export default function DashboardPage() {
                 <div className="mt-8">
                   <div className="mb-8">
                     <h2 className="text-3xl font-bold font-headline tracking-tight">Log a Property Demand</h2>
-                    <p className="text-muted-foreground mt-2">Describe your property requirements to find the best matches.</p>
+                    <p className="text-muted-foreground mt-2">Describe your property requirements to Get the best matches.</p>
                   </div>
                   <DemandForm />
                 </div>
