@@ -11,8 +11,11 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Briefcase, CheckCircle2, Clock, XCircle, Percent } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { mockSubmissions, type SubmissionStatus } from '@/lib/mock-data';
+import { useData } from '@/contexts/data-context';
+import { useAuth } from '@/contexts/auth-context';
+import { type Submission } from '@/contexts/data-context';
 
+export type SubmissionStatus = "Pending" | "Shortlisted" | "Rejected";
 
 const StatusIndicator = ({ status }: { status: SubmissionStatus }) => {
     const statusConfig = {
@@ -32,8 +35,50 @@ const StatusIndicator = ({ status }: { status: SubmissionStatus }) => {
     );
 };
 
+type GroupedSubmission = {
+    demandId: string;
+    demandDetails: {
+      propertyType: string;
+      location: string;
+    };
+    properties: (Submission & { status: SubmissionStatus })[];
+}
 
 export function MySubmissions() {
+    const { user } = useAuth();
+    const { demands, submissions } = useData();
+    const [groupedSubmissions, setGroupedSubmissions] = React.useState<GroupedSubmission[]>([]);
+
+    React.useEffect(() => {
+        if (user?.email) {
+            const mySubmissions = submissions.filter(sub => sub.property.userEmail === user.email);
+
+            const grouped = mySubmissions.reduce((acc, submission) => {
+                const demand = demands.find(d => d.demandId === submission.demandId);
+                if (!demand) return acc;
+
+                let group = acc.find(g => g.demandId === submission.demandId);
+                if (!group) {
+                    group = {
+                        demandId: submission.demandId,
+                        demandDetails: {
+                            propertyType: demand.propertyType,
+                            location: demand.location,
+                        },
+                        properties: [],
+                    };
+                    acc.push(group);
+                }
+
+                group.properties.push({ ...submission, status: 'Pending' }); // Mock status
+                return acc;
+
+            }, [] as GroupedSubmission[]);
+
+            setGroupedSubmissions(grouped);
+        }
+    }, [submissions, demands, user]);
+
   return (
     <div className="mt-8">
         <div className="mb-8">
@@ -41,7 +86,7 @@ export function MySubmissions() {
             <p className="text-muted-foreground mt-2">Track the status of properties you've submitted against demands.</p>
         </div>
         <Accordion type="single" collapsible className="w-full space-y-4">
-            {mockSubmissions.map((submission) => (
+            {groupedSubmissions.map((submission) => (
                 <AccordionItem value={submission.demandId} key={submission.demandId} className="border rounded-lg bg-card">
                     <AccordionTrigger className="p-6 hover:no-underline">
                         <div className="flex justify-between items-center w-full">
@@ -60,16 +105,16 @@ export function MySubmissions() {
                         {submission.properties.length > 0 ? (
                             <div className="space-y-4">
                                 {submission.properties.map(property => (
-                                    <Card key={property.propertyId} className="flex items-center justify-between p-4 flex-wrap gap-2">
+                                    <Card key={property.property.propertyId} className="flex items-center justify-between p-4 flex-wrap gap-2">
                                         <div>
-                                            <p className="font-semibold">{property.propertyName}</p>
-                                            <p className="text-sm text-muted-foreground">Property ID: {property.propertyId}</p>
+                                            <p className="font-semibold">{property.property.userCompanyName}</p>
+                                            <p className="text-sm text-muted-foreground">Property ID: {property.property.propertyId}</p>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            {property.matchScore && (
+                                            {property.matchResult && (
                                               <div className="flex items-center gap-2 text-sm font-semibold text-primary">
                                                 <Percent className="w-4 h-4" />
-                                                <span>{(property.matchScore * 100).toFixed(0)}% Match</span>
+                                                <span>{(property.matchResult.overallScore * 100).toFixed(0)}% Match</span>
                                               </div>
                                             )}
                                             <StatusIndicator status={property.status} />

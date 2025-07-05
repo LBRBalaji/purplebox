@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { List, MapPin, Box, ArrowRight } from 'lucide-react';
-import { mockDemands } from '@/lib/mock-data';
+import { useData } from '@/contexts/data-context';
 
 
 export function DemandList() {
   const router = useRouter();
+  const { demands } = useData();
 
   const handleSubmitMatch = (demandId: string) => {
     // Navigate to the 'Submit Match' tab and pass the demandId as a query parameter
@@ -24,7 +25,7 @@ export function DemandList() {
             <p className="text-muted-foreground mt-2">Browse demands logged by users and submit a matching property.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockDemands.map((demand) => (
+            {demands.map((demand) => (
                 <Card key={demand.demandId} className="flex flex-col">
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between flex-wrap gap-2">
@@ -39,7 +40,7 @@ export function DemandList() {
                         <div className="space-y-4">
                             <div>
                                 <h4 className="font-semibold flex items-center gap-2 mb-1"><Box className="w-4 h-4" /> Size</h4>
-                                <p className="text-sm text-muted-foreground">{demand.size}</p>
+                                <p className="text-sm text-muted-foreground">{demand.size} Sq. Ft.</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold flex items-center gap-2 mb-1"><List className="w-4 h-4" /> Description</h4>

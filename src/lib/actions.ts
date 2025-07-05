@@ -52,10 +52,8 @@ export async function generateDescriptionAction(
 
 export async function logAndImproveDemandAction(
   data: DemandSchema
-): Promise<{ improvedDescription?: string; error?: string }> {
+): Promise<{ demand?: DemandSchema, improvedDescription?: string; error?: string }> {
   try {
-    console.log("Logging demand:", data);
-
     const input: ImprovePropertyDemandDescriptionInput = {
       description: data.description,
       propertyType: data.propertyType,
@@ -67,13 +65,7 @@ export async function logAndImproveDemandAction(
 
     const result = await improvePropertyDemandDescription(input);
     
-    // In a real app, you would save the new demand (data) and its improved description to a database.
-    console.log("Demand logged and improved:", {
-      demand: data,
-      improvedDescription: result.improvedDescription,
-    });
-    
-    return { improvedDescription: result.improvedDescription };
+    return { demand: data, improvedDescription: result.improvedDescription };
   } catch (error) {
     console.error("Error improving demand description:", error);
     const e = error as Error;
@@ -82,16 +74,15 @@ export async function logAndImproveDemandAction(
 }
 
 export async function getPropertyMatchScoreAction(
-  propertyData: PropertySchema
-): Promise<{ result?: GetPropertyMatchScoreOutput; error?: string }> {
+  propertyData: PropertySchema,
+  allDemands: DemandSchema[],
+): Promise<{ submission?: { property: PropertySchema, matchResult: GetPropertyMatchScoreOutput, demandId: string }; error?: string }> {
   try {
     if (!propertyData.o2oDealDemandId) {
       return { error: "No Demand ID was provided for matching." };
     }
-
-    // In a real app, you would fetch this from a database.
-    // For now, we find it in the mock data.
-    const demandData = mockDemands.find(d => d.demandId === propertyData.o2oDealDemandId);
+    
+    const demandData = allDemands.find(d => d.demandId === propertyData.o2oDealDemandId);
 
     if (!demandData) {
         return { error: `Demand with ID "${propertyData.o2oDealDemandId}" not found.` };
@@ -99,13 +90,16 @@ export async function getPropertyMatchScoreAction(
 
     const result = await getPropertyMatchScore({
       property: propertyData,
-      demand: demandData as unknown as DemandSchema, // Cast because mock data isn't strictly typed
+      demand: demandData,
     });
     
-    // In a real app, you would save this match result to a database.
-    console.log("Match score calculated:", result);
+    const submission = {
+      property: propertyData,
+      matchResult: result,
+      demandId: propertyData.o2oDealDemandId,
+    };
 
-    return { result };
+    return { submission };
   } catch (error) {
     console.error("Error getting property match score:", error);
     const e = error as Error;

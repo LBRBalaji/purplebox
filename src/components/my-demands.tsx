@@ -12,10 +12,32 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, MessageSquare, Percent } from 'lucide-react';
 import Image from 'next/image';
-import { myDemands } from '@/lib/mock-data';
 import { Progress } from './ui/progress';
+import { useData } from '@/contexts/data-context';
+import { useAuth } from '@/contexts/auth-context';
+import { type DemandSchema } from '@/lib/schema';
+import { type Submission } from '@/contexts/data-context';
+
+type DemandWithMatches = DemandSchema & {
+  matches: Submission[];
+}
 
 export function MyDemands() {
+  const { user } = useAuth();
+  const { demands, submissions } = useData();
+  const [myDemandsWithMatches, setMyDemandsWithMatches] = React.useState<DemandWithMatches[]>([]);
+
+  React.useEffect(() => {
+    if (user?.email) {
+      const userDemands = demands.filter(d => d.userEmail === user.email);
+      const demandsWithSubmissions = userDemands.map(demand => {
+        const demandSubmissions = submissions.filter(sub => sub.demandId === demand.demandId);
+        return { ...demand, matches: demandSubmissions };
+      });
+      setMyDemandsWithMatches(demandsWithSubmissions);
+    }
+  }, [demands, submissions, user]);
+
   return (
     <div className="mt-8">
       <div className="mb-8">
@@ -23,7 +45,7 @@ export function MyDemands() {
         <p className="text-muted-foreground mt-2">Review matches submitted for your active demands.</p>
       </div>
       <Accordion type="single" collapsible className="w-full space-y-4">
-        {myDemands.map((demand) => (
+        {myDemandsWithMatches.map((demand) => (
           <AccordionItem value={demand.demandId} key={demand.demandId} className="border rounded-lg bg-card">
             <AccordionTrigger className="p-6 hover:no-underline">
               <div className="flex justify-between items-center w-full">
@@ -40,30 +62,30 @@ export function MyDemands() {
               {demand.matches.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {demand.matches.map(match => (
-                    <Card key={match.propertyId}>
+                    <Card key={match.property.propertyId}>
                       <CardHeader>
                         <div className="aspect-video relative rounded-md overflow-hidden mb-4">
-                          <Image src={match.image} alt={match.propertyName} data-ai-hint={match.dataAiHint} fill className="object-cover" />
+                          <Image src="https://placehold.co/600x400.png" alt={match.property.userCompanyName || 'Property'} data-ai-hint="modern office" fill className="object-cover" />
                         </div>
-                        <CardTitle>{match.propertyName}</CardTitle>
+                        <CardTitle>{match.property.userCompanyName}</CardTitle>
                         <CardDescription>
                           <div className="flex items-center gap-2 text-primary font-semibold">
                             <Percent className="w-4 h-4" /> 
-                            <span>{(match.matchScore * 100).toFixed(0)}% Match</span>
+                            <span>{(match.matchResult.overallScore * 100).toFixed(0)}% Match</span>
                           </div>
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <Progress value={match.matchScore * 100} className="h-2" />
-                        <p className="text-xs text-muted-foreground italic">{match.justification}</p>
+                        <Progress value={match.matchResult.overallScore * 100} className="h-2" />
+                        <p className="text-xs text-muted-foreground italic">{match.matchResult.justification}</p>
                         <div className="grid grid-cols-2 gap-4 text-sm pt-2">
                           <div>
                             <p className="text-muted-foreground">Size</p>
-                            <p className="font-medium">{match.size}</p>
+                            <p className="font-medium">{match.property.size} Sq. Ft.</p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">Rent</p>
-                            <p className="font-medium">{match.rent}</p>
+                            <p className="font-medium">₹{match.property.rentPerSft}/sft</p>
                           </div>
                         </div>
                       </CardContent>

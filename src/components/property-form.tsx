@@ -45,6 +45,8 @@ import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { Progress } from "./ui/progress";
+import { useData } from "@/contexts/data-context";
+import { useAuth } from "@/contexts/auth-context";
 
 
 type AiResult = {
@@ -55,6 +57,8 @@ type AiResult = {
 export function PropertyForm() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
+  const { demands, addSubmission } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
   const [aiResult, setAiResult] = React.useState<AiResult | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -97,7 +101,14 @@ export function PropertyForm() {
   React.useEffect(() => {
     const newId = `PS-${Date.now()}`;
     form.setValue("propertyId", newId);
-  }, [form]);
+
+    if (user) {
+        form.setValue("userName", user.userName);
+        form.setValue("userCompanyName", user.companyName);
+        form.setValue("userPhoneNumber", user.phone);
+        form.setValue("userEmail", user.email);
+    }
+  }, [form, user]);
 
   React.useEffect(() => {
     if (demandIdFromUrl) {
@@ -142,19 +153,25 @@ export function PropertyForm() {
     setIsLoading(true);
     setAiResult(null);
     try {
-      let result;
-      if (data.o2oDealDemandId) {
+      if (isMatchingMode) {
         // Matching flow
-        result = await getPropertyMatchScoreAction(data);
-        if (result.error) throw new Error(result.error);
-        setAiResult({ matchResult: result.result });
+        const result = await getPropertyMatchScoreAction(data, demands);
+        if (result.error || !result.submission) {
+            throw new Error(result.error || "Failed to get a valid response from the action.");
+        }
+        addSubmission(result.submission);
+        setAiResult({ matchResult: result.submission.matchResult });
       } else {
         // Description generation flow
-        result = await generateDescriptionAction(data);
+        const result = await generateDescriptionAction(data);
         if (result.error) throw new Error(result.error);
         setAiResult({ description: result.description });
       }
       setIsDialogOpen(true);
+      toast({
+        title: "Success!",
+        description: isMatchingMode ? "Property match submitted." : "AI description generated.",
+      });
     } catch (error) {
       const e = error as Error;
       toast({
@@ -283,10 +300,10 @@ export function PropertyForm() {
                 <CardHeader><CardTitle className="flex items-center gap-2"><User className="w-5 h-5 text-primary" /> User Details</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
                   <FormField control={form.control} name="userType" render={({ field }) => (<FormItem><FormLabel>User Type</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Developer">Developer</SelectItem><SelectItem value="Agent">Agent</SelectItem><SelectItem value="Owner">Owner</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userName" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userCompanyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userPhoneNumber" render={({ field }) => (<FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="userName" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="userCompanyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="userPhoneNumber" render={({ field }) => (<FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
                   <FormField
                     control={form.control}
                     name="o2oDealDemandId"
@@ -353,7 +370,7 @@ export function PropertyForm() {
                 <DialogHeader>
                   <DialogTitle>AI Property Match Analysis</DialogTitle>
                   <DialogDescription>
-                    Here is the AI-generated match score for the property against the demand.
+                    Here is the AI-generated match score for the property against the demand. This has now been submitted to the customer.
                   </DialogDescription>
                 </DialogHeader>
                 {isLoading || !aiResult?.matchResult ? (

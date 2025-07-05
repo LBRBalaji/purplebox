@@ -43,6 +43,7 @@ import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Se
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
+import { useData } from "@/contexts/data-context";
 
 const priorityItems = [
     { id: 'size', label: 'Size' },
@@ -59,6 +60,7 @@ const priorityItems = [
 export function DemandForm() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { addDemand } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
   const [demandId, setDemandId] = React.useState("");
   const [improvedDescription, setImprovedDescription] = React.useState("");
@@ -137,16 +139,33 @@ export function DemandForm() {
     setIsLoading(true);
     try {
       const result = await logAndImproveDemandAction(data);
-      if (result.error) {
-        throw new Error(result.error);
+      if (result.error || !result.demand) {
+        throw new Error(result.error || "Failed to get a valid response from the action.");
       }
+      
+      addDemand(result.demand);
+
       setImprovedDescription(result.improvedDescription || "No description generated.");
       setIsDialogOpen(true);
       toast({
         title: "Demand Logged & Improved!",
-        description: `Your demand (ID: ${data.demandId}) has been processed.`,
+        description: `Your demand (ID: ${data.demandId}) has been processed and circulated.`,
       });
-      form.reset(); // Reset form after successful submission
+      // Reset form after successful submission, but keep user details
+      const userDetails = {
+        companyName: user?.companyName,
+        userName: user?.userName,
+        userEmail: user?.email,
+        userPhone: user?.phone,
+      }
+      form.reset({
+        ...form.formState.defaultValues,
+        ...userDetails,
+        demandId: "",
+        propertyType: undefined,
+        description: "",
+        preferences: { nonCompromisable: [] }
+      }); 
     } catch (error) {
        const e = error as Error;
        toast({
@@ -187,7 +206,7 @@ export function DemandForm() {
                   <FormField control={form.control} name="propertyType" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Property Required Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl><SelectTrigger><SelectValue placeholder="Select a property type" /></SelectTrigger></FormControl>
                           <SelectContent>
                             <SelectItem value="Industrial Building">Industrial Building</SelectItem>
@@ -227,7 +246,7 @@ export function DemandForm() {
                    <FormField control={form.control} name="readiness" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Readiness</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl><SelectTrigger><SelectValue placeholder="Select readiness" /></SelectTrigger></FormControl>
                           <SelectContent>
                             <SelectItem value="Immediate">Immediate</SelectItem>
