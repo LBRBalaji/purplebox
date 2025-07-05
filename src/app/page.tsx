@@ -1,55 +1,63 @@
-import { PropertyForm } from "@/components/property-form";
-import { DemandForm } from "@/components/demand-form";
-import { Card, CardContent } from "@/components/ui/card";
-import { Building, Sparkles } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+'use client';
 
-function Header() {
-  return (
-    <header className="p-4 border-b">
-      <div className="container mx-auto flex items-center gap-2">
-        <div className="relative">
-          <Building className="h-7 w-7 text-primary" />
-          <Sparkles className="h-4 w-4 text-accent absolute -top-1 -right-2" />
-        </div>
-        <h1 className="text-xl font-bold font-headline text-primary">PropSource AI</h1>
-      </div>
-    </header>
-  );
-}
+import * as React from 'react';
+import { useAuth } from '@/contexts/auth-context';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Building, Sparkles, LogIn } from 'lucide-react';
 
-export default function Home() {
+export default function LoginPage() {
+  const { login } = useAuth();
+  const [email, setEmail] = React.useState('');
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    login(email);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto p-4 md:p-8">
-        <div className="max-w-6xl mx-auto">
-            <Tabs defaultValue="demand" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="demand">Log Demand</TabsTrigger>
-                  <TabsTrigger value="property">Submit Property</TabsTrigger>
-                </TabsList>
-                <TabsContent value="demand">
-                  <div className="mt-8">
-                    <div className="mb-8">
-                      <h2 className="text-3xl font-bold font-headline tracking-tight">Log a Property Demand</h2>
-                      <p className="text-muted-foreground mt-2">Describe your property requirements to find the best matches.</p>
-                    </div>
-                    <DemandForm />
-                  </div>
-                </TabsContent>
-                <TabsContent value="property">
-                  <div className="mt-8">
-                    <div className="mb-8">
-                      <h2 className="text-3xl font-bold font-headline tracking-tight">Submit a Property</h2>
-                      <p className="text-muted-foreground mt-2">Fill out the form below to submit a property and get an AI-generated description.</p>
-                    </div>
-                    <PropertyForm />
-                  </div>
-                </TabsContent>
-            </Tabs>
-        </div>
-      </main>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="text-center">
+          <div className="mx-auto flex items-center gap-2 mb-4">
+            <div className="relative">
+              <Building className="h-10 w-10 text-primary" />
+              <Sparkles className="h-5 w-5 text-accent absolute -top-2 -right-2" />
+            </div>
+            <h1 className="text-3xl font-bold font-headline text-primary">PropSource AI</h1>
+          </div>
+          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardDescription>
+            Enter your email to access your dashboard.
+            <br />
+            <small className="text-xs text-muted-foreground">
+              (Use admin@example.com or user@example.com)
+            </small>
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleLogin}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" className="w-full">
+              <LogIn className="mr-2 h-4 w-4" /> Sign In
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   );
 }
