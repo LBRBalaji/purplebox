@@ -3,15 +3,15 @@ import { z } from 'zod';
 export const propertySchema = z.object({
   propertyId: z.string(),
   propertyGeoLocation: z.string().min(1, 'Geo location is required.'),
-  size: z.string().min(1, 'Size is required.'),
+  size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be a positive number.'),
   floor: z.string().min(1, 'Floor is required.'),
   readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
   siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project']),
   safety: z.string().min(1, 'Safety information is required.'),
-  ceilingHeight: z.string().min(1, 'Ceiling height is required.'),
+  ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height must be a number."}).positive('Ceiling height must be positive.'),
   
-  rentPerSft: z.string().min(1, 'Rent is required.'),
-  rentalSecurityDeposit: z.string().min(1, 'Deposit is required.'),
+  rentPerSft: z.coerce.number({invalid_type_error: "Rent must be a number."}).positive('Rent must be positive.'),
+  rentalSecurityDeposit: z.coerce.number({invalid_type_error: "Deposit must be a number."}).positive('Deposit must be positive.'),
 
   userType: z.enum(['Developer', 'Agent', 'Owner']),
   userName: z.string().min(1, 'User name is required.'),
@@ -30,7 +30,7 @@ export const propertySchema = z.object({
   fireHydrant: z.enum(['Installed', 'Can be provided']),
   fireNoc: z.enum(['Obtained', 'Applied For', 'To Apply']),
   
-  docks: z.string().min(1, 'Number of docks is required.'),
+  docks: z.coerce.number({invalid_type_error: "Docks must be a number."}).int().nonnegative('Docks cannot be negative.'),
   canopy: z.enum(['Installed', 'Can be provided']),
 
   additionalInformation: z.string().optional(),
@@ -48,10 +48,23 @@ export const demandSchema = z.object({
     required_error: "Property type is required.",
   }),
   location: z.string().min(1, 'Location is required.'),
-  radius: z.string().min(1, 'Radius is required.').regex(/^\d+(\.\d+)?$/, "Radius must be a number."),
-  size: z.string().min(1, 'Size is required.'),
-  ceilingHeight: z.string().optional(),
-  docks: z.string().optional(),
+  radius: z.coerce.number({invalid_type_error: "Radius must be a number."}).positive("Radius must be a positive number."),
+  size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be positive.'),
+  ceilingHeight: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce
+      .number({ invalid_type_error: "Ceiling height must be a number." })
+      .positive("Ceiling height must be positive.")
+      .optional()
+  ),
+  docks: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce
+      .number({ invalid_type_error: "Docks must be a number." })
+      .int()
+      .nonnegative("Docks cannot be negative.")
+      .optional()
+  ),
   readiness: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
   preferences: z.object({

@@ -85,10 +85,10 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       userPhone: "",
       propertyType: undefined,
       location: "",
-      radius: "",
-      size: "",
-      ceilingHeight: "",
-      docks: "",
+      radius: undefined,
+      size: undefined,
+      ceilingHeight: undefined,
+      docks: undefined,
       readiness: "Immediate",
       description: "",
       preferences: {
@@ -287,7 +287,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                    <FormField control={form.control} name="size" render={({ field }) => (
                       <FormItem>
                           <FormLabel>Size Required (Sq. Ft.)</FormLabel>
-                          <FormControl><Input placeholder="e.g. 50000" {...field} /></FormControl>
+                          <FormControl><Input type="number" placeholder="e.g. 50000" {...field} /></FormControl>
                           <FormMessage />
                       </FormItem>
                   )}
@@ -295,7 +295,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                   <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
                       <FormItem>
                           <FormLabel>Min. Ceiling Height (ft)</FormLabel>
-                          <FormControl><Input placeholder="e.g. 30" {...field} /></FormControl>
+                          <FormControl><Input type="number" placeholder="e.g. 30" {...field} /></FormControl>
                           <FormMessage />
                       </FormItem>
                   )}
@@ -303,7 +303,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                   <FormField control={form.control} name="docks" render={({ field }) => (
                       <FormItem>
                           <FormLabel>Min. Number of Docks</FormLabel>
-                          <FormControl><Input placeholder="e.g. 4" {...field} /></FormControl>
+                          <FormControl><Input type="number" placeholder="e.g. 4" {...field} /></FormControl>
                           <FormMessage />
                       </FormItem>
                   )}
@@ -362,7 +362,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                     <FormField control={form.control} name="radius" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Radius (km)</FormLabel>
-                          <FormControl><Input placeholder="e.g. 10" {...field} /></FormControl>
+                          <FormControl><Input type="number" placeholder="e.g. 10" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}

@@ -70,14 +70,14 @@ export function PropertyForm() {
     defaultValues: {
       propertyId: "",
       propertyGeoLocation: "",
-      size: "",
+      size: undefined,
       floor: "",
       readinessToOccupy: "Immediate",
       siteType: "Standalone",
       safety: "",
-      ceilingHeight: "",
-      rentPerSft: "",
-      rentalSecurityDeposit: "",
+      ceilingHeight: undefined,
+      rentPerSft: undefined,
+      rentalSecurityDeposit: undefined,
       userType: "Agent",
       userName: "",
       userCompanyName: "",
@@ -91,7 +91,7 @@ export function PropertyForm() {
       genSetBackup: "Available",
       fireHydrant: "Installed",
       fireNoc: "Obtained",
-      docks: "",
+      docks: undefined,
       canopy: "Installed",
       additionalInformation: "",
     },
@@ -226,7 +226,7 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="size" render={({ field }) => (
-                      <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input placeholder="e.g. 50000" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 50000" {...field} /></FormControl><FormMessage /></FormItem>
                     )}
                   />
                   <FormField control={form.control} name="floor" render={({ field }) => (
@@ -258,7 +258,7 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
-                      <FormItem><FormLabel>Ceiling Height (ft)</FormLabel><FormControl><Input placeholder="e.g. 30" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Ceiling Height (ft)</FormLabel><FormControl><Input type="number" placeholder="e.g. 30" {...field} /></FormControl><FormMessage /></FormItem>
                     )}
                   />
                 </CardContent>
@@ -268,8 +268,8 @@ export function PropertyForm() {
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><HandCoins className="w-5 h-5 text-primary" /> Commercials</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="rentPerSft" render={({ field }) => (<FormItem><FormLabel>Rent per Sq. Ft.</FormLabel><FormControl><Input placeholder="e.g. 25" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (<FormItem><FormLabel>Security Deposit (months)</FormLabel><FormControl><Input placeholder="e.g. 6" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="rentPerSft" render={({ field }) => (<FormItem><FormLabel>Rent per Sq. Ft.</FormLabel><FormControl><Input type="number" placeholder="e.g. 25" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (<FormItem><FormLabel>Security Deposit (months)</FormLabel><FormControl><Input type="number" placeholder="e.g. 6" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 </CardContent>
               </Card>
 
@@ -296,7 +296,7 @@ export function PropertyForm() {
                <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="w-5 h-5 text-primary" /> Docks & More</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="docks" render={({ field }) => (<FormItem><FormLabel>Number of Docks</FormLabel><FormControl><Input placeholder="e.g. 8" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="docks" render={({ field }) => (<FormItem><FormLabel>Number of Docks</FormLabel><FormControl><Input type="number" placeholder="e.g. 8" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="canopy" render={({ field }) => (<FormItem><FormLabel>Canopy</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     <FormItem>
                         <FormLabel>Upload Images</FormLabel>
