@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -9,17 +10,31 @@ import { MyDemands } from "@/components/my-demands";
 import { MySubmissions } from "@/components/my-submissions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
   
   // Determine default tab for SuperAdmin when navigating from demand list
   const propertyDefaultTab = searchParams.get('tab') || 'view-demands';
   
   // State to control the active tab for the User role
-  const [userActiveTab, setUserActiveTab] = React.useState('log-demand');
+  const editDemandId = searchParams.get('editDemandId');
+  const [userActiveTab, setUserActiveTab] = React.useState(editDemandId ? 'log-demand' : 'log-demand');
+
+  React.useEffect(() => {
+    const editId = searchParams.get('editDemandId');
+    if (editId) {
+      setUserActiveTab('log-demand');
+    }
+  }, [searchParams]);
+
+  const onDemandUpserted = () => {
+    router.push('/dashboard');
+    setUserActiveTab('my-demands');
+  };
 
   if (user?.role === 'User') {
     return (
@@ -27,21 +42,21 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto">
           <Tabs value={userActiveTab} onValueChange={setUserActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="log-demand">Log New Demand</TabsTrigger>
+              <TabsTrigger value="log-demand">{editDemandId ? 'Edit Demand' : 'Log New Demand'}</TabsTrigger>
               <TabsTrigger value="my-demands">My Demands & Matches</TabsTrigger>
               <TabsTrigger value="shortlisted">Shortlisted</TabsTrigger>
             </TabsList>
             <TabsContent value="log-demand">
               <div className="mt-8">
                 <div className="mb-8">
-                  <h2 className="text-3xl font-bold font-headline tracking-tight">Log a Property Demand</h2>
-                  <p className="text-muted-foreground mt-2">Describe your property requirements to Get the best matches.</p>
+                  <h2 className="text-3xl font-bold font-headline tracking-tight">{editDemandId ? 'Edit Your Demand' : 'Log a Property Demand'}</h2>
+                  <p className="text-muted-foreground mt-2">{editDemandId ? 'Modify your requirements and priorities below.' : 'Describe your property requirements to get the best matches.'}</p>
                 </div>
-                <DemandForm onDemandLogged={() => setUserActiveTab('my-demands')} />
+                <DemandForm onDemandLogged={onDemandUpserted} />
               </div>
             </TabsContent>
             <TabsContent value="my-demands">
-              <MyDemands />
+              <MyDemands onSwitchTab={setUserActiveTab} />
             </TabsContent>
             <TabsContent value="shortlisted">
               <div className="mt-8">

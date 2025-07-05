@@ -1,6 +1,8 @@
+
 'use client';
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Accordion,
   AccordionContent,
@@ -10,7 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, MessageSquare, Percent } from 'lucide-react';
+import { Star, MessageSquare, Percent, Pencil } from 'lucide-react';
 import Image from 'next/image';
 import { Progress } from './ui/progress';
 import { useData } from '@/contexts/data-context';
@@ -22,10 +24,11 @@ type DemandWithMatches = DemandSchema & {
   matches: Submission[];
 }
 
-export function MyDemands() {
+export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void }) {
   const { user } = useAuth();
   const { demands, submissions } = useData();
   const [myDemandsWithMatches, setMyDemandsWithMatches] = React.useState<DemandWithMatches[]>([]);
+  const router = useRouter();
 
   React.useEffect(() => {
     if (user?.email) {
@@ -37,6 +40,13 @@ export function MyDemands() {
       setMyDemandsWithMatches(demandsWithSubmissions);
     }
   }, [demands, submissions, user]);
+  
+  const handleEdit = (e: React.MouseEvent, demandId: string) => {
+    e.stopPropagation(); // Prevent accordion from toggling
+    router.push(`/dashboard?editDemandId=${demandId}`, { scroll: false });
+    onSwitchTab('log-demand');
+  };
+
 
   return (
     <div className="mt-8">
@@ -53,9 +63,14 @@ export function MyDemands() {
                   <h3 className="font-bold text-lg">{demand.demandId}</h3>
                   <p className="text-sm text-muted-foreground">{demand.propertyType} - {demand.location}</p>
                 </div>
-                <Badge variant={demand.matches.length > 0 ? 'default' : 'secondary'}>
-                  {demand.matches.length} {demand.matches.length === 1 ? 'Match' : 'Matches'}
-                </Badge>
+                <div className="flex items-center gap-2">
+                   <Button variant="outline" size="sm" onClick={(e) => handleEdit(e, demand.demandId)}>
+                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                  </Button>
+                  <Badge variant={demand.matches.length > 0 ? 'default' : 'secondary'}>
+                    {demand.matches.length} {demand.matches.length === 1 ? 'Match' : 'Matches'}
+                  </Badge>
+                </div>
               </div>
             </AccordionTrigger>
             <AccordionContent className="p-6 pt-0">

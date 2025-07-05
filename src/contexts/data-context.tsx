@@ -15,6 +15,7 @@ export type Submission = {
 type DataContextType = {
   demands: DemandSchema[];
   addDemand: (demand: DemandSchema) => void;
+  updateDemand: (demand: DemandSchema) => void;
   submissions: Submission[];
   addSubmission: (submission: Submission) => void;
 };
@@ -29,12 +30,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setDemands((prev) => [...prev, demand]);
   };
 
+  const updateDemand = (updatedDemand: DemandSchema) => {
+    setDemands((prev) =>
+      prev.map((demand) =>
+        demand.demandId === updatedDemand.demandId ? updatedDemand : demand
+      )
+    );
+  };
+
   const addSubmission = (submission: Submission) => {
     setSubmissions((prev) => [...prev, submission]);
   };
 
   return (
-    <DataContext.Provider value={{ demands, addDemand, submissions, addSubmission }}>
+    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission }}>
       {children}
     </DataContext.Provider>
   );

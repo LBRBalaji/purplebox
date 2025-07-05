@@ -1,8 +1,10 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as React from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -60,12 +62,18 @@ const priorityItems = [
 export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   const { toast } = useToast();
   const { user } = useAuth();
-  const { addDemand } = useData();
+  const { demands, addDemand, updateDemand } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
   const [demandId, setDemandId] = React.useState("");
   const [improvedDescription, setImprovedDescription] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isCopied, setIsCopied] = React.useState(false);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const editDemandId = searchParams.get('editDemandId');
+  const isEditMode = !!editDemandId;
 
   const form = useForm<DemandSchema>({
     resolver: zodResolver(demandSchema),
@@ -92,8 +100,8 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   const companyNameValue = form.watch("companyName");
 
   React.useEffect(() => {
-    if (user) {
-      // Pre-fill user details from auth context
+    if (user && !isEditMode) {
+      // Pre-fill user details from auth context, only on create mode
       form.reset({
         ...form.getValues(),
         companyName: user.companyName,
@@ -102,16 +110,26 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
         userPhone: user.phone,
       });
     }
-  }, [user, form]);
+  }, [user, form, isEditMode]);
 
   React.useEffect(() => {
-    if (companyNameValue) {
+    if (companyNameValue && !isEditMode) {
       const companyPart = (companyNameValue.split(" ")[0] || "DEMAND").toUpperCase();
       const newId = `${companyPart}-${Date.now()}`;
       setDemandId(newId);
       form.setValue("demandId", newId);
     }
-  }, [companyNameValue, form]);
+  }, [companyNameValue, form, isEditMode]);
+
+  React.useEffect(() => {
+    if (isEditMode) {
+      const demandToEdit = demands.find(d => d.demandId === editDemandId);
+      if (demandToEdit) {
+        form.reset(demandToEdit);
+        setDemandId(demandToEdit.demandId);
+      }
+    }
+  }, [isEditMode, editDemandId, demands, form]);
 
   const handleShare = async () => {
     const data = form.getValues();
@@ -159,29 +177,35 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
         throw new Error(result.error || "Failed to get a valid response from the action.");
       }
       
-      addDemand(result.demand);
+      if (isEditMode) {
+        updateDemand(result.demand);
+      } else {
+        addDemand(result.demand);
+      }
 
       setImprovedDescription(result.improvedDescription || "No description generated.");
       setIsDialogOpen(true);
       toast({
-        title: "Demand Logged & Improved!",
-        description: `Your demand (ID: ${data.demandId}) has been processed and circulated.`,
+        title: isEditMode ? "Demand Updated!" : "Demand Logged & Improved!",
+        description: `Your demand (ID: ${data.demandId}) has been processed.`,
       });
-      // Reset form after successful submission, but keep user details
-      const userDetails = {
-        companyName: user?.companyName,
-        userName: user?.userName,
-        userEmail: user?.email,
-        userPhone: user?.phone,
+
+      if (!isEditMode) {
+        const userDetails = {
+          companyName: user?.companyName,
+          userName: user?.userName,
+          userEmail: user?.email,
+          userPhone: user?.phone,
+        }
+        form.reset({
+          ...form.formState.defaultValues,
+          ...userDetails,
+          demandId: "",
+          propertyType: undefined,
+          description: "",
+          preferences: { nonCompromisable: [] }
+        });
       }
-      form.reset({
-        ...form.formState.defaultValues,
-        ...userDetails,
-        demandId: "",
-        propertyType: undefined,
-        description: "",
-        preferences: { nonCompromisable: [] }
-      }); 
     } catch (error) {
        const e = error as Error;
        toast({
@@ -203,7 +227,27 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
   const handleViewMyDemands = () => {
     setIsDialogOpen(false);
+    router.push('/dashboard', { scroll: false });
     onDemandLogged();
+  };
+
+  const handleLogAnother = () => {
+    setIsDialogOpen(false);
+    router.push('/dashboard', { scroll: false }); // Clear edit mode if it was active
+    const userDetails = {
+      companyName: user?.companyName,
+      userName: user?.userName,
+      userEmail: user?.email,
+      userPhone: user?.phone,
+    };
+    form.reset({
+      ...form.formState.defaultValues,
+      ...userDetails,
+      demandId: "",
+      propertyType: undefined,
+      description: "",
+      preferences: { nonCompromisable: [] },
+    });
   };
 
   return (
@@ -406,12 +450,12 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
               {isLoading ? (
                 <>
                   <Sparkles className="mr-2 h-4 w-4 animate-spin" />
-                  Logging...
+                  {isEditMode ? 'Updating...' : 'Logging...'}
                 </>
               ) : (
                 <>
                   <ClipboardPlus className="mr-2 h-4 w-4" />
-                  Log Demand
+                  {isEditMode ? 'Update Demand' : 'Log Demand'}
                 </>
               )}
             </Button>
@@ -421,9 +465,9 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
-                <DialogTitle>Demand Logged & Improved!</DialogTitle>
+                <DialogTitle>{isEditMode ? 'Demand Updated!' : 'Demand Logged & Improved!'}</DialogTitle>
                 <DialogDescription>
-                    We've enhanced your demand description using AI and circulated it to the market. What would you like to do next?
+                    We've enhanced your demand description using AI. What would you like to do next?
                 </DialogDescription>
             </DialogHeader>
             <div className="relative mt-4">
@@ -435,9 +479,9 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                   </p>
             </div>
             <DialogFooter className="sm:justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <Button variant="outline" onClick={handleLogAnother}>
                   <ClipboardPlus className="mr-2 h-4 w-4" />
-                  Log Another Demand
+                  {isEditMode ? 'Log a New Demand' : 'Log Another Demand'}
                 </Button>
                 <Button onClick={handleViewMyDemands}>
                   <List className="mr-2 h-4 w-4" />
