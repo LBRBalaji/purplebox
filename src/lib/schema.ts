@@ -55,8 +55,8 @@ export const demandSchema = z.object({
   readiness: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'No Specific']),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
   preferences: z.object({
-    nonCompromisable: z.array(z.string()).default([]),
-  }).default({}),
+    nonCompromisable: z.array(z.string()).min(1, { message: "Please select at least one priority requirement." }),
+  }),
 });
 
 export type DemandSchema = z.infer<typeof demandSchema>;

@@ -50,6 +50,7 @@ The following items are non-compromisable: {{#each demand.preferences.nonComprom
 - If 'location' is non-compromisable, you must assume the provided property is outside the required radius. The 'location' score and 'overallScore' must be very low (less than 0.2).
 - If 'ceilingHeight' is non-compromisable and the property's ceiling height is less than what is demanded, the 'features' score and 'overallScore' must be very low (less than 0.2).
 - If 'docks' is non-compromisable and the property has fewer docks than demanded, the 'features' score and 'overallScore' must be very low (less than 0.2).
+- If 'readiness' is non-compromisable, evaluate if the property's readiness meets the demand's required timeline. For example, a demand for 'Immediate' readiness is not met by a property available 'Within 6 months'. If it doesn't meet the requirement, the 'features' score and 'overallScore' must be very low (less than 0.2).
 {{else}}
 There are no non-compromisable items. Evaluate the match based on a holistic assessment of all factors.
 {{/if}}
@@ -63,6 +64,7 @@ Analyze the following data:
 - Size: {{{demand.size}}} Sq. Ft.
 - Required Ceiling Height (ft): {{{demand.ceilingHeight}}}
 - Required Docks: {{{demand.docks}}}
+- Required Readiness: {{{demand.readiness}}}
 - Description: {{{demand.description}}}
 - Non-Compromisable Items: {{#if demand.preferences.nonCompromisable}}{{#each demand.preferences.nonCompromisable}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None{{/if}}
 
@@ -73,6 +75,7 @@ Analyze the following data:
 - Size: {{{property.size}}} Sq. Ft.
 - Ceiling Height: {{{property.ceilingHeight}}} ft
 - Docks: {{{property.docks}}}
+- Readiness to Occupy: {{{property.readinessToOccupy}}}
 - Power: {{{property.availablePower}}}
 - Additional Info: {{{property.additionalInformation}}}
 

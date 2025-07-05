@@ -50,6 +50,7 @@ const priorityItems = [
     { id: 'location', label: 'Location & Radius' },
     { id: 'ceilingHeight', label: 'Ceiling Height' },
     { id: 'docks', label: 'Number of Docks' },
+    { id: 'readiness', label: 'Readiness' },
 ];
 
 export function DemandForm() {
@@ -297,7 +298,7 @@ export function DemandForm() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2"><Star className="w-5 h-5 text-primary" /> Requirement Priorities</CardTitle>
-                  <CardDescription>Select items that are non-negotiable for your demand.</CardDescription>
+                  <CardDescription>Select items that are non-negotiable for your demand. This helps the AI find you the most relevant properties. This section is mandatory.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <FormField
