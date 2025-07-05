@@ -317,7 +317,8 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                             <SelectItem value="Immediate">Immediate</SelectItem>
                             <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
                             <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
-                            <SelectItem value="No Specific">No Specific Timeline</SelectItem>
+                            <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
+                            <SelectItem value="BTS">BTS (Build to Suit)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

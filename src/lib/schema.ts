@@ -5,7 +5,7 @@ export const propertySchema = z.object({
   propertyGeoLocation: z.string().min(1, 'Geo location is required.'),
   size: z.string().min(1, 'Size is required.'),
   floor: z.string().min(1, 'Floor is required.'),
-  readinessToOccupy: z.enum(['Immediate', 'Within 3 months', 'Within 6 months', 'BTS']),
+  readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
   siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project']),
   safety: z.string().min(1, 'Safety information is required.'),
   ceilingHeight: z.string().min(1, 'Ceiling height is required.'),
@@ -52,7 +52,7 @@ export const demandSchema = z.object({
   size: z.string().min(1, 'Size is required.'),
   ceilingHeight: z.string().optional(),
   docks: z.string().optional(),
-  readiness: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'No Specific']),
+  readiness: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
   preferences: z.object({
     nonCompromisable: z.array(z.string()).min(1, { message: "Please select at least one priority requirement." }),

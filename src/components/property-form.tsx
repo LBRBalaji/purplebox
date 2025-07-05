@@ -234,7 +234,19 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
-                      <FormItem><FormLabel>Readiness to Occupy</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Immediate">Immediate</SelectItem><SelectItem value="Within 3 months">Within 3 months</SelectItem><SelectItem value="Within 6 months">Within 6 months</SelectItem><SelectItem value="BTS">BTS</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Readiness to Occupy</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="Immediate">Immediate</SelectItem>
+                          <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
+                          <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
+                          <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
+                          <SelectItem value="BTS">BTS (Build to Suit)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      </FormItem>
                     )}
                   />
                   <FormField control={form.control} name="siteType" render={({ field }) => (
