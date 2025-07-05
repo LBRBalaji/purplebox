@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building, Sparkles, LogIn } from 'lucide-react';
+import { Building, Sparkles, LogIn, UserCog, User as UserIcon } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -30,11 +30,7 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
-            Enter your email to access your dashboard.
-            <br />
-            <small className="text-xs text-muted-foreground">
-              (Use admin@example.com or user@example.com)
-            </small>
+            Enter your email or use a test account to sign in.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
@@ -44,17 +40,39 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="admin@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full">
-              <LogIn className="mr-2 h-4 w-4" /> Sign In
+              <LogIn className="mr-2 h-4 w-4" /> Sign In with Email
             </Button>
+            
+            <div className="relative w-full">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                    Or use a test account
+                    </span>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 w-full">
+                <Button type="button" variant="outline" onClick={() => login('admin@example.com')}>
+                    <UserCog className="mr-2 h-4 w-4" />
+                    Admin
+                </Button>
+                <Button type="button" variant="outline" onClick={() => login('user@example.com')}>
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    User
+                </Button>
+            </div>
           </CardFooter>
         </form>
       </Card>
