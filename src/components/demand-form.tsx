@@ -45,12 +45,15 @@ import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
 
 const priorityItems = [
-    { id: 'propertyType', label: 'Property Type' },
     { id: 'size', label: 'Size' },
     { id: 'location', label: 'Location & Radius' },
     { id: 'ceilingHeight', label: 'Ceiling Height' },
     { id: 'docks', label: 'Number of Docks' },
     { id: 'readiness', label: 'Readiness' },
+    { id: 'approvals', label: 'Approvals Status' },
+    { id: 'fireNoc', label: 'Fire NOC Status' },
+    { id: 'power', label: 'Sufficient Power' },
+    { id: 'fireSafety', label: 'Fire Safety Compliance' },
 ];
 
 export function DemandForm() {

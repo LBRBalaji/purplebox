@@ -45,12 +45,15 @@ The user has specified certain criteria as "Non-Compromisable". You must strictl
 {{#if demand.preferences.nonCompromisable}}
 The following items are non-compromisable: {{#each demand.preferences.nonCompromisable}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}.
 
-- If 'propertyType' is non-compromisable and the property types do not match, the 'features' score and 'overallScore' must be very low (less than 0.2).
 - If 'size' is non-compromisable and the property size is not within a 10% tolerance of the demanded size, the 'size' score and 'overallScore' must be very low (less than 0.2).
 - If 'location' is non-compromisable, you must assume the provided property is outside the required radius. The 'location' score and 'overallScore' must be very low (less than 0.2).
 - If 'ceilingHeight' is non-compromisable and the property's ceiling height is less than what is demanded, the 'features' score and 'overallScore' must be very low (less than 0.2).
 - If 'docks' is non-compromisable and the property has fewer docks than demanded, the 'features' score and 'overallScore' must be very low (less than 0.2).
 - If 'readiness' is non-compromisable, evaluate if the property's readiness meets the demand's required timeline. For example, a demand for 'Immediate' readiness is not met by a property available 'Within 6 months'. If it doesn't meet the requirement, the 'features' score and 'overallScore' must be very low (less than 0.2).
+- If 'approvals' is non-compromisable and the property's 'approvalStatus' is not 'Obtained', the 'features' score and 'overallScore' must be very low (less than 0.2).
+- If 'fireNoc' is non-compromisable and the property's 'fireNoc' is not 'Obtained', the 'features' score and 'overallScore' must be very low (less than 0.2).
+- If 'power' is non-compromisable, you must evaluate if the property's 'availablePower' seems sufficient based on the demand description. If it seems insufficient, the 'features' score and 'overallScore' must be very low (less than 0.2).
+- If 'fireSafety' is non-compromisable and the property's 'fireHydrant' is not 'Installed', the 'features' score and 'overallScore' must be very low (less than 0.2).
 {{else}}
 There are no non-compromisable items. Evaluate the match based on a holistic assessment of all factors.
 {{/if}}
@@ -76,7 +79,10 @@ Analyze the following data:
 - Ceiling Height: {{{property.ceilingHeight}}} ft
 - Docks: {{{property.docks}}}
 - Readiness to Occupy: {{{property.readinessToOccupy}}}
-- Power: {{{property.availablePower}}}
+- Available Power: {{{property.availablePower}}}
+- Approval Status: {{{property.approvalStatus}}}
+- Fire NOC Status: {{{property.fireNoc}}}
+- Fire Hydrant Status: {{{property.fireHydrant}}}
 - Additional Info: {{{property.additionalInformation}}}
 
 Based on this information, provide your analysis as a JSON object matching the output schema. Be concise but clear in your justification.
