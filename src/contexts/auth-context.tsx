@@ -46,13 +46,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       storedUsers = {};
     }
 
-    if (Object.keys(storedUsers).length === 0) {
-      // If no users in storage, initialize with defaults
-      localStorage.setItem('propsource_users', JSON.stringify(defaultUsers));
-      setUsers(defaultUsers);
-    } else {
-      setUsers(storedUsers);
-    }
+    // Merge default users with stored users to ensure defaults are always available
+    const mergedUsers = { ...defaultUsers, ...storedUsers };
+    setUsers(mergedUsers);
+    localStorage.setItem('propsource_users', JSON.stringify(mergedUsers));
+
 
     // Check for a logged-in user in session storage on initial load
     try {
@@ -98,7 +96,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     sessionStorage.removeItem('user');
-    localStorage.removeItem('propsource_users'); // For a clean logout, you might want to clear this
     router.push('/');
   };
 
