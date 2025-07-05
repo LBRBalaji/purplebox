@@ -1,7 +1,8 @@
 "use server";
 
 import { generatePropertyDescription, type GeneratePropertyDescriptionInput } from "@/ai/flows/generate-property-description";
-import { type PropertySchema } from "./schema";
+import { improvePropertyDemandDescription, type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-property-demand";
+import { type PropertySchema, type DemandSchema } from "./schema";
 
 export async function generateDescriptionAction(
   data: PropertySchema
@@ -42,5 +43,29 @@ export async function generateDescriptionAction(
   } catch (error) {
     console.error("Error generating property description:", error);
     return { error: "An unexpected error occurred while generating the description." };
+  }
+}
+
+export async function logAndImproveDemandAction(
+  data: DemandSchema
+): Promise<{ improvedDescription?: string; error?: string }> {
+  try {
+    console.log("Logging demand:", data);
+
+    const input: ImprovePropertyDemandDescriptionInput = {
+      description: data.description,
+      propertyType: data.propertyType,
+      location: data.location,
+      size: data.size,
+      additionalDetails: "", // Can be extended later
+    };
+
+    const result = await improvePropertyDemandDescription(input);
+    
+    return { improvedDescription: result.improvedDescription };
+  } catch (error) {
+    console.error("Error improving demand description:", error);
+    const e = error as Error;
+    return { error: e.message || "An unexpected error occurred while improving the description." };
   }
 }
