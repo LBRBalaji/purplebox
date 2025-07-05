@@ -18,7 +18,7 @@ function Header() {
             <Building className="h-7 w-7 text-primary" />
             <Sparkles className="h-4 w-4 text-accent absolute -top-1 -right-2" />
           </div>
-          <h1 className="text-xl font-bold font-headline text-primary">PropSource AI</h1>
+          <h1 className="text-xl font-bold font-headline text-primary">DryAxs</h1>
         </div>
         {user && (
           <div className="flex items-center gap-4">

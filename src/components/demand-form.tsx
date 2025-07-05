@@ -146,7 +146,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     const text = `*Property Demand Alert!* 📣\n\n*Demand ID:* ${data.demandId}\n*Looking for:* ${data.propertyType}\n*Size:* ${data.size} Sq. Ft.\n*Location:* Near ${data.location} (within a ${data.radius} km radius)\n\n*Description:* ${data.description}`;
 
     const shareData = {
-      title: `PropSource AI Demand: ${data.propertyType} in ${data.location}`,
+      title: `DryAxs Demand: ${data.propertyType} in ${data.location}`,
       text: text,
       url: window.location.href, // This URL will just point to the dashboard for now
     };

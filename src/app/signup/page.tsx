@@ -50,7 +50,7 @@ export default function SignupPage() {
               <Building className="h-10 w-10 text-primary" />
               <Sparkles className="h-5 w-5 text-accent absolute -top-2 -right-2" />
             </div>
-            <h1 className="text-3xl font-bold font-headline text-primary">PropSource AI</h1>
+            <h1 className="text-3xl font-bold font-headline text-primary">DryAxs</h1>
           </div>
           <CardTitle className="text-2xl">Create an Account</CardTitle>
           <CardDescription>

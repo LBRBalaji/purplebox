@@ -5,8 +5,8 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { DataProvider } from '@/contexts/data-context';
 
 export const metadata: Metadata = {
-  title: 'PropSource AI',
-  description: 'Demand-specific property sourcing powered by AI',
+  title: 'DryAxs',
+  description: 'Lease Properties, Sourced On Demand',
 };
 
 export default function RootLayout({
