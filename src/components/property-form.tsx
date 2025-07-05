@@ -40,7 +40,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema } from "@/lib/schema";
 import { generateDescriptionAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 
 
