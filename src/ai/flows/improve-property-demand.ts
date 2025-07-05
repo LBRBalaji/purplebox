@@ -16,6 +16,7 @@ const ImprovePropertyDemandDescriptionInputSchema = z.object({
   propertyType: z.string().describe('The type of property (e.g., industrial, commercial).'),
   location: z.string().describe('The desired location of the property.'),
   size: z.string().describe('The desired size of the property (e.g., in square feet).'),
+  readiness: z.string().optional().describe('The desired timeline for property readiness.'),
   additionalDetails: z.string().optional().describe('Any additional details about the property demand.'),
 });
 export type ImprovePropertyDemandDescriptionInput = z.infer<typeof ImprovePropertyDemandDescriptionInputSchema>;
@@ -41,9 +42,10 @@ const prompt = ai.definePrompt({
   Property Type: {{{propertyType}}}
   Location: {{{location}}}
   Size: {{{size}}}
+  Readiness: {{{readiness}}}
   Additional Details: {{{additionalDetails}}}
 
-  Improved Description:`, // Removed the unneeded ```template``` tags and added instructions to be an expert real estate agent
+  Improved Description:`,
 });
 
 const improvePropertyDemandDescriptionFlow = ai.defineFlow(
@@ -57,4 +59,3 @@ const improvePropertyDemandDescriptionFlow = ai.defineFlow(
     return output!;
   }
 );
-

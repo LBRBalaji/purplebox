@@ -6,20 +6,27 @@ import { useRouter } from 'next/navigation';
 type User = {
   email: string;
   role: 'SuperAdmin' | 'User';
+  companyName: string;
+  userName: string;
+  phone: string;
 };
+
+export type NewUser = Omit<User, 'role'>;
 
 type AuthContextType = {
   user: User | null;
   login: (email: string) => void;
+  signup: (details: NewUser) => void;
   logout: () => void;
   isLoading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// In a real app, this would be a database.
 const hardcodedUsers: { [email: string]: User } = {
-  'admin@example.com': { email: 'admin@example.com', role: 'SuperAdmin' },
-  'user@example.com': { email: 'user@example.com', role: 'User' },
+  'admin@example.com': { email: 'admin@example.com', role: 'SuperAdmin', companyName: 'PropSource', userName: 'Admin', phone: 'N/A' },
+  'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test User', phone: '555-123-4567' },
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -49,9 +56,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sessionStorage.setItem('user', JSON.stringify(foundUser));
       router.push('/dashboard');
     } else {
-      alert('Invalid credentials');
+      alert('Invalid credentials. Please sign up or use a test account.');
     }
   };
+
+  const signup = (details: NewUser) => {
+    if (hardcodedUsers[details.email.toLowerCase()]) {
+      alert("An account with this email already exists. Please log in.");
+      return;
+    }
+    const newUser: User = { ...details, role: 'User' };
+    
+    // Simulate saving the new user
+    hardcodedUsers[newUser.email.toLowerCase()] = newUser;
+
+    // Log the new user in
+    setUser(newUser);
+    sessionStorage.setItem('user', JSON.stringify(newUser));
+    router.push('/dashboard');
+  }
 
   const logout = () => {
     setUser(null);
@@ -60,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

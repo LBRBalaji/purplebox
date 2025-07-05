@@ -52,6 +52,7 @@ export const demandSchema = z.object({
   size: z.string().min(1, 'Size is required.'),
   ceilingHeight: z.string().optional(),
   docks: z.string().optional(),
+  readiness: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'No Specific']),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
   preferences: z.object({
     nonCompromisable: z.array(z.string()).default([]),

@@ -11,7 +11,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,9 +39,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { logAndImproveDemandAction } from "@/lib/actions";
-import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send, Star } from 'lucide-react';
+import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send, Star, ClipboardPlus, CalendarClock } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
+import { useAuth } from "@/contexts/auth-context";
 
 const priorityItems = [
     { id: 'propertyType', label: 'Property Type' },
@@ -54,6 +54,7 @@ const priorityItems = [
 
 export function DemandForm() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const [demandId, setDemandId] = React.useState("");
   const [improvedDescription, setImprovedDescription] = React.useState("");
@@ -74,6 +75,7 @@ export function DemandForm() {
       size: "",
       ceilingHeight: "",
       docks: "",
+      readiness: "Immediate",
       description: "",
       preferences: {
         nonCompromisable: [],
@@ -82,6 +84,19 @@ export function DemandForm() {
   });
 
   const companyNameValue = form.watch("companyName");
+
+  React.useEffect(() => {
+    if (user) {
+      // Pre-fill user details from auth context
+      form.reset({
+        ...form.getValues(),
+        companyName: user.companyName,
+        userName: user.userName,
+        userEmail: user.email,
+        userPhone: user.phone,
+      });
+    }
+  }, [user, form]);
 
   React.useEffect(() => {
     if (companyNameValue) {
@@ -127,6 +142,7 @@ export function DemandForm() {
         title: "Demand Logged & Improved!",
         description: `Your demand (ID: ${data.demandId}) has been processed.`,
       });
+      form.reset(); // Reset form after successful submission
     } catch (error) {
        const e = error as Error;
        toast({
@@ -204,6 +220,22 @@ export function DemandForm() {
                       </FormItem>
                   )}
                   />
+                   <FormField control={form.control} name="readiness" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Readiness</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl><SelectTrigger><SelectValue placeholder="Select readiness" /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Immediate">Immediate</SelectItem>
+                            <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
+                            <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
+                            <SelectItem value="No Specific">No Specific Timeline</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </CardContent>
               </Card>
 
@@ -255,10 +287,10 @@ export function DemandForm() {
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><User className="w-5 h-5 text-primary" /> User Details</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <FormField control={form.control} name="companyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userName" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userPhone" render={({ field }) => (<FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="companyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="userName" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="userPhone" render={({ field }) => (<FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
                 </CardContent>
               </Card>
 
@@ -325,17 +357,17 @@ export function DemandForm() {
               </Card>
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-8">
             <Button type="submit" size="lg" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Sparkles className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting...
+                  Logging...
                 </>
               ) : (
                 <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Submit Demand
+                  <ClipboardPlus className="mr-2 h-4 w-4" />
+                  Log Demand
                 </>
               )}
             </Button>

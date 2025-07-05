@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Building, Sparkles, LogIn, UserCog, User as UserIcon } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -72,6 +73,13 @@ export default function LoginPage() {
                     <UserIcon className="mr-2 h-4 w-4" />
                     Demand Customer
                 </Button>
+            </div>
+
+            <div className="text-sm text-center text-muted-foreground pt-2">
+                Don&apos;t have a customer account?{' '}
+                <Link href="/signup" className="underline text-primary">
+                    Sign Up
+                </Link>
             </div>
           </CardFooter>
         </form>

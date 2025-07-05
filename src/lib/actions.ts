@@ -61,10 +61,17 @@ export async function logAndImproveDemandAction(
       propertyType: data.propertyType,
       location: data.location,
       size: data.size,
+      readiness: data.readiness,
       additionalDetails: "", // Can be extended later
     };
 
     const result = await improvePropertyDemandDescription(input);
+    
+    // In a real app, you would save the new demand (data) and its improved description to a database.
+    console.log("Demand logged and improved:", {
+      demand: data,
+      improvedDescription: result.improvedDescription,
+    });
     
     return { improvedDescription: result.improvedDescription };
   } catch (error) {
@@ -92,7 +99,7 @@ export async function getPropertyMatchScoreAction(
 
     const result = await getPropertyMatchScore({
       property: propertyData,
-      demand: demandData as DemandSchema, // Cast because mock data isn't strictly typed
+      demand: demandData as unknown as DemandSchema, // Cast because mock data isn't strictly typed
     });
     
     // In a real app, you would save this match result to a database.
