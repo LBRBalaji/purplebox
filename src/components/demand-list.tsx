@@ -14,8 +14,8 @@ export function DemandList() {
   const { demands } = useData();
 
   const handleSubmitMatch = (demandId: string) => {
-    // Navigate to the 'Submit Match' tab and pass the demandId as a query parameter
-    router.push(`/dashboard?tab=submit-property&demandId=${demandId}`);
+    // Navigate to the same page but with a query param to trigger the form view
+    router.push(`/dashboard?demandId=${demandId}`);
   };
 
   return (
