@@ -73,7 +73,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      {children}
+      <React.Suspense fallback={
+        <main className="container mx-auto p-4 md:p-8">
+          <div className="max-w-6xl mx-auto space-y-8">
+             <Skeleton className="h-10 w-full max-w-[500px]" />
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Skeleton className="h-[250px] w-full" />
+                <Skeleton className="h-[250px] w-full" />
+                <Skeleton className="h-[250px] w-full" />
+             </div>
+          </div>
+        </main>
+      }>{children}</React.Suspense>
     </div>
   );
 }

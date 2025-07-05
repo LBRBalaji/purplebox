@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -46,6 +47,7 @@ import { Skeleton } from "./ui/skeleton";
 
 export function PropertyForm() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = React.useState(false);
   const [generatedDescription, setGeneratedDescription] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -84,11 +86,21 @@ export function PropertyForm() {
     },
   });
 
+  const o2oDealDemandIdValue = form.watch('o2oDealDemandId');
+
   React.useEffect(() => {
     const newId = `PS-${Date.now()}`;
     setPropertyId(newId);
     form.setValue("propertyId", newId);
   }, [form]);
+
+  React.useEffect(() => {
+    const demandIdFromUrl = searchParams.get('demandId');
+    if (demandIdFromUrl) {
+      form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
+    }
+  }, [searchParams, form]);
+
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
@@ -238,7 +250,7 @@ export function PropertyForm() {
                <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="w-5 h-5 text-primary" /> Docks & More</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="docks" render={({ field }) => (<FormItem><FormLabel>Number of Docks</FormLabel><FormControl><Input placeholder="e.g. 8" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="docks" render={({ field }) => (<FormItem><FormLabel>Number of Docks</FormLabel><FormControl><Input placeholder="e.g. 8" {...field} /></FormControl><FormMessage /></FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="canopy" render={({ field }) => (<FormItem><FormLabel>Canopy</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     <FormItem>
                         <FormLabel>Upload Images</FormLabel>
@@ -259,7 +271,22 @@ export function PropertyForm() {
                   <FormField control={form.control} name="userCompanyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={form.control} name="userPhoneNumber" render={({ field }) => (<FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="o2oDealDemandId" render={({ field }) => (<FormItem><FormLabel>O2O Deal Demand ID (Optional)</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
+                  <FormField
+                    control={form.control}
+                    name="o2oDealDemandId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>O2O Deal Demand ID</FormLabel>
+                        <FormControl>
+                          <Input {...field} readOnly={!!o2oDealDemandIdValue} />
+                        </FormControl>
+                        <FormDescription>
+                          This is pre-filled when you submit a match.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </CardContent>
               </Card>
 
