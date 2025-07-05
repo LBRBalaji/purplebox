@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Building, Sparkles, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
@@ -24,10 +25,15 @@ export default function SignupPage() {
     companyName: '',
     userName: '',
     phone: '',
+    role: 'User',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleRoleChange = (value: 'User' | 'SuperAdmin') => {
+    setFormData({ ...formData, role: value });
   };
 
   const handleSignup = (e: React.FormEvent) => {
@@ -46,13 +52,45 @@ export default function SignupPage() {
             </div>
             <h1 className="text-3xl font-bold font-headline text-primary">PropSource AI</h1>
           </div>
-          <CardTitle className="text-2xl">Create Customer Account</CardTitle>
+          <CardTitle className="text-2xl">Create an Account</CardTitle>
           <CardDescription>
-            Sign up to start logging your property demands.
+            Sign up as a customer or a property provider.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSignup}>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+                <Label>Account Type</Label>
+                <RadioGroup
+                    defaultValue="User"
+                    className="grid grid-cols-2 gap-4"
+                    onValueChange={handleRoleChange}
+                    value={formData.role}
+                >
+                    <div>
+                    <RadioGroupItem value="User" id="role-user" className="peer sr-only" />
+                    <Label
+                        htmlFor="role-user"
+                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                    >
+                        Demand Customer
+                    </Label>
+                    </div>
+                    <div>
+                    <RadioGroupItem
+                        value="SuperAdmin"
+                        id="role-provider"
+                        className="peer sr-only"
+                    />
+                    <Label
+                        htmlFor="role-provider"
+                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                    >
+                        Property Provider
+                    </Label>
+                    </div>
+                </RadioGroup>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="companyName">Company Name</Label>

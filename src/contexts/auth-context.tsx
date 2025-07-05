@@ -11,7 +11,8 @@ type User = {
   phone: string;
 };
 
-export type NewUser = Omit<User, 'role'>;
+// NewUser now includes the role, as the signup form will determine it.
+export type NewUser = User;
 
 type AuthContextType = {
   user: User | null;
@@ -23,18 +24,36 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// In a real app, this would be a database.
-const hardcodedUsers: { [email: string]: User } = {
+const defaultUsers: { [email: string]: User } = {
   'admin@example.com': { email: 'admin@example.com', role: 'SuperAdmin', companyName: 'PropSource', userName: 'Admin', phone: 'N/A' },
   'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test User', phone: '555-123-4567' },
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<{ [email: string]: User }>({});
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
+    let storedUsers;
+    try {
+      // Use localStorage to persist user accounts across sessions
+      const usersFromStorage = localStorage.getItem('propsource_users');
+      storedUsers = usersFromStorage ? JSON.parse(usersFromStorage) : {};
+    } catch (e) {
+      console.error("Could not parse users from localStorage", e);
+      storedUsers = {};
+    }
+
+    if (Object.keys(storedUsers).length === 0) {
+      // If no users in storage, initialize with defaults
+      localStorage.setItem('propsource_users', JSON.stringify(defaultUsers));
+      setUsers(defaultUsers);
+    } else {
+      setUsers(storedUsers);
+    }
+
     // Check for a logged-in user in session storage on initial load
     try {
       const storedUser = sessionStorage.getItem('user');
@@ -50,35 +69,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (email: string) => {
-    const foundUser = hardcodedUsers[email.toLowerCase()];
+    const foundUser = users[email.toLowerCase()];
     if (foundUser) {
       setUser(foundUser);
       sessionStorage.setItem('user', JSON.stringify(foundUser));
       router.push('/dashboard');
     } else {
-      alert('Invalid credentials. Please sign up or use a test account.');
+      alert('This email is not registered. Please sign up.');
     }
   };
 
   const signup = (details: NewUser) => {
-    if (hardcodedUsers[details.email.toLowerCase()]) {
+    if (users[details.email.toLowerCase()]) {
       alert("An account with this email already exists. Please log in.");
       return;
     }
-    const newUser: User = { ...details, role: 'User' };
     
-    // Simulate saving the new user
-    hardcodedUsers[newUser.email.toLowerCase()] = newUser;
+    const newUsers = { ...users, [details.email.toLowerCase()]: details };
+    setUsers(newUsers);
+    localStorage.setItem('propsource_users', JSON.stringify(newUsers));
 
     // Log the new user in
-    setUser(newUser);
-    sessionStorage.setItem('user', JSON.stringify(newUser));
+    setUser(details);
+    sessionStorage.setItem('user', JSON.stringify(details));
     router.push('/dashboard');
   }
 
   const logout = () => {
     setUser(null);
     sessionStorage.removeItem('user');
+    localStorage.removeItem('propsource_users'); // For a clean logout, you might want to clear this
     router.push('/');
   };
 
