@@ -220,7 +220,7 @@ export function DemandForm() {
                         </div>
                       </div>
                       <div className="absolute bottom-2 right-2 bg-background/80 p-1.5 rounded-md text-xs text-muted-foreground">
-                          Map functionality coming soon
+                          Add Google Maps API key to enable map
                       </div>
                     </div>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
