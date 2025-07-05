@@ -6,38 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { List, MapPin, Box, ArrowRight } from 'lucide-react';
+import { mockDemands } from '@/lib/mock-data';
 
-// Mock data until a database is connected
-const mockDemands = [
-  {
-    demandId: 'ACME-1689345',
-    propertyType: 'Warehouse',
-    location: 'Mumbai, India',
-    size: '100,000 Sq. Ft.',
-    description: 'Urgent requirement for a large warehouse with high ceilings and 10+ docks near the port.',
-  },
-  {
-    demandId: 'TECHCORP-1689346',
-    propertyType: 'Office Space',
-    location: 'Bangalore, India',
-    size: '25,000 Sq. Ft.',
-    description: 'A-grade office building with modern amenities, good connectivity, and parking for 50 cars.',
-  },
-  {
-    demandId: 'RETAILCO-1689347',
-    propertyType: 'Retail Showroom',
-    location: 'Delhi, India',
-    size: '5,000 Sq. Ft.',
-    description: 'High-street retail location with heavy footfall, large glass frontage, and high visibility.',
-  },
-    {
-    demandId: 'GLOBAL-1689348',
-    propertyType: 'Industrial Building',
-    location: 'Chennai, India',
-    size: '250,000 Sq. Ft.',
-    description: 'Industrial facility for manufacturing, requiring heavy power load and effluent treatment plant.',
-  },
-];
 
 export function DemandList() {
   const router = useRouter();

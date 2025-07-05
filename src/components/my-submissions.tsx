@@ -9,54 +9,10 @@ import {
 } from "@/components/ui/accordion"
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Briefcase, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { Briefcase, CheckCircle2, Clock, XCircle, Percent } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { mockSubmissions, type SubmissionStatus } from '@/lib/mock-data';
 
-type SubmissionStatus = "Pending" | "Shortlisted" | "Rejected";
-
-const mockSubmissions = [
-    {
-        demandId: 'TECHCORP-1689346',
-        demandDetails: {
-          propertyType: 'Office Space',
-          location: 'Bangalore, India',
-        },
-        properties: [
-          {
-            propertyId: 'PS-12345',
-            propertyName: 'Prestige Tech Park',
-            status: 'Shortlisted' as SubmissionStatus,
-          },
-          {
-            propertyId: 'PS-67890',
-            propertyName: 'Global Tech Village',
-            status: 'Pending' as SubmissionStatus,
-          },
-        ],
-    },
-    {
-        demandId: 'ACME-1689345',
-        demandDetails: {
-          propertyType: 'Warehouse',
-          location: 'Mumbai, India',
-        },
-        properties: [
-          {
-            propertyId: 'PS-ABCDE',
-            propertyName: 'Industrial Unit, Guindy',
-            status: 'Rejected' as SubmissionStatus,
-          },
-        ],
-    },
-    {
-        demandId: 'RETAILCO-1689347',
-        demandDetails: {
-            propertyType: 'Retail Showroom',
-            location: 'Delhi, India',
-        },
-        properties: [],
-    }
-];
 
 const StatusIndicator = ({ status }: { status: SubmissionStatus }) => {
     const statusConfig = {
@@ -104,12 +60,20 @@ export function MySubmissions() {
                         {submission.properties.length > 0 ? (
                             <div className="space-y-4">
                                 {submission.properties.map(property => (
-                                    <Card key={property.propertyId} className="flex items-center justify-between p-4">
+                                    <Card key={property.propertyId} className="flex items-center justify-between p-4 flex-wrap gap-2">
                                         <div>
                                             <p className="font-semibold">{property.propertyName}</p>
                                             <p className="text-sm text-muted-foreground">Property ID: {property.propertyId}</p>
                                         </div>
-                                        <StatusIndicator status={property.status} />
+                                        <div className="flex items-center gap-4">
+                                            {property.matchScore && (
+                                              <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                                                <Percent className="w-4 h-4" />
+                                                <span>{(property.matchScore * 100).toFixed(0)}% Match</span>
+                                              </div>
+                                            )}
+                                            <StatusIndicator status={property.status} />
+                                        </div>
                                     </Card>
                                 ))}
                             </div>

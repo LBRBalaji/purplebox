@@ -11,6 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,8 +40,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { logAndImproveDemandAction } from "@/lib/actions";
-import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send } from 'lucide-react';
+import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send, Star } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
+import { Switch } from "./ui/switch";
 
 export function DemandForm() {
   const { toast } = useToast();
@@ -62,7 +64,12 @@ export function DemandForm() {
       location: "",
       radius: "",
       size: "",
-      description: ""
+      description: "",
+      preferences: {
+        isPropertyTypeNonCompromisable: false,
+        isSizeNonCompromisable: false,
+        isLocationNonCompromisable: false,
+      }
     },
   });
 
@@ -230,6 +237,42 @@ export function DemandForm() {
                   <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Star className="w-5 h-5 text-primary" /> Requirement Priorities</CardTitle>
+                  <CardDescription>Set your non-negotiable requirements.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField control={form.control} name="preferences.isPropertyTypeNonCompromisable" render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>Property Type</FormLabel>
+                        <FormDescription>Must match exactly.</FormDescription>
+                      </div>
+                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="preferences.isSizeNonCompromisable" render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>Size</FormLabel>
+                        <FormDescription>Must be very close to what is required.</FormDescription>
+                      </div>
+                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="preferences.isLocationNonCompromisable" render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>Location & Radius</FormLabel>
+                        <FormDescription>Must be within the specified area.</FormDescription>
+                      </div>
+                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                    </FormItem>
+                  )} />
+                </CardContent>
+              </Card>
               
               <Card>
                   <CardHeader><CardTitle className="flex items-center gap-2"><Share2 className="w-5 h-5 text-primary" /> Share Demand</CardTitle></CardHeader>
@@ -252,7 +295,7 @@ export function DemandForm() {
               ) : (
                 <>
                   <Send className="mr-2 h-4 w-4" />
-                  Submit Match
+                  Submit Demand
                 </>
               )}
             </Button>

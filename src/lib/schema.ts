@@ -51,6 +51,11 @@ export const demandSchema = z.object({
   radius: z.string().min(1, 'Radius is required.').regex(/^\d+(\.\d+)?$/, "Radius must be a number."),
   size: z.string().min(1, 'Size is required.'),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
+  preferences: z.object({
+    isPropertyTypeNonCompromisable: z.boolean().default(false),
+    isSizeNonCompromisable: z.boolean().default(false),
+    isLocationNonCompromisable: z.boolean().default(false),
+  }).default({}),
 });
 
 export type DemandSchema = z.infer<typeof demandSchema>;

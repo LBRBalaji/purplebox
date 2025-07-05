@@ -40,18 +40,24 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema } from "@/lib/schema";
-import { generateDescriptionAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles } from 'lucide-react';
+import { generateDescriptionAction, getPropertyMatchScoreAction } from "@/lib/actions";
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
+import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
+import { Progress } from "./ui/progress";
 
+
+type AiResult = {
+  description?: string;
+  matchResult?: GetPropertyMatchScoreOutput;
+}
 
 export function PropertyForm() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = React.useState(false);
-  const [generatedDescription, setGeneratedDescription] = React.useState("");
+  const [aiResult, setAiResult] = React.useState<AiResult | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [propertyId, setPropertyId] = React.useState("");
   const [isCopied, setIsCopied] = React.useState(false);
 
   const form = useForm<PropertySchema>({
@@ -86,20 +92,18 @@ export function PropertyForm() {
     },
   });
 
-  const o2oDealDemandIdValue = form.watch('o2oDealDemandId');
+  const demandIdFromUrl = searchParams.get('demandId');
 
   React.useEffect(() => {
     const newId = `PS-${Date.now()}`;
-    setPropertyId(newId);
     form.setValue("propertyId", newId);
   }, [form]);
 
   React.useEffect(() => {
-    const demandIdFromUrl = searchParams.get('demandId');
     if (demandIdFromUrl) {
       form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
     }
-  }, [searchParams, form]);
+  }, [searchParams, form, demandIdFromUrl]);
 
 
   const handleGetLocation = () => {
@@ -136,18 +140,26 @@ export function PropertyForm() {
 
   async function onSubmit(data: PropertySchema) {
     setIsLoading(true);
+    setAiResult(null);
     try {
-      const result = await generateDescriptionAction(data);
-      if (result.error) {
-        throw new Error(result.error);
+      let result;
+      if (data.o2oDealDemandId) {
+        // Matching flow
+        result = await getPropertyMatchScoreAction(data);
+        if (result.error) throw new Error(result.error);
+        setAiResult({ matchResult: result.result });
+      } else {
+        // Description generation flow
+        result = await generateDescriptionAction(data);
+        if (result.error) throw new Error(result.error);
+        setAiResult({ description: result.description });
       }
-      setGeneratedDescription(result.description || "No description generated.");
       setIsDialogOpen(true);
     } catch (error) {
       const e = error as Error;
       toast({
         variant: "destructive",
-        title: "Generation Failed",
+        title: "Action Failed",
         description: e.message,
       });
     } finally {
@@ -156,10 +168,14 @@ export function PropertyForm() {
   }
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(generatedDescription);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    if (aiResult?.description) {
+      navigator.clipboard.writeText(aiResult.description);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
   };
+
+  const isMatchingMode = !!demandIdFromUrl;
 
   return (
     <>
@@ -278,7 +294,7 @@ export function PropertyForm() {
                       <FormItem>
                         <FormLabel>O2O Deal Demand ID</FormLabel>
                         <FormControl>
-                          <Input {...field} readOnly={!!o2oDealDemandIdValue} />
+                          <Input {...field} readOnly />
                         </FormControl>
                         <FormDescription>
                           This is pre-filled when you submit a match.
@@ -313,7 +329,12 @@ export function PropertyForm() {
               {isLoading ? (
                 <>
                   <Sparkles className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
+                  {isMatchingMode ? 'Analyzing...' : 'Generating...'}
+                </>
+              ) : isMatchingMode ? (
+                <>
+                  <Wand className="mr-2 h-4 w-4" />
+                  Calculate Match Score
                 </>
               ) : (
                 <>
@@ -327,32 +348,81 @@ export function PropertyForm() {
       </Form>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
-            <DialogHeader>
-                <DialogTitle>AI-Generated Property Description</DialogTitle>
-                <DialogDescription>
-                    Here is the description generated by AI based on the details you provided. You can copy it for your listings.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="relative mt-4">
-              {isLoading ? (
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
+           {isMatchingMode ? (
+              <>
+                <DialogHeader>
+                  <DialogTitle>AI Property Match Analysis</DialogTitle>
+                  <DialogDescription>
+                    Here is the AI-generated match score for the property against the demand.
+                  </DialogDescription>
+                </DialogHeader>
+                {isLoading || !aiResult?.matchResult ? (
+                  <div className="space-y-4 mt-4">
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                ) : (
+                  <div className="space-y-4 mt-4">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">Overall Match Score</p>
+                      <p className="text-6xl font-bold text-primary">{(aiResult.matchResult.overallScore * 100).toFixed(0)}%</p>
+                      <Progress value={aiResult.matchResult.overallScore * 100} className="h-2 mt-2" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p className="font-semibold">Location</p>
+                            <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.location * 100).toFixed(0)}%</p>
+                        </div>
+                        <div>
+                            <p className="font-semibold">Size</p>
+                            <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.size * 100).toFixed(0)}%</p>
+                        </div>
+                        <div>
+                            <p className="font-semibold">Features</p>
+                            <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.features * 100).toFixed(0)}%</p>
+                        </div>
+                    </div>
+                    <div>
+                        <p className="font-semibold text-sm">Justification</p>
+                        <p className="text-sm text-muted-foreground bg-secondary p-3 rounded-md mt-1">
+                          {aiResult.matchResult.justification}
+                        </p>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <DialogHeader>
+                    <DialogTitle>AI-Generated Property Description</DialogTitle>
+                    <DialogDescription>
+                        Here is the description generated by AI. You can copy it for your listings.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="relative mt-4">
+                  {isLoading ? (
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  ) : (
+                    <>
+                      <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={handleCopy}>
+                        {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                      <p className="text-sm text-muted-foreground bg-secondary p-4 rounded-md whitespace-pre-wrap min-h-[150px]">
+                          {aiResult?.description}
+                      </p>
+                    </>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={handleCopy}>
-                    {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                  <p className="text-sm text-muted-foreground bg-secondary p-4 rounded-md whitespace-pre-wrap min-h-[150px]">
-                      {generatedDescription}
-                  </p>
-                </>
-              )}
-            </div>
+              </>
+            )}
             <DialogFooter>
-                <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Close</Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>

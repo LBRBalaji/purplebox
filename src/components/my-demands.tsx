@@ -7,47 +7,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, MessageSquare } from 'lucide-react';
+import { Star, MessageSquare, Percent } from 'lucide-react';
 import Image from 'next/image';
-
-
-// Mock data for demands created by the user
-const myDemands = [
-  {
-    demandId: 'TECHCORP-1689346',
-    propertyType: 'Office Space',
-    location: 'Bangalore, India',
-    size: '25,000 Sq. Ft.',
-    matches: [
-      {
-        propertyId: 'PS-12345',
-        propertyName: 'Prestige Tech Park',
-        size: '26,000 Sq. Ft.',
-        rent: '₹85/sft',
-        image: 'https://placehold.co/600x400.png',
-        dataAiHint: 'modern office',
-      },
-      {
-        propertyId: 'PS-67890',
-        propertyName: 'Global Tech Village',
-        size: '24,500 Sq. Ft.',
-        rent: '₹80/sft',
-        image: 'https://placehold.co/600x400.png',
-        dataAiHint: 'corporate building',
-      }
-    ],
-  },
-  {
-    demandId: 'MYCOMPANY-1689349',
-    propertyType: 'Warehouse',
-    location: 'Chennai, India',
-    size: '50,000 Sq. Ft.',
-    matches: [],
-  },
-];
+import { myDemands } from '@/lib/mock-data';
+import { Progress } from './ui/progress';
 
 export function MyDemands() {
   return (
@@ -80,15 +46,25 @@ export function MyDemands() {
                           <Image src={match.image} alt={match.propertyName} data-ai-hint={match.dataAiHint} fill className="object-cover" />
                         </div>
                         <CardTitle>{match.propertyName}</CardTitle>
+                        <CardDescription>
+                          <div className="flex items-center gap-2 text-primary font-semibold">
+                            <Percent className="w-4 h-4" /> 
+                            <span>{(match.matchScore * 100).toFixed(0)}% Match</span>
+                          </div>
+                        </CardDescription>
                       </CardHeader>
-                      <CardContent className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">Size</p>
-                          <p className="font-medium">{match.size}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Rent</p>
-                          <p className="font-medium">{match.rent}</p>
+                      <CardContent className="space-y-4">
+                        <Progress value={match.matchScore * 100} className="h-2" />
+                        <p className="text-xs text-muted-foreground italic">{match.justification}</p>
+                        <div className="grid grid-cols-2 gap-4 text-sm pt-2">
+                          <div>
+                            <p className="text-muted-foreground">Size</p>
+                            <p className="font-medium">{match.size}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Rent</p>
+                            <p className="font-medium">{match.rent}</p>
+                          </div>
                         </div>
                       </CardContent>
                       <CardFooter className="gap-2">
