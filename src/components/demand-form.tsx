@@ -156,7 +156,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     const text = `*Property Demand Alert!* 📣\n\n*Demand ID:* ${data.demandId}\n*Looking for:* ${data.propertyType}\n*Size:* ${data.size} Sq. Ft.\n*Location:* Near ${data.location} (within a ${data.radius} km radius)\n\n*Description:* ${data.description || 'Details available upon request.'}`;
 
     const shareData = {
-      title: `Origin Depot Demand: ${data.propertyType} in ${data.location}`,
+      title: `WareHouse Origin Demand: ${data.propertyType} in ${data.location}`,
       text: text,
       url: window.location.href,
     };

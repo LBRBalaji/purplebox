@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -28,7 +29,7 @@ export default function LoginPage() {
                 <Building className="h-10 w-10 text-primary" />
                 <Sparkles className="h-5 w-5 text-accent absolute -top-2 -right-2" />
               </div>
-              <h1 className="text-3xl font-bold font-headline text-primary">Origin Depot</h1>
+              <h1 className="text-3xl font-bold font-headline text-primary">WareHouse Origin</h1>
             </div>
             <p className="text-xs text-muted-foreground mt-1">Lease Properties, Sourced On Demand</p>
           </div>
