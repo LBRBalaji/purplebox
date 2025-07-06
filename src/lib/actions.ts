@@ -5,8 +5,6 @@ import { generatePropertyDescription, type GeneratePropertyDescriptionInput } fr
 import { improvePropertyDemandDescription, type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-property-demand";
 import { getPropertyMatchScore, type GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { type PropertySchema, type DemandSchema } from "./schema";
-import { mockDemands } from "./mock-data";
-
 
 export async function generateDescriptionAction(
   data: PropertySchema
@@ -51,26 +49,30 @@ export async function generateDescriptionAction(
   }
 }
 
-export async function logAndImproveDemandAction(
-  data: DemandSchema
-): Promise<{ demand?: DemandSchema, improvedDescription?: string; error?: string }> {
+export async function getImprovedDemandDescriptionAction(
+  input: ImprovePropertyDemandDescriptionInput
+): Promise<{ improvedDescription?: string; error?: string }> {
   try {
-    const input: ImprovePropertyDemandDescriptionInput = {
-      description: data.description,
-      propertyType: data.propertyType,
-      location: data.location,
-      size: String(data.size),
-      readiness: data.readiness,
-      additionalDetails: "", // Can be extended later
-    };
-
     const result = await improvePropertyDemandDescription(input);
-    
-    return { demand: data, improvedDescription: result.improvedDescription };
+    return { improvedDescription: result.improvedDescription };
   } catch (error) {
     console.error("Error improving demand description:", error);
     const e = error as Error;
     return { error: e.message || "An unexpected error occurred while improving the description." };
+  }
+}
+
+export async function logDemandAction(
+  data: DemandSchema
+): Promise<{ demand?: DemandSchema; error?: string }> {
+  try {
+    // In a real app, you'd save `data` to a database here.
+    // For this mock app, we just return the data to be added to the client-side state.
+    return { demand: data };
+  } catch (error) {
+    console.error("Error logging demand:", error);
+    const e = error as Error;
+    return { error: e.message || "An unexpected error occurred while logging the demand." };
   }
 }
 

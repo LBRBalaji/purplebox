@@ -2,7 +2,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldPath } from "react-hook-form";
 import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -45,12 +45,13 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
-import { logAndImproveDemandAction } from "@/lib/actions";
-import { User, Sparkles, Copy, Check, List, ChevronsUpDown, PlusCircle, ClipboardPlus } from 'lucide-react';
+import { getImprovedDemandDescriptionAction, logDemandAction } from "@/lib/actions";
+import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
 import { useData } from "@/contexts/data-context";
+import { type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-property-demand";
 
 const priorityItems = [
     { id: 'size', label: 'Size' },
@@ -69,10 +70,9 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   const { user } = useAuth();
   const { demands, addDemand, updateDemand } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isGenerating, setIsGenerating] = React.useState(false);
   const [demandId, setDemandId] = React.useState("");
-  const [improvedDescription, setImprovedDescription] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [isCopied, setIsCopied] = React.useState(false);
   
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -142,10 +142,52 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     }
   }, [isEditMode, editDemandId, demands, form]);
   
+  const handleGenerateDescription = async () => {
+    const fieldsToValidate: FieldPath<DemandSchema>[] = ['propertyType', 'location', 'radius', 'size'];
+    const isValid = await form.trigger(fieldsToValidate);
+    if (!isValid) {
+      toast({
+        variant: "destructive",
+        title: "Missing Information",
+        description: "Please fill in Property Type, Location, Radius, and Size before generating a description.",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const data = form.getValues();
+      const input: ImprovePropertyDemandDescriptionInput = {
+        description: data.description,
+        propertyType: data.propertyType!,
+        location: data.location,
+        size: String(data.size),
+        readiness: data.readiness,
+        additionalDetails: `Ceiling height: ${data.ceilingHeight || 'N/A'}, Docks: ${data.docks || 'N/A'}. Non-compromisable items: ${data.preferences?.nonCompromisable?.join(', ') || 'None'}.`,
+      };
+      const result = await getImprovedDemandDescriptionAction(input);
+      if (result.error || !result.improvedDescription) {
+        throw new Error(result.error || "Failed to generate description.");
+      }
+      form.setValue("description", result.improvedDescription, { shouldValidate: true });
+      toast({ title: "Description generated successfully!" });
+    } catch (error) {
+      const e = error as Error;
+      toast({
+        variant: "destructive",
+        title: "Generation Failed",
+        description: e.message,
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+
   async function onSubmit(data: DemandSchema) {
     setIsLoading(true);
     try {
-      const result = await logAndImproveDemandAction(data);
+      const result = await logDemandAction(data);
       if (result.error || !result.demand) {
         throw new Error(result.error || "Failed to get a valid response from the action.");
       }
@@ -156,13 +198,8 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
         addDemand(result.demand);
       }
 
-      setImprovedDescription(result.improvedDescription || "No description generated.");
       setIsDialogOpen(true);
-      toast({
-        title: isEditMode ? "Demand Updated!" : "Demand Logged & Improved!",
-        description: `Your demand (ID: ${data.demandId}) has been processed.`,
-      });
-
+      
       if (!isEditMode) {
         const userDetails = {
           companyName: user?.companyName,
@@ -190,13 +227,6 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       setIsLoading(false);
     }
   }
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(improvedDescription);
-    setIsCopied(true);
-    toast({ title: 'Description copied to clipboard!' });
-    setTimeout(() => setIsCopied(false), 2000);
-  };
 
   const handleViewMyDemands = () => {
     setIsDialogOpen(false);
@@ -317,7 +347,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                   {/* --- LEVEL 2: OPTIONAL --- */}
                   <Collapsible open={isOptionalOpen} onOpenChange={setIsOptionalOpen}>
                     <CollapsibleTrigger asChild>
-                      <Button variant="outline" className="w-full justify-between">
+                      <Button type="button" variant="outline" className="w-full justify-between">
                         <div className="flex items-center gap-2">
                            <PlusCircle className="h-4 w-4" />
                            {isOptionalOpen ? 'Hide Optional Details & Priorities' : 'Show Optional Details & Priorities'}
@@ -329,18 +359,37 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                       <div className="space-y-2">
                         <FormLabel className="text-base font-semibold text-primary">Optional Details & Priorities</FormLabel>
                         <div className="p-4 border rounded-lg space-y-6">
-                            <FormField
-                                control={form.control}
-                                name="description"
-                                render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Description</FormLabel>
-                                <FormControl>
-                                    <Textarea placeholder="e.g., 'We need a warehouse with high ceilings for storing equipment. Must be near the main highway and have at least 4 loading docks...'" className="min-h-[120px]" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )} />
+                            <div className="space-y-1">
+                                <div className="flex items-center justify-between gap-4">
+                                  <FormLabel>Description</FormLabel>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleGenerateDescription}
+                                    disabled={isGenerating || isLoading}
+                                    className="gap-2"
+                                  >
+                                    {isGenerating ? (
+                                      <Sparkles className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <Sparkles className="h-4 w-4" />
+                                    )}
+                                    Generate with AI
+                                  </Button>
+                                </div>
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                    <FormControl>
+                                        <Textarea placeholder="e.g., 'We need a warehouse with high ceilings for storing equipment. Must be near the main highway and have at least 4 loading docks...'" className="min-h-[120px]" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )} />
+                            </div>
                             <div className="space-y-3">
                                 <FormLabel>Requirement Priorities</FormLabel>
                                 <p className="text-sm text-muted-foreground">Select items that are non-negotiable and provide details. This helps the AI find you the most relevant properties.</p>
@@ -437,7 +486,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
             </div>
           </div>
           <div className="flex justify-end mt-8">
-            <Button type="submit" size="lg" disabled={isLoading}>
+            <Button type="submit" size="lg" disabled={isLoading || isGenerating}>
               {isLoading ? (
                 <>
                   <Sparkles className="mr-2 h-4 w-4 animate-spin" />
@@ -454,21 +503,13 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
         </form>
       </Form>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-md">
             <DialogHeader>
-                <DialogTitle>{isEditMode ? 'Demand Updated!' : 'Demand Logged & Improved!'}</DialogTitle>
+                <DialogTitle>{isEditMode ? 'Demand Updated!' : 'Demand Logged Successfully!'}</DialogTitle>
                 <DialogDescription>
-                    We've enhanced your demand description using AI. What would you like to do next?
+                    Your demand has been saved. What would you like to do next?
                 </DialogDescription>
             </DialogHeader>
-            <div className="relative mt-4">
-                  <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={handleCopy}>
-                    {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                  <p className="text-sm text-muted-foreground bg-secondary p-4 rounded-md whitespace-pre-wrap min-h-[150px]">
-                      {improvedDescription}
-                  </p>
-            </div>
             <DialogFooter className="sm:justify-end gap-2 pt-4">
                 <Button variant="outline" onClick={handleLogAnother}>
                   <ClipboardPlus className="mr-2 h-4 w-4" />
