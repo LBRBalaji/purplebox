@@ -46,7 +46,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { logAndImproveDemandAction } from "@/lib/actions";
-import { User, Share2, Sparkles, Copy, Check, Star, ClipboardPlus, List, ChevronsUpDown, PlusCircle } from 'lucide-react';
+import { User, Sparkles, Copy, Check, List, ChevronsUpDown, PlusCircle, ClipboardPlus } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
@@ -141,39 +141,6 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       }
     }
   }, [isEditMode, editDemandId, demands, form]);
-
-  const handleShare = async () => {
-    const data = form.getValues();
-    if (!data.propertyType || !data.size || !data.location || !data.radius) {
-        toast({
-            variant: "destructive",
-            title: "Cannot Share Yet",
-            description: "Please fill in all required demand details before sharing.",
-        });
-        return;
-    }
-
-    const text = `*Property Demand Alert!* 📣\n\n*Demand ID:* ${data.demandId}\n*Looking for:* ${data.propertyType}\n*Size:* ${data.size} Sq. Ft.\n*Location:* Near ${data.location} (within a ${data.radius} km radius)\n\n*Description:* ${data.description || 'Details available upon request.'}`;
-
-    const shareData = {
-      title: `WareHouse Origin Demand: ${data.propertyType} in ${data.location}`,
-      text: text,
-      url: window.location.href,
-    };
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-        toast({ title: 'Demand shared successfully!' });
-      } else {
-        await navigator.clipboard.writeText(`${shareData.text}\n\nView this demand: ${shareData.url}`);
-        toast({ title: 'Demand details copied to clipboard!' });
-      }
-    } catch (err) {
-      if ((err as Error).name !== 'AbortError') {
-        toast({ variant: "destructive", title: 'Error sharing', description: 'Could not share the demand.' });
-      }
-    }
-  };
   
   async function onSubmit(data: DemandSchema) {
     setIsLoading(true);
@@ -453,15 +420,6 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                   <FormField control={form.control} name="userPhone" render={({ field }) => (<FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
                 </CardContent>
-              </Card>
-              <Card>
-                  <CardHeader><CardTitle className="flex items-center gap-2"><Share2 className="w-5 h-5 text-primary" /> Share Demand</CardTitle></CardHeader>
-                  <CardContent className="flex items-center gap-2">
-                      <Button type="button" variant="outline" onClick={handleShare} className="w-full">
-                          <Share2 className="mr-2 h-4 w-4" />
-                          Share via Social Media
-                      </Button>
-                  </CardContent>
               </Card>
             </div>
           </div>
