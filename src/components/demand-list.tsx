@@ -3,14 +3,13 @@
 
 import * as React from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
@@ -27,7 +26,7 @@ export function DemandList() {
   const handleSubmitMatch = (demandId: string) => {
     router.push(`/dashboard?demandId=${demandId}`);
   };
-
+  
   const handleCirculateDemand = (demand: DemandSchema) => {
     let usersFromStorage;
     try {
@@ -86,53 +85,53 @@ WareHouse Origin
 
   return (
     <div className="mt-8">
-        <Card>
-            <CardHeader>
-                <CardTitle>Active Demands</CardTitle>
-                <CardDescription>Review new demands, circulate them to providers, or submit a match directly.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Demand ID</TableHead>
-                            <TableHead>Property Type</TableHead>
-                            <TableHead>Location</TableHead>
-                            <TableHead>Size (Sq. Ft.)</TableHead>
-                            <TableHead>Readiness</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {demands.length > 0 ? (
-                            demands.map((demand) => (
-                                <TableRow key={demand.demandId}>
-                                    <TableCell className="font-medium">{demand.demandId}</TableCell>
-                                    <TableCell><Badge variant="secondary">{demand.propertyType}</Badge></TableCell>
-                                    <TableCell>{demand.location}</TableCell>
-                                    <TableCell>{demand.size.toLocaleString()}</TableCell>
-                                    <TableCell>{demand.readiness}</TableCell>
-                                    <TableCell className="text-right space-x-2">
-                                        <Button onClick={() => handleCirculateDemand(demand)} variant="outline" size="sm">
-                                            <Mail className="mr-2 h-4 w-4" /> Circulate
-                                        </Button>
-                                        <Button onClick={() => handleSubmitMatch(demand.demandId)} size="sm">
-                                            Submit Match <ArrowRight className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                    No active demands.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </CardContent>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold font-headline tracking-tight">Active Demands</h2>
+        <p className="text-muted-foreground mt-2">Review new demands, circulate them to providers, or submit a match directly.</p>
+      </div>
+      {demands.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {demands.map((demand) => (
+            <Card key={demand.demandId}>
+              <CardHeader>
+                <CardTitle>{demand.demandId}</CardTitle>
+                <CardDescription>
+                  <Badge variant="secondary">{demand.propertyType}</Badge>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-sm">
+                  <p className="font-semibold">Location:</p>
+                  <p>{demand.location} (within {demand.radius}km)</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="font-semibold">Size:</p>
+                    <p>{demand.size.toLocaleString()} sq. ft.</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold">Readiness:</p>
+                    <p>{demand.readiness}</p>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex-col items-stretch gap-2">
+                <Button onClick={() => handleSubmitMatch(demand.demandId)}>
+                  Submit Match <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button onClick={() => handleCirculateDemand(demand)} variant="outline">
+                    <Mail className="mr-2 h-4 w-4" /> Circulate to Providers
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card className="text-center p-12">
+            <CardTitle>No Active Demands</CardTitle>
+            <CardDescription className="mt-2">New demands from customers will appear here.</CardDescription>
         </Card>
+      )}
     </div>
   );
 }
