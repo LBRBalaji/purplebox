@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { type DemandSchema, type PropertySchema } from '@/lib/schema';
 import { type GetPropertyMatchScoreOutput } from '@/ai/flows/get-property-match-score';
-import { mockDemands } from '@/lib/mock-data';
+import { mockDemands, mockSubmissions } from '@/lib/mock-data';
 
 export type Submission = {
     demandId: string;
@@ -24,7 +24,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [demands, setDemands] = useState<DemandSchema[]>(mockDemands as DemandSchema[]);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
 
   const addDemand = (demand: DemandSchema) => {
     setDemands((prev) => [...prev, demand]);
