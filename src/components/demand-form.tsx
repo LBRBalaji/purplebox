@@ -31,6 +31,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
     Dialog,
     DialogContent,
     DialogDescription,
@@ -41,7 +46,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { logAndImproveDemandAction } from "@/lib/actions";
-import { ClipboardList, User, MapPinned, Share2, Sparkles, Copy, Check, Info, Send, Star, ClipboardPlus, CalendarClock, List } from 'lucide-react';
+import { User, Share2, Sparkles, Copy, Check, Star, ClipboardPlus, List, ChevronsUpDown, PlusCircle } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
@@ -68,12 +73,14 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   const [improvedDescription, setImprovedDescription] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isCopied, setIsCopied] = React.useState(false);
-
+  
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const editDemandId = searchParams.get('editDemandId');
   const isEditMode = !!editDemandId;
+
+  const [isOptionalOpen, setIsOptionalOpen] = React.useState(isEditMode);
 
   const form = useForm<DemandSchema>({
     resolver: zodResolver(demandSchema),
@@ -101,7 +108,6 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
   React.useEffect(() => {
     if (user && !isEditMode) {
-      // Pre-fill user details from auth context, only on create mode
       form.reset({
         ...form.getValues(),
         companyName: user.companyName,
@@ -127,42 +133,42 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       if (demandToEdit) {
         form.reset(demandToEdit);
         setDemandId(demandToEdit.demandId);
+
+        const hasOptionalData = demandToEdit.ceilingHeight || demandToEdit.docks || demandToEdit.description || (demandToEdit.preferences?.nonCompromisable && demandToEdit.preferences.nonCompromisable.length > 0);
+        if (hasOptionalData) {
+            setIsOptionalOpen(true);
+        }
       }
     }
   }, [isEditMode, editDemandId, demands, form]);
 
   const handleShare = async () => {
     const data = form.getValues();
-    // Ensure all required fields for sharing are filled before proceeding
-    if (!data.propertyType || !data.size || !data.location || !data.radius || !data.description) {
+    if (!data.propertyType || !data.size || !data.location || !data.radius) {
         toast({
             variant: "destructive",
             title: "Cannot Share Yet",
-            description: "Please fill in all demand details before sharing.",
+            description: "Please fill in all required demand details before sharing.",
         });
         return;
     }
 
-    const text = `*Property Demand Alert!* 📣\n\n*Demand ID:* ${data.demandId}\n*Looking for:* ${data.propertyType}\n*Size:* ${data.size} Sq. Ft.\n*Location:* Near ${data.location} (within a ${data.radius} km radius)\n\n*Description:* ${data.description}`;
+    const text = `*Property Demand Alert!* 📣\n\n*Demand ID:* ${data.demandId}\n*Looking for:* ${data.propertyType}\n*Size:* ${data.size} Sq. Ft.\n*Location:* Near ${data.location} (within a ${data.radius} km radius)\n\n*Description:* ${data.description || 'Details available upon request.'}`;
 
     const shareData = {
       title: `DryAxs Demand: ${data.propertyType} in ${data.location}`,
       text: text,
-      url: window.location.href, // This URL will just point to the dashboard for now
+      url: window.location.href,
     };
     try {
-      // The Web Share API is mostly for mobile devices
       if (navigator.share) {
         await navigator.share(shareData);
         toast({ title: 'Demand shared successfully!' });
       } else {
-        // Fallback for desktop: copy to clipboard
         await navigator.clipboard.writeText(`${shareData.text}\n\nView this demand: ${shareData.url}`);
         toast({ title: 'Demand details copied to clipboard!' });
       }
     } catch (err) {
-      console.error('Sharing failed:', err);
-      // Don't show an error if user cancels the share dialog
       if ((err as Error).name !== 'AbortError') {
         toast({ variant: "destructive", title: 'Error sharing', description: 'Could not share the demand.' });
       }
@@ -233,7 +239,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
   const handleLogAnother = () => {
     setIsDialogOpen(false);
-    router.push('/dashboard', { scroll: false }); // Clear edit mode if it was active
+    router.push('/dashboard', { scroll: false });
     const userDetails = {
       companyName: user?.companyName,
       userName: user?.userName,
@@ -258,114 +264,182 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
             <div className="lg:col-span-2 space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><ClipboardList className="w-5 h-5 text-primary" /> Demand Details</CardTitle>
+                  <CardTitle>{isEditMode ? 'Edit Demand' : 'Log New Demand'}</CardTitle>
+                  <CardDescription>
+                    Fill in the required fields below. Add optional details for more accurate matches.
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <FormField control={form.control} name="demandId" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Demand ID</FormLabel>
-                        <FormControl><Input {...field} disabled /></FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField control={form.control} name="propertyType" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Property Required Type</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl><SelectTrigger><SelectValue placeholder="Select a property type" /></SelectTrigger></FormControl>
-                          <SelectContent>
-                            <SelectItem value="Industrial Building">Industrial Building</SelectItem>
-                            <SelectItem value="Warehouse">Warehouse</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                   <FormField control={form.control} name="size" render={({ field }) => (
-                      <FormItem>
-                          <FormLabel>Size Required (Sq. Ft.)</FormLabel>
-                          <FormControl><Input type="number" placeholder="e.g. 50000" {...field} /></FormControl>
-                          <FormMessage />
-                      </FormItem>
-                  )}
-                  />
-                  <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
-                      <FormItem>
-                          <FormLabel>Min. Ceiling Height (ft)</FormLabel>
-                          <FormControl><Input type="number" placeholder="e.g. 30" {...field} /></FormControl>
-                          <FormMessage />
-                      </FormItem>
-                  )}
-                  />
-                  <FormField control={form.control} name="docks" render={({ field }) => (
-                      <FormItem>
-                          <FormLabel>Min. Number of Docks</FormLabel>
-                          <FormControl><Input type="number" placeholder="e.g. 4" {...field} /></FormControl>
-                          <FormMessage />
-                      </FormItem>
-                  )}
-                  />
-                   <FormField control={form.control} name="readiness" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Readiness</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl><SelectTrigger><SelectValue placeholder="Select readiness" /></SelectTrigger></FormControl>
-                          <SelectContent>
-                            <SelectItem value="Immediate">Immediate</SelectItem>
-                            <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
-                            <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
-                            <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
-                            <SelectItem value="BTS">BTS (Build to Suit)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                  <CardHeader><CardTitle className="flex items-center gap-2"><Info className="w-5 h-5 text-primary" /> Demand Description</CardTitle></CardHeader>
-                  <CardContent>
-                      <FormField control={form.control} name="description" render={({ field }) => (
+                <CardContent className="space-y-6">
+                  {/* --- LEVEL 1: REQUIRED --- */}
+                  <div className="space-y-2">
+                    <FormLabel className="text-base font-semibold text-primary">Required Details</FormLabel>
+                    <div className="p-4 border rounded-lg space-y-6 bg-secondary/50">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <FormField control={form.control} name="demandId" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Demand ID</FormLabel>
+                              <FormControl><Input {...field} disabled /></FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField control={form.control} name="propertyType" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Property Type</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a type" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Industrial Building">Industrial Building</SelectItem>
+                                  <SelectItem value="Warehouse">Warehouse</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField control={form.control} name="size" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Size (Sq. Ft.)</FormLabel>
+                                <FormControl><Input type="number" placeholder="e.g. 50000" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                      </div>
+                      <div className="space-y-4">
+                        <FormLabel>Location</FormLabel>
+                        <DemandMapWrapper />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <FormField control={form.control} name="location" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Location Coordinates</FormLabel>
+                                <FormControl><Input placeholder="e.g. 13.0827, 80.2707" {...field} readOnly /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField control={form.control} name="radius" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Radius (km)</FormLabel>
+                                <FormControl><Input type="number" placeholder="e.g. 10" {...field} /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <FormField control={form.control} name="readiness" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Describe your requirements</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="e.g., 'We need a 50,000 sq ft warehouse with high ceilings for storing industrial equipment. Must be located within 10km of the main highway and have at least 4 loading docks...'" className="min-h-[120px]" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                  </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><MapPinned className="w-5 h-5 text-primary" /> Location</CardTitle>
-                  <CardDescription>Search for a location or click on the map, then specify the search radius.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <DemandMapWrapper />
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="location" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Location Coordinates</FormLabel>
-                          <FormControl><Input placeholder="e.g. 13.0827, 80.2707" {...field} readOnly /></FormControl>
+                          <FormLabel>Readiness</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select readiness" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                              <SelectItem value="Immediate">Immediate</SelectItem>
+                              <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
+                              <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
+                              <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
+                              <SelectItem value="BTS">BTS (Build to Suit)</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <FormField control={form.control} name="radius" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Radius (km)</FormLabel>
-                          <FormControl><Input type="number" placeholder="e.g. 10" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    </div>
                   </div>
+
+                  {/* --- LEVEL 2: OPTIONAL --- */}
+                  <Collapsible open={isOptionalOpen} onOpenChange={setIsOptionalOpen}>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="outline" className="w-full justify-between">
+                        <div className="flex items-center gap-2">
+                           <PlusCircle className="h-4 w-4" />
+                           {isOptionalOpen ? 'Hide Optional Details' : 'Show Optional Details'}
+                        </div>
+                        <ChevronsUpDown className="h-4 w-4" />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-4">
+                      <div className="space-y-2">
+                        <FormLabel className="text-base font-semibold text-primary">Optional Details</FormLabel>
+                        <div className="p-4 border rounded-lg space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Min. Ceiling Height (ft)</FormLabel>
+                                        <FormControl><Input type="number" placeholder="e.g. 30" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField control={form.control} name="docks" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Min. Number of Docks</FormLabel>
+                                        <FormControl><Input type="number" placeholder="e.g. 4" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                            </div>
+                            <FormField control={form.control} name="description" render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                    <Textarea placeholder="e.g., 'We need a warehouse with high ceilings for storing equipment. Must be near the main highway and have at least 4 loading docks...'" className="min-h-[120px]" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )} />
+                            <div className="space-y-3">
+                                <FormLabel>Requirement Priorities</FormLabel>
+                                <p className="text-sm text-muted-foreground">Select items that are non-negotiable. This helps the AI find you the most relevant properties.</p>
+                                <FormField
+                                    control={form.control}
+                                    name="preferences.nonCompromisable"
+                                    render={() => (
+                                    <FormItem className="space-y-3">
+                                        {priorityItems.map((item) => (
+                                        <FormField
+                                            key={item.id}
+                                            control={form.control}
+                                            name="preferences.nonCompromisable"
+                                            render={({ field }) => {
+                                            return (
+                                                <FormItem
+                                                key={item.id}
+                                                className="flex flex-row items-center space-x-3 space-y-0"
+                                                >
+                                                <FormControl>
+                                                    <Checkbox
+                                                    checked={field.value?.includes(item.id)}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentValue = field.value || [];
+                                                        return checked
+                                                        ? field.onChange([...currentValue, item.id])
+                                                        : field.onChange(
+                                                            currentValue.filter(
+                                                                (value) => value !== item.id
+                                                            )
+                                                            );
+                                                    }}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className="font-normal">
+                                                    {item.label}
+                                                </FormLabel>
+                                                </FormItem>
+                                            );
+                                            }}
+                                        />
+                                        ))}
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </CardContent>
               </Card>
             </div>
@@ -380,59 +454,6 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                   <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
                 </CardContent>
               </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Star className="w-5 h-5 text-primary" /> Requirement Priorities</CardTitle>
-                  <CardDescription>Select items that are non-negotiable for your demand. This helps the AI find you the most relevant properties. This section is mandatory.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <FormField
-                    control={form.control}
-                    name="preferences.nonCompromisable"
-                    render={() => (
-                      <FormItem className="space-y-3">
-                        {priorityItems.map((item) => (
-                          <FormField
-                            key={item.id}
-                            control={form.control}
-                            name="preferences.nonCompromisable"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={item.id}
-                                  className="flex flex-row items-center space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(item.id)}
-                                      onCheckedChange={(checked) => {
-                                        const currentValue = field.value || [];
-                                        return checked
-                                          ? field.onChange([...currentValue, item.id])
-                                          : field.onChange(
-                                              currentValue.filter(
-                                                (value) => value !== item.id
-                                              )
-                                            );
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal">
-                                    {item.label}
-                                  </FormLabel>
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-              
               <Card>
                   <CardHeader><CardTitle className="flex items-center gap-2"><Share2 className="w-5 h-5 text-primary" /> Share Demand</CardTitle></CardHeader>
                   <CardContent className="flex items-center gap-2">

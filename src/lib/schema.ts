@@ -66,9 +66,9 @@ export const demandSchema = z.object({
       .optional()
   ),
   readiness: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
-  description: z.string().min(10, 'Description must be at least 10 characters.'),
+  description: z.string().optional(),
   preferences: z.object({
-    nonCompromisable: z.array(z.string()).min(1, { message: "Please select at least one priority requirement." }),
+    nonCompromisable: z.array(z.string()).optional(),
   }),
 });
 

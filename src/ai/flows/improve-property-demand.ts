@@ -12,7 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const ImprovePropertyDemandDescriptionInputSchema = z.object({
-  description: z.string().describe('The original property demand description.'),
+  description: z.string().optional().describe('The original property demand description.'),
   propertyType: z.string().describe('The type of property (e.g., industrial, commercial).'),
   location: z.string().describe('The desired location of the property.'),
   size: z.string().describe('The desired size of the property (e.g., in square feet).'),
@@ -36,9 +36,14 @@ const prompt = ai.definePrompt({
   output: {schema: ImprovePropertyDemandDescriptionOutputSchema},
   prompt: `You are an expert real estate agent specializing in crafting compelling property demand descriptions.
 
+  {{#if description}}
   Improve the following property demand description to attract more potential matches. Focus on making the description more engaging, detailed, and professional, while accurately reflecting the provided information.
 
   Original Description: {{{description}}}
+  {{else}}
+  Create a compelling property demand description based on the following details. Make it engaging, detailed, and professional.
+  {{/if}}
+  
   Property Type: {{{propertyType}}}
   Location: {{{location}}}
   Size: {{{size}}}
