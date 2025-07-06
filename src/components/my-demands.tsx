@@ -138,11 +138,11 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                           </div>
                         </CardContent>
                         <CardFooter className="gap-2">
-                          <Button variant="outline" className="w-full" disabled>
-                            <Star className="mr-2 h-4 w-4" /> Shortlist (Soon)
+                          <Button variant="outline" className="w-full">
+                            <Star className="mr-2 h-4 w-4" /> Shortlist
                           </Button>
-                          <Button className="w-full" disabled>
-                            <MessageSquare className="mr-2 h-4 w-4" /> Chat (Soon)
+                          <Button className="w-full">
+                            <MessageSquare className="mr-2 h-4 w-4" /> Chat
                           </Button>
                         </CardFooter>
                       </Card>
