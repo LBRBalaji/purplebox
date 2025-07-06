@@ -1,3 +1,4 @@
+
 "use server";
 
 import { generatePropertyDescription, type GeneratePropertyDescriptionInput } from "@/ai/flows/generate-property-description";
@@ -58,7 +59,7 @@ export async function logAndImproveDemandAction(
       description: data.description,
       propertyType: data.propertyType,
       location: data.location,
-      size: data.size,
+      size: String(data.size),
       readiness: data.readiness,
       additionalDetails: "", // Can be extended later
     };
