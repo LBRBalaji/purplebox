@@ -19,6 +19,9 @@ import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import { type DemandSchema } from '@/lib/schema';
 import { type Submission } from '@/contexts/data-context';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from './ui/button';
+
 
 type DemandWithMatches = DemandSchema & {
   matches: Submission[];
@@ -41,13 +44,6 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
     }
   }, [demands, submissions, user]);
   
-  const handleEdit = (e: React.MouseEvent, demandId: string) => {
-    e.stopPropagation(); // Prevent accordion from toggling
-    router.push(`/dashboard?editDemandId=${demandId}`, { scroll: false });
-    onSwitchTab('log-demand');
-  };
-
-
   return (
     <div className="mt-8">
       <div className="mb-8">
@@ -64,9 +60,27 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                   <p className="text-sm text-muted-foreground">{demand.propertyType} - {demand.location}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                   <Button variant="outline" size="sm" onClick={(e) => handleEdit(e, demand.demandId)}>
-                    <Pencil className="mr-2 h-4 w-4" /> Edit
-                  </Button>
+                   <div
+                      role="button"
+                      aria-label={`Edit demand ${demand.demandId}`}
+                      tabIndex={0}
+                      className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/dashboard?editDemandId=${demand.demandId}`, { scroll: false });
+                        onSwitchTab('log-demand');
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          router.push(`/dashboard?editDemandId=${demand.demandId}`, { scroll: false });
+                          onSwitchTab('log-demand');
+                        }
+                      }}
+                    >
+                      <Pencil className="mr-2 h-4 w-4" /> Edit
+                    </div>
                   <Badge variant={demand.matches.length > 0 ? 'default' : 'secondary'}>
                     {demand.matches.length} {demand.matches.length === 1 ? 'Match' : 'Matches'}
                   </Badge>
