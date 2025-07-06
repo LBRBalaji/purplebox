@@ -13,7 +13,7 @@ export const propertySchema = z.object({
   rentPerSft: z.coerce.number({invalid_type_error: "Rent must be a number."}).positive('Rent must be positive.'),
   rentalSecurityDeposit: z.coerce.number({invalid_type_error: "Deposit must be a number."}).positive('Deposit must be positive.'),
 
-  userType: z.enum(['Developer', 'Agent', 'Owner']),
+  userType: z.enum(['Developer', 'Owner']),
   userName: z.string().min(1, 'User name is required.'),
   userCompanyName: z.string().min(1, 'Company name is required.'),
   o2oDealDemandId: z.string().optional(),
@@ -44,7 +44,7 @@ export const demandSchema = z.object({
   userName: z.string().min(1, 'User name is required.'),
   userEmail: z.string().email('Invalid email address.'),
   userPhone: z.string().min(1, 'Phone number is required.'),
-  propertyType: z.enum(['Industrial Building', 'Warehouse', 'Retail Showroom', 'Office Space'], {
+  propertyType: z.enum(['Industrial Building', 'Warehouse'], {
     required_error: "Property type is required.",
   }),
   location: z.string().min(1, 'Location is required.'),

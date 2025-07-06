@@ -276,8 +276,6 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                           <SelectContent>
                             <SelectItem value="Industrial Building">Industrial Building</SelectItem>
                             <SelectItem value="Warehouse">Warehouse</SelectItem>
-                            <SelectItem value="Retail Showroom">Retail Showroom</SelectItem>
-                            <SelectItem value="Office Space">Office Space</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

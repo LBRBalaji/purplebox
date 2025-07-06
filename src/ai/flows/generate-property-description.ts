@@ -24,7 +24,7 @@ const GeneratePropertyDescriptionInputSchema = z.object({
   ceilingHeight: z.number().describe('The ceiling height of the property.'),
   rentPerSft: z.number().describe('The rent per square foot.'),
   rentalSecurityDeposit: z.number().describe('The rental security deposit (number of months).'),
-  userType: z.enum(['Developer', 'Agent', 'Owner']).describe('The type of user submitting the property.'),
+  userType: z.enum(['Developer', 'Owner']).describe('The type of user submitting the property.'),
   userName: z.string().describe('The name of the user submitting the property.'),
   userCompanyName: z.string().describe('The company name of the user submitting the property.'),
   userPhoneNumber: z.string().describe('The phone number of the user submitting the property.'),

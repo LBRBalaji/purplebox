@@ -25,14 +25,14 @@ export const mockDemands = [
     companyName: 'TechCorp',
     userName: 'Jane Smith',
     userPhone: '123-456-7890',
-    propertyType: 'Office Space',
+    propertyType: 'Industrial Building',
     location: '13.0827, 80.2707',
     radius: 10,
     size: 25000,
     readiness: 'Within 90 Days',
-    ceilingHeight: 12,
-    docks: 0,
-    description: 'A-grade office building with modern amenities, good connectivity, and parking for 50 cars.',
+    ceilingHeight: 25,
+    docks: 4,
+    description: 'Need an industrial building for a light assembly line. Good connectivity is a must.',
     preferences: {
       nonCompromisable: ['location'],
     },
@@ -43,16 +43,16 @@ export const mockDemands = [
     companyName: 'RetailCo',
     userName: 'Peter Jones',
     userPhone: '123-456-7890',
-    propertyType: 'Retail Showroom',
+    propertyType: 'Warehouse',
     location: '28.6139, 77.2090',
-    radius: 5,
-    size: 5000,
+    radius: 15,
+    size: 15000,
     readiness: 'Immediate',
-    ceilingHeight: 15,
-    docks: 0,
-    description: 'High-street retail location with heavy footfall, large glass frontage, and high visibility.',
+    ceilingHeight: 20,
+    docks: 2,
+    description: 'Looking for a warehouse for e-commerce fulfillment in the city center. Must be ready for immediate occupation.',
     preferences: {
-      nonCompromisable: ['location', 'approvals'],
+      nonCompromisable: ['location', 'readiness'],
     },
   },
     {
@@ -79,7 +79,7 @@ export const mockDemands = [
 export const myDemands = [
   {
     demandId: 'TECHCORP-1689346',
-    propertyType: 'Office Space',
+    propertyType: 'Industrial Building',
     location: 'Bangalore, India',
     size: 25000,
     matches: [
@@ -119,7 +119,7 @@ export const mockSubmissions = [
     {
         demandId: 'TECHCORP-1689346',
         demandDetails: {
-          propertyType: 'Office Space',
+          propertyType: 'Industrial Building',
           location: 'Bangalore, India',
         },
         properties: [
@@ -155,7 +155,7 @@ export const mockSubmissions = [
     {
         demandId: 'RETAILCO-1689347',
         demandDetails: {
-            propertyType: 'Retail Showroom',
+            propertyType: 'Warehouse',
             location: 'Delhi, India',
         },
         properties: [],
