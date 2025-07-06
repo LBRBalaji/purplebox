@@ -25,7 +25,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const defaultUsers: { [email: string]: User } = {
-  'admin@example.com': { email: 'admin@example.com', role: 'SuperAdmin', companyName: 'DryAxs', userName: 'Admin', phone: 'N/A' },
+  'admin@example.com': { email: 'admin@example.com', role: 'SuperAdmin', companyName: 'Origin Depot', userName: 'Admin', phone: 'N/A' },
   'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test User', phone: '555-123-4567' },
 };
 
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let storedUsers;
     try {
       // Use localStorage to persist user accounts across sessions
-      const usersFromStorage = localStorage.getItem('dryaxs_users');
+      const usersFromStorage = localStorage.getItem('origindepot_users');
       storedUsers = usersFromStorage ? JSON.parse(usersFromStorage) : {};
     } catch (e) {
       console.error("Could not parse users from localStorage", e);
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Merge default users with stored users to ensure defaults are always available
     const mergedUsers = { ...defaultUsers, ...storedUsers };
     setUsers(mergedUsers);
-    localStorage.setItem('dryaxs_users', JSON.stringify(mergedUsers));
+    localStorage.setItem('origindepot_users', JSON.stringify(mergedUsers));
 
 
     // Check for a logged-in user in session storage on initial load
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     const newUsers = { ...users, [details.email.toLowerCase()]: details };
     setUsers(newUsers);
-    localStorage.setItem('dryaxs_users', JSON.stringify(newUsers));
+    localStorage.setItem('origindepot_users', JSON.stringify(newUsers));
 
     // Log the new user in
     setUser(details);
