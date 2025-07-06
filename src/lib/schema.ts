@@ -1,3 +1,4 @@
+
 import { z } from 'zod';
 
 export const propertySchema = z.object({
@@ -70,6 +71,22 @@ export const demandSchema = z.object({
   preferences: z.object({
     nonCompromisable: z.array(z.string()).optional(),
   }),
+}).refine(data => {
+    if (data.preferences?.nonCompromisable?.includes('ceilingHeight')) {
+        return data.ceilingHeight !== undefined && data.ceilingHeight > 0;
+    }
+    return true;
+}, {
+    message: "A value is required when 'Ceiling Height' is a priority.",
+    path: ['ceilingHeight'],
+}).refine(data => {
+    if (data.preferences?.nonCompromisable?.includes('docks')) {
+        return data.docks !== undefined && data.docks >= 0;
+    }
+    return true;
+}, {
+    message: "A value is required when 'Number of Docks' is a priority.",
+    path: ['docks'],
 });
 
 export type DemandSchema = z.infer<typeof demandSchema>;

@@ -320,34 +320,19 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                       <Button variant="outline" className="w-full justify-between">
                         <div className="flex items-center gap-2">
                            <PlusCircle className="h-4 w-4" />
-                           {isOptionalOpen ? 'Hide Optional Details' : 'Show Optional Details'}
+                           {isOptionalOpen ? 'Hide Optional Details & Priorities' : 'Show Optional Details & Priorities'}
                         </div>
                         <ChevronsUpDown className="h-4 w-4" />
                       </Button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-4">
                       <div className="space-y-2">
-                        <FormLabel className="text-base font-semibold text-primary">Optional Details</FormLabel>
+                        <FormLabel className="text-base font-semibold text-primary">Optional Details & Priorities</FormLabel>
                         <div className="p-4 border rounded-lg space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Min. Ceiling Height (ft)</FormLabel>
-                                        <FormControl><Input type="number" placeholder="e.g. 30" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField control={form.control} name="docks" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Min. Number of Docks</FormLabel>
-                                        <FormControl><Input type="number" placeholder="e.g. 4" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                            </div>
-                            <FormField control={form.control} name="description" render={({ field }) => (
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
                                 <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
@@ -358,48 +343,76 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                             )} />
                             <div className="space-y-3">
                                 <FormLabel>Requirement Priorities</FormLabel>
-                                <p className="text-sm text-muted-foreground">Select items that are non-negotiable. This helps the AI find you the most relevant properties.</p>
+                                <p className="text-sm text-muted-foreground">Select items that are non-negotiable and provide details. This helps the AI find you the most relevant properties.</p>
                                 <FormField
                                     control={form.control}
                                     name="preferences.nonCompromisable"
-                                    render={() => (
-                                    <FormItem className="space-y-3">
-                                        {priorityItems.map((item) => (
-                                        <FormField
-                                            key={item.id}
-                                            control={form.control}
-                                            name="preferences.nonCompromisable"
-                                            render={({ field }) => {
+                                    render={({ field }) => (
+                                    <div className="space-y-4 pt-2">
+                                        {priorityItems.map((item) => {
+                                            const isChecked = field.value?.includes(item.id);
                                             return (
-                                                <FormItem
-                                                key={item.id}
-                                                className="flex flex-row items-center space-x-3 space-y-0"
-                                                >
+                                            <div key={item.id} className="space-y-2">
+                                                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                                                 <FormControl>
                                                     <Checkbox
-                                                    checked={field.value?.includes(item.id)}
-                                                    onCheckedChange={(checked) => {
-                                                        const currentValue = field.value || [];
-                                                        return checked
-                                                        ? field.onChange([...currentValue, item.id])
-                                                        : field.onChange(
-                                                            currentValue.filter(
-                                                                (value) => value !== item.id
-                                                            )
-                                                            );
-                                                    }}
+                                                        checked={isChecked}
+                                                        onCheckedChange={(checked) => {
+                                                            const currentValue = field.value || [];
+                                                            const newValue = checked
+                                                                ? [...currentValue, item.id]
+                                                                : currentValue.filter((value) => value !== item.id);
+                                                            field.onChange(newValue);
+
+                                                            if (!checked) {
+                                                                if (item.id === 'ceilingHeight') {
+                                                                    form.setValue('ceilingHeight', undefined, { shouldValidate: true });
+                                                                }
+                                                                if (item.id === 'docks') {
+                                                                    form.setValue('docks', undefined, { shouldValidate: true });
+                                                                }
+                                                            }
+                                                        }}
                                                     />
                                                 </FormControl>
                                                 <FormLabel className="font-normal">
                                                     {item.label}
                                                 </FormLabel>
                                                 </FormItem>
+                                                
+                                                {isChecked && item.id === 'ceilingHeight' && (
+                                                    <div className="pl-8 pr-1">
+                                                        <FormField
+                                                            control={form.control}
+                                                            name="ceilingHeight"
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl><Input type="number" placeholder="Enter min ceiling height (ft)" {...field} /></FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {isChecked && item.id === 'docks' && (
+                                                    <div className="pl-8 pr-1">
+                                                        <FormField
+                                                            control={form.control}
+                                                            name="docks"
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl><Input type="number" placeholder="Enter min number of docks" {...field} /></FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
                                             );
-                                            }}
-                                        />
-                                        ))}
-                                        <FormMessage />
-                                    </FormItem>
+                                        })}
+                                        <FormMessage /> 
+                                    </div>
                                     )}
                                 />
                             </div>
