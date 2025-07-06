@@ -21,7 +21,7 @@ function Header() {
           </div>
           <div>
             <h1 className="text-xl font-bold font-headline text-primary">WareHouse Origin</h1>
-            <p className="text-xs text-muted-foreground">Lease Properties, Sourced On Demand</p>
+            <p className="text-xs text-muted-foreground">Sourcing Simplified</p>
           </div>
         </div>
         {user && (

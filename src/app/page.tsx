@@ -31,7 +31,7 @@ export default function LoginPage() {
               </div>
               <h1 className="text-3xl font-bold font-headline text-primary">WareHouse Origin</h1>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Lease Properties, Sourced On Demand</p>
+            <p className="text-xs text-muted-foreground mt-1">Sourcing Simplified</p>
           </div>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>

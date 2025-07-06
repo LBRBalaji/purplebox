@@ -6,8 +6,8 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { DataProvider } from '@/contexts/data-context';
 
 export const metadata: Metadata = {
-  title: 'WareHouse Origin: Lease Properties, Sourced On Demand',
-  description: 'Lease Properties, Sourced On Demand',
+  title: 'WareHouse Origin: Sourcing Simplified',
+  description: 'Sourcing Simplified',
 };
 
 export default function RootLayout({
