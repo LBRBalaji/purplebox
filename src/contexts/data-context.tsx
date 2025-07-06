@@ -18,6 +18,8 @@ type DataContextType = {
   updateDemand: (demand: DemandSchema) => void;
   submissions: Submission[];
   addSubmission: (submission: Submission) => void;
+  shortlistedItems: Submission[];
+  toggleShortlist: (submission: Submission) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -25,6 +27,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export function DataProvider({ children }: { children: ReactNode }) {
   const [demands, setDemands] = useState<DemandSchema[]>(mockDemands as DemandSchema[]);
   const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
+  const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
 
   const addDemand = (demand: DemandSchema) => {
     setDemands((prev) => [...prev, demand]);
@@ -42,8 +45,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setSubmissions((prev) => [...prev, submission]);
   };
 
+  const toggleShortlist = (submissionToToggle: Submission) => {
+    setShortlistedItems((prev) => {
+      const isShortlisted = prev.some(
+        (item) => item.property.propertyId === submissionToToggle.property.propertyId
+      );
+      if (isShortlisted) {
+        return prev.filter(
+          (item) => item.property.propertyId !== submissionToToggle.property.propertyId
+        );
+      } else {
+        return [...prev, submissionToToggle];
+      }
+    });
+  };
+
   return (
-    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission }}>
+    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, shortlistedItems, toggleShortlist }}>
       {children}
     </DataContext.Provider>
   );

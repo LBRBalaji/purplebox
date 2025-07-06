@@ -29,7 +29,7 @@ type DemandWithMatches = DemandSchema & {
 
 export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void }) {
   const { user } = useAuth();
-  const { demands, submissions } = useData();
+  const { demands, submissions, shortlistedItems, toggleShortlist } = useData();
   const [myDemandsWithMatches, setMyDemandsWithMatches] = React.useState<DemandWithMatches[]>([]);
   const router = useRouter();
 
@@ -44,6 +44,12 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
     }
   }, [demands, submissions, user]);
   
+  const handleChat = (match: Submission) => {
+    const subject = `Inquiry about Property ID: ${match.property.propertyId}`;
+    const body = `Hi ${match.property.userName},\n\nI'm interested in learning more about the property you submitted (ID: ${match.property.propertyId}) for my demand (ID: ${match.demandId}).\n\nPlease let me know when would be a good time to connect.\n\nThanks,\n${user?.userName}`;
+    window.location.href = `mailto:${match.property.userEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
   return (
     <div className="mt-8">
       <div className="mb-8">
@@ -109,7 +115,9 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
               <AccordionContent className="p-6 pt-4">
                 {demand.matches.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {demand.matches.map(match => (
+                    {demand.matches.map(match => {
+                      const isShortlisted = shortlistedItems.some(item => item.property.propertyId === match.property.propertyId);
+                      return (
                       <Card key={match.property.propertyId}>
                         <CardHeader>
                           <div className="aspect-video relative rounded-md overflow-hidden mb-4">
@@ -138,15 +146,20 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                           </div>
                         </CardContent>
                         <CardFooter className="gap-2">
-                          <Button variant="outline" className="w-full">
-                            <Star className="mr-2 h-4 w-4" /> Shortlist
+                          <Button 
+                            variant={isShortlisted ? "default" : "outline"}
+                            className="w-full"
+                            onClick={() => toggleShortlist(match)}
+                          >
+                            <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-current text-yellow-400")} /> 
+                            {isShortlisted ? 'Shortlisted' : 'Shortlist'}
                           </Button>
-                          <Button className="w-full">
+                          <Button className="w-full" onClick={() => handleChat(match)}>
                             <MessageSquare className="mr-2 h-4 w-4" /> Chat
                           </Button>
                         </CardFooter>
                       </Card>
-                    ))}
+                    )})}
                   </div>
                 ) : (
                   <div className="text-muted-foreground text-center py-8">

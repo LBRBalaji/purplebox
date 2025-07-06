@@ -9,10 +9,10 @@ import { DemandList } from "@/components/demand-list";
 import { MyDemands } from "@/components/my-demands";
 import { MySubmissions } from "@/components/my-submissions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { ShortlistedProperties } from '@/components/shortlisted-properties';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -62,17 +62,7 @@ export default function DashboardPage() {
               <MyDemands onSwitchTab={setUserActiveTab} />
             </TabsContent>
             <TabsContent value="shortlisted">
-              <div className="mt-8">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Shortlisted Properties</CardTitle>
-                        <CardDescription>Properties you shortlist will appear here. This feature is coming soon.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground text-center py-8">No shortlisted properties yet.</p>
-                    </CardContent>
-                </Card>
-              </div>
+              <ShortlistedProperties />
             </TabsContent>
           </Tabs>
         </div>
