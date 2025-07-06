@@ -230,7 +230,9 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
   const handleViewMyDemands = () => {
     setIsDialogOpen(false);
+    // This navigation clears any 'editDemandId' from the URL
     router.push('/dashboard', { scroll: false });
+    // This callback will switch the active tab in the parent component
     onDemandLogged();
   };
 

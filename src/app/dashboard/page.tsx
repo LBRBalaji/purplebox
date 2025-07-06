@@ -34,7 +34,8 @@ export default function DashboardPage() {
   }, [searchParams]);
 
   const onDemandUpserted = () => {
-    router.push('/dashboard');
+    // This function's sole responsibility is now to switch the tab.
+    // Navigation is handled within the form's dialog.
     setUserActiveTab('my-demands');
   };
 
