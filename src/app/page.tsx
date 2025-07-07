@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building, Sparkles, LogIn, UserCog, User as UserIcon } from 'lucide-react';
+import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Truck as TruckIcon } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -21,7 +21,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto flex flex-col items-center mb-4">
             <div className="flex items-center gap-2">
@@ -68,19 +68,25 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 w-full">
+            <div className="grid grid-cols-1 gap-4 w-full">
                 <Button type="button" variant="outline" onClick={() => login('admin@example.com')}>
                     <UserCog className="mr-2 h-4 w-4" />
                     Property Provider
                 </Button>
-                <Button type="button" variant="outline" onClick={() => login('user@example.com')}>
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    Demand Customer
-                </Button>
+                <div className="grid grid-cols-2 gap-4">
+                    <Button type="button" variant="outline" onClick={() => login('user@example.com')}>
+                        <UserIcon className="mr-2 h-4 w-4" />
+                        Customer
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => login('logistics.pro@example.com')}>
+                        <TruckIcon className="mr-2 h-4 w-4" />
+                        Logistics Pro
+                    </Button>
+                </div>
             </div>
 
             <div className="text-sm text-center text-muted-foreground pt-2">
-                Don&apos;t have a customer account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link href="/signup" className="underline text-primary">
                     Sign Up
                 </Link>
