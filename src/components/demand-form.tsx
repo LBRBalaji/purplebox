@@ -104,7 +104,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     },
   });
 
-  const companyNameValue = form.watch("companyName");
+  const watchedDemandId = form.watch("demandId");
 
   React.useEffect(() => {
     if (user && !isEditMode) {
@@ -119,13 +119,13 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   }, [user, form, isEditMode]);
 
   React.useEffect(() => {
-    if (companyNameValue && !isEditMode) {
-      const companyPart = (companyNameValue.split(" ")[0] || "DEMAND").toUpperCase();
-      const newId = `${companyPart}-${Date.now()}`;
-      setDemandId(newId);
-      form.setValue("demandId", newId);
+    // Generate an ID for a new demand if one doesn't exist
+    if (!isEditMode && !watchedDemandId) {
+        const newId = `DMD-${Date.now()}`;
+        setDemandId(newId);
+        form.setValue("demandId", newId);
     }
-  }, [companyNameValue, form, isEditMode]);
+  }, [isEditMode, watchedDemandId, form]);
 
   React.useEffect(() => {
     if (isEditMode) {

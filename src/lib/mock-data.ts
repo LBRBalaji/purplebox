@@ -1,8 +1,9 @@
+
 export type SubmissionStatus = "Pending" | "Shortlisted" | "Rejected";
 
 export const mockDemands = [
   {
-    demandId: 'ACME-1689345',
+    demandId: 'DMD-1700000000001',
     userEmail: 'user@example.com',
     companyName: 'ACME Corp',
     userName: 'John Doe',
@@ -20,7 +21,7 @@ export const mockDemands = [
     },
   },
   {
-    demandId: 'TECHCORP-1689346',
+    demandId: 'DMD-1700000000002',
     userEmail: 'user@example.com',
     companyName: 'TechCorp',
     userName: 'Jane Smith',
@@ -38,7 +39,7 @@ export const mockDemands = [
     },
   },
   {
-    demandId: 'RETAILCO-1689347',
+    demandId: 'DMD-1700000000003',
     userEmail: 'anotheruser@example.com',
     companyName: 'RetailCo',
     userName: 'Peter Jones',
@@ -56,7 +57,7 @@ export const mockDemands = [
     },
   },
     {
-    demandId: 'GLOBAL-1689348',
+    demandId: 'DMD-1700000000004',
     userEmail: 'anotheruser@example.com',
     companyName: 'Global Industries',
     userName: 'Mary Williams',
@@ -78,7 +79,7 @@ export const mockDemands = [
 
 export const mockSubmissions = [
   {
-    demandId: 'ACME-1689345',
+    demandId: 'DMD-1700000000001',
     property: {
       propertyId: 'PS-ACME-001',
       propertyGeoLocation: '12.9716, 77.5946',
@@ -95,7 +96,7 @@ export const mockSubmissions = [
       userCompanyName: 'Origin Depot Properties',
       userPhoneNumber: 'N/A',
       userEmail: 'admin@example.com',
-      o2oDealDemandId: 'ACME-1689345',
+      o2oDealDemandId: 'DMD-1700000000001',
       approvalStatus: 'Obtained',
       approvalAuthority: 'BDA',
       installedCapacity: '500 kva',
@@ -118,7 +119,7 @@ export const mockSubmissions = [
     },
   },
   {
-    demandId: 'ACME-1689345',
+    demandId: 'DMD-1700000000001',
     property: {
       propertyId: 'PS-ACME-002',
       propertyGeoLocation: '12.9716, 77.5946',
@@ -135,7 +136,7 @@ export const mockSubmissions = [
       userCompanyName: 'Value Warehousing',
       userPhoneNumber: 'N/A',
       userEmail: 'someowner@example.com',
-      o2oDealDemandId: 'ACME-1689345',
+      o2oDealDemandId: 'DMD-1700000000001',
       approvalStatus: 'Obtained',
       approvalAuthority: 'BDA',
       installedCapacity: '400 kva',
@@ -158,7 +159,7 @@ export const mockSubmissions = [
     },
   },
     {
-    demandId: 'TECHCORP-1689346',
+    demandId: 'DMD-1700000000002',
     property: {
       propertyId: 'PS-TECH-001',
       propertyGeoLocation: '13.1986, 77.7066',
@@ -175,7 +176,7 @@ export const mockSubmissions = [
       userCompanyName: 'Origin Depot Properties',
       userPhoneNumber: 'N/A',
       userEmail: 'admin@example.com',
-      o2oDealDemandId: 'TECHCORP-1689346',
+      o2oDealDemandId: 'DMD-1700000000002',
       approvalStatus: 'Obtained',
       approvalAuthority: 'CMDA',
       installedCapacity: '200 kva',
