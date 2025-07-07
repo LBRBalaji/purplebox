@@ -35,9 +35,9 @@ export function ShortlistedProperties() {
                   <Card key={match.property.propertyId} className="flex flex-col">
                     <CardHeader>
                       <div className="aspect-video relative rounded-md overflow-hidden mb-4">
-                        <Image src="https://placehold.co/600x400.png" alt={match.property.userCompanyName || 'Property'} data-ai-hint="modern office" fill className="object-cover" />
+                        <Image src="https://placehold.co/600x400.png" alt={`Property ${match.property.propertyId}`} data-ai-hint="modern office" fill className="object-cover" />
                       </div>
-                      <CardTitle>{match.property.userCompanyName}</CardTitle>
+                      <CardTitle>Property ID: {match.property.propertyId}</CardTitle>
                       <CardDescription>
                         <div className="inline-flex items-center gap-2 text-primary font-semibold border border-primary/50 bg-primary/10 px-2 py-1 rounded-md text-sm">
                           <Percent className="w-4 h-4" />
