@@ -13,10 +13,22 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Mail } from 'lucide-react';
+import { ArrowRight, Mail, Info, ListChecks } from 'lucide-react';
 import { useData } from '@/contexts/data-context';
 import type { DemandSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
+
+const priorityLabels: { [key: string]: string } = {
+  size: 'Size',
+  location: 'Location',
+  ceilingHeight: 'Ceiling Height',
+  docks: 'Docks',
+  readiness: 'Readiness',
+  approvals: 'Approvals',
+  fireNoc: 'Fire NOC',
+  power: 'Power',
+  fireSafety: 'Fire Safety',
+};
 
 export function DemandList() {
   const router = useRouter();
@@ -92,14 +104,14 @@ WareHouse Origin
       {demands.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {demands.map((demand) => (
-            <Card key={demand.demandId}>
+            <Card key={demand.demandId} className="flex flex-col">
               <CardHeader>
                 <CardTitle>{demand.demandId}</CardTitle>
                 <CardDescription>
                   <Badge variant="secondary">{demand.propertyType}</Badge>
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 flex-grow">
                 <div className="text-sm">
                   <p className="font-semibold">Location:</p>
                   <p>{demand.location} (within {demand.radius}km)</p>
@@ -114,6 +126,20 @@ WareHouse Origin
                     <p>{demand.readiness}</p>
                   </div>
                 </div>
+                {demand.description && (
+                  <div className="text-sm space-y-1 pt-2">
+                    <p className="font-semibold flex items-center gap-1.5"><Info className="h-4 w-4" /> Description:</p>
+                    <p className="text-muted-foreground text-xs pl-1 line-clamp-3">{demand.description}</p>
+                  </div>
+                )}
+                {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
+                    <div className="text-sm space-y-2 pt-2">
+                      <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Priorities:</p>
+                      <div className="flex flex-wrap gap-1.5 pl-1">
+                        {demand.preferences.nonCompromisable.map(item => <Badge key={item} variant="outline" className="font-normal">{priorityLabels[item] || item}</Badge>)}
+                      </div>
+                    </div>
+                )}
               </CardContent>
               <CardFooter className="flex-col items-stretch gap-2">
                 <Button onClick={() => handleSubmitMatch(demand.demandId)}>
