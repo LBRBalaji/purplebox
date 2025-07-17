@@ -47,7 +47,7 @@ type GroupedSubmission = {
 
 export function MySubmissions() {
     const { user } = useAuth();
-    const { demands, submissions } = useData();
+    const { demands, submissions, shortlistedItems } = useData();
     const [groupedSubmissions, setGroupedSubmissions] = React.useState<GroupedSubmission[]>([]);
 
     React.useEffect(() => {
@@ -56,7 +56,7 @@ export function MySubmissions() {
 
             const grouped = mySubmissions.reduce((acc, submission) => {
                 const demand = demands.find(d => d.demandId === submission.demandId);
-                if (!demand) return acc;
+                if (!demand) return acc; // Gracefully skip if demand not found
 
                 let group = acc.find(g => g.demandId === submission.demandId);
                 if (!group) {
@@ -71,14 +71,17 @@ export function MySubmissions() {
                     acc.push(group);
                 }
 
-                group.properties.push({ ...submission, status: 'Pending' }); // Mock status
+                const isShortlisted = shortlistedItems.some(item => item.property.propertyId === submission.property.propertyId);
+                const status: SubmissionStatus = isShortlisted ? "Shortlisted" : "Pending";
+
+                group.properties.push({ ...submission, status });
                 return acc;
 
             }, [] as GroupedSubmission[]);
 
             setGroupedSubmissions(grouped);
         }
-    }, [submissions, demands, user]);
+    }, [submissions, demands, user, shortlistedItems]);
 
   return (
     <div className="mt-8">
@@ -86,18 +89,19 @@ export function MySubmissions() {
             <h2 className="text-3xl font-bold font-headline tracking-tight flex items-center gap-3"><Briefcase /> My Submissions</h2>
             <p className="text-muted-foreground mt-2">Track the status of properties you've submitted against demands.</p>
         </div>
+        {groupedSubmissions.length > 0 ? (
         <Accordion type="single" collapsible className="w-full space-y-4">
             {groupedSubmissions.map((submission) => (
                 <AccordionItem value={submission.demandId} key={submission.demandId} className="border rounded-lg bg-card">
-                    <AccordionTrigger className="p-6 hover:no-underline">
-                        <div className="flex justify-between items-center w-full">
+                    <AccordionTrigger className="p-6 hover:no-underline data-[state=open]:border-b">
+                        <div className="flex justify-between items-center w-full flex-wrap gap-4">
                             <div className="text-left">
                                 <h3 className="font-bold text-lg">{submission.demandId}</h3>
                                 <p className="text-sm text-muted-foreground">
                                     {submission.demandDetails.propertyType} - {submission.demandDetails.location}
                                 </p>
                             </div>
-                            <Badge variant={submission.properties.length > 0 ? 'default' : 'secondary'}>
+                            <Badge variant={submission.properties.length > 0 ? 'default' : 'secondary'} className="rounded-md">
                                 {submission.properties.length} {submission.properties.length === 1 ? 'Submission' : 'Submissions'}
                             </Badge>
                         </div>
@@ -133,6 +137,12 @@ export function MySubmissions() {
                 </AccordionItem>
             ))}
         </Accordion>
+        ) : (
+            <Card className="text-center p-12">
+                <CardTitle>No Submissions Found</CardTitle>
+                <CardDescription className="mt-2">Properties you submit against demands will appear here.</CardDescription>
+            </Card>
+        )}
     </div>
   );
 }
