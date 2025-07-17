@@ -10,6 +10,8 @@ export type Submission = {
     demandId: string;
     property: PropertySchema;
     matchResult: GetPropertyMatchScoreOutput;
+    isNew?: boolean;
+    demandUserEmail?: string;
 }
 
 type DataContextType = {
@@ -20,6 +22,7 @@ type DataContextType = {
   addSubmission: (submission: Submission) => void;
   shortlistedItems: Submission[];
   toggleShortlist: (submission: Submission) => void;
+  clearNewSubmissions: (propertyIds: string[]) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -49,7 +52,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const addSubmission = (submission: Submission) => {
-    setSubmissions((prev) => [...prev, submission]);
+    const demand = demands.find(d => d.demandId === submission.demandId);
+    const submissionWithNewFlag: Submission = {
+        ...submission,
+        isNew: true,
+        demandUserEmail: demand?.userEmail
+    };
+    setSubmissions((prev) => [...prev, submissionWithNewFlag]);
   };
 
   const toggleShortlist = (submissionToToggle: Submission) => {
@@ -67,8 +76,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const clearNewSubmissions = (propertyIds: string[]) => {
+    setSubmissions(prev => 
+        prev.map(sub => 
+            propertyIds.includes(sub.property.propertyId) ? { ...sub, isNew: false } : sub
+        )
+    );
+  }
+
   return (
-    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, shortlistedItems, toggleShortlist }}>
+    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, shortlistedItems, toggleShortlist, clearNewSubmissions }}>
       {children}
     </DataContext.Provider>
   );

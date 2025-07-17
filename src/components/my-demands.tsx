@@ -40,9 +40,9 @@ const priorityLabels: { [key: string]: string } = {
   fireSafety: 'Fire Safety Compliance',
 };
 
-export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void }) {
+export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: string) => void, newMatchCount: number }) {
   const { user } = useAuth();
-  const { demands, submissions, shortlistedItems, toggleShortlist } = useData();
+  const { demands, submissions, shortlistedItems, toggleShortlist, clearNewSubmissions } = useData();
   const [myDemandsWithMatches, setMyDemandsWithMatches] = React.useState<DemandWithMatches[]>([]);
   const [selectedChat, setSelectedChat] = React.useState<Submission | null>(null);
   const router = useRouter();
@@ -57,6 +57,17 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
       setMyDemandsWithMatches(demandsWithSubmissions);
     }
   }, [demands, submissions, user]);
+
+  const handleAccordionChange = (demandId: string) => {
+    // When the user opens an accordion, mark all submissions for that demand as "not new"
+    const submissionIdsToClear = myDemandsWithMatches
+        .find(d => d.demandId === demandId)
+        ?.matches.map(s => s.property.propertyId) || [];
+    
+    if (submissionIdsToClear.length > 0) {
+        clearNewSubmissions(submissionIdsToClear);
+    }
+  };
   
 
   return (
@@ -67,7 +78,7 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
           <p className="text-muted-foreground mt-2">Review matches submitted for your active demands.</p>
         </div>
         {myDemandsWithMatches.length > 0 ? (
-          <Accordion type="single" collapsible className="w-full space-y-4">
+          <Accordion type="single" collapsible className="w-full space-y-4" onValueChange={handleAccordionChange}>
             {myDemandsWithMatches.map((demand) => (
               <AccordionItem value={demand.demandId} key={demand.demandId} className="border rounded-lg bg-card">
                 <AccordionTrigger className="p-6 hover:no-underline data-[state=open]:border-b">
@@ -76,6 +87,11 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                       <div className="flex items-center gap-4 flex-wrap">
                         <h3 className="font-bold text-lg text-primary truncate" title={demand.demandId}>{demand.demandId}</h3>
                         <Badge variant="secondary">{demand.propertyType}</Badge>
+                         {demand.matches.some(m => m.isNew) && (
+                            <Badge className="bg-accent text-accent-foreground animate-pulse">
+                                {demand.matches.filter(m => m.isNew).length} New Match
+                            </Badge>
+                        )}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-2 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1.5">
@@ -116,7 +132,7 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                         >
                           <Pencil className="mr-2 h-4 w-4" /> Edit
                         </div>
-                      <Badge variant={demand.matches.length > 0 ? 'default' : 'secondary'} className="w-[110px] justify-center rounded-md">
+                      <Badge variant={demand.matches.length > 0 ? 'default' : 'secondary'} className="w-[110px] justify-center">
                         {demand.matches.length} {demand.matches.length === 1 ? 'Match' : 'Matches'}
                       </Badge>
                     </div>
@@ -162,10 +178,11 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                         {demand.matches.map(match => {
                             const isShortlisted = shortlistedItems.some(item => item.property.propertyId === match.property.propertyId);
                             return (
-                            <Card key={match.property.propertyId}>
+                            <Card key={match.property.propertyId} className={cn(match.isNew && "border-primary border-2")}>
                             <CardHeader>
                                 <div className="aspect-video relative rounded-md overflow-hidden mb-4">
                                 <Image src="https://placehold.co/600x400.png" alt={`Property ${match.property.propertyId}`} data-ai-hint="modern office" fill className="object-cover" />
+                                    {match.isNew && <Badge className="absolute top-2 right-2 bg-primary animate-pulse">New</Badge>}
                                 </div>
                                 <CardTitle>Property ID: {match.property.propertyId}</CardTitle>
                                 <CardDescription>

@@ -3,6 +3,7 @@
 
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
+import { useData } from '@/contexts/data-context';
 import { PropertyForm } from "@/components/property-form";
 import { DemandForm } from "@/components/demand-form";
 import { DemandList } from "@/components/demand-list";
@@ -13,9 +14,11 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { ShortlistedProperties } from '@/components/shortlisted-properties';
+import { Badge } from '@/components/ui/badge';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { submissions } = useData();
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -24,7 +27,13 @@ export default function DashboardPage() {
   
   // For User, to handle demand editing
   const editDemandId = searchParams.get('editDemandId');
-  const [userActiveTab, setUserActiveTab] = React.useState(editDemandId ? 'log-demand' : 'log-demand');
+  const [userActiveTab, setUserActiveTab] = React.useState(editDemandId ? 'log-demand' : 'my-demands');
+
+  const newMatchCount = React.useMemo(() => {
+    if (!user) return 0;
+    return submissions.filter(s => s.isNew && s.demandUserEmail === user.email).length;
+  }, [submissions, user]);
+
 
   React.useEffect(() => {
     const editId = searchParams.get('editDemandId');
@@ -46,7 +55,12 @@ export default function DashboardPage() {
           <Tabs value={userActiveTab} onValueChange={setUserActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="log-demand">{editDemandId ? 'Edit Demand' : 'Log New Demand'}</TabsTrigger>
-              <TabsTrigger value="my-demands">My Demands & Matches</TabsTrigger>
+              <TabsTrigger value="my-demands" className="relative">
+                My Demands & Matches
+                {newMatchCount > 0 && (
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0 animate-pulse">{newMatchCount}</Badge>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="shortlisted">Shortlisted</TabsTrigger>
             </TabsList>
             <TabsContent value="log-demand">
@@ -59,7 +73,7 @@ export default function DashboardPage() {
               </div>
             </TabsContent>
             <TabsContent value="my-demands">
-              <MyDemands onSwitchTab={setUserActiveTab} />
+              <MyDemands onSwitchTab={setUserActiveTab} newMatchCount={newMatchCount} />
             </TabsContent>
             <TabsContent value="shortlisted">
               <ShortlistedProperties />

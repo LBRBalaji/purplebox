@@ -79,7 +79,7 @@ export async function logDemandAction(
 export async function getPropertyMatchScoreAction(
   propertyData: PropertySchema,
   allDemands: DemandSchema[],
-): Promise<{ submission?: { property: PropertySchema, matchResult: GetPropertyMatchScoreOutput, demandId: string }; error?: string }> {
+): Promise<{ submission?: { property: PropertySchema, matchResult: GetPropertyMatchScoreOutput, demandId: string, demandUserEmail?: string }; error?: string }> {
   try {
     if (!propertyData.o2oDealDemandId) {
       return { error: "No Demand ID was provided for matching." };
@@ -100,6 +100,7 @@ export async function getPropertyMatchScoreAction(
       property: propertyData,
       matchResult: result,
       demandId: propertyData.o2oDealDemandId,
+      demandUserEmail: demandData.userEmail,
     };
 
     return { submission };
