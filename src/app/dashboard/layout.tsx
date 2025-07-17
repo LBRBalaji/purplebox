@@ -41,18 +41,6 @@ function Header() {
   );
 }
 
-function Footer() {
-  return (
-    <footer className="p-4 border-t mt-auto bg-card">
-      <div className="container mx-auto text-center text-sm text-muted-foreground">
-        <p>
-          <span className="font-bold text-primary">O2O</span> | Simplifying Real Estate Transactions. All rights reserved.
-        </p>
-      </div>
-    </footer>
-  );
-}
-
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
@@ -65,7 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading || !user) {
     return (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="flex flex-col min-h-screen">
             <header className="p-4 border-b">
                 <div className="container mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -82,13 +70,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                    <Skeleton className="h-[400px] w-full" />
                 </div>
             </main>
-            <Footer />
         </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
       <Header />
       <main className="flex-grow">
         <React.Suspense fallback={
@@ -104,7 +91,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         }>{children}</React.Suspense>
       </main>
-      <Footer />
-    </div>
+    </>
   );
 }
