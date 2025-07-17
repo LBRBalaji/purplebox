@@ -6,27 +6,68 @@ import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Star, MessageSquare, Percent } from 'lucide-react';
+import { Star, MessageSquare, Percent, Download } from 'lucide-react';
 import Image from 'next/image';
 import { Progress } from './ui/progress';
 import { cn } from '@/lib/utils';
 import type { Submission } from '@/contexts/data-context';
 import { ChatDialog } from './chat-dialog';
+import * as XLSX from 'xlsx';
 
 export function ShortlistedProperties() {
   const { user } = useAuth();
   const { shortlistedItems, toggleShortlist } = useData();
   const [selectedChat, setSelectedChat] = React.useState<Submission | null>(null);
 
+  const handleDownload = () => {
+    const dataToExport = shortlistedItems.map(item => ({
+        'Demand ID': item.demandId,
+        'Property ID': item.property.propertyId,
+        'Match Score (%)': (item.matchResult.overallScore * 100).toFixed(0),
+        'Size (Sq. Ft.)': item.property.size,
+        'Rent (per Sq. Ft.)': item.property.rentPerSft,
+        'Ceiling Height (ft)': item.property.ceilingHeight,
+        'Docks': item.property.docks,
+        'Readiness': item.property.readinessToOccupy,
+        'Site Type': item.property.siteType,
+        'Approval Status': item.property.approvalStatus,
+        'Fire NOC': item.property.fireNoc,
+        'AI Justification': item.matchResult.justification,
+    }));
+    
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Shortlisted Properties");
+    
+    // Auto-fit columns
+    const cols = Object.keys(dataToExport[0]);
+    const colWidths = cols.map(col => ({
+        wch: Math.max(...dataToExport.map(row => row[col as keyof typeof row]?.toString().length ?? 0), col.length)
+    }));
+    worksheet["!cols"] = colWidths;
+    
+    XLSX.writeFile(workbook, "shortlisted_properties.xlsx");
+  };
+
   return (
     <>
       <div className="mt-8">
         <Card>
           <CardHeader>
-            <CardTitle>Shortlisted Properties</CardTitle>
-            <CardDescription>
-              Properties you've shortlisted appear here. You can start a conversation or remove them from this list.
-            </CardDescription>
+            <div className="flex justify-between items-start flex-wrap gap-4">
+              <div>
+                <CardTitle>Shortlisted Properties</CardTitle>
+                <CardDescription>
+                  Properties you've shortlisted appear here. You can start a conversation or remove them from this list.
+                </CardDescription>
+              </div>
+              {shortlistedItems.length > 0 && (
+                <Button onClick={handleDownload}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download as Excel
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {shortlistedItems.length > 0 ? (
