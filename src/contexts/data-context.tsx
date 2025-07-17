@@ -27,7 +27,14 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export function DataProvider({ children }: { children: ReactNode }) {
   const [demands, setDemands] = useState<DemandSchema[]>(mockDemands as DemandSchema[]);
   const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
-  const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
+  const [shortlistedItems, setShortlistedItems] = useState<Submission[]>(() => {
+    // Pre-populate with a couple of items for easier testing
+    const initialShortlist = mockSubmissions.filter(sub => 
+        sub.property.propertyId === 'PS-ACME-001' || 
+        sub.property.propertyId === 'PS-LOGI-001'
+    );
+    return initialShortlist as Submission[];
+  });
 
   const addDemand = (demand: DemandSchema) => {
     setDemands((prev) => [...prev, demand]);

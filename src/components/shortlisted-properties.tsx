@@ -33,6 +33,7 @@ export function ShortlistedProperties() {
         'Approval Status': item.property.approvalStatus,
         'Fire NOC': item.property.fireNoc,
         'AI Justification': item.matchResult.justification,
+        'Image Link': `https://placehold.co/600x400.png`,
     }));
     
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
