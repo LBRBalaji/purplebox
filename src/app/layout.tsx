@@ -15,7 +15,7 @@ function Footer() {
     <footer className="p-4 border-t bg-card">
       <div className="container mx-auto text-center text-sm text-muted-foreground">
         <p>
-          <span className="font-bold text-primary">O2O</span> | Simplifying Real Estate Transactions. All rights reserved.
+          <span className="font-bold text-primary">Lakshmi Balaji O2O</span> | Simplifying Real Estate Transactions. All rights reserved.
         </p>
       </div>
     </footer>
