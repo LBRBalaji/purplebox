@@ -23,7 +23,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="flex-grow bg-background flex items-center justify-center p-4">
+      <div className="flex-grow bg-background flex flex-col items-center justify-center p-4 pt-16 md:pt-24">
         <Card className="w-full max-w-md z-10">
           <CardHeader className="text-center">
             <div className="mx-auto flex flex-col items-center mb-4">
