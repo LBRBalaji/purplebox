@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 function LoginCard() {
   const { login } = useAuth();
   const [email, setEmail] = React.useState('');
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ function LoginCard() {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-20 w-full max-w-md">
+    <div className="fixed top-4 right-4 z-20 w-full max-w-sm">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <Card className="shadow-2xl bg-background/80 backdrop-blur-sm">
           <CollapsibleTrigger asChild>
