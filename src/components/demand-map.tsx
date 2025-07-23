@@ -100,7 +100,8 @@ function AutocompleteAndMap() {
                  map.setZoom(12);
             }
         }
-    }, [locationValue, radiusValue, map, circle, setValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [locationValue, radiusValue, map, setValue]);
 
 
     const handleGetLocation = useCallback(() => {
