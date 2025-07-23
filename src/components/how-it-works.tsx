@@ -26,7 +26,7 @@ export function HowItWorksSection() {
       <style jsx>{`
         #how-it-works-container {
             font-family: 'Inter', sans-serif;
-            background-color: #1e3a5f; /* Primary navy blue */
+            background-color: #1e3a5f;
             color: #FFFFFF; /* Secondary white */
             position: relative;
             overflow: hidden;
