@@ -20,7 +20,7 @@ const mapStyles: google.maps.MapTypeStyle[] = [
     { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#98a5be" }] },
     { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#2c6675" }] },
     { featureType: "transit", elementType: "labels.text.fill", stylers: [{ color: "#98a5be" }] },
-    { featureType: "water", elementType: "geometry", stylers: [{ color: "#023e58" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#1e3a5f" }] },
 ];
 
 function Heatmap() {
@@ -169,7 +169,7 @@ export function NetworkMapSection() {
                     width: 100%;
                     height: 500px;
                     border-radius: 1rem;
-                    background-color: #0a2342;
+                    background-color: #1e3a5f;
                     border: 2px solid rgba(44, 165, 141, 0.5);
                 }
             `}</style>
