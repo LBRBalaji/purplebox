@@ -27,6 +27,7 @@ function LoginCard() {
 
   return (
     <div className="fixed top-4 right-4 z-20 w-full max-w-xs">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} asChild>
         <Card className="shadow-2xl bg-background/80 backdrop-blur-sm">
             <CardHeader>
                 <div className="flex items-start justify-between gap-4">
@@ -42,25 +43,23 @@ function LoginCard() {
                             <CardDescription>Sourcing Simplified</CardDescription>
                         </div>
                     </div>
-                     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-                        <CollapsibleTrigger asChild>
-                            <Button variant="ghost" size="sm" className="w-9 p-0">
-                                <ChevronsUpDown className="h-4 w-4" />
-                                <span className="sr-only">Toggle Login</span>
-                            </Button>
-                        </CollapsibleTrigger>
-                    </Collapsible>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                            <LogIn className="h-4 w-4 mr-2" />
+                            Login
+                        </Button>
+                    </CollapsibleTrigger>
                 </div>
             </CardHeader>
-            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleContent>
             <form onSubmit={handleLogin}>
-              <CardContent className="space-y-4">
-                <CardTitle className="text-2xl pt-2">Login</CardTitle>
-                <CardDescription>
-                  Enter your email or use a test account to sign in.
-                </CardDescription>
-                <div className="space-y-2">
+              <CardContent className="space-y-4 pt-0">
+                 <div className="relative w-full">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                </div>
+                <div className="space-y-2 pt-4">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
@@ -114,8 +113,8 @@ function LoginCard() {
               </CardFooter>
             </form>
           </CollapsibleContent>
-        </Collapsible>
         </Card>
+      </Collapsible>
     </div>
   );
 }
