@@ -77,7 +77,7 @@ export function HowItWorksSection() {
       `}</style>
       <div id="how-it-works-container" className="antialiased">
         <div className="text-center py-16 px-4">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4" style={{color: "var(--color-highlight)"}}>Warehouse Origin-Source Warehouse</h1>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4" style={{color: "var(--color-highlight)"}}>WareHouse Origin</h1>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">How It Works</h2>
             <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-300">
                 Our streamlined process transforms a complex search into a simple, confident journey. We connect your precise needs with our exclusive network to deliver unparalleled results.
