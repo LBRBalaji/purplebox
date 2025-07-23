@@ -160,7 +160,7 @@ export function NetworkMapSection() {
         <>
             <style jsx>{`
                 #network-section-gmaps {
-                    background: #0a2342;
+                    background: #1e3a5f;
                     color: white;
                 }
                 .fade-in-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
