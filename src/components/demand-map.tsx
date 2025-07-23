@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -78,7 +79,8 @@ function AutocompleteAndMap() {
         if (position && map) {
             if (circle) circle.setMap(null); // Remove old circle before creating a new one
 
-            const radiusInMeters = parseFloat(radiusValue) * 1000;
+            const radiusInMeters = (radiusValue ? Number(radiusValue) : 0) * 1000;
+            
             if (radiusInMeters > 0) {
                 const newCircle = new google.maps.Circle({
                     strokeColor: 'hsl(var(--primary))',
@@ -98,7 +100,7 @@ function AutocompleteAndMap() {
                  map.setZoom(12);
             }
         }
-    }, [locationValue, radiusValue, map]);
+    }, [locationValue, radiusValue, map, circle, setValue]);
 
 
     const handleGetLocation = useCallback(() => {
