@@ -171,7 +171,7 @@ export function NetworkMapSection() {
                     width: 100%;
                     height: 500px;
                     border-radius: 1rem;
-                    background-color: #1e3a5f;
+                    background-color: #0a2342;
                     border: 2px solid rgba(44, 165, 141, 0.5);
                 }
             `}</style>
