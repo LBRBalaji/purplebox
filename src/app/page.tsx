@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Truck as TruckIcon } from 'lucide-react';
 import Link from 'next/link';
 import { HowItWorksSection } from '@/components/how-it-works';
+import { NetworkMapSection } from '@/components/network-map';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -98,6 +99,7 @@ export default function LoginPage() {
         </Card>
       </div>
       <HowItWorksSection />
+      <NetworkMapSection />
     </>
   );
 }
