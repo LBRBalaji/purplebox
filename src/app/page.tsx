@@ -26,7 +26,7 @@ function LoginCard() {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-20 w-full max-w-sm">
+    <div className="fixed top-4 right-4 z-20 w-full max-w-xs">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <Card className="shadow-2xl bg-background/80 backdrop-blur-sm">
           <CollapsibleTrigger asChild>
