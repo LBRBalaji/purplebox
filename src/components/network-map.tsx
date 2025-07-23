@@ -20,7 +20,7 @@ const mapStyles: google.maps.MapTypeStyle[] = [
     { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#98a5be" }] },
     { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#2c6675" }] },
     { featureType: "transit", elementType: "labels.text.fill", stylers: [{ color: "#98a5be" }] },
-    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0e1626" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#023e58" }] },
 ];
 
 function Heatmap() {
