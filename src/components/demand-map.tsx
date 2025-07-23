@@ -13,7 +13,7 @@ import type { DemandSchema } from '@/lib/schema';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
-import { MapPin } from 'lucide-react';
+import { MapPin, Dot } from 'lucide-react';
 
 const containerStyle = {
   width: '100%',
@@ -82,11 +82,11 @@ function AutocompleteAndMap() {
             const radiusInMeters = (radiusValue ? Number(radiusValue) : 0) * 1000;
             
             if (radiusInMeters > 0) {
-                const newCircle = new google.maps.Circle({
-                    strokeColor: 'hsl(var(--primary))',
+                 const newCircle = new google.maps.Circle({
+                    strokeColor: 'hsl(210 60% 50%)',
                     strokeOpacity: 0.8,
                     strokeWeight: 2,
-                    fillColor: 'hsl(var(--primary))',
+                    fillColor: 'hsl(210 60% 50%)',
                     fillOpacity: 0.2,
                     map,
                     center: position,
@@ -100,8 +100,7 @@ function AutocompleteAndMap() {
                  map.setZoom(12);
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [locationValue, radiusValue, map, setValue]);
+    }, [locationValue, radiusValue, map]);
 
 
     const handleGetLocation = useCallback(() => {
@@ -137,7 +136,13 @@ function AutocompleteAndMap() {
                     mapId="demand-map"
                     style={containerStyle}
                 >
-                    {markerPosition && <AdvancedMarker position={markerPosition} />}
+                    {markerPosition && (
+                      <AdvancedMarker position={markerPosition}>
+                        <div className="w-6 h-6 rounded-full bg-primary/80 border-2 border-primary-foreground ring-2 ring-primary shadow-lg flex items-center justify-center">
+                          <Dot className="w-4 h-4 text-primary-foreground" />
+                        </div>
+                      </AdvancedMarker>
+                    )}
                 </Map>
             </div>
         </div>
