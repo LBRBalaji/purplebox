@@ -35,42 +35,28 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 
-type AppMarkerProps = {
+type WarehouseMarkerProps = {
     warehouse: WarehouseSchema;
-    onClick: (warehouse: WarehouseSchema) => void;
+    onClick: () => void;
 };
 
-// This is a separate component for the marker so we can use the useAdvancedMarkerRef hook
-const AppMarker = ({ warehouse, onClick }: AppMarkerProps) => {
+const WarehouseMarker = ({ warehouse, onClick }: WarehouseMarkerProps) => {
     const [ref, marker] = useAdvancedMarkerRef();
 
     React.useEffect(() => {
         if (!marker) return;
-
-        const listener = marker.addListener('click', () => {
-            onClick(warehouse);
-        });
-        
-        // Add a 'gmp-click' listener to handle clicks when clustered
-        // as the default 'click' event is captured by the clusterer.
-        marker.addListener('gmp-click', () => {
-            onClick(warehouse);
-        });
-        
-        return () => {
-            listener.remove();
-        }
-    }, [marker, warehouse, onClick]);
+        const listener = marker.addListener('gmp-click', onClick);
+        return () => listener.remove();
+    }, [marker, onClick]);
 
     return (
-        <AdvancedMarker ref={ref} position={warehouse.generalizedLocation} >
+        <AdvancedMarker ref={ref} position={warehouse.generalizedLocation}>
             <div className="w-6 h-6 rounded-full bg-primary/80 border-2 border-primary-foreground ring-2 ring-primary shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
                 <Building className="w-3 h-3 text-primary-foreground" />
             </div>
         </AdvancedMarker>
     );
-};
-
+}
 
 function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
@@ -84,19 +70,19 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   
-  const [markers, setMarkers] = React.useState<{ [key: string]: google.maps.marker.AdvancedMarkerElement }>({});
-  const clusterer = React.useRef<MarkerClusterer | null>(null);
+  const markersRef = React.useRef<{[key: string]: google.maps.marker.AdvancedMarkerElement}>({});
+  const clustererRef = React.useRef<MarkerClusterer | null>(null);
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const idleListenerRef = React.useRef<google.maps.MapsEventListener | null>(null);
 
+  // Initialize SearchBox
   React.useEffect(() => {
     if (!places || !inputRef.current) return;
     const newSearchBox = new places.SearchBox(inputRef.current);
     setSearchBox(newSearchBox);
 
     return () => {
-      // Cleanup on component unmount
       if (newSearchBox) {
         google.maps.event.clearInstanceListeners(newSearchBox);
       }
@@ -106,12 +92,13 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   // Initialize MarkerClusterer
   React.useEffect(() => {
     if (!map) return;
-    if (!clusterer.current) {
-        clusterer.current = new MarkerClusterer({ map });
+    if (!clustererRef.current) {
+        clustererRef.current = new MarkerClusterer({ map });
     }
   }, [map]);
 
 
+  // Handle search box places changing
   React.useEffect(() => {
     if (!searchBox || !map) return;
     const listener = searchBox.addListener('places_changed', () => {
@@ -160,16 +147,13 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     }
   }, [map, toast]);
 
+  // Fetch warehouses on map idle
   React.useEffect(() => {
     if (!map) return;
-    // Remove previous listener to avoid multiple fetches
     if (idleListenerRef.current) {
         google.maps.event.removeListener(idleListenerRef.current);
     }
-    // Add new listener for map idle
     idleListenerRef.current = map.addListener('idle', fetchAndSetWarehouses);
-    
-    // Initial fetch
     fetchAndSetWarehouses();
 
     return () => {
@@ -184,29 +168,24 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     setIsSheetOpen(true);
     if(map) {
         map.panTo(warehouse.generalizedLocation);
+        map.setZoom(14);
     }
   }, [map]);
   
-  // Update clusters when markers change
+  // Update clusters when warehouses change
   React.useEffect(() => {
-    clusterer.current?.clearMarkers();
-    clusterer.current?.addMarkers(Object.values(markers));
-  }, [markers]);
-
-  const setMarkerRef = (marker: google.maps.marker.AdvancedMarkerElement | null, key: string) => {
-    if (marker && markers[key]) return;
-    if (!marker && !markers[key]) return;
-    
-    setMarkers(prev => {
-        if (marker) {
-            return { ...prev, [key]: marker };
-        } else {
-            const newMarkers = { ...prev };
-            delete newMarkers[key];
-            return newMarkers;
-        }
+    clustererRef.current?.clearMarkers();
+    const markers = warehouses.map(warehouse => {
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+            position: warehouse.generalizedLocation,
+            gmpClickable: true
+        });
+        marker.addEventListener('gmp-click', () => handleMarkerClick(warehouse));
+        return marker;
     });
-  };
+    clustererRef.current?.addMarkers(markers);
+  }, [warehouses, handleMarkerClick]);
+
 
   return (
     <>
@@ -231,20 +210,14 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         </div>
       )}
       <Map
-        defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
-        defaultZoom={5}
+        defaultCenter={{ lat: 13.13, lng: 79.91 }}
+        defaultZoom={10}
         mapId={mapId}
         disableDefaultUI={true}
         gestureHandling="greedy"
         className="h-full w-full"
       >
-        {warehouses.map((warehouse) => (
-            <AppMarker 
-                key={warehouse.id}
-                warehouse={warehouse}
-                onClick={handleMarkerClick}
-            />
-        ))}
+        {/* Markers are now managed by the MarkerClusterer so we don't render them here */}
       </Map>
       
       {selectedWarehouse && (
