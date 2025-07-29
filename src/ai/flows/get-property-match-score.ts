@@ -42,30 +42,36 @@ const prompt = ai.definePrompt({
 
 You must provide an overall score, a breakdown for location, size, and features, and a justification. The scores must be between 0.0 and 1.0.
 
-CRUCIAL INSTRUCTIONS:
-The user has specified certain criteria as "Non-Compromisable". You must strictly adhere to these.
-{{#if demand.preferences.nonCompromisable}}
-The following items are non-compromisable: {{#each demand.preferences.nonCompromisable}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}.
+**SCORING GUIDELINES:**
 
-- If 'size' is non-compromisable and the property size is not within a 10% tolerance of the demanded size, the 'size' score and 'overallScore' must be very low (less than 0.2).
-- If 'location' is non-compromisable, you must assume the provided property is outside the required radius. The 'location' score and 'overallScore' must be very low (less than 0.2).
-- If 'ceilingHeight' is non-compromisable and the property's ceiling height is less than what is demanded, the 'features' score and 'overallScore' must be very low (less than 0.2).
-- If 'docks' is non-compromisable and the property has fewer docks than demanded, the 'features' score and 'overallScore' must be very low (less than 0.2).
-- If 'readiness' is non-compromisable, evaluate if the property's readiness meets the demand's required timeline. For example, a demand for 'Immediate' readiness is not met by a property available 'Within 6 months'. If it doesn't meet the requirement, the 'features' score and 'overallScore' must be very low (less than 0.2).
-- If 'approvals' is non-compromisable and the property's 'approvalStatus' is not 'Obtained', the 'features' score and 'overallScore' must be very low (less than 0.2).
-- If 'fireNoc' is non-compromisable and the property's 'fireNoc' is not 'Obtained', the 'features' score and 'overallScore' must be very low (less than 0.2).
-- If 'power' is non-compromisable, you must evaluate if the property's 'availablePower' seems sufficient based on the demand description. If it seems insufficient, the 'features' score and 'overallScore' must be very low (less than 0.2).
-- If 'fireSafety' is non-compromisable and the property's 'fireHydrant' is not 'Installed', the 'features' score and 'overallScore' must be very low (less than 0.2).
-{{else}}
-There are no non-compromisable items. Evaluate the match based on a holistic assessment of all factors.
-{{/if}}
+1.  **Location Score:**
+    *   The property provider has a field \`isLocationConfirmed\`. If \`isLocationConfirmed\` is \`true\`, it means the provider confirms their property is within the customer's desired radius. In this case, the **location score should be very high (e.g., 0.9 to 1.0)**. Do not penalize the location if this is confirmed.
 
-Analyze the following data:
+2.  **Size Score:**
+    *   Calculate the percentage difference between the demanded size and the property size.
+    *   If 'size' is a non-compromisable priority:
+        *   If the property size is within a **15% tolerance** (either larger or smaller) of the demanded size, the score should still be high (e.g., > 0.85).
+        *   If the property size is outside the 15% tolerance, the score should be very low (< 0.2).
+    *   If 'size' is NOT a non-compromisable priority, be more lenient. A 20-25% difference might still result in a score of 0.6-0.7.
+
+3.  **Features Score:**
+    *   This score is a blend of all other features (Ceiling Height, Docks, Readiness, Approvals, Fire Safety, etc.).
+    *   If a feature (e.g., 'docks', 'ceilingHeight') is a non-compromisable priority:
+        *   If the property **meets or exceeds** the requirement (e.g., has same or more docks), that part of the feature score should be 1.0.
+        *   If the property is **slightly below** the requirement (e.g., 11 docks instead of 12), the score should be penalized, but not to zero. A score of 0.7-0.8 for that specific feature is reasonable.
+        *   If the property is **significantly below** the requirement, the score for that feature should be very low (< 0.2).
+    *   Evaluate all features and create a blended score.
+
+4.  **Overall Score & Justification:**
+    *   The overall score should be a weighted average of the Location, Size, and Features scores.
+    *   Your justification MUST be clear and logical. Explain WHY you gave each score, referencing the specific numbers (e.g., "The size score is 0.9 because the 92,000 sq ft property is within the 15% tolerance of the 100,000 sq ft demand."). If a score is low, explain the exact reason based on the provided numbers and priorities.
+
+**Analyze the following data:**
 
 **PROPERTY DEMAND**
 - Demand ID: {{{demand.demandId}}}
 - Property Type: {{{demand.propertyType}}}
-- Location: Within {{{demand.radius}}} km of {{{demand.location}}}
+- Location: Within {{{demand.radius}}} km of {{{demand.locationName}}}
 - Size: {{{demand.size}}} Sq. Ft.
 - Required Ceiling Height (ft): {{{demand.ceilingHeight}}}
 - Required Docks: {{{demand.docks}}}
@@ -75,8 +81,8 @@ Analyze the following data:
 
 **SUBMITTED PROPERTY**
 - Property ID: {{{property.propertyId}}}
+- Location Confirmed by Provider: {{{property.isLocationConfirmed}}}
 - Site Type: {{{property.siteType}}}
-- Location: {{{property.propertyGeoLocation}}} (Assume this is just a text label, not for distance calculation)
 - Size: {{{property.size}}} Sq. Ft.
 - Ceiling Height: {{{property.ceilingHeight}}} ft
 - Docks: {{{property.docks}}}
