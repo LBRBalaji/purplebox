@@ -177,7 +177,7 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
                         <div className="flex gap-3 text-xs">
                            <span className="font-semibold">Ready: <b className="text-green-600">{data.readiness.ready}</b></span>
                            <span className="font-semibold">Soon: <b className="text-amber-600">{data.readiness.soon}</b></span>
-                           <span className="font-semibold">Building: <b className="text-blue-600">{data.readiness.building}</b></span>
+                           <span className="font-semibold">BTS: <b className="text-blue-600">{data.readiness.building}</b></span>
                         </div>
                     </div>
                      <div className="flex justify-between items-center">
