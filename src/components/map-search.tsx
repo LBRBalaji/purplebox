@@ -50,7 +50,9 @@ const WarehouseMarker = ({ warehouse, onClick }: WarehouseMarkerProps) => {
         // The gmp-click event is not always reliable with the clusterer
         marker.addListener('click', onClick); 
         return () => {
-             google.maps.event.clearInstanceListeners(marker);
+             if (marker) {
+                google.maps.event.clearInstanceListeners(marker);
+             }
         }
     }, [marker, onClick]);
 
@@ -84,7 +86,6 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [regionSummary, setRegionSummary] = React.useState<RegionSummary | null>(null);
   
-  const markersRef = React.useRef<{[key: string]: google.maps.marker.AdvancedMarkerElement}>({});
   const clustererRef = React.useRef<MarkerClusterer | null>(null);
 
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -158,6 +159,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             if (result.error) throw new Error(result.error);
             
             if (result.warehouses) {
+              // The primary action on search is to calculate the summary
+              // We do not set the warehouses state here to avoid showing markers
               calculateRegionSummary(result.warehouses, place.formatted_address || 'Selected Area');
             }
           } catch(error) {
@@ -215,6 +218,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         google.maps.event.removeListener(idleListenerRef.current);
     }
     idleListenerRef.current = map.addListener('idle', () => {
+      // Only fetch markers if we are not in a summary view
       if (!regionSummary) {
         fetchAndSetWarehouses();
       }
@@ -241,9 +245,11 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   
   // Update clusters when warehouses change
   React.useEffect(() => {
-    if (!map) return;
-    clustererRef.current?.clearMarkers();
-    if (warehouses.length > 0) {
+    if (!clustererRef.current) return;
+    clustererRef.current.clearMarkers();
+    
+    // Only add markers if there are warehouses to show and we are not in summary view
+    if (warehouses.length > 0 && !regionSummary) {
       const newMarkers = warehouses.map(warehouse => {
           const marker = new google.maps.marker.AdvancedMarkerElement({
               position: warehouse.generalizedLocation,
@@ -252,9 +258,9 @@ function MapSearchContent({ mapId }: { mapId: string }) {
           marker.addEventListener('gmp-click', () => handleMarkerClick(warehouse));
           return marker;
       });
-      clustererRef.current?.addMarkers(newMarkers);
+      clustererRef.current.addMarkers(newMarkers);
     }
-  }, [warehouses, handleMarkerClick, map]);
+  }, [warehouses, handleMarkerClick, regionSummary]);
 
 
   return (
@@ -287,7 +293,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         gestureHandling="greedy"
         className="h-full w-full"
       >
-        {/* Markers are now managed by the MarkerClusterer so we don't render them here */}
+        {/* Markers are now managed by the MarkerClusterer and conditional logic, so we don't render them here */}
       </Map>
       
       {regionSummary && (
@@ -300,7 +306,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                     </div>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
                       setRegionSummary(null);
-                      fetchAndSetWarehouses(); // Now fetch and show markers
+                      // After closing, fetch the markers for browsing
+                      fetchAndSetWarehouses(); 
                     }}>
                         <X className="h-4 w-4" />
                     </Button>
@@ -434,6 +441,3 @@ export function MapSearch({ mapId }: { mapId: string }) {
     </div>
   );
 }
-
-    
-    
