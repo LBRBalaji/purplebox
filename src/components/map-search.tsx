@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 
@@ -193,46 +193,52 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
     )
 }
 
-function MapSearchInfographic({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng: number } | null) => void }) {
+function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng: number } | null) => void }) {
     const steps = [
         {
-            title: "Search a Region",
-            description: "Use the search bar to find a city or industrial area (e.g., 'Oragadam')."
+            title: "Define Your Need",
+            description: "One form, ten minutes, unlocks the entire market.",
+            icon: FileText,
         },
         {
-            title: "View Supply Summary",
-            description: "See an instant overview of warehouse availability and specs for that location."
+            title: "Activate Our Network",
+            description: "Your requirement is confidentially routed to our vetted network.",
+            icon: Share2,
         },
         {
-            title: "Log Your Demand",
-            description: "Use the insights to log a specific demand and get matched with properties."
+            title: "Receive Curated Options",
+            description: "No noise. Just 3-5 qualified, actionable proposals.",
+            icon: MailCheck,
         }
     ];
 
     return (
         <Card className="flex flex-col h-full bg-gradient-to-br from-primary/5 via-background to-background border-0 shadow-none">
             <CardHeader className="text-center">
-                 <CardTitle className="text-xl font-bold font-headline text-foreground">
-                    How to Use Map Search
+                 <CardTitle className="text-2xl font-bold font-headline text-foreground">
+                    Warehouse Sourcing, Simplified.
                  </CardTitle>
-                 <CardDescription>Follow these steps to find and source your ideal warehouse.</CardDescription>
+                 <CardDescription>Our three-step process finds your perfect match.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center">
-                <div className="space-y-6 relative py-4">
+                <div className="space-y-8 relative py-4">
                      <div className="absolute left-6 top-10 bottom-10 w-0.5 bg-border -z-10" />
-                    {steps.map((step, index) => (
-                        <div key={index} className="flex items-start gap-4">
-                            <div className="flex-shrink-0 z-10">
-                                <div className="h-12 w-12 rounded-full bg-background border-2 border-primary text-primary flex items-center justify-center font-bold text-lg">
-                                    0{index + 1}
+                    {steps.map((step, index) => {
+                        const Icon = step.icon;
+                        return (
+                            <div key={index} className="flex items-start gap-5">
+                                <div className="flex-shrink-0 z-10">
+                                    <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                                        <Icon className="h-6 w-6" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-lg text-foreground mt-0.5">{step.title}</h4>
+                                    <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
                                 </div>
                             </div>
-                            <div>
-                                <h4 className="font-semibold text-foreground mt-1">{step.title}</h4>
-                                <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </CardContent>
              <CardFooter className="pt-4 border-t">
@@ -241,7 +247,6 @@ function MapSearchInfographic({ onLogDemand }: { onLogDemand: (center?: { lat: n
         </Card>
     );
 }
-
 
 function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
@@ -328,7 +333,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       let url = '/dashboard?logNew=true';
       if (center) {
         const locationString = `${center.lat.toFixed(6)},${center.lng.toFixed(6)}`;
-        url += `&location=${locationString}&radius=5`;
+        url += `&location=${encodeURIComponent(locationString)}&radius=5`;
       }
       router.push(url);
     } else {
@@ -339,9 +344,10 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   const handleLoginSuccess = () => {
     setIsLoginDialogOpen(false);
-    let url = '/dashboard';
+    let url = '/dashboard?logNew=true';
     if (pendingRedirectCenter) {
-      url = `/dashboard?logNew=true&location=${pendingRedirectCenter.lat.toFixed(6)},${pendingRedirectCenter.lng.toFixed(6)}&radius=5`;
+      const locationString = `${pendingRedirectCenter.lat.toFixed(6)},${pendingRedirectCenter.lng.toFixed(6)}`;
+      url += `&location=${encodeURIComponent(locationString)}&radius=5`;
     }
     router.push(url);
     setPendingRedirectCenter(null);
@@ -408,12 +414,12 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                             This is an Untapped Opportunity!
                         </h3>
                         <p className="text-sm mt-2 mb-6 text-muted-foreground">
-                           We are actively expanding our network here. Log your demand, and we&apos;ll get to work sourcing the perfect match for you.
+                           We don&apos;t have aggregated supply data for this specific area, but you can still log a demand.
                         </p>
                         <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="primary"/>
                     </div>
                 ) : (
-                    <MapSearchInfographic onLogDemand={handleLogDemandClick} />
+                    <HowItWorks onLogDemand={handleLogDemandClick} />
                 )}
             </aside>
         </div>
