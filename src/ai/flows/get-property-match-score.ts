@@ -60,10 +60,10 @@ You must provide an overall score, a breakdown for multiple categories, and a de
     *   If \`isLocationConfirmed\` is \`false\`, the score must be very low (0.1), as the location is unverified.
 
 2.  **Size Score:**
-    *   Calculate the percentage difference: \`abs(demandSize - propertySize) / demandSize\`.
-    *   If size is within a **15% tolerance** of the demand, the score should be high (0.85-1.0).
-    *   If size is outside the 15% tolerance, the score should decrease proportionally. A 25% difference might score around 0.6. A 90% difference should score very low (e.g. 0.05).
-    *   If size is a **non-compromisable** priority and the property is outside the 15% tolerance, the size score should be very low (< 0.2).
+    *   Calculate the score using the direct ratio: \`min(propertySize, demandSize) / max(propertySize, demandSize)\`.
+    *   For example, if demand is 100,000 sq ft and property is 92,000 sq ft, the score is 92000/100000 = 0.92.
+    *   If demand is 15,000 and property is 10,000, the score is 10000/15000 = 0.66.
+    *   If size is a **non-compromisable** priority and the score is below 0.85 (i.e., more than 15% deviation), the final size score should be very low (< 0.2).
 
 3.  **Amenities Score (Docks, Ceiling Height, etc.):**
     *   This is a blended score. If the customer requires a specific number of docks (e.g., 12) and the property has fewer (e.g., 11), the score for that item **must be calculated proportionally** as \`propertyDocks / demandDocks\` (11/12 = 0.92). A score of 9/12 would be 0.75.
