@@ -84,9 +84,9 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                     <UserIcon className="mr-2 h-4 w-4" />
                     Customer
                 </Button>
-                <Button type="button" variant="outline" onClick={() => handleTestUserLogin('logistics.pro@example.com')}>
-                    <TruckIcon className="mr-2 h-4 w-4" />
-                    Logistics Pro
+                 <Button type="button" variant="outline" onClick={() => handleTestUserLogin('provider@example.com')}>
+                    <UserCog className="mr-2 h-4 w-4" />
+                    Property Provider
                 </Button>
             </div>
 

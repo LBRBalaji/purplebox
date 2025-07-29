@@ -29,6 +29,7 @@ const defaultUsers: { [email: string]: User } = {
   'admin@example.com': { email: 'admin@example.com', role: 'SuperAdmin', companyName: 'Origin Depot', userName: 'Admin', phone: 'N/A' },
   'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test User', phone: '555-123-4567' },
   'logistics.pro@example.com': { email: 'logistics.pro@example.com', role: 'User', companyName: 'ProLogistics Solutions', userName: 'Sunil Patel', phone: '555-987-6543' },
+  'provider@example.com': { email: 'provider@example.com', role: 'SuperAdmin', companyName: 'Prime Properties', userName: 'Anil Kumar', phone: '555-111-2222' },
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
