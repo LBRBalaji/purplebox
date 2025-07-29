@@ -8,15 +8,19 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Card, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardTitle, CardDescription, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Briefcase, CheckCircle2, Clock, XCircle, Percent } from 'lucide-react';
+import { Briefcase, CheckCircle2, Clock, XCircle, Percent, Building2, Scaling, HandCoins, CalendarCheck, Truck, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useData, type SubmissionStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import { type Submission } from '@/contexts/data-context';
 
 const StatusIndicator = ({ status }: { status: SubmissionStatus }) => {
+    if (status === 'Pending') {
+      return null;
+    }
+
     const statusConfig = {
         Approved: { icon: CheckCircle2, color: 'text-green-600', bgColor: 'bg-green-100', text: 'Approved' },
         Pending: { icon: Clock, color: 'text-amber-600', bgColor: 'bg-amber-100', text: 'Pending Review' },
@@ -106,20 +110,50 @@ export function MySubmissions() {
                         {submission.properties.length > 0 ? (
                             <div className="space-y-4">
                                 {submission.properties.map(property => (
-                                    <Card key={property.property.propertyId} className="flex items-center justify-between p-4 flex-wrap gap-2">
-                                        <div>
-                                            <p className="font-semibold">{property.property.userCompanyName}</p>
-                                            <p className="text-sm text-muted-foreground">Property ID: {property.property.propertyId}</p>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            {property.matchResult && (
-                                              <Badge variant="outline" className="border-primary/80 bg-primary/10 text-primary font-semibold">
-                                                <Percent className="mr-1.5 h-4 w-4" />
-                                                <span>{(property.matchResult.overallScore * 100).toFixed(0)}% Match</span>
-                                              </Badge>
-                                            )}
-                                            <StatusIndicator status={property.status} />
-                                        </div>
+                                    <Card key={property.property.propertyId} className="bg-secondary/50">
+                                        <CardHeader className="flex flex-row items-start justify-between flex-wrap gap-2 pb-4">
+                                            <div>
+                                                <CardTitle className="text-lg">{property.property.propertyId}</CardTitle>
+                                                <CardDescription>{property.property.userCompanyName}</CardDescription>
+                                            </div>
+                                             <div className="flex items-center gap-4">
+                                                {property.matchResult && (
+                                                  <Badge variant="outline" className="border-primary/80 bg-primary/10 text-primary font-semibold">
+                                                    <Percent className="mr-1.5 h-4 w-4" />
+                                                    <span>{(property.matchResult.overallScore * 100).toFixed(0)}% Match</span>
+                                                  </Badge>
+                                                )}
+                                                <StatusIndicator status={property.status} />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 text-sm">
+                                                <div className="space-y-1">
+                                                    <p className="font-semibold flex items-center gap-1.5 text-muted-foreground"><Scaling className="w-4 h-4"/>Size</p>
+                                                    <p>{property.property.size.toLocaleString()} sq. ft.</p>
+                                                </div>
+                                                 <div className="space-y-1">
+                                                    <p className="font-semibold flex items-center gap-1.5 text-muted-foreground"><HandCoins className="w-4 h-4"/>Rent/sft</p>
+                                                    <p>₹{property.property.rentPerSft}</p>
+                                                </div>
+                                                 <div className="space-y-1">
+                                                    <p className="font-semibold flex items-center gap-1.5 text-muted-foreground"><Building2 className="w-4 h-4"/>Ceiling</p>
+                                                    <p>{property.property.ceilingHeight} ft</p>
+                                                </div>
+                                                 <div className="space-y-1">
+                                                    <p className="font-semibold flex items-center gap-1.5 text-muted-foreground"><Truck className="w-4 h-4"/>Docks</p>
+                                                    <p>{property.property.docks}</p>
+                                                </div>
+                                                 <div className="space-y-1">
+                                                    <p className="font-semibold flex items-center gap-1.5 text-muted-foreground"><CalendarCheck className="w-4 h-4"/>Readiness</p>
+                                                    <p>{property.property.readinessToOccupy}</p>
+                                                </div>
+                                                 <div className="space-y-1">
+                                                    <p className="font-semibold flex items-center gap-1.5 text-muted-foreground"><Flame className="w-4 h-4"/>Fire NOC</p>
+                                                    <p>{property.property.fireNoc}</p>
+                                                </div>
+                                            </div>
+                                        </CardContent>
                                     </Card>
                                 ))}
                             </div>
