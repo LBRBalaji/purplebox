@@ -8,7 +8,52 @@ import {
 } from '@vis.gl/react-google-maps';
 import * as React from 'react';
 import { Input } from './ui/input';
-import { Search } from 'lucide-react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle } from 'lucide-react';
+
+
+function RegionalSummaryCard() {
+    return (
+        <Card className="absolute top-4 left-1/2 z-10 w-full max-w-sm -translate-x-1/2 shadow-lg bg-background/90 backdrop-blur-sm">
+            <CardHeader>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <CardTitle className="flex items-center gap-2">
+                           <Building2 className="h-6 w-6 text-primary"/>
+                           Thiruvallur Region
+                        </CardTitle>
+                        <CardDescription>Aggregated Warehouse Supply</CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <div className="flex justify-between items-center p-3 rounded-md bg-primary/10">
+                    <p className="font-bold text-primary">Total Listings</p>
+                    <p className="text-2xl font-bold text-primary">15</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                    <div className="flex justify-between items-center">
+                        <p className="text-muted-foreground flex items-center gap-2"><Scaling className="h-4 w-4" /> Size Range</p>
+                        <p className="font-semibold">45,000 - 300,000 sq. ft.</p>
+                    </div>
+                     <div className="flex justify-between items-center">
+                        <p className="text-muted-foreground flex items-center gap-2"><CalendarCheck className="h-4 w-4" /> Readiness</p>
+                        <div className="flex gap-3 text-xs">
+                           <span className="font-semibold">Ready: <b className="text-green-600">8</b></span>
+                           <span className="font-semibold">Soon: <b className="text-amber-600">3</b></span>
+                           <span className="font-semibold">Building: <b className="text-blue-600">4</b></span>
+                        </div>
+                    </div>
+                     <div className="flex justify-between items-center">
+                        <p className="text-muted-foreground flex items-center gap-2"><CheckCircle className="h-4 w-4" /> Avg. Ceiling Height</p>
+                        <p className="font-semibold">~42 ft.</p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
 
 
 function MapSearchContent({ mapId }: { mapId: string }) {
@@ -30,7 +75,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       }
     };
   }, [places]);
-  
+
   // Handle search box places changing
   React.useEffect(() => {
     if (!searchBox || !map) return;
@@ -49,19 +94,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   return (
     <>
-      <div className="absolute top-4 left-1/2 z-10 w-full max-w-sm -translate-x-1/2 rounded-lg bg-background p-2 shadow-lg">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            ref={inputRef}
-            placeholder="Search for a city or region..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-      
+      <RegionalSummaryCard />
+
       <Map
         defaultCenter={{ lat: 13.13, lng: 79.91 }}
         defaultZoom={10}
@@ -70,7 +104,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         gestureHandling="greedy"
         className="h-full w-full"
       >
-        {/* Markers have been removed to provide a clean slate */}
+        {/* Intentionally left blank to keep the map clean */}
       </Map>
     </>
   );
