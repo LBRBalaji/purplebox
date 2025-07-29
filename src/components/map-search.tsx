@@ -117,7 +117,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
   },
 };
 
-const LogDemandButton = ({ center, onLogDemand, variant = 'primary' }: { center: { lat: number; lng: number } | null, onLogDemand: (center?: { lat: number; lng: number } | null) => void, variant?: "primary" | "secondary" }) => {
+const LogDemandButton = ({ center, onLogDemand, variant = 'primary' }: { center: { lat: number; lng: number } | null, onLogDemand: (center?: { lat: number; lng: number } | null) => void, variant?: "primary" | "secondary" | "default" }) => {
     const { user } = useAuth();
 
     return (
@@ -126,7 +126,7 @@ const LogDemandButton = ({ center, onLogDemand, variant = 'primary' }: { center:
                 className="w-full" 
                 onClick={() => onLogDemand(center)} 
                 disabled={user?.role === 'SuperAdmin'}
-                variant={variant as any}
+                variant={variant}
             >
                 {user && user.role === 'User' ? (
                     <>
@@ -187,7 +187,7 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
                 </div>
             </CardContent>
             <CardFooter>
-                <LogDemandButton center={data.center} onLogDemand={onLogDemand} variant="primary" />
+                <LogDemandButton center={data.center} onLogDemand={onLogDemand} variant="default" />
             </CardFooter>
         </Card>
     )
