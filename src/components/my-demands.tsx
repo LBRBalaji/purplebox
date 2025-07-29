@@ -186,11 +186,11 @@ export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: s
                                     {match.isNew && <Badge className="absolute top-2 right-2 bg-primary animate-pulse">New</Badge>}
                                 </div>
                                 <CardTitle>Property ID: {match.property.propertyId}</CardTitle>
-                                <CardDescription>
-                                <div className="inline-flex items-center gap-2 text-primary font-semibold border border-primary/50 bg-primary/10 px-2 py-1 rounded-md text-sm">
-                                    <Percent className="w-4 h-4" /> 
-                                    <span>{(match.matchResult.overallScore * 100).toFixed(0)}% Match</span>
-                                </div>
+                                <CardDescription asChild>
+                                  <div className="inline-flex items-center gap-2 text-primary font-semibold border border-primary/50 bg-primary/10 px-2 py-1 rounded-md text-sm">
+                                      <Percent className="w-4 h-4" /> 
+                                      <span>{(match.matchResult.overallScore * 100).toFixed(0)}% Match</span>
+                                  </div>
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
