@@ -12,24 +12,22 @@ import { Card, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Briefcase, CheckCircle2, Clock, XCircle, Percent } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useData } from '@/contexts/data-context';
+import { useData, type SubmissionStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import { type Submission } from '@/contexts/data-context';
 
-export type SubmissionStatus = "Pending" | "Shortlisted" | "Rejected";
-
 const StatusIndicator = ({ status }: { status: SubmissionStatus }) => {
     const statusConfig = {
-        Shortlisted: { icon: CheckCircle2, color: 'text-green-600', bgColor: 'bg-green-100', text: 'Shortlisted' },
+        Approved: { icon: CheckCircle2, color: 'text-green-600', bgColor: 'bg-green-100', text: 'Approved' },
         Pending: { icon: Clock, color: 'text-amber-600', bgColor: 'bg-amber-100', text: 'Pending Review' },
-        Rejected: { icon: XCircle, color: 'text-red-600', bgColor: 'bg-red-100', text: 'Not Shortlisted' },
+        Rejected: { icon: XCircle, color: 'text-red-600', bgColor: 'bg-red-100', text: 'Rejected' },
     };
 
     const config = statusConfig[status];
     const Icon = config.icon;
 
     return (
-        <Badge variant="outline" className={cn("border-0 font-medium", config.bgColor, config.color)}>
+        <Badge variant="outline" className={cn("border-0 font-medium w-32 justify-center", config.bgColor, config.color)}>
             <Icon className="mr-2 h-4 w-4" />
             {config.text}
         </Badge>
@@ -42,21 +40,22 @@ type GroupedSubmission = {
       propertyType: string;
       location: string;
     };
-    properties: (Submission & { status: SubmissionStatus })[];
+    properties: Submission[];
 }
 
 export function MySubmissions() {
     const { user } = useAuth();
-    const { demands, submissions, shortlistedItems } = useData();
+    const { demands, submissions } = useData();
     const [groupedSubmissions, setGroupedSubmissions] = React.useState<GroupedSubmission[]>([]);
 
     React.useEffect(() => {
         if (user?.email) {
+            // Providers see submissions they authored
             const mySubmissions = submissions.filter(sub => sub.property.userEmail === user.email);
 
             const grouped = mySubmissions.reduce((acc, submission) => {
                 const demand = demands.find(d => d.demandId === submission.demandId);
-                if (!demand) return acc; // Gracefully skip if demand not found
+                if (!demand) return acc;
 
                 let group = acc.find(g => g.demandId === submission.demandId);
                 if (!group) {
@@ -71,17 +70,14 @@ export function MySubmissions() {
                     acc.push(group);
                 }
 
-                const isShortlisted = shortlistedItems.some(item => item.property.propertyId === submission.property.propertyId);
-                const status: SubmissionStatus = isShortlisted ? "Shortlisted" : "Pending";
-
-                group.properties.push({ ...submission, status });
+                group.properties.push(submission);
                 return acc;
 
             }, [] as GroupedSubmission[]);
 
             setGroupedSubmissions(grouped);
         }
-    }, [submissions, demands, user, shortlistedItems]);
+    }, [submissions, demands, user]);
 
   return (
     <div className="mt-8">

@@ -6,12 +6,15 @@ import { type DemandSchema, type PropertySchema } from '@/lib/schema';
 import { type GetPropertyMatchScoreOutput } from '@/ai/flows/get-property-match-score';
 import { mockDemands, mockSubmissions } from '@/lib/mock-data';
 
+export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
+
 export type Submission = {
     demandId: string;
     property: PropertySchema;
     matchResult: GetPropertyMatchScoreOutput;
     isNew?: boolean;
     demandUserEmail?: string;
+    status: SubmissionStatus;
 }
 
 type DataEvent = {
@@ -27,6 +30,7 @@ type DataContextType = {
   updateDemand: (demand: DemandSchema) => void;
   submissions: Submission[];
   addSubmission: (submission: Submission, userEmail?: string) => void;
+  updateSubmissionStatus: (propertyId: string, status: SubmissionStatus) => void;
   shortlistedItems: Submission[];
   toggleShortlist: (submission: Submission) => void;
   clearNewSubmissions: (propertyIds: string[]) => void;
@@ -40,16 +44,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>(() => {
-    // Pre-populate with a couple of items for easier testing
     const initialShortlist = mockSubmissions.filter(sub => 
-        sub.property.propertyId === 'PS-ACME-001' || 
-        sub.property.propertyId === 'PS-LOGI-001'
+        (sub.property.propertyId === 'PS-ACME-001' || 
+        sub.property.propertyId === 'PS-LOGI-001') && sub.status === 'Approved'
     );
     return initialShortlist as Submission[];
   });
 
   const addDemand = (demand: DemandSchema, userEmail?: string) => {
-    setDemands((prev) => [demand, ...prev]); // Add to the top of the list
+    setDemands((prev) => [demand, ...prev]);
     setLastEvent({
       type: 'new_demand',
       id: demand.demandId,
@@ -68,12 +71,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addSubmission = (submission: Submission, userEmail?: string) => {
     const demand = demands.find(d => d.demandId === submission.demandId);
-    const submissionWithNewFlag: Submission = {
+    // All new submissions are pending
+    const submissionWithDefaults: Submission = {
         ...submission,
         isNew: true,
-        demandUserEmail: demand?.userEmail
+        demandUserEmail: demand?.userEmail,
+        status: 'Pending', 
     };
-    setSubmissions((prev) => [submissionWithNewFlag, ...prev]);
+    setSubmissions((prev) => [submissionWithDefaults, ...prev]);
     setLastEvent({
         type: 'new_submission',
         id: submission.demandId,
@@ -82,7 +87,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const updateSubmissionStatus = (propertyId: string, status: SubmissionStatus) => {
+    setSubmissions(prev =>
+      prev.map(sub =>
+        sub.property.propertyId === propertyId ? { ...sub, status } : sub
+      )
+    );
+     // If a property is rejected, remove it from the shortlist
+    if (status === 'Rejected') {
+      setShortlistedItems(prev => prev.filter(item => item.property.propertyId !== propertyId));
+    }
+  };
+
   const toggleShortlist = (submissionToToggle: Submission) => {
+    // A customer can only shortlist an approved submission
+    if (submissionToToggle.status !== 'Approved') return;
+
     setShortlistedItems((prev) => {
       const isShortlisted = prev.some(
         (item) => item.property.propertyId === submissionToToggle.property.propertyId
@@ -106,7 +126,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent }}>
+    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent }}>
       {children}
     </DataContext.Provider>
   );

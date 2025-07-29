@@ -1,5 +1,5 @@
 
-export type SubmissionStatus = "Pending" | "Shortlisted" | "Rejected";
+import { Submission } from "@/contexts/data-context";
 
 export const mockDemands = [
   {
@@ -95,7 +95,7 @@ export const mockDemands = [
 ];
 
 
-export const mockSubmissions = [
+export const mockSubmissions: Submission[] = [
   {
     demandId: 'DMD-1700000000001',
     property: {
@@ -135,6 +135,7 @@ export const mockSubmissions = [
       },
       justification: "This property is an excellent match. It slightly exceeds the requested size and is in the perfect location, meeting all critical feature requirements like docks and ceiling height.",
     },
+    status: 'Approved',
   },
   {
     demandId: 'DMD-1700000000001',
@@ -175,6 +176,7 @@ export const mockSubmissions = [
       },
       justification: "Good location match, but the size is below the 10% tolerance for your non-compromisable requirement. It also has fewer docks than requested.",
     },
+    status: 'Pending',
   },
     {
     demandId: 'DMD-1700000000002',
@@ -215,6 +217,7 @@ export const mockSubmissions = [
       },
       justification: "This property matches your size and feature requirements well. However, because 'location' was marked as non-compromisable, the score is very low as the property is assumed to be outside the specified radius.",
     },
+    status: 'Rejected',
   },
   {
     demandId: 'DMD-1700000000005',
@@ -255,6 +258,7 @@ export const mockSubmissions = [
       },
       justification: "Excellent match. This property meets all non-compromisable requirements for readiness, ceiling height, and fire NOC. It also offers more docks than required and is a good size fit.",
     },
+    status: 'Approved',
   },
   {
     demandId: 'DMD-1700000000005',
@@ -295,5 +299,6 @@ export const mockSubmissions = [
       },
       justification: "This property is a poor match. Although it meets the readiness and fire NOC requirements, the ceiling height of 35 ft is significantly lower than the 45 ft specified as a non-compromisable item, making it unsuitable for the client's vertical storage needs.",
     },
+    status: 'Pending',
   },
 ];

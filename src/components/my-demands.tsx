@@ -51,7 +51,8 @@ export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: s
     if (user?.email) {
       const userDemands = demands.filter(d => d.userEmail === user.email);
       const demandsWithSubmissions = userDemands.map(demand => {
-        const demandSubmissions = submissions.filter(sub => sub.demandId === demand.demandId);
+        // Customers only see APPROVED submissions
+        const demandSubmissions = submissions.filter(sub => sub.demandId === demand.demandId && sub.status === 'Approved');
         return { ...demand, matches: demandSubmissions };
       });
       setMyDemandsWithMatches(demandsWithSubmissions);
@@ -75,7 +76,7 @@ export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: s
       <div className="mt-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold font-headline tracking-tight">My Demands & Matches</h2>
-          <p className="text-muted-foreground mt-2">Review matches submitted for your active demands.</p>
+          <p className="text-muted-foreground mt-2">Review approved matches submitted for your active demands.</p>
         </div>
         {myDemandsWithMatches.length > 0 ? (
           <Accordion type="single" collapsible className="w-full space-y-4" onValueChange={handleAccordionChange}>
@@ -173,7 +174,7 @@ export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: s
 
                   {demand.matches.length > 0 ? (
                     <div>
-                        <h4 className="font-semibold text-lg text-foreground mb-4">Submitted Matches</h4>
+                        <h4 className="font-semibold text-lg text-foreground mb-4">Approved Matches</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {demand.matches.map(match => {
                             const isShortlisted = shortlistedItems.some(item => item.property.propertyId === match.property.propertyId);
@@ -225,8 +226,8 @@ export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: s
                     </div>
                   ) : (
                     <div className="text-muted-foreground text-center py-8">
-                      <p>No matches have been submitted for this demand yet.</p>
-                      <p className="text-xs mt-1">Matches from property providers will appear here once submitted.</p>
+                      <p>No approved matches have been found for this demand yet.</p>
+                      <p className="text-xs mt-1">Properties submitted by providers will appear here once they are approved by an admin.</p>
                     </div>
                   )}
                 </AccordionContent>

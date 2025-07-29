@@ -16,6 +16,8 @@ import { ArrowLeft } from 'lucide-react';
 import { ShortlistedProperties } from '@/components/shortlisted-properties';
 import { Badge } from '@/components/ui/badge';
 import { AdminNotifier } from '@/components/admin-notifier';
+import { ApprovalQueue } from '@/components/approval-queue';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -23,10 +25,10 @@ export default function DashboardPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  // For SuperAdmin, to show the property form
+  // For SuperAdmin (Property Provider)
   const propertySubmitDemandId = searchParams.get('demandId');
   
-  // For User, to handle demand editing and new demand from map
+  // For User (Customer)
   const editDemandId = searchParams.get('editDemandId');
   const logNewFromMap = searchParams.get('logNew');
 
@@ -35,7 +37,8 @@ export default function DashboardPage() {
 
   const newMatchCount = React.useMemo(() => {
     if (!user) return 0;
-    return submissions.filter(s => s.isNew && s.demandUserEmail === user.email).length;
+    // Customer only sees new matches that are APPROVED
+    return submissions.filter(s => s.isNew && s.demandUserEmail === user.email && s.status === 'Approved').length;
   }, [submissions, user]);
 
 
@@ -48,10 +51,40 @@ export default function DashboardPage() {
   }, [searchParams]);
 
   const onDemandUpserted = () => {
-    // This function's sole responsibility is now to switch the tab.
-    // Navigation is handled within the form's dialog.
     setUserActiveTab('my-demands');
   };
+
+  if (user?.email === 'admin@example.com') {
+    return (
+      <>
+        <AdminNotifier />
+        <main className="container mx-auto p-4 md:p-8">
+          <div className="max-w-7xl mx-auto">
+             <Card>
+                <CardHeader>
+                    <CardTitle>Admin Dashboard</CardTitle>
+                    <CardDescription>
+                        Welcome, Admin. Your primary role is to circulate new demands and approve/reject property submissions.
+                    </CardDescription>
+                </CardHeader>
+             </Card>
+             <Tabs defaultValue="demands" className="w-full mt-6">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="demands">Circulate Demands</TabsTrigger>
+                    <TabsTrigger value="approvals">Approval Queue</TabsTrigger>
+                </TabsList>
+                <TabsContent value="demands">
+                    <DemandList />
+                </TabsContent>
+                <TabsContent value="approvals">
+                    <ApprovalQueue />
+                </TabsContent>
+             </Tabs>
+          </div>
+        </main>
+      </>
+    );
+  }
 
   if (user?.role === 'User') {
     return (
@@ -89,7 +122,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (user?.role === 'SuperAdmin') {
+  if (user?.role === 'SuperAdmin') { // Property Provider
     return (
       <>
         <AdminNotifier />

@@ -16,12 +16,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.push('/');
       return;
     }
-    // Specific check for analytics page to ensure only SuperAdmins can access it
-    if (!isLoading && user && pathname.startsWith('/dashboard/analytics') && user.role !== 'SuperAdmin') {
+    // Specific check for analytics page
+    if (!isLoading && user && pathname.startsWith('/dashboard/analytics') && user.email !== 'admin@example.com') {
       router.push('/dashboard');
     }
-     // Specific check for manage warehouses page to ensure only SuperAdmins can access it
+     // Specific check for manage warehouses page
     if (!isLoading && user && pathname.startsWith('/dashboard/manage-warehouses') && user.role !== 'SuperAdmin') {
+      router.push('/dashboard');
+    }
+     // Specific check for approval page
+    if (!isLoading && user && pathname.startsWith('/dashboard/approval') && user.email !== 'admin@example.com') {
       router.push('/dashboard');
     }
   }, [user, isLoading, router, pathname]);
