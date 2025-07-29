@@ -25,13 +25,13 @@ export default function MapSearchPage() {
   }
 
   return (
-    <div className="flex flex-col flex-grow">
-        <Header />
-        <div className="flex-grow">
-            <APIProvider apiKey={apiKey} libraries={['places', 'marker', 'geometry']}>
-                <MapSearch mapId={mapId}/>
-            </APIProvider>
-        </div>
+    <div className="flex flex-col h-full">
+      <Header />
+      <div className="flex-grow">
+        <APIProvider apiKey={apiKey} libraries={['places', 'marker', 'geometry']}>
+          <MapSearch mapId={mapId}/>
+        </APIProvider>
+      </div>
     </div>
   );
 }
