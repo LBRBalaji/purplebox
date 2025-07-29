@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 
@@ -410,7 +410,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                             This is an Untapped Opportunity!
                         </h3>
                         <p className="text-sm mt-2 mb-6 text-muted-foreground">
-                           We don&apos;t have aggregated supply data for this specific area, but you can still log a demand.
+                           While we don't have aggregated supply data here yet, our sourcing network is always expanding. Log your demand, and we'll activate our network to find a match for you.
                         </p>
                         <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="default"/>
                     </div>
