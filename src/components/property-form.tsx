@@ -144,6 +144,8 @@ export function PropertyForm() {
   const [aiResult, setAiResult] = React.useState<AiResult | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isCopied, setIsCopied] = React.useState(false);
+  const [placeholders, setPlaceholders] = React.useState<Partial<PropertySchema>>({});
+
 
   const form = useForm<PropertySchema>({
     resolver: zodResolver(propertySchema),
@@ -197,16 +199,17 @@ export function PropertyForm() {
       form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
       const demandToMatch = demands.find(d => d.demandId === demandIdFromUrl);
       if (demandToMatch) {
-        // Pre-fill form with demand details
+        // Set placeholders for reference in grey text
+        setPlaceholders({
+          propertyGeoLocation: demandToMatch.locationName || demandToMatch.location,
+          size: demandToMatch.size,
+          readinessToOccupy: demandToMatch.readiness,
+          ceilingHeight: demandToMatch.ceilingHeight,
+          docks: demandToMatch.docks,
+        });
+        
+        // We still set the form value for the AI to use, but the user can override it.
         form.setValue('propertyGeoLocation', demandToMatch.locationName || demandToMatch.location);
-        form.setValue('size', demandToMatch.size);
-        form.setValue('readinessToOccupy', demandToMatch.readiness);
-        if (demandToMatch.ceilingHeight) {
-          form.setValue('ceilingHeight', demandToMatch.ceilingHeight);
-        }
-        if (demandToMatch.docks !== undefined) {
-          form.setValue('docks', demandToMatch.docks);
-        }
       }
     }
   }, [searchParams, form, demandIdFromUrl, demands]);
@@ -233,7 +236,7 @@ export function PropertyForm() {
       setIsDialogOpen(true);
       toast({
         title: "Success!",
-        description: isMatchingMode ? "Property match submitted for approval." : "AI description generated.",
+        description: isMatchingMode ? "Property match submitted." : "AI description generated.",
       });
     } catch (error) {
       const e = error as Error;
@@ -278,7 +281,7 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="size" render={({ field }) => (
-                      <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={placeholders.size ? String(placeholders.size) : "e.g. 50000"} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )}
                   />
                   <div className="md:col-span-2">
@@ -305,8 +308,8 @@ export function PropertyForm() {
                   />
                   <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
                       <FormItem><FormLabel>Readiness to Occupy</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                      <Select onValueChange={field.onChange} value={field.value} defaultValue={placeholders.readinessToOccupy}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Select readiness" /></SelectTrigger></FormControl>
                         <SelectContent>
                           <SelectItem value="Immediate">Immediate</SelectItem>
                           <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
@@ -328,7 +331,7 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
-                      <FormItem><FormLabel>Ceiling Height (ft)</FormLabel><FormControl><Input type="number" placeholder="e.g. 30" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Ceiling Height (ft)</FormLabel><FormControl><Input type="number" placeholder={placeholders.ceilingHeight ? String(placeholders.ceilingHeight) : "e.g. 30"} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )}
                   />
                 </CardContent>
@@ -366,7 +369,7 @@ export function PropertyForm() {
                <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="w-5 h-5 text-primary" /> Docks & More</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="docks" render={({ field }) => (<FormItem><FormLabel>Number of Docks</FormLabel><FormControl><Input type="number" placeholder="e.g. 8" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="docks" render={({ field }) => (<FormItem><FormLabel>Number of Docks</FormLabel><FormControl><Input type="number" placeholder={placeholders.docks ? String(placeholders.docks) : "e.g. 8"} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="canopy" render={({ field }) => (<FormItem><FormLabel>Canopy</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     <FormItem>
                         <FormLabel>Upload Images</FormLabel>
@@ -434,7 +437,7 @@ export function PropertyForm() {
               ) : isMatchingMode ? (
                 <>
                   <Wand className="mr-2 h-4 w-4" />
-                  Submit for Approval
+                  Submit Match
                 </>
               ) : (
                 <>
