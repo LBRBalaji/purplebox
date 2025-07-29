@@ -7,7 +7,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Check, Info, ListChecks, Percent, ThumbsDown, ThumbsUp, X } from 'lucide-react';
+import { Check, Info, ListChecks, Percent, ThumbsDown, ThumbsUp, X, MapPin, Scaling, CalendarCheck, HandCoins, Zap, ShieldCheck, Truck } from 'lucide-react';
+import { Separator } from './ui/separator';
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size',
@@ -20,6 +21,19 @@ const priorityLabels: { [key: string]: string } = {
   power: 'Power',
   fireSafety: 'Fire Safety',
 };
+
+const ScoreDisplay = ({ label, score, icon: Icon }: { label: string, score: number, icon: React.ElementType }) => {
+    const displayScore = Math.round(score * 100);
+    const colorClass = displayScore >= 85 ? 'text-green-600' : displayScore >= 60 ? 'text-amber-600' : 'text-red-600';
+    
+    return (
+        <div className="flex justify-between items-center text-sm">
+            <p className="font-medium flex items-center gap-2"><Icon className="h-4 w-4 text-muted-foreground" /> {label}</p>
+            <p className={`font-bold ${colorClass}`}>{displayScore}%</p>
+        </div>
+    );
+};
+
 
 export function ApprovalQueue() {
     const { demands, submissions, updateSubmissionStatus } = useData();
@@ -64,6 +78,8 @@ export function ApprovalQueue() {
                 const demand = demands.find(d => d.demandId === submission.demandId);
                 if (!demand) return null;
 
+                const breakdown = submission.matchResult.scoreBreakdown;
+
                 return (
                     <Card key={submission.property.propertyId}>
                         <CardHeader>
@@ -96,7 +112,7 @@ export function ApprovalQueue() {
                                 <div className="space-y-4">
                                     <h3 className="font-semibold text-lg">Submitted Property ({submission.property.propertyId})</h3>
                                     <div className="p-4 border rounded-md space-y-3">
-                                        <p><strong>Location:</strong> {submission.property.propertyGeoLocation}</p>
+                                        <p><strong>Location:</strong> {submission.property.isLocationConfirmed ? <span className="text-green-600 font-semibold">Confirmed by Provider</span> : <span className="text-red-600 font-semibold">Not Confirmed</span>}</p>
                                         <p><strong>Size:</strong> {submission.property.size.toLocaleString()} sq. ft.</p>
                                         <p><strong>Readiness:</strong> {submission.property.readinessToOccupy}</p>
                                         <p><strong>Ceiling Height:</strong> {submission.property.ceilingHeight} ft</p>
@@ -108,13 +124,23 @@ export function ApprovalQueue() {
                              {/* AI Analysis */}
                              <div className="mt-6">
                                 <h3 className="font-semibold text-lg mb-2">AI Match Analysis</h3>
-                                <div className="p-4 border rounded-md bg-primary/5 space-y-2">
+                                <div className="p-4 border rounded-md bg-primary/5 space-y-4">
                                      <div className="flex items-center gap-3">
-                                        <Badge className="text-lg">
+                                        <Badge className="text-lg py-1 px-4">
                                             <Percent className="mr-2 h-4 w-4"/>
-                                            {(submission.matchResult.overallScore * 100).toFixed(0)}% Match
+                                            {(submission.matchResult.overallScore * 100).toFixed(0)}% Overall Match
                                         </Badge>
-                                        <p className="text-sm text-muted-foreground italic">{submission.matchResult.justification}</p>
+                                        <p className="text-sm text-muted-foreground italic line-clamp-2">{submission.matchResult.justification}</p>
+                                     </div>
+                                     <Separator />
+                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
+                                        <ScoreDisplay label="Location" score={breakdown.location} icon={MapPin} />
+                                        <ScoreDisplay label="Size" score={breakdown.size} icon={Scaling} />
+                                        <ScoreDisplay label="Amenities" score={breakdown.amenities} icon={Truck} />
+                                        <ScoreDisplay label="Commercials" score={breakdown.commercials} icon={HandCoins} />
+                                        <ScoreDisplay label="Power" score={breakdown.power} icon={Zap} />
+                                        <ScoreDisplay label="Fire Safety" score={breakdown.fireSafety} icon={Flame} />
+                                        <ScoreDisplay label="Approvals" score={breakdown.approvals} icon={ShieldCheck} />
                                      </div>
                                 </div>
                              </div>

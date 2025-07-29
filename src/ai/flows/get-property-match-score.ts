@@ -20,13 +20,17 @@ const GetPropertyMatchScoreInputSchema = z.object({
 export type GetPropertyMatchScoreInput = z.infer<typeof GetPropertyMatchScoreInputSchema>;
 
 const GetPropertyMatchScoreOutputSchema = z.object({
-  overallScore: z.number().min(0).max(1).describe('The overall match score from 0 to 1, where 1 is a perfect match.'),
+  overallScore: z.number().min(0).max(1).describe('The overall weighted match score from 0 to 1, where 1 is a perfect match.'),
   scoreBreakdown: z.object({
-      location: z.number().min(0).max(1).describe('Score for how well the property location matches the demand criteria (0-1).'),
+      location: z.number().min(0).max(1).describe('Score for location match (0-1). 1.0 if confirmed by provider.'),
       size: z.number().min(0).max(1).describe('Score for how well the property size matches the demand (0-1).'),
-      features: z.number().min(0).max(1).describe('Score for how well the property amenities and other features match the demand (0-1).'),
-    }).describe('A breakdown of scores for different sections.'),
-  justification: z.string().describe('A detailed explanation for the calculated scores, highlighting strengths and weaknesses of the match.'),
+      commercials: z.number().min(0).max(1).describe('Score for the commercial terms (rent, deposit) (0-1). Assumed 0.9 if no specifics from customer.'),
+      power: z.number().min(0).max(1).describe('Score for the power infrastructure (0-1). Assumed 0.9 if no specifics from customer.'),
+      fireSafety: z.number().min(0).max(1).describe('Score for fire safety compliance (0-1). Assumed 0.9 if no specifics from customer.'),
+      approvals: z.number().min(0).max(1).describe('Score for statutory approvals (0-1). Assumed 0.9 if no specifics from customer.'),
+      amenities: z.number().min(0).max(1).describe('Score for amenities like docks and canopy (0-1).'),
+    }).describe('A breakdown of scores for different categories.'),
+  justification: z.string().describe('A detailed explanation for the calculated scores, highlighting strengths and weaknesses of the match for each category.'),
 });
 export type GetPropertyMatchScoreOutput = z.infer<typeof GetPropertyMatchScoreOutputSchema>;
 
@@ -41,31 +45,47 @@ const prompt = ai.definePrompt({
   model: googleAI.model('gemini-1.5-flash-latest'),
   prompt: `You are an expert Commercial Real Estate Analyst. Your task is to calculate a detailed match score between a property demand and a submitted property.
 
-You must provide an overall score, a breakdown for location, size, and features, and a justification. The scores must be between 0.0 and 1.0.
+You must provide an overall score, a breakdown for multiple categories, and a detailed justification. The scores must be between 0.0 and 1.0.
 
-**SCORING GUIDELINES:**
+**GENERAL SCORING GUIDELINES:**
+
+- **Non-Compromisable Items:** If a customer marks an item as "non-compromisable", any significant deviation in the property should lead to a very low score **for that specific category**. However, do not let it drag the entire overall score to zero if other categories are a good match.
+- **No Customer Preference:** If the customer has NOT specified a requirement for a category (e.g., they did not specify 'fireNoc' as a priority or mention it in the description), you should give a high score (e.g., 0.9-1.0) to a property that has positive attributes in that category (e.g., Fire NOC is "Obtained"). This rewards well-equipped properties. Assume a default score of 0.9 for categories like Commercials, Power, Fire Safety, and Approvals if no customer preference is stated.
+- **Justification:** Your justification MUST be detailed and address each category separately. Explain the "why" behind each score.
+
+**CATEGORY-SPECIFIC SCORING RULES:**
 
 1.  **Location Score:**
-    *   The property provider has a field \`isLocationConfirmed\`. If \`isLocationConfirmed\` is \`true\`, it means the provider confirms their property is within the customer's desired radius. In this case, the **location score should be very high (e.g., 0.95 to 1.0)**. Do not penalize the location if this is confirmed. If it is false, the score should be very low (0.1).
+    *   If the property provider has set \`isLocationConfirmed\` to \`true\`, the **location score must be 1.0**. The justification should state that the provider has confirmed the location match.
+    *   If \`isLocationConfirmed\` is \`false\`, the score must be very low (0.1), as the location is unverified.
 
 2.  **Size Score:**
     *   Calculate the percentage difference: \`abs(demandSize - propertySize) / demandSize\`.
-    *   If size is a **non-compromisable** priority:
-        *   If the property size is outside a **15% tolerance**, the score should be very low (< 0.2).
-        *   Otherwise, the score should be high (> 0.85).
-    *   If size is **NOT** a non-compromisable priority, be more lenient. A difference up to 25% should still result in a score around 0.6-0.7.
+    *   If size is within a **15% tolerance** of the demand, the score should be high (0.85-1.0).
+    *   If size is outside the 15% tolerance, the score should decrease proportionally. A 25% difference might score around 0.6.
+    *   If size is a **non-compromisable** priority and the property is outside the 15% tolerance, the size score should be very low (< 0.2).
 
-3.  **Features Score:**
-    *   This score is a blend of all other features (Ceiling Height, Docks, Readiness, Approvals, Fire Safety, etc.).
-    *   If a feature (e.g., 'docks', 'ceilingHeight') is a **non-compromisable** priority:
-        *   If the property **meets or exceeds** the requirement, that part of the feature score should be 1.0.
-        *   If the property is **below** the requirement, penalize it, but proportionally. A property with 11 of 12 required docks should get a dock-specific score around 0.9. A score of 9 of 12 docks should be around 0.75. A very low number should result in a very low score for that feature (< 0.2).
-    *   If a feature is **NOT** a non-compromisable priority, be more lenient.
-    *   Evaluate all features and create a blended score.
+3.  **Amenities Score (Docks, Canopy, etc.):**
+    *   This is a blended score. If the customer requires a specific number of docks (e.g., 12) and the property has fewer (e.g., 11), the score should be proportional (11/12 = 0.92). A score of 9/12 would be 0.75.
+    *   If the customer requires a specific ceiling height and the property is below, score it proportionally (e.g., 38ft provided vs 40ft required is 38/40 = 0.95 score).
+    *   If the customer has **no** requirement for docks or ceiling height, a property with a reasonable number (e.g., >5 docks, >30ft ceiling) should get a high score (0.9-1.0).
 
-4.  **Overall Score & Justification:**
-    *   The overall score should be a weighted average of the Location, Size, and Features scores. Give higher weight to non-compromisable items.
-    *   Your justification MUST be clear, logical, and reference specific numbers. For example: "The size score is 0.9 because the 92,000 sq ft property is well within the 15% tolerance of the 100,000 sq ft demand." If a score is low, explain the exact reason based on the provided numbers and priorities. For example: "The features score is impacted because the required ceiling height of 40ft was a non-compromisable priority, and the provided 36ft is below this."
+4.  **Fire Safety Score:**
+    *   If the customer makes 'fireNoc' or 'fireSafety' a priority, a property with "Obtained" Fire NOC and "Installed" Fire Hydrant gets a 1.0. "Applied For" gets ~0.6. "To Apply" gets ~0.3.
+    *   If the customer has **no** preference, a property with "Obtained" NOC still gets a high score (1.0).
+
+5.  **Approvals Score:**
+    *   Similar to Fire Safety. If the customer makes 'approvals' a priority, "Obtained" status gets 1.0. "Applied For" gets ~0.6. "To Apply" or "Un-Approved" gets a low score.
+    *   If the customer has **no** preference, a property with "Obtained" approvals gets a high score (1.0).
+
+6.  **Power Score:**
+    *   If the customer requires power, evaluate the provided capacity. If no specific requirement, assume a high score (0.9) for any specified available power.
+
+7.  **Commercials Score:**
+    *   This is subjective. If no customer preference, assume 0.9. If customer mentions "budget-friendly", a lower rent/sft should get a higher score.
+
+8.  **Overall Score:**
+    *   This should be a weighted average of all category scores. Give higher weight to categories marked as non-compromisable. Your justification should briefly explain the overall score based on the category breakdown.
 
 **Analyze the following data:**
 
@@ -88,13 +108,15 @@ You must provide an overall score, a breakdown for location, size, and features,
 - Ceiling Height: {{{property.ceilingHeight}}} ft
 - Docks: {{{property.docks}}}
 - Readiness to Occupy: {{{property.readinessToOccupy}}}
+- Rent Per Sft: ₹{{{property.rentPerSft}}}
 - Available Power: {{{property.availablePower}}}
 - Approval Status: {{{property.approvalStatus}}}
 - Fire NOC Status: {{{property.fireNoc}}}
 - Fire Hydrant Status: {{{property.fireHydrant}}}
+- Canopy Status: {{{property.canopy}}}
 - Additional Info: {{{property.additionalInformation}}}
 
-Based on this information, provide your analysis as a JSON object matching the output schema. Be concise but clear in your justification.
+Based on this information, provide your analysis as a JSON object matching the output schema.
 `,
 });
 
