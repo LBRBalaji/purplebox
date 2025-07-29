@@ -150,7 +150,7 @@ export function PropertyForm() {
       propertyId: "",
       propertyGeoLocation: "",
       size: undefined,
-      floor: "",
+      floor: "Ground",
       readinessToOccupy: "Immediate",
       siteType: "Standalone",
       safety: "",
@@ -193,8 +193,21 @@ export function PropertyForm() {
   React.useEffect(() => {
     if (demandIdFromUrl) {
       form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
+      const demandToMatch = demands.find(d => d.demandId === demandIdFromUrl);
+      if (demandToMatch) {
+        // Pre-fill form with demand details
+        form.setValue('propertyGeoLocation', demandToMatch.location);
+        form.setValue('size', demandToMatch.size);
+        form.setValue('readinessToOccupy', demandToMatch.readiness);
+        if (demandToMatch.ceilingHeight) {
+          form.setValue('ceilingHeight', demandToMatch.ceilingHeight);
+        }
+        if (demandToMatch.docks !== undefined) {
+          form.setValue('docks', demandToMatch.docks);
+        }
+      }
     }
-  }, [searchParams, form, demandIdFromUrl]);
+  }, [searchParams, form, demandIdFromUrl, demands]);
 
 
   const handleGetLocation = () => {
