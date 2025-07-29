@@ -74,44 +74,27 @@ const useMatchScorer = (demand: DemandSchema | undefined, watchedValues: Partial
     const calculateScore = React.useCallback((field: 'size' | 'ceilingHeight' | 'docks') => {
         if (!demand) return null;
 
-        const isNonCompromisable = demand.preferences?.nonCompromisable?.includes(field) ?? false;
-
         if (field === 'size') {
             const demandSize = demand.size;
             const propertySize = watchedValues.size;
-            if (!propertySize) return null;
-            
-            const diff = Math.abs(demandSize - propertySize);
-            const pctDiff = diff / demandSize;
-
-            if (isNonCompromisable && pctDiff > 0.15) return 0.1; // Harsh penalty
-            if (pctDiff <= 0.15) return 0.95;
-            if (pctDiff <= 0.25) return 0.7;
-            return 0.4;
+            if (!propertySize || !demandSize) return null;
+            return Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
         }
 
         if (field === 'ceilingHeight') {
             const demandHeight = demand.ceilingHeight;
             const propertyHeight = watchedValues.ceilingHeight;
             if (!demandHeight || !propertyHeight) return null;
-
             if (propertyHeight >= demandHeight) return 1.0;
-            const score = propertyHeight / demandHeight;
-            
-            if (isNonCompromisable) return Math.max(0.1, score * 0.5); // Still penalize heavily but not to zero
-            return score;
+            return propertyHeight / demandHeight;
         }
         
         if (field === 'docks') {
             const demandDocks = demand.docks;
             const propertyDocks = watchedValues.docks;
             if (demandDocks === undefined || propertyDocks === undefined || demandDocks === 0) return null;
-
             if (propertyDocks >= demandDocks) return 1.0;
-            const score = propertyDocks / demandDocks;
-
-            if (isNonCompromisable) return Math.max(0.1, score * 0.5);
-            return score;
+            return propertyDocks / demandDocks;
         }
 
         return null;
@@ -591,7 +574,7 @@ export function PropertyForm() {
                         </div>
                         <div>
                             <p className="font-semibold">Features</p>
-                            <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.features * 100).toFixed(0)}%</p>
+                            <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.amenities * 100).toFixed(0)}%</p>
                         </div>
                     </div>
                     <div>

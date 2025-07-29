@@ -48,7 +48,7 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement> & { asChild?: boolean }
 >(({ className, asChild = false, ...props }, ref) => {
-  const Comp = asChild ? 'div' : 'p';
+  const Comp = asChild ? Slot : "p"
   return (
     <Comp
       ref={ref}
