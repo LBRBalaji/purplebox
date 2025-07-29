@@ -36,23 +36,24 @@ const prompt = ai.definePrompt({
   input: {schema: ImprovePropertyDemandDescriptionInputSchema},
   output: {schema: ImprovePropertyDemandDescriptionOutputSchema},
   model: googleAI.model('gemini-1.5-flash-latest'),
-  prompt: `You are an expert real estate agent specializing in crafting compelling property demand descriptions.
+  prompt: `You are an expert real estate agent specializing in writing clear and professional property DEMAND requests on behalf of a client. Your tone should be that of a company seeking a property, not advertising one.
 
   {{#if description}}
-  Improve the following property demand description to attract more potential matches. Focus on making the description more engaging, detailed, and professional, while accurately reflecting the provided information.
+  Based on the original description and the structured details below, write an improved and comprehensive demand description from the perspective of a company looking for a property. Use the location name, not coordinates.
 
   Original Description: {{{description}}}
   {{else}}
-  Create a compelling property demand description based on the following details. Make it engaging, detailed, and professional.
+  Based on the following details, write a comprehensive and professional demand description from the perspective of a company looking for a property. Use the location name provided.
   {{/if}}
   
-  Property Type: {{{propertyType}}}
-  Location: {{{location}}}
-  Size: {{{size}}}
-  Readiness: {{{readiness}}}
-  Additional Details: {{{additionalDetails}}}
+  **Client Requirement Details:**
+  - Property Type Needed: {{{propertyType}}}
+  - Desired Location: {{{location}}}
+  - Required Size: {{{size}}} Sq. Ft.
+  - Occupancy Timeline: {{{readiness}}}
+  - Other Specifications: {{{additionalDetails}}}
 
-  Improved Description:`,
+  Improved Demand Description:`,
 });
 
 const improvePropertyDemandDescriptionFlow = ai.defineFlow(
