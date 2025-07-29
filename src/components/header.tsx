@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Skeleton } from './ui/skeleton';
 
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -44,10 +45,10 @@ const NavLink = ({ href, children }: { href: string, children: React.ReactNode }
 }
 
 export function Header() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isAdmin = user?.email === 'admin@example.com';
-  const isSuperAdmin = user?.role === 'SuperAdmin';
+  const isPropertyProvider = user?.role === 'SuperAdmin';
 
   return (
     <>
@@ -65,27 +66,36 @@ export function Header() {
           </Link>
           
           <nav className="hidden sm:flex items-center gap-6 mx-auto">
-               {user && (
-                  <NavLink href="/dashboard">
-                      <LayoutDashboard className="h-4 w-4" /> Dashboard
-                  </NavLink>
-              )}
-              <NavLink href="/map-search">
-                  <Map className="h-4 w-4" /> Map Search
-              </NavLink>
-              {isAdmin && (
-                <>
-                  <NavLink href="/dashboard/manage-warehouses">
-                      <Warehouse className="h-4 w-4" /> Manage Warehouses
-                  </NavLink>
-                  <NavLink href="/dashboard/approval">
-                      <ShieldCheck className="h-4 w-4" /> Approval Queue
-                  </NavLink>
-                  <NavLink href="/dashboard/analytics">
-                      <BarChart className="h-4 w-4" /> Analytics
-                  </NavLink>
-                </>
-              )}
+                {isLoading ? (
+                    <div className="flex items-center gap-6">
+                        <Skeleton className="h-5 w-24" />
+                        <Skeleton className="h-5 w-24" />
+                    </div>
+                ) : (
+                    <>
+                        {user && (
+                            <NavLink href="/dashboard">
+                                <LayoutDashboard className="h-4 w-4" /> Dashboard
+                            </NavLink>
+                        )}
+                        <NavLink href="/map-search">
+                            <Map className="h-4 w-4" /> Map Search
+                        </NavLink>
+                        {isAdmin && (
+                            <>
+                                <NavLink href="/dashboard/manage-warehouses">
+                                    <Warehouse className="h-4 w-4" /> Manage Warehouses
+                                </NavLink>
+                                <NavLink href="/dashboard/approval">
+                                    <ShieldCheck className="h-4 w-4" /> Approval Queue
+                                </NavLink>
+                                <NavLink href="/dashboard/analytics">
+                                    <BarChart className="h-4 w-4" /> Analytics
+                                </NavLink>
+                            </>
+                        )}
+                    </>
+                )}
           </nav>
 
            <div className="flex items-center gap-4 flex-shrink-0">
@@ -95,7 +105,9 @@ export function Header() {
                     WhatsApp O2O
                 </Button>
               </Link>
-              {user ? (
+              {isLoading ? (
+                <Skeleton className="h-9 w-24" />
+              ) : user ? (
                 <div className="flex items-center gap-4">
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">{user.userName}</p>
