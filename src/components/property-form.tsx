@@ -49,6 +49,7 @@ import { Progress } from "./ui/progress";
 import { useData } from "@/contexts/data-context";
 import { useAuth } from "@/contexts/auth-context";
 import { Badge } from "./ui/badge";
+import { Switch } from "./ui/switch";
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size',
@@ -149,6 +150,7 @@ export function PropertyForm() {
     defaultValues: {
       propertyId: "",
       propertyGeoLocation: "",
+      isLocationConfirmed: false,
       size: undefined,
       floor: "Ground",
       readinessToOccupy: "Immediate",
@@ -209,38 +211,6 @@ export function PropertyForm() {
     }
   }, [searchParams, form, demandIdFromUrl, demands]);
 
-
-  const handleGetLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const locationString = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-          form.setValue("propertyGeoLocation", locationString, {
-            shouldValidate: true,
-          });
-          toast({
-            title: "Location Captured",
-            description: `Set to: ${locationString}`,
-          });
-        },
-        (error) => {
-          console.error("Error getting location", error);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Could not retrieve your location.",
-          });
-        }
-      );
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Unsupported",
-        description: "Geolocation is not supported by your browser.",
-      });
-    }
-  };
 
   async function onSubmit(data: PropertySchema) {
     setIsLoading(true);
@@ -311,6 +281,24 @@ export function PropertyForm() {
                       <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )}
                   />
+                  <div className="md:col-span-2">
+                    <FormField control={form.control} name="isLocationConfirmed" render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <FormLabel className="text-base">Confirm Location Match</FormLabel>
+                                <FormDescription>
+                                    By enabling this, you confirm your property is within the customer's desired location area.
+                                </FormDescription>
+                            </div>
+                            <FormControl>
+                                <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )} />
+                  </div>
                   <FormField control={form.control} name="floor" render={({ field }) => (
                       <FormItem><FormLabel>Floor</FormLabel><FormControl><Input placeholder="e.g. Ground Floor" {...field} /></FormControl><FormMessage /></FormItem>
                     )}

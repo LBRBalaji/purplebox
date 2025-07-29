@@ -4,6 +4,9 @@ import { z } from 'zod';
 export const propertySchema = z.object({
   propertyId: z.string(),
   propertyGeoLocation: z.string().optional(),
+  isLocationConfirmed: z.boolean().refine(val => val === true, {
+    message: "You must confirm the location match."
+  }),
   size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be a positive number.'),
   floor: z.string().min(1, 'Floor is required.'),
   readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
