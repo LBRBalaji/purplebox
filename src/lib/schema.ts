@@ -93,6 +93,7 @@ export type DemandSchema = z.infer<typeof demandSchema>;
 
 const warehouseFormSchema = z.object({
     id: z.string(),
+    locationName: z.string().min(1, 'Location name is required.'),
     latLng: z.string().min(1, 'Lat/Lng is required.')
       .regex(/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}, ?-?([1]?[0-7]?[0-9]|[1-9]?[0-9])\.{1}\d{1,6}$/, 'Invalid Lat/Lng format. Use "lat, lng".'),
     isActive: z.boolean(),
@@ -104,13 +105,14 @@ const warehouseFormSchema = z.object({
         officeSpace: z.boolean(),
         flooringType: z.string().min(1, 'Flooring type is required.'),
     }),
-    imageUrls: z.array(z.string()),
+    imageUrls: z.array(z.string().url().or(z.literal(''))).optional(),
 });
 
 export const warehouseSchema = warehouseFormSchema.transform(data => {
     const [lat, lng] = data.latLng.split(',').map(s => parseFloat(s.trim()));
     return {
         ...data,
+        imageUrls: data.imageUrls?.filter(url => url), // Filter out empty strings
         generalizedLocation: { lat, lng },
     };
 });

@@ -2,11 +2,9 @@
 import { type WarehouseSchema } from "./schema";
 
 // This is a helper function to satisfy the transformed schema structure
-const createWarehouseEntry = (entry: Omit<WarehouseSchema, 'latLng' | 'title' | 'address'> & {
+const createWarehouseEntry = (entry: Omit<WarehouseSchema, 'latLng' | 'generalizedLocation'> & {
     lat: number;
     lng: number;
-    title?: string;
-    address?: any;
 }): WarehouseSchema => {
     return {
         ...entry,
@@ -22,6 +20,7 @@ const createWarehouseEntry = (entry: Omit<WarehouseSchema, 'latLng' | 'title' | 
 export const warehouses: WarehouseSchema[] = [
   createWarehouseEntry({
     id: 'WH-001',
+    locationName: 'Oragadam',
     isActive: true,
     lat: 12.83,
     lng: 79.95,
@@ -41,6 +40,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-002',
+    locationName: 'Sriperumbudur',
     isActive: true,
     lat: 12.96,
     lng: 79.95,
@@ -59,6 +59,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-003',
+    locationName: 'Guindy',
     isActive: false, // This one is inactive
     lat: 13.0102,
     lng: 80.2156,
@@ -76,6 +77,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-004',
+    locationName: 'Bhiwandi',
     isActive: true,
     lat: 19.30,
     lng: 73.06,
@@ -96,6 +98,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-005',
+    locationName: 'Hosur',
     isActive: true,
     lat: 12.75,
     lng: 77.82,
@@ -114,6 +117,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-006',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.13,
     lng: 79.91,
@@ -124,6 +128,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-007',
+    locationName: 'Vallam-Vadagal',
     isActive: true,
     lat: 12.92,
     lng: 79.93,
@@ -134,6 +139,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-008',
+    locationName: 'Mannur',
     isActive: true,
     lat: 13.04,
     lng: 79.99,
@@ -144,6 +150,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-009',
+    locationName: 'Mappedu',
     isActive: true,
     lat: 13.09,
     lng: 79.95,
@@ -154,6 +161,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-010',
+    locationName: 'Sunguvarchatram',
     isActive: true,
     lat: 12.97,
     lng: 79.84,
@@ -164,6 +172,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-011',
+    locationName: 'Walajabad',
     isActive: true,
     lat: 12.80,
     lng: 79.83,
@@ -174,6 +183,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-012',
+    locationName: 'Redhills',
     isActive: true,
     lat: 13.17,
     lng: 80.20,
@@ -185,6 +195,7 @@ export const warehouses: WarehouseSchema[] = [
   createWarehouseEntry({
     id: 'WH-013',
     isActive: true,
+    locationName: 'Padianallur (Redhills)',
     lat: 13.23,
     lng: 80.17,
     size: 110000,
@@ -195,6 +206,7 @@ export const warehouses: WarehouseSchema[] = [
   createWarehouseEntry({
     id: 'WH-014',
     isActive: true,
+    locationName: 'Ponneri (Redhills)',
     lat: 13.21,
     lng: 80.19,
     size: 180000,
@@ -205,6 +217,7 @@ export const warehouses: WarehouseSchema[] = [
   createWarehouseEntry({
     id: 'WH-015',
     isActive: true,
+    locationName: 'Minjur (Redhills)',
     lat: 13.15,
     lng: 80.05,
     size: 90000,
@@ -214,6 +227,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-016',
+    locationName: 'Vengal',
     isActive: true,
     lat: 13.21,
     lng: 79.98,
@@ -224,6 +238,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-017',
+    locationName: 'Periyapalayam',
     isActive: true,
     lat: 13.31,
     lng: 80.09,
@@ -235,6 +250,7 @@ export const warehouses: WarehouseSchema[] = [
   createWarehouseEntry({
     id: 'WH-018',
     isActive: true,
+    locationName: 'Oragadam',
     lat: 12.84,
     lng: 79.96,
     size: 320000,
@@ -244,6 +260,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-019',
+    locationName: 'Sriperumbudur',
     isActive: true,
     lat: 12.97,
     lng: 79.94,
@@ -254,6 +271,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-020',
+    locationName: 'Mannur',
     isActive: true,
     lat: 13.05,
     lng: 80.01,
@@ -264,6 +282,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-021',
+    locationName: 'Redhills',
     isActive: true,
     lat: 13.18,
     lng: 80.21,
@@ -274,6 +293,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-022',
+    locationName: 'Vengal',
     isActive: true,
     lat: 13.22,
     lng: 79.97,
@@ -284,6 +304,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-023',
+    locationName: 'Sunguvarchatram',
     isActive: true,
     lat: 12.98,
     lng: 79.85,
@@ -294,6 +315,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-024',
+    locationName: 'Poonamallee',
     isActive: true,
     lat: 13.06,
     lng: 80.11,
@@ -304,6 +326,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-025',
+    locationName: 'Gurgaon',
     isActive: true,
     lat: 28.45,
     lng: 76.82,
@@ -314,6 +337,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-026',
+    locationName: 'Pune',
     isActive: true,
     lat: 18.75,
     lng: 73.81,
@@ -324,6 +348,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-027',
+    locationName: 'Tauranga',
     isActive: true,
     lat: -37.74,
     lng: 176.09,
@@ -334,6 +359,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-028',
+    locationName: 'Auckland',
     isActive: true,
     lat: -37.00,
     lng: 174.79,
@@ -344,6 +370,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-029',
+    locationName: 'Polivakkam',
     isActive: true,
     lat: 12.92,
     lng: 80.08,
@@ -354,6 +381,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-030',
+    locationName: 'Aranvoyal',
     isActive: true,
     lat: 13.11,
     lng: 79.94,
@@ -364,6 +392,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-031',
+    locationName: 'Koppur',
     isActive: true,
     lat: 13.43,
     lng: 80.12,
@@ -374,6 +403,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-032',
+    locationName: 'Putlur',
     isActive: true,
     lat: 13.59,
     lng: 80.02,
@@ -385,6 +415,7 @@ export const warehouses: WarehouseSchema[] = [
   // New Thiruvallur Data
   createWarehouseEntry({
     id: 'WH-THV-001',
+    locationName: 'Polivakkam (Thiruvallur)',
     isActive: true,
     lat: 13.131,
     lng: 79.905,
@@ -395,6 +426,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-002',
+    locationName: 'Aranvoyal (Thiruvallur)',
     isActive: true,
     lat: 13.133,
     lng: 79.912,
@@ -405,6 +437,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-003',
+    locationName: 'Koppur (Thiruvallur)',
     isActive: true,
     lat: 13.118,
     lng: 79.938,
@@ -415,6 +448,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-004',
+    locationName: 'Putlur (Thiruvallur)',
     isActive: true,
     lat: 13.105,
     lng: 79.955,
@@ -425,6 +459,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-005',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.109,
     lng: 79.971,
@@ -435,6 +470,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-006',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.145,
     lng: 79.921,
@@ -445,6 +481,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-007',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.138,
     lng: 79.899,
@@ -455,6 +492,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-008',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.151,
     lng: 79.908,
@@ -465,6 +503,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-009',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.085,
     lng: 79.885,
@@ -475,6 +514,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-010',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.075,
     lng: 79.865,
@@ -485,6 +525,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-011',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.160,
     lng: 79.940,
@@ -495,6 +536,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-012',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.128,
     lng: 79.880,
@@ -505,6 +547,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-013',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.175,
     lng: 79.915,
@@ -515,6 +558,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-014',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.030,
     lng: 79.890,
@@ -525,6 +569,7 @@ export const warehouses: WarehouseSchema[] = [
   }),
   createWarehouseEntry({
     id: 'WH-THV-015',
+    locationName: 'Thiruvallur',
     isActive: true,
     lat: 13.155,
     lng: 79.995,

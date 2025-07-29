@@ -49,6 +49,7 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
     resolver: zodResolver(warehouseSchema),
     defaultValues: {
       id: '',
+      locationName: '',
       latLng: '',
       isActive: true,
       generalizedLocation: { lat: 0, lng: 0 },
@@ -74,6 +75,7 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
         } else {
             form.reset({
                 id: `WH-${Date.now()}`,
+                locationName: '',
                 latLng: '',
                 isActive: true,
                 generalizedLocation: { lat: 0, lng: 0 },
@@ -111,10 +113,10 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
                     </FormItem>
                   )}
                 />
-                <FormField control={form.control} name="latLng" render={({ field }) => (
+                 <FormField control={form.control} name="locationName" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Latitude, Longitude</FormLabel>
-                        <FormControl><Input {...field} placeholder="e.g. 12.83, 79.95" /></FormControl>
+                        <FormLabel>Location Name</FormLabel>
+                        <FormControl><Input {...field} placeholder="e.g. Oragadam" /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
@@ -122,6 +124,13 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
 
                {/* Location & Size */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField control={form.control} name="latLng" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Latitude, Longitude</FormLabel>
+                        <FormControl><Input {...field} placeholder="e.g. 12.83, 79.95" /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
                  <FormField control={form.control} name="size" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Size (sq. ft.)</FormLabel>

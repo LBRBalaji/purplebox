@@ -97,7 +97,7 @@ export function WarehouseList() {
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>Location (Lat, Lng)</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Size (Sq. Ft)</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
@@ -107,7 +107,7 @@ export function WarehouseList() {
               {warehouses.map(warehouse => (
                 <TableRow key={warehouse.id}>
                   <TableCell className="font-mono">{warehouse.id}</TableCell>
-                  <TableCell className="font-mono">{`${warehouse.generalizedLocation.lat}, ${warehouse.generalizedLocation.lng}`}</TableCell>
+                  <TableCell>{warehouse.locationName}</TableCell>
                   <TableCell>{warehouse.size.toLocaleString()}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
