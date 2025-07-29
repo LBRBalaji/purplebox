@@ -24,7 +24,7 @@ export default function MapSearchPage() {
   }
 
   return (
-    <APIProvider apiKey={apiKey} libraries={['places', 'marker']}>
+    <APIProvider apiKey={apiKey} libraries={['places', 'marker', 'geometry']}>
       <MapSearch mapId={mapId}/>
     </APIProvider>
   );

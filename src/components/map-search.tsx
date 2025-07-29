@@ -54,7 +54,7 @@ function RegionalSummaryCard() {
             <CardFooter>
                  <p className="text-xs text-muted-foreground flex items-start gap-2">
                     <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                    <span>This is an aggregated summary. Zoom in or clear the search to browse individual listings.</span>
+                    <span>This is an aggregated summary. You can zoom in to browse individual listings if needed.</span>
                 </p>
             </CardFooter>
         </Card>
@@ -68,6 +68,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
   const [showSummary, setShowSummary] = React.useState(false);
+  const [circle, setCircle] = React.useState<google.maps.Circle | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Initialize SearchBox
@@ -90,19 +91,45 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       const places = searchBox.getPlaces();
       if (places && places.length > 0 && places[0].geometry) {
         const place = places[0];
-        map.fitBounds(place.geometry.viewport!);
+        const viewport = place.geometry.viewport;
+        if (viewport) {
+           map.fitBounds(viewport);
+
+           if (circle) circle.setMap(null); // Remove old circle
+
+           const newCircle = new google.maps.Circle({
+                strokeColor: 'hsl(210 60% 50%)',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: 'hsl(210 60% 50%)',
+                fillOpacity: 0.2,
+                map,
+                center: place.geometry.location,
+                radius: viewport.getNorthEast().lat() > viewport.getSouthWest().lat() ?
+                  google.maps.geometry.spherical.computeDistanceBetween(viewport.getCenter(), viewport.getNorthEast()) :
+                  10000 // default radius for point locations
+            });
+            setCircle(newCircle);
+        } else if (place.geometry.location) {
+            map.setCenter(place.geometry.location);
+            map.setZoom(12);
+        }
         setShowSummary(true); // Show the summary card on search
       }
     });
     return () => {
       google.maps.event.removeListener(listener);
     }
-  }, [searchBox, map]);
+  }, [searchBox, map, circle]);
 
 
   const clearSearch = () => {
     setSearchInput('');
     setShowSummary(false);
+    if (circle) {
+      circle.setMap(null);
+      setCircle(null);
+    }
   };
 
   return (
