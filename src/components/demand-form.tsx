@@ -119,13 +119,24 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   }, [user, form, isEditMode]);
 
   React.useEffect(() => {
+    // Check for pre-fill data from map search
+    const locationFromMap = searchParams.get('location');
+    const radiusFromMap = searchParams.get('radius');
+
+    if (locationFromMap) {
+      form.setValue('location', locationFromMap, { shouldValidate: true });
+    }
+    if (radiusFromMap) {
+      form.setValue('radius', Number(radiusFromMap), { shouldValidate: true });
+    }
+    
     // Generate an ID for a new demand if one doesn't exist
     if (!isEditMode && !watchedDemandId) {
         const newId = `DMD-${Date.now()}`;
         setDemandId(newId);
         form.setValue("demandId", newId);
     }
-  }, [isEditMode, watchedDemandId, form]);
+  }, [isEditMode, watchedDemandId, form, searchParams]);
 
   React.useEffect(() => {
     if (isEditMode) {

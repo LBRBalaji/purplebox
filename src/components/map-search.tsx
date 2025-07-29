@@ -7,10 +7,13 @@ import {
   useMapsLibrary,
 } from '@vis.gl/react-google-maps';
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
+import { LoginDialog } from './login-dialog';
 
 
 type RegionalSummary = {
@@ -19,6 +22,7 @@ type RegionalSummary = {
     sizeRange: string;
     readiness: { ready: number; soon: number; building: number };
     avgCeilingHeight: number;
+    center: { lat: number; lng: number };
 };
 
 // Fictional data for different regions
@@ -29,6 +33,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '45,000 - 300,000 sq. ft.',
     readiness: { ready: 8, soon: 3, building: 4 },
     avgCeilingHeight: 42,
+    center: { lat: 13.13, lng: 79.91 },
   },
   'oragadam': {
     regionName: 'Oragadam Industrial Corridor',
@@ -36,6 +41,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '100,000 - 500,000 sq. ft.',
     readiness: { ready: 15, soon: 5, building: 5 },
     avgCeilingHeight: 48,
+    center: { lat: 12.83, lng: 79.95 },
   },
   'sriperumbudur': {
     regionName: 'Sriperumbudur',
@@ -43,6 +49,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '80,000 - 400,000 sq. ft.',
     readiness: { ready: 10, soon: 6, building: 2 },
     avgCeilingHeight: 45,
+    center: { lat: 12.96, lng: 79.95 },
   },
   'vallam': { // For Vallam-Vadagal
     regionName: 'Vallam-Vadagal',
@@ -50,6 +57,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '150,000 - 600,000 sq. ft.',
     readiness: { ready: 4, soon: 3, building: 5 },
     avgCeilingHeight: 50,
+    center: { lat: 12.92, lng: 79.93 },
   },
   'sunguvarchatram': {
     regionName: 'Sunguvarchatram',
@@ -57,6 +65,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '50,000 - 250,000 sq. ft.',
     readiness: { ready: 5, soon: 2, building: 2 },
     avgCeilingHeight: 40,
+    center: { lat: 12.97, lng: 79.84 },
   },
    'walajabad': {
     regionName: 'Walajabad',
@@ -64,6 +73,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '30,000 - 150,000 sq. ft.',
     readiness: { ready: 4, soon: 1, building: 2 },
     avgCeilingHeight: 35,
+    center: { lat: 12.80, lng: 79.83 },
   },
   'mappedu': {
     regionName: 'Mappedu',
@@ -71,6 +81,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '60,000 - 200,000 sq. ft.',
     readiness: { ready: 3, soon: 2, building: 1 },
     avgCeilingHeight: 38,
+    center: { lat: 13.09, lng: 79.95 },
   },
   'mannur': {
     regionName: 'Mannur',
@@ -78,6 +89,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '75,000 - 180,000 sq. ft.',
     readiness: { ready: 5, soon: 3, building: 0 },
     avgCeilingHeight: 40,
+    center: { lat: 13.04, lng: 79.99 },
   },
   'redhills': {
     regionName: 'Redhills',
@@ -85,6 +97,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '25,000 - 220,000 sq. ft.',
     readiness: { ready: 12, soon: 7, building: 3 },
     avgCeilingHeight: 36,
+    center: { lat: 13.17, lng: 80.20 },
   },
   'vengal': {
     regionName: 'Vengal',
@@ -92,6 +105,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '100,000 - 250,000 sq. ft.',
     readiness: { ready: 1, soon: 1, building: 3 },
     avgCeilingHeight: 45,
+    center: { lat: 13.21, lng: 79.98 },
   },
   'periyapalayam': {
     regionName: 'Periyapalayam',
@@ -99,11 +113,14 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
     sizeRange: '50,000 - 100,000 sq. ft.',
     readiness: { ready: 2, soon: 2, building: 0 },
     avgCeilingHeight: 32,
+    center: { lat: 13.31, lng: 80.09 },
   },
 };
 
 
-function RegionalSummaryCard({ data }: { data: RegionalSummary }) {
+function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onLogDemand: (center: { lat: number; lng: number }) => void; }) {
+    const { user } = useAuth();
+    
     return (
         <Card className="shadow-none border-0 h-full flex flex-col bg-transparent">
             <CardHeader>
@@ -141,10 +158,21 @@ function RegionalSummaryCard({ data }: { data: RegionalSummary }) {
                     </div>
                 </div>
             </CardContent>
-            <CardFooter>
-                 <p className="text-xs text-muted-foreground flex items-start gap-2">
+            <CardFooter className="flex flex-col gap-3">
+                 <Button className="w-full" onClick={() => onLogDemand(data.center)} disabled={user?.role === 'SuperAdmin'}>
+                    {user && user.role === 'User' ? (
+                        <>
+                            <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand Here
+                        </>
+                    ) : (
+                         <>
+                            <LogIn className="mr-2 h-4 w-4" /> Login to Log Demand
+                        </>
+                    )}
+                </Button>
+                <p className="text-xs text-muted-foreground flex items-start gap-2">
                     <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                    <span>This is a fictional aggregated summary. Zoom in to browse individual listings if needed.</span>
+                    <span>This is a fictional aggregated summary. Actual listings may vary.</span>
                 </p>
             </CardFooter>
         </Card>
@@ -155,10 +183,14 @@ function RegionalSummaryCard({ data }: { data: RegionalSummary }) {
 function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
   const places = useMapsLibrary('places');
+  const router = useRouter();
+  const { user } = useAuth();
+  
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
   const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
   const [circle, setCircle] = React.useState<google.maps.Circle | null>(null);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Initialize SearchBox
@@ -182,6 +214,18 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       if (places && places.length > 0 && places[0].geometry) {
         const place = places[0];
         const location = place.geometry.location;
+        
+        // Find matching summary data by checking if the place name contains a key
+        const placeName = place.name?.toLowerCase() || '';
+        let foundData = null;
+        for (const key in regionalDataStore) {
+            if (placeName.includes(key)) {
+                foundData = regionalDataStore[key];
+                break;
+            }
+        }
+        setSummaryData(foundData);
+        
         if (location) {
            if (circle) circle.setMap(null); // Remove old circle
            
@@ -207,23 +251,23 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 map.setZoom(12); // Fallback zoom
             }
         }
-        
-        // Find matching summary data
-        const placeName = place.name?.toLowerCase() || '';
-        let foundData = null;
-        for (const key in regionalDataStore) {
-            if (placeName.includes(key)) {
-                foundData = regionalDataStore[key];
-                break;
-            }
-        }
-        setSummaryData(foundData);
       }
     });
     return () => {
       google.maps.event.removeListener(listener);
     }
   }, [searchBox, map, circle]);
+
+  const handleLogDemandClick = (center: { lat: number; lng: number }) => {
+    if (user && user.role === 'User') {
+      const locationString = `${center.lat.toFixed(6)},${center.lng.toFixed(6)}`;
+      // Redirect user to the dashboard and pre-fill location
+      router.push(`/dashboard?logNew=true&location=${locationString}&radius=5`);
+    } else {
+      // If user is not logged in, or not a 'User', open login dialog
+      setIsLoginDialogOpen(true);
+    }
+  };
 
 
   const clearSearch = () => {
@@ -233,61 +277,62 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       circle.setMap(null);
       setCircle(null);
     }
-    // Reset to a wider view of India
     if (inputRef.current) inputRef.current.value = '';
     map?.setCenter({ lat: 20.5937, lng: 78.9629 });
     map?.setZoom(5);
   };
 
   return (
-    <div className="flex h-full w-full">
-        <div className="flex-grow h-full relative">
-            <div className="absolute top-4 left-4 z-10 w-full max-w-sm">
-                <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                    ref={inputRef}
-                    placeholder="Search for a region..."
-                    className="pl-9 shadow-md bg-background"
-                    value={searchInput}
-                    onChange={e => setSearchInput(e.target.value)}
-                />
-                {searchInput && (
-                    <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                    onClick={clearSearch}
-                    >
-                    <X className="h-4 w-4" />
-                    </Button>
-                )}
+    <>
+        <div className="flex h-full w-full">
+            <div className="flex-grow h-full relative">
+                <div className="absolute top-4 left-4 z-10 w-full max-w-sm">
+                    <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        ref={inputRef}
+                        placeholder="Search for a region..."
+                        className="pl-9 shadow-md bg-background"
+                        value={searchInput}
+                        onChange={e => setSearchInput(e.target.value)}
+                    />
+                    {searchInput && (
+                        <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                        onClick={clearSearch}
+                        >
+                        <X className="h-4 w-4" />
+                        </Button>
+                    )}
+                    </div>
                 </div>
-            </div>
 
-            <Map
-                defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
-                defaultZoom={5}
-                mapId={mapId}
-                disableDefaultUI={true}
-                gestureHandling="greedy"
-                className="h-full w-full"
-            >
-                {/* Intentionally left blank to keep the map clean unless browsing */}
-            </Map>
+                <Map
+                    defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
+                    defaultZoom={5}
+                    mapId={mapId}
+                    disableDefaultUI={true}
+                    gestureHandling="greedy"
+                    className="h-full w-full"
+                >
+                </Map>
+            </div>
+            <aside className="w-[400px] h-full border-l bg-card/80 backdrop-blur-sm">
+                {summaryData ? (
+                    <RegionalSummaryCard data={summaryData} onLogDemand={handleLogDemandClick} />
+                ) : (
+                    <div className="p-8 text-center text-muted-foreground h-full flex flex-col justify-center">
+                        <Building2 className="h-12 w-12 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-foreground">Explore Warehouse Supply</h3>
+                        <p className="text-sm mt-2">Search for a city or region (e.g., Oragadam, Sriperumbudur) to see an aggregated summary of available warehouse listings.</p>
+                    </div>
+                )}
+            </aside>
         </div>
-        <aside className="w-[400px] h-full border-l bg-card/80 backdrop-blur-sm">
-            {summaryData ? (
-                <RegionalSummaryCard data={summaryData} />
-            ) : (
-                <div className="p-8 text-center text-muted-foreground h-full flex flex-col justify-center">
-                    <Building2 className="h-12 w-12 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-foreground">Explore Warehouse Supply</h3>
-                    <p className="text-sm mt-2">Search for a city or region (e.g., Oragadam, Sriperumbudur) to see an aggregated summary of available warehouse listings.</p>
-                </div>
-            )}
-        </aside>
-    </div>
+        <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
+    </>
   );
 }
 

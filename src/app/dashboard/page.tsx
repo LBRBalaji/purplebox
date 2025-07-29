@@ -25,9 +25,12 @@ export default function DashboardPage() {
   // For SuperAdmin, to show the property form
   const propertySubmitDemandId = searchParams.get('demandId');
   
-  // For User, to handle demand editing
+  // For User, to handle demand editing and new demand from map
   const editDemandId = searchParams.get('editDemandId');
-  const [userActiveTab, setUserActiveTab] = React.useState(editDemandId ? 'log-demand' : 'my-demands');
+  const logNewFromMap = searchParams.get('logNew');
+
+  const initialUserTab = editDemandId || logNewFromMap ? 'log-demand' : 'my-demands';
+  const [userActiveTab, setUserActiveTab] = React.useState(initialUserTab);
 
   const newMatchCount = React.useMemo(() => {
     if (!user) return 0;
@@ -37,7 +40,8 @@ export default function DashboardPage() {
 
   React.useEffect(() => {
     const editId = searchParams.get('editDemandId');
-    if (editId) {
+    const newFromMap = searchParams.get('logNew');
+    if (editId || newFromMap) {
       setUserActiveTab('log-demand');
     }
   }, [searchParams]);
