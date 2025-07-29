@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Truck as TruckIcon } from 'lucide-react';
+import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Truck as TruckIcon, Map } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -117,15 +117,23 @@ export default function LoginPage() {
       <LoginDialog />
        <div className="text-center p-8">
             <div className="mx-auto flex flex-col items-center mb-4">
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Building className="h-12 w-12 text-primary" />
-                <Sparkles className="h-6 w-6 text-accent absolute -top-2 -right-3" />
-              </div>
-              <h1 className="text-5xl font-bold font-headline text-primary">WareHouse Origin</h1>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Building className="h-12 w-12 text-primary" />
+                    <Sparkles className="h-6 w-6 text-accent absolute -top-2 -right-3" />
+                  </div>
+                  <h1 className="text-5xl font-bold font-headline text-primary">WareHouse Origin</h1>
+                </div>
+                <p className="text-lg text-muted-foreground mt-2">Sourcing Simplified</p>
             </div>
-            <p className="text-lg text-muted-foreground mt-2">Sourcing Simplified</p>
-          </div>
+            <div className="mt-8">
+                <Link href="/map-search">
+                    <Button size="lg">
+                        <Map className="mr-2 h-5 w-5" />
+                        Browse Warehouses on Map
+                    </Button>
+                </Link>
+            </div>
         </div>
     </div>
   );

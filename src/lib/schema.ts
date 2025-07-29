@@ -90,3 +90,30 @@ export const demandSchema = z.object({
 });
 
 export type DemandSchema = z.infer<typeof demandSchema>;
+
+export const warehouseSchema = z.object({
+    id: z.string(),
+    title: z.string(),
+    isActive: z.boolean(),
+    address: z.object({
+        line1: z.string(),
+        city: z.string(),
+        state: z.string(),
+        postalCode: z.string(),
+    }),
+    generalizedLocation: z.object({
+        lat: z.number(),
+        lng: z.number(),
+    }),
+    size: z.number(),
+    readiness: z.enum(['Ready for Occupancy', 'Under Construction', 'Available in 3 months']),
+    specifications: z.object({
+        ceilingHeight: z.number(),
+        docks: z.number(),
+        officeSpace: z.boolean(),
+        flooringType: z.string(),
+    }),
+    imageUrls: z.array(z.string()),
+});
+
+export type WarehouseSchema = z.infer<typeof warehouseSchema>;
