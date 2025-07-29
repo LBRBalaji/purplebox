@@ -46,8 +46,12 @@ const WarehouseMarker = ({ warehouse, onClick }: WarehouseMarkerProps) => {
 
     React.useEffect(() => {
         if (!marker) return;
-        const listener = marker.addListener('gmp-click', onClick);
-        return () => listener.remove();
+        // This is a workaround to handle clicks on clustered markers
+        // The gmp-click event is not always reliable with the clusterer
+        marker.addListener('click', onClick); 
+        return () => {
+             google.maps.event.clearInstanceListeners(marker);
+        }
     }, [marker, onClick]);
 
     return (
@@ -134,9 +138,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         const place = places[0];
         map.fitBounds(place.geometry.viewport!);
         
-        // Wait for map to idle before fetching data, but don't show markers immediately.
         const idleListener = map.addListener('idle', async () => {
-          google.maps.event.removeListener(idleListener); // Run only once
+          google.maps.event.removeListener(idleListener);
           const bounds = map.getBounds();
           if (!bounds) return;
 
@@ -144,8 +147,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
           const ne = bounds.getNorthEast();
           
           setIsLoading(true);
-          setWarehouses([]); // Clear existing markers
-          clustererRef.current?.clearMarkers();
+          setWarehouses([]); // <-- Clear existing markers from view
+          clustererRef.current?.clearMarkers(); // <-- Clear markers from clusterer
           
           try {
             const result = await getWarehousesAction({
@@ -155,8 +158,6 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             if (result.error) throw new Error(result.error);
             
             if (result.warehouses) {
-              // On search, we *only* want to show the summary.
-              // We don't call setWarehouses here to avoid rendering markers.
               calculateRegionSummary(result.warehouses, place.formatted_address || 'Selected Area');
             }
           } catch(error) {
@@ -210,12 +211,10 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   // Fetch warehouses on map idle for browsing
   React.useEffect(() => {
     if (!map) return;
-    // This listener handles manual browsing (pan/zoom)
     if (idleListenerRef.current) {
         google.maps.event.removeListener(idleListenerRef.current);
     }
     idleListenerRef.current = map.addListener('idle', () => {
-      // Don't fetch if a summary is shown, let the user dismiss it first
       if (!regionSummary) {
         fetchAndSetWarehouses();
       }
@@ -242,9 +241,10 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   
   // Update clusters when warehouses change
   React.useEffect(() => {
+    if (!map) return;
     clustererRef.current?.clearMarkers();
     if (warehouses.length > 0) {
-      const markers = warehouses.map(warehouse => {
+      const newMarkers = warehouses.map(warehouse => {
           const marker = new google.maps.marker.AdvancedMarkerElement({
               position: warehouse.generalizedLocation,
               gmpClickable: true
@@ -252,9 +252,9 @@ function MapSearchContent({ mapId }: { mapId: string }) {
           marker.addEventListener('gmp-click', () => handleMarkerClick(warehouse));
           return marker;
       });
-      clustererRef.current?.addMarkers(markers);
+      clustererRef.current?.addMarkers(newMarkers);
     }
-  }, [warehouses, handleMarkerClick]);
+  }, [warehouses, handleMarkerClick, map]);
 
 
   return (
@@ -300,8 +300,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                     </div>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
                       setRegionSummary(null);
-                      // After closing, load the markers for that region
-                      fetchAndSetWarehouses();
+                      fetchAndSetWarehouses(); // Now fetch and show markers
                     }}>
                         <X className="h-4 w-4" />
                     </Button>
@@ -436,4 +435,5 @@ export function MapSearch({ mapId }: { mapId: string }) {
   );
 }
 
+    
     
