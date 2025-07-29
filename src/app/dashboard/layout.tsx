@@ -16,21 +16,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.push('/');
       return;
     }
-    // Specific check for analytics page
-    if (!isLoading && user && pathname.startsWith('/dashboard/analytics') && user.email !== 'admin@example.com') {
-      router.push('/dashboard');
-    }
-     // Specific check for manage warehouses page
-    if (!isLoading && user && pathname.startsWith('/dashboard/manage-warehouses') && user.role !== 'SuperAdmin') {
-      router.push('/dashboard');
-    }
-     // Specific check for approval page
-    if (!isLoading && user && pathname.startsWith('/dashboard/approval') && user.email !== 'admin@example.com') {
-      router.push('/dashboard');
-    }
-     // Specific check for manage users page
-    if (!isLoading && user && pathname.startsWith('/dashboard/manage-users') && user.email !== 'admin@example.com') {
-        router.push('/dashboard');
+
+    if (!isLoading && user) {
+        const isMainAdmin = user.email === 'admin@example.com';
+        const isO2O = user.role === 'O2O';
+
+        // Analytics is only for the main admin
+        if (pathname.startsWith('/dashboard/analytics') && !isMainAdmin) {
+            router.push('/dashboard');
+        }
+        
+        // Manage Users is only for the main admin
+        if (pathname.startsWith('/dashboard/manage-users') && !isMainAdmin) {
+            router.push('/dashboard');
+        }
+
+        // Manage Warehouses is for SuperAdmin roles (main admin and providers) and O2O
+        if (pathname.startsWith('/dashboard/manage-warehouses') && user.role !== 'SuperAdmin' && !isO2O) {
+            router.push('/dashboard');
+        }
+        
+        // Approval Queue is for main admin and O2O
+        if (pathname.startsWith('/dashboard/approval') && !isMainAdmin && !isO2O) {
+            router.push('/dashboard');
+        }
     }
   }, [user, isLoading, router, pathname]);
 

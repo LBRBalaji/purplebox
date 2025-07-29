@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -48,6 +48,7 @@ export function Header() {
   const { user, logout, isLoading } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isAdmin = user?.email === 'admin@example.com';
+  const isO2O = user?.role === 'O2O';
 
   return (
     <>
@@ -80,16 +81,20 @@ export function Header() {
                         <NavLink href="/map-search">
                             <Map className="h-4 w-4" /> Map Search
                         </NavLink>
-                        {isAdmin && (
+                        {(isAdmin || isO2O) && (
                             <>
-                                <NavLink href="/dashboard/manage-users">
-                                    <Users className="h-4 w-4" /> Manage Users
-                                </NavLink>
                                 <NavLink href="/dashboard/manage-warehouses">
                                     <Warehouse className="h-4 w-4" /> Manage Warehouses
                                 </NavLink>
                                 <NavLink href="/dashboard/approval">
                                     <ShieldCheck className="h-4 w-4" /> Approval Queue
+                                </NavLink>
+                            </>
+                        )}
+                        {isAdmin && (
+                            <>
+                                <NavLink href="/dashboard/manage-users">
+                                    <Users className="h-4 w-4" /> Manage Users
                                 </NavLink>
                                 <NavLink href="/dashboard/analytics">
                                     <BarChart className="h-4 w-4" /> Analytics
@@ -101,7 +106,7 @@ export function Header() {
           </nav>
 
            <div className="flex items-center gap-4 flex-shrink-0">
-              {!isAdmin && (
+              {user?.role !== 'SuperAdmin' && user?.role !== 'O2O' && (
                 <Link href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline">
                       <WhatsAppIcon className="mr-2 h-5 w-5" />

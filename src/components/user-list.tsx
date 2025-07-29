@@ -96,8 +96,8 @@ export function UserList() {
                   <TableCell>{user.companyName}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                     <Badge variant={user.role === 'SuperAdmin' ? "secondary" : "outline"}>
-                        {user.role === 'SuperAdmin' ? 'Provider' : 'Customer'}
+                     <Badge variant={user.role === 'SuperAdmin' ? "secondary" : user.role === 'O2O' ? 'default' : "outline"}>
+                        {user.role === 'SuperAdmin' ? 'Provider' : user.role === 'O2O' ? 'O2O' : 'Customer'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

@@ -33,7 +33,7 @@ export default function SignupPage() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleRoleChange = (value: 'User' | 'SuperAdmin') => {
+  const handleRoleChange = (value: 'User' | 'SuperAdmin' | 'O2O') => {
     setFormData({ ...formData, role: value });
   };
 

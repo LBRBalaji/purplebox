@@ -38,7 +38,7 @@ const userFormSchema = z.object({
     companyName: z.string().min(1, 'Company name is required.'),
     userName: z.string().min(1, 'User name is required.'),
     phone: z.string().min(1, 'Phone number is required.'),
-    role: z.enum(['User', 'SuperAdmin']),
+    role: z.enum(['User', 'SuperAdmin', 'O2O']),
 });
 
 type UserFormSchema = z.infer<typeof userFormSchema>;
@@ -134,6 +134,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                       <SelectContent>
                         <SelectItem value="User">Customer (Demand)</SelectItem>
                         <SelectItem value="SuperAdmin">Property Provider</SelectItem>
+                        <SelectItem value="O2O">O2O Platform Manager</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

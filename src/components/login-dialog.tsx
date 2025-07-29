@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Truck as TruckIcon } from 'lucide-react';
+import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -87,6 +87,10 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                  <Button type="button" variant="outline" onClick={() => handleTestUserLogin('provider@example.com')}>
                     <UserCog className="mr-2 h-4 w-4" />
                     Property Provider
+                </Button>
+                 <Button type="button" variant="outline" className="col-span-2" onClick={() => handleTestUserLogin('o2o@example.com')}>
+                    <Briefcase className="mr-2 h-4 w-4" />
+                    O2O Manager
                 </Button>
             </div>
 

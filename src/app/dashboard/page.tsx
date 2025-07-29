@@ -54,7 +54,10 @@ export default function DashboardPage() {
     setUserActiveTab('my-demands');
   };
 
-  if (user?.email === 'admin@example.com') {
+  const isMainAdmin = user?.email === 'admin@example.com';
+  const isO2O = user?.role === 'O2O';
+
+  if (isMainAdmin || isO2O) {
     return (
       <>
         <AdminNotifier />
@@ -62,20 +65,25 @@ export default function DashboardPage() {
           <div className="max-w-7xl mx-auto">
              <Card>
                 <CardHeader>
-                    <CardTitle>Admin Dashboard</CardTitle>
+                    <CardTitle>{isMainAdmin ? 'Admin Dashboard' : 'O2O Dashboard'}</CardTitle>
                     <CardDescription>
-                        Welcome, Admin. Your primary role is to circulate new demands and approve/reject property submissions.
+                        {isMainAdmin 
+                            ? "Welcome, Admin. Your primary role is to circulate new demands and approve/reject property submissions."
+                            : "Welcome, O2O Manager. Your role is to manage warehouse listings and the submission approval queue."
+                        }
                     </CardDescription>
                 </CardHeader>
              </Card>
-             <Tabs defaultValue="demands" className="w-full mt-6">
+             <Tabs defaultValue={isMainAdmin ? "demands" : "approvals"} className="w-full mt-6">
                 <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="demands">Circulate Demands</TabsTrigger>
+                    {isMainAdmin && <TabsTrigger value="demands">Circulate Demands</TabsTrigger>}
                     <TabsTrigger value="approvals">Approval Queue</TabsTrigger>
                 </TabsList>
-                <TabsContent value="demands">
-                    <DemandList />
-                </TabsContent>
+                {isMainAdmin && (
+                    <TabsContent value="demands">
+                        <DemandList />
+                    </TabsContent>
+                )}
                 <TabsContent value="approvals">
                     <ApprovalQueue />
                 </TabsContent>

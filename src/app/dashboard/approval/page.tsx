@@ -9,13 +9,15 @@ export default function ApprovalPage() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
 
+    const hasAccess = user?.email === 'admin@example.com' || user?.role === 'O2O';
+
     React.useEffect(() => {
-        if (!isLoading && user?.email !== 'admin@example.com') {
+        if (!isLoading && !hasAccess) {
             router.push('/dashboard');
         }
-    }, [user, isLoading, router]);
+    }, [user, isLoading, router, hasAccess]);
     
-    if (isLoading || user?.email !== 'admin@example.com') {
+    if (isLoading || !hasAccess) {
         return null;
     }
 
