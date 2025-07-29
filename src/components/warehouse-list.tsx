@@ -97,8 +97,8 @@ export function WarehouseList() {
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Location</TableHead>
+                <TableHead>Location (Lat, Lng)</TableHead>
+                <TableHead>Size (Sq. Ft)</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -107,15 +107,15 @@ export function WarehouseList() {
               {warehouses.map(warehouse => (
                 <TableRow key={warehouse.id}>
                   <TableCell className="font-mono">{warehouse.id}</TableCell>
-                  <TableCell className="font-medium">{warehouse.title}</TableCell>
-                  <TableCell>{warehouse.address.city}, {warehouse.address.state}</TableCell>
+                  <TableCell className="font-mono">{`${warehouse.generalizedLocation.lat}, ${warehouse.generalizedLocation.lng}`}</TableCell>
+                  <TableCell>{warehouse.size.toLocaleString()}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                         <Switch
                             id={`active-toggle-${warehouse.id}`}
                             checked={warehouse.isActive}
                             onCheckedChange={(checked) => handleToggleActive(warehouse.id, checked)}
-                            aria-label={`Toggle visibility for ${warehouse.title}`}
+                            aria-label={`Toggle visibility for ${warehouse.id}`}
                         />
                          <Badge variant={warehouse.isActive ? "default" : "secondary"}>
                             {warehouse.isActive ? 'Active' : 'Inactive'}

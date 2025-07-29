@@ -91,29 +91,29 @@ export const demandSchema = z.object({
 
 export type DemandSchema = z.infer<typeof demandSchema>;
 
-export const warehouseSchema = z.object({
+const warehouseFormSchema = z.object({
     id: z.string(),
-    title: z.string(),
+    latLng: z.string().min(1, 'Lat/Lng is required.')
+      .regex(/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}, ?-?([1]?[0-7]?[0-9]|[1-9]?[0-9])\.{1}\d{1,6}$/, 'Invalid Lat/Lng format. Use "lat, lng".'),
     isActive: z.boolean(),
-    address: z.object({
-        line1: z.string(),
-        city: z.string(),
-        state: z.string(),
-        postalCode: z.string(),
-    }),
-    generalizedLocation: z.object({
-        lat: z.number(),
-        lng: z.number(),
-    }),
-    size: z.number(),
+    size: z.coerce.number().positive(),
     readiness: z.enum(['Ready for Occupancy', 'Under Construction', 'Available in 3 months']),
     specifications: z.object({
-        ceilingHeight: z.number(),
-        docks: z.number(),
+        ceilingHeight: z.coerce.number().positive(),
+        docks: z.coerce.number().int().nonnegative(),
         officeSpace: z.boolean(),
-        flooringType: z.string(),
+        flooringType: z.string().min(1, 'Flooring type is required.'),
     }),
     imageUrls: z.array(z.string()),
 });
+
+export const warehouseSchema = warehouseFormSchema.transform(data => {
+    const [lat, lng] = data.latLng.split(',').map(s => parseFloat(s.trim()));
+    return {
+        ...data,
+        generalizedLocation: { lat, lng },
+    };
+});
+
 
 export type WarehouseSchema = z.infer<typeof warehouseSchema>;

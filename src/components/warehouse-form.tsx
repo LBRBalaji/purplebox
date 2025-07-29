@@ -49,14 +49,8 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
     resolver: zodResolver(warehouseSchema),
     defaultValues: {
       id: '',
-      title: '',
+      latLng: '',
       isActive: true,
-      address: {
-        line1: '',
-        city: '',
-        state: '',
-        postalCode: '',
-      },
       generalizedLocation: { lat: 0, lng: 0 },
       size: 0,
       readiness: 'Ready for Occupancy',
@@ -73,13 +67,15 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
   React.useEffect(() => {
     if (isOpen) {
         if (isEditMode && warehouse) {
-            form.reset(warehouse);
+            form.reset({
+                ...warehouse,
+                latLng: `${warehouse.generalizedLocation.lat}, ${warehouse.generalizedLocation.lng}`
+            });
         } else {
             form.reset({
                 id: `WH-${Date.now()}`,
-                title: '',
+                latLng: '',
                 isActive: true,
-                address: { line1: '', city: '', state: '', postalCode: '' },
                 generalizedLocation: { lat: 0, lng: 0 },
                 size: 0,
                 readiness: 'Ready for Occupancy',
@@ -115,73 +111,17 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
                     </FormItem>
                   )}
                 />
-                <FormField control={form.control} name="title" render={({ field }) => (
+                <FormField control={form.control} name="latLng" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl><Input {...field} placeholder="e.g. Modern Logistics Hub" /></FormControl>
-                      <FormMessage />
+                        <FormLabel>Latitude, Longitude</FormLabel>
+                        <FormControl><Input {...field} placeholder="e.g. 12.83, 79.95" /></FormControl>
+                        <FormMessage />
                     </FormItem>
-                  )}
-                />
-              </div>
-
-               {/* Address */}
-              <div className="space-y-2">
-                <FormLabel className="font-medium">Address</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md">
-                     <FormField control={form.control} name="address.line1" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Address Line 1</FormLabel>
-                          <FormControl><Input {...field} placeholder="e.g. Oragadam Industrial Corridor" /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField control={form.control} name="address.city" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <FormControl><Input {...field} placeholder="e.g. Oragadam" /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField control={form.control} name="address.state" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>State</FormLabel>
-                          <FormControl><Input {...field} placeholder="e.g. Tamil Nadu" /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField control={form.control} name="address.postalCode" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Postal Code</FormLabel>
-                          <FormControl><Input {...field} placeholder="e.g. 602105" /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                </div>
+                )} />
               </div>
 
                {/* Location & Size */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <FormField control={form.control} name="generalizedLocation.lat" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Latitude</FormLabel>
-                      <FormControl><Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} placeholder="e.g. 12.83" /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField control={form.control} name="generalizedLocation.lng" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Longitude</FormLabel>
-                      <FormControl><Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} placeholder="e.g. 79.95" /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                  <FormField control={form.control} name="size" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Size (sq. ft.)</FormLabel>
