@@ -15,7 +15,7 @@ import {z} from 'genkit';
 const ImprovePropertyDemandDescriptionInputSchema = z.object({
   description: z.string().optional().describe('The original property demand description.'),
   propertyType: z.string().describe('The type of property (e.g., industrial, commercial).'),
-  location: z.string().describe('The desired location of the property.'),
+  location: z.string().describe('The desired location name of the property (e.g., "Oragadam, Chennai"). NEVER use coordinates.'),
   size: z.string().describe('The desired size of the property (e.g., in square feet).'),
   readiness: z.string().optional().describe('The desired timeline for property readiness.'),
   additionalDetails: z.string().optional().describe('Any additional details about the property demand.'),
@@ -36,19 +36,19 @@ const prompt = ai.definePrompt({
   input: {schema: ImprovePropertyDemandDescriptionInputSchema},
   output: {schema: ImprovePropertyDemandDescriptionOutputSchema},
   model: googleAI.model('gemini-1.5-flash-latest'),
-  prompt: `You are an expert real estate agent specializing in writing clear and professional property DEMAND requests on behalf of a client. Your tone should be that of a company seeking a property, not advertising one.
+  prompt: `You are an expert real estate agent specializing in writing clear and professional property DEMAND requests on behalf of a client. Your tone should be that of a company seeking a property, not advertising one. You MUST use the provided location name and NEVER use coordinates.
 
   {{#if description}}
-  Based on the original description and the structured details below, write an improved and comprehensive demand description from the perspective of a company looking for a property. Use the location name, not coordinates.
+  Based on the original description and the structured details below, write an improved and comprehensive demand description from the perspective of a company looking for a property.
 
   Original Description: {{{description}}}
   {{else}}
-  Based on the following details, write a comprehensive and professional demand description from the perspective of a company looking for a property. Use the location name provided.
+  Based on the following details, write a comprehensive and professional demand description from the perspective of a company looking for a property.
   {{/if}}
   
   **Client Requirement Details:**
   - Property Type Needed: {{{propertyType}}}
-  - Desired Location: {{{location}}}
+  - Desired Location Name: {{{location}}}
   - Required Size: {{{size}}} Sq. Ft.
   - Occupancy Timeline: {{{readiness}}}
   - Other Specifications: {{{additionalDetails}}}
