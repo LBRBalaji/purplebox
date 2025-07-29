@@ -4,7 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as React from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -192,6 +192,7 @@ function DemandSummaryCard({ demandId }: { demandId: string }) {
 export function PropertyForm() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { user } = useAuth();
   const { demands, addSubmission } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -266,6 +267,12 @@ export function PropertyForm() {
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
 
+  const handleCloseDialogAndRedirect = () => {
+    setIsDialogOpen(false);
+    if (isMatchingMode) {
+      router.push('/dashboard');
+    }
+  };
 
   async function onSubmit(data: PropertySchema) {
     setIsLoading(true);
@@ -539,7 +546,7 @@ export function PropertyForm() {
           </div>
         </form>
       </Form>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialogAndRedirect}>
         <DialogContent className="sm:max-w-2xl">
            {isMatchingMode ? (
               <>
@@ -615,7 +622,7 @@ export function PropertyForm() {
               </>
             )}
             <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Close</Button>
+                <Button variant="outline" onClick={handleCloseDialogAndRedirect}>Close</Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>
