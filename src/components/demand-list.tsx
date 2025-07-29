@@ -120,8 +120,8 @@ WareHouse Origin
             <Card key={demand.demandId} className="flex flex-col">
               <CardHeader>
                 <CardTitle>{demand.demandId}</CardTitle>
-                <CardDescription>
-                  <Badge variant="secondary">{demand.propertyType}</Badge>
+                <CardDescription asChild>
+                  <div><Badge variant="secondary">{demand.propertyType}</Badge></div>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 flex-grow">
