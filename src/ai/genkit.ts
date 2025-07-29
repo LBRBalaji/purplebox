@@ -1,5 +1,5 @@
 import {genkit, Plugin} from 'genkit';
-import {googleAI} from '@genk-ai/googleai';
+import {googleAI} from '@genkit-ai/googleai';
 
 if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
   console.warn(
