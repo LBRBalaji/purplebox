@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 
@@ -192,6 +192,56 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
     )
 }
 
+function HowItWorks() {
+    const steps = [
+        {
+            icon: FileText,
+            title: "Define Your Need.",
+            description: "One form, ten minutes, unlocks the entire market."
+        },
+        {
+            icon: Share2,
+            title: "Activate Our Network.",
+            description: "Your requirement is confidentially routed to our vetted network."
+        },
+        {
+            icon: MailCheck,
+            title: "Receive Curated Options.",
+            description: "No noise. Just 3-5 qualified, actionable proposals."
+        }
+    ]
+
+    return (
+        <div className="flex flex-col h-full justify-center">
+            <div className="mb-8 text-center">
+                 <Building2 className="h-12 w-12 mx-auto mb-4 text-primary" />
+                 <h3 className="text-xl font-bold font-headline text-foreground">
+                    How It Works
+                 </h3>
+            </div>
+            <div className="space-y-8 relative">
+                <div className="absolute left-7 top-2 bottom-2 w-0.5 bg-border -z-10" />
+                {steps.map((step, index) => (
+                    <div key={index} className="flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                            <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+                                 <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                                    <step.icon className="h-5 w-5" />
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p className="font-bold text-lg text-primary">0{index+1}</p>
+                            <h4 className="font-semibold text-foreground">{step.title}</h4>
+                            <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+}
+
 
 function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
@@ -335,22 +385,19 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             <aside className="w-[400px] h-full border-l bg-card/80 backdrop-blur-sm p-8 flex flex-col justify-center">
                 {summaryData ? (
                     <RegionalSummaryCard data={summaryData} onLogDemand={handleLogDemandClick} />
-                ) : (
+                ) : lastSearchedCenter ? (
                     <div className="text-center text-muted-foreground">
                         <Building2 className="h-12 w-12 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-foreground">
-                            {lastSearchedCenter ? 'This is an Untapped Opportunity!' : 'Explore Warehouse Supply'}
+                            This is an Untapped Opportunity!
                         </h3>
                         <p className="text-sm mt-2 mb-6">
-                            {lastSearchedCenter 
-                                ? "Log your demand now and let us find the perfect properties for you in this emerging area."
-                                : "Search for a city or region (e.g., Oragadam, Sriperumbudur) to see a summary of available listings."
-                            }
+                            We don't have aggregated supply data for this specific area, but you can still log a demand.
                         </p>
-                        {lastSearchedCenter && (
-                            <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} />
-                        )}
+                        <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} />
                     </div>
+                ) : (
+                    <HowItWorks />
                 )}
             </aside>
         </div>
