@@ -49,6 +49,7 @@ export const demandSchema = z.object({
     required_error: "Property type is required.",
   }),
   location: z.string().min(1, 'Location is required.'),
+  locationName: z.string().optional(),
   radius: z.coerce.number({invalid_type_error: "Radius must be a number."}).positive("Radius must be a positive number."),
   size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be positive.'),
   ceilingHeight: z.preprocess(

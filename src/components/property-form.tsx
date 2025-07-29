@@ -104,7 +104,7 @@ function DemandSummaryCard({ demandId }: { demandId: string }) {
                     </div>
                      <div>
                         <p className="font-semibold">Location</p>
-                        <p className="text-muted-foreground truncate" title={demand.location}>{demand.location}</p>
+                        <p className="text-muted-foreground truncate" title={demand.locationName || demand.location}>{demand.locationName || demand.location}</p>
                     </div>
                      <div>
                         <p className="font-semibold">Radius</p>
@@ -196,7 +196,7 @@ export function PropertyForm() {
       const demandToMatch = demands.find(d => d.demandId === demandIdFromUrl);
       if (demandToMatch) {
         // Pre-fill form with demand details
-        form.setValue('propertyGeoLocation', demandToMatch.location);
+        form.setValue('propertyGeoLocation', demandToMatch.locationName || demandToMatch.location);
         form.setValue('size', demandToMatch.size);
         form.setValue('readinessToOccupy', demandToMatch.readiness);
         if (demandToMatch.ceilingHeight) {

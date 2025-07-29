@@ -92,6 +92,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       userPhone: "",
       propertyType: undefined,
       location: "",
+      locationName: "",
       radius: undefined,
       size: undefined,
       ceilingHeight: undefined,
@@ -122,9 +123,13 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     // Check for pre-fill data from map search
     const locationFromMap = searchParams.get('location');
     const radiusFromMap = searchParams.get('radius');
+    const locationNameFromMap = searchParams.get('locationName');
 
     if (locationFromMap) {
       form.setValue('location', locationFromMap, { shouldValidate: true });
+    }
+    if (locationNameFromMap) {
+      form.setValue('locationName', locationNameFromMap, { shouldValidate: true });
     }
     if (radiusFromMap) {
       form.setValue('radius', Number(radiusFromMap), { shouldValidate: true });
@@ -171,7 +176,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       const input: ImprovePropertyDemandDescriptionInput = {
         description: data.description,
         propertyType: data.propertyType!,
-        location: data.location,
+        location: data.locationName || data.location,
         size: String(data.size),
         readiness: data.readiness,
         additionalDetails: `Ceiling height: ${data.ceilingHeight || 'N/A'}, Docks: ${data.docks || 'N/A'}. Non-compromisable items: ${data.preferences?.nonCompromisable?.join(', ') || 'None'}.`,
@@ -319,10 +324,10 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                         <FormLabel>Location</FormLabel>
                         <DemandMapWrapper />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <FormField control={form.control} name="location" render={({ field }) => (
+                          <FormField control={form.control} name="locationName" render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Location Coordinates</FormLabel>
-                                <FormControl><Input placeholder="e.g. 13.0827, 80.2707" {...field} readOnly /></FormControl>
+                                <FormLabel>Location Name</FormLabel>
+                                <FormControl><Input placeholder="e.g. Oragadam, Chennai" {...field} readOnly /></FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}

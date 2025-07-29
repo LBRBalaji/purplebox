@@ -63,7 +63,7 @@ export function MySubmissions() {
                         demandId: submission.demandId,
                         demandDetails: {
                             propertyType: demand.propertyType,
-                            location: demand.location,
+                            location: demand.locationName || demand.location,
                         },
                         properties: [],
                     };

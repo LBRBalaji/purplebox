@@ -31,13 +31,14 @@ function AutocompleteAndMap() {
     const [circle, setCircle] = useState<google.maps.Circle | null>(null);
     const locationValue = watch('location');
     const radiusValue = watch('radius');
+    const locationNameValue = watch('locationName');
     const autocompleteInputRef = useRef<HTMLInputElement>(null);
 
     // Init Autocomplete
     useEffect(() => {
         if (!map || !autocompleteInputRef.current) return;
         const autocomplete = new google.maps.places.Autocomplete(autocompleteInputRef.current, {
-            fields: ["geometry.location", "formatted_address"],
+            fields: ["geometry.location", "formatted_address", "name"],
         });
         const listener = autocomplete.addListener('place_changed', () => {
             const place = autocomplete.getPlace();
@@ -46,6 +47,7 @@ function AutocompleteAndMap() {
                 const lat = place.geometry.location.lat();
                 const lng = place.geometry.location.lng();
                 setValue('location', `${lat.toFixed(6)}, ${lng.toFixed(6)}`, { shouldValidate: true, shouldDirty: true });
+                setValue('locationName', place.name || place.formatted_address || '', { shouldValidate: true, shouldDirty: true });
             }
         });
         return () => { google.maps.event.removeListener(listener); };
@@ -58,7 +60,9 @@ function AutocompleteAndMap() {
             if (e.latLng) {
                 const lat = e.latLng.lat();
                 const lng = e.latLng.lng();
-                setValue('location', `${lat.toFixed(6)}, ${lng.toFixed(6)}`, { shouldValidate: true, shouldDirty: true });
+                const latLngString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                setValue('location', latLngString, { shouldValidate: true, shouldDirty: true });
+                setValue('locationName', latLngString, { shouldValidate: true, shouldDirty: true }); // Fallback to coords for name
                 setSelectedPlace(null); // Clear place selection to use lat/lng directly
             }
         });
@@ -108,7 +112,9 @@ function AutocompleteAndMap() {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    setValue("location", `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`, { shouldValidate: true, shouldDirty: true });
+                    const latLngString = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                    setValue("location", latLngString, { shouldValidate: true, shouldDirty: true });
+                    setValue("locationName", latLngString, { shouldValidate: true, shouldDirty: true });
                     setSelectedPlace(null);
                 },
                 (error) => alert("Could not retrieve your location.")
@@ -123,7 +129,7 @@ function AutocompleteAndMap() {
             <div>
                 <Label htmlFor="autocomplete">Search Location</Label>
                 <div className="flex gap-2">
-                    <Input id="autocomplete" ref={autocompleteInputRef} placeholder="Search or click the map" />
+                    <Input id="autocomplete" ref={autocompleteInputRef} placeholder="Search or click the map" defaultValue={locationNameValue && !locationNameValue.includes(',') ? locationNameValue : ''} />
                     <Button type="button" variant="outline" size="icon" onClick={handleGetLocation} aria-label="Get current location"><MapPin className="w-4 h-4"/></Button>
                 </div>
             </div>

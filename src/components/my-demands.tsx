@@ -101,8 +101,8 @@ export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: s
                           </div>
                           <div className="flex items-center gap-1.5">
                               <MapPin className="h-4 w-4" />
-                              <span className="truncate" title={`${demand.location} (within ${demand.radius}km)`}>
-                                  {demand.location} ({demand.radius}km)
+                              <span className="truncate" title={`${demand.locationName || demand.location} (within ${demand.radius}km)`}>
+                                  {demand.locationName || demand.location} ({demand.radius}km)
                               </span>
                           </div>
                           <div className="flex items-center gap-1.5">

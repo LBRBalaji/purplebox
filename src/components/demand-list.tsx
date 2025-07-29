@@ -86,7 +86,7 @@ export function DemandList() {
 Demand ID: ${demand.demandId}
 Property Type: ${demand.propertyType}
 Size: ${demand.size.toLocaleString()} Sq. Ft.
-Location: Near ${demand.location} (within a ${demand.radius} km radius)
+Location: Near ${demand.locationName || demand.location} (within a ${demand.radius} km radius)
 Readiness: ${demand.readiness}
 Description: ${demand.description || 'No additional description provided.'}
 ${(demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0) ? `\nNon-Compromisable Items: ${demand.preferences.nonCompromisable.join(', ')}` : ''}
@@ -127,7 +127,7 @@ WareHouse Origin
               <CardContent className="space-y-4 flex-grow">
                 <div className="text-sm">
                   <p className="font-semibold">Location:</p>
-                  <p>{demand.location} (within {demand.radius}km)</p>
+                  <p>{demand.locationName || demand.location} (within {demand.radius}km)</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>

@@ -79,7 +79,7 @@ export function ApprovalQueue() {
                                     <h3 className="font-semibold text-lg">Customer Demand</h3>
                                     <div className="p-4 border rounded-md bg-secondary/50 space-y-3">
                                         <p><strong>Property Type:</strong> {demand.propertyType}</p>
-                                        <p><strong>Location:</strong> {demand.location} (within {demand.radius}km)</p>
+                                        <p><strong>Location:</strong> {demand.locationName || demand.location} (within {demand.radius}km)</p>
                                         <p><strong>Size:</strong> {demand.size.toLocaleString()} sq. ft.</p>
                                         <p><strong>Readiness:</strong> {demand.readiness}</p>
                                         {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
