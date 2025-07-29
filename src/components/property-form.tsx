@@ -39,10 +39,15 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
 import { generateDescriptionAction, getPropertyMatchScoreAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { Progress } from "./ui/progress";
@@ -584,12 +589,19 @@ export function PropertyForm() {
                             <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.amenities * 100).toFixed(0)}%</p>
                         </div>
                     </div>
-                    <div>
-                        <p className="font-semibold text-sm">Justification</p>
-                        <p className="text-sm text-muted-foreground bg-secondary p-3 rounded-md mt-1">
-                          {aiResult.matchResult.justification}
-                        </p>
-                    </div>
+                    <Collapsible>
+                        <CollapsibleTrigger asChild>
+                           <Button variant="link" className="text-sm p-0 h-auto">
+                             Show Justification
+                             <ChevronsUpDown className="h-4 w-4 ml-1" />
+                           </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                            <p className="text-sm text-muted-foreground bg-secondary p-3 rounded-md mt-2">
+                              {aiResult.matchResult.justification}
+                            </p>
+                        </CollapsibleContent>
+                    </Collapsible>
                   </div>
                 )}
               </>
@@ -629,5 +641,3 @@ export function PropertyForm() {
     </>
   );
 }
-
-    
