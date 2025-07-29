@@ -1,4 +1,6 @@
 
+'use client';
+
 import { MapSearch } from '@/components/map-search';
 import { APIProvider } from '@vis.gl/react-google-maps';
 
