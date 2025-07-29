@@ -15,7 +15,7 @@ import {z} from 'genkit';
 const ImprovePropertyDemandDescriptionInputSchema = z.object({
   description: z.string().optional().describe('The original property demand description.'),
   propertyType: z.string().describe('The type of property (e.g., industrial, commercial).'),
-  location: z.string().describe('The desired location name of the property (e.g., "Oragadam, Chennai"). NEVER use coordinates.'),
+  locationName: z.string().describe('The desired location name of the property (e.g., "Oragadam, Chennai"). This is a name, not coordinates.'),
   size: z.string().describe('The desired size of the property (e.g., in square feet).'),
   readiness: z.string().optional().describe('The desired timeline for property readiness.'),
   additionalDetails: z.string().optional().describe('Any additional details about the property demand.'),
@@ -36,7 +36,9 @@ const prompt = ai.definePrompt({
   input: {schema: ImprovePropertyDemandDescriptionInputSchema},
   output: {schema: ImprovePropertyDemandDescriptionOutputSchema},
   model: googleAI.model('gemini-1.5-flash-latest'),
-  prompt: `You are an expert real estate agent specializing in writing clear and professional property DEMAND requests on behalf of a client. Your tone should be that of a company seeking a property, not advertising one. You MUST use the provided location name and NEVER use coordinates.
+  prompt: `You are an expert real estate agent specializing in writing clear and professional property DEMAND requests on behalf of a client.
+  Your tone should be that of a company seeking a property, not advertising one.
+  You MUST use the provided **Location Name** and MUST NOT use coordinates in your response.
 
   {{#if description}}
   Based on the original description and the structured details below, write an improved and comprehensive demand description from the perspective of a company looking for a property.
@@ -48,7 +50,7 @@ const prompt = ai.definePrompt({
   
   **Client Requirement Details:**
   - Property Type Needed: {{{propertyType}}}
-  - Desired Location Name: {{{location}}}
+  - Desired Location Name: {{{locationName}}}
   - Required Size: {{{size}}} Sq. Ft.
   - Occupancy Timeline: {{{readiness}}}
   - Other Specifications: {{{additionalDetails}}}
