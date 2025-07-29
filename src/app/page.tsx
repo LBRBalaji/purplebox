@@ -9,8 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Truck as TruckIcon } from 'lucide-react';
 import Link from 'next/link';
-import { HowItWorksSection } from '@/components/how-it-works';
-import { NetworkMapSection } from '@/components/network-map';
 import {
   Dialog,
   DialogContent,
@@ -115,12 +113,20 @@ function LoginDialog() {
 
 export default function LoginPage() {
   return (
-    <div className="flex-grow">
+    <div className="flex-grow flex items-center justify-center bg-background">
       <LoginDialog />
-      <main>
-        <HowItWorksSection />
-        <NetworkMapSection />
-      </main>
+       <div className="text-center p-8">
+            <div className="mx-auto flex flex-col items-center mb-4">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Building className="h-12 w-12 text-primary" />
+                <Sparkles className="h-6 w-6 text-accent absolute -top-2 -right-3" />
+              </div>
+              <h1 className="text-5xl font-bold font-headline text-primary">WareHouse Origin</h1>
+            </div>
+            <p className="text-lg text-muted-foreground mt-2">Sourcing Simplified</p>
+          </div>
+        </div>
     </div>
   );
 }
