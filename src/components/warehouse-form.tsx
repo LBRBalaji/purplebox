@@ -77,9 +77,9 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
                 latLng: '',
                 isActive: true,
                 generalizedLocation: { lat: 0, lng: 0 },
-                size: 0,
+                size: undefined,
                 readiness: 'Ready for Occupancy',
-                specifications: { ceilingHeight: 0, docks: 0, officeSpace: false, flooringType: '' },
+                specifications: { ceilingHeight: undefined, docks: undefined, officeSpace: false, flooringType: '' },
                 imageUrls: [],
             });
         }
@@ -125,7 +125,15 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
                  <FormField control={form.control} name="size" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Size (sq. ft.)</FormLabel>
-                      <FormControl><Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} placeholder="e.g. 150000" /></FormControl>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={e => field.onChange(e.target.value === '' ? undefined : parseInt(e.target.value, 10))}
+                          placeholder="e.g. 150000"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -154,7 +162,15 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
                      <FormField control={form.control} name="specifications.ceilingHeight" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Ceiling Height (ft)</FormLabel>
-                          <FormControl><Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} placeholder="e.g. 45" /></FormControl>
+                          <FormControl>
+                             <Input
+                                type="number"
+                                {...field}
+                                value={field.value ?? ''}
+                                onChange={e => field.onChange(e.target.value === '' ? undefined : parseInt(e.target.value, 10))}
+                                placeholder="e.g. 45"
+                              />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -162,7 +178,15 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
                     <FormField control={form.control} name="specifications.docks" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Number of Docks</FormLabel>
-                          <FormControl><Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} placeholder="e.g. 20" /></FormControl>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              {...field}
+                              value={field.value ?? ''}
+                              onChange={e => field.onChange(e.target.value === '' ? undefined : parseInt(e.target.value, 10))}
+                              placeholder="e.g. 20"
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}

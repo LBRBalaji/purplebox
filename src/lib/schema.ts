@@ -96,11 +96,11 @@ const warehouseFormSchema = z.object({
     latLng: z.string().min(1, 'Lat/Lng is required.')
       .regex(/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}, ?-?([1]?[0-7]?[0-9]|[1-9]?[0-9])\.{1}\d{1,6}$/, 'Invalid Lat/Lng format. Use "lat, lng".'),
     isActive: z.boolean(),
-    size: z.coerce.number().positive(),
+    size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive(),
     readiness: z.enum(['Ready for Occupancy', 'Under Construction', 'Available in 3 months']),
     specifications: z.object({
-        ceilingHeight: z.coerce.number().positive(),
-        docks: z.coerce.number().int().nonnegative(),
+        ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height must be a number."}).positive(),
+        docks: z.coerce.number({invalid_type_error: "Docks must be a number."}).int().nonnegative(),
         officeSpace: z.boolean(),
         flooringType: z.string().min(1, 'Flooring type is required.'),
     }),
