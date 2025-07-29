@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck, ArrowDown } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 
@@ -193,60 +193,53 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
     )
 }
 
-function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng: number } | null) => void }) {
+function MapSearchInfographic({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng: number } | null) => void }) {
     const steps = [
         {
-            icon: FileText,
-            title: "Define Your Need.",
-            description: "One form, ten minutes, unlocks the entire market."
+            title: "Search a Region",
+            description: "Use the search bar to find a city or industrial area (e.g., 'Oragadam')."
         },
         {
-            icon: Share2,
-            title: "Activate Our Network.",
-            description: "Your requirement is confidentially routed to our vetted network."
+            title: "View Supply Summary",
+            description: "See an instant overview of warehouse availability and specs for that location."
         },
         {
-            icon: MailCheck,
-            title: "Receive Curated Options.",
-            description: "No noise. Just 3-5 qualified, actionable proposals."
+            title: "Log Your Demand",
+            description: "Use the insights to log a specific demand and get matched with properties."
         }
-    ]
+    ];
 
     return (
         <Card className="flex flex-col h-full bg-gradient-to-br from-primary/5 via-background to-background border-0 shadow-none">
             <CardHeader className="text-center">
-                 <Building2 className="h-10 w-10 mx-auto mb-2 text-primary" />
                  <CardTitle className="text-xl font-bold font-headline text-foreground">
-                    Unlock Your Perfect Warehouse
+                    How to Use Map Search
                  </CardTitle>
-                 <CardDescription>The fastest way to source industrial and warehousing space.</CardDescription>
+                 <CardDescription>Follow these steps to find and source your ideal warehouse.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center">
                 <div className="space-y-6 relative py-4">
-                    <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-border -z-10" />
+                     <div className="absolute left-6 top-10 bottom-10 w-0.5 bg-border -z-10" />
                     {steps.map((step, index) => (
                         <div key={index} className="flex items-start gap-4">
                             <div className="flex-shrink-0 z-10">
-                                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center ring-8 ring-background">
-                                    <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                                        <step.icon className="h-5 w-5" />
-                                    </div>
+                                <div className="h-12 w-12 rounded-full bg-background border-2 border-primary text-primary flex items-center justify-center font-bold text-lg">
+                                    0{index + 1}
                                 </div>
                             </div>
-                            <div className="pt-1">
-                                <p className="font-bold text-base text-primary">0{index+1}</p>
-                                <h4 className="font-semibold text-foreground">{step.title}</h4>
+                            <div>
+                                <h4 className="font-semibold text-foreground mt-1">{step.title}</h4>
                                 <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
                             </div>
                         </div>
                     ))}
                 </div>
             </CardContent>
-             <CardFooter>
+             <CardFooter className="pt-4 border-t">
                 <LogDemandButton center={null} onLogDemand={onLogDemand} variant="secondary" />
             </CardFooter>
         </Card>
-    )
+    );
 }
 
 
@@ -408,7 +401,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                         <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="primary"/>
                     </div>
                 ) : (
-                    <HowItWorks onLogDemand={handleLogDemandClick} />
+                    <MapSearchInfographic onLogDemand={handleLogDemandClick} />
                 )}
             </aside>
         </div>
