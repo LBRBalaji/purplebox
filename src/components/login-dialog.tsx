@@ -79,21 +79,15 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 w-full">
-                <Button type="button" variant="outline" onClick={() => handleTestUserLogin('admin@example.com')}>
-                    <UserCog className="mr-2 h-4 w-4" />
-                    Property Provider
+            <div className="grid grid-cols-2 gap-4">
+                <Button type="button" variant="outline" onClick={() => handleTestUserLogin('user@example.com')}>
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    Customer
                 </Button>
-                <div className="grid grid-cols-2 gap-4">
-                    <Button type="button" variant="outline" onClick={() => handleTestUserLogin('user@example.com')}>
-                        <UserIcon className="mr-2 h-4 w-4" />
-                        Customer
-                    </Button>
-                    <Button type="button" variant="outline" onClick={() => handleTestUserLogin('logistics.pro@example.com')}>
-                        <TruckIcon className="mr-2 h-4 w-4" />
-                        Logistics Pro
-                    </Button>
-                </div>
+                <Button type="button" variant="outline" onClick={() => handleTestUserLogin('logistics.pro@example.com')}>
+                    <TruckIcon className="mr-2 h-4 w-4" />
+                    Logistics Pro
+                </Button>
             </div>
 
             <div className="text-sm text-center text-muted-foreground pt-2">
