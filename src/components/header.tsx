@@ -46,6 +46,8 @@ const NavLink = ({ href, children }: { href: string, children: React.ReactNode }
 export function Header() {
   const { user, logout } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
+  const isAdmin = user?.email === 'admin@example.com';
+  const isSuperAdmin = user?.role === 'SuperAdmin';
 
   return (
     <>
@@ -71,15 +73,11 @@ export function Header() {
               <NavLink href="/map-search">
                   <Map className="h-4 w-4" /> Map Search
               </NavLink>
-              {user?.role === 'SuperAdmin' && (
+              {isAdmin && (
                 <>
                   <NavLink href="/dashboard/manage-warehouses">
                       <Warehouse className="h-4 w-4" /> Manage Warehouses
                   </NavLink>
-                </>
-              )}
-              {user?.email === 'admin@example.com' && (
-                 <>
                   <NavLink href="/dashboard/approval">
                       <ShieldCheck className="h-4 w-4" /> Approval Queue
                   </NavLink>
