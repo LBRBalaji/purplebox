@@ -117,7 +117,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
   },
 };
 
-const LogDemandButton = ({ center, onLogDemand, variant = 'primary' }: { center: { lat: number; lng: number } | null, onLogDemand: (center?: { lat: number; lng: number } | null) => void, variant?: "primary" | "secondary" | "default" | "destructive" | "outline" | "ghost" | "link" | null }) => {
+const LogDemandButton = ({ center, onLogDemand, variant = "default" }: { center: { lat: number; lng: number } | null, onLogDemand: (center?: { lat: number; lng: number } | null) => void, variant?: "primary" | "secondary" | "default" | "destructive" | "outline" | "ghost" | "link" | null }) => {
     const { user } = useAuth();
 
     return (
