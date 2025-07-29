@@ -63,7 +63,7 @@ You must provide an overall score, a breakdown for multiple categories, and a de
     *   Calculate the score using the direct ratio: \`min(propertySize, demandSize) / max(propertySize, demandSize)\`.
     *   For example, if demand is 100,000 sq ft and property is 92,000 sq ft, the score is 92000/100000 = 0.92.
     *   If demand is 15,000 and property is 10,000, the score is 10000/15000 = 0.66.
-    *   If size is a **non-compromisable** priority and the score is below 0.85 (i.e., more than 15% deviation), the final size score should be very low (< 0.2).
+    *   If demand is 250,000 sq ft and property is 200,000 sq ft, the score is 200000/250000 = 0.8.
 
 3.  **Amenities Score (Docks, Ceiling Height, etc.):**
     *   This is a blended score. If the customer requires a specific number of docks (e.g., 12) and the property has fewer (e.g., 11), the score for that item **must be calculated proportionally** as \`propertyDocks / demandDocks\` (11/12 = 0.92). A score of 9/12 would be 0.75.
