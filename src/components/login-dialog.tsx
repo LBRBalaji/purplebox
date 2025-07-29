@@ -38,7 +38,7 @@ export function LoginDialog({ isOpen, onOpenChange }: { isOpen: boolean, onOpenC
               </div>
               <div>
                   <DialogTitle className="text-xl font-bold font-headline">
-                      Login to <span className="text-accent">WareHouse Origin</span>
+                      Login to <span className="text-primary">WareHouse Origin</span>
                   </DialogTitle>
                   <DialogDescription>Enter your email to sign in.</DialogDescription>
               </div>

@@ -43,8 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <>
       <Header />
-      <main className="flex-grow">
-        <React.Suspense fallback={
+      <React.Suspense fallback={
           <div className="container mx-auto p-4 md:p-8">
             <div className="max-w-6xl mx-auto space-y-8">
               <Skeleton className="h-10 w-full max-w-[500px]" />
@@ -56,7 +55,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         }>{children}</React.Suspense>
-      </main>
     </>
   );
 }

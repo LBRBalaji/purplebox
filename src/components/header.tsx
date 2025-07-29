@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 
@@ -28,6 +28,11 @@ export function Header() {
                   </div>
               </Link>
               <nav className="hidden sm:flex items-center gap-4">
+                   {user && (
+                      <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                          <LayoutDashboard className="h-4 w-4" /> Dashboard
+                      </Link>
+                  )}
                   <Link href="/map-search" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
                       <Map className="h-4 w-4" /> Map Search
                   </Link>
@@ -41,8 +46,8 @@ export function Header() {
           {user ? (
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium">{user.email}</p>
-                <p className="text-xs text-muted-foreground">{user.role}</p>
+                <p className="text-sm font-medium">{user.userName}</p>
+                <p className="text-xs text-muted-foreground">{user.companyName} ({user.role})</p>
               </div>
               <Button variant="outline" size="sm" onClick={logout}>
                 <LogOut className="mr-2 h-4 w-4" />
