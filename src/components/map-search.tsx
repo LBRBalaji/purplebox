@@ -412,7 +412,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                         <p className="text-sm mt-2 mb-6 text-muted-foreground">
                            We don&apos;t have aggregated supply data for this specific area, but you can still log a demand.
                         </p>
-                        <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="secondary"/>
+                        <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="default"/>
                     </div>
                 ) : (
                     <HowItWorks onLogDemand={handleLogDemandClick} />
