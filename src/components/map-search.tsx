@@ -26,7 +26,8 @@ import { type WarehouseSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
 import { Badge } from './ui/badge';
-import { Building, MapPin, Search, Scaling, HardHat, CheckCircle, Truck, Info, Star } from 'lucide-react';
+import { Building, MapPin, Search, Scaling, HardHat, CheckCircle, Truck, Info, Star, Hash, CalendarDays, X } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {
   Carousel,
   CarouselContent,
@@ -58,6 +59,14 @@ const WarehouseMarker = ({ warehouse, onClick }: WarehouseMarkerProps) => {
     );
 }
 
+type RegionSummary = {
+    name: string;
+    total: number;
+    minSize: number;
+    maxSize: number;
+    readiness: { [key: string]: number };
+}
+
 function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
   const places = useMapsLibrary('places');
@@ -69,6 +78,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [selectedWarehouse, setSelectedWarehouse] = React.useState<WarehouseSchema | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
+  const [regionSummary, setRegionSummary] = React.useState<RegionSummary | null>(null);
   
   const markersRef = React.useRef<{[key: string]: google.maps.marker.AdvancedMarkerElement}>({});
   const clustererRef = React.useRef<MarkerClusterer | null>(null);
@@ -97,6 +107,23 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     }
   }, [map]);
 
+  const calculateRegionSummary = (warehousesInView: WarehouseSchema[], placeName: string) => {
+    if (warehousesInView.length === 0) {
+        setRegionSummary(null);
+        return;
+    }
+
+    const total = warehousesInView.length;
+    const sizes = warehousesInView.map(w => w.size);
+    const minSize = Math.min(...sizes);
+    const maxSize = Math.max(...sizes);
+    const readiness = warehousesInView.reduce((acc, w) => {
+        acc[w.readiness] = (acc[w.readiness] || 0) + 1;
+        return acc;
+    }, {} as {[key: string]: number});
+
+    setRegionSummary({ name: placeName, total, minSize, maxSize, readiness });
+  }
 
   // Handle search box places changing
   React.useEffect(() => {
@@ -104,7 +131,22 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     const listener = searchBox.addListener('places_changed', () => {
       const places = searchBox.getPlaces();
       if (places && places.length > 0 && places[0].geometry) {
-        map.fitBounds(places[0].geometry.viewport!);
+        const place = places[0];
+        map.fitBounds(place.geometry.viewport!);
+        // We need to wait for the map to be idle after fitting bounds to get the correct warehouses
+        const idleListener = map.addListener('idle', async () => {
+            const bounds = map.getBounds();
+            if (!bounds) return;
+            const sw = bounds.getSouthWest();
+            const ne = bounds.getNorthEast();
+            const warehousesInView = await getWarehousesAction({
+                sw_lat: sw.lat(), sw_lng: sw.lng(), ne_lat: ne.lat(), ne_lng: ne.lng()
+            });
+            if (warehousesInView.warehouses) {
+                calculateRegionSummary(warehousesInView.warehouses, place.formatted_address || 'Selected Area');
+            }
+            google.maps.event.removeListener(idleListener);
+        });
       }
     });
     return () => {
@@ -220,6 +262,51 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         {/* Markers are now managed by the MarkerClusterer so we don't render them here */}
       </Map>
       
+      {regionSummary && (
+        <Card className="absolute bottom-4 left-1/2 z-10 w-full max-w-md -translate-x-1/2 shadow-lg animate-in fade-in-0 slide-in-from-bottom-5 duration-500">
+            <CardHeader>
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <CardTitle className="text-lg">Supply Summary</CardTitle>
+                        <p className="text-sm text-primary font-medium">{regionSummary.name}</p>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setRegionSummary(null)}>
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-full"><Hash className="h-5 w-5 text-primary" /></div>
+                    <div>
+                        <p className="text-muted-foreground">Total Listings</p>
+                        <p className="font-semibold">{regionSummary.total}</p>
+                    </div>
+                </div>
+                 <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-full"><Scaling className="h-5 w-5 text-primary" /></div>
+                    <div>
+                        <p className="text-muted-foreground">Size Range (sq. ft.)</p>
+                        <p className="font-semibold">{regionSummary.minSize.toLocaleString()} - {regionSummary.maxSize.toLocaleString()}</p>
+                    </div>
+                </div>
+                <div className="flex items-start gap-3 col-span-full">
+                    <div className="p-2 bg-primary/10 rounded-full mt-1"><CalendarDays className="h-5 w-5 text-primary" /></div>
+                    <div>
+                        <p className="text-muted-foreground">Readiness Status</p>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                            {Object.entries(regionSummary.readiness).map(([status, count]) => (
+                                <p key={status} className="font-semibold">
+                                    {count} <span className="font-normal text-muted-foreground">{status}</span>
+                                </p>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+      )}
+
       {selectedWarehouse && (
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetContent className="w-full sm:max-w-md p-0">
@@ -316,3 +403,5 @@ export function MapSearch({ mapId }: { mapId: string }) {
     </div>
   );
 }
+
+    
