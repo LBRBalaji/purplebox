@@ -25,7 +25,7 @@ export default function MapSearchPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen w-screen">
+    <div className="flex flex-col flex-grow">
         <Header />
         <div className="flex-grow">
             <APIProvider apiKey={apiKey} libraries={['places', 'marker', 'geometry']}>
