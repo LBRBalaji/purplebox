@@ -96,22 +96,22 @@ const useMatchScorer = (demand: DemandSchema | undefined, watchedValues: Partial
             if (!demandHeight || !propertyHeight) return null;
 
             if (propertyHeight >= demandHeight) return 1.0;
-            const pctDiff = (demandHeight - propertyHeight) / demandHeight;
+            const score = propertyHeight / demandHeight;
             
-            if (isNonCompromisable && propertyHeight < demandHeight) return 0.1;
-            if (pctDiff < 0.1) return 0.8; // 10% less
-            return 0.3;
+            if (isNonCompromisable) return Math.max(0.1, score * 0.5); // Still penalize heavily but not to zero
+            return score;
         }
         
         if (field === 'docks') {
             const demandDocks = demand.docks;
             const propertyDocks = watchedValues.docks;
-            if (demandDocks === undefined || propertyDocks === undefined) return null;
+            if (demandDocks === undefined || propertyDocks === undefined || demandDocks === 0) return null;
 
             if (propertyDocks >= demandDocks) return 1.0;
-            if (isNonCompromisable) return 0.1;
-            if (propertyDocks >= demandDocks - 2) return 0.75; // within 2 docks
-            return 0.3;
+            const score = propertyDocks / demandDocks;
+
+            if (isNonCompromisable) return Math.max(0.1, score * 0.5);
+            return score;
         }
 
         return null;
@@ -544,7 +544,7 @@ export function PropertyForm() {
               {isLoading ? (
                 <>
                   <Sparkles className="mr-2 h-4 w-4 animate-spin" />
-                  {isMatchingMode ? 'Analyzing...' : 'Generating...'}
+                  Analyzing...
                 </>
               ) : (
                 <>
