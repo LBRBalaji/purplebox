@@ -117,9 +117,36 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
   },
 };
 
+const LogDemandButton = ({ center, onLogDemand }: { center: { lat: number; lng: number } | null, onLogDemand: (center: { lat: number, lng: number }) => void }) => {
+    const { user } = useAuth();
+
+    return (
+        <div className="flex flex-col gap-3">
+             <Button 
+                className="w-full" 
+                onClick={() => center && onLogDemand(center)} 
+                disabled={user?.role === 'SuperAdmin' || !center}
+            >
+                {user && user.role === 'User' ? (
+                    <>
+                        <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand Here
+                    </>
+                ) : (
+                     <>
+                        <LogIn className="mr-2 h-4 w-4" /> Login to Log Demand
+                    </>
+                )}
+            </Button>
+            <p className="text-xs text-muted-foreground flex items-start gap-2">
+                <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>Get Detailed and <strong className="font-semibold text-foreground">Downloadable</strong> Warehouse Proposals in 48 Hours on your Dashboard. Simple and Easy.</span>
+            </p>
+        </div>
+    );
+};
+
 
 function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onLogDemand: (center: { lat: number; lng: number }) => void; }) {
-    const { user } = useAuth();
     
     return (
         <Card className="shadow-none border-0 h-full flex flex-col bg-transparent">
@@ -158,22 +185,8 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className="flex flex-col gap-3">
-                 <Button className="w-full" onClick={() => onLogDemand(data.center)} disabled={user?.role === 'SuperAdmin'}>
-                    {user && user.role === 'User' ? (
-                        <>
-                            <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand Here
-                        </>
-                    ) : (
-                         <>
-                            <LogIn className="mr-2 h-4 w-4" /> Login to Log Demand
-                        </>
-                    )}
-                </Button>
-                <p className="text-xs text-muted-foreground flex items-start gap-2">
-                    <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                    <span>Get Detailed and <strong className="font-semibold text-foreground">Downloadable</strong> Warehouse Proposals in 48 Hours on your Dashboard. Simple and Easy.</span>
-                </p>
+            <CardFooter>
+                <LogDemandButton center={data.center} onLogDemand={onLogDemand} />
             </CardFooter>
         </Card>
     )
@@ -189,6 +202,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
   const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
+  const [lastSearchedCenter, setLastSearchedCenter] = React.useState<{ lat: number, lng: number } | null>(null);
   const [circle, setCircle] = React.useState<google.maps.Circle | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -215,22 +229,22 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         const place = places[0];
         const location = place.geometry.location;
         
-        // Find matching summary data by checking if the place name contains a key
-        const placeName = place.name?.toLowerCase() || '';
-        let foundData = null;
-        for (const key in regionalDataStore) {
-            if (placeName.includes(key)) {
-                foundData = regionalDataStore[key];
-                break;
-            }
-        }
-        setSummaryData(foundData);
-        
         if (location) {
-           if (circle) circle.setMap(null); // Remove old circle
+            const center = { lat: location.lat(), lng: location.lng() };
+            setLastSearchedCenter(center);
+            
+            const placeName = place.name?.toLowerCase() || '';
+            let foundData = null;
+            for (const key in regionalDataStore) {
+                if (placeName.includes(key)) {
+                    foundData = regionalDataStore[key];
+                    break;
+                }
+            }
+            setSummaryData(foundData);
+            
+           if (circle) circle.setMap(null);
            
-           const fixedRadius = 10000; // 10km radius to cover sub-regions
-
            const newCircle = new google.maps.Circle({
                 strokeColor: 'hsl(210 60% 50%)',
                 strokeOpacity: 0.8,
@@ -239,7 +253,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 fillOpacity: 0.2,
                 map,
                 center: location,
-                radius: fixedRadius
+                radius: 5000, // 5km radius
             });
             setCircle(newCircle);
             
@@ -248,7 +262,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 map.fitBounds(bounds);
             } else {
                 map.setCenter(location);
-                map.setZoom(12); // Fallback zoom
+                map.setZoom(12);
             }
         }
       }
@@ -261,10 +275,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const handleLogDemandClick = (center: { lat: number; lng: number }) => {
     if (user && user.role === 'User') {
       const locationString = `${center.lat.toFixed(6)},${center.lng.toFixed(6)}`;
-      // Redirect user to the dashboard and pre-fill location
       router.push(`/dashboard?logNew=true&location=${locationString}&radius=5`);
     } else {
-      // If user is not logged in, or not a 'User', open login dialog
       setIsLoginDialogOpen(true);
     }
   };
@@ -273,6 +285,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const clearSearch = () => {
     setSearchInput('');
     setSummaryData(null);
+    setLastSearchedCenter(null);
     if (circle) {
       circle.setMap(null);
       setCircle(null);
@@ -319,14 +332,24 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 >
                 </Map>
             </div>
-            <aside className="w-[400px] h-full border-l bg-card/80 backdrop-blur-sm">
+            <aside className="w-[400px] h-full border-l bg-card/80 backdrop-blur-sm p-8 flex flex-col justify-center">
                 {summaryData ? (
                     <RegionalSummaryCard data={summaryData} onLogDemand={handleLogDemandClick} />
                 ) : (
-                    <div className="p-8 text-center text-muted-foreground h-full flex flex-col justify-center">
+                    <div className="text-center text-muted-foreground">
                         <Building2 className="h-12 w-12 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-foreground">Explore Warehouse Supply</h3>
-                        <p className="text-sm mt-2">Search for a city or region (e.g., Oragadam, Sriperumbudur) to see an aggregated summary of available warehouse listings.</p>
+                        <h3 className="text-lg font-semibold text-foreground">
+                            {lastSearchedCenter ? 'No Aggregated Supply Data' : 'Explore Warehouse Supply'}
+                        </h3>
+                        <p className="text-sm mt-2 mb-6">
+                            {lastSearchedCenter 
+                                ? "We don't have aggregated supply data for this specific area, but you can still log a demand."
+                                : "Search for a city or region (e.g., Oragadam, Sriperumbudur) to see a summary of available listings."
+                            }
+                        </p>
+                        {lastSearchedCenter && (
+                            <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} />
+                        )}
                     </div>
                 )}
             </aside>
