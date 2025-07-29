@@ -42,6 +42,14 @@ export function DemandList() {
   };
   
   const handleCirculateDemand = (demand: DemandSchema) => {
+    // 1. Notify Admin on WhatsApp that a demand is being circulated
+    const adminPhoneNumber = "919841098170";
+    const whatsappMessage = `Circulating new property demand to providers. Demand ID: ${demand.demandId}`;
+    const whatsappUrl = `https://wa.me/${adminPhoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(whatsappUrl, '_blank');
+
+
+    // 2. Prepare email for providers
     let usersFromStorage;
     try {
       usersFromStorage = localStorage.getItem('warehouseorigin_users');
@@ -94,7 +102,10 @@ WareHouse Origin
 
     const mailtoLink = `mailto:?bcc=${developerEmails}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body.trim())}`;
     
-    window.location.href = mailtoLink;
+    // Use a small delay to ensure the WhatsApp tab opens first, then open the mail client.
+    setTimeout(() => {
+        window.location.href = mailtoLink;
+    }, 500);
   };
 
   return (
