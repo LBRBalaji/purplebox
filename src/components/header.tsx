@@ -50,47 +50,47 @@ export function Header() {
   return (
     <>
       <header className="p-4 border-b bg-card">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
-              <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2">
-                  <div className="relative">
-                      <Building className="h-7 w-7 text-primary" />
-                      <Sparkles className="h-4 w-4 text-accent absolute -top-1 -right-2" />
-                  </div>
-                  <div>
-                      <h1 className="text-xl font-bold font-headline text-primary">WareHouse Origin</h1>
-                      <p className="text-xs text-muted-foreground">Sourcing Simplified</p>
-                  </div>
-              </Link>
-              <nav className="hidden sm:flex items-center gap-4">
-                   {user && (
-                      <NavLink href="/dashboard">
-                          <LayoutDashboard className="h-4 w-4" /> Dashboard
-                      </NavLink>
-                  )}
-                  <NavLink href="/map-search">
-                      <Map className="h-4 w-4" /> Map Search
+        <div className="container mx-auto flex items-center justify-between gap-4">
+          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 flex-shrink-0">
+              <div className="relative">
+                  <Building className="h-7 w-7 text-primary" />
+                  <Sparkles className="h-4 w-4 text-accent absolute -top-1 -right-2" />
+              </div>
+              <div>
+                  <h1 className="text-xl font-bold font-headline text-primary">WareHouse Origin</h1>
+                  <p className="text-xs text-muted-foreground">Sourcing Simplified</p>
+              </div>
+          </Link>
+          
+          <nav className="hidden sm:flex items-center gap-6 mx-auto">
+               {user && (
+                  <NavLink href="/dashboard">
+                      <LayoutDashboard className="h-4 w-4" /> Dashboard
                   </NavLink>
-                  {user?.role === 'SuperAdmin' && (
-                    <>
-                      <NavLink href="/dashboard/manage-warehouses">
-                          <Warehouse className="h-4 w-4" /> Manage Warehouses
-                      </NavLink>
-                    </>
-                  )}
-                  {user?.email === 'admin@example.com' && (
-                     <>
-                      <NavLink href="/dashboard/approval">
-                          <ShieldCheck className="h-4 w-4" /> Approval Queue
-                      </NavLink>
-                      <NavLink href="/dashboard/analytics">
-                          <BarChart className="h-4 w-4" /> Analytics
-                      </NavLink>
-                    </>
-                  )}
-              </nav>
-          </div>
-           <div className="flex items-center gap-4">
+              )}
+              <NavLink href="/map-search">
+                  <Map className="h-4 w-4" /> Map Search
+              </NavLink>
+              {user?.role === 'SuperAdmin' && (
+                <>
+                  <NavLink href="/dashboard/manage-warehouses">
+                      <Warehouse className="h-4 w-4" /> Manage Warehouses
+                  </NavLink>
+                </>
+              )}
+              {user?.email === 'admin@example.com' && (
+                 <>
+                  <NavLink href="/dashboard/approval">
+                      <ShieldCheck className="h-4 w-4" /> Approval Queue
+                  </NavLink>
+                  <NavLink href="/dashboard/analytics">
+                      <BarChart className="h-4 w-4" /> Analytics
+                  </NavLink>
+                </>
+              )}
+          </nav>
+
+           <div className="flex items-center gap-4 flex-shrink-0">
               <Link href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
                  <Button variant="outline">
                     <WhatsAppIcon className="mr-2 h-5 w-5" />
