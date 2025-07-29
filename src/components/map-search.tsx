@@ -193,7 +193,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
 export function MapSearch({ mapId }: { mapId: string }) {
   return (
-    <div className="h-screen w-screen">
+    <div className="h-full w-full">
       <MapSearchContent mapId={mapId} />
     </div>
   );
