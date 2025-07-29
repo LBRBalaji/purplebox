@@ -172,7 +172,7 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
                 </Button>
                 <p className="text-xs text-muted-foreground flex items-start gap-2">
                     <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                    <span>This is a fictional aggregated summary. Actual listings may vary.</span>
+                    <span>Get Detailed Warehouse Proposals in 48 Hours on your Dashboard. Simple and Easy.</span>
                 </p>
             </CardFooter>
         </Card>
@@ -229,7 +229,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         if (location) {
            if (circle) circle.setMap(null); // Remove old circle
            
-           const fixedRadius = 5000; // 5km radius
+           const fixedRadius = 10000; // 10km radius to cover sub-regions
 
            const newCircle = new google.maps.Circle({
                 strokeColor: 'hsl(210 60% 50%)',
