@@ -4,9 +4,12 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -22,6 +25,23 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
       />
     </svg>
   );
+
+const NavLink = ({ href, children }: { href: string, children: React.ReactNode }) => {
+    const pathname = usePathname();
+    const isActive = pathname === href;
+
+    return (
+        <Link 
+            href={href} 
+            className={cn(
+                "text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2",
+                isActive && "text-primary"
+            )}
+        >
+            {children}
+        </Link>
+    )
+}
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -44,17 +64,17 @@ export function Header() {
               </Link>
               <nav className="hidden sm:flex items-center gap-4">
                    {user && (
-                      <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      <NavLink href="/dashboard">
                           <LayoutDashboard className="h-4 w-4" /> Dashboard
-                      </Link>
+                      </NavLink>
                   )}
-                  <Link href="/map-search" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                  <NavLink href="/map-search">
                       <Map className="h-4 w-4" /> Map Search
-                  </Link>
+                  </NavLink>
                   {user?.role === 'SuperAdmin' && (
-                      <Link href="/dashboard/manage-warehouses" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-                          Manage Warehouses
-                      </Link>
+                      <NavLink href="/dashboard/manage-warehouses">
+                          <Warehouse className="h-4 w-4" /> Manage Warehouses
+                      </NavLink>
                   )}
               </nav>
           </div>

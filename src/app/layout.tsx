@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from '@/contexts/auth-context';
 import { DataProvider } from '@/contexts/data-context';
+import { Header } from '@/components/header';
 
 export const metadata: Metadata = {
   title: 'WareHouse Origin: Sourcing Simplified',
@@ -39,7 +40,8 @@ export default function RootLayout({
       <body className="antialiased flex flex-col min-h-screen">
         <AuthProvider>
           <DataProvider>
-            <main className="flex-grow">{children}</main>
+            <Header />
+            <main className="flex-grow flex flex-col">{children}</main>
             <Footer />
           </DataProvider>
         </AuthProvider>

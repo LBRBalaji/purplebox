@@ -3,7 +3,6 @@
 
 import { MapSearch } from '@/components/map-search';
 import { APIProvider } from '@vis.gl/react-google-maps';
-import { Header } from '@/components/header';
 
 export default function MapSearchPage() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -13,7 +12,7 @@ export default function MapSearchPage() {
 
   if (!apiKey) {
     return (
-      <div className="flex h-screen w-screen flex-col items-center justify-center bg-background text-foreground">
+      <div className="flex-grow flex items-center justify-center bg-background text-foreground">
         <div className="p-8 text-center">
           <h1 className="text-2xl font-bold">Map Feature Not Available</h1>
           <p className="mt-2 text-muted-foreground">
@@ -25,13 +24,10 @@ export default function MapSearchPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <Header />
-      <div className="flex-grow">
-        <APIProvider apiKey={apiKey} libraries={['places', 'marker', 'geometry']}>
-          <MapSearch mapId={mapId}/>
-        </APIProvider>
-      </div>
+    <div className="flex-grow flex flex-col">
+      <APIProvider apiKey={apiKey} libraries={['places', 'marker', 'geometry']}>
+        <MapSearch mapId={mapId}/>
+      </APIProvider>
     </div>
   );
 }
