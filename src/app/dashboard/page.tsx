@@ -122,10 +122,8 @@ export default function DashboardPage() {
     );
   }
 
-  if (user?.role === 'SuperAdmin') { // Property Provider
+  if (user?.role === 'SuperAdmin') { // This now correctly handles Property Providers who are not the main admin
     return (
-      <>
-        {/* AdminNotifier is removed for regular SuperAdmins */}
         <main className="container mx-auto p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
             <Tabs defaultValue="view-demands" className="w-full">
@@ -161,7 +159,6 @@ export default function DashboardPage() {
             </Tabs>
           </div>
         </main>
-      </>
     );
   }
 

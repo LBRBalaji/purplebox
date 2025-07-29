@@ -48,7 +48,6 @@ export function Header() {
   const { user, logout, isLoading } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isAdmin = user?.email === 'admin@example.com';
-  const isPropertyProvider = user?.role === 'SuperAdmin';
 
   return (
     <>
