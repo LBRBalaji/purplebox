@@ -62,13 +62,14 @@ You must provide an overall score, a breakdown for multiple categories, and a de
 2.  **Size Score:**
     *   Calculate the percentage difference: \`abs(demandSize - propertySize) / demandSize\`.
     *   If size is within a **15% tolerance** of the demand, the score should be high (0.85-1.0).
-    *   If size is outside the 15% tolerance, the score should decrease proportionally. A 25% difference might score around 0.6.
+    *   If size is outside the 15% tolerance, the score should decrease proportionally. A 25% difference might score around 0.6. A 90% difference should score very low (e.g. 0.05).
     *   If size is a **non-compromisable** priority and the property is outside the 15% tolerance, the size score should be very low (< 0.2).
 
-3.  **Amenities Score (Docks, Canopy, etc.):**
-    *   This is a blended score. If the customer requires a specific number of docks (e.g., 12) and the property has fewer (e.g., 11), the score should be proportional (11/12 = 0.92). A score of 9/12 would be 0.75.
-    *   If the customer requires a specific ceiling height and the property is below, score it proportionally (e.g., 38ft provided vs 40ft required is 38/40 = 0.95 score).
+3.  **Amenities Score (Docks, Ceiling Height, etc.):**
+    *   This is a blended score. If the customer requires a specific number of docks (e.g., 12) and the property has fewer (e.g., 11), the score for that item **must be calculated proportionally** as \`propertyDocks / demandDocks\` (11/12 = 0.92). A score of 9/12 would be 0.75.
+    *   If the customer requires a specific ceiling height and the property is below, score it **proportionally** as \`propertyHeight / demandHeight\` (e.g., 38ft provided vs 40ft required is 38/40 = 0.95 score).
     *   If the customer has **no** requirement for docks or ceiling height, a property with a reasonable number (e.g., >5 docks, >30ft ceiling) should get a high score (0.9-1.0).
+    *   Combine these proportional scores to produce the final amenities score.
 
 4.  **Fire Safety Score:**
     *   If the customer makes 'fireNoc' or 'fireSafety' a priority, a property with "Obtained" Fire NOC and "Installed" Fire Hydrant gets a 1.0. "Applied For" gets ~0.6. "To Apply" gets ~0.3.
