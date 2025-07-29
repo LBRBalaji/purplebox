@@ -17,6 +17,7 @@ import { ArrowRight, Mail, Info, ListChecks } from 'lucide-react';
 import { useData } from '@/contexts/data-context';
 import type { DemandSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/auth-context';
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size',
@@ -32,6 +33,7 @@ const priorityLabels: { [key: string]: string } = {
 
 export function DemandList() {
   const router = useRouter();
+  const { user } = useAuth();
   const { demands } = useData();
   const { toast } = useToast();
 
@@ -145,9 +147,11 @@ WareHouse Origin
                 <Button onClick={() => handleSubmitMatch(demand.demandId)}>
                   Submit Match <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-                <Button onClick={() => handleCirculateDemand(demand)} variant="outline">
-                    <Mail className="mr-2 h-4 w-4" /> Circulate to Providers
-                </Button>
+                {user?.email === 'admin@example.com' && (
+                  <Button onClick={() => handleCirculateDemand(demand)} variant="outline">
+                      <Mail className="mr-2 h-4 w-4" /> Circulate to Providers
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
