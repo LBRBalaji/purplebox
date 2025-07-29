@@ -160,7 +160,7 @@ export function PropertyForm() {
         if (result.error || !result.submission) {
             throw new Error(result.error || "Failed to get a valid response from the action.");
         }
-        addSubmission(result.submission);
+        addSubmission(result.submission, user?.email);
         setAiResult({ matchResult: result.submission.matchResult });
       } else {
         // Description generation flow

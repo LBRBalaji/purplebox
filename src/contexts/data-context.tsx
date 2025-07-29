@@ -14,15 +14,23 @@ export type Submission = {
     demandUserEmail?: string;
 }
 
+type DataEvent = {
+  type: 'new_demand' | 'new_submission';
+  id: string; // The ID of the demand or submission
+  timestamp: string;
+  triggeredBy: string | undefined; // The email of the user who triggered the event
+};
+
 type DataContextType = {
   demands: DemandSchema[];
-  addDemand: (demand: DemandSchema) => void;
+  addDemand: (demand: DemandSchema, userEmail?: string) => void;
   updateDemand: (demand: DemandSchema) => void;
   submissions: Submission[];
-  addSubmission: (submission: Submission) => void;
+  addSubmission: (submission: Submission, userEmail?: string) => void;
   shortlistedItems: Submission[];
   toggleShortlist: (submission: Submission) => void;
   clearNewSubmissions: (propertyIds: string[]) => void;
+  lastEvent: DataEvent | null;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -30,6 +38,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export function DataProvider({ children }: { children: ReactNode }) {
   const [demands, setDemands] = useState<DemandSchema[]>(mockDemands as DemandSchema[]);
   const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
+  const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>(() => {
     // Pre-populate with a couple of items for easier testing
     const initialShortlist = mockSubmissions.filter(sub => 
@@ -39,8 +48,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return initialShortlist as Submission[];
   });
 
-  const addDemand = (demand: DemandSchema) => {
-    setDemands((prev) => [...prev, demand]);
+  const addDemand = (demand: DemandSchema, userEmail?: string) => {
+    setDemands((prev) => [demand, ...prev]); // Add to the top of the list
+    setLastEvent({
+      type: 'new_demand',
+      id: demand.demandId,
+      timestamp: new Date().toISOString(),
+      triggeredBy: userEmail,
+    });
   };
 
   const updateDemand = (updatedDemand: DemandSchema) => {
@@ -51,14 +66,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const addSubmission = (submission: Submission) => {
+  const addSubmission = (submission: Submission, userEmail?: string) => {
     const demand = demands.find(d => d.demandId === submission.demandId);
     const submissionWithNewFlag: Submission = {
         ...submission,
         isNew: true,
         demandUserEmail: demand?.userEmail
     };
-    setSubmissions((prev) => [...prev, submissionWithNewFlag]);
+    setSubmissions((prev) => [submissionWithNewFlag, ...prev]);
+    setLastEvent({
+        type: 'new_submission',
+        id: submission.demandId,
+        timestamp: new Date().toISOString(),
+        triggeredBy: userEmail,
+    });
   };
 
   const toggleShortlist = (submissionToToggle: Submission) => {
@@ -85,7 +106,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, shortlistedItems, toggleShortlist, clearNewSubmissions }}>
+    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent }}>
       {children}
     </DataContext.Provider>
   );

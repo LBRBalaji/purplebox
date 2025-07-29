@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { ShortlistedProperties } from '@/components/shortlisted-properties';
 import { Badge } from '@/components/ui/badge';
+import { AdminNotifier } from '@/components/admin-notifier';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -90,41 +91,44 @@ export default function DashboardPage() {
 
   if (user?.role === 'SuperAdmin') {
     return (
-      <main className="container mx-auto p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          <Tabs defaultValue="view-demands" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="view-demands">
-                {propertySubmitDemandId ? 'Submit Match' : 'Active Demands'}
-              </TabsTrigger>
-              <TabsTrigger value="my-submissions">My Submissions</TabsTrigger>
-            </TabsList>
-            <TabsContent value="view-demands">
-              {propertySubmitDemandId ? (
-                 <div className="mt-8">
-                    <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
-                      <div>
-                        <h2 className="text-3xl font-bold font-headline tracking-tight">Submit a Matching Property</h2>
-                        <p className="text-muted-foreground mt-2">
-                          Submit against Demand ID: <span className="font-mono text-primary bg-primary/10 px-2 py-1 rounded-md">{propertySubmitDemandId}</span>
-                        </p>
+      <>
+        <AdminNotifier />
+        <main className="container mx-auto p-4 md:p-8">
+          <div className="max-w-7xl mx-auto">
+            <Tabs defaultValue="view-demands" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="view-demands">
+                  {propertySubmitDemandId ? 'Submit Match' : 'Active Demands'}
+                </TabsTrigger>
+                <TabsTrigger value="my-submissions">My Submissions</TabsTrigger>
+              </TabsList>
+              <TabsContent value="view-demands">
+                {propertySubmitDemandId ? (
+                  <div className="mt-8">
+                      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+                        <div>
+                          <h2 className="text-3xl font-bold font-headline tracking-tight">Submit a Matching Property</h2>
+                          <p className="text-muted-foreground mt-2">
+                            Submit against Demand ID: <span className="font-mono text-primary bg-primary/10 px-2 py-1 rounded-md">{propertySubmitDemandId}</span>
+                          </p>
+                        </div>
+                        <Button variant="outline" onClick={() => router.push('/dashboard')}>
+                          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Demands
+                        </Button>
                       </div>
-                      <Button variant="outline" onClick={() => router.push('/dashboard')}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Demands
-                      </Button>
+                      <PropertyForm />
                     </div>
-                    <PropertyForm />
-                  </div>
-              ) : (
-                <DemandList />
-              )}
-            </TabsContent>
-            <TabsContent value="my-submissions">
-              <MySubmissions />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
+                ) : (
+                  <DemandList />
+                )}
+              </TabsContent>
+              <TabsContent value="my-submissions">
+                <MySubmissions />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </main>
+      </>
     );
   }
 

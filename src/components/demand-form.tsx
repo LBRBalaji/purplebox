@@ -46,7 +46,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { getImprovedDemandDescriptionAction, logDemandAction } from "@/lib/actions";
-import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus } from 'lucide-react';
+import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
@@ -206,7 +206,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       if (isEditMode) {
         updateDemand(result.demand);
       } else {
-        addDemand(result.demand);
+        addDemand(result.demand, user?.email);
       }
 
       setIsDialogOpen(true);
