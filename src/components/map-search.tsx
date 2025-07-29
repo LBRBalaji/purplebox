@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck, ArrowDown } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 
@@ -255,6 +255,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [lastSearchedCenter, setLastSearchedCenter] = React.useState<{ lat: number, lng: number } | null>(null);
   const [circle, setCircle] = React.useState<google.maps.Circle | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
+  const [pendingRedirectCenter, setPendingRedirectCenter] = React.useState<{ lat: number; lng: number } | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Initialize SearchBox
@@ -331,8 +332,19 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       }
       router.push(url);
     } else {
+      setPendingRedirectCenter(center || null);
       setIsLoginDialogOpen(true);
     }
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoginDialogOpen(false);
+    let url = '/dashboard';
+    if (pendingRedirectCenter) {
+      url = `/dashboard?logNew=true&location=${pendingRedirectCenter.lat.toFixed(6)},${pendingRedirectCenter.lng.toFixed(6)}&radius=5`;
+    }
+    router.push(url);
+    setPendingRedirectCenter(null);
   };
 
 
@@ -396,7 +408,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                             This is an Untapped Opportunity!
                         </h3>
                         <p className="text-sm mt-2 mb-6 text-muted-foreground">
-                            We don&apos;t have aggregated supply data for this specific area, but you can still log a demand.
+                           We are actively expanding our network here. Log your demand, and we&apos;ll get to work sourcing the perfect match for you.
                         </p>
                         <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="primary"/>
                     </div>
@@ -405,7 +417,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 )}
             </aside>
         </div>
-        <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
+        <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={handleLoginSuccess}/>
     </>
   );
 }

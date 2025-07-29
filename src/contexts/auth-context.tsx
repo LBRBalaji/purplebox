@@ -17,7 +17,7 @@ export type NewUser = User;
 
 type AuthContextType = {
   user: User | null;
-  login: (email: string) => void;
+  login: (email: string, onLoginSuccess?: () => void) => void;
   signup: (details: NewUser) => void;
   logout: () => void;
   isLoading: boolean;
@@ -68,12 +68,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (email: string) => {
+  const login = (email: string, onLoginSuccess?: () => void) => {
     const foundUser = users[email.toLowerCase()];
     if (foundUser) {
       setUser(foundUser);
       sessionStorage.setItem('user', JSON.stringify(foundUser));
-      router.push('/dashboard');
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      } else {
+        router.push('/dashboard');
+      }
     } else {
       alert('This email is not registered. Please sign up.');
     }

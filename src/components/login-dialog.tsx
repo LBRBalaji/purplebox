@@ -17,15 +17,20 @@ import {
 } from '@/components/ui/dialog';
 
 
-export function LoginDialog({ isOpen, onOpenChange }: { isOpen: boolean, onOpenChange: (open: boolean) => void }) {
+export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: boolean, onOpenChange: (open: boolean) => void, onLoginSuccess?: () => void }) {
   const { login } = useAuth();
   const [email, setEmail] = React.useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email);
+    login(email, onLoginSuccess); // Pass the callback to the login function
     onOpenChange(false);
   };
+  
+  const handleTestUserLogin = (testEmail: string) => {
+    login(testEmail, onLoginSuccess);
+    onOpenChange(false);
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -75,16 +80,16 @@ export function LoginDialog({ isOpen, onOpenChange }: { isOpen: boolean, onOpenC
             </div>
 
             <div className="grid grid-cols-1 gap-4 w-full">
-                <Button type="button" variant="outline" onClick={() => login('admin@example.com')}>
+                <Button type="button" variant="outline" onClick={() => handleTestUserLogin('admin@example.com')}>
                     <UserCog className="mr-2 h-4 w-4" />
                     Property Provider
                 </Button>
                 <div className="grid grid-cols-2 gap-4">
-                    <Button type="button" variant="outline" onClick={() => login('user@example.com')}>
+                    <Button type="button" variant="outline" onClick={() => handleTestUserLogin('user@example.com')}>
                         <UserIcon className="mr-2 h-4 w-4" />
                         Customer
                     </Button>
-                    <Button type="button" variant="outline" onClick={() => login('logistics.pro@example.com')}>
+                    <Button type="button" variant="outline" onClick={() => handleTestUserLogin('logistics.pro@example.com')}>
                         <TruckIcon className="mr-2 h-4 w-4" />
                         Logistics Pro
                     </Button>
