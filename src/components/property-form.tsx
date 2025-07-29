@@ -42,17 +42,96 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema } from "@/lib/schema";
 import { generateDescriptionAction, getPropertyMatchScoreAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { Progress } from "./ui/progress";
 import { useData } from "@/contexts/data-context";
 import { useAuth } from "@/contexts/auth-context";
+import { Badge } from "./ui/badge";
+
+const priorityLabels: { [key: string]: string } = {
+  size: 'Size',
+  location: 'Location',
+  ceilingHeight: 'Ceiling Height',
+  docks: 'Docks',
+  readiness: 'Readiness',
+  approvals: 'Approvals',
+  fireNoc: 'Fire NOC',
+  power: 'Power',
+  fireSafety: 'Fire Safety',
+};
 
 
 type AiResult = {
   description?: string;
   matchResult?: GetPropertyMatchScoreOutput;
+}
+
+function DemandSummaryCard({ demandId }: { demandId: string }) {
+    const { demands } = useData();
+    const demand = demands.find(d => d.demandId === demandId);
+
+    if (!demand) {
+        return (
+            <Card className="bg-amber-50 border-amber-200">
+                <CardHeader>
+                    <CardTitle className="text-amber-800">Demand Not Found</CardTitle>
+                    <CardDescription className="text-amber-700">Could not find details for Demand ID: {demandId}</CardDescription>
+                </CardHeader>
+            </Card>
+        );
+    }
+    
+    return (
+        <Card className="bg-primary/5 mb-6">
+            <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                    <ClipboardList className="h-5 w-5 text-primary" />
+                    Demand Summary
+                </CardTitle>
+                 <CardDescription>You are submitting a property against this demand.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <p className="font-semibold">Property Type</p>
+                        <p className="text-muted-foreground">{demand.propertyType}</p>
+                    </div>
+                     <div>
+                        <p className="font-semibold">Size (Sq. Ft.)</p>
+                        <p className="text-muted-foreground">{demand.size.toLocaleString()}</p>
+                    </div>
+                     <div>
+                        <p className="font-semibold">Location</p>
+                        <p className="text-muted-foreground truncate" title={demand.location}>{demand.location}</p>
+                    </div>
+                     <div>
+                        <p className="font-semibold">Radius</p>
+                        <p className="text-muted-foreground">{demand.radius} km</p>
+                    </div>
+                </div>
+                 {demand.description && (
+                    <div className="text-sm">
+                        <p className="font-semibold flex items-center gap-1.5"><FileText className="h-4 w-4" /> Description</p>
+                        <p className="text-muted-foreground mt-1 whitespace-pre-wrap text-xs bg-background/50 p-2 rounded-md">{demand.description}</p>
+                    </div>
+                )}
+                 {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
+                    <div className="text-sm">
+                        <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Priorities</p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {demand.preferences.nonCompromisable.map(item => (
+                                <Badge key={item} variant="outline" className="font-medium bg-background">
+                                    {priorityLabels[item] || item}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
 }
 
 export function PropertyForm() {
@@ -171,7 +250,7 @@ export function PropertyForm() {
       setIsDialogOpen(true);
       toast({
         title: "Success!",
-        description: isMatchingMode ? "Property match submitted." : "AI description generated.",
+        description: isMatchingMode ? "Property match submitted for approval." : "AI description generated.",
       });
     } catch (error) {
       const e = error as Error;
@@ -199,6 +278,7 @@ export function PropertyForm() {
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {isMatchingMode && demandIdFromUrl && <DemandSummaryCard demandId={demandIdFromUrl} />}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               {/* Site Section */}
@@ -364,7 +444,7 @@ export function PropertyForm() {
               ) : isMatchingMode ? (
                 <>
                   <Wand className="mr-2 h-4 w-4" />
-                  Calculate Match Score
+                  Submit for Approval
                 </>
               ) : (
                 <>
@@ -381,9 +461,9 @@ export function PropertyForm() {
            {isMatchingMode ? (
               <>
                 <DialogHeader>
-                  <DialogTitle>AI Match Score Calculated!</DialogTitle>
+                  <DialogTitle>AI Match Score Calculated & Submitted!</DialogTitle>
                   <DialogDescription>
-                    The AI has analyzed this property against the demand. The calculated match score below has been sent to the customer for review.
+                    The AI has analyzed this property against the demand. The submission is now pending admin approval.
                   </DialogDescription>
                 </DialogHeader>
                 {isLoading || !aiResult?.matchResult ? (
