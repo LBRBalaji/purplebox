@@ -6,14 +6,15 @@ import { APIProvider } from '@vis.gl/react-google-maps';
 
 export default function MapSearchPage() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const mapId = process.env.NEXT_PUBLIC_MAP_ID;
 
-  if (!apiKey) {
+  if (!apiKey || !mapId) {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-background text-foreground">
         <div className="p-8 text-center">
           <h1 className="text-2xl font-bold">Map Feature Not Available</h1>
           <p className="mt-2 text-muted-foreground">
-            The Google Maps API key is missing. Please add it to your environment variables to enable this feature.
+            The Google Maps API key or Map ID is missing. Please add it to your environment variables to enable this feature.
           </p>
         </div>
       </div>
@@ -22,7 +23,7 @@ export default function MapSearchPage() {
 
   return (
     <APIProvider apiKey={apiKey} libraries={['places', 'marker']}>
-      <MapSearch />
+      <MapSearch mapId={mapId}/>
     </APIProvider>
   );
 }

@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/carousel"
 
 
-function MapSearchContent() {
+function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
   const places = useMapsLibrary('places');
   const { toast } = useToast();
@@ -162,7 +162,7 @@ function MapSearchContent() {
       <Map
         defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
         defaultZoom={5}
-        mapId={process.env.NEXT_PUBLIC_MAP_ID}
+        mapId={mapId}
         disableDefaultUI={true}
         gestureHandling="greedy"
         className="h-full w-full"
@@ -269,10 +269,10 @@ const getReadinessBadgeColor = (readiness: string) => {
 }
 
 
-export function MapSearch() {
+export function MapSearch({ mapId }: { mapId: string }) {
   return (
     <div className="h-screen w-screen relative">
-      <MapSearchContent />
+      <MapSearchContent mapId={mapId} />
     </div>
   );
 }
