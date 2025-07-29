@@ -15,7 +15,7 @@ import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info } from 
 
 function RegionalSummaryCard() {
     return (
-        <Card className="shadow-none border-0 h-full flex flex-col">
+        <Card className="shadow-none border-0 h-full flex flex-col bg-transparent">
             <CardHeader>
                 <div className="flex justify-between items-start">
                     <div>
@@ -91,11 +91,11 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       const places = searchBox.getPlaces();
       if (places && places.length > 0 && places[0].geometry) {
         const place = places[0];
-        const viewport = place.geometry.viewport;
-        if (viewport) {
-           map.fitBounds(viewport);
-
+        const location = place.geometry.location;
+        if (location) {
            if (circle) circle.setMap(null); // Remove old circle
+           
+           const fixedRadius = 15000; // 15km radius
 
            const newCircle = new google.maps.Circle({
                 strokeColor: 'hsl(210 60% 50%)',
@@ -104,15 +104,18 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 fillColor: 'hsl(210 60% 50%)',
                 fillOpacity: 0.2,
                 map,
-                center: place.geometry.location,
-                radius: viewport.getNorthEast().lat() > viewport.getSouthWest().lat() ?
-                  google.maps.geometry.spherical.computeDistanceBetween(viewport.getCenter(), viewport.getNorthEast()) :
-                  10000 // default radius for point locations
+                center: location,
+                radius: fixedRadius
             });
             setCircle(newCircle);
-        } else if (place.geometry.location) {
-            map.setCenter(place.geometry.location);
-            map.setZoom(12);
+            
+            const bounds = newCircle.getBounds();
+            if (bounds) {
+                map.fitBounds(bounds);
+            } else {
+                map.setCenter(location);
+                map.setZoom(10);
+            }
         }
         setShowSummary(true); // Show the summary card on search
       }
@@ -130,6 +133,9 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       circle.setMap(null);
       setCircle(null);
     }
+    // Reset to a wider view of India
+    map?.setCenter({ lat: 20.5937, lng: 78.9629 });
+    map?.setZoom(5);
   };
 
   return (
@@ -166,10 +172,10 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 gestureHandling="greedy"
                 className="h-full w-full"
             >
-                {/* Intentionally left blank to keep the map clean */}
+                {/* Intentionally left blank to keep the map clean unless browsing */}
             </Map>
         </div>
-        <aside className="w-[400px] h-full border-l bg-background">
+        <aside className="w-[400px] h-full border-l bg-card/80 backdrop-blur-sm">
             {showSummary ? (
                 <RegionalSummaryCard />
             ) : (
