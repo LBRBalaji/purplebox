@@ -210,8 +210,14 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       }
 
       setIsDialogOpen(true);
-      
+
       if (!isEditMode) {
+        // Send WhatsApp notification
+        const adminPhoneNumber = "919841098170";
+        const message = `New property demand logged. Demand ID: ${data.demandId}`;
+        const whatsappUrl = `https://wa.me/${adminPhoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        
         const userDetails = {
           companyName: user?.companyName,
           userName: user?.userName,
