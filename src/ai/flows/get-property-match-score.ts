@@ -86,7 +86,7 @@ You must provide an overall score, a breakdown for multiple categories, and a de
     *   This is subjective. If no customer preference, assume 0.9. If customer mentions "budget-friendly", a lower rent/sft should get a higher score.
 
 8.  **Overall Score:**
-    *   This should be a weighted average of all category scores. Give higher weight to categories marked as non-compromisable. Your justification should briefly explain the overall score based on the category breakdown.
+    *   The \`overallScore\` **MUST be the simple mathematical average** of all the category scores in the \`scoreBreakdown\`. Do not use a complex weighted average. Your final justification should briefly state this is an average and point out the highest and lowest scoring categories.
 
 **Analyze the following data:**
 
