@@ -8,8 +8,7 @@
  * - GetWarehousesOutput - The return type for the getWarehouses function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 import { warehouseSchema } from '@/lib/schema';
 import { warehouses } from '@/lib/warehouse-mock-data';
 
@@ -27,17 +26,7 @@ const GetWarehousesOutputSchema = z.object({
 export type GetWarehousesOutput = z.infer<typeof GetWarehousesOutputSchema>;
 
 export async function getWarehouses(input: GetWarehousesInput): Promise<GetWarehousesOutput> {
-  return getWarehousesFlow(input);
-}
-
-const getWarehousesFlow = ai.defineFlow(
-  {
-    name: 'getWarehousesFlow',
-    inputSchema: GetWarehousesInputSchema,
-    outputSchema: GetWarehousesOutputSchema,
-  },
-  async (input) => {
-    // This flow simulates a database query to find warehouses within the given map bounds.
+    // This function simulates a database query to find warehouses within the given map bounds.
     // In a real application, this would be a query to a geospatial database like PostGIS or Firestore with Geo-queries.
     
     const visibleWarehouses = warehouses.filter(warehouse => {
@@ -51,5 +40,4 @@ const getWarehousesFlow = ai.defineFlow(
     });
 
     return { warehouses: visibleWarehouses };
-  }
-);
+}
