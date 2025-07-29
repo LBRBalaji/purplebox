@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Check, Info, ListChecks, Percent, ThumbsDown, ThumbsUp, X, MapPin, Scaling, CalendarCheck, HandCoins, Zap, ShieldCheck, Truck } from 'lucide-react';
+import { Check, Info, ListChecks, Percent, ThumbsDown, ThumbsUp, X, MapPin, Scaling, CalendarCheck, HandCoins, Zap, ShieldCheck, Truck, Flame } from 'lucide-react';
 import { Separator } from './ui/separator';
 
 const priorityLabels: { [key: string]: string } = {
