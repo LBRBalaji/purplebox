@@ -28,6 +28,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!isLoading && user && pathname.startsWith('/dashboard/approval') && user.email !== 'admin@example.com') {
       router.push('/dashboard');
     }
+     // Specific check for manage users page
+    if (!isLoading && user && pathname.startsWith('/dashboard/manage-users') && user.email !== 'admin@example.com') {
+        router.push('/dashboard');
+    }
   }, [user, isLoading, router, pathname]);
 
   if (isLoading || !user) {

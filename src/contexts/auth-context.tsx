@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-type User = {
+export type User = {
   email: string;
   role: 'SuperAdmin' | 'User';
   companyName: string;
@@ -17,10 +17,14 @@ export type NewUser = User;
 
 type AuthContextType = {
   user: User | null;
+  users: { [email: string]: User };
   login: (email: string, onLoginSuccess?: () => void) => void;
   signup: (details: NewUser) => void;
   logout: () => void;
   isLoading: boolean;
+  addUser: (details: NewUser) => void;
+  updateUser: (details: NewUser) => void;
+  deleteUser: (email: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -69,6 +73,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const persistUsers = (updatedUsers: { [email: string]: User }) => {
+    setUsers(updatedUsers);
+    localStorage.setItem('warehouseorigin_users', JSON.stringify(updatedUsers));
+  }
+
   const login = (email: string, onLoginSuccess?: () => void) => {
     const foundUser = users[email.toLowerCase()];
     if (foundUser) {
@@ -85,15 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = (details: NewUser) => {
-    if (users[details.email.toLowerCase()]) {
-      alert("An account with this email already exists. Please log in.");
-      return;
-    }
-    
-    const newUsers = { ...users, [details.email.toLowerCase()]: details };
-    setUsers(newUsers);
-    localStorage.setItem('warehouseorigin_users', JSON.stringify(newUsers));
-
+    addUser(details);
     // Log the new user in
     setUser(details);
     sessionStorage.setItem('user', JSON.stringify(details));
@@ -106,8 +107,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/');
   };
 
+  const addUser = (details: NewUser) => {
+    if (users[details.email.toLowerCase()]) {
+      alert("An account with this email already exists.");
+      return;
+    }
+    const newUsers = { ...users, [details.email.toLowerCase()]: details };
+    persistUsers(newUsers);
+  };
+  
+  const updateUser = (details: NewUser) => {
+    if (!users[details.email.toLowerCase()]) {
+      alert("Cannot update a non-existent user.");
+      return;
+    }
+    const newUsers = { ...users, [details.email.toLowerCase()]: details };
+    persistUsers(newUsers);
+
+    // If the updated user is the currently logged-in user, update session storage as well
+    if (user?.email === details.email) {
+      setUser(details);
+      sessionStorage.setItem('user', JSON.stringify(details));
+    }
+  };
+
+  const deleteUser = (email: string) => {
+    if (email === 'admin@example.com') {
+        alert("The main admin account cannot be deleted.");
+        return;
+    }
+    const newUsers = { ...users };
+    delete newUsers[email.toLowerCase()];
+    persistUsers(newUsers);
+
+    if (user?.email === email) {
+      logout();
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, users, login, signup, logout, isLoading, addUser, updateUser, deleteUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -82,6 +82,9 @@ export function Header() {
                         </NavLink>
                         {isAdmin && (
                             <>
+                                <NavLink href="/dashboard/manage-users">
+                                    <Users className="h-4 w-4" /> Manage Users
+                                </NavLink>
                                 <NavLink href="/dashboard/manage-warehouses">
                                     <Warehouse className="h-4 w-4" /> Manage Warehouses
                                 </NavLink>
