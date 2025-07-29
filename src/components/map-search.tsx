@@ -128,31 +128,49 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   // Handle search box places changing
   React.useEffect(() => {
     if (!searchBox || !map) return;
-    const listener = searchBox.addListener('places_changed', () => {
+    const listener = searchBox.addListener('places_changed', async () => {
       const places = searchBox.getPlaces();
       if (places && places.length > 0 && places[0].geometry) {
         const place = places[0];
         map.fitBounds(place.geometry.viewport!);
-        // We need to wait for the map to be idle after fitting bounds to get the correct warehouses
+        
+        // Wait for map to idle before fetching data, but don't show markers immediately.
         const idleListener = map.addListener('idle', async () => {
-            const bounds = map.getBounds();
-            if (!bounds) return;
-            const sw = bounds.getSouthWest();
-            const ne = bounds.getNorthEast();
-            const warehousesInView = await getWarehousesAction({
-                sw_lat: sw.lat(), sw_lng: sw.lng(), ne_lat: ne.lat(), ne_lng: ne.lng()
+          google.maps.event.removeListener(idleListener); // Run only once
+          const bounds = map.getBounds();
+          if (!bounds) return;
+
+          const sw = bounds.getSouthWest();
+          const ne = bounds.getNorthEast();
+          
+          setIsLoading(true);
+          setWarehouses([]); // Clear existing markers
+          clustererRef.current?.clearMarkers();
+          
+          try {
+            const result = await getWarehousesAction({
+              sw_lat: sw.lat(), sw_lng: sw.lng(), ne_lat: ne.lat(), ne_lng: ne.lng()
             });
-            if (warehousesInView.warehouses) {
-                calculateRegionSummary(warehousesInView.warehouses, place.formatted_address || 'Selected Area');
+
+            if (result.error) throw new Error(result.error);
+            
+            if (result.warehouses) {
+              // On search, we *only* want to show the summary.
+              // We don't call setWarehouses here to avoid rendering markers.
+              calculateRegionSummary(result.warehouses, place.formatted_address || 'Selected Area');
             }
-            google.maps.event.removeListener(idleListener);
+          } catch(error) {
+              toast({ variant: 'destructive', title: 'Failed to load summary', description: (error as Error).message });
+          } finally {
+            setIsLoading(false);
+          }
         });
       }
     });
     return () => {
       google.maps.event.removeListener(listener);
     }
-  }, [searchBox, map]);
+  }, [searchBox, map, toast]);
 
   const fetchAndSetWarehouses = React.useCallback(async () => {
     if (!map) return;
@@ -189,13 +207,21 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     }
   }, [map, toast]);
 
-  // Fetch warehouses on map idle
+  // Fetch warehouses on map idle for browsing
   React.useEffect(() => {
     if (!map) return;
+    // This listener handles manual browsing (pan/zoom)
     if (idleListenerRef.current) {
         google.maps.event.removeListener(idleListenerRef.current);
     }
-    idleListenerRef.current = map.addListener('idle', fetchAndSetWarehouses);
+    idleListenerRef.current = map.addListener('idle', () => {
+      // Don't fetch if a summary is shown, let the user dismiss it first
+      if (!regionSummary) {
+        fetchAndSetWarehouses();
+      }
+    });
+
+    // Initial load
     fetchAndSetWarehouses();
 
     return () => {
@@ -203,7 +229,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             google.maps.event.removeListener(idleListenerRef.current);
         }
     }
-  }, [map, fetchAndSetWarehouses]);
+  }, [map, fetchAndSetWarehouses, regionSummary]);
 
   const handleMarkerClick = React.useCallback((warehouse: WarehouseSchema) => {
     setSelectedWarehouse(warehouse);
@@ -217,15 +243,17 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   // Update clusters when warehouses change
   React.useEffect(() => {
     clustererRef.current?.clearMarkers();
-    const markers = warehouses.map(warehouse => {
-        const marker = new google.maps.marker.AdvancedMarkerElement({
-            position: warehouse.generalizedLocation,
-            gmpClickable: true
-        });
-        marker.addEventListener('gmp-click', () => handleMarkerClick(warehouse));
-        return marker;
-    });
-    clustererRef.current?.addMarkers(markers);
+    if (warehouses.length > 0) {
+      const markers = warehouses.map(warehouse => {
+          const marker = new google.maps.marker.AdvancedMarkerElement({
+              position: warehouse.generalizedLocation,
+              gmpClickable: true
+          });
+          marker.addEventListener('gmp-click', () => handleMarkerClick(warehouse));
+          return marker;
+      });
+      clustererRef.current?.addMarkers(markers);
+    }
   }, [warehouses, handleMarkerClick]);
 
 
@@ -270,7 +298,11 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                         <CardTitle className="text-lg">Supply Summary</CardTitle>
                         <p className="text-sm text-primary font-medium">{regionSummary.name}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setRegionSummary(null)}>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
+                      setRegionSummary(null);
+                      // After closing, load the markers for that region
+                      fetchAndSetWarehouses();
+                    }}>
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
