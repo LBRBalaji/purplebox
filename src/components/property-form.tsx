@@ -307,17 +307,6 @@ export function PropertyForm() {
                       </FormItem>
                     )}
                   />
-                  <FormField control={form.control} name="propertyGeoLocation" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Geo Location</FormLabel>
-                        <div className="flex gap-2">
-                            <FormControl><Input placeholder="e.g. 13.0827, 80.2707" {...field} /></FormControl>
-                            <Button type="button" variant="outline" size="icon" onClick={handleGetLocation}><MapPin className="w-4 h-4"/></Button>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField control={form.control} name="size" render={({ field }) => (
                       <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )}
