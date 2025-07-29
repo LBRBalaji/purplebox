@@ -117,19 +117,20 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
   },
 };
 
-const LogDemandButton = ({ center, onLogDemand }: { center: { lat: number; lng: number } | null, onLogDemand: (center: { lat: number, lng: number }) => void }) => {
+const LogDemandButton = ({ center, onLogDemand, variant = 'primary' }: { center: { lat: number; lng: number } | null, onLogDemand: (center?: { lat: number; lng: number } | null) => void, variant?: "primary" | "secondary" }) => {
     const { user } = useAuth();
 
     return (
         <div className="flex flex-col gap-3">
              <Button 
                 className="w-full" 
-                onClick={() => center && onLogDemand(center)} 
-                disabled={user?.role === 'SuperAdmin' || !center}
+                onClick={() => onLogDemand(center)} 
+                disabled={user?.role === 'SuperAdmin'}
+                variant={variant as any}
             >
                 {user && user.role === 'User' ? (
                     <>
-                        <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand Here
+                        <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand
                     </>
                 ) : (
                      <>
@@ -186,13 +187,13 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
                 </div>
             </CardContent>
             <CardFooter>
-                <LogDemandButton center={data.center} onLogDemand={onLogDemand} />
+                <LogDemandButton center={data.center} onLogDemand={onLogDemand} variant="primary" />
             </CardFooter>
         </Card>
     )
 }
 
-function HowItWorks() {
+function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng: number } | null) => void }) {
     const steps = [
         {
             icon: FileText,
@@ -212,33 +213,39 @@ function HowItWorks() {
     ]
 
     return (
-        <div className="flex flex-col h-full justify-center">
-            <div className="mb-8 text-center">
-                 <Building2 className="h-12 w-12 mx-auto mb-4 text-primary" />
-                 <h3 className="text-xl font-bold font-headline text-foreground">
-                    How It Works
-                 </h3>
-            </div>
-            <div className="space-y-8 relative">
-                <div className="absolute left-7 top-2 bottom-2 w-0.5 bg-border -z-10" />
-                {steps.map((step, index) => (
-                    <div key={index} className="flex items-start gap-4">
-                        <div className="flex-shrink-0">
-                            <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-                                 <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                                    <step.icon className="h-5 w-5" />
+        <Card className="flex flex-col h-full bg-gradient-to-br from-primary/5 via-background to-background border-0 shadow-none">
+            <CardHeader className="text-center">
+                 <Building2 className="h-10 w-10 mx-auto mb-2 text-primary" />
+                 <CardTitle className="text-xl font-bold font-headline text-foreground">
+                    Unlock Your Perfect Warehouse
+                 </CardTitle>
+                 <CardDescription>The fastest way to source industrial and warehousing space.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow flex flex-col justify-center">
+                <div className="space-y-6 relative py-4">
+                    <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-border -z-10" />
+                    {steps.map((step, index) => (
+                        <div key={index} className="flex items-start gap-4">
+                            <div className="flex-shrink-0 z-10">
+                                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center ring-8 ring-background">
+                                    <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                                        <step.icon className="h-5 w-5" />
+                                    </div>
                                 </div>
                             </div>
+                            <div className="pt-1">
+                                <p className="font-bold text-base text-primary">0{index+1}</p>
+                                <h4 className="font-semibold text-foreground">{step.title}</h4>
+                                <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="font-bold text-lg text-primary">0{index+1}</p>
-                            <h4 className="font-semibold text-foreground">{step.title}</h4>
-                            <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+                    ))}
+                </div>
+            </CardContent>
+             <CardFooter>
+                <LogDemandButton center={null} onLogDemand={onLogDemand} variant="secondary" />
+            </CardFooter>
+        </Card>
     )
 }
 
@@ -322,10 +329,14 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     }
   }, [searchBox, map, circle]);
 
-  const handleLogDemandClick = (center: { lat: number; lng: number }) => {
+  const handleLogDemandClick = (center?: { lat: number; lng: number } | null) => {
     if (user && user.role === 'User') {
-      const locationString = `${center.lat.toFixed(6)},${center.lng.toFixed(6)}`;
-      router.push(`/dashboard?logNew=true&location=${locationString}&radius=5`);
+      let url = '/dashboard?logNew=true';
+      if (center) {
+        const locationString = `${center.lat.toFixed(6)},${center.lng.toFixed(6)}`;
+        url += `&location=${locationString}&radius=5`;
+      }
+      router.push(url);
     } else {
       setIsLoginDialogOpen(true);
     }
@@ -386,18 +397,18 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 {summaryData ? (
                     <RegionalSummaryCard data={summaryData} onLogDemand={handleLogDemandClick} />
                 ) : lastSearchedCenter ? (
-                    <div className="text-center text-muted-foreground">
-                        <Building2 className="h-12 w-12 mx-auto mb-4" />
+                    <div className="text-center">
+                        <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                         <h3 className="text-lg font-semibold text-foreground">
                             This is an Untapped Opportunity!
                         </h3>
-                        <p className="text-sm mt-2 mb-6">
-                            We don't have aggregated supply data for this specific area, but you can still log a demand.
+                        <p className="text-sm mt-2 mb-6 text-muted-foreground">
+                            We don&apos;t have aggregated supply data for this specific area, but you can still log a demand.
                         </p>
-                        <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} />
+                        <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="primary"/>
                     </div>
                 ) : (
-                    <HowItWorks />
+                    <HowItWorks onLogDemand={handleLogDemandClick} />
                 )}
             </aside>
         </div>
