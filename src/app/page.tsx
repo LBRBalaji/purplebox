@@ -5,13 +5,10 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Building, Sparkles, Map } from 'lucide-react';
 import Link from 'next/link';
-import { Header } from '@/components/header';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow flex items-center justify-center bg-background">
+    <div className="flex-grow flex flex-col items-center justify-center bg-background">
         <div className="text-center p-8">
               <div className="mx-auto flex flex-col items-center mb-4">
                   <div className="flex items-center gap-2">
@@ -32,7 +29,6 @@ export default function LandingPage() {
                   </Link>
               </div>
           </div>
-      </main>
     </div>
   );
 }
