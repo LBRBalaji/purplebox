@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 
@@ -196,19 +196,16 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
 function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng: number } | null) => void }) {
     const steps = [
         {
-            title: "Define Your Need",
-            description: "One form, ten minutes, unlocks the entire market.",
-            icon: FileText,
+            title: "Search a Region",
+            description: "Use the search bar to find a city or industrial area.",
         },
         {
-            title: "Activate Our Network",
-            description: "Your requirement is confidentially routed to our vetted network.",
-            icon: Share2,
+            title: "View Supply Summary",
+            description: "See an aggregated overview of listings in that zone.",
         },
         {
-            title: "Receive Curated Options",
-            description: "No noise. Just 3-5 qualified, actionable proposals.",
-            icon: MailCheck,
+            title: "Log Your Demand",
+            description: "Use the insights to log a specific, targeted demand.",
         }
     ];
 
@@ -216,20 +213,19 @@ function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng
         <Card className="flex flex-col h-full bg-gradient-to-br from-primary/5 via-background to-background border-0 shadow-none">
             <CardHeader className="text-center">
                  <CardTitle className="text-2xl font-bold font-headline text-foreground">
-                    Warehouse Sourcing, Simplified.
+                    How to Source Your Warehouse
                  </CardTitle>
-                 <CardDescription>Our three-step process finds your perfect match.</CardDescription>
+                 <CardDescription>Log your demand directly, or do a quick search first to gain insights.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center">
                 <div className="space-y-8 relative py-4">
                      <div className="absolute left-6 top-10 bottom-10 w-0.5 bg-border -z-10" />
                     {steps.map((step, index) => {
-                        const Icon = step.icon;
                         return (
                             <div key={index} className="flex items-start gap-5">
                                 <div className="flex-shrink-0 z-10">
-                                    <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                                        <Icon className="h-6 w-6" />
+                                    <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+                                        0{index + 1}
                                     </div>
                                 </div>
                                 <div>
