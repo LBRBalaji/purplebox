@@ -5,7 +5,8 @@ import {
   Map,
   useMap,
   useMapsLibrary,
-  useAdvancedMarkerRef
+  useAdvancedMarkerRef,
+  AdvancedMarker
 } from '@vis.gl/react-google-maps';
 import * as React from 'react';
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
@@ -50,15 +51,23 @@ const AppMarker = ({ warehouse, onClick }: AppMarkerProps) => {
             onClick(warehouse);
         });
         
+        // Add a 'gmp-click' listener to handle clicks when clustered
+        // as the default 'click' event is captured by the clusterer.
+        marker.addListener('gmp-click', () => {
+            onClick(warehouse);
+        });
+        
         return () => {
             listener.remove();
         }
     }, [marker, warehouse, onClick]);
 
     return (
-        <div ref={ref} className="w-6 h-6 rounded-full bg-primary/80 border-2 border-primary-foreground ring-2 ring-primary shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-            <Building className="w-3 h-3 text-primary-foreground" />
-        </div>
+        <AdvancedMarker ref={ref} position={warehouse.generalizedLocation} >
+            <div className="w-6 h-6 rounded-full bg-primary/80 border-2 border-primary-foreground ring-2 ring-primary shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                <Building className="w-3 h-3 text-primary-foreground" />
+            </div>
+        </AdvancedMarker>
     );
 };
 
@@ -75,8 +84,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   
-  const clustererRef = React.useRef<MarkerClusterer | null>(null);
-  const markersRef = React.useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+  const [markers, setMarkers] = React.useState<{ [key: string]: google.maps.marker.AdvancedMarkerElement }>({});
+  const clusterer = React.useRef<MarkerClusterer | null>(null);
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const idleListenerRef = React.useRef<google.maps.MapsEventListener | null>(null);
@@ -97,8 +106,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   // Initialize MarkerClusterer
   React.useEffect(() => {
     if (!map) return;
-    if (!clustererRef.current) {
-        clustererRef.current = new MarkerClusterer({ map });
+    if (!clusterer.current) {
+        clusterer.current = new MarkerClusterer({ map });
     }
   }, [map]);
 
@@ -178,29 +187,26 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     }
   }, [map]);
   
-  // Update clusters when warehouses change
+  // Update clusters when markers change
   React.useEffect(() => {
-      if (!clustererRef.current) return;
-      
-      // Clear previous markers from the clusterer
-      clustererRef.current.clearMarkers();
-      
-      const newMarkers = warehouses.map(warehouse => {
-          const markerElement = document.createElement('div');
-          // This is a bit of a trick to render our React component into a DOM element for the marker
-          const root = (window as any).ReactDOM.createRoot(markerElement); 
-          root.render(<AppMarker warehouse={warehouse} onClick={handleMarkerClick} />);
+    clusterer.current?.clearMarkers();
+    clusterer.current?.addMarkers(Object.values(markers));
+  }, [markers]);
 
-          const advMarker = new google.maps.marker.AdvancedMarkerElement({
-              position: warehouse.generalizedLocation,
-              content: markerElement,
-          });
-
-          return advMarker;
-      });
-
-      clustererRef.current.addMarkers(newMarkers);
-  }, [warehouses, handleMarkerClick]);
+  const setMarkerRef = (marker: google.maps.marker.AdvancedMarkerElement | null, key: string) => {
+    if (marker && markers[key]) return;
+    if (!marker && !markers[key]) return;
+    
+    setMarkers(prev => {
+        if (marker) {
+            return { ...prev, [key]: marker };
+        } else {
+            const newMarkers = { ...prev };
+            delete newMarkers[key];
+            return newMarkers;
+        }
+    });
+  };
 
   return (
     <>
@@ -232,7 +238,13 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         gestureHandling="greedy"
         className="h-full w-full"
       >
-        {/* Markers are now managed by the MarkerClusterer so we don't render them here directly */}
+        {warehouses.map((warehouse) => (
+            <AppMarker 
+                key={warehouse.id}
+                warehouse={warehouse}
+                onClick={handleMarkerClick}
+            />
+        ))}
       </Map>
       
       {selectedWarehouse && (
