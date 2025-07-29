@@ -101,12 +101,14 @@ export function Header() {
           </nav>
 
            <div className="flex items-center gap-4 flex-shrink-0">
-              <Link href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
-                 <Button variant="outline">
-                    <WhatsAppIcon className="mr-2 h-5 w-5" />
-                    WhatsApp O2O
-                </Button>
-              </Link>
+              {!isAdmin && (
+                <Link href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline">
+                      <WhatsAppIcon className="mr-2 h-5 w-5" />
+                      WhatsApp O2O
+                  </Button>
+                </Link>
+              )}
               {isLoading ? (
                 <Skeleton className="h-9 w-24" />
               ) : user ? (
