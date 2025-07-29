@@ -13,7 +13,97 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info } from 'lucide-react';
 
 
-function RegionalSummaryCard() {
+type RegionalSummary = {
+    regionName: string;
+    totalListings: number;
+    sizeRange: string;
+    readiness: { ready: number; soon: number; building: number };
+    avgCeilingHeight: number;
+};
+
+// Fictional data for different regions
+const regionalDataStore: { [key: string]: RegionalSummary } = {
+  'thiruvallur': {
+    regionName: 'Thiruvallur Region',
+    totalListings: 15,
+    sizeRange: '45,000 - 300,000 sq. ft.',
+    readiness: { ready: 8, soon: 3, building: 4 },
+    avgCeilingHeight: 42,
+  },
+  'oragadam': {
+    regionName: 'Oragadam Industrial Corridor',
+    totalListings: 25,
+    sizeRange: '100,000 - 500,000 sq. ft.',
+    readiness: { ready: 15, soon: 5, building: 5 },
+    avgCeilingHeight: 48,
+  },
+  'sriperumbudur': {
+    regionName: 'Sriperumbudur',
+    totalListings: 18,
+    sizeRange: '80,000 - 400,000 sq. ft.',
+    readiness: { ready: 10, soon: 6, building: 2 },
+    avgCeilingHeight: 45,
+  },
+  'vallam': { // For Vallam-Vadagal
+    regionName: 'Vallam-Vadagal',
+    totalListings: 12,
+    sizeRange: '150,000 - 600,000 sq. ft.',
+    readiness: { ready: 4, soon: 3, building: 5 },
+    avgCeilingHeight: 50,
+  },
+  'sunguvarchatram': {
+    regionName: 'Sunguvarchatram',
+    totalListings: 9,
+    sizeRange: '50,000 - 250,000 sq. ft.',
+    readiness: { ready: 5, soon: 2, building: 2 },
+    avgCeilingHeight: 40,
+  },
+   'walajabad': {
+    regionName: 'Walajabad',
+    totalListings: 7,
+    sizeRange: '30,000 - 150,000 sq. ft.',
+    readiness: { ready: 4, soon: 1, building: 2 },
+    avgCeilingHeight: 35,
+  },
+  'mappedu': {
+    regionName: 'Mappedu',
+    totalListings: 6,
+    sizeRange: '60,000 - 200,000 sq. ft.',
+    readiness: { ready: 3, soon: 2, building: 1 },
+    avgCeilingHeight: 38,
+  },
+  'mannur': {
+    regionName: 'Mannur',
+    totalListings: 8,
+    sizeRange: '75,000 - 180,000 sq. ft.',
+    readiness: { ready: 5, soon: 3, building: 0 },
+    avgCeilingHeight: 40,
+  },
+  'redhills': {
+    regionName: 'Redhills',
+    totalListings: 22,
+    sizeRange: '25,000 - 220,000 sq. ft.',
+    readiness: { ready: 12, soon: 7, building: 3 },
+    avgCeilingHeight: 36,
+  },
+  'vengal': {
+    regionName: 'Vengal',
+    totalListings: 5,
+    sizeRange: '100,000 - 250,000 sq. ft.',
+    readiness: { ready: 1, soon: 1, building: 3 },
+    avgCeilingHeight: 45,
+  },
+  'periyapalayam': {
+    regionName: 'Periyapalayam',
+    totalListings: 4,
+    sizeRange: '50,000 - 100,000 sq. ft.',
+    readiness: { ready: 2, soon: 2, building: 0 },
+    avgCeilingHeight: 32,
+  },
+};
+
+
+function RegionalSummaryCard({ data }: { data: RegionalSummary }) {
     return (
         <Card className="shadow-none border-0 h-full flex flex-col bg-transparent">
             <CardHeader>
@@ -21,7 +111,7 @@ function RegionalSummaryCard() {
                     <div>
                         <CardTitle className="flex items-center gap-2">
                            <Building2 className="h-6 w-6 text-primary"/>
-                           Thiruvallur Region
+                           {data.regionName}
                         </CardTitle>
                         <CardDescription>Aggregated Warehouse Supply</CardDescription>
                     </div>
@@ -30,31 +120,31 @@ function RegionalSummaryCard() {
             <CardContent className="space-y-4 flex-grow">
                 <div className="flex justify-between items-center p-3 rounded-md bg-primary/10">
                     <p className="font-bold text-primary">Total Listings</p>
-                    <p className="text-2xl font-bold text-primary">15</p>
+                    <p className="text-2xl font-bold text-primary">{data.totalListings}</p>
                 </div>
                 <div className="space-y-3 text-sm">
                     <div className="flex justify-between items-center">
                         <p className="text-muted-foreground flex items-center gap-2"><Scaling className="h-4 w-4" /> Size Range</p>
-                        <p className="font-semibold">45,000 - 300,000 sq. ft.</p>
+                        <p className="font-semibold">{data.sizeRange}</p>
                     </div>
                      <div className="flex justify-between items-center">
                         <p className="text-muted-foreground flex items-center gap-2"><CalendarCheck className="h-4 w-4" /> Readiness</p>
                         <div className="flex gap-3 text-xs">
-                           <span className="font-semibold">Ready: <b className="text-green-600">8</b></span>
-                           <span className="font-semibold">Soon: <b className="text-amber-600">3</b></span>
-                           <span className="font-semibold">Building: <b className="text-blue-600">4</b></span>
+                           <span className="font-semibold">Ready: <b className="text-green-600">{data.readiness.ready}</b></span>
+                           <span className="font-semibold">Soon: <b className="text-amber-600">{data.readiness.soon}</b></span>
+                           <span className="font-semibold">Building: <b className="text-blue-600">{data.readiness.building}</b></span>
                         </div>
                     </div>
                      <div className="flex justify-between items-center">
                         <p className="text-muted-foreground flex items-center gap-2"><CheckCircle className="h-4 w-4" /> Avg. Ceiling Height</p>
-                        <p className="font-semibold">~42 ft.</p>
+                        <p className="font-semibold">~{data.avgCeilingHeight} ft.</p>
                     </div>
                 </div>
             </CardContent>
             <CardFooter>
                  <p className="text-xs text-muted-foreground flex items-start gap-2">
                     <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                    <span>This is an aggregated summary. You can zoom in to browse individual listings if needed.</span>
+                    <span>This is a fictional aggregated summary. Zoom in to browse individual listings if needed.</span>
                 </p>
             </CardFooter>
         </Card>
@@ -67,7 +157,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const places = useMapsLibrary('places');
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
-  const [showSummary, setShowSummary] = React.useState(false);
+  const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
   const [circle, setCircle] = React.useState<google.maps.Circle | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -95,7 +185,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         if (location) {
            if (circle) circle.setMap(null); // Remove old circle
            
-           const fixedRadius = 15000; // 15km radius
+           const fixedRadius = 5000; // 5km radius
 
            const newCircle = new google.maps.Circle({
                 strokeColor: 'hsl(210 60% 50%)',
@@ -114,10 +204,20 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 map.fitBounds(bounds);
             } else {
                 map.setCenter(location);
-                map.setZoom(10);
+                map.setZoom(12); // Fallback zoom
             }
         }
-        setShowSummary(true); // Show the summary card on search
+        
+        // Find matching summary data
+        const placeName = place.name?.toLowerCase() || '';
+        let foundData = null;
+        for (const key in regionalDataStore) {
+            if (placeName.includes(key)) {
+                foundData = regionalDataStore[key];
+                break;
+            }
+        }
+        setSummaryData(foundData);
       }
     });
     return () => {
@@ -128,12 +228,13 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   const clearSearch = () => {
     setSearchInput('');
-    setShowSummary(false);
+    setSummaryData(null);
     if (circle) {
       circle.setMap(null);
       setCircle(null);
     }
     // Reset to a wider view of India
+    if (inputRef.current) inputRef.current.value = '';
     map?.setCenter({ lat: 20.5937, lng: 78.9629 });
     map?.setZoom(5);
   };
@@ -165,8 +266,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             </div>
 
             <Map
-                defaultCenter={{ lat: 13.13, lng: 79.91 }}
-                defaultZoom={10}
+                defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
+                defaultZoom={5}
                 mapId={mapId}
                 disableDefaultUI={true}
                 gestureHandling="greedy"
@@ -176,13 +277,13 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             </Map>
         </div>
         <aside className="w-[400px] h-full border-l bg-card/80 backdrop-blur-sm">
-            {showSummary ? (
-                <RegionalSummaryCard />
+            {summaryData ? (
+                <RegionalSummaryCard data={summaryData} />
             ) : (
                 <div className="p-8 text-center text-muted-foreground h-full flex flex-col justify-center">
                     <Building2 className="h-12 w-12 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-foreground">Explore Warehouse Supply</h3>
-                    <p className="text-sm mt-2">Search for a city or region to see an aggregated summary of available warehouse listings.</p>
+                    <p className="text-sm mt-2">Search for a city or region (e.g., Oragadam, Sriperumbudur) to see an aggregated summary of available warehouse listings.</p>
                 </div>
             )}
         </aside>
