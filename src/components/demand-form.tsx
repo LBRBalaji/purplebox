@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -175,7 +176,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       const input: ImprovePropertyDemandDescriptionInput = {
         description: data.description,
         propertyType: data.propertyType!,
-        locationName: data.locationName || data.location,
+        locationName: data.locationName || "the specified area",
         size: String(data.size),
         readiness: data.readiness,
         additionalDetails: `Ceiling height: ${data.ceilingHeight || 'N/A'}, Docks: ${data.docks || 'N/A'}. Non-compromisable items: ${data.preferences?.nonCompromisable?.join(', ') || 'None'}.`,
