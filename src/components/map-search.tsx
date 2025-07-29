@@ -238,7 +238,7 @@ function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng
                 </div>
             </CardContent>
              <CardFooter className="pt-4 border-t">
-                <LogDemandButton center={null} onLogDemand={onLogDemand} variant="secondary" />
+                <LogDemandButton center={null} onLogDemand={onLogDemand} variant="default" />
             </CardFooter>
         </Card>
     );
