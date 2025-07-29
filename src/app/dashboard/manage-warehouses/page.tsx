@@ -11,7 +11,8 @@ export default function ManageWarehousesPage() {
 
     React.useEffect(() => {
         if (!isLoading && user?.role !== 'SuperAdmin') {
-            // Redirect non-admins away from this page
+            // This is a redundant check as the layout also protects this route,
+            // but it's good practice for page-level security.
             router.push('/dashboard');
         }
     }, [user, isLoading, router]);

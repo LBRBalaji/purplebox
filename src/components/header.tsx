@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -72,9 +72,14 @@ export function Header() {
                       <Map className="h-4 w-4" /> Map Search
                   </NavLink>
                   {user?.role === 'SuperAdmin' && (
+                    <>
                       <NavLink href="/dashboard/manage-warehouses">
                           <Warehouse className="h-4 w-4" /> Manage Warehouses
                       </NavLink>
+                      <NavLink href="/dashboard/analytics">
+                          <BarChart className="h-4 w-4" /> Analytics
+                      </NavLink>
+                    </>
                   )}
               </nav>
           </div>

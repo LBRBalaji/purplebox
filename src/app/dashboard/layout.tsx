@@ -3,18 +3,28 @@
 
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   React.useEffect(() => {
     if (!isLoading && !user) {
       router.push('/');
+      return;
     }
-  }, [user, isLoading, router]);
+    // Specific check for analytics page to ensure only SuperAdmins can access it
+    if (!isLoading && user && pathname.startsWith('/dashboard/analytics') && user.role !== 'SuperAdmin') {
+      router.push('/dashboard');
+    }
+     // Specific check for manage warehouses page to ensure only SuperAdmins can access it
+    if (!isLoading && user && pathname.startsWith('/dashboard/manage-warehouses') && user.role !== 'SuperAdmin') {
+      router.push('/dashboard');
+    }
+  }, [user, isLoading, router, pathname]);
 
   if (isLoading || !user) {
     return (
