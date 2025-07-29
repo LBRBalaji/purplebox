@@ -13,9 +13,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle } from 'lucide-react';
 
 
-function RegionalSummaryCard() {
+function RegionalSummaryCard({ onDismiss }: { onDismiss: () => void }) {
     return (
-        <Card className="absolute top-4 left-1/2 z-10 w-full max-w-sm -translate-x-1/2 shadow-lg bg-background/90 backdrop-blur-sm">
+        <Card className="absolute top-4 left-1/2 z-10 w-full max-w-sm -translate-x-1/2 shadow-lg bg-background/90 backdrop-blur-sm animate-in fade-in-0 zoom-in-95">
             <CardHeader>
                 <div className="flex justify-between items-start">
                     <div>
@@ -25,6 +25,10 @@ function RegionalSummaryCard() {
                         </CardTitle>
                         <CardDescription>Aggregated Warehouse Supply</CardDescription>
                     </div>
+                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDismiss}>
+                        <X className="h-4 w-4" />
+                        <span className="sr-only">Dismiss</span>
+                    </Button>
                 </div>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -61,6 +65,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const places = useMapsLibrary('places');
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
+  const [showSummary, setShowSummary] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Initialize SearchBox
@@ -84,6 +89,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       if (places && places.length > 0 && places[0].geometry) {
         const place = places[0];
         map.fitBounds(place.geometry.viewport!);
+        setShowSummary(true); // Show the summary card on search
       }
     });
     return () => {
@@ -92,9 +98,36 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   }, [searchBox, map]);
 
 
+  const clearSearch = () => {
+    setSearchInput('');
+  };
+
   return (
     <>
-      <RegionalSummaryCard />
+      <div className="absolute top-4 left-4 z-10 w-full max-w-sm">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            ref={inputRef}
+            placeholder="Search for a region..."
+            className="pl-9 shadow-md"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+          />
+          {searchInput && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              onClick={clearSearch}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+      
+      {showSummary && <RegionalSummaryCard onDismiss={() => setShowSummary(false)} />}
 
       <Map
         defaultCenter={{ lat: 13.13, lng: 79.91 }}
