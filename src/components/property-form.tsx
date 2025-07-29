@@ -553,7 +553,7 @@ export function PropertyForm() {
                 <DialogHeader>
                   <DialogTitle>AI Match Score Calculated & Submitted!</DialogTitle>
                   <DialogDescription>
-                    The AI has analyzed this property against the demand. The submission is now pending admin approval.
+                    The AI has analyzed this property against the demand.
                   </DialogDescription>
                 </DialogHeader>
                 {isLoading || !aiResult?.matchResult ? (
@@ -629,3 +629,5 @@ export function PropertyForm() {
     </>
   );
 }
+
+    
