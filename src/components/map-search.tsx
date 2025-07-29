@@ -339,11 +339,11 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                     <div className="text-center text-muted-foreground">
                         <Building2 className="h-12 w-12 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-foreground">
-                            {lastSearchedCenter ? 'No Aggregated Supply Data' : 'Explore Warehouse Supply'}
+                            {lastSearchedCenter ? 'This is an Untapped Opportunity!' : 'Explore Warehouse Supply'}
                         </h3>
                         <p className="text-sm mt-2 mb-6">
                             {lastSearchedCenter 
-                                ? "We don't have aggregated supply data for this specific area, but you can still log a demand."
+                                ? "Log your demand now and let us find the perfect properties for you in this emerging area."
                                 : "Search for a city or region (e.g., Oragadam, Sriperumbudur) to see a summary of available listings."
                             }
                         </p>
