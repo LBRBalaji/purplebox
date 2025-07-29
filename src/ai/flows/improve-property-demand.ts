@@ -9,6 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
 
 const ImprovePropertyDemandDescriptionInputSchema = z.object({
@@ -34,6 +35,7 @@ const prompt = ai.definePrompt({
   name: 'improvePropertyDemandDescriptionPrompt',
   input: {schema: ImprovePropertyDemandDescriptionInputSchema},
   output: {schema: ImprovePropertyDemandDescriptionOutputSchema},
+  model: googleAI.model('gemini-1.5-flash-latest'),
   prompt: `You are an expert real estate agent specializing in crafting compelling property demand descriptions.
 
   {{#if description}}
