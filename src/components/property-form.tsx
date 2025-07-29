@@ -40,7 +40,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast";
-import { propertySchema, type PropertySchema } from "@/lib/schema";
+import { propertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
 import { generateDescriptionAction, getPropertyMatchScoreAction } from "@/lib/actions";
 import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
@@ -50,6 +50,7 @@ import { useData } from "@/contexts/data-context";
 import { useAuth } from "@/contexts/auth-context";
 import { Badge } from "./ui/badge";
 import { Switch } from "./ui/switch";
+import { cn } from "@/lib/utils";
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size',
@@ -67,6 +68,76 @@ const priorityLabels: { [key: string]: string } = {
 type AiResult = {
   description?: string;
   matchResult?: GetPropertyMatchScoreOutput;
+}
+
+const useMatchScorer = (demand: DemandSchema | undefined, watchedValues: Partial<PropertySchema>) => {
+    const calculateScore = React.useCallback((field: 'size' | 'ceilingHeight' | 'docks') => {
+        if (!demand) return null;
+
+        const isNonCompromisable = demand.preferences?.nonCompromisable?.includes(field) ?? false;
+
+        if (field === 'size') {
+            const demandSize = demand.size;
+            const propertySize = watchedValues.size;
+            if (!propertySize) return null;
+            
+            const diff = Math.abs(demandSize - propertySize);
+            const pctDiff = diff / demandSize;
+
+            if (isNonCompromisable && pctDiff > 0.15) return 0.1; // Harsh penalty
+            if (pctDiff <= 0.15) return 0.95;
+            if (pctDiff <= 0.25) return 0.7;
+            return 0.4;
+        }
+
+        if (field === 'ceilingHeight') {
+            const demandHeight = demand.ceilingHeight;
+            const propertyHeight = watchedValues.ceilingHeight;
+            if (!demandHeight || !propertyHeight) return null;
+
+            if (propertyHeight >= demandHeight) return 1.0;
+            const pctDiff = (demandHeight - propertyHeight) / demandHeight;
+            
+            if (isNonCompromisable && propertyHeight < demandHeight) return 0.1;
+            if (pctDiff < 0.1) return 0.8; // 10% less
+            return 0.3;
+        }
+        
+        if (field === 'docks') {
+            const demandDocks = demand.docks;
+            const propertyDocks = watchedValues.docks;
+            if (demandDocks === undefined || propertyDocks === undefined) return null;
+
+            if (propertyDocks >= demandDocks) return 1.0;
+            if (isNonCompromisable) return 0.1;
+            if (propertyDocks >= demandDocks - 2) return 0.75; // within 2 docks
+            return 0.3;
+        }
+
+        return null;
+    }, [demand, watchedValues]);
+
+    const sizeScore = calculateScore('size');
+    const ceilingHeightScore = calculateScore('ceilingHeight');
+    const docksScore = calculateScore('docks');
+
+    return { sizeScore, ceilingHeightScore, docksScore };
+};
+
+const FieldMatchIndicator = ({ score }: { score: number | null }) => {
+    if (score === null) return null;
+
+    const displayScore = Math.round(score * 100);
+    const colorClasses = 
+        displayScore >= 90 ? "bg-green-100 text-green-800 border-green-300" :
+        displayScore >= 70 ? "bg-amber-100 text-amber-800 border-amber-300" :
+        "bg-red-100 text-red-800 border-red-300";
+
+    return (
+        <Badge variant="outline" className={cn("text-xs font-bold", colorClasses)}>
+            {displayScore}% Match
+        </Badge>
+    )
 }
 
 function DemandSummaryCard({ demandId }: { demandId: string }) {
@@ -144,8 +215,9 @@ export function PropertyForm() {
   const [aiResult, setAiResult] = React.useState<AiResult | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isCopied, setIsCopied] = React.useState(false);
-  const [placeholders, setPlaceholders] = React.useState<Partial<PropertySchema>>({});
 
+  const demandIdFromUrl = searchParams.get('demandId');
+  const isMatchingMode = !!demandIdFromUrl;
 
   const form = useForm<PropertySchema>({
     resolver: zodResolver(propertySchema),
@@ -180,7 +252,14 @@ export function PropertyForm() {
     },
   });
 
-  const demandIdFromUrl = searchParams.get('demandId');
+  const demandToMatch = React.useMemo(() => 
+    demands.find(d => d.demandId === demandIdFromUrl),
+    [demands, demandIdFromUrl]
+  );
+  
+  const watchedFields = form.watch();
+  const { sizeScore, ceilingHeightScore, docksScore } = useMatchScorer(demandToMatch, watchedFields);
+
 
   React.useEffect(() => {
     const newId = `PS-${Date.now()}`;
@@ -197,22 +276,12 @@ export function PropertyForm() {
   React.useEffect(() => {
     if (demandIdFromUrl) {
       form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
-      const demandToMatch = demands.find(d => d.demandId === demandIdFromUrl);
       if (demandToMatch) {
-        // Set placeholders for reference in grey text
-        setPlaceholders({
-          propertyGeoLocation: demandToMatch.locationName || demandToMatch.location,
-          size: demandToMatch.size,
-          readinessToOccupy: demandToMatch.readiness,
-          ceilingHeight: demandToMatch.ceilingHeight,
-          docks: demandToMatch.docks,
-        });
-        
-        // We still set the form value for the AI to use, but the user can override it.
+        // Pre-fill location for AI context
         form.setValue('propertyGeoLocation', demandToMatch.locationName || demandToMatch.location);
       }
     }
-  }, [searchParams, form, demandIdFromUrl, demands]);
+  }, [searchParams, form, demandIdFromUrl, demandToMatch]);
 
 
   async function onSubmit(data: PropertySchema) {
@@ -258,8 +327,6 @@ export function PropertyForm() {
     }
   };
 
-  const isMatchingMode = !!demandIdFromUrl;
-
   return (
     <>
       <Form {...form}>
@@ -281,7 +348,21 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="size" render={({ field }) => (
-                      <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={placeholders.size ? String(placeholders.size) : "e.g. 50000"} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                      <FormItem>
+                        <div className="flex justify-between items-center">
+                          <FormLabel>Size (Sq. Ft.)</FormLabel>
+                           <FieldMatchIndicator score={sizeScore} />
+                        </div>
+                        <FormControl>
+                            <Input 
+                                type="number" 
+                                placeholder={demandToMatch?.size ? String(demandToMatch.size) : "e.g. 50000"} 
+                                {...field} value={field.value ?? ''} 
+                                className="placeholder:text-muted-foreground/60"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                   <div className="md:col-span-2">
@@ -307,9 +388,10 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
-                      <FormItem><FormLabel>Readiness to Occupy</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} defaultValue={placeholders.readinessToOccupy}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select readiness" /></SelectTrigger></FormControl>
+                      <FormItem>
+                      <FormLabel>Readiness to Occupy</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={demandToMatch?.readiness || "Select readiness"} /></SelectTrigger></FormControl>
                         <SelectContent>
                           <SelectItem value="Immediate">Immediate</SelectItem>
                           <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
@@ -331,7 +413,21 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
-                      <FormItem><FormLabel>Ceiling Height (ft)</FormLabel><FormControl><Input type="number" placeholder={placeholders.ceilingHeight ? String(placeholders.ceilingHeight) : "e.g. 30"} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                      <FormItem>
+                        <div className="flex justify-between items-center">
+                          <FormLabel>Ceiling Height (ft)</FormLabel>
+                           <FieldMatchIndicator score={ceilingHeightScore} />
+                        </div>
+                        <FormControl>
+                            <Input 
+                                type="number" 
+                                placeholder={demandToMatch?.ceilingHeight ? String(demandToMatch.ceilingHeight) : "e.g. 30"} 
+                                {...field} value={field.value ?? ''}
+                                className="placeholder:text-muted-foreground/60"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                 </CardContent>
@@ -369,7 +465,23 @@ export function PropertyForm() {
                <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="w-5 h-5 text-primary" /> Docks & More</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="docks" render={({ field }) => (<FormItem><FormLabel>Number of Docks</FormLabel><FormControl><Input type="number" placeholder={placeholders.docks ? String(placeholders.docks) : "e.g. 8"} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="docks" render={({ field }) => (
+                      <FormItem>
+                        <div className="flex justify-between items-center">
+                          <FormLabel>Number of Docks</FormLabel>
+                          <FieldMatchIndicator score={docksScore} />
+                        </div>
+                        <FormControl>
+                            <Input 
+                                type="number" 
+                                placeholder={demandToMatch?.docks !== undefined ? String(demandToMatch.docks) : "e.g. 8"} 
+                                {...field} value={field.value ?? ''}
+                                className="placeholder:text-muted-foreground/60"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                     <FormField control={form.control} name="canopy" render={({ field }) => (<FormItem><FormLabel>Canopy</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     <FormItem>
                         <FormLabel>Upload Images</FormLabel>
@@ -434,15 +546,10 @@ export function PropertyForm() {
                   <Sparkles className="mr-2 h-4 w-4 animate-spin" />
                   {isMatchingMode ? 'Analyzing...' : 'Generating...'}
                 </>
-              ) : isMatchingMode ? (
+              ) : (
                 <>
                   <Wand className="mr-2 h-4 w-4" />
                   Submit Match
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Generate AI Description
                 </>
               )}
             </Button>
