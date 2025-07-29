@@ -9,13 +9,13 @@ import {
 import * as React from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info } from 'lucide-react';
 
 
-function RegionalSummaryCard({ onDismiss }: { onDismiss: () => void }) {
+function RegionalSummaryCard() {
     return (
-        <Card className="absolute top-4 left-1/2 z-10 w-full max-w-sm -translate-x-1/2 shadow-lg bg-background/90 backdrop-blur-sm animate-in fade-in-0 zoom-in-95">
+        <Card className="shadow-none border-0 h-full flex flex-col">
             <CardHeader>
                 <div className="flex justify-between items-start">
                     <div>
@@ -25,18 +25,14 @@ function RegionalSummaryCard({ onDismiss }: { onDismiss: () => void }) {
                         </CardTitle>
                         <CardDescription>Aggregated Warehouse Supply</CardDescription>
                     </div>
-                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDismiss}>
-                        <X className="h-4 w-4" />
-                        <span className="sr-only">Dismiss</span>
-                    </Button>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4 flex-grow">
                 <div className="flex justify-between items-center p-3 rounded-md bg-primary/10">
                     <p className="font-bold text-primary">Total Listings</p>
                     <p className="text-2xl font-bold text-primary">15</p>
                 </div>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-3 text-sm">
                     <div className="flex justify-between items-center">
                         <p className="text-muted-foreground flex items-center gap-2"><Scaling className="h-4 w-4" /> Size Range</p>
                         <p className="font-semibold">45,000 - 300,000 sq. ft.</p>
@@ -55,6 +51,12 @@ function RegionalSummaryCard({ onDismiss }: { onDismiss: () => void }) {
                     </div>
                 </div>
             </CardContent>
+            <CardFooter>
+                 <p className="text-xs text-muted-foreground flex items-start gap-2">
+                    <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>This is an aggregated summary. Zoom in or clear the search to browse individual listings.</span>
+                </p>
+            </CardFooter>
         </Card>
     )
 }
@@ -100,53 +102,65 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   const clearSearch = () => {
     setSearchInput('');
+    setShowSummary(false);
   };
 
   return (
-    <>
-      <div className="absolute top-4 left-4 z-10 w-full max-w-sm">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            ref={inputRef}
-            placeholder="Search for a region..."
-            className="pl-9 shadow-md"
-            value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
-          />
-          {searchInput && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-              onClick={clearSearch}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </div>
-      
-      {showSummary && <RegionalSummaryCard onDismiss={() => setShowSummary(false)} />}
+    <div className="flex h-full w-full">
+        <div className="flex-grow h-full relative">
+            <div className="absolute top-4 left-4 z-10 w-full max-w-sm">
+                <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                    ref={inputRef}
+                    placeholder="Search for a region..."
+                    className="pl-9 shadow-md bg-background"
+                    value={searchInput}
+                    onChange={e => setSearchInput(e.target.value)}
+                />
+                {searchInput && (
+                    <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                    onClick={clearSearch}
+                    >
+                    <X className="h-4 w-4" />
+                    </Button>
+                )}
+                </div>
+            </div>
 
-      <Map
-        defaultCenter={{ lat: 13.13, lng: 79.91 }}
-        defaultZoom={10}
-        mapId={mapId}
-        disableDefaultUI={true}
-        gestureHandling="greedy"
-        className="h-full w-full"
-      >
-        {/* Intentionally left blank to keep the map clean */}
-      </Map>
-    </>
+            <Map
+                defaultCenter={{ lat: 13.13, lng: 79.91 }}
+                defaultZoom={10}
+                mapId={mapId}
+                disableDefaultUI={true}
+                gestureHandling="greedy"
+                className="h-full w-full"
+            >
+                {/* Intentionally left blank to keep the map clean */}
+            </Map>
+        </div>
+        <aside className="w-[400px] h-full border-l bg-background">
+            {showSummary ? (
+                <RegionalSummaryCard />
+            ) : (
+                <div className="p-8 text-center text-muted-foreground h-full flex flex-col justify-center">
+                    <Building2 className="h-12 w-12 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-foreground">Explore Warehouse Supply</h3>
+                    <p className="text-sm mt-2">Search for a city or region to see an aggregated summary of available warehouse listings.</p>
+                </div>
+            )}
+        </aside>
+    </div>
   );
 }
 
 
 export function MapSearch({ mapId }: { mapId: string }) {
   return (
-    <div className="h-screen w-screen relative">
+    <div className="h-screen w-screen">
       <MapSearchContent mapId={mapId} />
     </div>
   );
