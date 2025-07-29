@@ -5,9 +5,10 @@ import {
   Map,
   useMap,
   useMapsLibrary,
-  AdvancedMarker,
+  useAdvancedMarkerRef
 } from '@vis.gl/react-google-maps';
 import * as React from 'react';
+import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import {
@@ -33,6 +34,34 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 
+type AppMarkerProps = {
+    warehouse: WarehouseSchema;
+    onClick: (warehouse: WarehouseSchema) => void;
+};
+
+// This is a separate component for the marker so we can use the useAdvancedMarkerRef hook
+const AppMarker = ({ warehouse, onClick }: AppMarkerProps) => {
+    const [ref, marker] = useAdvancedMarkerRef();
+
+    React.useEffect(() => {
+        if (!marker) return;
+
+        const listener = marker.addListener('click', () => {
+            onClick(warehouse);
+        });
+        
+        return () => {
+            listener.remove();
+        }
+    }, [marker, warehouse, onClick]);
+
+    return (
+        <div ref={ref} className="w-6 h-6 rounded-full bg-primary/80 border-2 border-primary-foreground ring-2 ring-primary shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+            <Building className="w-3 h-3 text-primary-foreground" />
+        </div>
+    );
+};
+
 
 function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
@@ -45,6 +74,9 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [selectedWarehouse, setSelectedWarehouse] = React.useState<WarehouseSchema | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
+  
+  const clustererRef = React.useRef<MarkerClusterer | null>(null);
+  const markersRef = React.useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const idleListenerRef = React.useRef<google.maps.MapsEventListener | null>(null);
@@ -61,6 +93,15 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       }
     };
   }, [places]);
+  
+  // Initialize MarkerClusterer
+  React.useEffect(() => {
+    if (!map) return;
+    if (!clustererRef.current) {
+        clustererRef.current = new MarkerClusterer({ map });
+    }
+  }, [map]);
+
 
   React.useEffect(() => {
     if (!searchBox || !map) return;
@@ -129,13 +170,37 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     }
   }, [map, fetchAndSetWarehouses]);
 
-  const handleMarkerClick = (warehouse: WarehouseSchema) => {
+  const handleMarkerClick = React.useCallback((warehouse: WarehouseSchema) => {
     setSelectedWarehouse(warehouse);
     setIsSheetOpen(true);
     if(map) {
         map.panTo(warehouse.generalizedLocation);
     }
-  };
+  }, [map]);
+  
+  // Update clusters when warehouses change
+  React.useEffect(() => {
+      if (!clustererRef.current) return;
+      
+      // Clear previous markers from the clusterer
+      clustererRef.current.clearMarkers();
+      
+      const newMarkers = warehouses.map(warehouse => {
+          const markerElement = document.createElement('div');
+          // This is a bit of a trick to render our React component into a DOM element for the marker
+          const root = (window as any).ReactDOM.createRoot(markerElement); 
+          root.render(<AppMarker warehouse={warehouse} onClick={handleMarkerClick} />);
+
+          const advMarker = new google.maps.marker.AdvancedMarkerElement({
+              position: warehouse.generalizedLocation,
+              content: markerElement,
+          });
+
+          return advMarker;
+      });
+
+      clustererRef.current.addMarkers(newMarkers);
+  }, [warehouses, handleMarkerClick]);
 
   return (
     <>
@@ -167,17 +232,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         gestureHandling="greedy"
         className="h-full w-full"
       >
-        {warehouses.map((warehouse) => (
-          <AdvancedMarker
-            key={warehouse.id}
-            position={warehouse.generalizedLocation}
-            onClick={() => handleMarkerClick(warehouse)}
-          >
-            <div className="w-6 h-6 rounded-full bg-primary/80 border-2 border-primary-foreground ring-2 ring-primary shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                <Building className="w-3 h-3 text-primary-foreground" />
-            </div>
-          </AdvancedMarker>
-        ))}
+        {/* Markers are now managed by the MarkerClusterer so we don't render them here directly */}
       </Map>
       
       {selectedWarehouse && (
