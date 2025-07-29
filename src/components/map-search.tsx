@@ -117,7 +117,7 @@ const regionalDataStore: { [key: string]: RegionalSummary } = {
   },
 };
 
-const LogDemandButton = ({ center, onLogDemand, variant = 'primary' }: { center: { lat: number; lng: number } | null, onLogDemand: (center?: { lat: number; lng: number } | null) => void, variant?: "primary" | "secondary" | "default" }) => {
+const LogDemandButton = ({ center, onLogDemand, variant = 'primary' }: { center: { lat: number; lng: number } | null, onLogDemand: (center?: { lat: number; lng: number } | null) => void, variant?: "primary" | "secondary" | "default" | "destructive" | "outline" | "ghost" | "link" | null }) => {
     const { user } = useAuth();
 
     return (
@@ -412,7 +412,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                         <p className="text-sm mt-2 mb-6 text-muted-foreground">
                            We don&apos;t have aggregated supply data for this specific area, but you can still log a demand.
                         </p>
-                        <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="primary"/>
+                        <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="secondary"/>
                     </div>
                 ) : (
                     <HowItWorks onLogDemand={handleLogDemandClick} />
