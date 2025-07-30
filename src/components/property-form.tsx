@@ -94,12 +94,13 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
             </Card>
         );
     }
-
-    const priorityItems = [
+    
+    const basePriorities = [
         ...(demand.preferences.nonCompromisable || []),
         ...(demand.optionals?.crane?.required ? ['crane'] : []),
         ...(demand.operationType === 'Manufacturing' ? ['operations'] : []),
     ];
+    const priorityItems = Array.from(new Set(basePriorities));
     
     const getSection = (priority: string) => {
         if (['crane'].includes(priority)) return 'Optionals';
@@ -157,7 +158,7 @@ const ScoreBadge = ({ score }: { score: number | null }) => {
     const displayScore = Math.round(score * 100);
     const colorClass = displayScore >= 85 ? 'bg-green-100 text-green-800 border-green-300' 
         : displayScore >= 60 ? 'bg-amber-100 text-amber-800 border-amber-300' 
-        : 'bg-red-100 text-red-800 border-red-300';
+        : 'bg-destructive/20 text-destructive-foreground border-destructive/30';
 
     return (
         <Badge variant="outline" className={cn("absolute -top-2 -right-2", colorClass)}>
@@ -291,18 +292,22 @@ export function PropertyForm() {
   
   const priorityCounts = React.useMemo(() => {
     if (!demandToMatch) return { optionals: 0, operations: 0 };
-    let optionalCount = 0;
-    let operationCount = 0;
+    
+    const basePriorities = [
+        ...(demandToMatch.preferences.nonCompromisable || []),
+        ...(demandToMatch.optionals?.crane?.required ? ['crane'] : []),
+        ...(demandToMatch.operationType === 'Manufacturing' ? ['operations'] : []),
+    ];
+    const uniquePriorities = Array.from(new Set(basePriorities));
 
-    if (demandToMatch.optionals?.crane?.required) {
-        optionalCount++;
-    }
-
-    if (demandToMatch.operationType === 'Manufacturing') {
-        operationCount++;
-    }
-
-    return { optionals: optionalCount, operations: operationCount };
+    return uniquePriorities.reduce((acc, item) => {
+        if (['crane'].includes(item) || demandToMatch.optionals?.hasOwnProperty(item)) {
+            acc.optionals++;
+        } else if (['operations'].includes(item) || demandToMatch.operations?.hasOwnProperty(item)) {
+            acc.operations++;
+        }
+        return acc;
+    }, { optionals: 0, operations: 0 });
   }, [demandToMatch]);
   
   React.useEffect(() => {
