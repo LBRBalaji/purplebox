@@ -164,7 +164,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
   const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
-  const [lastSearchedCenter, setLastSearchedCenter] = React.useState<{ lat: number, lng: number } | null>(null);
+  const [lastSearchedCenter, setLastSearchedCenter] = React.useState<{ lat: number; lng: number } | null>(null);
   const [circle, setCircle] = React.useState<google.maps.Circle | null>(null);
   const [heatmap, setHeatmap] = React.useState<google.maps.visualization.HeatmapLayer | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
@@ -184,6 +184,22 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         data: heatmapData,
         radius: 40,
         opacity: 0.9,
+        gradient: [
+            'rgba(0, 255, 255, 0)',
+            'rgba(0, 255, 255, 1)',
+            'rgba(0, 191, 255, 1)',
+            'rgba(0, 127, 255, 1)',
+            'rgba(0, 63, 255, 1)',
+            'rgba(0, 0, 255, 1)',
+            'rgba(0, 0, 223, 1)',
+            'rgba(0, 0, 191, 1)',
+            'rgba(0, 0, 159, 1)',
+            'rgba(0, 0, 127, 1)',
+            'rgba(63, 0, 91, 1)',
+            'rgba(127, 0, 63, 1)',
+            'rgba(191, 0, 31, 1)',
+            'rgba(255, 0, 0, 1)',
+        ]
     });
     setHeatmap(newHeatmap);
 
