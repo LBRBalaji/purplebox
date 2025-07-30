@@ -480,244 +480,6 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                     </div>
                   </div>
 
-                  {/* --- LEVEL 2: ESSENTIALS --- */}
-                  <Collapsible open={isEssentialsOpen} onOpenChange={setIsEssentialsOpen}>
-                    <CollapsibleTrigger asChild>
-                      <Button type="button" variant="outline" className="w-full justify-between">
-                        <div className="flex items-center gap-2">
-                           <Briefcase className="h-4 w-4" />
-                           {isEssentialsOpen ? 'Hide Essentials & Preferences' : 'Show Essentials & Preferences'}
-                        </div>
-                        <ChevronsUpDown className="h-4 w-4" />
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                      <div className="space-y-2">
-                        <FormLabel className="text-base font-semibold text-primary">Essentials & Preferences</FormLabel>
-                         <p className="text-sm text-muted-foreground">Select items that are critical and provide more details. This helps our AI-assisted sourcing find you the most relevant properties.</p>
-                        <div className="p-4 border rounded-lg space-y-6">
-                            <div className="space-y-4 pt-2">
-                                {/* Size */}
-                                <PriorityCard title="Size Range" icon={Scaling} form={form} field="preferences.nonCompromisable" fieldName="size">
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <FormField control={form.control} name="sizeMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 80000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                            <FormField control={form.control} name="sizeMax" render={({ field }) => (<FormItem><FormLabel>Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 100000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                        </div>
-                                        <div className="p-3 rounded-md bg-secondary">
-                                            <FormLabel>Effective Usable Area</FormLabel>
-                                            <p className="text-lg font-bold text-primary">{effectiveUsableArea.toLocaleString()} Sq. Ft.</p>
-                                            <p className="text-xs text-muted-foreground">Calculated as 90% of max area.</p>
-                                        </div>
-                                        <FormField control={form.control} name="sizeVariationPercentage" render={({ field }) => (
-                                            <FormItem>
-                                                <div className="flex justify-between items-center">
-                                                    <FormLabel>Acceptable Variation</FormLabel>
-                                                    <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-md">
-                                                        +/- {field.value}%
-                                                    </span>
-                                                </div>
-                                                <FormControl>
-                                                    <Slider
-                                                        defaultValue={[field.value ?? 10]}
-                                                        max={25}
-                                                        step={1}
-                                                        onValueChange={(value) => field.onChange(value[0])}
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}/>
-                                    </div>
-                                </PriorityCard>
-
-                                 {/* Building Type */}
-                                <PriorityCard title="Building Type" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="buildingType">
-                                  <div className="space-y-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="buildingType"
-                                        render={({ field }) => (
-                                            <FormItem className="space-y-3">
-                                              <div className="flex items-center justify-center">
-                                                  <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted w-fit">
-                                                      <Button type="button" variant={field.value === 'PEB' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('PEB')} className="rounded-full">PEB</Button>
-                                                      <Button type="button" variant={field.value === 'RCC' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('RCC')} className="rounded-full">RCC</Button>
-                                                  </div>
-                                              </div>
-                                              <p className="text-xs text-muted-foreground text-center">PEB (Pre-Engineered Building with Galvalume Sheet)</p>
-                                              <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                     {buildingType === 'RCC' && (
-                                        <FormField
-                                            control={form.control}
-                                            name="floorPreference"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3 pt-4 border-t">
-                                                <FormLabel>Floor Preference</FormLabel>
-                                                <FormControl>
-                                                    <RadioGroup
-                                                    onValueChange={field.onChange}
-                                                    value={field.value}
-                                                    className="grid grid-cols-3 gap-4"
-                                                    >
-                                                    <FormItem>
-                                                        <FormControl><RadioGroupItem value="Ground" id="ground" className="peer sr-only" /></FormControl>
-                                                        <FormLabel htmlFor="ground" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Ground</FormLabel>
-                                                    </FormItem>
-                                                    <FormItem>
-                                                        <FormControl><RadioGroupItem value="Multi-Floor" id="multi-floor" className="peer sr-only" /></FormControl>
-                                                        <FormLabel htmlFor="multi-floor" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Multi-Floor</FormLabel>
-                                                    </FormItem>
-                                                    <FormItem>
-                                                        <FormControl><RadioGroupItem value="Any" id="any" className="peer sr-only" /></FormControl>
-                                                        <FormLabel htmlFor="any" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Any</FormLabel>
-                                                    </FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                     )}
-                                   </div>
-                                </PriorityCard>
-
-                                {/* Ceiling Height */}
-                                <PriorityCard title="Ceiling Height" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="ceilingHeight">
-                                    <div className="flex gap-2">
-                                        <FormField control={form.control} name="ceilingHeight" render={({ field: heightField }) => (
-                                            <FormItem className="flex-grow"><FormControl><Input type="number" placeholder="Enter min height" {...heightField} value={heightField.value ?? ''} /></FormControl><FormMessage /></FormItem>
-                                        )} />
-                                        <FormField control={form.control} name="ceilingHeightUnit" render={({ field: unitField }) => (
-                                            <FormItem><Select onValueChange={unitField.onChange} value={unitField.value}><FormControl><SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="ft">ft</SelectItem><SelectItem value="m">m</SelectItem></SelectContent></Select></FormItem>
-                                        )} />
-                                    </div>
-                                </PriorityCard>
-
-                                {/* Docks */}
-                                <PriorityCard title="Number of Docks" icon={Warehouse} form={form} field="preferences.nonCompromisable" fieldName="docks">
-                                    <FormField control={form.control} name="docks" render={({ field }) => (
-                                        <FormItem><FormControl><Input type="number" placeholder="Enter min number of docks" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </PriorityCard>
-                                
-                                 {/* Power */}
-                                <PriorityCard title="Power Requirement" icon={Zap} form={form} field="preferences.nonCompromisable" fieldName="power">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormField control={form.control} name="powerMin" render={({ field }) => (<FormItem><FormLabel>Min kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 100" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="powerMax" render={({ field }) => (<FormItem><FormLabel>Max kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 500" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                    </div>
-                                </PriorityCard>
-
-                                {/* Toggles */}
-                                <PriorityCard title="Approvals" icon={ShieldCheck} form={form} field="preferences.nonCompromisable" fieldName="approvals">
-                                    <PriorityToggle form={form} field="preferences.approvals" />
-                                </PriorityCard>
-                                <PriorityCard title="Fire NOC" icon={Flame} form={form} field="preferences.nonCompromisable" fieldName="fireNoc">
-                                    <PriorityToggle form={form} field="preferences.fireNoc" />
-                                </PriorityCard>
-                                 <PriorityCard title="Fire Safety Infrastructure" icon={Flame} form={form} field="preferences.nonCompromisable" fieldName="fireSafety">
-                                    <PriorityToggle form={form} field="preferences.fireSafety" />
-                                </PriorityCard>
-                            </div>
-                        </div>
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                  
-                  {/* --- LEVEL 3: OPTIONALS --- */}
-                  <Collapsible open={isOptionalsOpen} onOpenChange={setIsOptionalsOpen}>
-                    <CollapsibleTrigger asChild>
-                      <Button type="button" variant="outline" className="w-full justify-between">
-                        <div className="flex items-center gap-2">
-                           <PlusCircle className="h-4 w-4" />
-                           {isOptionalsOpen ? 'Hide Optionals & Preferences' : 'Show Optionals & Preferences'}
-                        </div>
-                        <ChevronsUpDown className="h-4 w-4" />
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                      <div className="space-y-2">
-                        <FormLabel className="text-base font-semibold text-primary">Optionals & Preferences</FormLabel>
-                        <div className="p-4 border rounded-lg space-y-6">
-                            {/* Office Space */}
-                             <div className="space-y-2">
-                                <FormLabel className="flex items-center gap-2"><Building className="w-4 h-4"/> Office Space</FormLabel>
-                                <div className="grid grid-cols-2 gap-4 pl-6">
-                                    <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 2000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                    <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel>Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                </div>
-                            </div>
-                            
-                            {/* Cafeteria */}
-                            <div className="space-y-2">
-                                <FormLabel className="flex items-center gap-2"><Utensils className="w-4 h-4"/> Cafeteria/Canteen</FormLabel>
-                                <div className="grid grid-cols-2 gap-4 pl-6">
-                                    <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4 pt-2">
-                                                    <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Cafeteria" id="cafe" /></FormControl><FormLabel htmlFor="cafe">Cafeteria</FormLabel></FormItem>
-                                                    <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Canteen" id="canteen" /></FormControl><FormLabel htmlFor="canteen">Canteen</FormLabel></FormItem>
-                                                </RadioGroup>
-                                            </FormControl>
-                                        </FormItem>
-                                    )}/>
-                                     <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem><FormLabel>Seating Capacity</FormLabel><FormControl><Input type="number" placeholder="e.g. 50" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                </div>
-                            </div>
-
-                            {/* Toilets */}
-                             <div className="space-y-2">
-                                <FormLabel className="flex items-center gap-2"><Users className="w-4 h-4"/> Additional Toilets</FormLabel>
-                                <div className="grid grid-cols-2 gap-4 pl-6">
-                                    <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel>For Men (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                    <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel>For Women (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                </div>
-                            </div>
-                            
-                             {/* Parking/Storage */}
-                             <div className="space-y-2">
-                                <FormLabel className="flex items-center gap-2"><Car className="w-4 h-4"/> Parking & Storage</FormLabel>
-                                <div className="space-y-4 pl-6">
-                                    <div>
-                                     <FormLabel className="text-xs font-semibold">Truck Parking Yard</FormLabel>
-                                     <div className="grid grid-cols-2 gap-4">
-                                        <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 20000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                     </div>
-                                    </div>
-                                     <div>
-                                     <FormLabel className="text-xs font-semibold">Open Storage Yard</FormLabel>
-                                     <div className="grid grid-cols-2 gap-4">
-                                        <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                     </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* Tenant Improvements */}
-                             <div className="space-y-2">
-                                <FormLabel className="flex items-center gap-2"><HardHat className="w-4 h-4"/> Tenant Specific Improvements</FormLabel>
-                                <div className="pl-6">
-                                     <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <Textarea placeholder="Describe any specific modifications or improvements required..." className="min-h-[100px]" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )} />
-                                </div>
-                            </div>
-                        </div>
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-
                 </CardContent>
               </Card>
             </div>
@@ -734,20 +496,260 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
               </Card>
             </div>
           </div>
-           <div className="space-y-2">
-                <FormLabel className="text-base font-semibold text-primary">Additional Notes</FormLabel>
-                <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                    <FormItem>
-                    <FormControl>
-                        <Textarea placeholder="Add any other notes, context, or summary of your requirements here..." className="min-h-[100px]" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )} />
-            </div>
+          
+           {/* --- LEVEL 2: ESSENTIALS --- */}
+            <Collapsible open={isEssentialsOpen} onOpenChange={setIsEssentialsOpen}>
+            <CollapsibleTrigger asChild>
+                <Button type="button" variant="outline" className="w-full justify-between">
+                <div className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4" />
+                    {isEssentialsOpen ? 'Hide Essentials & Preferences' : 'Show Essentials & Preferences-The Key Defining Factors in Lease'}
+                </div>
+                <ChevronsUpDown className="h-4 w-4" />
+                </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                <div className="space-y-2">
+                <FormLabel className="text-base font-semibold text-primary">Essentials & Preferences</FormLabel>
+                    <p className="text-sm text-muted-foreground">Select items that are critical and provide more details. This helps our AI-assisted sourcing find you the most relevant properties.</p>
+                <div className="p-4 border rounded-lg space-y-6">
+                    <div className="space-y-4 pt-2">
+                        {/* Size */}
+                        <PriorityCard title="Size Range" icon={Scaling} form={form} field="preferences.nonCompromisable" fieldName="size">
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField control={form.control} name="sizeMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 80000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                    <FormField control={form.control} name="sizeMax" render={({ field }) => (<FormItem><FormLabel>Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 100000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                </div>
+                                <div className="p-3 rounded-md bg-secondary">
+                                    <FormLabel>Effective Usable Area</FormLabel>
+                                    <p className="text-lg font-bold text-primary">{effectiveUsableArea.toLocaleString()} Sq. Ft.</p>
+                                    <p className="text-xs text-muted-foreground">Calculated as 90% of max area.</p>
+                                </div>
+                                <FormField control={form.control} name="sizeVariationPercentage" render={({ field }) => (
+                                    <FormItem>
+                                        <div className="flex justify-between items-center">
+                                            <FormLabel>Acceptable Variation</FormLabel>
+                                            <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-md">
+                                                +/- {field.value}%
+                                            </span>
+                                        </div>
+                                        <FormControl>
+                                            <Slider
+                                                defaultValue={[field.value ?? 10]}
+                                                max={25}
+                                                step={1}
+                                                onValueChange={(value) => field.onChange(value[0])}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}/>
+                            </div>
+                        </PriorityCard>
+
+                            {/* Building Type */}
+                        <PriorityCard title="Building Type" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="buildingType">
+                            <div className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="buildingType"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-3">
+                                        <div className="flex items-center justify-center">
+                                            <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted w-fit">
+                                                <Button type="button" variant={field.value === 'PEB' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('PEB')} className="rounded-full">PEB</Button>
+                                                <Button type="button" variant={field.value === 'RCC' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('RCC')} className="rounded-full">RCC</Button>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground text-center">PEB (Pre-Engineered Building with Galvalume Sheet)</p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                                {buildingType === 'RCC' && (
+                                <FormField
+                                    control={form.control}
+                                    name="floorPreference"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-3 pt-4 border-t">
+                                        <FormLabel>Floor Preference</FormLabel>
+                                        <FormControl>
+                                            <RadioGroup
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            className="grid grid-cols-3 gap-4"
+                                            >
+                                            <FormItem>
+                                                <FormControl><RadioGroupItem value="Ground" id="ground" className="peer sr-only" /></FormControl>
+                                                <FormLabel htmlFor="ground" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Ground</FormLabel>
+                                            </FormItem>
+                                            <FormItem>
+                                                <FormControl><RadioGroupItem value="Multi-Floor" id="multi-floor" className="peer sr-only" /></FormControl>
+                                                <FormLabel htmlFor="multi-floor" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Multi-Floor</FormLabel>
+                                            </FormItem>
+                                            <FormItem>
+                                                <FormControl><RadioGroupItem value="Any" id="any" className="peer sr-only" /></FormControl>
+                                                <FormLabel htmlFor="any" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Any</FormLabel>
+                                            </FormItem>
+                                            </RadioGroup>
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                )}
+                            </div>
+                        </PriorityCard>
+
+                        {/* Ceiling Height */}
+                        <PriorityCard title="Ceiling Height" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="ceilingHeight">
+                            <div className="flex gap-2">
+                                <FormField control={form.control} name="ceilingHeight" render={({ field: heightField }) => (
+                                    <FormItem className="flex-grow"><FormControl><Input type="number" placeholder="Enter min height" {...heightField} value={heightField.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                                )} />
+                                <FormField control={form.control} name="ceilingHeightUnit" render={({ field: unitField }) => (
+                                    <FormItem><Select onValueChange={unitField.onChange} value={unitField.value}><FormControl><SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="ft">ft</SelectItem><SelectItem value="m">m</SelectItem></SelectContent></Select></FormItem>
+                                )} />
+                            </div>
+                        </PriorityCard>
+
+                        {/* Docks */}
+                        <PriorityCard title="Number of Docks" icon={Warehouse} form={form} field="preferences.nonCompromisable" fieldName="docks">
+                            <FormField control={form.control} name="docks" render={({ field }) => (
+                                <FormItem><FormControl><Input type="number" placeholder="Enter min number of docks" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                        </PriorityCard>
+                        
+                            {/* Power */}
+                        <PriorityCard title="Power Requirement" icon={Zap} form={form} field="preferences.nonCompromisable" fieldName="power">
+                            <div className="grid grid-cols-2 gap-4">
+                                <FormField control={form.control} name="powerMin" render={({ field }) => (<FormItem><FormLabel>Min kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 100" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="powerMax" render={({ field }) => (<FormItem><FormLabel>Max kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 500" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                            </div>
+                        </PriorityCard>
+
+                        {/* Toggles */}
+                        <PriorityCard title="Approvals" icon={ShieldCheck} form={form} field="preferences.nonCompromisable" fieldName="approvals">
+                            <PriorityToggle form={form} field="preferences.approvals" />
+                        </PriorityCard>
+                        <PriorityCard title="Fire NOC" icon={Flame} form={form} field="preferences.nonCompromisable" fieldName="fireNoc">
+                            <PriorityToggle form={form} field="preferences.fireNoc" />
+                        </PriorityCard>
+                            <PriorityCard title="Fire Safety Infrastructure" icon={Flame} form={form} field="preferences.nonCompromisable" fieldName="fireSafety">
+                            <PriorityToggle form={form} field="preferences.fireSafety" />
+                        </PriorityCard>
+                    </div>
+
+                    <div className="space-y-2 pt-6 border-t">
+                        <FormLabel className="text-base font-semibold text-primary">Additional Notes</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                            <FormItem>
+                            <FormControl>
+                                <Textarea placeholder="Add any other notes, context, or summary of your requirements here..." className="min-h-[100px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )} />
+                    </div>
+                </div>
+                </div>
+            </CollapsibleContent>
+            </Collapsible>
+          
+            {/* --- LEVEL 3: OPTIONALS --- */}
+            <Collapsible open={isOptionalsOpen} onOpenChange={setIsOptionalsOpen}>
+            <CollapsibleTrigger asChild>
+                <Button type="button" variant="outline" className="w-full justify-between">
+                <div className="flex items-center gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    {isOptionalsOpen ? 'Hide Optionals & Preferences' : 'Show Optionals & Preferences'}
+                </div>
+                <ChevronsUpDown className="h-4 w-4" />
+                </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                <div className="space-y-2">
+                <FormLabel className="text-base font-semibold text-primary">Optionals & Preferences</FormLabel>
+                <div className="p-4 border rounded-lg space-y-6">
+                    {/* Office Space */}
+                        <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><Building className="w-4 h-4"/> Office Space</FormLabel>
+                        <div className="grid grid-cols-2 gap-4 pl-6">
+                            <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 2000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel>Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                        </div>
+                    </div>
+                    
+                    {/* Cafeteria */}
+                    <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><Utensils className="w-4 h-4"/> Cafeteria/Canteen</FormLabel>
+                        <div className="grid grid-cols-2 gap-4 pl-6">
+                            <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4 pt-2">
+                                            <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Cafeteria" id="cafe" /></FormControl><FormLabel htmlFor="cafe">Cafeteria</FormLabel></FormItem>
+                                            <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Canteen" id="canteen" /></FormControl><FormLabel htmlFor="canteen">Canteen</FormLabel></FormItem>
+                                        </RadioGroup>
+                                    </FormControl>
+                                </FormItem>
+                            )}/>
+                                <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem><FormLabel>Seating Capacity</FormLabel><FormControl><Input type="number" placeholder="e.g. 50" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                        </div>
+                    </div>
+
+                    {/* Toilets */}
+                        <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><Users className="w-4 h-4"/> Additional Toilets</FormLabel>
+                        <div className="grid grid-cols-2 gap-4 pl-6">
+                            <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel>For Men (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel>For Women (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                        </div>
+                    </div>
+                    
+                        {/* Parking/Storage */}
+                        <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><Car className="w-4 h-4"/> Parking & Storage</FormLabel>
+                        <div className="space-y-4 pl-6">
+                            <div>
+                                <FormLabel className="text-xs font-semibold">Truck Parking Yard</FormLabel>
+                                <div className="grid grid-cols-2 gap-4">
+                                <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 20000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                </div>
+                            </div>
+                                <div>
+                                <FormLabel className="text-xs font-semibold">Open Storage Yard</FormLabel>
+                                <div className="grid grid-cols-2 gap-4">
+                                <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Tenant Improvements */}
+                        <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><HardHat className="w-4 h-4"/> Tenant Specific Improvements</FormLabel>
+                        <div className="pl-6">
+                                <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Textarea placeholder="Describe any specific modifications or improvements required..." className="min-h-[100px]" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </CollapsibleContent>
+            </Collapsible>
+
           <div className="flex justify-end mt-8">
             <Button type="submit" size="lg" disabled={isLoading || isGenerating}>
               {isLoading ? (
