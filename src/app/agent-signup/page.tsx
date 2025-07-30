@@ -27,7 +27,7 @@ export default function AgentSignupPage() {
   const { addAgentLead } = useData();
   const { toast } = useToast();
   const [isSubmitted, setIsSubmitted] = React.useState(false);
-  const [formData, setFormData] = React.useState<Omit<AgentLead, 'id'>>({
+  const [formData, setFormData] = React.useState<Omit<AgentLead, 'id' | 'status'>>({
     agentType: 'Individual',
     name: '',
     companyName: '',
@@ -95,9 +95,9 @@ export default function AgentSignupPage() {
           <CardTitle className="text-2xl">Become an Agent Partner</CardTitle>
           <Alert className="mt-4 text-left bg-primary/5 border-primary/20">
             <Star className="h-5 w-5 text-primary/80" />
-            <AlertTitle className="font-semibold text-primary/90">Waitlist Registration</AlertTitle>
+            <AlertTitle className="font-semibold text-primary/90">Your Partnership Journey Starts Here</AlertTitle>
             <AlertDescription className="text-primary/80">
-                Register your interest and we'll add you to our waitlist for platform onboarding.
+                We're excited you're here! Submit your application to join our waitlist and be among the first considered for our growing network.
             </AlertDescription>
           </Alert>
         </CardHeader>
