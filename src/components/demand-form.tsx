@@ -472,43 +472,12 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                       <div className="space-y-2">
                         <FormLabel className="text-base font-semibold text-primary">Optional Details & Priorities</FormLabel>
                         <div className="p-4 border rounded-lg space-y-6">
-                            <div className="space-y-1">
-                                <div className="flex items-center justify-between gap-4">
-                                  <FormLabel>Description</FormLabel>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleGenerateDescription}
-                                    disabled={isGenerating || isLoading}
-                                    className="gap-2"
-                                  >
-                                    {isGenerating ? (
-                                      <Sparkles className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                      <Sparkles className="h-4 w-4" />
-                                    )}
-                                    Generate with AI
-                                  </Button>
-                                </div>
-                                <FormField
-                                    control={form.control}
-                                    name="description"
-                                    render={({ field }) => (
-                                    <FormItem>
-                                    <FormControl>
-                                        <Textarea placeholder="e.g., 'We need a warehouse with high ceilings for storing equipment. Must be near the main highway and have at least 4 loading docks...'" className="min-h-[120px]" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )} />
-                            </div>
                             <div className="space-y-3">
                                 <FormLabel>Requirement Priorities</FormLabel>
                                 <p className="text-sm text-muted-foreground">Select items that are critical and provide more details. This helps our AI-assisted sourcing find you the most relevant properties.</p>
                                 <div className="space-y-4 pt-2">
                                     {/* Size */}
-                                    <PriorityCard title="Size" icon={Scaling} form={form} field="preferences.nonCompromisable" fieldName="size">
+                                    <PriorityCard title="Size Range" icon={Scaling} form={form} field="preferences.nonCompromisable" fieldName="size">
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-4">
                                                 <FormField control={form.control} name="sizeMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 80000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
@@ -558,7 +527,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                                             <RadioGroupItem value="PEB" id="peb" className="peer sr-only" />
                                                         </FormControl>
                                                         <FormLabel htmlFor="peb" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                                                            PEB
+                                                            PEB <span className="font-normal text-xs text-muted-foreground mt-1">(Pre-Engineered Building with Galvalume Sheet)</span>
                                                         </FormLabel>
                                                     </FormItem>
                                                     <FormItem>
@@ -648,6 +617,20 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                     </PriorityCard>
                                 </div>
                             </div>
+                            <div className="space-y-1">
+                                <FormLabel>Additional Preferences (Notes)</FormLabel>
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                    <FormControl>
+                                        <Textarea placeholder="e.g., 'We need a warehouse with high ceilings for storing equipment. Must be near the main highway and have at least 4 loading docks...'" className="min-h-[100px]" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )} />
+                            </div>
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -708,5 +691,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     </>
   );
 }
+
+    
 
     
