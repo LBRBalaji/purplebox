@@ -678,67 +678,80 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                             </Button>
                         </CollapsibleTrigger>
                         <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                            <div className="p-4 border rounded-lg grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
-                                {/* Office Space */}
-                                <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2"><Building className="w-4 h-4"/> Office Space</FormLabel>
-                                    <div className="grid grid-cols-2 gap-4 pl-6">
-                                        <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 2000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel>Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                            <div className="p-4 border rounded-lg space-y-8">
+                                
+                                {/* Office & Amenities */}
+                                <div className="space-y-4">
+                                    <FormLabel className="flex items-center gap-2 text-base"><Building className="w-4 h-4"/> Office & Amenities</FormLabel>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Office Space</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 2000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4 pt-2">
+                                                                <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Cafeteria" id="cafe" /></FormControl><FormLabel htmlFor="cafe" className="font-normal">Cafeteria</FormLabel></FormItem>
+                                                                <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Canteen" id="canteen" /></FormControl><FormLabel htmlFor="canteen" className="font-normal">Canteen</FormLabel></FormItem>
+                                                            </RadioGroup>
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}/>
+                                                <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem><FormLabel className="text-xs">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder="e.g. 50" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Additional Toilets</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Men (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Women (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                {/* Cafeteria */}
-                                <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2"><Utensils className="w-4 h-4"/> Cafeteria/Canteen</FormLabel>
-                                    <div className="grid grid-cols-2 gap-4 pl-6">
-                                        <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4 pt-2">
-                                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Cafeteria" id="cafe" /></FormControl><FormLabel htmlFor="cafe">Cafeteria</FormLabel></FormItem>
-                                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Canteen" id="canteen" /></FormControl><FormLabel htmlFor="canteen">Canteen</FormLabel></FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                            </FormItem>
-                                        )}/>
-                                            <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem><FormLabel>Seating Capacity</FormLabel><FormControl><Input type="number" placeholder="e.g. 50" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                {/* Parking & Storage */}
+                                <div className="space-y-4">
+                                    <FormLabel className="flex items-center gap-2 text-base"><Car className="w-4 h-4"/> Parking & Storage</FormLabel>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Truck Parking Yard</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 20000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Open Storage Yard</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {/* Utilities & Infrastructure */}
+                                <div className="space-y-4">
+                                    <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities & Infrastructure</FormLabel>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
+                                        <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder="e.g., 100" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder="e.g., 10,000" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormControl><Input placeholder="Requirement & Type" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormControl><Input placeholder="Type & LUX Levels" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                     </div>
                                 </div>
 
-                                {/* Toilets */}
+                                 {/* Tenant Improvements */}
                                 <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2"><Users className="w-4 h-4"/> Additional Toilets</FormLabel>
-                                    <div className="grid grid-cols-2 gap-4 pl-6">
-                                        <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel>For Men (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel>For Women (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                    </div>
-                                </div>
-                                
-                                {/* Parking/Storage */}
-                                <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2"><Car className="w-4 h-4"/> Parking & Storage</FormLabel>
-                                    <div className="space-y-4 pl-6">
-                                        <div>
-                                            <FormLabel className="text-xs font-semibold">Truck Parking Yard</FormLabel>
-                                            <div className="grid grid-cols-2 gap-4">
-                                            <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                            <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 20000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <FormLabel className="text-xs font-semibold">Open Storage Yard</FormLabel>
-                                            <div className="grid grid-cols-2 gap-4">
-                                            <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                            <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {/* Tenant Improvements */}
-                                <div className="space-y-2 md:col-span-2">
-                                    <FormLabel className="flex items-center gap-2"><HardHat className="w-4 h-4"/> Tenant Specific Improvements</FormLabel>
+                                    <FormLabel className="flex items-center gap-2 text-base"><HardHat className="w-4 h-4"/> Tenant Specific Improvements</FormLabel>
                                     <div className="pl-6">
                                         <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
                                         <FormItem>
@@ -750,32 +763,9 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                     )} />
                                     </div>
                                 </div>
-
+                                
+                                {/* Crane */}
                                 <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement</FormLabel>
-                                    <div className="pl-6">
-                                        <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormControl><Input type="number" placeholder="KL/Per Day" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (If any)</FormLabel>
-                                    <div className="pl-6">
-                                        <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormControl><Input placeholder="e.g., 10,000 Sq. Ft." {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel>
-                                    <div className="pl-6">
-                                        <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormControl><Input placeholder="Requirement & Type" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel>
-                                    <div className="pl-6">
-                                        <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormControl><Input placeholder="Type & LUX Levels" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    </div>
-                                </div>
-                                <div className="md:col-span-2 space-y-2">
                                     <FormField
                                         control={form.control}
                                         name="optionals.crane.required"
@@ -788,7 +778,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                                     id="crane-required"
                                                 />
                                             </FormControl>
-                                            <FormLabel htmlFor="crane-required" className="flex items-center gap-2 !m-0"><CraneIcon className="w-4 h-4"/> Any Crane Requirement?</FormLabel>
+                                            <FormLabel htmlFor="crane-required" className="flex items-center gap-2 text-base !m-0"><CraneIcon className="w-4 h-4"/> Any Crane Requirement?</FormLabel>
                                             </FormItem>
                                         )}
                                     />
@@ -938,3 +928,5 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     </>
   );
 }
+
+    
