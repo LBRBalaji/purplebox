@@ -551,51 +551,34 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                         </div>
                                     </PriorityCard>
 
-                                        {/* Building Type */}
+                                    {/* Building Type */}
                                     <PriorityCard title="Building Type" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="buildingType">
                                         <FormField control={form.control} name="buildingType" render={({ field }) => (
                                             <FormItem className="space-y-3">
                                                 <FormControl>
-                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-2 gap-4">
-                                                        <FormItem>
-                                                          <FormControl><RadioGroupItem value="PEB" id="peb" className="peer sr-only" /></FormControl>
-                                                          <FormLabel htmlFor="peb" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                                                            PEB
-                                                            <span className="font-normal text-xs text-muted-foreground mt-1 text-center">(Pre-Engineered Building with Galvalume Sheet)</span>
-                                                          </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem>
-                                                           <FormControl><RadioGroupItem value="RCC" id="rcc" className="peer sr-only" /></FormControl>
-                                                          <FormLabel htmlFor="rcc" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                                                            RCC
-                                                           </FormLabel>
-                                                        </FormItem>
-                                                    </RadioGroup>
+                                                    <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted w-fit">
+                                                        <Button type="button" variant={field.value === 'PEB' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('PEB')} className="rounded-full">PEB</Button>
+                                                        <Button type="button" variant={field.value === 'RCC' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('RCC')} className="rounded-full">RCC</Button>
+                                                    </div>
                                                 </FormControl>
+                                                <FormDescription className="text-xs">
+                                                    PEB (Pre-Engineered Building with Galvalume Sheet)
+                                                </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
                                         {buildingType === 'RCC' && (
                                             <FormField control={form.control} name="floorPreference" render={({ field }) => (
                                                 <FormItem className="space-y-3 pt-4 border-t">
-                                                <FormLabel>Floor Preference</FormLabel>
-                                                <FormControl>
-                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-3 gap-4">
-                                                        <FormItem>
-                                                            <FormControl><RadioGroupItem value="Ground" id="ground" className="peer sr-only" /></FormControl>
-                                                            <FormLabel htmlFor="ground" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Ground</FormLabel>
-                                                        </FormItem>
-                                                        <FormItem>
-                                                            <FormControl><RadioGroupItem value="Multi-Floor" id="multi-floor" className="peer sr-only" /></FormControl>
-                                                            <FormLabel htmlFor="multi-floor" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Multi-Floor</FormLabel>
-                                                        </FormItem>
-                                                        <FormItem>
-                                                            <FormControl><RadioGroupItem value="Any" id="any" className="peer sr-only" /></FormControl>
-                                                            <FormLabel htmlFor="any" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Any</FormLabel>
-                                                        </FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage />
+                                                    <FormLabel>Floor Preference</FormLabel>
+                                                    <FormControl>
+                                                        <div className="grid grid-cols-3 gap-1 rounded-full p-1 bg-muted w-fit">
+                                                            <Button type="button" variant={field.value === 'Ground' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('Ground')} className="rounded-full">Ground</Button>
+                                                            <Button type="button" variant={field.value === 'Multi-Floor' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('Multi-Floor')} className="rounded-full">Multi-Floor</Button>
+                                                            <Button type="button" variant={field.value === 'Any' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('Any')} className="rounded-full">Any</Button>
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
                                                 </FormItem>
                                             )} />
                                         )}
@@ -620,7 +603,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                         )} />
                                     </PriorityCard>
                                     
-                                        {/* Power */}
+                                    {/* Power */}
                                     <PriorityCard title="Power Requirement" icon={Zap} form={form} field="preferences.nonCompromisable" fieldName="power">
                                         <div className="grid grid-cols-2 gap-4">
                                             <FormField control={form.control} name="powerMin" render={({ field }) => (<FormItem><FormLabel>Min kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 100" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
@@ -686,15 +669,15 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                                 <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-x-4">
+                                        <div className="grid grid-cols-2 gap-x-4 items-end">
                                             <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
                                                     <FormControl>
-                                                        <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4 pt-2">
-                                                            <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Cafeteria" id="cafe" /></FormControl><FormLabel htmlFor="cafe" className="font-normal">Cafeteria</FormLabel></FormItem>
-                                                            <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Canteen" id="canteen" /></FormControl><FormLabel htmlFor="canteen" className="font-normal">Canteen</FormLabel></FormItem>
-                                                        </RadioGroup>
+                                                        <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted w-fit">
+                                                            <Button type="button" variant={field.value === 'Cafeteria' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('Cafeteria')} className="rounded-full">Cafeteria</Button>
+                                                            <Button type="button" variant={field.value === 'Canteen' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('Canteen')} className="rounded-full">Canteen</Button>
+                                                        </div>
                                                     </FormControl>
                                                 </FormItem>
                                             )}/>
@@ -920,7 +903,3 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     </>
   );
 }
-
-    
-
-    
