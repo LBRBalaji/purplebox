@@ -47,7 +47,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
 import { getPropertyMatchScoreAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { Progress } from "./ui/progress";
@@ -246,6 +246,9 @@ export function PropertyForm() {
       docks: undefined,
       canopy: "Installed",
       additionalInformation: "",
+      optionals: {
+        crane: { required: false }
+      }
     },
   });
 
@@ -471,7 +474,7 @@ export function PropertyForm() {
                             <Input
                               type="number"
                               placeholder={
-                                demandToMatch.powerMin
+                                demandToMatch.powerMin !== undefined
                                   ? `Required: ${demandToMatch.powerMin} - ${demandToMatch.powerMax} kVA`
                                   : 'e.g. 500'
                               }
@@ -505,64 +508,120 @@ export function PropertyForm() {
                     <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                         <Card>
                             <CardContent className="pt-6 space-y-8">
+                                
+                                {/* Office & Amenities */}
                                 <div className="space-y-4">
                                     <FormLabel className="flex items-center gap-2 text-base"><Building className="w-4 h-4"/> Office & Amenities</FormLabel>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Office (Sq.Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
-                                            <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Office (Sq.Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Office Space</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
                                         </div>
-                                         <div className="grid grid-cols-2 gap-x-4 items-end">
+                                        <div className="grid grid-cols-2 gap-x-4 items-end">
                                             <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
-                                                <FormItem>
-                                                  <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
                                                   <Select onValueChange={field.onChange} value={field.value}>
                                                     <FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Req: ${demandToMatch.optionals?.cafeteriaOrCanteen}`}/></SelectTrigger></FormControl>
                                                     <SelectContent><SelectItem value="Cafeteria">Cafeteria</SelectItem><SelectItem value="Canteen">Canteen</SelectItem></SelectContent>
                                                   </Select>
-                                                  <FormMessage />
                                                 </FormItem>
                                             )}/>
-                                            <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.seatingCapacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                            <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.seatingCapacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Additional Toilets</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Men (count)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.additionalToiletsMen ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Women (count)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.additionalToiletsWomen ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                
+                                {/* Parking & Storage */}
                                 <div className="space-y-4">
                                     <FormLabel className="flex items-center gap-2 text-base"><Car className="w-4 h-4"/> Parking & Storage</FormLabel>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Truck Parking</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
-                                            <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Truck Parking</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Truck Parking Yard</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
                                         </div>
-                                         <div className="grid grid-cols-2 gap-4">
-                                            <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Open Storage</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
-                                            <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Open Storage</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-sm">Open Storage Yard</FormLabel>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                
+                                {/* Utilities & Infrastructure */}
                                 <div className="space-y-4">
                                     <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities & Infrastructure</FormLabel>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
-                                        <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water (KL/Day)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.processWaterRequirement ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area (Sq. Ft.)</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.hvacArea ?? 'N/A'}`} {...field} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.processWaterRequirement ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.hvacArea ?? 'N/A'}`} {...field} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
                                         <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.sprinklerRequirement ?? 'N/A'}`} {...field} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.lightingRequirement ?? 'N/A'}`} {...field} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.lightingRequirement ?? 'N/A'}`} {...field} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
                                     </div>
                                 </div>
-                                {craneRequired && (
-                                    <div className="space-y-2">
-                                        <FormLabel className="flex items-center gap-2 text-base"><CraneIcon className="w-4 h-4"/> Crane Details</FormLabel>
-                                        <div className="pl-6 pt-4">
+
+                                 {/* Tenant Improvements */}
+                                <div className="space-y-2">
+                                    <FormLabel className="flex items-center gap-2 text-base"><HardHat className="w-4 h-4"/> Tenant Specific Improvements</FormLabel>
+                                    <div className="pl-6">
+                                        <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Textarea placeholder="Describe any specific modifications or improvements required..." className="min-h-[100px]" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                    </div>
+                                </div>
+                                
+                                {/* Crane */}
+                                <div className="space-y-2">
+                                    <FormField
+                                        control={form.control}
+                                        name="optionals.crane.required"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center gap-2">
+                                            <FormControl>
+                                                <Switch
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                    id="crane-required"
+                                                />
+                                            </FormControl>
+                                            <FormLabel htmlFor="crane-required" className="flex items-center gap-2 text-base !m-0"><CraneIcon className="w-4 h-4"/> Any Crane Requirement?</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Collapsible open={form.watch('optionals.crane.required')}>
+                                        <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pl-6 pt-4">
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
                                                 <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
                                                     <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.optionals?.crane?.type ?? 'N/A'}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                                                 )}/>
                                                 <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.count ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.transverseLength ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.span ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.underhookHeight ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
                                                 <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.capacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
                                             </div>
-                                        </div>
-                                    </div>
-                                )}
+                                        </CollapsibleContent>
+                                    </Collapsible>
+                                </div>
                             </CardContent>
                         </Card>
                     </CollapsibleContent>
