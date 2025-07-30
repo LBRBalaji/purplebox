@@ -423,54 +423,56 @@ export function PropertyForm() {
   );
 
   const craneSection = (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2"><CraneIcon className="w-5 h-5 text-primary" /> Crane Details</CardTitle>
-        {isCranePrioritized && <CardDescription>This is a critical requirement for the customer.</CardDescription>}
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-            <FormField
-                control={form.control}
-                name="optionals.crane.required"
-                render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-2">
-                    <FormControl>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            id="crane-required"
-                        />
-                    </FormControl>
-                    <FormLabel htmlFor="crane-required" className="text-base !m-0">Crane Provided?</FormLabel>
-                    </FormItem>
-                )}
-            />
-            <Collapsible open={form.watch('optionals.crane.required')}>
-                <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pt-4">
-                    {demandToMatch.optionals?.crane?.required && (
-                          <div className="mb-4 p-3 rounded-md bg-destructive/10 text-destructive-foreground/90">
-                            <FormLabel className="text-sm font-semibold">Customer Requirement</FormLabel>
-                            <FormDescription className="text-destructive/90">
-                                A {demandToMatch.optionals.crane.capacity} Ton {demandToMatch.optionals.crane.type} crane is required.
-                            </FormDescription>
-                          </div>
+    <div id="crane-details-section">
+        <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2"><CraneIcon className="w-5 h-5 text-primary" /> Crane Details</CardTitle>
+            {isCranePrioritized && <CardDescription>This is a critical requirement for the customer.</CardDescription>}
+        </CardHeader>
+        <CardContent>
+            <div className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="optionals.crane.required"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-center gap-2">
+                        <FormControl>
+                            <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                id="crane-required"
+                            />
+                        </FormControl>
+                        <FormLabel htmlFor="crane-required" className="text-base !m-0">Crane Provided?</FormLabel>
+                        </FormItem>
                     )}
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
-                        <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
-                            <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.optionals?.crane?.type ?? 'N/A'}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-                        )}/>
-                        <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.count ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.transverseLength ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.span ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.underhookHeight ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.capacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                    </div>
-                </CollapsibleContent>
-            </Collapsible>
-        </div>
-      </CardContent>
-    </Card>
+                />
+                <Collapsible open={form.watch('optionals.crane.required')}>
+                    <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pt-4">
+                        {demandToMatch.optionals?.crane?.required && (
+                            <div className="mb-4 p-3 rounded-md bg-destructive/10 text-destructive-foreground/90">
+                                <FormLabel className="text-sm font-semibold">Customer Requirement</FormLabel>
+                                <FormDescription className="text-destructive/90">
+                                    A {demandToMatch.optionals.crane.capacity} Ton {demandToMatch.optionals.crane.type} crane is required.
+                                </FormDescription>
+                            </div>
+                        )}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
+                            <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
+                                <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.optionals?.crane?.type ?? 'N/A'}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                            )}/>
+                            <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.count ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.transverseLength ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.span ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.underhookHeight ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.capacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                        </div>
+                    </CollapsibleContent>
+                </Collapsible>
+            </div>
+        </CardContent>
+        </Card>
+    </div>
   );
 
   const optionalsSection = (
@@ -580,70 +582,72 @@ export function PropertyForm() {
   );
 
   const operationsSection = (
-      <Collapsible open={isOperationsOpen} onOpenChange={setIsOperationsOpen}>
-          <CollapsibleTrigger asChild>
-              <Button type="button" variant="outline" className="w-full justify-between">
-              <div className="flex items-center gap-2">
-                  <Factory className="h-4 w-4" />
-                  Operational Details
-              </div>
-              <ChevronsUpDown className="h-4 w-4" />
-              </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-              <Card>
-                <CardHeader>
-                    <CardTitle>Operational Details</CardTitle>
-                    {isOperationsPrioritized && <CardDescription>This is a critical requirement for the customer's manufacturing process.</CardDescription>}
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
-                      <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
-                      <FormItem>
-                          <FormLabel>Unit Categorization (MPCB/EC)</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                              <SelectTrigger className="placeholder:text-destructive/50">
-                              <SelectValue placeholder={`Req: ${demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}`} />
-                              </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                              <SelectItem value="Green">Green</SelectItem>
-                              <SelectItem value="Orange">Orange</SelectItem>
-                              <SelectItem value="Red">Red</SelectItem>
-                          </SelectContent>
-                          </Select>
-                          <FormMessage />
-                      </FormItem>
-                      )}/>
-                      <div></div>
-                      <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
-                      <FormItem>
-                          <FormLabel>Effluent Treatment Plant Details</FormLabel>
-                          {demandToMatch.operations?.etpDetails && (
-                              <FormDescription>Customer Requirement: {demandToMatch.operations.etpDetails}</FormDescription>
-                          )}
-                          <FormControl>
-                          <Textarea placeholder="Capacity, technology, etc." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                      </FormItem>
-                      )}/>
-                      <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
-                      <FormItem>
-                          <FormLabel>Effluent Characteristics</FormLabel>
-                          {demandToMatch.operations?.effluentCharacteristics && (
-                              <FormDescription>Customer Requirement: {demandToMatch.operations.effluentCharacteristics}</FormDescription>
-                          )}
-                          <FormControl>
-                          <Textarea placeholder="pH, temperature, chemical composition, etc." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                      </FormItem>
-                      )}/>
-                  </CardContent>
-              </Card>
-          </CollapsibleContent>
-      </Collapsible>
+      <div id="operations-details-section">
+        <Collapsible open={isOperationsOpen} onOpenChange={setIsOperationsOpen} className={cn(isOperationsPrioritized && "pt-6")}>
+            <CollapsibleTrigger asChild>
+                <Button type="button" variant="outline" className="w-full justify-between">
+                <div className="flex items-center gap-2">
+                    <Factory className="h-4 w-4" />
+                    Operational Details
+                </div>
+                <ChevronsUpDown className="h-4 w-4" />
+                </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Operational Details</CardTitle>
+                        {isOperationsPrioritized && <CardDescription>This is a critical requirement for the customer's manufacturing process.</CardDescription>}
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+                        <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Unit Categorization (MPCB/EC)</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                                <SelectTrigger className="placeholder:text-destructive/50">
+                                <SelectValue placeholder={`Req: ${demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}`} />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                <SelectItem value="Green">Green</SelectItem>
+                                <SelectItem value="Orange">Orange</SelectItem>
+                                <SelectItem value="Red">Red</SelectItem>
+                            </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}/>
+                        <div></div>
+                        <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Effluent Treatment Plant Details</FormLabel>
+                            {demandToMatch.operations?.etpDetails && (
+                                <FormDescription>Customer Requirement: {demandToMatch.operations.etpDetails}</FormDescription>
+                            )}
+                            <FormControl>
+                            <Textarea placeholder="Capacity, technology, etc." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}/>
+                        <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Effluent Characteristics</FormLabel>
+                            {demandToMatch.operations?.effluentCharacteristics && (
+                                <FormDescription>Customer Requirement: {demandToMatch.operations.effluentCharacteristics}</FormDescription>
+                            )}
+                            <FormControl>
+                            <Textarea placeholder="pH, temperature, chemical composition, etc." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}/>
+                    </CardContent>
+                </Card>
+            </CollapsibleContent>
+        </Collapsible>
+      </div>
   );
 
   const providerDetailsSection = (
@@ -699,6 +703,7 @@ export function PropertyForm() {
               {/* Render non-prioritized standard sections */}
               {optionalsSection}
               {!isOperationsPrioritized && demandToMatch.operationType === 'Manufacturing' && operationsSection}
+              
               {additionalInfoSection}
             </div>
 
@@ -826,5 +831,7 @@ export function PropertyForm() {
     </>
   );
 }
+
+    
 
     
