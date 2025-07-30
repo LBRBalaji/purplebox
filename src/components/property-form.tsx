@@ -347,8 +347,8 @@ export function PropertyForm() {
             <div className="lg:col-span-2 space-y-6">
               {/* Essentials */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Essentials</CardTitle>
+                 <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Essentials & Preferences</CardTitle>
                   <CardDescription>Provide the core details of the property, answering the customer's primary requirements.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -464,7 +464,26 @@ export function PropertyForm() {
                         <FormMessage />
                       </FormItem>
                     )} />
-                     <FormField control={form.control} name="availablePower" render={({ field }) => (<FormItem><FormLabel>Available Power (kVA)</FormLabel><FormControl><Input type="number" placeholder={demandToMatch.powerMin ? `Req: ${demandToMatch.powerMin}-${demandToMatch.powerMax} kVA` : ""} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="availablePower" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Available Power (kVA)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder={
+                                demandToMatch.powerMin
+                                  ? `Required: ${demandToMatch.powerMin} - ${demandToMatch.powerMax} kVA`
+                                  : 'e.g. 500'
+                              }
+                              {...field}
+                              value={field.value ?? ''}
+                              className="placeholder:text-muted-foreground/60"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                      <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem><FormLabel>Approval Status</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Pref: ${demandToMatch.preferences.approvals}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                      <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem><FormLabel>Fire NOC</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Pref: ${demandToMatch.preferences.fireNoc}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                       <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem><FormLabel>Fire Safety Infrastructure</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Pref: ${demandToMatch.preferences.fireSafety}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
@@ -745,7 +764,3 @@ export function PropertyForm() {
     </>
   );
 }
-
-    
-
-    
