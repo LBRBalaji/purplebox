@@ -78,7 +78,7 @@ export function AgentWaitlist() {
             </TableHeader>
             <TableBody>
               {agentLeads.map(lead => {
-                const statusInfo = statusConfig[lead.status];
+                const statusInfo = statusConfig[lead.status] || statusConfig.Pending;
 
                 return (
                     <TableRow key={lead.id}>
