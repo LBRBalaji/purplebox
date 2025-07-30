@@ -90,7 +90,7 @@ const PreferenceBadge = ({ preference }: { preference: 'Must to have' | 'Good to
 };
 
 
-function DemandSummaryCard({ demand, onHighlightSection }: { demand: DemandSchema | undefined, onHighlightSection: (sectionId: string) => void }) {
+function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
 
     if (!demand) {
         return (
@@ -109,38 +109,15 @@ function DemandSummaryCard({ demand, onHighlightSection }: { demand: DemandSchem
                     <ClipboardList className="h-5 w-5 text-primary" />
                     Demand Summary: {demand.demandId}
                 </CardTitle>
-                 <CardDescription>You are submitting a property against this demand. Click on a key requirement below to navigate to its section.</CardDescription>
+                 <CardDescription>You are submitting a property against this demand. The most relevant sections have been moved to the top for you.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 {demand.description && (
                     <div className="text-sm">
-                        <p className="font-semibold flex items-center gap-1.5"><FileText className="h-4 w-4" /> Description</p>
+                        <p className="font-semibold flex items-center gap-1.5"><FileText className="h-4 w-4" /> Customer Description</p>
                         <p className="text-muted-foreground mt-1 whitespace-pre-wrap text-xs bg-background/50 p-2 rounded-md">{demand.description}</p>
                     </div>
                 )}
-                 
-                <div className="space-y-2">
-                    <p className="font-semibold flex items-center gap-1.5 text-sm"><Pin className="h-4 w-4" /> Key Requirements</p>
-                    <div className="flex flex-wrap gap-2">
-                        {demand.optionals?.crane?.required && (
-                            <Button size="sm" variant="outline" className="bg-background" onClick={() => onHighlightSection('crane')}>
-                                <CraneIcon className="mr-2 h-4 w-4" /> Crane Details
-                            </Button>
-                        )}
-                        {(demand.operations?.etpDetails || demand.operations?.effluentCharacteristics) && (
-                             <Button size="sm" variant="outline" className="bg-background" onClick={() => onHighlightSection('operations')}>
-                                <Factory className="mr-2 h-4 w-4" /> ETP / Operations
-                            </Button>
-                        )}
-                         {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
-                            demand.preferences.nonCompromisable.map(item => (
-                                <Badge key={item} variant="secondary" className="font-medium bg-background border-primary/20 text-primary">
-                                    {priorityLabels[item] || item} is a priority
-                                </Badge>
-                            ))
-                        )}
-                    </div>
-                </div>
             </CardContent>
         </Card>
     )
@@ -161,7 +138,6 @@ export function PropertyForm() {
   
   const [isOptionalsOpen, setIsOptionalsOpen] = React.useState(false);
   const [isOperationsOpen, setIsOperationsOpen] = React.useState(false);
-  const [highlightedSection, setHighlightedSection] = React.useState<string | null>(null);
 
   const demandIdFromUrl = searchParams.get('demandId');
   const isMatchingMode = !!demandIdFromUrl;
@@ -227,20 +203,6 @@ export function PropertyForm() {
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
   
-  const handleHighlightSection = (sectionId: string) => {
-    if (sectionId === 'crane') {
-        setIsOptionalsOpen(true);
-    }
-    if (sectionId === 'operations') {
-        setIsOperationsOpen(true);
-    }
-
-    setHighlightedSection(sectionId);
-    setTimeout(() => {
-        setHighlightedSection(null);
-    }, 2500); // Highlight lasts for 2.5 seconds
-  };
-
 
   const handleCloseDialogAndRedirect = () => {
     setIsDialogOpen(false);
@@ -309,403 +271,438 @@ export function PropertyForm() {
     )
   }
 
+  // --- Dynamic Form Sections ---
+  const essentialsSection = (
+    <Card>
+       <CardHeader>
+        <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Essentials & Preferences</CardTitle>
+        <CardDescription>Provide the core details of the property, answering the customer's primary requirements.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+          <FormField control={form.control} name="isLocationConfirmed" render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-primary/5">
+                <div className="space-y-0.5">
+                    <FormLabel className="text-base">Confirm Location Match</FormLabel>
+                    <FormDescription>
+                        Confirm this property is within <b>{demandToMatch.radius}km</b> of <b>{demandToMatch.locationName || demandToMatch.location}</b>.
+                    </FormDescription>
+                </div>
+                <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+            </FormItem>
+        )} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <FormField control={form.control} name="size" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Size (Sq. Ft.)</FormLabel>
+              <FormControl>
+                  <Input 
+                      type="number" 
+                      placeholder={`Req: ${demandToMatch.sizeMin || demandToMatch.size} - ${demandToMatch.sizeMax || demandToMatch.size} sq.ft.`}
+                      {...field} value={field.value ?? ''} 
+                      className="placeholder:text-destructive/50"
+                  />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+           <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Readiness</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.readiness}`} /></SelectTrigger></FormControl>
+                  <SelectContent>
+                    <SelectItem value="Immediate">Immediate</SelectItem>
+                    <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
+                    <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
+                    <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
+                    <SelectItem value="BTS">BTS (Build to Suit)</SelectItem>
+                  </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )} />
+           <FormField control={form.control} name="buildingType" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Building Type</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.buildingType}`} /></SelectTrigger></FormControl>
+                <SelectContent>
+                  <SelectItem value="PEB">PEB</SelectItem>
+                  <SelectItem value="RCC">RCC</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )} />
+          {buildingType === 'RCC' && (
+              <FormField control={form.control} name="floor" render={({ field }) => (
+                 <FormItem>
+                  <FormLabel>Floor Preference</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.floorPreference}`} /></SelectTrigger></FormControl>
+                      <SelectContent>
+                      <SelectItem value="Ground">Ground</SelectItem>
+                      <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
+                      <SelectItem value="Any">Any</SelectItem>
+                      </SelectContent>
+                  </Select>
+                  <FormMessage />
+                 </FormItem>
+               )}
+              />
+          )}
+           <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
+            <FormItem>
+               <FormLabel>Ceiling Height ({demandToMatch.ceilingHeightUnit || 'ft'})</FormLabel>
+              <FormControl>
+                  <Input 
+                      type="number" 
+                      placeholder={demandToMatch.ceilingHeight ? `Req: ${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit || 'ft'}` : "e.g. 30"} 
+                      {...field} value={field.value ?? ''}
+                      className="placeholder:text-destructive/50"
+                  />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+          <FormField control={form.control} name="docks" render={({ field }) => (
+            <FormItem>
+                <FormLabel>Number of Docks</FormLabel>
+              <FormControl>
+                  <Input 
+                      type="number" 
+                      placeholder={demandToMatch.docks !== undefined ? `Req: ${demandToMatch.docks}` : "e.g. 8"} 
+                      {...field} value={field.value ?? ''}
+                      className="placeholder:text-destructive/50"
+                  />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+           <FormField control={form.control} name="availablePower" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Available Power (kVA)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder={
+                      (demandToMatch.powerMin !== undefined || demandToMatch.powerMax !== undefined)
+                        ? `Required: ${demandToMatch.powerMin ?? '...'} - ${demandToMatch.powerMax ?? '...'} kVA`
+                        : 'e.g. 500'
+                    }
+                    {...field}
+                    value={field.value ?? ''}
+                    className="placeholder:text-destructive/50"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem>
+             <div className="flex items-center justify-between">
+               <FormLabel>Approval Status</FormLabel>
+               <PreferenceBadge preference={demandToMatch.preferences.approvals} />
+             </div>
+             <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+           <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem>
+             <div className="flex items-center justify-between">
+                <FormLabel>Fire NOC</FormLabel>
+                <PreferenceBadge preference={demandToMatch.preferences.fireNoc} />
+             </div>
+             <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+            <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem>
+              <div className="flex items-center justify-between">
+                <FormLabel>Fire Safety Infrastructure</FormLabel>
+                <PreferenceBadge preference={demandToMatch.preferences.fireSafety} />
+              </div>
+              <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const optionalsSection = (
+      <Collapsible open={isOptionalsOpen} onOpenChange={setIsOptionalsOpen}>
+          <CollapsibleTrigger asChild>
+              <Button type="button" variant="outline" className="w-full justify-between">
+              <div className="flex items-center gap-2">
+                  <PlusCircle className="h-4 w-4" />
+                  Optionals & Preferences
+              </div>
+              <ChevronsUpDown className="h-4 w-4" />
+              </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+              <Card>
+                  <CardContent className="pt-6 space-y-8">
+                      {/* Office & Amenities */}
+                      <div className="space-y-4">
+                          <FormLabel className="flex items-center gap-2 text-base"><Building className="w-4 h-4"/> Office & Amenities</FormLabel>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
+                              <div className="space-y-2">
+                                  <FormLabel className="text-sm">Office Space</FormLabel>
+                                  <div className="grid grid-cols-2 gap-4">
+                                      <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                  </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-x-4 items-end">
+                                  <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
+                                      <FormItem className="space-y-2">
+                                          <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                          <FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.optionals?.cafeteriaOrCanteen}`}/></SelectTrigger></FormControl>
+                                          <SelectContent><SelectItem value="Cafeteria">Cafeteria</SelectItem><SelectItem value="Canteen">Canteen</SelectItem></SelectContent>
+                                        </Select>
+                                      </FormItem>
+                                  )}/>
+                                  <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.seatingCapacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                              </div>
+                              <div className="space-y-2">
+                                  <FormLabel className="text-sm">Additional Toilets</FormLabel>
+                                  <div className="grid grid-cols-2 gap-4">
+                                      <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Men (count)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.additionalToiletsMen ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Women (count)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.additionalToiletsWomen ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      {/* Parking & Storage */}
+                      <div className="space-y-4">
+                          <FormLabel className="flex items-center gap-2 text-base"><Car className="w-4 h-4"/> Parking & Storage</FormLabel>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
+                              <div className="space-y-2">
+                                  <FormLabel className="text-sm">Truck Parking Yard</FormLabel>
+                                  <div className="grid grid-cols-2 gap-4">
+                                      <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                  </div>
+                              </div>
+                              <div className="space-y-2">
+                                  <FormLabel className="text-sm">Open Storage Yard</FormLabel>
+                                  <div className="grid grid-cols-2 gap-4">
+                                      <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      {/* Utilities & Infrastructure */}
+                      <div className="space-y-4">
+                          <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities & Infrastructure</FormLabel>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
+                              <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.processWaterRequirement ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                              <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.hvacArea ?? 'N/A'}`} {...field} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                              <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.sprinklerRequirement ?? 'N/A'}`} {...field} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                              <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.lightingRequirement ?? 'N/A'}`} {...field} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                      </div>
+
+                       {/* Tenant Improvements */}
+                      <div className="space-y-2">
+                          <FormLabel className="flex items-center gap-2 text-base"><HardHat className="w-4 h-4"/> Tenant Specific Improvements</FormLabel>
+                          <div className="pl-6">
+                              <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
+                              <FormItem>
+                                  {demandToMatch.optionals?.tenantSpecificImprovements && (
+                                      <FormDescription>Customer Requirement: {demandToMatch.optionals.tenantSpecificImprovements}</FormDescription>
+                                  )}
+                                  <FormControl>
+                                      <Textarea placeholder="Describe any specific modifications or improvements required..." className="min-h-[100px]" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )} />
+                          </div>
+                      </div>
+                      
+                      {/* Crane */}
+                      <div className="space-y-2">
+                          <FormField
+                              control={form.control}
+                              name="optionals.crane.required"
+                              render={({ field }) => (
+                                  <FormItem className="flex flex-row items-center gap-2">
+                                  <FormControl>
+                                      <Switch
+                                          checked={field.value}
+                                          onCheckedChange={field.onChange}
+                                          id="crane-required"
+                                      />
+                                  </FormControl>
+                                  <FormLabel htmlFor="crane-required" className="flex items-center gap-2 text-base !m-0"><CraneIcon className="w-4 h-4"/> Crane Provided?</FormLabel>
+                                  </FormItem>
+                              )}
+                          />
+                          <Collapsible open={form.watch('optionals.crane.required')}>
+                              <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pl-6 pt-4">
+                                  {demandToMatch.optionals?.crane?.required && (
+                                       <div className="mb-4">
+                                          <FormLabel className="text-sm">Customer Requirement</FormLabel>
+                                          <FormDescription>
+                                              A {demandToMatch.optionals.crane.capacity} Ton {demandToMatch.optionals.crane.type} crane is required.
+                                          </FormDescription>
+                                       </div>
+                                  )}
+                                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
+                                      <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
+                                          <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.optionals?.crane?.type ?? 'N/A'}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                                      )}/>
+                                      <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.count ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.transverseLength ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.span ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.underhookHeight ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.capacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
+                                  </div>
+                              </CollapsibleContent>
+                          </Collapsible>
+                      </div>
+                  </CardContent>
+              </Card>
+          </CollapsibleContent>
+      </Collapsible>
+  );
+
+  const operationsSection = (
+      <Collapsible open={isOperationsOpen} onOpenChange={setIsOperationsOpen}>
+          <CollapsibleTrigger asChild>
+              <Button type="button" variant="outline" className="w-full justify-between">
+              <div className="flex items-center gap-2">
+                  <Factory className="h-4 w-4" />
+                  Operational Details
+              </div>
+              <ChevronsUpDown className="h-4 w-4" />
+              </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+              <Card>
+                <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+                      <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Unit Categorization (MPCB/EC)</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                              <SelectTrigger className="placeholder:text-destructive/50">
+                              <SelectValue placeholder={`Req: ${demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}`} />
+                              </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              <SelectItem value="Green">Green</SelectItem>
+                              <SelectItem value="Orange">Orange</SelectItem>
+                              <SelectItem value="Red">Red</SelectItem>
+                          </SelectContent>
+                          </Select>
+                          <FormMessage />
+                      </FormItem>
+                      )}/>
+                      <div></div>
+                      <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Effluent Treatment Plant Details</FormLabel>
+                          {demandToMatch.operations?.etpDetails && (
+                              <FormDescription>Customer Requirement: {demandToMatch.operations.etpDetails}</FormDescription>
+                          )}
+                          <FormControl>
+                          <Textarea placeholder="Capacity, technology, etc." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                      </FormItem>
+                      )}/>
+                      <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Effluent Characteristics</FormLabel>
+                          {demandToMatch.operations?.effluentCharacteristics && (
+                              <FormDescription>Customer Requirement: {demandToMatch.operations.effluentCharacteristics}</FormDescription>
+                          )}
+                          <FormControl>
+                          <Textarea placeholder="pH, temperature, chemical composition, etc." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                      </FormItem>
+                      )}/>
+                  </CardContent>
+              </Card>
+          </CollapsibleContent>
+      </Collapsible>
+  );
+
+  const providerDetailsSection = (
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2"><UserCog className="w-5 h-5 text-primary" /> Provider Details</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <FormField control={form.control} name="userName" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
+          <FormField control={form.control} name="userCompanyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
+        </CardContent>
+      </Card>
+  );
+
+  const commercialsSection = (
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2"><HandCoins className="w-5 h-5 text-primary" /> Commercials</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <FormField control={form.control} name="rentPerSft" render={({ field }) => (<FormItem><FormLabel>Rent per Sq.Ft.</FormLabel><FormControl><Input type="number" placeholder="e.g. 25" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+          <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (<FormItem><FormLabel>Rental Security Deposit (Months)</FormLabel><FormControl><Input type="number" placeholder="e.g. 6" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+        </CardContent>
+      </Card>
+  );
+
+  const additionalInfoSection = (
+      <Card>
+         <CardHeader><CardTitle className="flex items-center gap-2"><Info className="w-5 h-5 text-primary" /> Additional Information</CardTitle></CardHeader>
+         <CardContent>
+            <FormField control={form.control} name="additionalInformation" render={({ field }) => (
+                <FormItem>
+                    <FormControl>
+                        <Textarea placeholder="Provide any other relevant details..." className="min-h-[100px]" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+         </CardContent>
+      </Card>
+  );
+
+  // --- Determine Render Order ---
+  const isCraneRequired = !!demandToMatch.optionals?.crane?.required;
+  const isManufacturing = demandToMatch.operationType === 'Manufacturing';
+
+  const formSections = [
+    { id: 'essentials', component: essentialsSection, isPrioritized: true },
+    { id: 'optionals', component: optionalsSection, isPrioritized: isCraneRequired },
+    { id: 'operations', component: operationsSection, isPrioritized: isManufacturing },
+    { id: 'additionalInfo', component: additionalInfoSection, isPrioritized: false },
+  ];
+
+  const sortedSections = [...formSections].sort((a, b) => {
+    if (a.isPrioritized === b.isPrioritized) return 0;
+    return a.isPrioritized ? -1 : 1;
+  });
+
+
   return (
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onAttemptSubmit)} className="space-y-6">
-          <DemandSummaryCard demand={demandToMatch} onHighlightSection={handleHighlightSection} />
+          <DemandSummaryCard demand={demandToMatch} />
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              {/* Essentials */}
-              <Card>
-                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Essentials & Preferences</CardTitle>
-                  <CardDescription>Provide the core details of the property, answering the customer's primary requirements.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <FormField control={form.control} name="isLocationConfirmed" render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-primary/5">
-                          <div className="space-y-0.5">
-                              <FormLabel className="text-base">Confirm Location Match</FormLabel>
-                              <FormDescription>
-                                  Confirm this property is within <b>{demandToMatch.radius}km</b> of <b>{demandToMatch.locationName || demandToMatch.location}</b>.
-                              </FormDescription>
-                          </div>
-                          <FormControl>
-                              <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                      </FormItem>
-                  )} />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <FormField control={form.control} name="size" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Size (Sq. Ft.)</FormLabel>
-                        <FormControl>
-                            <Input 
-                                type="number" 
-                                placeholder={`Req: ${demandToMatch.sizeMin || demandToMatch.size} - ${demandToMatch.sizeMax || demandToMatch.size} sq.ft.`}
-                                {...field} value={field.value ?? ''} 
-                                className="placeholder:text-destructive/50"
-                            />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                     <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Readiness</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.readiness}`} /></SelectTrigger></FormControl>
-                            <SelectContent>
-                              <SelectItem value="Immediate">Immediate</SelectItem>
-                              <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
-                              <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
-                              <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
-                              <SelectItem value="BTS">BTS (Build to Suit)</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                     <FormField control={form.control} name="buildingType" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Building Type</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.buildingType}`} /></SelectTrigger></FormControl>
-                          <SelectContent>
-                            <SelectItem value="PEB">PEB</SelectItem>
-                            <SelectItem value="RCC">RCC</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                    {buildingType === 'RCC' && (
-                        <FormField control={form.control} name="floor" render={({ field }) => (
-                           <FormItem>
-                            <FormLabel>Floor Preference</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.floorPreference}`} /></SelectTrigger></FormControl>
-                                <SelectContent>
-                                <SelectItem value="Ground">Ground</SelectItem>
-                                <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
-                                <SelectItem value="Any">Any</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                           </FormItem>
-                         )}
-                        />
-                    )}
-                     <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
-                      <FormItem>
-                         <FormLabel>Ceiling Height ({demandToMatch.ceilingHeightUnit || 'ft'})</FormLabel>
-                        <FormControl>
-                            <Input 
-                                type="number" 
-                                placeholder={demandToMatch.ceilingHeight ? `Req: ${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit || 'ft'}` : "e.g. 30"} 
-                                {...field} value={field.value ?? ''}
-                                className="placeholder:text-destructive/50"
-                            />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                    <FormField control={form.control} name="docks" render={({ field }) => (
-                      <FormItem>
-                          <FormLabel>Number of Docks</FormLabel>
-                        <FormControl>
-                            <Input 
-                                type="number" 
-                                placeholder={demandToMatch.docks !== undefined ? `Req: ${demandToMatch.docks}` : "e.g. 8"} 
-                                {...field} value={field.value ?? ''}
-                                className="placeholder:text-destructive/50"
-                            />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                     <FormField control={form.control} name="availablePower" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Available Power (kVA)</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              placeholder={
-                                (demandToMatch.powerMin !== undefined || demandToMatch.powerMax !== undefined)
-                                  ? `Required: ${demandToMatch.powerMin ?? '...'} - ${demandToMatch.powerMax ?? '...'} kVA`
-                                  : 'e.g. 500'
-                              }
-                              {...field}
-                              value={field.value ?? ''}
-                              className="placeholder:text-destructive/50"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem>
-                       <div className="flex items-center justify-between">
-                         <FormLabel>Approval Status</FormLabel>
-                         <PreferenceBadge preference={demandToMatch.preferences.approvals} />
-                       </div>
-                       <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                     <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem>
-                       <div className="flex items-center justify-between">
-                          <FormLabel>Fire NOC</FormLabel>
-                          <PreferenceBadge preference={demandToMatch.preferences.fireNoc} />
-                       </div>
-                       <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem>
-                        <div className="flex items-center justify-between">
-                          <FormLabel>Fire Safety Infrastructure</FormLabel>
-                          <PreferenceBadge preference={demandToMatch.preferences.fireSafety} />
-                        </div>
-                        <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Optionals */}
-               <Collapsible open={isOptionalsOpen} onOpenChange={setIsOptionalsOpen}>
-                    <CollapsibleTrigger asChild>
-                        <Button type="button" variant="outline" className="w-full justify-between">
-                        <div className="flex items-center gap-2">
-                            <PlusCircle className="h-4 w-4" />
-                            Optionals & Preferences
-                        </div>
-                        <ChevronsUpDown className="h-4 w-4" />
-                        </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                        <Card>
-                            <CardContent className="pt-6 space-y-8">
-                                
-                                {/* Office & Amenities */}
-                                <div className="space-y-4">
-                                    <FormLabel className="flex items-center gap-2 text-base"><Building className="w-4 h-4"/> Office & Amenities</FormLabel>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
-                                        <div className="space-y-2">
-                                            <FormLabel className="text-sm">Office Space</FormLabel>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-x-4 items-end">
-                                            <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
-                                                <FormItem className="space-y-2">
-                                                    <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
-                                                  <Select onValueChange={field.onChange} value={field.value}>
-                                                    <FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.optionals?.cafeteriaOrCanteen}`}/></SelectTrigger></FormControl>
-                                                    <SelectContent><SelectItem value="Cafeteria">Cafeteria</SelectItem><SelectItem value="Canteen">Canteen</SelectItem></SelectContent>
-                                                  </Select>
-                                                </FormItem>
-                                            )}/>
-                                            <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.seatingCapacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <FormLabel className="text-sm">Additional Toilets</FormLabel>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Men (count)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.additionalToiletsMen ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Women (count)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.additionalToiletsWomen ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {/* Parking & Storage */}
-                                <div className="space-y-4">
-                                    <FormLabel className="flex items-center gap-2 text-base"><Car className="w-4 h-4"/> Parking & Storage</FormLabel>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
-                                        <div className="space-y-2">
-                                            <FormLabel className="text-sm">Truck Parking Yard</FormLabel>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <FormLabel className="text-sm">Open Storage Yard</FormLabel>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {/* Utilities & Infrastructure */}
-                                <div className="space-y-4">
-                                    <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities & Infrastructure</FormLabel>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
-                                        <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.processWaterRequirement ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.hvacArea ?? 'N/A'}`} {...field} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.sprinklerRequirement ?? 'N/A'}`} {...field} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.lightingRequirement ?? 'N/A'}`} {...field} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                    </div>
-                                </div>
-
-                                 {/* Tenant Improvements */}
-                                <div className="space-y-2">
-                                    <FormLabel className="flex items-center gap-2 text-base"><HardHat className="w-4 h-4"/> Tenant Specific Improvements</FormLabel>
-                                    <div className="pl-6">
-                                        <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
-                                        <FormItem>
-                                            {demandToMatch.optionals?.tenantSpecificImprovements && (
-                                                <FormDescription>Customer Requirement: {demandToMatch.optionals.tenantSpecificImprovements}</FormDescription>
-                                            )}
-                                            <FormControl>
-                                                <Textarea placeholder="Describe any specific modifications or improvements required..." className="min-h-[100px]" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )} />
-                                    </div>
-                                </div>
-                                
-                                {/* Crane */}
-                                <div className={cn("space-y-2 rounded-lg p-3 transition-colors", highlightedSection === 'crane' && 'bg-primary/10')}>
-                                    <FormField
-                                        control={form.control}
-                                        name="optionals.crane.required"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-center gap-2">
-                                            <FormControl>
-                                                <Switch
-                                                    checked={field.value}
-                                                    onCheckedChange={field.onChange}
-                                                    id="crane-required"
-                                                />
-                                            </FormControl>
-                                            <FormLabel htmlFor="crane-required" className="flex items-center gap-2 text-base !m-0"><CraneIcon className="w-4 h-4"/> Crane Provided?</FormLabel>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <Collapsible open={form.watch('optionals.crane.required')}>
-                                        <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pl-6 pt-4">
-                                            {demandToMatch.optionals?.crane?.required && (
-                                                 <div className="mb-4">
-                                                    <FormLabel className="text-sm">Customer Requirement</FormLabel>
-                                                    <FormDescription>
-                                                        A {demandToMatch.optionals.crane.capacity} Ton {demandToMatch.optionals.crane.type} crane is required.
-                                                    </FormDescription>
-                                                 </div>
-                                            )}
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
-                                                <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
-                                                    <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-destructive/50"><SelectValue placeholder={`Req: ${demandToMatch.optionals?.crane?.type ?? 'N/A'}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-                                                )}/>
-                                                <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.count ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.transverseLength ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.span ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.underhookHeight ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.crane?.capacity ?? 'N/A'}`} {...field} value={field.value ?? ''} className="placeholder:text-destructive/50"/></FormControl><FormMessage /></FormItem>)} />
-                                            </div>
-                                        </CollapsibleContent>
-                                    </Collapsible>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </CollapsibleContent>
-                </Collapsible>
-              
-              {/* Operations */}
-              {demandToMatch.operationType === 'Manufacturing' && (
-                <Collapsible open={isOperationsOpen} onOpenChange={setIsOperationsOpen}>
-                    <CollapsibleTrigger asChild>
-                        <Button type="button" variant="outline" className="w-full justify-between">
-                        <div className="flex items-center gap-2">
-                            <Factory className="h-4 w-4" />
-                            Operational Details
-                        </div>
-                        <ChevronsUpDown className="h-4 w-4" />
-                        </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                        <Card className={cn("transition-colors", highlightedSection === 'operations' && 'bg-primary/10')}>
-                          <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
-                                <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Unit Categorization (MPCB/EC)</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger className="placeholder:text-destructive/50">
-                                        <SelectValue placeholder={`Req: ${demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}`} />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="Green">Green</SelectItem>
-                                        <SelectItem value="Orange">Orange</SelectItem>
-                                        <SelectItem value="Red">Red</SelectItem>
-                                    </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                                )}/>
-                                <div></div>
-                                <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Effluent Treatment Plant Details</FormLabel>
-                                    {demandToMatch.operations?.etpDetails && (
-                                        <FormDescription>Customer Requirement: {demandToMatch.operations.etpDetails}</FormDescription>
-                                    )}
-                                    <FormControl>
-                                    <Textarea placeholder="Capacity, technology, etc." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                                )}/>
-                                <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Effluent Characteristics</FormLabel>
-                                    {demandToMatch.operations?.effluentCharacteristics && (
-                                        <FormDescription>Customer Requirement: {demandToMatch.operations.effluentCharacteristics}</FormDescription>
-                                    )}
-                                    <FormControl>
-                                    <Textarea placeholder="pH, temperature, chemical composition, etc." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                                )}/>
-                            </CardContent>
-                        </Card>
-                    </CollapsibleContent>
-                </Collapsible>
-              )}
+              {sortedSections.map(section => (
+                <React.Fragment key={section.id}>
+                  {section.component}
+                </React.Fragment>
+              ))}
             </div>
 
             <div className="lg:col-span-1 space-y-6">
-              <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><UserCog className="w-5 h-5 text-primary" /> Provider Details</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField control={form.control} name="userName" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userCompanyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
-                </CardContent>
-              </Card>
-               <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><HandCoins className="w-5 h-5 text-primary" /> Commercials</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField control={form.control} name="rentPerSft" render={({ field }) => (<FormItem><FormLabel>Rent per Sq.Ft.</FormLabel><FormControl><Input type="number" placeholder="e.g. 25" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (<FormItem><FormLabel>Rental Security Deposit (Months)</FormLabel><FormControl><Input type="number" placeholder="e.g. 6" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                </CardContent>
-              </Card>
-              <Card>
-                 <CardHeader><CardTitle className="flex items-center gap-2"><Info className="w-5 h-5 text-primary" /> Additional Information</CardTitle></CardHeader>
-                 <CardContent>
-                    <FormField control={form.control} name="additionalInformation" render={({ field }) => (
-                        <FormItem>
-                            <FormControl>
-                                <Textarea placeholder="Provide any other relevant details..." className="min-h-[100px]" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
-                 </CardContent>
-              </Card>
+              {providerDetailsSection}
+              {commercialsSection}
             </div>
           </div>
           <div className="flex justify-end">
@@ -827,5 +824,3 @@ export function PropertyForm() {
     </>
   );
 }
-
-    
