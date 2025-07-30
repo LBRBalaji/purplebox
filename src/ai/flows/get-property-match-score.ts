@@ -64,11 +64,12 @@ You must provide an overall score, a breakdown for multiple categories, and a de
     *   If no range is given, use the direct ratio: \`min(propertySize, demandSize) / max(propertySize, demandSize)\`.
     *   Consider the 'sizeVariationPercentage'. A property just outside the primary 'size' but within the variation percentage should still get a decent score.
 
-3.  **Amenities Score (Docks, Ceiling Height, etc.):**
+3.  **Amenities Score (Blended):**
     *   This is a blended score. If the customer requires a specific number of docks (e.g., 12) and the property has fewer (e.g., 11), the score for that item **must be calculated proportionally** as \`propertyDocks / demandDocks\` (11/12 = 0.92). A score of 9/12 would be 0.75.
     *   If the customer requires a specific ceiling height and the property is below, score it **proportionally** as \`propertyHeight / demandHeight\` (e.g., 38ft provided vs 40ft required is 38/40 = 0.95 score). Note the units (ft/m).
     *   If the customer has **no** requirement for docks or ceiling height, a property with a reasonable number (e.g., >5 docks, >30ft ceiling) should get a high score (0.9-1.0).
-    *   **Building Type:** If the customer specifies a building type (PEB/RCC) and the property's site type doesn't align, penalize the score. If they choose RCC and have a floor preference, check if the property's floor matches.
+    *   **Building Type:** If the customer specifies a building type (PEB/RCC) and the property's site type doesn't align, penalize the score. If they choose RCC and have a floor preference, check if the property's floor matches. A mismatch on a non-compromisable building type should result in a low amenities score.
+    *   **Crane:** If a crane is required (non-compromisable), a property without one should receive a very low score for this part of the amenities calculation. If the property has a crane, score it based on how well its capacity, span, and height match the requirements.
     *   Combine these proportional scores to produce the final amenities score.
 
 4.  **Fire Safety Score:**
@@ -92,7 +93,7 @@ You must provide an overall score, a breakdown for multiple categories, and a de
 
 **PROPERTY DEMAND**
 - Demand ID: {{{demand.demandId}}}
-- Property Type: {{{demand.propertyType}}}
+- Operation Type: {{{demand.operationType}}}
 - Location: Within {{{demand.radius}}} km of {{{demand.locationName}}}
 - Size: {{demand.size}} Sq. Ft. (Range: {{#if demand.sizeMin}}{{demand.sizeMin}} - {{demand.sizeMax}}{{else}}Not Specified{{/if}}, Variation: +/-{{demand.sizeVariationPercentage}}%)
 - Building Type: {{demand.buildingType}} (Floor Pref: {{#if demand.floorPreference}}{{demand.floorPreference}}{{else}}N/A{{/if}})
@@ -100,17 +101,27 @@ You must provide an overall score, a breakdown for multiple categories, and a de
 - Required Docks: {{#if demand.docks}}{{{demand.docks}}}{{else}}Not Specified{{/if}}
 - Required Readiness: {{{demand.readiness}}}
 - Power Requirement (kVA): {{#if demand.powerMin}}{{demand.powerMin}} - {{demand.powerMax}}{{else}}Not Specified{{/if}}
+- Crane Required: {{#if demand.optionals.crane.required}}Yes{{else}}No{{/if}}
+  {{#if demand.optionals.crane.required}}
+  - Crane Type: {{demand.optionals.crane.type}}
+  - Crane Capacity: {{demand.optionals.crane.capacity}} Tons
+  {{/if}}
 - Description: {{{demand.description}}}
 - **Priorities:**
   - Non-Compromisable Items: {{#if demand.preferences.nonCompromisable}}{{#each demand.preferences.nonCompromisable}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None{{/if}}
   - Approvals: {{demand.preferences.approvals}}
   - Fire NOC: {{demand.preferences.fireNoc}}
   - Fire Safety: {{demand.preferences.fireSafety}}
+- **Operational Needs:**
+  {{#if demand.operations.etpDetails}}
+  - ETP Details: {{demand.operations.etpDetails}}
+  {{/if}}
 
 **SUBMITTED PROPERTY**
 - Property ID: {{{property.propertyId}}}
 - Location Confirmed by Provider: {{{property.isLocationConfirmed}}}
-- Site Type: {{{property.siteType}}}
+- Site Type: {{{property.siteType}}} (Align with PEB/RCC)
+- Floor: {{{property.floor}}}
 - Size: {{{property.size}}} Sq. Ft.
 - Ceiling Height: {{{property.ceilingHeight}}} ft
 - Docks: {{{property.docks}}}

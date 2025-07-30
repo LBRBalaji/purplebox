@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Mail, Info, ListChecks, Building } from 'lucide-react';
+import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction } from 'lucide-react';
 import { useData } from '@/contexts/data-context';
 import type { DemandSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
@@ -123,8 +123,12 @@ WareHouse Origin
                 <CardTitle>{demand.demandId}</CardTitle>
                 <CardDescription asChild>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="secondary">{demand.operationType}</Badge>
+                    <Badge variant="secondary" className="flex items-center gap-1.5">
+                      {demand.operationType === 'Manufacturing' ? <Factory className="h-3 w-3" /> : <Building className="h-3 w-3" />}
+                      {demand.operationType}
+                    </Badge>
                     {demand.buildingType && <Badge variant="outline" className="flex items-center gap-1.5"><Building className="h-3 w-3" />{demand.buildingType}</Badge>}
+                    {demand.optionals?.crane?.required && <Badge variant="outline" className="flex items-center gap-1.5"><Construction className="h-3 w-3" />Crane</Badge>}
                   </div>
                 </CardDescription>
               </CardHeader>

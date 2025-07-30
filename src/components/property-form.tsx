@@ -47,7 +47,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
 import { generateDescriptionAction, getPropertyMatchScoreAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { Progress } from "./ui/progress";
@@ -173,11 +173,11 @@ function DemandSummaryCard({ demandId }: { demandId: string }) {
                     </div>
                      {demand.buildingType && <div>
                         <p className="font-semibold">Building Type</p>
-                        <p className="text-muted-foreground">{demand.buildingType}</p>
+                        <p className="text-muted-foreground">{demand.buildingType} {demand.floorPreference ? `(${demand.floorPreference})` : ''}</p>
                     </div>}
-                     {demand.floorPreference && <div>
-                        <p className="font-semibold">Floor Preference</p>
-                        <p className="text-muted-foreground">{demand.floorPreference}</p>
+                    {demand.optionals?.crane?.required && <div>
+                        <p className="font-semibold">Crane Required</p>
+                        <p className="text-muted-foreground">Yes ({demand.optionals.crane.capacity} Ton)</p>
                     </div>}
                 </div>
                  {demand.description && (
