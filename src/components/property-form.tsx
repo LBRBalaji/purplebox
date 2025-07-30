@@ -57,7 +57,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
 import { getPropertyMatchScoreAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { Progress } from "./ui/progress";
@@ -83,23 +83,20 @@ const priorityLabels: { [key: string]: string } = {
 const PreferenceBadge = ({ preference }: { preference: 'Must to have' | 'Good to have' | undefined }) => {
     if (!preference) return null;
     return (
-        <Badge variant={preference === 'Must to have' ? 'destructive' : 'secondary'} className="text-xs">
+        <Badge variant={preference === 'Must to have' ? "destructive" : "secondary"} className="text-xs">
             {preference}
         </Badge>
     );
 };
 
 
-function DemandSummaryCard({ demandId }: { demandId: string }) {
-    const { demands } = useData();
-    const demand = demands.find(d => d.demandId === demandId);
+function DemandSummaryCard({ demand, onScrollToSection }: { demand: DemandSchema | undefined, onScrollToSection: (sectionId: string) => void }) {
 
     if (!demand) {
         return (
             <Card className="bg-amber-50 border-amber-200">
                 <CardHeader>
                     <CardTitle className="text-amber-800">Demand Not Found</CardTitle>
-                    <CardDescription className="text-amber-700">Could not find details for Demand ID: {demandId}</CardDescription>
                 </CardHeader>
             </Card>
         );
@@ -110,55 +107,40 @@ function DemandSummaryCard({ demandId }: { demandId: string }) {
             <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                     <ClipboardList className="h-5 w-5 text-primary" />
-                    Demand Summary
+                    Demand Summary: {demand.demandId}
                 </CardTitle>
-                 <CardDescription>You are submitting a property against this demand.</CardDescription>
+                 <CardDescription>You are submitting a property against this demand. Click on a key requirement below to navigate to its section.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                        <p className="font-semibold">Operation Type</p>
-                        <p className="text-muted-foreground">{demand.operationType}</p>
-                    </div>
-                     <div>
-                        <p className="font-semibold">Size (Sq. Ft.)</p>
-                        <p className="text-muted-foreground">{demand.size.toLocaleString()}</p>
-                    </div>
-                     <div>
-                        <p className="font-semibold">Location</p>
-                        <p className="text-muted-foreground truncate" title={demand.locationName || demand.location}>{demand.locationName || demand.location}</p>
-                    </div>
-                     <div>
-                        <p className="font-semibold">Radius</p>
-                        <p className="text-muted-foreground">{demand.radius} km</p>
-                    </div>
-                     {demand.buildingType && <div>
-                        <p className="font-semibold">Building Type</p>
-                        <p className="text-muted-foreground">{demand.buildingType} {demand.floorPreference ? `(${demand.floorPreference})` : ''}</p>
-                    </div>}
-                    {demand.optionals?.crane?.required && <div>
-                        <p className="font-semibold">Crane Required</p>
-                        <p className="text-muted-foreground">Yes ({demand.optionals.crane.capacity} Ton)</p>
-                    </div>}
-                </div>
-                 {demand.description && (
+                {demand.description && (
                     <div className="text-sm">
                         <p className="font-semibold flex items-center gap-1.5"><FileText className="h-4 w-4" /> Description</p>
                         <p className="text-muted-foreground mt-1 whitespace-pre-wrap text-xs bg-background/50 p-2 rounded-md">{demand.description}</p>
                     </div>
                 )}
-                 {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
-                    <div className="text-sm">
-                        <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Priorities</p>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {demand.preferences.nonCompromisable.map(item => (
-                                <Badge key={item} variant="outline" className="font-medium bg-background">
-                                    {priorityLabels[item] || item}
+                 
+                <div className="space-y-2">
+                    <p className="font-semibold flex items-center gap-1.5 text-sm"><Pin className="h-4 w-4" /> Key Requirements</p>
+                    <div className="flex flex-wrap gap-2">
+                        {demand.optionals?.crane?.required && (
+                            <Button size="sm" variant="outline" className="bg-background" onClick={() => onScrollToSection('crane-details-section')}>
+                                <CraneIcon className="mr-2 h-4 w-4" /> Crane Details
+                            </Button>
+                        )}
+                        {demand.operations?.etpDetails && (
+                             <Button size="sm" variant="outline" className="bg-background" onClick={() => onScrollToSection('operations-details-section')}>
+                                <Factory className="mr-2 h-4 w-4" /> ETP / Operations
+                            </Button>
+                        )}
+                         {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
+                            demand.preferences.nonCompromisable.map(item => (
+                                <Badge key={item} variant="secondary" className="font-medium bg-background border-primary/20 text-primary">
+                                    {priorityLabels[item] || item} is a priority
                                 </Badge>
-                            ))}
-                        </div>
+                            ))
+                        )}
                     </div>
-                )}
+                </div>
             </CardContent>
         </Card>
     )
@@ -171,11 +153,14 @@ export function PropertyForm() {
   const { user } = useAuth();
   const { demands, addSubmission } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
-  const [aiResult, setAiResult] = React.useState<AiResult | null>(null);
+  const [aiResult, setAiResult] = React.useState<{ matchResult: GetPropertyMatchScoreOutput } | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
   const [submissionData, setSubmissionData] = React.useState<PropertySchema | null>(null);
   const [isCopied, setIsCopied] = React.useState(false);
+  
+  const [isOptionalsOpen, setIsOptionalsOpen] = React.useState(false);
+  const [isOperationsOpen, setIsOperationsOpen] = React.useState(false);
 
   const demandIdFromUrl = searchParams.get('demandId');
   const isMatchingMode = !!demandIdFromUrl;
@@ -220,7 +205,6 @@ export function PropertyForm() {
     [demands, demandIdFromUrl]
   );
   
-  const craneRequired = demandToMatch?.optionals?.crane?.required;
   const buildingType = form.watch('buildingType');
 
 
@@ -241,6 +225,26 @@ export function PropertyForm() {
       form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
+  
+  const handleScrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+        // Expand the relevant collapsible before scrolling
+        if (sectionId.startsWith('crane') || sectionId.startsWith('optionals')) {
+            setIsOptionalsOpen(true);
+        }
+        if (sectionId.startsWith('operations')) {
+            setIsOperationsOpen(true);
+        }
+        
+        // Allow time for the collapsible to open
+        setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.focus({ preventScroll: true }); // Focus for accessibility
+        }, 300);
+    }
+  };
+
 
   const handleCloseDialogAndRedirect = () => {
     setIsDialogOpen(false);
@@ -289,8 +293,8 @@ export function PropertyForm() {
   }
 
   const handleCopy = () => {
-    if (aiResult?.description) {
-      navigator.clipboard.writeText(aiResult.description);
+    if (aiResult?.matchResult.justification) {
+      navigator.clipboard.writeText(aiResult.matchResult.justification);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     }
@@ -313,7 +317,7 @@ export function PropertyForm() {
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onAttemptSubmit)} className="space-y-6">
-          <DemandSummaryCard demandId={demandIdFromUrl} />
+          <DemandSummaryCard demand={demandToMatch} onScrollToSection={handleScrollToSection} />
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -470,7 +474,7 @@ export function PropertyForm() {
               </Card>
 
               {/* Optionals */}
-               <Collapsible>
+               <Collapsible open={isOptionalsOpen} onOpenChange={setIsOptionalsOpen}>
                     <CollapsibleTrigger asChild>
                         <Button type="button" variant="outline" className="w-full justify-between">
                         <div className="flex items-center gap-2">
@@ -568,7 +572,7 @@ export function PropertyForm() {
                                 </div>
                                 
                                 {/* Crane */}
-                                <div className="space-y-2">
+                                <div className="space-y-2" id="crane-details-section">
                                     <FormField
                                         control={form.control}
                                         name="optionals.crane.required"
@@ -612,7 +616,7 @@ export function PropertyForm() {
               
               {/* Operations */}
               {demandToMatch.operationType === 'Manufacturing' && (
-                <Collapsible>
+                <Collapsible open={isOperationsOpen} onOpenChange={setIsOperationsOpen}>
                     <CollapsibleTrigger asChild>
                         <Button type="button" variant="outline" className="w-full justify-between">
                         <div className="flex items-center gap-2">
@@ -622,7 +626,7 @@ export function PropertyForm() {
                         <ChevronsUpDown className="h-4 w-4" />
                         </Button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down" id="operations-details-section">
                         <Card>
                           <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                                 <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
@@ -815,34 +819,7 @@ export function PropertyForm() {
                   </div>
                 )}
               </>
-            ) : (
-              <>
-                <DialogHeader>
-                    <DialogTitle>AI-Generated Property Description</DialogTitle>
-                    <DialogDescription>
-                        Here is the description generated by AI. You can copy it for your listings.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="relative mt-4">
-                  {isLoading ? (
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                  ) : (
-                    <>
-                      <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={handleCopy}>
-                        {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                      </Button>
-                      <p className="text-sm text-muted-foreground bg-secondary p-4 rounded-md whitespace-pre-wrap min-h-[150px]">
-                          {aiResult?.description}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </>
-            )}
+            ) : null }
             <DialogFooter>
                 <Button variant="outline" onClick={handleCloseDialogAndRedirect}>Close</Button>
             </DialogFooter>
