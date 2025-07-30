@@ -388,7 +388,7 @@ export function PropertyForm() {
                     )} />
                   </div>
                   <FormField control={form.control} name="floor" render={({ field }) => (
-                      <FormItem><FormLabel>Floor</FormLabel><FormControl><Input placeholder="e.g. Ground Floor" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Floor</FormLabel><FormControl><Input placeholder={demandToMatch?.floorPreference ? `Required: ${demandToMatch.floorPreference}`: 'e.g. Ground Floor'} {...field} className="placeholder:text-muted-foreground/60" /></FormControl><FormMessage /></FormItem>
                     )}
                   />
                   <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
@@ -409,7 +409,7 @@ export function PropertyForm() {
                     )}
                   />
                   <FormField control={form.control} name="siteType" render={({ field }) => (
-                      <FormItem><FormLabel>Site Type</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Standalone">Standalone</SelectItem><SelectItem value="Part of Industrial Park">Part of Industrial Park</SelectItem><SelectItem value="Part of Commercial Project">Part of Commercial Project</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Site Type</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={demandToMatch?.buildingType ? `Match: ${demandToMatch.buildingType}` : "Select type"}/></SelectTrigger></FormControl><SelectContent><SelectItem value="Standalone">Standalone</SelectItem><SelectItem value="Part of Industrial Park">Part of Industrial Park</SelectItem><SelectItem value="Part of Commercial Project">Part of Commercial Project</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                     )}
                   />
                   <FormField control={form.control} name="safety" render={({ field }) => (
@@ -425,7 +425,7 @@ export function PropertyForm() {
                         <FormControl>
                             <Input 
                                 type="number" 
-                                placeholder={demandToMatch?.ceilingHeight ? String(demandToMatch.ceilingHeight) : "e.g. 30"} 
+                                placeholder={demandToMatch?.ceilingHeight ? `Required: ${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit}` : "e.g. 30"} 
                                 {...field} value={field.value ?? ''}
                                 className="placeholder:text-muted-foreground/60"
                             />
@@ -452,7 +452,7 @@ export function PropertyForm() {
                     <CardHeader><CardTitle className="flex items-center gap-2"><Plug className="w-5 h-5 text-primary" /> Electricity</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                         <FormField control={form.control} name="installedCapacity" render={({ field }) => (<FormItem><FormLabel>Installed Capacity (kva/mva)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="availablePower" render={({ field }) => (<FormItem><FormLabel>Available Power</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="availablePower" render={({ field }) => (<FormItem><FormLabel>Available Power</FormLabel><FormControl><Input placeholder={demandToMatch?.powerMin ? `Required: ${demandToMatch.powerMin}-${demandToMatch.powerMax} kVA` : ""} {...field} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="genSetBackup" render={({ field }) => (<FormItem><FormLabel>Gen-set Backup</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Available">Available</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     </CardContent>
                 </Card>
@@ -460,7 +460,7 @@ export function PropertyForm() {
                     <CardHeader><CardTitle className="flex items-center gap-2"><Flame className="w-5 h-5 text-primary" /> Fire Safety</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                         <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem><FormLabel>Fire Hydrant</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem><FormLabel>Fire NOC</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem><FormLabel>Fire NOC</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={demandToMatch?.preferences?.fireNoc ? `Pref: ${demandToMatch.preferences.fireNoc}` : "Select status"} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     </CardContent>
                 </Card>
               </div>
@@ -478,7 +478,7 @@ export function PropertyForm() {
                         <FormControl>
                             <Input 
                                 type="number" 
-                                placeholder={demandToMatch?.docks !== undefined ? String(demandToMatch.docks) : "e.g. 8"} 
+                                placeholder={demandToMatch?.docks !== undefined ? `Required: ${demandToMatch.docks}` : "e.g. 8"} 
                                 {...field} value={field.value ?? ''}
                                 className="placeholder:text-muted-foreground/60"
                             />
@@ -529,7 +529,7 @@ export function PropertyForm() {
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><FileBadge className="w-5 h-5 text-primary" /> Statutory Approvals</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                    <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem><FormLabel>Approval Status</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem><FormLabel>Approval Status</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={demandToMatch?.preferences?.approvals ? `Pref: ${demandToMatch.preferences.approvals}` : "Select status"} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="approvalAuthority" render={({ field }) => (<FormItem><FormLabel>Approval Authority</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="DTCP">DTCP</SelectItem><SelectItem value="CMDA">CMDA</SelectItem><SelectItem value="BDA">BDA</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                 </CardContent>
               </Card>
