@@ -140,13 +140,16 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
             <CardContent className="space-y-4">
                 {demand.description && (
                     <div className="text-sm">
-                        <p className="font-semibold flex items-center gap-1.5"><FileText className="h-4 w-4" /> Customer Description</p>
+                        <p className="font-semibold flex items-center gap-1.5"><FileText className="h-4 w-4" /> Customer Demand Description</p>
                         <p className="text-muted-foreground mt-1 whitespace-pre-wrap text-xs bg-background/50 p-2 rounded-md">{demand.description}</p>
                     </div>
                 )}
                 {customerPriorities.length > 0 && (
-                    <div className="text-sm pt-2">
-                         <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Customer Priorities</p>
+                     <div className="text-sm pt-2">
+                        <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Customer Priorities</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            The following requirements are critical for the customer. Please pay close attention to them in the corresponding sections of the form.
+                        </p>
                          <ul className="list-disc pl-5 mt-2 space-y-1 text-muted-foreground">
                             {customerPriorities.map(p => (
                                 <li key={p.id}>
@@ -484,7 +487,7 @@ export function PropertyForm() {
                       <div className="flex items-center gap-2">
                           <PlusCircle className="h-4 w-4" />
                           Optionals & Preferences
-                          {optionalPrioritiesCount > 0 && <Badge variant="destructive" className="ml-2">{optionalPrioritiesCount} Priorities Inside</Badge>}
+                          {optionalPrioritiesCount > 0 && <Badge variant="destructive" className="ml-2">{optionalPrioritiesCount} {optionalPrioritiesCount === 1 ? "priority" : "priorities"} to fill</Badge>}
                       </div>
                       <ChevronsUpDown className="h-4 w-4" />
                       </Button>
@@ -577,7 +580,7 @@ export function PropertyForm() {
                               </div>
                               
                               {/* Crane */}
-                              <div className="space-y-4">
+                              <div className="space-y-4" id="crane-details-section">
                                   <CardTitle className="flex items-center gap-2 pt-4 border-t"><CraneIcon className="w-5 h-5 text-primary" /> Crane Details</CardTitle>
                                   {demandToMatch.optionals?.crane?.required && <CardDescription>This is a critical requirement for the customer.</CardDescription>}
                                   <div className="pl-6">
@@ -633,7 +636,7 @@ export function PropertyForm() {
                         <div className="flex items-center gap-2">
                             <Factory className="h-4 w-4" />
                             Operational Details
-                            {operationalPrioritiesCount > 0 && <Badge variant="destructive" className="ml-2">{operationalPrioritiesCount} Priorities Inside</Badge>}
+                            {operationalPrioritiesCount > 0 && <Badge variant="destructive" className="ml-2">{operationalPrioritiesCount} {operationalPrioritiesCount === 1 ? "priority" : "priorities"} to fill</Badge>}
                         </div>
                         <ChevronsUpDown className="h-4 w-4" />
                         </Button>
