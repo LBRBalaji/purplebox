@@ -90,7 +90,7 @@ const PreferenceBadge = ({ preference }: { preference: 'Must to have' | 'Good to
 };
 
 
-function DemandSummaryCard({ demand, onScrollToSection }: { demand: DemandSchema | undefined, onScrollToSection: (sectionId: string) => void }) {
+function DemandSummaryCard({ demand, onHighlightSection }: { demand: DemandSchema | undefined, onHighlightSection: (sectionId: string) => void }) {
 
     if (!demand) {
         return (
@@ -123,12 +123,12 @@ function DemandSummaryCard({ demand, onScrollToSection }: { demand: DemandSchema
                     <p className="font-semibold flex items-center gap-1.5 text-sm"><Pin className="h-4 w-4" /> Key Requirements</p>
                     <div className="flex flex-wrap gap-2">
                         {demand.optionals?.crane?.required && (
-                            <Button size="sm" variant="outline" className="bg-background" onClick={() => onScrollToSection('crane-details-section')}>
+                            <Button size="sm" variant="outline" className="bg-background" onClick={() => onHighlightSection('crane')}>
                                 <CraneIcon className="mr-2 h-4 w-4" /> Crane Details
                             </Button>
                         )}
                         {(demand.operations?.etpDetails || demand.operations?.effluentCharacteristics) && (
-                             <Button size="sm" variant="outline" className="bg-background" onClick={() => onScrollToSection('operations-details-section')}>
+                             <Button size="sm" variant="outline" className="bg-background" onClick={() => onHighlightSection('operations')}>
                                 <Factory className="mr-2 h-4 w-4" /> ETP / Operations
                             </Button>
                         )}
@@ -161,6 +161,7 @@ export function PropertyForm() {
   
   const [isOptionalsOpen, setIsOptionalsOpen] = React.useState(false);
   const [isOperationsOpen, setIsOperationsOpen] = React.useState(false);
+  const [highlightedSection, setHighlightedSection] = React.useState<string | null>(null);
 
   const demandIdFromUrl = searchParams.get('demandId');
   const isMatchingMode = !!demandIdFromUrl;
@@ -226,22 +227,18 @@ export function PropertyForm() {
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
   
-  const handleScrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-        // Expand the relevant collapsible before scrolling
-        if (sectionId.startsWith('crane') || sectionId.startsWith('optionals')) {
-            setIsOptionalsOpen(true);
-        }
-        if (sectionId.startsWith('operations')) {
-            setIsOperationsOpen(true);
-        }
-        
-        // Allow time for the collapsible to open
-        setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
+  const handleHighlightSection = (sectionId: string) => {
+    if (sectionId === 'crane') {
+        setIsOptionalsOpen(true);
     }
+    if (sectionId === 'operations') {
+        setIsOperationsOpen(true);
+    }
+
+    setHighlightedSection(sectionId);
+    setTimeout(() => {
+        setHighlightedSection(null);
+    }, 2500); // Highlight lasts for 2.5 seconds
   };
 
 
@@ -316,7 +313,7 @@ export function PropertyForm() {
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onAttemptSubmit)} className="space-y-6">
-          <DemandSummaryCard demand={demandToMatch} onScrollToSection={handleScrollToSection} />
+          <DemandSummaryCard demand={demandToMatch} onHighlightSection={handleHighlightSection} />
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -571,7 +568,7 @@ export function PropertyForm() {
                                 </div>
                                 
                                 {/* Crane */}
-                                <div className="space-y-2" id="crane-details-section">
+                                <div className={cn("space-y-2 rounded-lg p-3 transition-colors", highlightedSection === 'crane' && 'bg-primary/10')}>
                                     <FormField
                                         control={form.control}
                                         name="optionals.crane.required"
@@ -628,8 +625,8 @@ export function PropertyForm() {
                         <ChevronsUpDown className="h-4 w-4" />
                         </Button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down" id="operations-details-section">
-                        <Card>
+                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                        <Card className={cn("transition-colors", highlightedSection === 'operations' && 'bg-primary/10')}>
                           <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                                 <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
                                 <FormItem>
@@ -830,3 +827,5 @@ export function PropertyForm() {
     </>
   );
 }
+
+    
