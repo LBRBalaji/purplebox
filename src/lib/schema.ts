@@ -62,6 +62,7 @@ export const demandSchema = z.object({
       .positive("Ceiling height must be positive.")
       .optional()
   ),
+  ceilingHeightUnit: z.enum(['ft', 'm']).optional(),
   docks: z.preprocess(
     (val) => (val === "" || val === null ? undefined : val),
     z.coerce
