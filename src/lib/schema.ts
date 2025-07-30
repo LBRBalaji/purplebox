@@ -1,7 +1,7 @@
 
 import { z } from 'zod';
 
-export const propertySchema = z.object({
+export const propertySchemaBase = z.object({
   propertyId: z.string(),
   isLocationConfirmed: z.boolean().refine(val => val === true, {
     message: "You must confirm the location match."
@@ -10,11 +10,11 @@ export const propertySchema = z.object({
   // Property details mirroring demand questions
   size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be a positive number.'),
   readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
-  buildingType: z.enum(['PEB', 'RCC']),
-  floor: z.string().min(1, 'Floor is required.'),
-  ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height must be a number."}).positive('Ceiling height must be positive.'),
-  docks: z.coerce.number({invalid_type_error: "Docks must be a number."}).int().nonnegative('Docks cannot be negative.'),
-  availablePower: z.coerce.number({invalid_type_error: "Power must be a number."}).positive('Power must be positive.'),
+  buildingType: z.enum(['PEB', 'RCC']).optional(),
+  floor: z.string().optional(),
+  ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height must be a number."}).positive('Ceiling height must be positive.').optional(),
+  docks: z.coerce.number({invalid_type_error: "Docks must be a number."}).int().nonnegative('Docks cannot be negative.').optional(),
+  availablePower: z.coerce.number({invalid_type_error: "Power must be a number."}).positive('Power must be positive.').optional(),
   approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']),
   fireNoc: z.enum(['Obtained', 'Applied For', 'To Apply']),
   fireHydrant: z.enum(['Installed', 'Can be provided']),
@@ -72,7 +72,38 @@ export const propertySchema = z.object({
   }).optional(),
 });
 
-export type PropertySchema = z.infer<typeof propertySchema>;
+
+export const createPropertySchema = (demand: DemandSchema | undefined) => {
+    if (!demand) return propertySchemaBase; // Return base schema if no demand context
+
+    return propertySchemaBase.superRefine((data, ctx) => {
+        if (demand.buildingType && !data.buildingType) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Building type is required for this demand.", path: ["buildingType"] });
+        }
+        if (demand.floorPreference && !data.floor) {
+             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Floor preference is required for this demand.", path: ["floor"] });
+        }
+        if (demand.ceilingHeight && data.ceilingHeight === undefined) {
+             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Ceiling height is required for this demand.", path: ["ceilingHeight"] });
+        }
+        if (demand.docks !== undefined && data.docks === undefined) {
+             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Number of docks is required for this demand.", path: ["docks"] });
+        }
+        if ((demand.powerMin || demand.powerMax) && data.availablePower === undefined) {
+             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Available power is required for this demand.", path: ["availablePower"] });
+        }
+        // Add more conditional checks for optional/operational fields as needed
+        if (demand.optionals?.crane?.required && !data.optionals?.crane?.required) {
+             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Crane information is required for this demand.", path: ["optionals.crane.required"] });
+        }
+        if (demand.operations?.mpcbEcCategory && !data.operations?.mpcbEcCategory) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "MPCB/EC category compliance is required.", path: ["operations.mpcbEcCategory"] });
+        }
+    });
+};
+
+export type PropertySchema = z.infer<typeof propertySchemaBase>;
+
 
 export const demandSchema = z.object({
   demandId: z.string(),
@@ -197,6 +228,8 @@ export const warehouseSchema = warehouseFormSchema.transform(data => {
 
 
 export type WarehouseSchema = z.infer<typeof warehouseSchema>;
+
+    
 
     
 

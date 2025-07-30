@@ -2,7 +2,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast";
-import { propertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
+import { createPropertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
 import { getPropertyMatchScoreAction } from "@/lib/actions";
 import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
@@ -188,6 +188,13 @@ export function PropertyForm() {
   const demandIdFromUrl = searchParams.get('demandId');
   const isMatchingMode = !!demandIdFromUrl;
 
+  const demandToMatch = React.useMemo(() => 
+    demands.find(d => d.demandId === demandIdFromUrl),
+    [demands, demandIdFromUrl]
+  );
+  
+  const propertySchema = React.useMemo(() => createPropertySchema(demandToMatch), [demandToMatch]);
+
   const form = useForm<PropertySchema>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
@@ -197,7 +204,7 @@ export function PropertyForm() {
       floor: "Ground",
       readinessToOccupy: "Immediate",
       siteType: "Standalone",
-      buildingType: 'PEB',
+      buildingType: undefined,
       safety: "",
       ceilingHeight: undefined,
       rentPerSft: undefined,
@@ -224,11 +231,6 @@ export function PropertyForm() {
     },
   });
 
-  const demandToMatch = React.useMemo(() => 
-    demands.find(d => d.demandId === demandIdFromUrl),
-    [demands, demandIdFromUrl]
-  );
-  
   const priorityCounts = React.useMemo(() => {
     if (!demandToMatch) return { optionals: 0, operations: 0 };
     
@@ -332,13 +334,23 @@ export function PropertyForm() {
         setIsLoading(false);
     }
   }
-
-  const onInvalidSubmit = (errors: any) => {
+  
+  const onInvalidSubmit = (errors: FieldErrors<PropertySchema>) => {
     const errorFields = Object.keys(errors);
+    const fieldNameMapping: { [key: string]: string } = {
+        'size': 'Size',
+        'rentPerSft': 'Rent per Sq.Ft.',
+        'rentalSecurityDeposit': 'Security Deposit',
+        'isLocationConfirmed': 'Location Confirmation',
+        'optionals.crane.required': 'Crane Information'
+    };
+
+    const formattedErrorFields = errorFields.map(field => fieldNameMapping[field] || field).join(', ');
+
     toast({
         variant: 'destructive',
         title: 'Missing Required Fields',
-        description: 'Please fill out all required fields. We have navigated you to the first error.'
+        description: `Please fill out: ${formattedErrorFields}`
     });
 
     if(errorFields.some(field => field.startsWith('optionals') || field === 'optionals')) {
@@ -356,7 +368,11 @@ export function PropertyForm() {
         const element = document.querySelector(`[name="${firstErrorField}"]`);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            (element as HTMLElement).focus();
+            try {
+              (element as HTMLElement).focus();
+            } catch (e) {
+                // ignore errors on elements that can't be focused
+            }
         }
     }, 100); 
   }
@@ -371,69 +387,68 @@ export function PropertyForm() {
 
   const watchedValues = form.watch();
 
-  const calculateScore = React.useCallback((field: string, value: any) => {
+  const calculateScore = React.useCallback((field: string, value: any): number | null => {
     if (!demandToMatch || value === undefined || value === null || value === '') return null;
   
     let score = 0;
-    switch (field) {
-        case 'size': {
-            const propertySize = Number(value);
-            const demandSize = demandToMatch.size;
-            if (!propertySize || !demandSize) return null;
-            score = Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
-            break;
+    try {
+        switch (field) {
+            case 'size': {
+                const propertySize = Number(value);
+                const demandSize = demandToMatch.size;
+                if (!propertySize || !demandSize) return null;
+                score = Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
+                break;
+            }
+            case 'ceilingHeight': {
+                const propertyHeight = Number(value);
+                const demandHeight = demandToMatch.ceilingHeight;
+                if (!propertyHeight || !demandHeight) return null;
+                score = Math.min(propertyHeight, demandHeight) / Math.max(propertyHeight, demandHeight);
+                break;
+            }
+            case 'docks': {
+                const propertyDocks = Number(value);
+                const demandDocks = demandToMatch.docks;
+                if (propertyDocks === undefined || propertyDocks === null || !demandDocks) return null;
+                if (demandDocks === 0) return 1;
+                score = Math.min(propertyDocks, demandDocks) / Math.max(propertyDocks, demandDocks);
+                break;
+            }
+            case 'fireNoc':
+            case 'approvalStatus': {
+                if (value === 'Obtained') score = 1.0;
+                else if (value === 'Applied For') score = 0.6;
+                else if (value === 'To Apply') score = 0.3;
+                else score = 0.1;
+                break;
+            }
+            case 'operations.mpcbEcCategory':
+            case 'operations.etpDetails':
+            case 'operations.effluentCharacteristics':
+                if (!demandToMatch.operations || !Object.values(demandToMatch.operations).some(v => v)) return null;
+                if (value === 'Acceptable') score = 1.0;
+                else if (value === 'May Be') score = 0.5;
+                else score = 0.1;
+                break;
+            case 'optionals.crane.required':
+                const craneDemand = demandToMatch.optionals?.crane?.required;
+                if(!craneDemand) return null;
+                score = value ? 1.0 : 0.0;
+                break;
+            default:
+                return null;
         }
-        case 'ceilingHeight': {
-            const propertyHeight = Number(value);
-            const demandHeight = demandToMatch.ceilingHeight;
-            if (!propertyHeight || !demandHeight) return null;
-            score = Math.min(propertyHeight, demandHeight) / Math.max(propertyHeight, demandHeight);
-            break;
-        }
-        case 'docks': {
-            const propertyDocks = Number(value);
-            const demandDocks = demandToMatch.docks;
-            if (propertyDocks === undefined || propertyDocks === null || !demandDocks) return null;
-            score = Math.min(propertyDocks, demandDocks) / Math.max(propertyDocks, demandDocks);
-            break;
-        }
-        case 'fireNoc': {
-            if (value === 'Obtained') score = 1.0;
-            else if (value === 'Applied For') score = 0.6;
-            else if (value === 'To Apply') score = 0.3;
-            break;
-        }
-        case 'approvalStatus': {
-             if (value === 'Obtained') score = 1.0;
-            else if (value === 'Applied For') score = 0.6;
-            else if (value === 'To Apply') score = 0.3;
-            else score = 0.1;
-            break;
-        }
-        case 'operations.mpcbEcCategory':
-        case 'operations.etpDetails':
-        case 'operations.effluentCharacteristics':
-            if (!demandToMatch.operations || !Object.values(demandToMatch.operations).some(v => v)) return null;
-            if (value === 'Acceptable') score = 1.0;
-            else if (value === 'May Be') score = 0.5;
-            else score = 0.1;
-            break;
-        case 'optionals.crane.required':
-            const craneDemand = demandToMatch.optionals?.crane?.required;
-            if(!craneDemand) return null;
-            score = value ? 1.0 : 0.0;
-            break;
-        default:
-            return null;
+    } catch(e) {
+        return null;
     }
-    return score;
+    return isNaN(score) ? null : score;
   }, [demandToMatch]);
   
   const scoreCache = React.useMemo(() => {
     const scores: Record<string, number | null> = {};
     if (!demandToMatch) return scores;
     
-    // Flatten the watched values to handle nested objects
     const flattenObject = (obj: any, prefix = ''): Record<string, any> =>
         Object.keys(obj).reduce((acc, k) => {
             const pre = prefix.length ? prefix + '.' : '';
@@ -1012,3 +1027,5 @@ export function PropertyForm() {
     </>
   );
 }
+
+    
