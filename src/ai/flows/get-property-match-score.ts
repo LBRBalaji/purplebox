@@ -42,7 +42,7 @@ const prompt = ai.definePrompt({
   name: 'getPropertyMatchScorePrompt',
   input: {schema: GetPropertyMatchScoreInputSchema},
   output: {schema: GetPropertyMatchScoreOutputSchema},
-  model: googleAI.model('gemini-1.5-flash-latest'),
+  model: googleAI.model('gemini-1.5-pro-latest'),
   prompt: `You are an expert Commercial Real Estate Analyst. Your task is to calculate a detailed match score between a property demand and a submitted property.
 
 You must provide an overall score, a breakdown for multiple categories, and a detailed justification. The scores must be between 0.0 and 1.0.
