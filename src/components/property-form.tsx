@@ -345,7 +345,11 @@ export function PropertyForm() {
         'optionals.crane.required': 'Crane Information'
     };
 
-    const formattedErrorFields = errorFields.map(field => fieldNameMapping[field] || field).join(', ');
+    const formattedErrorFields = errorFields.map(field => {
+        const path = field as keyof typeof fieldNameMapping;
+        return fieldNameMapping[path] || field;
+    }).join(', ');
+    
 
     toast({
         variant: 'destructive',
@@ -369,7 +373,7 @@ export function PropertyForm() {
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             try {
-              (element as HTMLElement).focus();
+              (element as HTMLElement).focus({ preventScroll: true });
             } catch (e) {
                 // ignore errors on elements that can't be focused
             }
@@ -387,67 +391,66 @@ export function PropertyForm() {
 
   const watchedValues = form.watch();
 
-  const calculateScore = React.useCallback((field: string, value: any): number | null => {
-    if (!demandToMatch || value === undefined || value === null || value === '') return null;
-  
-    let score = 0;
-    try {
-        switch (field) {
-            case 'size': {
-                const propertySize = Number(value);
-                const demandSize = demandToMatch.size;
-                if (!propertySize || !demandSize) return null;
-                score = Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
-                break;
-            }
-            case 'ceilingHeight': {
-                const propertyHeight = Number(value);
-                const demandHeight = demandToMatch.ceilingHeight;
-                if (!propertyHeight || !demandHeight) return null;
-                score = Math.min(propertyHeight, demandHeight) / Math.max(propertyHeight, demandHeight);
-                break;
-            }
-            case 'docks': {
-                const propertyDocks = Number(value);
-                const demandDocks = demandToMatch.docks;
-                if (propertyDocks === undefined || propertyDocks === null || !demandDocks) return null;
-                if (demandDocks === 0) return 1;
-                score = Math.min(propertyDocks, demandDocks) / Math.max(propertyDocks, demandDocks);
-                break;
-            }
-            case 'fireNoc':
-            case 'approvalStatus': {
-                if (value === 'Obtained') score = 1.0;
-                else if (value === 'Applied For') score = 0.6;
-                else if (value === 'To Apply') score = 0.3;
-                else score = 0.1;
-                break;
-            }
-            case 'operations.mpcbEcCategory':
-            case 'operations.etpDetails':
-            case 'operations.effluentCharacteristics':
-                if (!demandToMatch.operations || !Object.values(demandToMatch.operations).some(v => v)) return null;
-                if (value === 'Acceptable') score = 1.0;
-                else if (value === 'May Be') score = 0.5;
-                else score = 0.1;
-                break;
-            case 'optionals.crane.required':
-                const craneDemand = demandToMatch.optionals?.crane?.required;
-                if(!craneDemand) return null;
-                score = value ? 1.0 : 0.0;
-                break;
-            default:
-                return null;
-        }
-    } catch(e) {
-        return null;
-    }
-    return isNaN(score) ? null : score;
-  }, [demandToMatch]);
-  
   const scoreCache = React.useMemo(() => {
     const scores: Record<string, number | null> = {};
     if (!demandToMatch) return scores;
+
+    const calculateScore = (field: string, value: any): number | null => {
+      if (value === undefined || value === null || value === '') return null;
+      let score = 0;
+      try {
+          switch (field) {
+              case 'size': {
+                  const propertySize = Number(value);
+                  const demandSize = demandToMatch.size;
+                  if (!propertySize || !demandSize) return null;
+                  score = Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
+                  break;
+              }
+              case 'ceilingHeight': {
+                  const propertyHeight = Number(value);
+                  const demandHeight = demandToMatch.ceilingHeight;
+                  if (!propertyHeight || !demandHeight) return null;
+                  score = Math.min(propertyHeight, demandHeight) / Math.max(propertyHeight, demandHeight);
+                  break;
+              }
+              case 'docks': {
+                  const propertyDocks = Number(value);
+                  const demandDocks = demandToMatch.docks;
+                  if (propertyDocks === undefined || propertyDocks === null || !demandDocks) return null;
+                  if (demandDocks === 0) return 1;
+                  score = Math.min(propertyDocks, demandDocks) / Math.max(propertyDocks, demandDocks);
+                  break;
+              }
+              case 'fireNoc':
+              case 'approvalStatus': {
+                  if (value === 'Obtained') score = 1.0;
+                  else if (value === 'Applied For') score = 0.6;
+                  else if (value === 'To Apply') score = 0.3;
+                  else score = 0.1;
+                  break;
+              }
+              case 'operations.mpcbEcCategory':
+              case 'operations.etpDetails':
+              case 'operations.effluentCharacteristics':
+                  if (!demandToMatch.operations || !Object.values(demandToMatch.operations).some(v => v)) return null;
+                  if (value === 'Acceptable') score = 1.0;
+                  else if (value === 'May Be') score = 0.5;
+                  else score = 0.1;
+                  break;
+              case 'optionals.crane.required':
+                  const craneDemand = demandToMatch.optionals?.crane?.required;
+                  if(!craneDemand) return null;
+                  score = value ? 1.0 : 0.0;
+                  break;
+              default:
+                  return null;
+          }
+      } catch(e) {
+          return null;
+      }
+      return isNaN(score) ? null : score;
+    }
     
     const flattenObject = (obj: any, prefix = ''): Record<string, any> =>
         Object.keys(obj).reduce((acc, k) => {
@@ -468,7 +471,7 @@ export function PropertyForm() {
         scores[key] = calculateScore(key, flatWatchedValues[key]);
     }
     return scores;
-  }, [watchedValues, calculateScore, demandToMatch]);
+  }, [watchedValues, demandToMatch]);
 
 
   if (!isMatchingMode || !demandToMatch) {
@@ -525,23 +528,26 @@ export function PropertyForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField control={form.control} name="size" render={({ field }) => (
                         <FormItem className="relative">
-                        <FormLabel>Size (Sq. Ft.)</FormLabel>
-                        <FormControl>
-                            <Input 
-                                type="number" 
-                                placeholder={`Req: ${demandToMatch.sizeMin || demandToMatch.size} - ${demandToMatch.sizeMax || demandToMatch.size} sq.ft.`}
-                                {...field} value={field.value ?? ''} 
-                            />
-                        </FormControl>
-                        <ScoreBadge score={scoreCache.size ?? null} />
-                        <FormMessage />
+                            <FormLabel>Size (Sq. Ft.)</FormLabel>
+                             <FormDescription>
+                                Req: {demandToMatch.sizeMin || demandToMatch.size} - {demandToMatch.sizeMax || demandToMatch.size} sq.ft.
+                             </FormDescription>
+                            <FormControl>
+                                <Input 
+                                    type="number" 
+                                    {...field} value={field.value ?? ''} 
+                                />
+                            </FormControl>
+                            <ScoreBadge score={scoreCache.size ?? null} />
+                            <FormMessage />
                         </FormItem>
                     )} />
                     <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Readiness</FormLabel>
+                        <FormDescription>Req: {demandToMatch.readiness}</FormDescription>
                         <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.readiness}`} /></SelectTrigger></FormControl>
+                            <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                             <SelectContent>
                                 <SelectItem value="Immediate">Immediate</SelectItem>
                                 <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
@@ -556,8 +562,9 @@ export function PropertyForm() {
                     <FormField control={form.control} name="buildingType" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Building Type</FormLabel>
+                        <FormDescription>Req: {demandToMatch.buildingType || "N/A"}</FormDescription>
                         <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.buildingType}>
-                            <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.buildingType}`} /></SelectTrigger></FormControl>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select building type"/></SelectTrigger></FormControl>
                             <SelectContent>
                             <SelectItem value="PEB">PEB</SelectItem>
                             <SelectItem value="RCC">RCC</SelectItem>
@@ -570,8 +577,9 @@ export function PropertyForm() {
                         <FormField control={form.control} name="floor" render={({ field }) => (
                             <FormItem>
                             <FormLabel>Floor Preference</FormLabel>
+                            <FormDescription>Req: {demandToMatch.floorPreference ?? 'N/A'}</FormDescription>
                             <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.floorPreference}>
-                                <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.floorPreference ?? 'N/A'}`} /></SelectTrigger></FormControl>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select floor preference" /></SelectTrigger></FormControl>
                                 <SelectContent>
                                 <SelectItem value="Ground">Ground</SelectItem>
                                 <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
@@ -586,10 +594,10 @@ export function PropertyForm() {
                     <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
                         <FormItem className="relative">
                         <FormLabel>Ceiling Height ({demandToMatch.ceilingHeightUnit || 'ft'})</FormLabel>
+                        <FormDescription>Req: {demandToMatch.ceilingHeight ? `${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit || 'ft'}` : "N/A"}</FormDescription>
                         <FormControl>
                             <Input 
                                 type="number" 
-                                placeholder={demandToMatch.ceilingHeight ? `Req: ${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit || 'ft'}` : "Req: N/A"} 
                                 {...field} value={field.value ?? ''}
                                 disabled={!demandToMatch.ceilingHeight}
                             />
@@ -602,10 +610,10 @@ export function PropertyForm() {
                     <FormField control={form.control} name="docks" render={({ field }) => (
                         <FormItem className="relative">
                             <FormLabel>Number of Docks</FormLabel>
+                            <FormDescription>Req: {demandToMatch.docks !== undefined ? `${demandToMatch.docks}` : "N/A"}</FormDescription>
                         <FormControl>
                             <Input 
                                 type="number" 
-                                placeholder={demandToMatch.docks !== undefined ? `Req: ${demandToMatch.docks}` : "Req: N/A"} 
                                 {...field} value={field.value ?? ''}
                                 disabled={demandToMatch.docks === undefined}
                             />
@@ -617,14 +625,12 @@ export function PropertyForm() {
                     <FormField control={form.control} name="availablePower" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Available Power (kVA)</FormLabel>
+                             <FormDescription>
+                                Req: {(demandToMatch.powerMin !== undefined || demandToMatch.powerMax !== undefined) ? `${demandToMatch.powerMin ?? '...'} - ${demandToMatch.powerMax ?? '...'} kVA` : 'N/A'}
+                             </FormDescription>
                             <FormControl>
                             <Input
                                 type="number"
-                                placeholder={
-                                (demandToMatch.powerMin !== undefined || demandToMatch.powerMax !== undefined)
-                                    ? `Req: ${demandToMatch.powerMin ?? '...'} - ${demandToMatch.powerMax ?? '...'} kVA`
-                                    : 'Req: N/A'
-                                }
                                 {...field}
                                 value={field.value ?? ''}
                                 disabled={demandToMatch.powerMin === undefined && demandToMatch.powerMax === undefined}
@@ -740,28 +746,31 @@ export function PropertyForm() {
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
                                       <div className="space-y-2">
                                           <FormLabel className="text-sm">Office Space</FormLabel>
+                                           <FormDescription>Req: {demandToMatch.optionals?.officeSpaceMin ?? '...'} - {demandToMatch.optionals?.officeSpaceMax ?? '...'} sq.ft.</FormDescription>
                                           <div className="grid grid-cols-2 gap-4">
-                                              <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMin ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.officeSpaceMin} /></FormControl><FormMessage /></FormItem>)} />
-                                              <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.officeSpaceMax ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.officeSpaceMax} /></FormControl><FormMessage /></FormItem>)} />
+                                              <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.officeSpaceMin} /></FormControl><FormMessage /></FormItem>)} />
+                                              <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.officeSpaceMax} /></FormControl><FormMessage /></FormItem>)} />
                                           </div>
                                       </div>
                                       <div className="grid grid-cols-2 gap-x-4 items-end">
                                           <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
                                               <FormItem className="space-y-2">
                                                   <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
+                                                  <FormDescription>Req: {demandToMatch.optionals?.cafeteriaOrCanteen ?? 'N/A'}</FormDescription>
                                                 <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.optionals?.cafeteriaOrCanteen}>
-                                                  <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.optionals?.cafeteriaOrCanteen ?? 'N/A'}`}/></SelectTrigger></FormControl>
+                                                  <FormControl><SelectTrigger><SelectValue placeholder="Select type"/></SelectTrigger></FormControl>
                                                   <SelectContent><SelectItem value="Cafeteria">Cafeteria</SelectItem><SelectItem value="Canteen">Canteen</SelectItem></SelectContent>
                                                 </Select>
                                               </FormItem>
                                           )}/>
-                                          <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.seatingCapacity ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.seatingCapacity} /></FormControl><FormMessage /></FormItem>)} />
+                                          <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating Capacity</FormLabel><FormDescription>Req: {demandToMatch.optionals?.seatingCapacity ?? 'N/A'}</FormDescription><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.seatingCapacity} /></FormControl><FormMessage /></FormItem>)} />
                                       </div>
                                       <div className="space-y-2">
                                           <FormLabel className="text-sm">Additional Toilets</FormLabel>
+                                          <FormDescription>Req: Men ({demandToMatch.optionals?.additionalToiletsMen ?? 'N/A'}), Women ({demandToMatch.optionals?.additionalToiletsWomen ?? 'N/A'})</FormDescription>
                                           <div className="grid grid-cols-2 gap-4">
-                                              <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Men (count)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.additionalToiletsMen ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.additionalToiletsMen} /></FormControl><FormMessage /></FormItem>)} />
-                                              <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Women (count)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.additionalToiletsWomen ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.additionalToiletsWomen} /></FormControl><FormMessage /></FormItem>)} />
+                                              <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Men (count)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.additionalToiletsMen} /></FormControl><FormMessage /></FormItem>)} />
+                                              <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Women (count)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.additionalToiletsWomen} /></FormControl><FormMessage /></FormItem>)} />
                                           </div>
                                       </div>
                                   </div>
@@ -773,16 +782,18 @@ export function PropertyForm() {
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
                                       <div className="space-y-2">
                                           <FormLabel className="text-sm">Truck Parking Yard</FormLabel>
+                                          <FormDescription>Req: {demandToMatch.optionals?.truckParkingYardMin ?? '...'} - {demandToMatch.optionals?.truckParkingYardMax ?? '...'} sq.ft.</FormDescription>
                                           <div className="grid grid-cols-2 gap-4">
-                                              <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.truckParkingYardMin} /></FormControl><FormMessage /></FormItem>)} />
-                                              <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.truckParkingYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.truckParkingYardMax} /></FormControl><FormMessage /></FormItem>)} />
+                                              <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.truckParkingYardMin} /></FormControl><FormMessage /></FormItem>)} />
+                                              <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.truckParkingYardMax} /></FormControl><FormMessage /></FormItem>)} />
                                           </div>
                                       </div>
                                       <div className="space-y-2">
                                           <FormLabel className="text-sm">Open Storage Yard</FormLabel>
+                                           <FormDescription>Req: {demandToMatch.optionals?.openStorageYardMin ?? '...'} - {demandToMatch.optionals?.openStorageYardMax ?? '...'} sq.ft.</FormDescription>
                                           <div className="grid grid-cols-2 gap-4">
-                                              <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMin ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.openStorageYardMin} /></FormControl><FormMessage /></FormItem>)} />
-                                              <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.openStorageYardMax ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.openStorageYardMax} /></FormControl><FormMessage /></FormItem>)} />
+                                              <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.openStorageYardMin} /></FormControl><FormMessage /></FormItem>)} />
+                                              <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.openStorageYardMax} /></FormControl><FormMessage /></FormItem>)} />
                                           </div>
                                       </div>
                                   </div>
@@ -792,10 +803,10 @@ export function PropertyForm() {
                               <div className="space-y-4">
                                   <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities &amp; Infrastructure</FormLabel>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
-                                      <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.processWaterRequirement ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.processWaterRequirement} /></FormControl><FormMessage /></FormItem>)} />
-                                      <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.hvacArea ?? 'N/A'}`} {...field} disabled={!demandToMatch.optionals?.hvacArea} /></FormControl><FormMessage /></FormItem>)} />
-                                      <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.sprinklerRequirement ?? 'N/A'}`} {...field} disabled={!demandToMatch.optionals?.sprinklerRequirement} /></FormControl><FormMessage /></FormItem>)} />
-                                      <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.lightingRequirement ?? 'N/A'}`} {...field} disabled={!demandToMatch.optionals?.lightingRequirement} /></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormDescription>Req: {demandToMatch.optionals?.processWaterRequirement ?? 'N/A'}</FormDescription><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.processWaterRequirement} /></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormDescription>Req: {demandToMatch.optionals?.hvacArea ?? 'N/A'}</FormDescription><FormControl><Input {...field} disabled={!demandToMatch.optionals?.hvacArea} /></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormDescription>Req: {demandToMatch.optionals?.sprinklerRequirement ?? 'N/A'}</FormDescription><FormControl><Input {...field} disabled={!demandToMatch.optionals?.sprinklerRequirement} /></FormControl><FormMessage /></FormItem>)} />
+                                      <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormDescription>Req: {demandToMatch.optionals?.lightingRequirement ?? 'N/A'}</FormDescription><FormControl><Input {...field} disabled={!demandToMatch.optionals?.lightingRequirement} /></FormControl><FormMessage /></FormItem>)} />
                                   </div>
                               </div>
 
@@ -805,9 +816,7 @@ export function PropertyForm() {
                                   <div className="pl-6">
                                       <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
                                       <FormItem>
-                                          {demandToMatch.optionals?.tenantSpecificImprovements && (
-                                              <FormDescription>Customer Requirement: {demandToMatch.optionals.tenantSpecificImprovements}</FormDescription>
-                                          )}
+                                          <FormDescription>Customer Requirement: {demandToMatch.optionals?.tenantSpecificImprovements || "N/A"}</FormDescription>
                                           <FormControl>
                                               <Textarea placeholder="Describe any specific modifications or improvements required..." className="min-h-[100px]" {...field} disabled={!demandToMatch.optionals?.tenantSpecificImprovements} />
                                           </FormControl>
@@ -1042,5 +1051,3 @@ export function PropertyForm() {
     </>
   );
 }
-
-    
