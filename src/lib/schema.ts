@@ -66,9 +66,9 @@ export const propertySchema = z.object({
   }).optional(),
   
   operations: z.object({
-      mpcbEcCategory: z.enum(['Green', 'Orange', 'Red']).optional(),
-      etpDetails: z.string().optional(),
-      effluentCharacteristics: z.string().optional(),
+      mpcbEcCategory: z.enum(['Acceptable', 'May Be', 'No']).optional(),
+      etpDetails: z.enum(['Acceptable', 'May Be', 'No']).optional(),
+      effluentCharacteristics: z.enum(['Acceptable', 'May Be', 'No']).optional(),
   }).optional(),
 });
 

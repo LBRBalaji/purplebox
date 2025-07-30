@@ -97,7 +97,7 @@ type PriorityInfo = {
     section: 'Essentials' | 'Optionals' | 'Operations';
 }
 
-function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
+function DemandSummaryCard({ demand, priorityCounts }: { demand: DemandSchema | undefined, priorityCounts: { optionals: number, operations: number } }) {
 
     if (!demand) {
         return (
@@ -114,14 +114,22 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
         const nonCompromisable = demand.preferences?.nonCompromisable || [];
 
         nonCompromisable.forEach(item => {
-            const section = ['crane'].includes(item) ? 'Optionals' 
-                          : ['operations'].includes(item) ? 'Operations' 
-                          : 'Essentials';
+            const isOptional = ['crane'].includes(item);
+            const isOperation = ['operations'].includes(item);
+
+            let section: PriorityInfo['section'] = 'Essentials';
+            if (isOptional) section = 'Optionals';
+            else if (isOperation) section = 'Operations';
+            
             priorities.push({ id: item, label: priorityLabels[item] || item, section });
         });
         
         if (demand.operationType === 'Manufacturing' && !priorities.some(p => p.id === 'operations')) {
              priorities.push({ id: 'operations', label: 'Operations Details', section: 'Operations' });
+        }
+        
+        if (demand.optionals?.crane?.required && !priorities.some(p => p.id === 'crane')) {
+            priorities.push({ id: 'crane', label: 'Crane Details', section: 'Optionals' });
         }
 
         return priorities;
@@ -147,12 +155,12 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
                      <div className="text-sm pt-2">
                         <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Customer Priorities</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                            The following requirements are critical for the customer. Please pay close attention to them in the corresponding sections of the form. Note: The most important sections are moved to the top of the form for you.
+                          The following requirements are critical for the customer. Please pay close attention to them in the corresponding sections of the form. The number of priorities for each section is indicated in the section header.
                         </p>
                          <ul className="list-disc pl-5 mt-2 space-y-1 text-muted-foreground">
                             {customerPriorities.map(p => (
                                 <li key={p.id}>
-                                    <span className="font-medium text-foreground">{p.label}</span>
+                                    <span className="font-medium text-foreground">{p.label}</span> ({p.section})
                                 </li>
                             ))}
                          </ul>
@@ -215,7 +223,8 @@ export function PropertyForm() {
       additionalInformation: "",
       optionals: {
         crane: { required: false }
-      }
+      },
+      operations: {}
     },
   });
 
@@ -226,12 +235,23 @@ export function PropertyForm() {
   
   const buildingType = form.watch('buildingType');
 
-  const { isCranePrioritized, isOperationsPrioritized } = React.useMemo(() => {
-    if (!demandToMatch) return { isCranePrioritized: false, isOperationsPrioritized: false };
-    return {
-        isCranePrioritized: !!demandToMatch.optionals?.crane?.required,
-        isOperationsPrioritized: demandToMatch.operationType === 'Manufacturing'
-    };
+  const priorityCounts = React.useMemo(() => {
+    if (!demandToMatch) return { optionals: 0, operations: 0 };
+    let optionalCount = 0;
+    let operationCount = 0;
+
+    if (demandToMatch.optionals?.crane?.required) {
+        optionalCount++;
+    }
+    // Add other optional priorities here if they exist
+
+    if (demandToMatch.operationType === 'Manufacturing') {
+        if (demandToMatch.operations?.mpcbEcCategory) operationCount++;
+        if (demandToMatch.operations?.etpDetails) operationCount++;
+        if (demandToMatch.operations?.effluentCharacteristics) operationCount++;
+    }
+
+    return { optionals: optionalCount, operations: operationCount };
   }, [demandToMatch]);
   
   React.useEffect(() => {
@@ -298,108 +318,14 @@ export function PropertyForm() {
     setSubmissionData(data);
     setIsConfirmOpen(true);
   }
-
-  const craneSection = (
-    <div id="crane-details-section">
-      <CardTitle className="flex items-center gap-2 pt-4 border-t"><CraneIcon className="w-5 h-5 text-primary" /> Crane Details</CardTitle>
-      {demandToMatch?.optionals?.crane?.required && <CardDescription>This is a critical requirement for the customer.</CardDescription>}
-      <div className="pl-6 pt-4">
-          <FormField
-              control={form.control}
-              name="optionals.crane.required"
-              render={({ field }) => (
-                  <FormItem className="flex flex-row items-center gap-2">
-                  <FormControl>
-                      <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          id="crane-required"
-                      />
-                  </FormControl>
-                  <FormLabel htmlFor="crane-required" className="text-base !m-0">Crane Provided?</FormLabel>
-                  </FormItem>
-              )}
-          />
-          <Collapsible open={form.watch('optionals.crane.required')}>
-              <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pt-4">
-                  {demandToMatch?.optionals?.crane?.required && (
-                      <div className="mb-4 p-3 rounded-md bg-secondary text-secondary-foreground/90">
-                          <FormLabel className="text-sm font-semibold">Customer Requirement</FormLabel>
-                          <FormDescription>
-                              A {demandToMatch.optionals.crane.capacity} Ton {demandToMatch.optionals.crane.type} crane is required.
-                          </FormDescription>
-                      </div>
-                  )}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
-                      <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
-                          <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch?.optionals?.crane?.type ?? 'N/A'}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-                      )}/>
-                      <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.count ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.transverseLength ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.span ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.underhookHeight ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.capacity ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                  </div>
-              </CollapsibleContent>
-          </Collapsible>
-      </div>
+  
+  const ComplianceToggle = ({ field, form }: { form: any, field: any }) => (
+    <div className="grid grid-cols-3 gap-1 rounded-full p-1 bg-muted w-fit">
+        <Button type="button" variant={field.value === 'Acceptable' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'Acceptable')} className="rounded-full">Acceptable</Button>
+        <Button type="button" variant={field.value === 'May Be' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'May Be')} className="rounded-full">May Be</Button>
+        <Button type="button" variant={field.value === 'No' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'No')} className="rounded-full">No</Button>
     </div>
   );
-
-  const operationsSection = (
-      <div id="operations-details-section">
-          <CardHeader>
-              <CardTitle>Operational Details</CardTitle>
-              <CardDescription>This is a critical requirement for the customer's manufacturing process.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
-              <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
-              <FormItem>
-                  <FormLabel>Unit Categorization (MPCB/EC)</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch?.operations?.mpcbEcCategory}>
-                  <FormControl>
-                      <SelectTrigger>
-                      <SelectValue placeholder={`Req: ${demandToMatch?.operations?.mpcbEcCategory ?? 'N/A'}`} />
-                      </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                      <SelectItem value="Green">Green</SelectItem>
-                      <SelectItem value="Orange">Orange</SelectItem>
-                      <SelectItem value="Red">Red</SelectItem>
-                  </SelectContent>
-                  </Select>
-                  <FormMessage />
-              </FormItem>
-              )}/>
-              <div></div>
-              <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
-              <FormItem>
-                  <FormLabel>Effluent Treatment Plant Details</FormLabel>
-                  {demandToMatch?.operations?.etpDetails && (
-                      <FormDescription>Customer Requirement: {demandToMatch.operations.etpDetails}</FormDescription>
-                  )}
-                  <FormControl>
-                  <Textarea placeholder="Capacity, technology, etc." {...field} disabled={!demandToMatch?.operations?.etpDetails} />
-                  </FormControl>
-                  <FormMessage />
-              </FormItem>
-              )}/>
-              <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
-              <FormItem>
-                  <FormLabel>Effluent Characteristics</FormLabel>
-                  {demandToMatch?.operations?.effluentCharacteristics && (
-                      <FormDescription>Customer Requirement: {demandToMatch.operations.effluentCharacteristics}</FormDescription>
-                  )}
-                  <FormControl>
-                  <Textarea placeholder="pH, temperature, chemical composition, etc." {...field} disabled={!demandToMatch?.operations?.effluentCharacteristics}/>
-                  </FormControl>
-                  <FormMessage />
-              </FormItem>
-              )}/>
-          </CardContent>
-      </div>
-  );
-
 
   if (!isMatchingMode || !demandToMatch) {
     return (
@@ -418,7 +344,7 @@ export function PropertyForm() {
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onAttemptSubmit)} className="space-y-6">
-          <DemandSummaryCard demand={demandToMatch} />
+          <DemandSummaryCard demand={demandToMatch} priorityCounts={priorityCounts} />
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -572,15 +498,13 @@ export function PropertyForm() {
                 </CardContent>
               </Card>
               
-              {isCranePrioritized && <Card>{craneSection}</Card>}
-              {isOperationsPrioritized && <Card>{operationsSection}</Card>}
-
               <Collapsible open={isOptionalsOpen} onOpenChange={setIsOptionalsOpen}>
                   <CollapsibleTrigger asChild>
                       <Button type="button" variant="outline" className="w-full justify-between">
                       <div className="flex items-center gap-2">
                           <PlusCircle className="h-4 w-4" />
                           Optionals & Preferences
+                           {priorityCounts.optionals > 0 && <Badge>{priorityCounts.optionals} priorities</Badge>}
                       </div>
                       <ChevronsUpDown className="h-4 w-4" />
                       </Button>
@@ -588,6 +512,50 @@ export function PropertyForm() {
                   <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                       <Card>
                           <CardContent className="pt-6 space-y-8">
+                              <div id="crane-details-section">
+                                <CardTitle className="flex items-center gap-2 pt-4 border-t"><CraneIcon className="w-5 h-5 text-primary" /> Crane Details</CardTitle>
+                                {demandToMatch?.optionals?.crane?.required && <CardDescription>This is a critical requirement for the customer.</CardDescription>}
+                                <div className="pl-6 pt-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="optionals.crane.required"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center gap-2">
+                                            <FormControl>
+                                                <Switch
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                    id="crane-required"
+                                                />
+                                            </FormControl>
+                                            <FormLabel htmlFor="crane-required" className="text-base !m-0">Crane Provided?</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Collapsible open={form.watch('optionals.crane.required')}>
+                                        <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pt-4">
+                                            {demandToMatch?.optionals?.crane?.required && (
+                                                <div className="mb-4 p-3 rounded-md bg-secondary text-secondary-foreground/90">
+                                                    <FormLabel className="text-sm font-semibold">Customer Requirement</FormLabel>
+                                                    <FormDescription>
+                                                        A {demandToMatch.optionals.crane.capacity} Ton {demandToMatch.optionals.crane.type} crane is required.
+                                                    </FormDescription>
+                                                </div>
+                                            )}
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
+                                                <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
+                                                    <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch?.optionals?.crane?.type ?? 'N/A'}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                                                )}/>
+                                                <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.count ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.transverseLength ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.span ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.underhookHeight ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch?.optionals?.crane?.capacity ?? 'N/A'}`} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
+                                        </CollapsibleContent>
+                                    </Collapsible>
+                                </div>
+                              </div>
                               {/* Office & Amenities */}
                               <div className="space-y-4">
                                   <FormLabel className="flex items-center gap-2 text-base"><Building className="w-4 h-4"/> Office & Amenities</FormLabel>
@@ -670,32 +638,55 @@ export function PropertyForm() {
                                   )} />
                                   </div>
                               </div>
-                              
-                              {/* Crane */}
-                              {!isCranePrioritized && (
-                                  <div className="space-y-4">
-                                      {craneSection}
-                                  </div>
-                              )}
                           </CardContent>
                       </Card>
                   </CollapsibleContent>
               </Collapsible>
               
-              {!isOperationsPrioritized && demandToMatch.operationType === 'Manufacturing' && (
+              {demandToMatch.operationType === 'Manufacturing' && (
                 <Collapsible open={isOperationsOpen} onOpenChange={setIsOperationsOpen}>
                     <CollapsibleTrigger asChild>
                         <Button type="button" variant="outline" className="w-full justify-between">
                         <div className="flex items-center gap-2">
                             <Factory className="h-4 w-4" />
                             Operational Details
+                             {priorityCounts.operations > 0 && <Badge>{priorityCounts.operations} priorities</Badge>}
                         </div>
                         <ChevronsUpDown className="h-4 w-4" />
                         </Button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                         <Card>
-                           {operationsSection}
+                            <CardHeader>
+                                <CardTitle>Operational Details</CardTitle>
+                                <CardDescription>Confirm if your property can meet these manufacturing-specific requirements.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                 <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
+                                  <FormItem>
+                                      <FormLabel>Unit Categorization (MPCB/EC)</FormLabel>
+                                      <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}</span></FormDescription>
+                                      <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
+                                      <FormMessage />
+                                  </FormItem>
+                                  )}/>
+                                 <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
+                                  <FormItem>
+                                      <FormLabel>Effluent Treatment Plant (ETP)</FormLabel>
+                                      <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.etpDetails ?? 'N/A'}</span></FormDescription>
+                                      <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
+                                      <FormMessage />
+                                  </FormItem>
+                                  )}/>
+                                 <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
+                                  <FormItem>
+                                      <FormLabel>Effluent Characteristics</FormLabel>
+                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.effluentCharacteristics ?? 'N/A'}</span></FormDescription>
+                                      <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
+                                      <FormMessage />
+                                  </FormItem>
+                                  )}/>
+                            </CardContent>
                         </Card>
                     </CollapsibleContent>
                 </Collapsible>
