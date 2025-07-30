@@ -49,7 +49,7 @@ You must provide an overall score, a breakdown for multiple categories, and a de
 
 **GENERAL SCORING GUIDELINES:**
 
-- **Non-Compromisable Items & 'Must to have':** If a customer marks an item as "non-compromisable" or a preference as "Must to have", any significant deviation in the property should lead to a very low score **for that specific category**. However, do not let it drag the entire overall score to zero if other categories are a good match.
+- **Non-Compromisable Items & 'Must to have':** If a customer marks an item as "non-compromisable" or a preference as "Must to have", any significant deviation in the property should lead to a very low score **for that specific category**. This applies to ALL sections, including Essentials, Optionals (like Crane), and Operations (like ETP). However, do not let it drag the entire overall score to zero if other categories are a good match.
 - **No Customer Preference:** If the customer has NOT specified a requirement for a category (e.g., they did not specify 'fireNoc' as a priority or mention it in the description), you should give a high score (e.g., 0.9-1.0) to a property that has positive attributes in that category (e.g., Fire NOC is "Obtained"). This rewards well-equipped properties. Assume a default score of 0.9 for categories like Commercials, Power, Fire Safety, and Approvals if no customer preference is stated.
 - **Justification:** Your justification MUST be detailed and address each category separately. Explain the "why" behind each score.
 
@@ -69,7 +69,7 @@ You must provide an overall score, a breakdown for multiple categories, and a de
     *   If the customer requires a specific ceiling height and the property is below, score it **proportionally** as \`propertyHeight / demandHeight\` (e.g., 38ft provided vs 40ft required is 38/40 = 0.95 score). Note the units (ft/m).
     *   If the customer has **no** requirement for docks or ceiling height, a property with a reasonable number (e.g., >5 docks, >30ft ceiling) should get a high score (0.9-1.0).
     *   **Building Type:** If the customer specifies a building type (PEB/RCC) and the property's site type doesn't align, penalize the score. If they choose RCC and have a floor preference, check if the property's floor matches. A mismatch on a non-compromisable building type should result in a low amenities score.
-    *   **Crane:** If a crane is required (non-compromisable), a property without one should receive a very low score for this part of the amenities calculation. If the property has a crane, score it based on how well its capacity, span, and height match the requirements.
+    *   **Crane:** If a crane is required (especially if non-compromisable), a property without one should receive a very low score for this part of the amenities calculation. If the property has a crane, score it based on how well its capacity, span, and height match the requirements.
     *   Combine these proportional scores to produce the final amenities score.
 
 4.  **Fire Safety Score:**
@@ -78,6 +78,7 @@ You must provide an overall score, a breakdown for multiple categories, and a de
 
 5.  **Approvals Score:**
     *   Similar to Fire Safety. If the customer marks 'approvals' as "Must to have", "Obtained" status gets 1.0. "Applied For" gets ~0.6. "To Apply" or "Un-Approved" gets a low score.
+    *   For **Operations** (Manufacturing), if there are specific requirements (like MPCB/EC category or ETP details) and the provider's response is "No," this should result in a low score for this category. "Acceptable" should be a high score, and "May Be" should be moderate.
     *   If the customer has **no** preference, a property with "Obtained" approvals gets a high score (1.0).
 
 6.  **Power Score:**
@@ -140,7 +141,13 @@ You must provide an overall score, a breakdown for multiple categories, and a de
   - Crane Type: {{property.optionals.crane.type}}
   - Crane Capacity: {{property.optionals.crane.capacity}} Tons
   {{/if}}
-- MPCB/EC Category: {{#if property.operations.mpcbEcCategory}}{{property.operations.mpcbEcCategory}}{{else}}N/A{{/if}}
+- **Operations Compliance:**
+  {{#if property.operations.mpcbEcCategory}}
+  - MPCB/EC Category Compliance: {{property.operations.mpcbEcCategory}}
+  {{/if}}
+  {{#if property.operations.etpDetails}}
+  - ETP Compliance: {{property.operations.etpDetails}}
+  {{/if}}
 - Additional Info: {{{property.additionalInformation}}}
 
 Based on this information, provide your analysis as a JSON object matching the output schema.
@@ -158,3 +165,4 @@ const getPropertyMatchScoreFlow = ai.defineFlow(
     return output!;
   }
 );
+
