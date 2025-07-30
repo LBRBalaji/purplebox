@@ -74,7 +74,7 @@ This table stores detailed information about every individual warehouse or indus
 
 **Application Flow:**
 
-1.  **Map Search:** The **Map Search** page queries this table to fetch all `Properties` where `isActive` is `true`. The data is used to generate the heatmap and regional summaries.
+1.  **Map Search:** The **Map Search** page is dynamic. When a user pans or zooms the map, the frontend sends the visible geographic boundaries (e.g., southwest and northeast coordinates) to the backend. The backend performs a **geospatial query** on the `Properties` table to fetch only the listings where `isActive` is `true` and the `generalizedLocation` falls within those boundaries. This dynamic data is used to generate the heatmap and regional summaries.
 2.  **Warehouse Management:** The O2O Manager or Admin uses the **Manage Warehouses** page to create, update, or delete records in this table. Toggling the `isActive` switch updates the corresponding record in the database.
 
 ---
