@@ -3,7 +3,7 @@
 
 import { generatePropertyDescription, type GeneratePropertyDescriptionInput } from "@/ai/flows/generate-property-description";
 import { improvePropertyDemandDescription, type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-property-demand";
-import { getPropertyMatchScore, type GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
+import { getPropertyMatchScore, type GetPropertyMatchScoreOutput, type GetPropertyMatchScoreInput } from "@/ai/flows/get-property-match-score";
 import { getWarehouses, type GetWarehousesInput, type GetWarehousesOutput } from "@/ai/flows/get-warehouses";
 import { type PropertySchema, type DemandSchema, type WarehouseSchema } from "./schema";
 
@@ -35,30 +35,24 @@ export async function logDemandAction(
 }
 
 export async function getPropertyMatchScoreAction(
-  propertyData: PropertySchema,
-  allDemands: DemandSchema[],
+  input: GetPropertyMatchScoreInput
 ): Promise<{ submission?: { property: PropertySchema, matchResult: GetPropertyMatchScoreOutput, demandId: string, demandUserEmail?: string }; error?: string }> {
   try {
-    if (!propertyData.o2oDealDemandId) {
-      return { error: "No Demand ID was provided for matching." };
+    if (!input.demand) {
+      return { error: `Demand data is missing.` };
     }
     
-    const demandData = allDemands.find(d => d.demandId === propertyData.o2oDealDemandId);
-
-    if (!demandData) {
-        return { error: `Demand with ID "${propertyData.o2oDealDemandId}" not found.` };
+    if (!input.property) {
+        return { error: `Property data is missing.` };
     }
 
-    const result = await getPropertyMatchScore({
-      property: propertyData,
-      demand: demandData,
-    });
+    const result = await getPropertyMatchScore(input);
     
     const submission = {
-      property: propertyData,
+      property: input.property,
       matchResult: result,
-      demandId: propertyData.o2oDealDemandId,
-      demandUserEmail: demandData.userEmail,
+      demandId: input.demand.demandId,
+      demandUserEmail: input.demand.userEmail,
     };
 
     return { submission };
@@ -81,5 +75,3 @@ export async function getWarehousesAction(
     return { error: e.message || "An unexpected error occurred while fetching warehouses." };
   }
 }
-
-    

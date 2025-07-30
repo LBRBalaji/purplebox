@@ -153,7 +153,7 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
 }
 
 const ScoreBadge = ({ score }: { score: number | null }) => {
-    if (score === null) return null;
+    if (score === null || score === undefined) return null;
 
     const displayScore = Math.round(score * 100);
     const colorClass = displayScore >= 85 ? 'bg-green-100 text-green-800 border-green-300' 
@@ -182,7 +182,7 @@ export function PropertyForm() {
   const [isEssentialsOpen, setIsEssentialsOpen] = React.useState(true);
   const [isOptionalsOpen, setIsOptionalsOpen] = React.useState(false);
   const [isOperationsOpen, setIsOperationsOpen] = React.useState(false);
-  const [isCommercialsOpen, setIsCommercialsOpen] = React.useState(false);
+  const [isCommercialsOpen, setIsCommercialsOpen] = React.useState(true);
   const [isAdditionalInfoOpen, setIsAdditionalInfoOpen] = React.useState(false);
 
   // State for individual scores
@@ -232,7 +232,7 @@ export function PropertyForm() {
     [demands, demandIdFromUrl]
   );
 
-  const calculateScore = React.useCallback((field: keyof PropertySchema, value: any) => {
+  const calculateScore = React.useCallback((field: string, value: any) => {
     if (!demandToMatch) return null;
 
     let score = 0;
@@ -271,24 +271,44 @@ export function PropertyForm() {
             else score = 0.1;
             break;
         }
+        case 'operations.mpcbEcCategory':
+        case 'operations.etpDetails':
+        case 'operations.effluentCharacteristics':
+            if (value === 'Acceptable') score = 1.0;
+            else if (value === 'May Be') score = 0.5;
+            else score = 0.1;
+            break;
+        case 'optionals.crane.required':
+            const craneDemand = demandToMatch.optionals?.crane?.required;
+            if(craneDemand) score = value ? 1.0 : 0.0;
+            else score = 0.9; // Not required, but providing is good
+            break;
         default:
             return null;
     }
     setScores(prev => ({...prev, [field]: score}));
   }, [demandToMatch]);
   
-  const buildingType = form.watch('buildingType');
-  const sizeValue = form.watch('size');
-  const ceilingHeightValue = form.watch('ceilingHeight');
-  const docksValue = form.watch('docks');
-  const fireNocValue = form.watch('fireNoc');
-  const approvalStatusValue = form.watch('approvalStatus');
+  const watchedValues = form.watch();
 
-  React.useEffect(() => { calculateScore('size', sizeValue) }, [sizeValue, calculateScore]);
-  React.useEffect(() => { calculateScore('ceilingHeight', ceilingHeightValue) }, [ceilingHeightValue, calculateScore]);
-  React.useEffect(() => { calculateScore('docks', docksValue) }, [docksValue, calculateScore]);
-  React.useEffect(() => { calculateScore('fireNoc', fireNocValue) }, [fireNocValue, calculateScore]);
-  React.useEffect(() => { calculateScore('approvalStatus', approvalStatusValue) }, [approvalStatusValue, calculateScore]);
+  React.useEffect(() => {
+    for (const [key, value] of Object.entries(watchedValues)) {
+      if (typeof value === 'object' && value !== null) {
+        for (const [subKey, subValue] of Object.entries(value)) {
+          if (typeof subValue === 'object' && subValue !== null) {
+            for (const [deepKey, deepValue] of Object.entries(subValue)) {
+                calculateScore(`${key}.${subKey}.${deepKey}`, deepValue);
+            }
+          } else {
+            calculateScore(`${key}.${subKey}`, subValue);
+          }
+        }
+      } else {
+        calculateScore(key, value);
+      }
+    }
+  }, [watchedValues, calculateScore]);
+
   
   const priorityCounts = React.useMemo(() => {
     if (!demandToMatch) return { optionals: 0, operations: 0 };
@@ -301,9 +321,9 @@ export function PropertyForm() {
     const uniquePriorities = Array.from(new Set(basePriorities));
 
     return uniquePriorities.reduce((acc, item) => {
-        if (['crane'].includes(item) || demandToMatch.optionals?.hasOwnProperty(item)) {
+        if (['crane'].includes(item) || demandToMatch.optionals?.hasOwnProperty(item as any)) {
             acc.optionals++;
-        } else if (['operations'].includes(item) || demandToMatch.operations?.hasOwnProperty(item)) {
+        } else if (['operations'].includes(item) || demandToMatch.operations?.hasOwnProperty(item as any)) {
             acc.operations++;
         }
         return acc;
@@ -368,13 +388,15 @@ export function PropertyForm() {
     }
   };
 
-  async function onAttemptSubmit(data: PropertySchema) {
+  const onAttemptSubmit = async (data: PropertySchema) => {
     setIsLoading(true);
     setMatchResult(null); // Clear previous results
     setSubmissionData(data); // Store current data
 
     try {
-        const result = await getPropertyMatchScoreAction(data, demands);
+        if(!demandToMatch) throw new Error("Demand to match not found");
+
+        const result = await getPropertyMatchScoreAction({ property: data, demand: demandToMatch });
         if (result.error || !result.submission) {
             throw new Error(result.error || "Failed to get a valid response from the action.");
         }
@@ -390,6 +412,24 @@ export function PropertyForm() {
     } finally {
         setIsLoading(false);
     }
+  }
+
+  const onInvalidSubmit = (errors: any) => {
+    const errorFields = Object.keys(errors);
+    if(errorFields.some(field => field.startsWith('optionals'))) {
+        setIsOptionalsOpen(true);
+    }
+    if(errorFields.some(field => field.startsWith('operations'))) {
+        setIsOperationsOpen(true);
+    }
+    if(errorFields.some(field => ['rentPerSft', 'rentalSecurityDeposit'].includes(field))) {
+        setIsCommercialsOpen(true);
+    }
+    toast({
+        variant: 'destructive',
+        title: 'Missing Required Fields',
+        description: 'Please fill out all required fields before submitting. Sections with errors have been expanded.'
+    })
   }
   
   const ComplianceToggle = ({ field, form }: { form: any, field: any }) => (
@@ -428,7 +468,7 @@ export function PropertyForm() {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onAttemptSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onAttemptSubmit, onInvalidSubmit)} className="space-y-6">
           <DemandSummaryCard demand={demandToMatch}/>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -495,7 +535,7 @@ export function PropertyForm() {
                         <FormMessage />
                         </FormItem>
                     )} />
-                    {buildingType === 'RCC' && (
+                    {form.getValues('buildingType') === 'RCC' && (
                         <FormField control={form.control} name="floor" render={({ field }) => (
                             <FormItem>
                             <FormLabel>Floor Preference</FormLabel>
@@ -594,7 +634,7 @@ export function PropertyForm() {
                       <Button type="button" variant="outline" className="w-full justify-between">
                       <div className="flex items-center gap-2">
                           <PlusCircle className="h-4 w-4" />
-                          Optionals & Preferences
+                          Optionals &amp; Preferences
                            {priorityCounts.optionals > 0 && <Badge>{priorityCounts.optionals} priorities</Badge>}
                       </div>
                       <ChevronsUpDown className="h-4 w-4" />
@@ -603,7 +643,7 @@ export function PropertyForm() {
                   <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                       <Card>
                           <CardContent className="pt-6 space-y-8">
-                              <div id="crane-details-section">
+                              <div id="crane-details-section" className="relative">
                                 <CardTitle className="flex items-center gap-2 pt-4 border-t"><CraneIcon className="w-5 h-5 text-primary" /> Crane Details</CardTitle>
                                 {demandToMatch?.optionals?.crane?.required && <CardDescription>This is a critical requirement for the customer.</CardDescription>}
                                 <div className="pl-6 pt-4">
@@ -646,10 +686,11 @@ export function PropertyForm() {
                                         </CollapsibleContent>
                                     </Collapsible>
                                 </div>
+                                <ScoreBadge score={scores['optionals.crane.required'] ?? null} />
                               </div>
                               {/* Office & Amenities */}
                               <div className="space-y-4">
-                                  <FormLabel className="flex items-center gap-2 text-base"><Building className="w-4 h-4"/> Office & Amenities</FormLabel>
+                                  <FormLabel className="flex items-center gap-2 text-base"><Building className="w-4 h-4"/> Office &amp; Amenities</FormLabel>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
                                       <div className="space-y-2">
                                           <FormLabel className="text-sm">Office Space</FormLabel>
@@ -682,7 +723,7 @@ export function PropertyForm() {
                               
                               {/* Parking & Storage */}
                               <div className="space-y-4">
-                                  <FormLabel className="flex items-center gap-2 text-base"><Car className="w-4 h-4"/> Parking & Storage</FormLabel>
+                                  <FormLabel className="flex items-center gap-2 text-base"><Car className="w-4 h-4"/> Parking &amp; Storage</FormLabel>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
                                       <div className="space-y-2">
                                           <FormLabel className="text-sm">Truck Parking Yard</FormLabel>
@@ -703,7 +744,7 @@ export function PropertyForm() {
                               
                               {/* Utilities & Infrastructure */}
                               <div className="space-y-4">
-                                  <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities & Infrastructure</FormLabel>
+                                  <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities &amp; Infrastructure</FormLabel>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
                                       <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder={`Req: ${demandToMatch.optionals?.processWaterRequirement ?? 'N/A'}`} {...field} value={field.value ?? ''} disabled={!demandToMatch.optionals?.processWaterRequirement} /></FormControl><FormMessage /></FormItem>)} />
                                       <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder={`Req: ${demandToMatch.optionals?.hvacArea ?? 'N/A'}`} {...field} disabled={!demandToMatch.optionals?.hvacArea} /></FormControl><FormMessage /></FormItem>)} />
@@ -754,27 +795,30 @@ export function PropertyForm() {
                             </CardHeader>
                             <CardContent className="space-y-6">
                                  <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
-                                  <FormItem>
+                                  <FormItem className="relative">
                                       <FormLabel>Unit Categorization (MPCB/EC)</FormLabel>
                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
+                                      <ScoreBadge score={scores['operations.mpcbEcCategory'] ?? null} />
                                   </FormItem>
                                   )}/>
                                  <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
-                                  <FormItem>
+                                  <FormItem className="relative">
                                       <FormLabel>Effluent Treatment Plant (ETP)</FormLabel>
                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.etpDetails ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
+                                      <ScoreBadge score={scores['operations.etpDetails'] ?? null} />
                                   </FormItem>
                                   )}/>
                                  <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
-                                  <FormItem>
+                                  <FormItem className="relative">
                                       <FormLabel>Effluent Characteristics</FormLabel>
                                        <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.effluentCharacteristics ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
+                                      <ScoreBadge score={scores['operations.effluentCharacteristics'] ?? null} />
                                   </FormItem>
                                   )}/>
                             </CardContent>
@@ -850,7 +894,7 @@ export function PropertyForm() {
               ) : (
                 <>
                   <Wand className="mr-2 h-4 w-4" />
-                  Review & Submit Match
+                  Review &amp; Submit Match
                 </>
               )}
             </Button>
@@ -921,9 +965,9 @@ export function PropertyForm() {
                   </div>
             )}
             <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setMatchResult(null)}>Go Back & Edit</AlertDialogCancel>
+                <AlertDialogCancel onClick={() => setMatchResult(null)}>Go Back &amp; Edit</AlertDialogCancel>
                 <AlertDialogAction onClick={handleFinalSubmit} disabled={isLoading}>
-                    {isLoading ? "Submitting..." : "Confirm & Submit"}
+                    {isLoading ? "Submitting..." : "Confirm &amp; Submit"}
                 </AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
