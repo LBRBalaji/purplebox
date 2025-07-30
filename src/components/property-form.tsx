@@ -474,7 +474,7 @@ export function PropertyForm() {
                             <Input
                               type="number"
                               placeholder={
-                                demandToMatch.powerMin !== undefined
+                                (demandToMatch.powerMin !== undefined && demandToMatch.powerMax !== undefined)
                                   ? `Required: ${demandToMatch.powerMin} - ${demandToMatch.powerMax} kVA`
                                   : 'e.g. 500'
                               }
