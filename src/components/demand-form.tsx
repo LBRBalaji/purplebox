@@ -47,7 +47,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { getImprovedDemandDescriptionAction, logDemandAction } from "@/lib/actions";
-import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight, Check, Scaling, Flame, ShieldCheck, Zap, Warehouse, Building, SlidersHorizontal, Percent, Briefcase, Utensils, Users, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, Factory, Construction as CraneIcon } from 'lucide-react';
+import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight, Check, Scaling, Flame, ShieldCheck, Zap, Warehouse, Building, SlidersHorizontal, Percent, Briefcase, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, Factory, Construction as CraneIcon } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
@@ -416,8 +416,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <Card>
+            <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle>{isEditMode ? 'Edit Demand' : 'Log New Demand'}</CardTitle>
                   <CardDescription>
@@ -554,36 +553,34 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
                                         {/* Building Type */}
                                     <PriorityCard title="Building Type" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="buildingType">
-                                        <div className="space-y-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="buildingType"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <div className="flex items-center justify-center">
-                                                        <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted w-fit">
-                                                            <Button type="button" variant={field.value === 'PEB' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('PEB')} className="rounded-full">PEB</Button>
-                                                            <Button type="button" variant={field.value === 'RCC' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('RCC')} className="rounded-full">RCC</Button>
-                                                        </div>
-                                                    </div>
-                                                    <p className="text-xs text-muted-foreground text-center">PEB (Pre-Engineered Building with Galvalume Sheet)</p>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                            {buildingType === 'RCC' && (
-                                            <FormField
-                                                control={form.control}
-                                                name="floorPreference"
-                                                render={({ field }) => (
-                                                    <FormItem className="space-y-3 pt-4 border-t">
-                                                    <FormLabel>Floor Preference</FormLabel>
-                                                    <FormControl>
-                                                        <RadioGroup
-                                                        onValueChange={field.onChange}
-                                                        value={field.value}
-                                                        className="grid grid-cols-3 gap-4"
-                                                        >
+                                        <FormField control={form.control} name="buildingType" render={({ field }) => (
+                                            <FormItem className="space-y-3">
+                                                <FormControl>
+                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-2 gap-4">
+                                                        <FormItem>
+                                                          <FormControl><RadioGroupItem value="PEB" id="peb" className="peer sr-only" /></FormControl>
+                                                          <FormLabel htmlFor="peb" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                                            PEB
+                                                            <span className="font-normal text-xs text-muted-foreground mt-1 text-center">(Pre-Engineered Building with Galvalume Sheet)</span>
+                                                          </FormLabel>
+                                                        </FormItem>
+                                                        <FormItem>
+                                                           <FormControl><RadioGroupItem value="RCC" id="rcc" className="peer sr-only" /></FormControl>
+                                                          <FormLabel htmlFor="rcc" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                                            RCC
+                                                           </FormLabel>
+                                                        </FormItem>
+                                                    </RadioGroup>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                        {buildingType === 'RCC' && (
+                                            <FormField control={form.control} name="floorPreference" render={({ field }) => (
+                                                <FormItem className="space-y-3 pt-4 border-t">
+                                                <FormLabel>Floor Preference</FormLabel>
+                                                <FormControl>
+                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-3 gap-4">
                                                         <FormItem>
                                                             <FormControl><RadioGroupItem value="Ground" id="ground" className="peer sr-only" /></FormControl>
                                                             <FormLabel htmlFor="ground" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Ground</FormLabel>
@@ -596,14 +593,12 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                                             <FormControl><RadioGroupItem value="Any" id="any" className="peer sr-only" /></FormControl>
                                                             <FormLabel htmlFor="any" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-xs font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">Any</FormLabel>
                                                         </FormItem>
-                                                        </RadioGroup>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            )}
-                                        </div>
+                                                    </RadioGroup>
+                                                </FormControl>
+                                                <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        )}
                                     </PriorityCard>
 
                                     {/* Ceiling Height */}
@@ -691,21 +686,19 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                                 <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                                             </div>
                                         </div>
-                                        <div className="space-y-2">
-                                            <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormControl>
-                                                            <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4 pt-2">
-                                                                <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Cafeteria" id="cafe" /></FormControl><FormLabel htmlFor="cafe" className="font-normal">Cafeteria</FormLabel></FormItem>
-                                                                <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Canteen" id="canteen" /></FormControl><FormLabel htmlFor="canteen" className="font-normal">Canteen</FormLabel></FormItem>
-                                                            </RadioGroup>
-                                                        </FormControl>
-                                                    </FormItem>
-                                                )}/>
-                                                <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem><FormLabel className="text-xs">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder="e.g. 50" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                            </div>
+                                        <div className="grid grid-cols-2 gap-x-4">
+                                            <FormField control={form.control} name="optionals.cafeteriaOrCanteen" render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-sm">Cafeteria/Canteen</FormLabel>
+                                                    <FormControl>
+                                                        <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4 pt-2">
+                                                            <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Cafeteria" id="cafe" /></FormControl><FormLabel htmlFor="cafe" className="font-normal">Cafeteria</FormLabel></FormItem>
+                                                            <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="Canteen" id="canteen" /></FormControl><FormLabel htmlFor="canteen" className="font-normal">Canteen</FormLabel></FormItem>
+                                                        </RadioGroup>
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}/>
+                                            <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder="e.g. 50" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                                         </div>
                                         <div className="space-y-2">
                                             <FormLabel className="text-sm">Additional Toilets</FormLabel>
@@ -872,10 +865,9 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                             </CollapsibleContent>
                         </Collapsible>
                     )}
-                  </div>
+                    </div>
                 </CardContent>
-              </Card>
-            </div>
+            </Card>
             <div className="lg:col-span-1 space-y-6">
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><User className="w-5 h-5 text-primary" /> User Details</CardTitle></CardHeader>
@@ -928,5 +920,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     </>
   );
 }
+
+    
 
     
