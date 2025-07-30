@@ -184,11 +184,6 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         data: heatmapData,
         radius: 40,
         opacity: 0.9,
-        gradient: [
-          'rgba(191, 154, 73, 0)',
-          'rgba(191, 154, 73, 1)',
-          'rgba(30, 73, 86, 1)',
-        ],
     });
     setHeatmap(newHeatmap);
 
