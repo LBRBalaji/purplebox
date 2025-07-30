@@ -92,21 +92,22 @@ const PriorityCard = ({ title, icon: Icon, children, form, field, fieldName }: P
                     onCheckedChange={handleCheckedChange}
                 />
             </div>
-            {isChecked && (
-                <div className="mt-4 pl-8 space-y-4">
+            <Collapsible open={isChecked}>
+              <CollapsibleContent className="CollapsibleContent">
+                <div className="mt-4 pl-8 space-y-4 pt-4 border-t border-primary/20">
                     {children}
                 </div>
-            )}
+              </CollapsibleContent>
+            </Collapsible>
         </div>
     );
 };
 
-const PriorityToggle = ({ form, field, label }: { form: UseFormReturn<DemandSchema>, field: FieldPath<DemandSchema['preferences']>, label: string }) => {
+const PriorityToggle = ({ form, field }: { form: UseFormReturn<DemandSchema>, field: FieldPath<DemandSchema['preferences']> }) => {
     const value = form.watch(field) as 'Must to have' | 'Good to have';
     return (
-        <div className="flex items-center gap-4">
-            <FormLabel>{label}</FormLabel>
-            <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted">
+        <div className="flex items-center justify-center">
+            <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted w-fit">
                  <Button
                     type="button"
                     variant={value === 'Must to have' ? 'default' : 'ghost'}
@@ -461,7 +462,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                         <ChevronsUpDown className="h-4 w-4" />
                       </Button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4">
+                    <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                       <div className="space-y-2">
                         <FormLabel className="text-base font-semibold text-primary">Optional Details & Priorities</FormLabel>
                         <div className="p-4 border rounded-lg space-y-6">
@@ -562,13 +563,13 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
                                     {/* Toggles */}
                                     <PriorityCard title="Approvals" icon={ShieldCheck} form={form} field="preferences.nonCompromisable" fieldName="approvals">
-                                        <PriorityToggle form={form} field="preferences.approvals" label="Approval Priority" />
+                                        <PriorityToggle form={form} field="preferences.approvals" />
                                     </PriorityCard>
                                     <PriorityCard title="Fire NOC" icon={Flame} form={form} field="preferences.nonCompromisable" fieldName="fireNoc">
-                                        <PriorityToggle form={form} field="preferences.fireNoc" label="Fire NOC Priority" />
+                                        <PriorityToggle form={form} field="preferences.fireNoc" />
                                     </PriorityCard>
                                      <PriorityCard title="Fire Safety Infrastructure" icon={Flame} form={form} field="preferences.nonCompromisable" fieldName="fireSafety">
-                                        <PriorityToggle form={form} field="preferences.fireSafety" label="Fire Safety Priority" />
+                                        <PriorityToggle form={form} field="preferences.fireSafety" />
                                     </PriorityCard>
                                 </div>
                             </div>
@@ -632,3 +633,5 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     </>
   );
 }
+
+    
