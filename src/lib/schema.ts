@@ -55,6 +55,9 @@ export const demandSchema = z.object({
   locationName: z.string().optional(),
   radius: z.coerce.number({invalid_type_error: "Radius must be a number."}).positive("Radius must be a positive number."),
   size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be positive.'),
+  sizeMin: z.coerce.number().optional(),
+  sizeMax: z.coerce.number().optional(),
+  sizeVariationPercentage: z.number().min(0).max(100).optional(),
   ceilingHeight: z.preprocess(
     (val) => (val === "" || val === null ? undefined : val),
     z.coerce
@@ -71,10 +74,15 @@ export const demandSchema = z.object({
       .nonnegative("Docks cannot be negative.")
       .optional()
   ),
+  powerMin: z.coerce.number().optional(),
+  powerMax: z.coerce.number().optional(),
   readiness: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
   description: z.string().optional(),
   preferences: z.object({
     nonCompromisable: z.array(z.string()).optional(),
+    approvals: z.enum(['Must to have', 'Good to have']).default('Must to have'),
+    fireNoc: z.enum(['Must to have', 'Good to have']).default('Must to have'),
+    fireSafety: z.enum(['Must to have', 'Good to have']).default('Must to have'),
   }),
 }).refine(data => {
     if (data.preferences?.nonCompromisable?.includes('ceilingHeight')) {

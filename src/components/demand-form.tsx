@@ -2,7 +2,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type FieldPath } from "react-hook-form";
+import { useForm, type FieldPath, type UseFormReturn } from "react-hook-form";
 import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -46,24 +46,89 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { getImprovedDemandDescriptionAction, logDemandAction } from "@/lib/actions";
-import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight } from 'lucide-react';
+import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight, Check, Scaling, Flame, ShieldCheck, Zap, Warehouse, Building, SlidersHorizontal, Percent } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
 import { useData } from "@/contexts/data-context";
 import { type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-property-demand";
+import { cn } from "@/lib/utils";
+import { Slider } from "./ui/slider";
 
 const priorityItems = [
-    { id: 'size', label: 'Size' },
     { id: 'location', label: 'Location & Radius' },
-    { id: 'ceilingHeight', label: 'Ceiling Height' },
-    { id: 'docks', label: 'Number of Docks' },
     { id: 'readiness', label: 'Readiness' },
-    { id: 'approvals', label: 'Approvals Status' },
-    { id: 'fireNoc', label: 'Fire NOC Status' },
-    { id: 'power', label: 'Sufficient Power' },
-    { id: 'fireSafety', label: 'Fire Safety Compliance' },
 ];
+
+type PriorityCardProps = {
+    title: string;
+    icon: React.ElementType;
+    children: React.ReactNode;
+    form: UseFormReturn<DemandSchema>;
+    field: FieldPath<DemandSchema['preferences']['nonCompromisable']>;
+    fieldName: string;
+};
+
+const PriorityCard = ({ title, icon: Icon, children, form, field, fieldName }: PriorityCardProps) => {
+    const isChecked = form.watch(field)?.includes(fieldName) ?? false;
+    
+    const handleCheckedChange = (checked: boolean) => {
+        const currentValues = form.getValues(field) || [];
+        const newValues = checked
+            ? [...currentValues, fieldName]
+            : currentValues.filter((value) => value !== fieldName);
+        form.setValue(field, newValues, { shouldValidate: true });
+    };
+
+    return (
+        <div className={cn("p-4 border rounded-lg transition-colors", isChecked ? 'bg-primary/5 border-primary/50' : 'bg-secondary/30')}>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <FormLabel className="font-semibold text-base">{title}</FormLabel>
+                </div>
+                <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={handleCheckedChange}
+                />
+            </div>
+            {isChecked && (
+                <div className="mt-4 pl-8 space-y-4">
+                    {children}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const PriorityToggle = ({ form, field, label }: { form: UseFormReturn<DemandSchema>, field: FieldPath<DemandSchema['preferences']>, label: string }) => {
+    const value = form.watch(field) as 'Must to have' | 'Good to have';
+    return (
+        <div className="flex items-center gap-4">
+            <FormLabel>{label}</FormLabel>
+            <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted">
+                 <Button
+                    type="button"
+                    variant={value === 'Must to have' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => form.setValue(field, 'Must to have')}
+                    className="rounded-full"
+                >
+                    Must to have
+                </Button>
+                <Button
+                    type="button"
+                    variant={value === 'Good to have' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => form.setValue(field, 'Good to have')}
+                     className="rounded-full"
+                >
+                    Good to have
+                </Button>
+            </div>
+        </div>
+    );
+}
 
 export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   const { toast } = useToast();
@@ -95,18 +160,31 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       locationName: "",
       radius: undefined,
       size: undefined,
+      sizeMin: undefined,
+      sizeMax: undefined,
+      sizeVariationPercentage: 10,
       ceilingHeight: undefined,
       ceilingHeightUnit: 'ft',
       docks: undefined,
+      powerMin: undefined,
+      powerMax: undefined,
       readiness: "Immediate",
       description: "",
       preferences: {
         nonCompromisable: [],
+        approvals: 'Must to have',
+        fireNoc: 'Must to have',
+        fireSafety: 'Must to have',
       }
     },
   });
 
   const watchedDemandId = form.watch("demandId");
+  const sizeMax = form.watch('sizeMax');
+  const effectiveUsableArea = React.useMemo(() => {
+    return sizeMax ? Math.round(sizeMax * 0.9) : 0;
+  }, [sizeMax]);
+
 
   React.useEffect(() => {
     if (user && !isEditMode) {
@@ -151,6 +229,12 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
         form.reset({
             ...demandToEdit,
             ceilingHeightUnit: demandToEdit.ceilingHeightUnit || 'ft',
+            preferences: {
+              ...demandToEdit.preferences,
+              approvals: demandToEdit.preferences.approvals || 'Must to have',
+              fireNoc: demandToEdit.preferences.fireNoc || 'Must to have',
+              fireSafety: demandToEdit.preferences.fireSafety || 'Must to have',
+            }
         });
         setDemandId(demandToEdit.demandId);
 
@@ -317,7 +401,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                         />
                          <FormField control={form.control} name="size" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Size (Sq. Ft.)</FormLabel>
+                                <FormLabel>Total Area (Sq. Ft.)</FormLabel>
                                 <FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -414,94 +498,79 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                             </div>
                             <div className="space-y-3">
                                 <FormLabel>Requirement Priorities</FormLabel>
-                                <p className="text-sm text-muted-foreground">Select items that are non-negotiable and provide details. This helps the AI find you the most relevant properties.</p>
-                                <FormField
-                                    control={form.control}
-                                    name="preferences.nonCompromisable"
-                                    render={({ field }) => (
-                                        <div className="space-y-2 pt-2">
-                                            {priorityItems.map((item) => {
-                                                const isChecked = field.value?.includes(item.id);
-                                                return (
-                                                    <div key={item.id} className="p-4 border rounded-md has-[input:checked]:bg-primary/5 has-[input:checked]:border-primary/50 transition-colors">
-                                                        <div className="flex items-start gap-4">
-                                                            <FormControl>
-                                                                <Checkbox
-                                                                    className="mt-1"
-                                                                    checked={isChecked}
-                                                                    onCheckedChange={(checked) => {
-                                                                        const currentValue = field.value || [];
-                                                                        const newValue = checked
-                                                                            ? [...currentValue, item.id]
-                                                                            : currentValue.filter((value) => value !== item.id);
-                                                                        field.onChange(newValue);
-
-                                                                        if (!checked) {
-                                                                            if (item.id === 'ceilingHeight') {
-                                                                                form.setValue('ceilingHeight', undefined, { shouldValidate: true });
-                                                                            }
-                                                                            if (item.id === 'docks') {
-                                                                                form.setValue('docks', undefined, { shouldValidate: true });
-                                                                            }
-                                                                        }
-                                                                    }}
-                                                                />
-                                                            </FormControl>
-                                                            <div className="w-full space-y-2">
-                                                                <FormLabel className="font-medium text-base -mt-1">{item.label}</FormLabel>
-                                                                
-                                                                {isChecked && item.id === 'ceilingHeight' && (
-                                                                    <div className="flex gap-2">
-                                                                        <FormField
-                                                                            control={form.control}
-                                                                            name="ceilingHeight"
-                                                                            render={({ field: heightField }) => (
-                                                                                <FormItem className="flex-grow">
-                                                                                    <FormControl>
-                                                                                        <Input type="number" placeholder="Enter min height" {...heightField} value={heightField.value ?? ''} />
-                                                                                    </FormControl>
-                                                                                    <FormMessage />
-                                                                                </FormItem>
-                                                                            )}
-                                                                        />
-                                                                        <FormField
-                                                                            control={form.control}
-                                                                            name="ceilingHeightUnit"
-                                                                            render={({ field: unitField }) => (
-                                                                                <FormItem>
-                                                                                    <Select onValueChange={unitField.onChange} value={unitField.value}>
-                                                                                        <FormControl><SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger></FormControl>
-                                                                                        <SelectContent>
-                                                                                            <SelectItem value="ft">ft</SelectItem>
-                                                                                            <SelectItem value="m">m</SelectItem>
-                                                                                        </SelectContent>
-                                                                                    </Select>
-                                                                                </FormItem>
-                                                                            )}
-                                                                        />
-                                                                    </div>
-                                                                )}
-                                                                {isChecked && item.id === 'docks' && (
-                                                                    <FormField
-                                                                        control={form.control}
-                                                                        name="docks"
-                                                                        render={({ field }) => (
-                                                                            <FormItem>
-                                                                                <FormControl><Input type="number" placeholder="Enter min number of docks" {...field} value={field.value ?? ''} /></FormControl>
-                                                                                <FormMessage />
-                                                                            </FormItem>
-                                                                        )}
-                                                                    />
-                                                                )}
-                                                            </div>
-                                                        </div>
+                                <p className="text-sm text-muted-foreground">Select items that are critical and provide more details. This helps the AI find you the most relevant properties.</p>
+                                <div className="space-y-4 pt-2">
+                                    {/* Size */}
+                                    <PriorityCard title="Size" icon={Scaling} form={form} field="preferences.nonCompromisable" fieldName="size">
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="sizeMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 80000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="sizeMax" render={({ field }) => (<FormItem><FormLabel>Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 100000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            </div>
+                                            <div className="p-3 rounded-md bg-secondary">
+                                                <FormLabel>Effective Usable Area</FormLabel>
+                                                <p className="text-lg font-bold text-primary">{effectiveUsableArea.toLocaleString()} Sq. Ft.</p>
+                                                <p className="text-xs text-muted-foreground">Calculated as 90% of max area.</p>
+                                            </div>
+                                            <FormField control={form.control} name="sizeVariationPercentage" render={({ field }) => (
+                                                <FormItem>
+                                                    <div className="flex justify-between items-center">
+                                                        <FormLabel>Acceptable Variation</FormLabel>
+                                                        <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-md">
+                                                            +/- {field.value}%
+                                                        </span>
                                                     </div>
-                                                );
-                                            })}
-                                            <FormMessage className="pl-2" /> 
+                                                    <FormControl>
+                                                        <Slider
+                                                            defaultValue={[field.value ?? 10]}
+                                                            max={25}
+                                                            step={1}
+                                                            onValueChange={(value) => field.onChange(value[0])}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}/>
                                         </div>
-                                    )}
-                                />
+                                    </PriorityCard>
+
+                                    {/* Ceiling Height */}
+                                    <PriorityCard title="Ceiling Height" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="ceilingHeight">
+                                        <div className="flex gap-2">
+                                            <FormField control={form.control} name="ceilingHeight" render={({ field: heightField }) => (
+                                                <FormItem className="flex-grow"><FormControl><Input type="number" placeholder="Enter min height" {...heightField} value={heightField.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                                            )} />
+                                            <FormField control={form.control} name="ceilingHeightUnit" render={({ field: unitField }) => (
+                                                <FormItem><Select onValueChange={unitField.onChange} value={unitField.value}><FormControl><SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="ft">ft</SelectItem><SelectItem value="m">m</SelectItem></SelectContent></Select></FormItem>
+                                            )} />
+                                        </div>
+                                    </PriorityCard>
+
+                                    {/* Docks */}
+                                    <PriorityCard title="Number of Docks" icon={Warehouse} form={form} field="preferences.nonCompromisable" fieldName="docks">
+                                        <FormField control={form.control} name="docks" render={({ field }) => (
+                                            <FormItem><FormControl><Input type="number" placeholder="Enter min number of docks" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                                        )} />
+                                    </PriorityCard>
+                                    
+                                     {/* Power */}
+                                    <PriorityCard title="Power Requirement" icon={Zap} form={form} field="preferences.nonCompromisable" fieldName="power">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <FormField control={form.control} name="powerMin" render={({ field }) => (<FormItem><FormLabel>Min kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 100" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            <FormField control={form.control} name="powerMax" render={({ field }) => (<FormItem><FormLabel>Max kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 500" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                        </div>
+                                    </PriorityCard>
+
+                                    {/* Toggles */}
+                                    <PriorityCard title="Approvals" icon={ShieldCheck} form={form} field="preferences.nonCompromisable" fieldName="approvals">
+                                        <PriorityToggle form={form} field="preferences.approvals" label="Approval Priority" />
+                                    </PriorityCard>
+                                    <PriorityCard title="Fire NOC" icon={Flame} form={form} field="preferences.nonCompromisable" fieldName="fireNoc">
+                                        <PriorityToggle form={form} field="preferences.fireNoc" label="Fire NOC Priority" />
+                                    </PriorityCard>
+                                     <PriorityCard title="Fire Safety Infrastructure" icon={Flame} form={form} field="preferences.nonCompromisable" fieldName="fireSafety">
+                                        <PriorityToggle form={form} field="preferences.fireSafety" label="Fire Safety Priority" />
+                                    </PriorityCard>
+                                </div>
                             </div>
                         </div>
                       </div>
