@@ -592,9 +592,12 @@ export function PropertyForm() {
                                     <Collapsible open={form.watch('optionals.crane.required')}>
                                         <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pl-6 pt-4">
                                             {demandToMatch.optionals?.crane?.required && (
-                                                <FormDescription className="mb-4">
-                                                    Customer requires a {demandToMatch.optionals.crane.capacity} Ton {demandToMatch.optionals.crane.type} crane.
-                                                </FormDescription>
+                                                 <div className="mb-4">
+                                                    <FormLabel className="text-sm">Customer Requirement</FormLabel>
+                                                    <FormDescription>
+                                                        A {demandToMatch.optionals.crane.capacity} Ton {demandToMatch.optionals.crane.type} crane is required.
+                                                    </FormDescription>
+                                                 </div>
                                             )}
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
                                                 <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
