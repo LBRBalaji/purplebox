@@ -98,6 +98,24 @@ export const demandSchema = z.object({
     openStorageYardMin: z.coerce.number().optional(),
     openStorageYardMax: z.coerce.number().optional(),
     tenantSpecificImprovements: z.string().optional(),
+    processWaterRequirement: z.coerce.number().optional(),
+    hvacArea: z.string().optional(),
+    sprinklerRequirement: z.string().optional(),
+    crane: z.object({
+        required: z.boolean().default(false),
+        type: z.enum(['EOT', 'Gantry']).optional(),
+        count: z.coerce.number().optional(),
+        transverseLength: z.coerce.number().optional(),
+        span: z.coerce.number().optional(),
+        underhookHeight: z.coerce.number().optional(),
+        capacity: z.coerce.number().optional(),
+    }).optional(),
+    lightingRequirement: z.string().optional(),
+  }).optional(),
+  operations: z.object({
+      mpcbEcCategory: z.enum(['Green', 'Orange', 'Red']).optional(),
+      etpDetails: z.string().optional(),
+      effluentCharacteristics: z.string().optional(),
   }).optional(),
 }).refine(data => {
     if (data.preferences?.nonCompromisable?.includes('ceilingHeight')) {

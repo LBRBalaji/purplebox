@@ -46,7 +46,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { getImprovedDemandDescriptionAction, logDemandAction } from "@/lib/actions";
-import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight, Check, Scaling, Flame, ShieldCheck, Zap, Warehouse, Building, SlidersHorizontal, Percent, Briefcase, Utensils, Users, Car, HardHat } from 'lucide-react';
+import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight, Check, Scaling, Flame, ShieldCheck, Zap, Warehouse, Building, SlidersHorizontal, Percent, Briefcase, Utensils, Users, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, Factory, Crane as CraneIcon } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
@@ -55,6 +55,7 @@ import { type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-p
 import { cn } from "@/lib/utils";
 import { Slider } from "./ui/slider";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Switch } from "./ui/switch";
 
 const priorityItems = [
     { id: 'location', label: 'Location & Radius' },
@@ -149,6 +150,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
   const [isEssentialsOpen, setIsEssentialsOpen] = React.useState(isEditMode);
   const [isOptionalsOpen, setIsOptionalsOpen] = React.useState(isEditMode);
+  const [isOperationsOpen, setIsOperationsOpen] = React.useState(isEditMode);
 
   const form = useForm<DemandSchema>({
     resolver: zodResolver(demandSchema),
@@ -193,13 +195,24 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
         openStorageYardMin: undefined,
         openStorageYardMax: undefined,
         tenantSpecificImprovements: "",
-      }
+        processWaterRequirement: undefined,
+        hvacArea: "",
+        sprinklerRequirement: "",
+        crane: { required: false },
+        lightingRequirement: "",
+      },
+      operations: {
+        mpcbEcCategory: undefined,
+        etpDetails: "",
+        effluentCharacteristics: "",
+      },
     },
   });
 
   const watchedDemandId = form.watch("demandId");
   const sizeMax = form.watch('sizeMax');
   const buildingType = form.watch('buildingType');
+  const craneRequired = form.watch('optionals.crane.required');
 
   const effectiveUsableArea = React.useMemo(() => {
     return sizeMax ? Math.round(sizeMax * 0.9) : 0;
@@ -247,18 +260,21 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       const demandToEdit = demands.find(d => d.demandId === editDemandId);
       if (demandToEdit) {
         form.reset({
+            ...form.formState.defaultValues,
             ...demandToEdit,
             ceilingHeightUnit: demandToEdit.ceilingHeightUnit || 'ft',
             buildingType: demandToEdit.buildingType || 'PEB',
             preferences: {
+              ...form.formState.defaultValues.preferences,
               ...demandToEdit.preferences,
-              approvals: demandToEdit.preferences.approvals || 'Must to have',
-              fireNoc: demandToEdit.preferences.fireNoc || 'Must to have',
-              fireSafety: demandToEdit.preferences.fireSafety || 'Must to have',
             },
             optionals: {
               ...form.formState.defaultValues.optionals,
               ...demandToEdit.optionals,
+            },
+            operations: {
+              ...form.formState.defaultValues.operations,
+              ...demandToEdit.operations,
             }
         });
         setDemandId(demandToEdit.demandId);
@@ -271,6 +287,11 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
         const hasOptionalData = Object.values(demandToEdit.optionals || {}).some(val => val !== undefined && val !== '' && val !== null);
         if (hasOptionalData) {
             setIsOptionalsOpen(true);
+        }
+
+        const hasOperationData = Object.values(demandToEdit.operations || {}).some(val => val !== undefined && val !== '' && val !== null);
+        if (hasOperationData) {
+            setIsOperationsOpen(true);
         }
       }
     }
@@ -673,7 +694,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
             <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                 <div className="space-y-2">
                 <FormLabel className="text-base font-semibold text-primary">Optionals & Preferences</FormLabel>
-                <div className="p-4 border rounded-lg space-y-6">
+                <div className="p-4 border rounded-lg grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                     {/* Office Space */}
                         <div className="space-y-2">
                         <FormLabel className="flex items-center gap-2"><Building className="w-4 h-4"/> Office Space</FormLabel>
@@ -732,7 +753,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                     </div>
                     
                     {/* Tenant Improvements */}
-                        <div className="space-y-2">
+                        <div className="space-y-2 md:col-span-2">
                         <FormLabel className="flex items-center gap-2"><HardHat className="w-4 h-4"/> Tenant Specific Improvements</FormLabel>
                         <div className="pl-6">
                                 <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
@@ -745,6 +766,139 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                             )} />
                         </div>
                     </div>
+
+                    <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement</FormLabel>
+                        <div className="pl-6">
+                            <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormControl><Input type="number" placeholder="KL/Per Day" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                        </div>
+                    </div>
+                     <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (If any)</FormLabel>
+                        <div className="pl-6">
+                            <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormControl><Input placeholder="e.g., 10,000 Sq. Ft." {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel>
+                        <div className="pl-6">
+                            <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormControl><Input placeholder="Requirement & Type" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <FormLabel className="flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel>
+                        <div className="pl-6">
+                            <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormControl><Input placeholder="Type & LUX Levels" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        </div>
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                         <FormField
+                            control={form.control}
+                            name="optionals.crane.required"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center gap-2">
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        id="crane-required"
+                                    />
+                                </FormControl>
+                                <FormLabel htmlFor="crane-required" className="flex items-center gap-2 !m-0"><CraneIcon className="w-4 h-4"/> Any Crane Requirement?</FormLabel>
+                                </FormItem>
+                            )}
+                         />
+                         <Collapsible open={craneRequired}>
+                            <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up pl-6 pt-4">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 border rounded-md">
+                                    <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
+                                        <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="EOT / Gantry" /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                                    )}/>
+                                    <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                    <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                    <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                    <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                    <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                </div>
+                            </CollapsibleContent>
+                         </Collapsible>
+                    </div>
+
+                </div>
+                </div>
+            </CollapsibleContent>
+            </Collapsible>
+
+            {/* --- Operations Section --- */}
+            <Collapsible open={isOperationsOpen} onOpenChange={setIsOperationsOpen}>
+            <CollapsibleTrigger asChild>
+                <Button type="button" variant="outline" className="w-full justify-between">
+                <div className="flex items-center gap-2">
+                    <Factory className="h-4 w-4" />
+                    {isOperationsOpen ? 'Hide Operation Details' : 'Show More About Your Operations'}
+                </div>
+                <ChevronsUpDown className="h-4 w-4" />
+                </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                <div className="space-y-2">
+                <FormLabel className="text-base font-semibold text-primary">Operation Details</FormLabel>
+                <div className="p-4 border rounded-lg grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+                     <FormField
+                        control={form.control}
+                        name="operations.mpcbEcCategory"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Unit Categorization (as per MPCB/EC)</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                <SelectValue placeholder="Select Category" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                <SelectItem value="Green">Green</SelectItem>
+                                <SelectItem value="Orange">Orange</SelectItem>
+                                <SelectItem value="Red">Red</SelectItem>
+                            </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <div></div>
+                     <FormField
+                        control={form.control}
+                        name="operations.etpDetails"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Details of Effluent Treatment Plant (if any)</FormLabel>
+                            <FormControl>
+                            <Textarea
+                                placeholder="Capacity, technology, etc."
+                                {...field}
+                            />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="operations.effluentCharacteristics"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Characteristics of Effluent (if any)</FormLabel>
+                            <FormControl>
+                            <Textarea
+                                placeholder="pH, temperature, chemical composition, etc."
+                                {...field}
+                            />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
                 </div>
                 </div>
             </CollapsibleContent>
