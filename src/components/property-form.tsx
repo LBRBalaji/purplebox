@@ -58,7 +58,7 @@ import { Switch } from "./ui/switch";
 import { cn } from "@/lib/utils";
 
 const priorityLabels: { [key: string]: string } = {
-  size: 'Size',
+  size: 'Size Range',
   location: 'Location',
   ceilingHeight: 'Ceiling Height',
   docks: 'Docks',
@@ -67,6 +67,7 @@ const priorityLabels: { [key: string]: string } = {
   fireNoc: 'Fire NOC',
   power: 'Power',
   fireSafety: 'Fire Safety',
+  buildingType: 'Building Type',
 };
 
 

@@ -29,7 +29,7 @@ type DemandWithMatches = DemandSchema & {
 }
 
 const priorityLabels: { [key: string]: string } = {
-  size: 'Size',
+  size: 'Size Range',
   location: 'Location & Radius',
   ceilingHeight: 'Ceiling Height',
   docks: 'Number of Docks',
@@ -38,6 +38,7 @@ const priorityLabels: { [key: string]: string } = {
   fireNoc: 'Fire NOC Status',
   power: 'Sufficient Power',
   fireSafety: 'Fire Safety Compliance',
+  buildingType: 'Building Type',
 };
 
 export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: string) => void, newMatchCount: number }) {

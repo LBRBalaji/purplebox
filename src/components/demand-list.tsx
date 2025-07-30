@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 
 const priorityLabels: { [key: string]: string } = {
-  size: 'Size',
+  size: 'Size Range',
   location: 'Location',
   ceilingHeight: 'Ceiling Height',
   docks: 'Docks',
@@ -29,6 +29,7 @@ const priorityLabels: { [key: string]: string } = {
   fireNoc: 'Fire NOC',
   power: 'Power',
   fireSafety: 'Fire Safety',
+  buildingType: 'Building Type',
 };
 
 export function DemandList() {
