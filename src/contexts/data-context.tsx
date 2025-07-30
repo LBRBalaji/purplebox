@@ -85,7 +85,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   const addAgentLead = (lead: Omit<AgentLead, 'id' | 'status'>) => {
-      const newLead = { ...lead, id: `AGENT-${Date.now()}`, status: 'Pending' as AgentStatus };
+      const newLead: AgentLead = { 
+        ...lead, 
+        id: `AGENT-${Date.now()}`, 
+        status: 'Pending' 
+      };
       const updatedLeads = [newLead, ...agentLeads];
       persistAgentLeads(updatedLeads);
   }
