@@ -46,7 +46,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { demandSchema, type DemandSchema } from "@/lib/schema";
 import { getImprovedDemandDescriptionAction, logDemandAction } from "@/lib/actions";
-import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight, Check, Scaling, Flame, ShieldCheck, Zap, Warehouse, Building, SlidersHorizontal, Percent, Briefcase, Utensils, Users, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, Factory, Crane as CraneIcon } from 'lucide-react';
+import { User, Sparkles, List, ChevronsUpDown, PlusCircle, ClipboardPlus, ArrowRight, Check, Scaling, Flame, ShieldCheck, Zap, Warehouse, Building, SlidersHorizontal, Percent, Briefcase, Utensils, Users, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, Factory, Construction as CraneIcon } from 'lucide-react';
 import DemandMapWrapper from "./demand-map";
 import { Checkbox } from "./ui/checkbox";
 import { useAuth } from "@/contexts/auth-context";
@@ -944,3 +944,5 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     </>
   );
 }
+
+    
