@@ -56,7 +56,6 @@ import {
 } from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast";
 import { createPropertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
-import { getPropertyMatchScoreAction } from "@/lib/actions";
 import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
@@ -166,6 +165,93 @@ const ScoreBadge = ({ score }: { score: number | null }) => {
         </Badge>
     );
 };
+
+const calculateClientSideScore = (property: PropertySchema, demand: DemandSchema): GetPropertyMatchScoreOutput => {
+    const breakdown: GetPropertyMatchScoreOutput['scoreBreakdown'] = {
+        location: 0,
+        size: 0,
+        commercials: 0.9,
+        power: 0,
+        fireSafety: 0,
+        approvals: 0,
+        amenities: 0,
+    };
+    const justificationPoints: string[] = [];
+
+    // Location
+    breakdown.location = property.isLocationConfirmed ? 1.0 : 0.1;
+    justificationPoints.push(`Location: ${breakdown.location === 1.0 ? 'Confirmed by provider.' : 'Not confirmed by provider.'}`);
+
+    // Size
+    const { size: propertySize, sizeVariationPercentage = 10 } = property;
+    const { size: demandSize, sizeMin, sizeMax } = demand;
+    const lowerBound = sizeMin || demandSize * (1 - sizeVariationPercentage / 100);
+    const upperBound = sizeMax || demandSize * (1 + sizeVariationPercentage / 100);
+    if (propertySize >= lowerBound && propertySize <= upperBound) {
+        breakdown.size = 1.0 - (Math.abs(demandSize - propertySize) / (upperBound - lowerBound));
+    } else {
+        breakdown.size = 0.1; // Penalize if outside range
+    }
+    justificationPoints.push(`Size: ${propertySize.toLocaleString()} sq. ft. is a ${Math.round(breakdown.size * 100)}% match to the required range of ${lowerBound.toLocaleString()}-${upperBound.toLocaleString()} sq. ft.`);
+
+    // Approvals
+    if (property.approvalStatus === 'Obtained') breakdown.approvals = 1.0;
+    else if (property.approvalStatus === 'Applied For') breakdown.approvals = 0.6;
+    else breakdown.approvals = 0.3;
+    if (demand.preferences.approvals === 'Must to have' && breakdown.approvals < 1.0) breakdown.approvals *= 0.5;
+    justificationPoints.push(`Approvals: Property status is '${property.approvalStatus}'.`);
+
+    // Fire Safety
+    const nocScore = property.fireNoc === 'Obtained' ? 1.0 : property.fireNoc === 'Applied For' ? 0.6 : 0.3;
+    const hydrantScore = property.fireHydrant === 'Installed' ? 1.0 : 0.5;
+    breakdown.fireSafety = (nocScore + hydrantScore) / 2;
+    if (demand.preferences.fireNoc === 'Must to have' && nocScore < 1.0) breakdown.fireSafety *= 0.5;
+    if (demand.preferences.fireSafety === 'Must to have' && hydrantScore < 1.0) breakdown.fireSafety *= 0.5;
+    justificationPoints.push(`Fire Safety: NOC is ${property.fireNoc} and hydrants are ${property.fireHydrant}.`);
+    
+    // Power
+    if (!demand.powerMin && !demand.powerMax) {
+        breakdown.power = 0.9;
+    } else if (property.availablePower) {
+        const pMin = demand.powerMin || 0;
+        const pMax = demand.powerMax || Infinity;
+        if(property.availablePower >= pMin && property.availablePower <= pMax) {
+            breakdown.power = 1.0;
+        } else {
+            breakdown.power = 0.1;
+        }
+    } else {
+        breakdown.power = 0.1;
+    }
+    justificationPoints.push(`Power: ${property.availablePower || 'N/A'} kVA provided.`);
+
+    // Amenities (Ceiling Height, Docks, Building Type, Crane)
+    const amenityScores: number[] = [];
+    if (demand.ceilingHeight && property.ceilingHeight) {
+        amenityScores.push(Math.min(property.ceilingHeight, demand.ceilingHeight) / Math.max(property.ceilingHeight, demand.ceilingHeight));
+    }
+    if (demand.docks !== undefined && property.docks !== undefined) {
+        amenityScores.push(demand.docks === 0 ? 1.0 : Math.min(property.docks, demand.docks) / Math.max(property.docks, demand.docks));
+    }
+    if(demand.buildingType && property.buildingType){
+        amenityScores.push(demand.buildingType === property.buildingType ? 1.0 : 0.2);
+    }
+    if(demand.optionals?.crane?.required) {
+        amenityScores.push(property.optionals?.crane?.required ? 1.0 : 0.0);
+    }
+    breakdown.amenities = amenityScores.length > 0 ? amenityScores.reduce((a, b) => a + b, 0) / amenityScores.length : 0.9;
+    justificationPoints.push(`Amenities: Blended score based on ceiling height, docks, and other features.`);
+
+    const allScores = Object.values(breakdown);
+    const overallScore = allScores.reduce((a,b) => a+b, 0) / allScores.length;
+
+    return {
+        overallScore: parseFloat(overallScore.toFixed(2)),
+        scoreBreakdown: breakdown,
+        justification: "Locally generated score. " + justificationPoints.join(' '),
+    };
+}
+
 
 export function PropertyForm() {
   const { toast } = useToast();
@@ -316,18 +402,17 @@ export function PropertyForm() {
 
     try {
         if(!demandToMatch) throw new Error("Demand to match not found");
-
-        const result = await getPropertyMatchScoreAction({ property: data, demand: demandToMatch });
-        if (result.error || !result.submission) {
-            throw new Error(result.error || "Failed to get a valid response from the action.");
-        }
-        setMatchResult(result.submission.matchResult);
+        
+        // Use the client-side scoring function
+        const result = calculateClientSideScore(data, demandToMatch);
+        
+        setMatchResult(result);
         setIsConfirmOpen(true);
     } catch (error) {
        const e = error as Error;
        toast({
         variant: "destructive",
-        title: "AI Score Calculation Failed",
+        title: "Score Calculation Failed",
         description: e.message,
       });
     } finally {
@@ -403,8 +488,14 @@ export function PropertyForm() {
               case 'size': {
                   const propertySize = Number(value);
                   const demandSize = demandToMatch.size;
-                  if (!propertySize || !demandSize) return null;
-                  score = Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
+                  const variation = demandToMatch.sizeVariationPercentage ?? 10;
+                  const lowerBound = demandToMatch.sizeMin || demandSize * (1 - variation / 100);
+                  const upperBound = demandToMatch.sizeMax || demandSize * (1 + variation / 100);
+                  if (propertySize >= lowerBound && propertySize <= upperBound) {
+                    score = 1.0 - (Math.abs(demandSize - propertySize) / (upperBound - lowerBound));
+                  } else {
+                    score = 0.1; // Penalize if outside range
+                  }
                   break;
               }
               case 'ceilingHeight': {
@@ -417,9 +508,9 @@ export function PropertyForm() {
               case 'docks': {
                   const propertyDocks = Number(value);
                   const demandDocks = demandToMatch.docks;
-                  if (propertyDocks === undefined || propertyDocks === null || !demandDocks) return null;
+                  if (propertyDocks === undefined || propertyDocks === null || demandDocks === undefined) return null;
                   if (demandDocks === 0) return 1;
-                  score = Math.min(propertyDocks, demandDocks) / Math.max(propertyDocks, demandDocks);
+                  score = Math.min(propertyDocks, demandDocks) / demandDocks;
                   break;
               }
               case 'fireNoc':
@@ -487,15 +578,15 @@ export function PropertyForm() {
     )
   }
 
-  const scoreItems = matchResult ? [
-      { criterion: "Location", demand: `${demandToMatch.locationName} (within ${demandToMatch.radius}km)`, property: submissionData?.isLocationConfirmed ? "Confirmed by Provider" : "Not Confirmed", score: matchResult.scoreBreakdown.location },
-      { criterion: "Size (Sq. Ft.)", demand: `${demandToMatch.size.toLocaleString()}`, property: `${submissionData?.size?.toLocaleString()}`, score: matchResult.scoreBreakdown.size },
-      { criterion: "Building Type", demand: `${demandToMatch.buildingType}${demandToMatch.floorPreference ? ` (${demandToMatch.floorPreference})` : ''}`, property: `${submissionData?.buildingType} (${submissionData?.floor})`, score: (matchResult.scoreBreakdown.amenities) },
-      { criterion: "Ceiling Height", demand: `${demandToMatch.ceilingHeight || 'N/A'} ${demandToMatch.ceilingHeightUnit || 'ft'}`, property: `${submissionData?.ceilingHeight} ft`, score: matchResult.scoreBreakdown.amenities },
-      { criterion: "Docks", demand: `${demandToMatch.docks || 'N/A'}`, property: `${submissionData?.docks}`, score: matchResult.scoreBreakdown.amenities },
-      { criterion: "Power (kVA)", demand: `${demandToMatch.powerMin || '...'} - ${demandToMatch.powerMax || '...'}`, property: `${submissionData?.availablePower}`, score: matchResult.scoreBreakdown.power },
-      { criterion: "Approvals", demand: demandToMatch.preferences.approvals || 'Good to have', property: submissionData?.approvalStatus, score: matchResult.scoreBreakdown.approvals },
-      { criterion: "Fire Safety (NOC)", demand: demandToMatch.preferences.fireNoc || 'Good to have', property: submissionData?.fireNoc, score: matchResult.scoreBreakdown.fireSafety },
+  const scoreItems = matchResult && submissionData ? [
+      { criterion: "Location", demand: `${demandToMatch.locationName} (within ${demandToMatch.radius}km)`, property: submissionData.isLocationConfirmed ? "Confirmed by Provider" : "Not Confirmed", score: matchResult.scoreBreakdown.location },
+      { criterion: "Size (Sq. Ft.)", demand: `${demandToMatch.size.toLocaleString()}`, property: `${submissionData.size.toLocaleString()}`, score: matchResult.scoreBreakdown.size },
+      { criterion: "Building Type", demand: `${demandToMatch.buildingType}${demandToMatch.floorPreference ? ` (${demandToMatch.floorPreference})` : ''}`, property: `${submissionData.buildingType} (${submissionData.floor})`, score: (matchResult.scoreBreakdown.amenities) },
+      { criterion: "Ceiling Height", demand: `${demandToMatch.ceilingHeight || 'N/A'} ${demandToMatch.ceilingHeightUnit || 'ft'}`, property: `${submissionData.ceilingHeight} ft`, score: matchResult.scoreBreakdown.amenities },
+      { criterion: "Docks", demand: `${demandToMatch.docks || 'N/A'}`, property: `${submissionData.docks}`, score: matchResult.scoreBreakdown.amenities },
+      { criterion: "Power (kVA)", demand: `${demandToMatch.powerMin || '...'} - ${demandToMatch.powerMax || '...'}`, property: `${submissionData.availablePower}`, score: matchResult.scoreBreakdown.power },
+      { criterion: "Approvals", demand: demandToMatch.preferences.approvals || 'Good to have', property: submissionData.approvalStatus, score: matchResult.scoreBreakdown.approvals },
+      { criterion: "Fire Safety (NOC)", demand: demandToMatch.preferences.fireNoc || 'Good to have', property: submissionData.fireNoc, score: matchResult.scoreBreakdown.fireSafety },
   ] : [];
 
 
@@ -959,9 +1050,9 @@ export function PropertyForm() {
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <AlertDialogContent className="max-w-4xl">
             <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI-Powered Submission Review</AlertDialogTitle>
+                <AlertDialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> Submission Review</AlertDialogTitle>
                 <AlertDialogDescription>
-                    The AI has analyzed your submission. Review the match scores below and confirm to send it for approval.
+                    Review the match scores below and confirm to send it for approval.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             {matchResult ? (
@@ -1005,7 +1096,7 @@ export function PropertyForm() {
                          </Table>
                     </div>
                      <div className="space-y-2">
-                        <h4 className="font-semibold">AI Justification</h4>
+                        <h4 className="font-semibold">Justification</h4>
                          <p className="text-sm text-muted-foreground bg-secondary p-3 rounded-md mt-2">
                             {matchResult.justification}
                         </p>

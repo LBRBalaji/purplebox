@@ -34,6 +34,8 @@ export async function logDemandAction(
   }
 }
 
+// This server action is no longer called by the property form in real-time,
+// but is kept here in case a server-side score check is needed elsewhere.
 export async function getPropertyMatchScoreAction(
   input: GetPropertyMatchScoreInput
 ): Promise<{ submission?: { property: PropertySchema, matchResult: GetPropertyMatchScoreOutput, demandId: string, demandUserEmail?: string }; error?: string }> {
