@@ -78,6 +78,8 @@ export const demandSchema = z.object({
   powerMax: z.coerce.number().optional(),
   readiness: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
   description: z.string().optional(),
+  buildingType: z.enum(['PEB', 'RCC']).default('PEB'),
+  floorPreference: z.enum(['Ground', 'Multi-Floor', 'Any']).optional(),
   preferences: z.object({
     nonCompromisable: z.array(z.string()).optional(),
     approvals: z.enum(['Must to have', 'Good to have']).default('Must to have'),
