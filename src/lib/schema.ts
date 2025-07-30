@@ -33,7 +33,7 @@ export const propertySchema = z.object({
   userPhoneNumber: z.string().min(1, 'Phone number is required.'),
   userEmail: z.string().email('Invalid email address.'),
   
-  // New granular fields from demand's Optionals & Operations
+  // Replicating Demand Schema for a 1:1 match
   siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project']),
   safety: z.string().min(1, 'Safety information is required.'),
   approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']),
@@ -41,6 +41,39 @@ export const propertySchema = z.object({
   genSetBackup: z.enum(['Available', 'Can be provided']),
   canopy: z.enum(['Installed', 'Can be provided']),
   additionalInformation: z.string().optional(),
+
+  optionals: z.object({
+    officeSpaceMin: z.coerce.number().optional(),
+    officeSpaceMax: z.coerce.number().optional(),
+    cafeteriaOrCanteen: z.enum(['Cafeteria', 'Canteen']).optional(),
+    seatingCapacity: z.coerce.number().optional(),
+    additionalToiletsMen: z.coerce.number().optional(),
+    additionalToiletsWomen: z.coerce.number().optional(),
+    truckParkingYardMin: z.coerce.number().optional(),
+    truckParkingYardMax: z.coerce.number().optional(),
+    openStorageYardMin: z.coerce.number().optional(),
+    openStorageYardMax: z.coerce.number().optional(),
+    tenantSpecificImprovements: z.string().optional(),
+    processWaterRequirement: z.coerce.number().optional(),
+    hvacArea: z.string().optional(),
+    sprinklerRequirement: z.string().optional(),
+    crane: z.object({
+        required: z.boolean().default(false),
+        type: z.enum(['EOT', 'Gantry']).optional(),
+        count: z.coerce.number().optional(),
+        transverseLength: z.coerce.number().optional(),
+        span: z.coerce.number().optional(),
+        underhookHeight: z.coerce.number().optional(),
+        capacity: z.coerce.number().optional(),
+    }).optional(),
+    lightingRequirement: z.string().optional(),
+  }).optional(),
+  
+  operations: z.object({
+      mpcbEcCategory: z.enum(['Green', 'Orange', 'Red']).optional(),
+      etpDetails: z.string().optional(),
+      effluentCharacteristics: z.string().optional(),
+  }).optional(),
 });
 
 export type PropertySchema = z.infer<typeof propertySchema>;

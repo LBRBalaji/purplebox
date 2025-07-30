@@ -116,6 +116,9 @@ You must provide an overall score, a breakdown for multiple categories, and a de
   {{#if demand.operations.etpDetails}}
   - ETP Details: {{demand.operations.etpDetails}}
   {{/if}}
+  {{#if demand.operations.mpcbEcCategory}}
+  - MPCB/EC Category: {{demand.operations.mpcbEcCategory}}
+  {{/if}}
 
 **SUBMITTED PROPERTY**
 - Property ID: {{{property.propertyId}}}
@@ -132,6 +135,12 @@ You must provide an overall score, a breakdown for multiple categories, and a de
 - Fire NOC Status: {{{property.fireNoc}}}
 - Fire Hydrant Status: {{{property.fireHydrant}}}
 - Canopy Status: {{{property.canopy}}}
+- Crane Provided: {{#if property.optionals.crane.required}}Yes{{else}}No{{/if}}
+  {{#if property.optionals.crane.required}}
+  - Crane Type: {{property.optionals.crane.type}}
+  - Crane Capacity: {{property.optionals.crane.capacity}} Tons
+  {{/if}}
+- MPCB/EC Category: {{#if property.operations.mpcbEcCategory}}{{property.operations.mpcbEcCategory}}{{else}}N/A{{/if}}
 - Additional Info: {{{property.additionalInformation}}}
 
 Based on this information, provide your analysis as a JSON object matching the output schema.
