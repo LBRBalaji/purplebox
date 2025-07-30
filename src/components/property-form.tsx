@@ -205,7 +205,7 @@ export function PropertyForm() {
       readinessToOccupy: "Immediate",
       siteType: "Standalone",
       buildingType: undefined,
-      safety: "",
+      safety: "Fully Compounded",
       ceilingHeight: undefined,
       rentPerSft: undefined,
       rentalSecurityDeposit: undefined,
@@ -634,6 +634,21 @@ export function PropertyForm() {
                         </FormItem>
                         )}
                     />
+                     <FormField control={form.control} name="safety" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Compound/Boundary Wall Safety</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    <SelectItem value="Fully Compounded">Fully Compounded</SelectItem>
+                                    <SelectItem value="Partially Compounded">Partially Compounded</SelectItem>
+                                    <SelectItem value="3-Side Compounded">3-Side Compounded</SelectItem>
+                                    <SelectItem value="Not Compounded">Not Compounded</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                     )}/>
                     <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem className="relative">
                         <div className="flex items-center justify-between">
                         <FormLabel>Approval Status</FormLabel>

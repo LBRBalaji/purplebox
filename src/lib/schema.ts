@@ -32,7 +32,7 @@ export const propertySchemaBase = z.object({
   userEmail: z.string().email('Invalid email address.'),
   
   siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project']),
-  safety: z.string().min(1, 'Safety information is required.'),
+  safety: z.enum(['Fully Compounded', 'Partially Compounded', '3-Side Compounded', 'Not Compounded']),
   approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']),
   genSetBackup: z.enum(['Available', 'Can be provided']),
   canopy: z.enum(['Installed', 'Can be provided']),
@@ -92,7 +92,6 @@ export const createPropertySchema = (demand: DemandSchema | undefined) => {
         if ((demand.powerMin || demand.powerMax) && data.availablePower === undefined) {
              ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Available power is required for this demand.", path: ["availablePower"] });
         }
-        // Add more conditional checks for optional/operational fields as needed
         if (demand.optionals?.crane?.required && !data.optionals?.crane?.required) {
              ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Crane information is required for this demand.", path: ["optionals.crane.required"] });
         }
