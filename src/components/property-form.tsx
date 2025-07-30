@@ -66,6 +66,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Badge } from "./ui/badge";
 import { Switch } from "./ui/switch";
 import { cn } from "@/lib/utils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
@@ -80,15 +81,6 @@ const priorityLabels: { [key: string]: string } = {
   buildingType: 'Building Type',
   crane: 'Crane Details',
   operations: 'Operations Details'
-};
-
-const PreferenceBadge = ({ preference }: { preference: 'Must to have' | 'Good to have' | undefined }) => {
-    if (!preference) return null;
-    return (
-        <Badge variant={preference === 'Must to have' ? "outline" : "secondary"} className="text-xs">
-            {preference}
-        </Badge>
-    );
 };
 
 type PriorityInfo = {
@@ -108,32 +100,6 @@ function DemandSummaryCard({ demand, priorityCounts }: { demand: DemandSchema | 
             </Card>
         );
     }
-
-    const customerPriorities: PriorityInfo[] = React.useMemo(() => {
-        const priorities: PriorityInfo[] = [];
-        const nonCompromisable = demand.preferences?.nonCompromisable || [];
-
-        nonCompromisable.forEach(item => {
-            const isOptional = ['crane'].includes(item);
-            const isOperation = ['operations'].includes(item);
-
-            let section: PriorityInfo['section'] = 'Essentials';
-            if (isOptional) section = 'Optionals';
-            else if (isOperation) section = 'Operations';
-            
-            priorities.push({ id: item, label: priorityLabels[item] || item, section });
-        });
-        
-        if (demand.operationType === 'Manufacturing' && !priorities.some(p => p.id === 'operations')) {
-             priorities.push({ id: 'operations', label: 'Operations Details', section: 'Operations' });
-        }
-        
-        if (demand.optionals?.crane?.required && !priorities.some(p => p.id === 'crane')) {
-            priorities.push({ id: 'crane', label: 'Crane Details', section: 'Optionals' });
-        }
-
-        return priorities;
-    }, [demand]);
     
     return (
         <Card className="bg-primary/5 mb-6">
@@ -151,21 +117,19 @@ function DemandSummaryCard({ demand, priorityCounts }: { demand: DemandSchema | 
                         <p className="text-muted-foreground mt-1 whitespace-pre-wrap text-xs bg-background/50 p-2 rounded-md">{demand.description}</p>
                     </div>
                 )}
-                {customerPriorities.length > 0 && (
-                     <div className="text-sm pt-2">
-                        <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Customer Priorities</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          The following requirements are critical for the customer. Please pay close attention to them in the corresponding sections of the form. The number of priorities for each section is indicated in the section header.
-                        </p>
-                         <ul className="list-disc pl-5 mt-2 space-y-1 text-muted-foreground">
-                            {customerPriorities.map(p => (
-                                <li key={p.id}>
-                                    <span className="font-medium text-foreground">{p.label}</span> ({p.section})
-                                </li>
-                            ))}
-                         </ul>
+                 <div className="text-sm pt-2">
+                    <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Customer Priorities</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      The following requirements are critical for the customer. The number of priorities for each section is indicated below.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {demand.preferences.nonCompromisable?.map(p => (
+                            <Badge key={p} variant="outline" className="font-medium">{priorityLabels[p] || p} (in Essentials)</Badge>
+                        ))}
+                         {demand.optionals?.crane?.required && <Badge variant="outline" className="font-medium">Crane Details (in Optionals)</Badge>}
+                         {demand.operationType === 'Manufacturing' && <Badge variant="outline" className="font-medium">Operational Details</Badge>}
                     </div>
-                )}
+                </div>
             </CardContent>
         </Card>
     )
@@ -178,10 +142,10 @@ export function PropertyForm() {
   const { user } = useAuth();
   const { demands, addSubmission } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
-  const [aiResult, setAiResult] = React.useState<{ matchResult: GetPropertyMatchScoreOutput } | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
   const [submissionData, setSubmissionData] = React.useState<PropertySchema | null>(null);
+  const [matchResult, setMatchResult] = React.useState<GetPropertyMatchScoreOutput | null>(null);
   
   const [isEssentialsOpen, setIsEssentialsOpen] = React.useState(true);
   const [isOptionalsOpen, setIsOptionalsOpen] = React.useState(false);
@@ -243,12 +207,9 @@ export function PropertyForm() {
     if (demandToMatch.optionals?.crane?.required) {
         optionalCount++;
     }
-    // Add other optional priorities here if they exist
 
     if (demandToMatch.operationType === 'Manufacturing') {
-        if (demandToMatch.operations?.mpcbEcCategory) operationCount++;
-        if (demandToMatch.operations?.etpDetails) operationCount++;
-        if (demandToMatch.operations?.effluentCharacteristics) operationCount++;
+        operationCount++;
     }
 
     return { optionals: optionalCount, operations: operationCount };
@@ -272,29 +233,28 @@ export function PropertyForm() {
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
   
-
-  const handleCloseDialogAndRedirect = () => {
-    setIsDialogOpen(false);
-    if (isMatchingMode) {
-      router.push('/dashboard');
-    }
-  };
-
-  const handleConfirmSubmit = async () => {
-    if (!submissionData) return;
+  const handleFinalSubmit = async () => {
     setIsLoading(true);
-    setAiResult(null);
+    if (!submissionData || !matchResult) {
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Missing submission data or match score.",
+        });
+        setIsLoading(false);
+        return;
+    }
+    
     try {
-        if (!isMatchingMode) {
-            throw new Error("This form is for submitting matches only.");
-        }
-        
-        const result = await getPropertyMatchScoreAction(submissionData, demands);
-        if (result.error || !result.submission) {
-            throw new Error(result.error || "Failed to get a valid response from the action.");
-        }
-        addSubmission(result.submission, user?.email);
-        setAiResult({ matchResult: result.submission.matchResult });
+        const submission = {
+          property: submissionData,
+          matchResult: matchResult,
+          demandId: submissionData.o2oDealDemandId!,
+          demandUserEmail: demandToMatch?.userEmail,
+        };
+
+        addSubmission(submission, user?.email);
+        setIsConfirmOpen(false);
         setIsDialogOpen(true);
         toast({
             title: "Success!",
@@ -309,14 +269,32 @@ export function PropertyForm() {
       });
     } finally {
       setIsLoading(false);
-      setIsConfirmOpen(false);
       setSubmissionData(null);
     }
   };
 
   async function onAttemptSubmit(data: PropertySchema) {
-    setSubmissionData(data);
-    setIsConfirmOpen(true);
+    setIsLoading(true);
+    setMatchResult(null); // Clear previous results
+    setSubmissionData(data); // Store current data
+
+    try {
+        const result = await getPropertyMatchScoreAction(data, demands);
+        if (result.error || !result.submission) {
+            throw new Error(result.error || "Failed to get a valid response from the action.");
+        }
+        setMatchResult(result.submission.matchResult);
+        setIsConfirmOpen(true);
+    } catch (error) {
+       const e = error as Error;
+       toast({
+        variant: "destructive",
+        title: "AI Score Calculation Failed",
+        description: e.message,
+      });
+    } finally {
+        setIsLoading(false);
+    }
   }
   
   const ComplianceToggle = ({ field, form }: { form: any, field: any }) => (
@@ -339,6 +317,18 @@ export function PropertyForm() {
         </Card>
     )
   }
+
+  const scoreItems = matchResult ? [
+      { criterion: "Location", demand: `${demandToMatch.locationName} (within ${demandToMatch.radius}km)`, property: submissionData?.isLocationConfirmed ? "Confirmed by Provider" : "Not Confirmed", score: matchResult.scoreBreakdown.location },
+      { criterion: "Size (Sq. Ft.)", demand: `${demandToMatch.size.toLocaleString()}`, property: `${submissionData?.size?.toLocaleString()}`, score: matchResult.scoreBreakdown.size },
+      { criterion: "Building Type", demand: `${demandToMatch.buildingType}${demandToMatch.floorPreference ? ` (${demandToMatch.floorPreference})` : ''}`, property: `${submissionData?.buildingType} (${submissionData?.floor})`, score: (matchResult.scoreBreakdown.amenities) },
+      { criterion: "Ceiling Height", demand: `${demandToMatch.ceilingHeight || 'N/A'} ${demandToMatch.ceilingHeightUnit || 'ft'}`, property: `${submissionData?.ceilingHeight} ft`, score: matchResult.scoreBreakdown.amenities },
+      { criterion: "Docks", demand: `${demandToMatch.docks || 'N/A'}`, property: `${submissionData?.docks}`, score: matchResult.scoreBreakdown.amenities },
+      { criterion: "Power (kVA)", demand: `${demandToMatch.powerMin || '...'} - ${demandToMatch.powerMax || '...'}`, property: `${submissionData?.availablePower}`, score: matchResult.scoreBreakdown.power },
+      { criterion: "Approvals", demand: demandToMatch.preferences.approvals || 'Good to have', property: submissionData?.approvalStatus, score: matchResult.scoreBreakdown.approvals },
+      { criterion: "Fire Safety (NOC)", demand: demandToMatch.preferences.fireNoc || 'Good to have', property: submissionData?.fireNoc, score: matchResult.scoreBreakdown.fireSafety },
+  ] : [];
+
 
   return (
     <>
@@ -375,7 +365,6 @@ export function PropertyForm() {
                                 type="number" 
                                 placeholder={`Req: ${demandToMatch.sizeMin || demandToMatch.size} - ${demandToMatch.sizeMax || demandToMatch.size} sq.ft.`}
                                 {...field} value={field.value ?? ''} 
-                                disabled={!demandToMatch.size}
                             />
                         </FormControl>
                         <FormMessage />
@@ -384,7 +373,7 @@ export function PropertyForm() {
                     <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Readiness</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.readiness}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.readiness}`} /></SelectTrigger></FormControl>
                             <SelectContent>
                                 <SelectItem value="Immediate">Immediate</SelectItem>
@@ -400,7 +389,7 @@ export function PropertyForm() {
                     <FormField control={form.control} name="buildingType" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Building Type</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.buildingType}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.buildingType}`} /></SelectTrigger></FormControl>
                             <SelectContent>
                             <SelectItem value="PEB">PEB</SelectItem>
@@ -414,7 +403,7 @@ export function PropertyForm() {
                         <FormField control={form.control} name="floor" render={({ field }) => (
                             <FormItem>
                             <FormLabel>Floor Preference</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.floorPreference}>
+                            <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.floorPreference ?? 'N/A'}`} /></SelectTrigger></FormControl>
                                 <SelectContent>
                                 <SelectItem value="Ground">Ground</SelectItem>
@@ -479,19 +468,19 @@ export function PropertyForm() {
                     <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
                         <FormLabel>Approval Status</FormLabel>
-                        <PreferenceBadge preference={demandToMatch.preferences.approvals} />
+                        <Badge variant={demandToMatch.preferences.approvals === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.approvals}</Badge>
                         </div>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
                             <FormLabel>Fire NOC</FormLabel>
-                            <PreferenceBadge preference={demandToMatch.preferences.fireNoc} />
+                            <Badge variant={demandToMatch.preferences.fireNoc === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.fireNoc}</Badge>
                         </div>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
                             <FormLabel>Fire Safety Infrastructure</FormLabel>
-                            <PreferenceBadge preference={demandToMatch.preferences.fireSafety} />
+                            <Badge variant={demandToMatch.preferences.fireSafety === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.fireSafety}</Badge>
                         </div>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     </div>
@@ -759,7 +748,7 @@ export function PropertyForm() {
               ) : (
                 <>
                   <Wand className="mr-2 h-4 w-4" />
-                  Submit Match
+                  Review & Submit Match
                 </>
               )}
             </Button>
@@ -767,101 +756,94 @@ export function PropertyForm() {
         </form>
       </Form>
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-4xl">
             <AlertDialogHeader>
-                <AlertDialogTitle>Review Your Submission</AlertDialogTitle>
+                <AlertDialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI-Powered Submission Review</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Please confirm your submission. The AI will calculate a match score and the details will be sent for approval.
+                    The AI has analyzed your submission. Review the match scores below and confirm to send it for approval.
                 </AlertDialogDescription>
             </AlertDialogHeader>
-             <div className="text-sm max-h-60 overflow-y-auto pr-4 -mr-4">
-                <h4 className="font-semibold mb-2">Checklist of Customer Requirements:</h4>
-                <ul className="space-y-1.5 list-disc pl-5">
-                    {Object.entries(demandToMatch.preferences).map(([key, value]) => {
-                         if (value === 'Must to have' || demandToMatch.preferences.nonCompromisable?.includes(key)) {
-                             const isMissing = !submissionData?.[key as keyof PropertySchema]
-                             return (
-                                <li key={key} className={cn("flex items-center", isMissing && "text-foreground")}>
-                                     {isMissing ? <AlertTriangle className="h-4 w-4 mr-2"/> : <CheckCircle className="h-4 w-4 mr-2 text-green-600"/>}
-                                    You have {isMissing ? 'not provided a value for' : 'provided a value for'} <span className="font-semibold mx-1">{priorityLabels[key] || key}</span>, which is a <span className="font-semibold mx-1">Must to have</span> item.
-                                </li>
-                             )
-                         }
-                         return null
-                    })}
-                    {demandToMatch.optionals?.crane?.required && (
-                        <li className={cn("flex items-center", !submissionData?.optionals?.crane?.required && "text-foreground")}>
-                            {!submissionData?.optionals?.crane?.required ? <AlertTriangle className="h-4 w-4 mr-2"/> : <CheckCircle className="h-4 w-4 mr-2 text-green-600"/>}
-                            You have {!submissionData?.optionals?.crane?.required ? 'not specified' : 'specified'} a crane, which the customer requires.
-                        </li>
-                    )}
-                </ul>
-            </div>
-            <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setSubmissionData(null)}>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleConfirmSubmit}>
-                    Confirm & Submit
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialogAndRedirect}>
-        <DialogContent className="sm:max-w-2xl">
-           {isMatchingMode ? (
-              <>
-                <DialogHeader>
-                  <DialogTitle>AI Match Score Calculated & Submitted!</DialogTitle>
-                  <DialogDescription>
-                    The AI has analyzed this property against the demand. Your submission is now pending approval from an admin.
-                  </DialogDescription>
-                </DialogHeader>
-                {isLoading || !aiResult?.matchResult ? (
-                  <div className="space-y-4 mt-4">
+            {matchResult ? (
+                <div className="space-y-6">
+                    <div className="text-center p-4 border rounded-md bg-primary/5">
+                      <p className="text-sm text-muted-foreground">Overall Match Score</p>
+                      <p className="text-6xl font-bold text-primary">{(matchResult.overallScore * 100).toFixed(0)}%</p>
+                      <Progress value={matchResult.overallScore * 100} className="h-2 mt-2" />
+                    </div>
+                    <div className="space-y-4">
+                        <h4 className="font-semibold">Scorecard</h4>
+                         <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-1/4">Criterion</TableHead>
+                                    <TableHead>Customer Requirement</TableHead>
+                                    <TableHead>Property Specification</TableHead>
+                                    <TableHead className="text-right w-[100px]">Match</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {scoreItems.map(item => {
+                                    const score = Math.round(item.score * 100);
+                                    const scoreColor = score > 85 ? 'bg-green-500' : score > 60 ? 'bg-amber-500' : 'bg-muted';
+                                    
+                                    return (
+                                        <TableRow key={item.criterion}>
+                                            <TableCell className="font-semibold">{item.criterion}</TableCell>
+                                            <TableCell>{item.demand}</TableCell>
+                                            <TableCell>{item.property}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center gap-2 justify-end">
+                                                    <span className="font-bold text-sm">{score}%</span>
+                                                    <Progress value={score} className={cn("h-2 w-12", scoreColor)} indicatorClassName={scoreColor} />
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
+                            </TableBody>
+                         </Table>
+                    </div>
+                     <div className="space-y-2">
+                        <h4 className="font-semibold">AI Justification</h4>
+                         <p className="text-sm text-muted-foreground bg-secondary p-3 rounded-md mt-2">
+                            {matchResult.justification}
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                 <div className="space-y-4 mt-4">
                     <Skeleton className="h-8 w-1/2" />
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-3/4" />
                   </div>
-                ) : (
-                  <div className="space-y-4 mt-4">
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Overall Match Score</p>
-                      <p className="text-6xl font-bold text-primary">{(aiResult.matchResult.overallScore * 100).toFixed(0)}%</p>
-                      <Progress value={aiResult.matchResult.overallScore * 100} className="h-2 mt-2" />
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                            <p className="font-semibold">Location</p>
-                            <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.location * 100).toFixed(0)}%</p>
-                        </div>
-                        <div>
-                            <p className="font-semibold">Size</p>
-                            <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.size * 100).toFixed(0)}%</p>
-                        </div>
-                        <div>
-                            <p className="font-semibold">Amenities</p>
-                            <p className="text-muted-foreground text-lg">{(aiResult.matchResult.scoreBreakdown.amenities * 100).toFixed(0)}%</p>
-                        </div>
-                    </div>
-                    <Collapsible>
-                        <CollapsibleTrigger asChild>
-                           <Button variant="link" className="text-sm p-0 h-auto">
-                             Show Justification
-                             <ChevronsUpDown className="h-4 w-4 ml-1" />
-                           </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                            <p className="text-sm text-muted-foreground bg-secondary p-3 rounded-md mt-2">
-                              {aiResult.matchResult.justification}
-                            </p>
-                        </CollapsibleContent>
-                    </Collapsible>
-                  </div>
-                )}
-              </>
-            ) : null }
+            )}
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setMatchResult(null)}>Go Back & Edit</AlertDialogCancel>
+                <AlertDialogAction onClick={handleFinalSubmit} disabled={isLoading}>
+                    {isLoading ? "Submitting..." : "Confirm & Submit"}
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <Dialog open={isDialogOpen} onOpenChange={() => {
+            if (isDialogOpen) { // only trigger on close
+                router.push('/dashboard');
+            }
+            setIsDialogOpen(!isDialogOpen);
+      }}>
+        <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Submission Sent for Approval!</DialogTitle>
+              <DialogDescription>
+                Your property match has been sent to the admin for review. You can track its status in the "My Submissions" tab.
+              </DialogDescription>
+            </DialogHeader>
             <DialogFooter>
-                <Button variant="outline" onClick={handleCloseDialogAndRedirect}>Close</Button>
+                <Button variant="outline" onClick={() => {
+                    setIsDialogOpen(false);
+                    router.push('/dashboard');
+                }}>Close</Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>
