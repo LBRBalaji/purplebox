@@ -413,7 +413,7 @@ export function PropertyForm() {
                         <FormControl>
                             <Input 
                                 type="number" 
-                                placeholder={demandToMatch.ceilingHeight ? `Required: ${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit}` : "e.g. 30"} 
+                                placeholder={demandToMatch.ceilingHeight ? `Required: ${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit || 'ft'}` : "e.g. 30"} 
                                 {...field} value={field.value ?? ''}
                                 className="placeholder:text-muted-foreground/60"
                             />
@@ -699,3 +699,5 @@ export function PropertyForm() {
     </>
   );
 }
+
+    
