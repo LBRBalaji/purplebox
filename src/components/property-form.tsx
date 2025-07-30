@@ -83,13 +83,7 @@ const priorityLabels: { [key: string]: string } = {
   operations: 'Operations Details'
 };
 
-type PriorityInfo = {
-    id: string;
-    label: string;
-    section: 'Essentials' | 'Optionals' | 'Operations';
-}
-
-function DemandSummaryCard({ demand, priorityCounts }: { demand: DemandSchema | undefined, priorityCounts: { optionals: number, operations: number } }) {
+function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
 
     if (!demand) {
         return (
@@ -100,7 +94,26 @@ function DemandSummaryCard({ demand, priorityCounts }: { demand: DemandSchema | 
             </Card>
         );
     }
+
+    const priorityItems = [
+        ...(demand.preferences.nonCompromisable || []),
+        ...(demand.optionals?.crane?.required ? ['crane'] : []),
+        ...(demand.operationType === 'Manufacturing' ? ['operations'] : []),
+    ];
     
+    const getSection = (priority: string) => {
+        if (['crane'].includes(priority)) return 'Optionals';
+        if (['operations'].includes(priority)) return 'Operations';
+        return 'Essentials';
+    }
+
+    const priorityCounts = priorityItems.reduce((acc, item) => {
+        const section = getSection(item);
+        if (section === 'Optionals') acc.optionals++;
+        if (section === 'Operations') acc.operations++;
+        return acc;
+    }, { optionals: 0, operations: 0 });
+
     return (
         <Card className="bg-primary/5 mb-6">
             <CardHeader>
@@ -108,7 +121,10 @@ function DemandSummaryCard({ demand, priorityCounts }: { demand: DemandSchema | 
                     <ClipboardList className="h-5 w-5 text-primary" />
                     Demand Summary: {demand.demandId}
                 </CardTitle>
-                 <CardDescription>You are submitting a property against this demand. The most relevant sections have been moved to the top for you.</CardDescription>
+                 <CardDescription>
+                    Fill out the form below. The customer's key priorities are listed here for your reference. 
+                    Badges with counts on the section headers indicate where priority items can be found.
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 {demand.description && (
@@ -119,21 +135,36 @@ function DemandSummaryCard({ demand, priorityCounts }: { demand: DemandSchema | 
                 )}
                  <div className="text-sm pt-2">
                     <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Customer Priorities</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      The following requirements are critical for the customer. The number of priorities for each section is indicated below.
-                    </p>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {demand.preferences.nonCompromisable?.map(p => (
-                            <Badge key={p} variant="outline" className="font-medium">{priorityLabels[p] || p} (in Essentials)</Badge>
-                        ))}
-                         {demand.optionals?.crane?.required && <Badge variant="outline" className="font-medium">Crane Details (in Optionals)</Badge>}
-                         {demand.operationType === 'Manufacturing' && <Badge variant="outline" className="font-medium">Operational Details</Badge>}
+                        {priorityItems.length > 0 ? priorityItems.map(p => (
+                            <div key={p} className="p-2 rounded-md bg-secondary border text-xs">
+                                <span className="font-semibold">{priorityLabels[p] || p}</span>
+                                <span className="text-muted-foreground"> (in {getSection(p)} section)</span>
+                            </div>
+                        )) : (
+                            <p className="text-xs text-muted-foreground">No specific high-priority items were marked by the customer.</p>
+                        )}
                     </div>
                 </div>
             </CardContent>
         </Card>
     )
 }
+
+const ScoreBadge = ({ score }: { score: number | null }) => {
+    if (score === null) return null;
+
+    const displayScore = Math.round(score * 100);
+    const colorClass = displayScore >= 85 ? 'bg-green-100 text-green-800 border-green-300' 
+        : displayScore >= 60 ? 'bg-amber-100 text-amber-800 border-amber-300' 
+        : 'bg-red-100 text-red-800 border-red-300';
+
+    return (
+        <Badge variant="outline" className={cn("absolute -top-2 -right-2", colorClass)}>
+            <Percent className="h-3 w-3 mr-1" /> {displayScore}
+        </Badge>
+    );
+};
 
 export function PropertyForm() {
   const { toast } = useToast();
@@ -152,6 +183,9 @@ export function PropertyForm() {
   const [isOperationsOpen, setIsOperationsOpen] = React.useState(false);
   const [isCommercialsOpen, setIsCommercialsOpen] = React.useState(false);
   const [isAdditionalInfoOpen, setIsAdditionalInfoOpen] = React.useState(false);
+
+  // State for individual scores
+  const [scores, setScores] = React.useState<Record<string, number | null>>({});
   
   const demandIdFromUrl = searchParams.get('demandId');
   const isMatchingMode = !!demandIdFromUrl;
@@ -196,9 +230,65 @@ export function PropertyForm() {
     demands.find(d => d.demandId === demandIdFromUrl),
     [demands, demandIdFromUrl]
   );
+
+  const calculateScore = React.useCallback((field: keyof PropertySchema, value: any) => {
+    if (!demandToMatch) return null;
+
+    let score = 0;
+    switch (field) {
+        case 'size': {
+            const propertySize = Number(value);
+            const demandSize = demandToMatch.size;
+            if (!propertySize || !demandSize) return null;
+            score = Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
+            break;
+        }
+        case 'ceilingHeight': {
+            const propertyHeight = Number(value);
+            const demandHeight = demandToMatch.ceilingHeight;
+            if (!propertyHeight || !demandHeight) return null;
+            score = Math.min(propertyHeight, demandHeight) / Math.max(propertyHeight, demandHeight);
+            break;
+        }
+        case 'docks': {
+            const propertyDocks = Number(value);
+            const demandDocks = demandToMatch.docks;
+            if (propertyDocks === undefined || propertyDocks === null || !demandDocks) return null;
+            score = Math.min(propertyDocks, demandDocks) / Math.max(propertyDocks, demandDocks);
+            break;
+        }
+        case 'fireNoc': {
+            if (value === 'Obtained') score = 1.0;
+            else if (value === 'Applied For') score = 0.6;
+            else if (value === 'To Apply') score = 0.3;
+            break;
+        }
+        case 'approvalStatus': {
+             if (value === 'Obtained') score = 1.0;
+            else if (value === 'Applied For') score = 0.6;
+            else if (value === 'To Apply') score = 0.3;
+            else score = 0.1;
+            break;
+        }
+        default:
+            return null;
+    }
+    setScores(prev => ({...prev, [field]: score}));
+  }, [demandToMatch]);
   
   const buildingType = form.watch('buildingType');
+  const sizeValue = form.watch('size');
+  const ceilingHeightValue = form.watch('ceilingHeight');
+  const docksValue = form.watch('docks');
+  const fireNocValue = form.watch('fireNoc');
+  const approvalStatusValue = form.watch('approvalStatus');
 
+  React.useEffect(() => { calculateScore('size', sizeValue) }, [sizeValue, calculateScore]);
+  React.useEffect(() => { calculateScore('ceilingHeight', ceilingHeightValue) }, [ceilingHeightValue, calculateScore]);
+  React.useEffect(() => { calculateScore('docks', docksValue) }, [docksValue, calculateScore]);
+  React.useEffect(() => { calculateScore('fireNoc', fireNocValue) }, [fireNocValue, calculateScore]);
+  React.useEffect(() => { calculateScore('approvalStatus', approvalStatusValue) }, [approvalStatusValue, calculateScore]);
+  
   const priorityCounts = React.useMemo(() => {
     if (!demandToMatch) return { optionals: 0, operations: 0 };
     let optionalCount = 0;
@@ -334,7 +424,7 @@ export function PropertyForm() {
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onAttemptSubmit)} className="space-y-6">
-          <DemandSummaryCard demand={demandToMatch} priorityCounts={priorityCounts} />
+          <DemandSummaryCard demand={demandToMatch}/>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -358,7 +448,7 @@ export function PropertyForm() {
                     )} />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField control={form.control} name="size" render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="relative">
                         <FormLabel>Size (Sq. Ft.)</FormLabel>
                         <FormControl>
                             <Input 
@@ -367,6 +457,7 @@ export function PropertyForm() {
                                 {...field} value={field.value ?? ''} 
                             />
                         </FormControl>
+                        <ScoreBadge score={scores.size ?? null} />
                         <FormMessage />
                         </FormItem>
                     )} />
@@ -389,7 +480,7 @@ export function PropertyForm() {
                     <FormField control={form.control} name="buildingType" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Building Type</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.buildingType}>
                             <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.buildingType}`} /></SelectTrigger></FormControl>
                             <SelectContent>
                             <SelectItem value="PEB">PEB</SelectItem>
@@ -403,7 +494,7 @@ export function PropertyForm() {
                         <FormField control={form.control} name="floor" render={({ field }) => (
                             <FormItem>
                             <FormLabel>Floor Preference</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.floorPreference}>
                                 <FormControl><SelectTrigger><SelectValue placeholder={`Req: ${demandToMatch.floorPreference ?? 'N/A'}`} /></SelectTrigger></FormControl>
                                 <SelectContent>
                                 <SelectItem value="Ground">Ground</SelectItem>
@@ -417,7 +508,7 @@ export function PropertyForm() {
                         />
                     )}
                     <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="relative">
                         <FormLabel>Ceiling Height ({demandToMatch.ceilingHeightUnit || 'ft'})</FormLabel>
                         <FormControl>
                             <Input 
@@ -427,12 +518,13 @@ export function PropertyForm() {
                                 disabled={!demandToMatch.ceilingHeight}
                             />
                         </FormControl>
+                        <ScoreBadge score={scores.ceilingHeight ?? null} />
                         <FormMessage />
                         </FormItem>
                     )}
                     />
                     <FormField control={form.control} name="docks" render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="relative">
                             <FormLabel>Number of Docks</FormLabel>
                         <FormControl>
                             <Input 
@@ -442,6 +534,7 @@ export function PropertyForm() {
                                 disabled={demandToMatch.docks === undefined}
                             />
                         </FormControl>
+                        <ScoreBadge score={scores.docks ?? null} />
                         <FormMessage />
                         </FormItem>
                     )} />
@@ -453,7 +546,7 @@ export function PropertyForm() {
                                 type="number"
                                 placeholder={
                                 (demandToMatch.powerMin !== undefined || demandToMatch.powerMax !== undefined)
-                                    ? `Required: ${demandToMatch.powerMin ?? '...'} - ${demandToMatch.powerMax ?? '...'} kVA`
+                                    ? `Req: ${demandToMatch.powerMin ?? '...'} - ${demandToMatch.powerMax ?? '...'} kVA`
                                     : 'Req: N/A'
                                 }
                                 {...field}
@@ -465,18 +558,22 @@ export function PropertyForm() {
                         </FormItem>
                         )}
                     />
-                    <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem>
+                    <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem className="relative">
                         <div className="flex items-center justify-between">
                         <FormLabel>Approval Status</FormLabel>
                         <Badge variant={demandToMatch.preferences.approvals === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.approvals}</Badge>
                         </div>
-                        <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem>
+                        <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select>
+                        <ScoreBadge score={scores.approvalStatus ?? null} />
+                        <FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem className="relative">
                         <div className="flex items-center justify-between">
                             <FormLabel>Fire NOC</FormLabel>
                             <Badge variant={demandToMatch.preferences.fireNoc === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.fireNoc}</Badge>
                         </div>
-                        <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                        <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select>
+                        <ScoreBadge score={scores.fireNoc ?? null} />
+                        <FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
                             <FormLabel>Fire Safety Infrastructure</FormLabel>
