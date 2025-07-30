@@ -7,49 +7,6 @@ import { getPropertyMatchScore, type GetPropertyMatchScoreOutput } from "@/ai/fl
 import { getWarehouses, type GetWarehousesInput, type GetWarehousesOutput } from "@/ai/flows/get-warehouses";
 import { type PropertySchema, type DemandSchema, type WarehouseSchema } from "./schema";
 
-export async function generateDescriptionAction(
-  data: PropertySchema
-): Promise<{ description?: string; error?: string }> {
-  try {
-    // Map form data to AI flow input
-    const input: GeneratePropertyDescriptionInput = {
-        propertyId: data.propertyId,
-        propertyGeoLocation: data.propertyGeoLocation,
-        size: data.size,
-        floor: data.floor,
-        readinessToOccupy: data.readinessToOccupy,
-        siteType: data.siteType,
-        safety: data.safety,
-        ceilingHeight: data.ceilingHeight,
-        rentPerSft: data.rentPerSft,
-        rentalSecurityDeposit: data.rentalSecurityDeposit,
-        userType: data.userType,
-        userName: data.userName,
-        userCompanyName: data.userCompanyName,
-        userPhoneNumber: data.userPhoneNumber,
-        userEmail: data.userEmail,
-        approvalStatus: data.approvalStatus,
-        approvalAuthority: data.approvalAuthority,
-        installedCapacity: data.installedCapacity,
-        availablePower: data.availablePower,
-        genSetBackup: data.genSetBackup,
-        fireHydrant: data.fireHydrant,
-        fireNoc: data.fireNoc,
-        docks: data.docks,
-        canopy: data.canopy,
-        additionalInformation: data.additionalInformation || "",
-    };
-
-    const result = await generatePropertyDescription(input);
-    
-    return { description: result.propertyDescription };
-  } catch (error) {
-    console.error("Error generating property description:", error);
-    const e = error as Error;
-    return { error: e.message || "An unexpected error occurred while generating the description." };
-  }
-}
-
 export async function getImprovedDemandDescriptionAction(
   input: ImprovePropertyDemandDescriptionInput
 ): Promise<{ improvedDescription?: string; error?: string }> {
