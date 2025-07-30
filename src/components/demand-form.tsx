@@ -13,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -160,7 +161,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       userName: "",
       userEmail: "",
       userPhone: "",
-      propertyType: undefined,
+      operationType: "Warehousing",
       location: "",
       locationName: "",
       radius: undefined,
@@ -212,6 +213,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   const watchedDemandId = form.watch("demandId");
   const sizeMax = form.watch('sizeMax');
   const buildingType = form.watch('buildingType');
+  const operationType = form.watch('operationType');
   const craneRequired = form.watch('optionals.crane.required');
 
   const effectiveUsableArea = React.useMemo(() => {
@@ -298,13 +300,13 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
   }, [isEditMode, editDemandId, demands, form]);
   
   const handleGenerateDescription = async () => {
-    const fieldsToValidate: FieldPath<DemandSchema>[] = ['propertyType', 'location', 'radius', 'size'];
+    const fieldsToValidate: FieldPath<DemandSchema>[] = ['operationType', 'location', 'radius', 'size'];
     const isValid = await form.trigger(fieldsToValidate);
     if (!isValid) {
       toast({
         variant: "destructive",
         title: "Missing Information",
-        description: "Please fill in Property Type, Location, Radius, and Size before generating a description.",
+        description: "Please fill in Operation Type, Location, Radius, and Size before generating a description.",
       });
       return;
     }
@@ -313,8 +315,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     try {
       const data = form.getValues();
       const input: ImprovePropertyDemandDescriptionInput = {
-        description: data.description,
-        propertyType: data.propertyType!,
+        propertyType: data.operationType!,
         locationName: data.locationName || "the specified area",
         size: String(data.size),
         readiness: data.readiness,
@@ -366,7 +367,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
           ...form.formState.defaultValues,
           ...userDetails,
           demandId: "",
-          propertyType: undefined,
+          operationType: "Warehousing",
           description: "",
           preferences: { nonCompromisable: [] }
         });
@@ -404,7 +405,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       ...form.formState.defaultValues,
       ...userDetails,
       demandId: "",
-      propertyType: undefined,
+      operationType: "Warehousing",
       description: "",
       preferences: { nonCompromisable: [] },
     });
@@ -436,14 +437,14 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                             </FormItem>
                           )}
                         />
-                        <FormField control={form.control} name="propertyType" render={({ field }) => (
+                        <FormField control={form.control} name="operationType" render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Property Type</FormLabel>
+                              <FormLabel>Type of Operation</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Select a type" /></SelectTrigger></FormControl>
                                 <SelectContent>
-                                  <SelectItem value="Industrial Building">Industrial Building</SelectItem>
-                                  <SelectItem value="Warehouse">Warehouse</SelectItem>
+                                  <SelectItem value="Warehousing">Warehousing</SelectItem>
+                                  <SelectItem value="Manufacturing">Manufacturing</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -483,7 +484,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                       </div>
                       <FormField control={form.control} name="readiness" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Readiness</FormLabel>
+                          <FormLabel>Building Readiness To Commence Operations</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Select readiness" /></SelectTrigger></FormControl>
                             <SelectContent>
@@ -647,6 +648,11 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                 <FormField control={form.control} name="powerMin" render={({ field }) => (<FormItem><FormLabel>Min kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 100" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                                 <FormField control={form.control} name="powerMax" render={({ field }) => (<FormItem><FormLabel>Max kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 500" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                             </div>
+                            {operationType === 'Warehousing' && (
+                                <FormDescription className="text-xs pt-2">
+                                    <b>Industry Guide:</b> A standard warehouse often requires 3 to 5 kVA per 1,000 sq. ft. This is an indicative guide only; please check with the relevant authority for accurate information.
+                                </FormDescription>
+                            )}
                         </PriorityCard>
 
                         {/* Toggles */}
@@ -944,5 +950,3 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     </>
   );
 }
-
-    

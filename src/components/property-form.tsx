@@ -156,8 +156,8 @@ function DemandSummaryCard({ demandId }: { demandId: string }) {
             <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                        <p className="font-semibold">Property Type</p>
-                        <p className="text-muted-foreground">{demand.propertyType}</p>
+                        <p className="font-semibold">Operation Type</p>
+                        <p className="text-muted-foreground">{demand.operationType}</p>
                     </div>
                      <div>
                         <p className="font-semibold">Size (Sq. Ft.)</p>

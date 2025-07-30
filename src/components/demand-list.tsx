@@ -80,12 +80,12 @@ export function DemandList() {
       return;
     }
     
-    const subject = `New Property Demand Alert: ${demand.propertyType} Required`;
+    const subject = `New Property Demand Alert: ${demand.operationType} Required`;
     const submitUrl = `${window.location.origin}/dashboard?demandId=${demand.demandId}`;
     const body = `A new property demand has been logged that may match your portfolio.
 
 Demand ID: ${demand.demandId}
-Property Type: ${demand.propertyType}
+Operation Type: ${demand.operationType}
 Size: ${demand.size.toLocaleString()} Sq. Ft.
 Location: Near ${demand.locationName || demand.location} (within a ${demand.radius} km radius)
 Readiness: ${demand.readiness}
@@ -123,7 +123,7 @@ WareHouse Origin
                 <CardTitle>{demand.demandId}</CardTitle>
                 <CardDescription asChild>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="secondary">{demand.propertyType}</Badge>
+                    <Badge variant="secondary">{demand.operationType}</Badge>
                     {demand.buildingType && <Badge variant="outline" className="flex items-center gap-1.5"><Building className="h-3 w-3" />{demand.buildingType}</Badge>}
                   </div>
                 </CardDescription>

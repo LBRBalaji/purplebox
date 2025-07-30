@@ -50,10 +50,10 @@ const prompt = ai.definePrompt({
   {{/if}}
   
   **Client Requirement Details:**
-  - Property Type Needed: {{{propertyType}}}
+  - Operation Type: {{{propertyType}}}
   - Desired Location Name: {{{locationName}}}
   - Required Size: {{{size}}} Sq. Ft.
-  - Occupancy Timeline: {{{readiness}}}
+  - Building Readiness To Commence Operations: {{{readiness}}}
   - Other Specifications: {{{additionalDetails}}}
 
   Improved Demand Description:`,
