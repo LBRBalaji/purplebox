@@ -463,14 +463,14 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                       <Button type="button" variant="outline" className="w-full justify-between">
                         <div className="flex items-center gap-2">
                            <PlusCircle className="h-4 w-4" />
-                           {isOptionalOpen ? 'Hide Optional Details & Priorities' : 'Show Optional Details & Priorities'}
+                           {isOptionalOpen ? 'Hide Essentials & Preferences' : 'Show Essentials & Preferences'}
                         </div>
                         <ChevronsUpDown className="h-4 w-4" />
                       </Button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                       <div className="space-y-2">
-                        <FormLabel className="text-base font-semibold text-primary">Optional Details & Priorities</FormLabel>
+                        <FormLabel className="text-base font-semibold text-primary">Essentials & Preferences</FormLabel>
                         <div className="p-4 border rounded-lg space-y-6">
                             <div className="space-y-3">
                                 <FormLabel>Requirement Priorities</FormLabel>
@@ -511,36 +511,20 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
 
                                      {/* Building Type */}
                                     <PriorityCard title="Building Type" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="buildingType">
+                                      <div className="space-y-4">
                                         <FormField
                                             control={form.control}
                                             name="buildingType"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-3">
-                                                <FormControl>
-                                                    <RadioGroup
-                                                    onValueChange={field.onChange}
-                                                    value={field.value}
-                                                    className="grid grid-cols-2 gap-4"
-                                                    >
-                                                    <FormItem>
-                                                        <FormControl>
-                                                            <RadioGroupItem value="PEB" id="peb" className="peer sr-only" />
-                                                        </FormControl>
-                                                        <FormLabel htmlFor="peb" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                                                            PEB <span className="font-normal text-xs text-muted-foreground mt-1">(Pre-Engineered Building with Galvalume Sheet)</span>
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                    <FormItem>
-                                                        <FormControl>
-                                                            <RadioGroupItem value="RCC" id="rcc" className="peer sr-only" />
-                                                        </FormControl>
-                                                        <FormLabel htmlFor="rcc" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                                                            RCC
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage />
+                                                  <div className="flex items-center justify-center">
+                                                      <div className="grid grid-cols-2 gap-1 rounded-full p-1 bg-muted w-fit">
+                                                          <Button type="button" variant={field.value === 'PEB' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('PEB')} className="rounded-full">PEB</Button>
+                                                          <Button type="button" variant={field.value === 'RCC' ? 'default' : 'ghost'} size="sm" onClick={() => field.onChange('RCC')} className="rounded-full">RCC</Button>
+                                                      </div>
+                                                  </div>
+                                                  <p className="text-xs text-muted-foreground text-center">PEB (Pre-Engineered Building with Galvalume Sheet)</p>
+                                                  <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
@@ -576,6 +560,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                                 )}
                                             />
                                          )}
+                                       </div>
                                     </PriorityCard>
 
                                     {/* Ceiling Height */}
@@ -691,7 +676,3 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
     </>
   );
 }
-
-    
-
-    
