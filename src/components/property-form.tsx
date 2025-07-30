@@ -184,9 +184,6 @@ export function PropertyForm() {
   const [isOperationsOpen, setIsOperationsOpen] = React.useState(false);
   const [isCommercialsOpen, setIsCommercialsOpen] = React.useState(true);
   const [isAdditionalInfoOpen, setIsAdditionalInfoOpen] = React.useState(false);
-
-  // State for individual scores
-  const [scores, setScores] = React.useState<Record<string, number | null>>({});
   
   const demandIdFromUrl = searchParams.get('demandId');
   const isMatchingMode = !!demandIdFromUrl;
@@ -231,84 +228,6 @@ export function PropertyForm() {
     demands.find(d => d.demandId === demandIdFromUrl),
     [demands, demandIdFromUrl]
   );
-
-  const calculateScore = React.useCallback((field: string, value: any) => {
-    if (!demandToMatch) return null;
-
-    let score = 0;
-    switch (field) {
-        case 'size': {
-            const propertySize = Number(value);
-            const demandSize = demandToMatch.size;
-            if (!propertySize || !demandSize) return null;
-            score = Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
-            break;
-        }
-        case 'ceilingHeight': {
-            const propertyHeight = Number(value);
-            const demandHeight = demandToMatch.ceilingHeight;
-            if (!propertyHeight || !demandHeight) return null;
-            score = Math.min(propertyHeight, demandHeight) / Math.max(propertyHeight, demandHeight);
-            break;
-        }
-        case 'docks': {
-            const propertyDocks = Number(value);
-            const demandDocks = demandToMatch.docks;
-            if (propertyDocks === undefined || propertyDocks === null || !demandDocks) return null;
-            score = Math.min(propertyDocks, demandDocks) / Math.max(propertyDocks, demandDocks);
-            break;
-        }
-        case 'fireNoc': {
-            if (value === 'Obtained') score = 1.0;
-            else if (value === 'Applied For') score = 0.6;
-            else if (value === 'To Apply') score = 0.3;
-            break;
-        }
-        case 'approvalStatus': {
-             if (value === 'Obtained') score = 1.0;
-            else if (value === 'Applied For') score = 0.6;
-            else if (value === 'To Apply') score = 0.3;
-            else score = 0.1;
-            break;
-        }
-        case 'operations.mpcbEcCategory':
-        case 'operations.etpDetails':
-        case 'operations.effluentCharacteristics':
-            if (value === 'Acceptable') score = 1.0;
-            else if (value === 'May Be') score = 0.5;
-            else score = 0.1;
-            break;
-        case 'optionals.crane.required':
-            const craneDemand = demandToMatch.optionals?.crane?.required;
-            if(craneDemand) score = value ? 1.0 : 0.0;
-            else score = 0.9; // Not required, but providing is good
-            break;
-        default:
-            return null;
-    }
-    setScores(prev => ({...prev, [field]: score}));
-  }, [demandToMatch]);
-  
-  const watchedValues = form.watch();
-
-  React.useEffect(() => {
-    for (const [key, value] of Object.entries(watchedValues)) {
-      if (typeof value === 'object' && value !== null) {
-        for (const [subKey, subValue] of Object.entries(value)) {
-          if (typeof subValue === 'object' && subValue !== null) {
-            for (const [deepKey, deepValue] of Object.entries(subValue)) {
-                calculateScore(`${key}.${subKey}.${deepKey}`, deepValue);
-            }
-          } else {
-            calculateScore(`${key}.${subKey}`, subValue);
-          }
-        }
-      } else {
-        calculateScore(key, value);
-      }
-    }
-  }, [watchedValues, calculateScore]);
-
   
   const priorityCounts = React.useMemo(() => {
     if (!demandToMatch) return { optionals: 0, operations: 0 };
@@ -439,6 +358,88 @@ export function PropertyForm() {
         <Button type="button" variant={field.value === 'No' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'No')} className="rounded-full">No</Button>
     </div>
   );
+
+  const watchedValues = form.watch();
+
+  const calculateScore = (field: string, value: any) => {
+    if (!demandToMatch || value === undefined || value === null || value === '') return null;
+  
+    let score = 0;
+    switch (field) {
+        case 'size': {
+            const propertySize = Number(value);
+            const demandSize = demandToMatch.size;
+            if (!propertySize || !demandSize) return null;
+            score = Math.min(propertySize, demandSize) / Math.max(propertySize, demandSize);
+            break;
+        }
+        case 'ceilingHeight': {
+            const propertyHeight = Number(value);
+            const demandHeight = demandToMatch.ceilingHeight;
+            if (!propertyHeight || !demandHeight) return null;
+            score = Math.min(propertyHeight, demandHeight) / Math.max(propertyHeight, demandHeight);
+            break;
+        }
+        case 'docks': {
+            const propertyDocks = Number(value);
+            const demandDocks = demandToMatch.docks;
+            if (propertyDocks === undefined || propertyDocks === null || !demandDocks) return null;
+            score = Math.min(propertyDocks, demandDocks) / Math.max(propertyDocks, demandDocks);
+            break;
+        }
+        case 'fireNoc': {
+            if (value === 'Obtained') score = 1.0;
+            else if (value === 'Applied For') score = 0.6;
+            else if (value === 'To Apply') score = 0.3;
+            break;
+        }
+        case 'approvalStatus': {
+             if (value === 'Obtained') score = 1.0;
+            else if (value === 'Applied For') score = 0.6;
+            else if (value === 'To Apply') score = 0.3;
+            else score = 0.1;
+            break;
+        }
+        case 'operations.mpcbEcCategory':
+        case 'operations.etpDetails':
+        case 'operations.effluentCharacteristics':
+            if (value === 'Acceptable') score = 1.0;
+            else if (value === 'May Be') score = 0.5;
+            else score = 0.1;
+            break;
+        case 'optionals.crane.required':
+            const craneDemand = demandToMatch.optionals?.crane?.required;
+            if(craneDemand) score = value ? 1.0 : 0.0;
+            else score = 0.9;
+            break;
+        default:
+            return null;
+    }
+    return score;
+  };
+  
+  const scores: Record<string, number | null> = {};
+  if (demandToMatch) {
+    Object.keys(watchedValues).forEach(key => {
+        const value = watchedValues[key as keyof typeof watchedValues];
+        if (typeof value === 'object' && value !== null) {
+            Object.keys(value).forEach(subKey => {
+                const subValue = value[subKey as keyof typeof value];
+                if (typeof subValue === 'object' && subValue !== null) {
+                    Object.keys(subValue).forEach(deepKey => {
+                        const deepValue = subValue[deepKey as keyof typeof subValue];
+                        scores[`${key}.${subKey}.${deepKey}`] = calculateScore(`${key}.${subKey}.${deepKey}`, deepValue);
+                    });
+                } else {
+                    scores[`${key}.${subKey}`] = calculateScore(`${key}.${subKey}`, subValue);
+                }
+            });
+        } else {
+            scores[key] = calculateScore(key, value);
+        }
+    });
+  }
+
 
   if (!isMatchingMode || !demandToMatch) {
     return (
