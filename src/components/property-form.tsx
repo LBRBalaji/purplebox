@@ -96,15 +96,15 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
     }
     
     const basePriorities = [
-        ...(demand.preferences.nonCompromisable || []),
+        ...(demand.preferences?.nonCompromisable || []),
         ...(demand.optionals?.crane?.required ? ['crane'] : []),
         ...(demand.operationType === 'Manufacturing' ? ['operations'] : []),
     ];
     const priorityItems = Array.from(new Set(basePriorities));
     
     const getSection = (priority: string) => {
-        if (['crane'].includes(priority)) return 'Optionals';
-        if (['operations'].includes(priority)) return 'Operations';
+        if (['crane'].includes(priority) || demand.optionals?.hasOwnProperty(priority as any)) return 'Optionals';
+        if (['operations'].includes(priority) || demand.operations?.hasOwnProperty(priority as any)) return 'Operations';
         return 'Essentials';
     }
 
@@ -158,7 +158,7 @@ const ScoreBadge = ({ score }: { score: number | null }) => {
     const displayScore = Math.round(score * 100);
     const colorClass = displayScore >= 85 ? 'bg-green-100 text-green-800 border-green-300' 
         : displayScore >= 60 ? 'bg-amber-100 text-amber-800 border-amber-300' 
-        : 'bg-destructive/20 text-destructive-foreground border-destructive/30';
+        : 'bg-destructive/20 text-foreground border-destructive/30';
 
     return (
         <Badge variant="outline" className={cn("absolute -top-2 -right-2", colorClass)}>
@@ -309,8 +309,8 @@ export function PropertyForm() {
 
   const onAttemptSubmit = async (data: PropertySchema) => {
     setIsLoading(true);
-    setMatchResult(null); // Clear previous results
-    setSubmissionData(data); // Store current data
+    setMatchResult(null); 
+    setSubmissionData(data); 
 
     try {
         if(!demandToMatch) throw new Error("Demand to match not found");
@@ -335,20 +335,30 @@ export function PropertyForm() {
 
   const onInvalidSubmit = (errors: any) => {
     const errorFields = Object.keys(errors);
-    if(errorFields.some(field => field.startsWith('optionals'))) {
+    toast({
+        variant: 'destructive',
+        title: 'Missing Required Fields',
+        description: 'Please fill out all required fields. We have navigated you to the first error.'
+    });
+
+    if(errorFields.some(field => field.startsWith('optionals') || field === 'optionals')) {
         setIsOptionalsOpen(true);
     }
-    if(errorFields.some(field => field.startsWith('operations'))) {
+    if(errorFields.some(field => field.startsWith('operations') || field === 'operations')) {
         setIsOperationsOpen(true);
     }
     if(errorFields.some(field => ['rentPerSft', 'rentalSecurityDeposit'].includes(field))) {
         setIsCommercialsOpen(true);
     }
-    toast({
-        variant: 'destructive',
-        title: 'Missing Required Fields',
-        description: 'Please fill out all required fields before submitting. Sections with errors have been expanded.'
-    })
+
+    setTimeout(() => {
+        const firstErrorField = errorFields[0];
+        const element = document.querySelector(`[name="${firstErrorField}"]`);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            (element as HTMLElement).focus();
+        }
+    }, 100); 
   }
   
   const ComplianceToggle = ({ field, form }: { form: any, field: any }) => (
@@ -361,7 +371,7 @@ export function PropertyForm() {
 
   const watchedValues = form.watch();
 
-  const calculateScore = (field: string, value: any) => {
+  const calculateScore = React.useCallback((field: string, value: any) => {
     if (!demandToMatch || value === undefined || value === null || value === '') return null;
   
     let score = 0;
@@ -403,42 +413,47 @@ export function PropertyForm() {
         case 'operations.mpcbEcCategory':
         case 'operations.etpDetails':
         case 'operations.effluentCharacteristics':
+            if (!demandToMatch.operations || !Object.values(demandToMatch.operations).some(v => v)) return null;
             if (value === 'Acceptable') score = 1.0;
             else if (value === 'May Be') score = 0.5;
             else score = 0.1;
             break;
         case 'optionals.crane.required':
             const craneDemand = demandToMatch.optionals?.crane?.required;
-            if(craneDemand) score = value ? 1.0 : 0.0;
-            else score = 0.9;
+            if(!craneDemand) return null;
+            score = value ? 1.0 : 0.0;
             break;
         default:
             return null;
     }
     return score;
-  };
+  }, [demandToMatch]);
   
-  const scores: Record<string, number | null> = {};
-  if (demandToMatch) {
-    Object.keys(watchedValues).forEach(key => {
-        const value = watchedValues[key as keyof typeof watchedValues];
-        if (typeof value === 'object' && value !== null) {
-            Object.keys(value).forEach(subKey => {
-                const subValue = value[subKey as keyof typeof value];
-                if (typeof subValue === 'object' && subValue !== null) {
-                    Object.keys(subValue).forEach(deepKey => {
-                        const deepValue = subValue[deepKey as keyof typeof subValue];
-                        scores[`${key}.${subKey}.${deepKey}`] = calculateScore(`${key}.${subKey}.${deepKey}`, deepValue);
-                    });
-                } else {
-                    scores[`${key}.${subKey}`] = calculateScore(`${key}.${subKey}`, subValue);
-                }
-            });
-        } else {
-            scores[key] = calculateScore(key, value);
-        }
-    });
-  }
+  const scoreCache = React.useMemo(() => {
+    const scores: Record<string, number | null> = {};
+    if (!demandToMatch) return scores;
+    
+    // Flatten the watched values to handle nested objects
+    const flattenObject = (obj: any, prefix = ''): Record<string, any> =>
+        Object.keys(obj).reduce((acc, k) => {
+            const pre = prefix.length ? prefix + '.' : '';
+            if (k === 'crane' && typeof obj[k] === 'object' && obj[k] !== null) {
+                 acc[pre + k + '.required'] = obj[k].required;
+            } else if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+                Object.assign(acc, flattenObject(obj[k], pre + k));
+            } else {
+                acc[pre + k] = obj[k];
+            }
+            return acc;
+        }, {} as Record<string, any>);
+  
+    const flatWatchedValues = flattenObject(watchedValues);
+
+    for (const key in flatWatchedValues) {
+        scores[key] = calculateScore(key, flatWatchedValues[key]);
+    }
+    return scores;
+  }, [watchedValues, calculateScore, demandToMatch]);
 
 
   if (!isMatchingMode || !demandToMatch) {
@@ -503,7 +518,7 @@ export function PropertyForm() {
                                 {...field} value={field.value ?? ''} 
                             />
                         </FormControl>
-                        <ScoreBadge score={scores.size ?? null} />
+                        <ScoreBadge score={scoreCache.size ?? null} />
                         <FormMessage />
                         </FormItem>
                     )} />
@@ -564,7 +579,7 @@ export function PropertyForm() {
                                 disabled={!demandToMatch.ceilingHeight}
                             />
                         </FormControl>
-                        <ScoreBadge score={scores.ceilingHeight ?? null} />
+                        <ScoreBadge score={scoreCache.ceilingHeight ?? null} />
                         <FormMessage />
                         </FormItem>
                     )}
@@ -580,7 +595,7 @@ export function PropertyForm() {
                                 disabled={demandToMatch.docks === undefined}
                             />
                         </FormControl>
-                        <ScoreBadge score={scores.docks ?? null} />
+                        <ScoreBadge score={scoreCache.docks ?? null} />
                         <FormMessage />
                         </FormItem>
                     )} />
@@ -610,7 +625,7 @@ export function PropertyForm() {
                         <Badge variant={demandToMatch.preferences.approvals === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.approvals}</Badge>
                         </div>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select>
-                        <ScoreBadge score={scores.approvalStatus ?? null} />
+                        <ScoreBadge score={scoreCache.approvalStatus ?? null} />
                         <FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem className="relative">
                         <div className="flex items-center justify-between">
@@ -618,7 +633,7 @@ export function PropertyForm() {
                             <Badge variant={demandToMatch.preferences.fireNoc === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.fireNoc}</Badge>
                         </div>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select>
-                        <ScoreBadge score={scores.fireNoc ?? null} />
+                        <ScoreBadge score={scoreCache.fireNoc ?? null} />
                         <FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
@@ -687,7 +702,7 @@ export function PropertyForm() {
                                         </CollapsibleContent>
                                     </Collapsible>
                                 </div>
-                                <ScoreBadge score={scores['optionals.crane.required'] ?? null} />
+                                <ScoreBadge score={scoreCache['optionals.crane.required'] ?? null} />
                               </div>
                               {/* Office & Amenities */}
                               <div className="space-y-4">
@@ -801,7 +816,7 @@ export function PropertyForm() {
                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
-                                      <ScoreBadge score={scores['operations.mpcbEcCategory'] ?? null} />
+                                      <ScoreBadge score={scoreCache['operations.mpcbEcCategory'] ?? null} />
                                   </FormItem>
                                   )}/>
                                  <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
@@ -810,7 +825,7 @@ export function PropertyForm() {
                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.etpDetails ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
-                                      <ScoreBadge score={scores['operations.etpDetails'] ?? null} />
+                                      <ScoreBadge score={scoreCache['operations.etpDetails'] ?? null} />
                                   </FormItem>
                                   )}/>
                                  <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
@@ -819,7 +834,7 @@ export function PropertyForm() {
                                        <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.effluentCharacteristics ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
-                                      <ScoreBadge score={scores['operations.effluentCharacteristics'] ?? null} />
+                                      <ScoreBadge score={scoreCache['operations.effluentCharacteristics'] ?? null} />
                                   </FormItem>
                                   )}/>
                             </CardContent>
