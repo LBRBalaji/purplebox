@@ -7,6 +7,7 @@ import { type GetPropertyMatchScoreOutput } from '@/ai/flows/get-property-match-
 import { mockDemands, mockSubmissions } from '@/lib/mock-data';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
+export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
 
 export type Submission = {
     demandId: string;
@@ -26,6 +27,7 @@ export type AgentLead = {
     phone: string;
     address: string;
     socialProfileId: string;
+    status: AgentStatus;
 }
 
 type DataEvent = {
@@ -47,7 +49,8 @@ type DataContextType = {
   clearNewSubmissions: (propertyIds: string[]) => void;
   lastEvent: DataEvent | null;
   agentLeads: AgentLead[];
-  addAgentLead: (lead: Omit<AgentLead, 'id'>) => void;
+  addAgentLead: (lead: Omit<AgentLead, 'id' | 'status'>) => void;
+  updateAgentLeadStatus: (leadId: string, status: AgentStatus) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -81,11 +84,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(updatedLeads));
   }
 
-  const addAgentLead = (lead: Omit<AgentLead, 'id'>) => {
-      const newLead = { ...lead, id: `AGENT-${Date.now()}` };
+  const addAgentLead = (lead: Omit<AgentLead, 'id' | 'status'>) => {
+      const newLead = { ...lead, id: `AGENT-${Date.now()}`, status: 'Pending' as AgentStatus };
       const updatedLeads = [newLead, ...agentLeads];
       persistAgentLeads(updatedLeads);
   }
+
+  const updateAgentLeadStatus = (leadId: string, status: AgentStatus) => {
+    const updatedLeads = agentLeads.map(lead => lead.id === leadId ? { ...lead, status } : lead);
+    persistAgentLeads(updatedLeads);
+  };
 
   const addDemand = (demand: DemandSchema, userEmail?: string) => {
     setDemands((prev) => [demand, ...prev]);
@@ -162,7 +170,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead }}>
+    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus }}>
       {children}
     </DataContext.Provider>
   );

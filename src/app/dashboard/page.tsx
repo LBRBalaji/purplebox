@@ -18,7 +18,6 @@ import { Badge } from '@/components/ui/badge';
 import { AdminNotifier } from '@/components/admin-notifier';
 import { ApprovalQueue } from '@/components/approval-queue';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AgentWaitlist } from '@/components/agent-waitlist';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -63,7 +62,6 @@ export default function DashboardPage() {
       ? [
           { value: 'demands', label: 'Circulate Demands' },
           { value: 'approvals', label: 'Approval Queue' },
-          { value: 'agent-waitlist', label: 'Agent Waitlist' },
         ]
       : [{ value: 'approvals', label: 'Approval Queue' }];
     
@@ -79,7 +77,7 @@ export default function DashboardPage() {
                     <CardTitle>{isMainAdmin ? 'Admin Dashboard' : 'O2O Dashboard'}</CardTitle>
                     <CardDescription>
                         {isMainAdmin 
-                            ? "Welcome, Admin. Your primary role is to circulate new demands, manage approvals, and review agent applications."
+                            ? "Welcome, Admin. Your primary role is to circulate new demands and manage the submission approval queue."
                             : "Welcome, O2O Manager. Your role is to manage warehouse listings and the submission approval queue."
                         }
                     </CardDescription>
@@ -99,11 +97,6 @@ export default function DashboardPage() {
                 <TabsContent value="approvals">
                     <ApprovalQueue />
                 </TabsContent>
-                {isMainAdmin && (
-                    <TabsContent value="agent-waitlist">
-                        <AgentWaitlist />
-                    </TabsContent>
-                )}
              </Tabs>
           </div>
         </main>
