@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 import { warehouses } from '@/lib/warehouse-mock-data';
@@ -21,101 +21,9 @@ type RegionalSummary = {
     regionName: string;
     totalListings: number;
     sizeRange: string;
-    readiness: { ready: number; soon: number; building: number };
+    readiness: { ready: number; soon: number; underConstruction: number };
     avgCeilingHeight: number;
     center: { lat: number; lng: number };
-};
-
-// Fictional data for different regions
-const regionalDataStore: { [key: string]: RegionalSummary } = {
-  'thiruvallur': {
-    regionName: 'Thiruvallur Region',
-    totalListings: 15,
-    sizeRange: '45,000 - 300,000 sq. ft.',
-    readiness: { ready: 8, soon: 3, building: 4 },
-    avgCeilingHeight: 42,
-    center: { lat: 13.13, lng: 79.91 },
-  },
-  'oragadam': {
-    regionName: 'Oragadam Industrial Corridor',
-    totalListings: 25,
-    sizeRange: '100,000 - 500,000 sq. ft.',
-    readiness: { ready: 15, soon: 5, building: 5 },
-    avgCeilingHeight: 48,
-    center: { lat: 12.83, lng: 79.95 },
-  },
-  'sriperumbudur': {
-    regionName: 'Sriperumbudur',
-    totalListings: 18,
-    sizeRange: '80,000 - 400,000 sq. ft.',
-    readiness: { ready: 10, soon: 6, building: 2 },
-    avgCeilingHeight: 45,
-    center: { lat: 12.96, lng: 79.95 },
-  },
-  'vallam': { // For Vallam-Vadagal
-    regionName: 'Vallam-Vadagal',
-    totalListings: 12,
-    sizeRange: '150,000 - 600,000 sq. ft.',
-    readiness: { ready: 4, soon: 3, building: 5 },
-    avgCeilingHeight: 50,
-    center: { lat: 12.92, lng: 79.93 },
-  },
-  'sunguvarchatram': {
-    regionName: 'Sunguvarchatram',
-    totalListings: 9,
-    sizeRange: '50,000 - 250,000 sq. ft.',
-    readiness: { ready: 5, soon: 2, building: 2 },
-    avgCeilingHeight: 40,
-    center: { lat: 12.97, lng: 79.84 },
-  },
-   'walajabad': {
-    regionName: 'Walajabad',
-    totalListings: 7,
-    sizeRange: '30,000 - 150,000 sq. ft.',
-    readiness: { ready: 4, soon: 1, building: 2 },
-    avgCeilingHeight: 35,
-    center: { lat: 12.80, lng: 79.83 },
-  },
-  'mappedu': {
-    regionName: 'Mappedu',
-    totalListings: 6,
-    sizeRange: '60,000 - 200,000 sq. ft.',
-    readiness: { ready: 3, soon: 2, building: 1 },
-    avgCeilingHeight: 38,
-    center: { lat: 13.09, lng: 79.95 },
-  },
-  'mannur': {
-    regionName: 'Mannur',
-    totalListings: 8,
-    sizeRange: '75,000 - 180,000 sq. ft.',
-    readiness: { ready: 5, soon: 3, building: 0 },
-    avgCeilingHeight: 40,
-    center: { lat: 13.04, lng: 79.99 },
-  },
-  'redhills': {
-    regionName: 'Redhills',
-    totalListings: 22,
-    sizeRange: '25,000 - 220,000 sq. ft.',
-    readiness: { ready: 12, soon: 7, building: 3 },
-    avgCeilingHeight: 36,
-    center: { lat: 13.17, lng: 80.20 },
-  },
-  'vengal': {
-    regionName: 'Vengal',
-    totalListings: 5,
-    sizeRange: '100,000 - 250,000 sq. ft.',
-    readiness: { ready: 1, soon: 1, building: 3 },
-    avgCeilingHeight: 45,
-    center: { lat: 13.21, lng: 79.98 },
-  },
-  'periyapalayam': {
-    regionName: 'Periyapalayam',
-    totalListings: 4,
-    sizeRange: '50,000 - 100,000 sq. ft.',
-    readiness: { ready: 2, soon: 2, building: 0 },
-    avgCeilingHeight: 32,
-    center: { lat: 13.31, lng: 80.09 },
-  },
 };
 
 const LogDemandButton = ({ center, onLogDemand, variant = "default" }: { center: { lat: number; lng: number } | null, onLogDemand: (center?: { lat: number; lng: number } | null) => void, variant?: "primary" | "secondary" | "default" | "destructive" | "outline" | "ghost" | "link" | null }) => {
@@ -178,7 +86,7 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
                         <div className="flex gap-3 text-xs">
                            <span className="font-semibold">Ready: <b className="text-green-600">{data.readiness.ready}</b></span>
                            <span className="font-semibold">Soon: <b className="text-amber-600">{data.readiness.soon}</b></span>
-                           <span className="font-semibold">BTS: <b className="text-blue-600">{data.readiness.building}</b></span>
+                           <span className="font-semibold">BTS: <b className="text-blue-600">{data.readiness.underConstruction}</b></span>
                         </div>
                     </div>
                      <div className="flex justify-between items-center">
@@ -249,6 +157,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
   const places = useMapsLibrary('places');
   const viz = useMapsLibrary('visualization');
+  const geometry = useMapsLibrary('geometry');
   const router = useRouter();
   const { user } = useAuth();
   
@@ -316,55 +225,80 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   // Handle search box places changing
   React.useEffect(() => {
-    if (!searchBox || !map) return;
+    if (!searchBox || !map || !geometry) return;
+
     const listener = searchBox.addListener('places_changed', async () => {
       const places = searchBox.getPlaces();
-      if (places && places.length > 0 && places[0].geometry) {
-        const place = places[0];
-        const location = place.geometry.location;
+      if (!places || places.length === 0 || !places[0].geometry || !places[0].geometry.location) {
+        return;
+      }
+      
+      const place = places[0];
+      const location = place.geometry.location;
+      const center = { lat: location.lat(), lng: location.lng() };
+      setLastSearchedCenter(center);
+      
+      // Dynamic summary calculation
+      const searchRadius = 25000; // 25km
+      const searchCenterLatLng = new google.maps.LatLng(center.lat, center.lng);
+
+      const nearbyWarehouses = warehouses.filter(w => {
+          if (!w.isActive) return false;
+          const warehouseLatLng = new google.maps.LatLng(w.generalizedLocation.lat, w.generalizedLocation.lng);
+          return geometry.spherical.computeDistanceBetween(searchCenterLatLng, warehouseLatLng) <= searchRadius;
+      });
+
+      if (nearbyWarehouses.length > 0) {
+        const sizes = nearbyWarehouses.map(w => w.size);
+        const heights = nearbyWarehouses.map(w => w.specifications.ceilingHeight);
         
-        if (location) {
-            const center = { lat: location.lat(), lng: location.lng() };
-            setLastSearchedCenter(center);
+        const readinessCounts = nearbyWarehouses.reduce((acc, w) => {
+            if (w.readiness === 'Ready for Occupancy') acc.ready++;
+            else if (w.readiness === 'Available in 3 months') acc.soon++;
+            else if (w.readiness === 'Under Construction') acc.underConstruction++;
+            return acc;
+        }, { ready: 0, soon: 0, underConstruction: 0 });
+
+        const newSummary: RegionalSummary = {
+            regionName: place.name || 'Searched Area',
+            totalListings: nearbyWarehouses.length,
+            sizeRange: `${Math.min(...sizes).toLocaleString()} - ${Math.max(...sizes).toLocaleString()} sq. ft.`,
+            readiness: readinessCounts,
+            avgCeilingHeight: Math.round(heights.reduce((a, b) => a + b, 0) / heights.length),
+            center: center,
+        };
+        setSummaryData(newSummary);
+      } else {
+        setSummaryData(null);
+      }
             
-            const placeName = place.name?.toLowerCase() || '';
-            let foundData = null;
-            for (const key in regionalDataStore) {
-                if (placeName.includes(key)) {
-                    foundData = regionalDataStore[key];
-                    break;
-                }
-            }
-            setSummaryData(foundData);
-            
-           if (circle) circle.setMap(null);
-           
-           const newCircle = new google.maps.Circle({
-                strokeColor: 'hsl(210 60% 50%)',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: 'hsl(210 60% 50%)',
-                fillOpacity: 0.2,
-                map,
-                center: location,
-                radius: 5000, // 5km radius
-            });
-            setCircle(newCircle);
-            
-            const bounds = newCircle.getBounds();
-            if (bounds) {
-                map.fitBounds(bounds);
-            } else {
-                map.setCenter(location);
-                map.setZoom(12);
-            }
-        }
+      if (circle) circle.setMap(null);
+      
+      const newCircle = new google.maps.Circle({
+            strokeColor: 'hsl(210 60% 50%)',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: 'hsl(210 60% 50%)',
+            fillOpacity: 0.15,
+            map,
+            center: location,
+            radius: searchRadius, 
+        });
+      setCircle(newCircle);
+      
+      const bounds = newCircle.getBounds();
+      if (bounds) {
+          map.fitBounds(bounds);
+      } else {
+          map.setCenter(location);
+          map.setZoom(10);
       }
     });
+
     return () => {
       google.maps.event.removeListener(listener);
     }
-  }, [searchBox, map, circle]);
+  }, [searchBox, map, circle, geometry]);
 
   const handleLogDemandClick = (center?: { lat: number; lng: number } | null) => {
     if (user && user.role === 'User') {
