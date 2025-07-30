@@ -47,7 +47,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
 import { getPropertyMatchScoreAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { Progress } from "./ui/progress";
@@ -222,7 +222,6 @@ export function PropertyForm() {
     defaultValues: {
       propertyId: "",
       isLocationConfirmed: false,
-      propertyGeoLocation: "",
       size: undefined,
       floor: "Ground",
       readinessToOccupy: "Immediate",
@@ -240,8 +239,7 @@ export function PropertyForm() {
       userEmail: "",
       approvalStatus: "Obtained",
       approvalAuthority: "DTCP",
-      installedCapacity: "",
-      availablePower: "",
+      availablePower: undefined,
       genSetBackup: "Available",
       fireHydrant: "Installed",
       fireNoc: "Obtained",
@@ -259,6 +257,7 @@ export function PropertyForm() {
   const watchedFields = form.watch();
   const { sizeScore, ceilingHeightScore, docksScore } = useMatchScorer(demandToMatch, watchedFields);
   const craneRequired = demandToMatch?.optionals?.crane?.required;
+  const buildingType = form.watch('buildingType');
 
 
   React.useEffect(() => {
@@ -276,10 +275,6 @@ export function PropertyForm() {
   React.useEffect(() => {
     if (demandIdFromUrl) {
       form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
-      if (demandToMatch) {
-        // Pre-fill location for AI context
-        form.setValue('propertyGeoLocation', demandToMatch.locationName || demandToMatch.location);
-      }
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
 
@@ -353,7 +348,8 @@ export function PropertyForm() {
               {/* Essentials */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Essentials & Preferences</CardTitle>
+                  <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Essentials</CardTitle>
+                  <CardDescription>Provide the core details of the property, answering the customer's primary requirements.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <FormField control={form.control} name="isLocationConfirmed" render={({ field }) => (
@@ -370,7 +366,7 @@ export function PropertyForm() {
                       </FormItem>
                   )} />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="size" render={({ field }) => (
+                     <FormField control={form.control} name="size" render={({ field }) => (
                       <FormItem>
                         <div className="flex justify-between items-center">
                           <FormLabel>Size (Sq. Ft.)</FormLabel>
@@ -379,7 +375,7 @@ export function PropertyForm() {
                         <FormControl>
                             <Input 
                                 type="number" 
-                                placeholder={`Required: ${demandToMatch.size.toLocaleString()}`}
+                                placeholder={`Req: ${demandToMatch.sizeMin || demandToMatch.size} - ${demandToMatch.sizeMax || demandToMatch.size} sq.ft.`}
                                 {...field} value={field.value ?? ''} 
                                 className="placeholder:text-muted-foreground/60"
                             />
@@ -387,11 +383,27 @@ export function PropertyForm() {
                         <FormMessage />
                       </FormItem>
                     )} />
+                     <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Readiness</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Req: ${demandToMatch.readiness}`} /></SelectTrigger></FormControl>
+                            <SelectContent>
+                              <SelectItem value="Immediate">Immediate</SelectItem>
+                              <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
+                              <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
+                              <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
+                              <SelectItem value="BTS">BTS (Build to Suit)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                      <FormField control={form.control} name="buildingType" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Building Type</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Required: ${demandToMatch.buildingType}`} /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Req: ${demandToMatch.buildingType}`} /></SelectTrigger></FormControl>
                           <SelectContent>
                             <SelectItem value="PEB">PEB</SelectItem>
                             <SelectItem value="RCC">RCC</SelectItem>
@@ -400,10 +412,23 @@ export function PropertyForm() {
                         <FormMessage />
                       </FormItem>
                     )} />
-                     <FormField control={form.control} name="floor" render={({ field }) => (
-                        <FormItem><FormLabel>Floor</FormLabel><FormControl><Input placeholder={demandToMatch.floorPreference ? `Required: ${demandToMatch.floorPreference}` : 'e.g. Ground Floor'} {...field} className="placeholder:text-muted-foreground/60" /></FormControl><FormMessage /></FormItem>
-                      )}
-                    />
+                    {buildingType === 'RCC' && (
+                        <FormField control={form.control} name="floor" render={({ field }) => (
+                           <FormItem>
+                            <FormLabel>Floor Preference</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Req: ${demandToMatch.floorPreference}`} /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                <SelectItem value="Ground">Ground</SelectItem>
+                                <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
+                                <SelectItem value="Any">Any</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                           </FormItem>
+                         )}
+                        />
+                    )}
                      <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
                       <FormItem>
                         <div className="flex justify-between items-center">
@@ -413,7 +438,7 @@ export function PropertyForm() {
                         <FormControl>
                             <Input 
                                 type="number" 
-                                placeholder={demandToMatch.ceilingHeight ? `Required: ${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit || 'ft'}` : "e.g. 30"} 
+                                placeholder={demandToMatch.ceilingHeight ? `Req: ${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit || 'ft'}` : "e.g. 30"} 
                                 {...field} value={field.value ?? ''}
                                 className="placeholder:text-muted-foreground/60"
                             />
@@ -431,7 +456,7 @@ export function PropertyForm() {
                         <FormControl>
                             <Input 
                                 type="number" 
-                                placeholder={demandToMatch.docks !== undefined ? `Required: ${demandToMatch.docks}` : "e.g. 8"} 
+                                placeholder={demandToMatch.docks !== undefined ? `Req: ${demandToMatch.docks}` : "e.g. 8"} 
                                 {...field} value={field.value ?? ''}
                                 className="placeholder:text-muted-foreground/60"
                             />
@@ -439,12 +464,14 @@ export function PropertyForm() {
                         <FormMessage />
                       </FormItem>
                     )} />
-                     <FormField control={form.control} name="availablePower" render={({ field }) => (<FormItem><FormLabel>Available Power (kVA)</FormLabel><FormControl><Input placeholder={demandToMatch.powerMin ? `Required: ${demandToMatch.powerMin}-${demandToMatch.powerMax} kVA` : ""} {...field} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
-                     <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem><FormLabel>Approval Status</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Preference: ${demandToMatch.preferences.approvals}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                     <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem><FormLabel>Fire NOC</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Preference: ${demandToMatch.preferences.fireNoc}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="availablePower" render={({ field }) => (<FormItem><FormLabel>Available Power (kVA)</FormLabel><FormControl><Input type="number" placeholder={demandToMatch.powerMin ? `Req: ${demandToMatch.powerMin}-${demandToMatch.powerMax} kVA` : ""} {...field} value={field.value ?? ''} className="placeholder:text-muted-foreground/60"/></FormControl><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem><FormLabel>Approval Status</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Pref: ${demandToMatch.preferences.approvals}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem><FormLabel>Fire NOC</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Pref: ${demandToMatch.preferences.fireNoc}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem><FormLabel>Fire Safety Infrastructure</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger className="placeholder:text-muted-foreground/60"><SelectValue placeholder={`Pref: ${demandToMatch.preferences.fireSafety}`} /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                   </div>
                 </CardContent>
               </Card>
+
               {/* Optionals */}
                <Collapsible>
                     <CollapsibleTrigger asChild>
@@ -588,6 +615,26 @@ export function PropertyForm() {
                   <FormField control={form.control} name="userName" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={form.control} name="userCompanyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem>)} />
                 </CardContent>
+              </Card>
+               <Card>
+                <CardHeader><CardTitle className="flex items-center gap-2"><HandCoins className="w-5 h-5 text-primary" /> Commercials</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField control={form.control} name="rentPerSft" render={({ field }) => (<FormItem><FormLabel>Rent per Sq.Ft.</FormLabel><FormControl><Input type="number" placeholder="e.g. 25" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (<FormItem><FormLabel>Rental Security Deposit (Months)</FormLabel><FormControl><Input type="number" placeholder="e.g. 6" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                </CardContent>
+              </Card>
+              <Card>
+                 <CardHeader><CardTitle className="flex items-center gap-2"><Info className="w-5 h-5 text-primary" /> Additional Information</CardTitle></CardHeader>
+                 <CardContent>
+                    <FormField control={form.control} name="additionalInformation" render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Textarea placeholder="Provide any other relevant details..." className="min-h-[100px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                 </CardContent>
               </Card>
             </div>
           </div>

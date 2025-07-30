@@ -3,11 +3,9 @@ import { z } from 'zod';
 
 export const propertySchema = z.object({
   propertyId: z.string(),
-  // Matching new demand fields
   isLocationConfirmed: z.boolean().refine(val => val === true, {
     message: "You must confirm the location match."
   }),
-  propertyGeoLocation: z.string().optional(),
   
   // Property details mirroring demand questions
   size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be a positive number.'),
@@ -16,7 +14,7 @@ export const propertySchema = z.object({
   floor: z.string().min(1, 'Floor is required.'),
   ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height must be a number."}).positive('Ceiling height must be positive.'),
   docks: z.coerce.number({invalid_type_error: "Docks must be a number."}).int().nonnegative('Docks cannot be negative.'),
-  availablePower: z.string().min(1, 'Available power is required.'),
+  availablePower: z.coerce.number({invalid_type_error: "Power must be a number."}).positive('Power must be positive.'),
   approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']),
   fireNoc: z.enum(['Obtained', 'Applied For', 'To Apply']),
   fireHydrant: z.enum(['Installed', 'Can be provided']),
@@ -33,11 +31,9 @@ export const propertySchema = z.object({
   userPhoneNumber: z.string().min(1, 'Phone number is required.'),
   userEmail: z.string().email('Invalid email address.'),
   
-  // Replicating Demand Schema for a 1:1 match
   siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project']),
   safety: z.string().min(1, 'Safety information is required.'),
   approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']),
-  installedCapacity: z.string().min(1, 'Installed capacity is required.'),
   genSetBackup: z.enum(['Available', 'Can be provided']),
   canopy: z.enum(['Installed', 'Can be provided']),
   additionalInformation: z.string().optional(),
