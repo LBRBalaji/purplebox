@@ -86,6 +86,19 @@ export const demandSchema = z.object({
     fireNoc: z.enum(['Must to have', 'Good to have']).default('Must to have'),
     fireSafety: z.enum(['Must to have', 'Good to have']).default('Must to have'),
   }),
+  optionals: z.object({
+    officeSpaceMin: z.coerce.number().optional(),
+    officeSpaceMax: z.coerce.number().optional(),
+    cafeteriaOrCanteen: z.enum(['Cafeteria', 'Canteen']).default('Cafeteria'),
+    seatingCapacity: z.coerce.number().optional(),
+    additionalToiletsMen: z.coerce.number().optional(),
+    additionalToiletsWomen: z.coerce.number().optional(),
+    truckParkingYardMin: z.coerce.number().optional(),
+    truckParkingYardMax: z.coerce.number().optional(),
+    openStorageYardMin: z.coerce.number().optional(),
+    openStorageYardMax: z.coerce.number().optional(),
+    tenantSpecificImprovements: z.string().optional(),
+  }).optional(),
 }).refine(data => {
     if (data.preferences?.nonCompromisable?.includes('ceilingHeight')) {
         return data.ceilingHeight !== undefined && data.ceilingHeight > 0;
