@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/accordion"
 import { Card, CardTitle, CardDescription, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Briefcase, CheckCircle2, Clock, XCircle, Percent, Building2, Scaling, HandCoins, CalendarCheck, Truck, Flame } from 'lucide-react';
+import { Briefcase, CheckCircle2, Clock, XCircle, Building2, Scaling, HandCoins, CalendarCheck, Truck, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useData, type SubmissionStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
@@ -117,12 +117,6 @@ export function MySubmissions() {
                                                 <CardDescription>{property.property.userCompanyName}</CardDescription>
                                             </div>
                                              <div className="flex items-center gap-4">
-                                                {property.matchResult && (
-                                                  <Badge variant="outline" className="border-primary/80 bg-primary/10 text-primary font-semibold">
-                                                    <Percent className="mr-1.5 h-4 w-4" />
-                                                    <span>{(property.matchResult.overallScore * 100).toFixed(0)}% Match</span>
-                                                  </Badge>
-                                                )}
                                                 <StatusIndicator status={property.status} />
                                             </div>
                                         </CardHeader>

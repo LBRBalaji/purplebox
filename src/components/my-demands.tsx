@@ -12,9 +12,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, MessageSquare, Percent, Pencil, MapPin, CalendarCheck, Scaling, ClipboardList, FileText, ListChecks } from 'lucide-react';
+import { Star, MessageSquare, Pencil, MapPin, CalendarCheck, Scaling, ClipboardList, FileText, ListChecks } from 'lucide-react';
 import Image from 'next/image';
-import { Progress } from './ui/progress';
 import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import { type DemandSchema } from '@/lib/schema';
@@ -187,16 +186,8 @@ export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: s
                                     {match.isNew && <Badge className="absolute top-2 right-2 bg-primary animate-pulse">New</Badge>}
                                 </div>
                                 <CardTitle>Property ID: {match.property.propertyId}</CardTitle>
-                                <CardDescription asChild>
-                                  <div className="inline-flex items-center gap-2 text-primary font-semibold border border-primary/50 bg-primary/10 px-2 py-1 rounded-md text-sm">
-                                      <Percent className="w-4 h-4" /> 
-                                      <span>{(match.matchResult.overallScore * 100).toFixed(0)}% Match</span>
-                                  </div>
-                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <Progress value={match.matchResult.overallScore * 100} className="h-2" />
-                                <p className="text-xs text-muted-foreground italic">{match.matchResult.justification}</p>
                                 <div className="grid grid-cols-2 gap-4 text-sm pt-2">
                                 <div>
                                     <p className="text-muted-foreground">Size</p>

@@ -230,7 +230,7 @@ export const mockDemands: DemandSchema[] = [
 ];
 
 
-export const mockSubmissions: Submission[] = [
+export const mockSubmissions: Omit<Submission, 'matchResult'>[] = [
   {
     demandId: 'DMD-1700000000001',
     property: {
@@ -261,19 +261,6 @@ export const mockSubmissions: Submission[] = [
       docks: 12,
       canopy: 'Installed',
       additionalInformation: 'State-of-the-art facility with modern amenities.',
-    },
-    matchResult: {
-      overallScore: 0.98,
-      scoreBreakdown: {
-        location: 1.0,
-        size: 0.95,
-        commercials: 0.9,
-        power: 0.9,
-        fireSafety: 1.0,
-        approvals: 1.0,
-        amenities: 1.0,
-      },
-      justification: "This property is an excellent match. It slightly exceeds the requested size and is in the perfect location, meeting all critical feature requirements like docks and ceiling height.",
     },
     status: 'Approved',
     isNew: true,
@@ -310,19 +297,6 @@ export const mockSubmissions: Submission[] = [
       canopy: 'Can be provided',
       additionalInformation: 'Economical option, slightly smaller than requested.',
     },
-    matchResult: {
-      overallScore: 0.10,
-      scoreBreakdown: {
-        location: 1.0,
-        size: 0.1,
-        commercials: 0.9,
-        power: 0.9,
-        fireSafety: 0.6,
-        approvals: 1.0,
-        amenities: 0.1,
-      },
-      justification: "Location Score: 1.0 - Location confirmed by the provider. Size Score: 0.1 - The property size (92,000 sq ft) is significantly smaller than the demand (100,000 sq ft) which is a non-compromisable item. Amenities Score: 0.1 - The property has 11 docks out of the required 12, which is a non-compromisable item. The ceiling height of 38ft is also lower than the required 40ft.",
-    },
     status: 'Pending',
     isNew: false,
     demandUserEmail: 'user@example.com',
@@ -357,19 +331,6 @@ export const mockSubmissions: Submission[] = [
       docks: 5,
       canopy: 'Installed',
       additionalInformation: 'Grade A space suitable for light industrial work.',
-    },
-    matchResult: {
-      overallScore: 0.61,
-      scoreBreakdown: {
-        location: 0.1,
-        size: 1.0,
-        commercials: 0.9,
-        power: 0.9,
-        fireSafety: 1.0,
-        approvals: 1.0,
-        amenities: 0.9,
-      },
-      justification: "This property matches your size and feature requirements well. However, because 'location' was marked as non-compromisable, the score is very low as the property's location is unverified. This significantly impacts the overall score.",
     },
     status: 'Rejected',
     isNew: false,
@@ -406,19 +367,6 @@ export const mockSubmissions: Submission[] = [
       canopy: 'Installed',
       additionalInformation: 'Brand new Grade-A+ facility with ESFR sprinklers and 8-ton point load flooring.',
     },
-    matchResult: {
-      overallScore: 0.98,
-      scoreBreakdown: {
-        location: 1.0,
-        size: 0.95,
-        commercials: 0.9,
-        power: 0.9,
-        fireSafety: 1.0,
-        approvals: 1.0,
-        amenities: 1.0,
-      },
-      justification: "Excellent match. This property meets all non-compromisable requirements for readiness, ceiling height, and fire NOC. It also offers more docks than required and is a good size fit.",
-    },
     status: 'Approved',
     isNew: true,
     demandUserEmail: 'logistics.pro@example.com',
@@ -453,19 +401,6 @@ export const mockSubmissions: Submission[] = [
       docks: 15,
       canopy: 'Installed',
       additionalInformation: 'Older facility, available immediately.',
-    },
-    matchResult: {
-      overallScore: 0.77,
-      scoreBreakdown: {
-        location: 1.0,
-        size: 1.0,
-        commercials: 0.9,
-        power: 0.9,
-        fireSafety: 1.0,
-        approvals: 1.0,
-        amenities: 0.78,
-      },
-      justification: "This property is a poor match. Although it meets the readiness and fire NOC requirements, the ceiling height of 35 ft is significantly lower than the 45 ft specified as a non-compromisable item, making it unsuitable for the client's vertical storage needs. This brings the amenities score down significantly.",
     },
     status: 'Pending',
     isNew: false,

@@ -34,37 +34,6 @@ export async function logDemandAction(
   }
 }
 
-// This server action is no longer called by the property form in real-time,
-// but is kept here in case a server-side score check is needed elsewhere.
-export async function getPropertyMatchScoreAction(
-  input: GetPropertyMatchScoreInput
-): Promise<{ submission?: { property: PropertySchema, matchResult: GetPropertyMatchScoreOutput, demandId: string, demandUserEmail?: string }; error?: string }> {
-  try {
-    if (!input.demand) {
-      return { error: `Demand data is missing.` };
-    }
-    
-    if (!input.property) {
-        return { error: `Property data is missing.` };
-    }
-
-    const result = await getPropertyMatchScore(input);
-    
-    const submission = {
-      property: input.property,
-      matchResult: result,
-      demandId: input.demand.demandId,
-      demandUserEmail: input.demand.userEmail,
-    };
-
-    return { submission };
-  } catch (error) {
-    console.error("Error getting property match score:", error);
-    const e = error as Error;
-    return { error: e.message || "An unexpected error occurred while calculating the match score." };
-  }
-}
-
 export async function getWarehousesAction(
   input: GetWarehousesInput
 ): Promise<{ warehouses?: WarehouseSchema[]; error?: string }> {

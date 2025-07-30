@@ -6,9 +6,8 @@ import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Star, MessageSquare, Percent, Download } from 'lucide-react';
+import { Star, MessageSquare, Download } from 'lucide-react';
 import Image from 'next/image';
-import { Progress } from './ui/progress';
 import { cn } from '@/lib/utils';
 import type { Submission } from '@/contexts/data-context';
 import { ChatDialog } from './chat-dialog';
@@ -23,7 +22,6 @@ export function ShortlistedProperties() {
     const dataToExport = shortlistedItems.map(item => ({
         'Demand ID': item.demandId,
         'Property ID': item.property.propertyId,
-        'Match Score (%)': (item.matchResult.overallScore * 100).toFixed(0),
         'Size (Sq. Ft.)': item.property.size,
         'Rent (per Sq. Ft.)': item.property.rentPerSft,
         'Ceiling Height (ft)': item.property.ceilingHeight,
@@ -32,7 +30,6 @@ export function ShortlistedProperties() {
         'Site Type': item.property.siteType,
         'Approval Status': item.property.approvalStatus,
         'Fire NOC': item.property.fireNoc,
-        'AI Justification': item.matchResult.justification,
         'Image Link': `https://placehold.co/600x400.png`,
     }));
     
@@ -81,15 +78,10 @@ export function ShortlistedProperties() {
                       </div>
                       <CardTitle>Property ID: {match.property.propertyId}</CardTitle>
                       <CardDescription>
-                        <div className="inline-flex items-center gap-2 text-primary font-semibold border border-primary/50 bg-primary/10 px-2 py-1 rounded-md text-sm">
-                          <Percent className="w-4 h-4" />
-                          <span>{(match.matchResult.overallScore * 100).toFixed(0)}% Match</span>
-                        </div>
+                        For Demand: {match.demandId}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4 flex-grow">
-                      <Progress value={match.matchResult.overallScore * 100} className="h-2" />
-                      <p className="text-xs text-muted-foreground italic">{match.matchResult.justification}</p>
                       <div className="grid grid-cols-2 gap-4 text-sm pt-2">
                         <div>
                           <p className="text-muted-foreground">Size</p>

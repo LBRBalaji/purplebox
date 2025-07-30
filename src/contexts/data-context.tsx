@@ -3,7 +3,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { type DemandSchema, type PropertySchema } from '@/lib/schema';
-import { type GetPropertyMatchScoreOutput } from '@/ai/flows/get-property-match-score';
 import { mockDemands, mockSubmissions } from '@/lib/mock-data';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
@@ -12,22 +11,9 @@ export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
 export type Submission = {
     demandId: string;
     property: PropertySchema;
-    matchResult: GetPropertyMatchScoreOutput;
     isNew?: boolean;
     demandUserEmail?: string;
     status: SubmissionStatus;
-}
-
-export type AgentLead = {
-    id: string;
-    agentType: 'Individual' | 'Company';
-    name: string;
-    companyName: string;
-    email: string;
-    phone: string;
-    address: string;
-    socialProfileId: string;
-    status: AgentStatus;
 }
 
 type DataEvent = {
@@ -42,7 +28,7 @@ type DataContextType = {
   addDemand: (demand: DemandSchema, userEmail?: string) => void;
   updateDemand: (demand: DemandSchema) => void;
   submissions: Submission[];
-  addSubmission: (submission: Submission, userEmail?: string) => void;
+  addSubmission: (submission: Omit<Submission, 'status'>, userEmail?: string) => void;
   updateSubmissionStatus: (propertyId: string, status: SubmissionStatus) => void;
   shortlistedItems: Submission[];
   toggleShortlist: (submission: Submission) => void;
@@ -60,13 +46,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
   const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
-  const [shortlistedItems, setShortlistedItems] = useState<Submission[]>(() => {
-    const initialShortlist = mockSubmissions.filter(sub => 
-        (sub.property.propertyId === 'PS-ACME-001' || 
-        sub.property.propertyId === 'PS-LOGI-001') && sub.status === 'Approved'
-    );
-    return initialShortlist as Submission[];
-  });
+  const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
 
   useEffect(() => {
     try {
@@ -117,7 +97,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const addSubmission = (submission: Submission, userEmail?: string) => {
+  const addSubmission = (submission: Omit<Submission, 'status'>, userEmail?: string) => {
     const demand = demands.find(d => d.demandId === submission.demandId);
     // All new submissions are pending
     const submissionWithDefaults: Submission = {

@@ -40,32 +40,17 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog"
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast";
 import { createPropertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin } from 'lucide-react';
-import { Skeleton } from "./ui/skeleton";
-import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
-import { Progress } from "./ui/progress";
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin } from 'lucide-react';
 import { useData } from "@/contexts/data-context";
 import { useAuth } from "@/contexts/auth-context";
 import { Badge } from "./ui/badge";
 import { Switch } from "./ui/switch";
-import { cn } from "@/lib/utils";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
@@ -97,7 +82,7 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
     const basePriorities = [
         ...(demand.preferences?.nonCompromisable || []),
         ...(demand.optionals?.crane?.required ? ['crane'] : []),
-        ...(demand.operationType === 'Manufacturing' ? ['operations'] : []),
+        ...(demand.operationType === 'Manufacturing' && Object.values(demand.operations || {}).some(v => v) ? ['operations'] : []),
     ];
     const priorityItems = Array.from(new Set(basePriorities));
     
@@ -106,13 +91,6 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
         if (['operations'].includes(priority) || demand.operations?.hasOwnProperty(priority as any)) return 'Operations';
         return 'Essentials';
     }
-
-    const priorityCounts = priorityItems.reduce((acc, item) => {
-        const section = getSection(item);
-        if (section === 'Optionals') acc.optionals++;
-        if (section === 'Operations') acc.operations++;
-        return acc;
-    }, { optionals: 0, operations: 0 });
 
     return (
         <Card className="bg-primary/5 mb-6">
@@ -123,7 +101,6 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
                 </CardTitle>
                  <CardDescription>
                     Fill out the form below. The customer's key priorities are listed here for your reference. 
-                    Badges with counts on the section headers indicate where priority items can be found.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -151,106 +128,13 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
     )
 }
 
-const ScoreBadge = ({ score }: { score: number | null }) => {
-    if (score === null || score === undefined) return null;
-
-    const displayScore = Math.round(score * 100);
-    const colorClass = displayScore >= 85 ? 'bg-green-100 text-green-800 border-green-300' 
-        : displayScore >= 60 ? 'bg-amber-100 text-amber-800 border-amber-300' 
-        : 'bg-destructive/20 text-foreground border-destructive/30';
-
-    return (
-        <Badge variant="outline" className={cn("absolute -top-2 -right-2", colorClass)}>
-            <Percent className="h-3 w-3 mr-1" /> {displayScore}
-        </Badge>
-    );
-};
-
-const calculateClientSideScore = (property: PropertySchema, demand: DemandSchema): GetPropertyMatchScoreOutput => {
-    const breakdown: GetPropertyMatchScoreOutput['scoreBreakdown'] = {
-        location: 0,
-        size: 0,
-        commercials: 0.9,
-        power: 0,
-        fireSafety: 0,
-        approvals: 0,
-        amenities: 0,
-    };
-    const justificationPoints: string[] = [];
-
-    // Location
-    breakdown.location = property.isLocationConfirmed ? 1.0 : 0.1;
-    justificationPoints.push(`Location: ${breakdown.location === 1.0 ? 'Confirmed by provider.' : 'Not confirmed by provider.'}`);
-
-    // Size
-    const { size: propertySize, sizeVariationPercentage = 10 } = property;
-    const { size: demandSize, sizeMin, sizeMax } = demand;
-    const lowerBound = sizeMin || demandSize * (1 - sizeVariationPercentage / 100);
-    const upperBound = sizeMax || demandSize * (1 + sizeVariationPercentage / 100);
-    if (propertySize >= lowerBound && propertySize <= upperBound) {
-        breakdown.size = 1.0 - (Math.abs(demandSize - propertySize) / (upperBound - lowerBound));
-    } else {
-        breakdown.size = 0.1; // Penalize if outside range
-    }
-    justificationPoints.push(`Size: ${propertySize.toLocaleString()} sq. ft. is a ${Math.round(breakdown.size * 100)}% match to the required range of ${lowerBound.toLocaleString()}-${upperBound.toLocaleString()} sq. ft.`);
-
-    // Approvals
-    if (property.approvalStatus === 'Obtained') breakdown.approvals = 1.0;
-    else if (property.approvalStatus === 'Applied For') breakdown.approvals = 0.6;
-    else breakdown.approvals = 0.3;
-    if (demand.preferences.approvals === 'Must to have' && breakdown.approvals < 1.0) breakdown.approvals *= 0.5;
-    justificationPoints.push(`Approvals: Property status is '${property.approvalStatus}'.`);
-
-    // Fire Safety
-    const nocScore = property.fireNoc === 'Obtained' ? 1.0 : property.fireNoc === 'Applied For' ? 0.6 : 0.3;
-    const hydrantScore = property.fireHydrant === 'Installed' ? 1.0 : 0.5;
-    breakdown.fireSafety = (nocScore + hydrantScore) / 2;
-    if (demand.preferences.fireNoc === 'Must to have' && nocScore < 1.0) breakdown.fireSafety *= 0.5;
-    if (demand.preferences.fireSafety === 'Must to have' && hydrantScore < 1.0) breakdown.fireSafety *= 0.5;
-    justificationPoints.push(`Fire Safety: NOC is ${property.fireNoc} and hydrants are ${property.fireHydrant}.`);
-    
-    // Power
-    if (!demand.powerMin && !demand.powerMax) {
-        breakdown.power = 0.9;
-    } else if (property.availablePower) {
-        const pMin = demand.powerMin || 0;
-        const pMax = demand.powerMax || Infinity;
-        if(property.availablePower >= pMin && property.availablePower <= pMax) {
-            breakdown.power = 1.0;
-        } else {
-            breakdown.power = 0.1;
-        }
-    } else {
-        breakdown.power = 0.1;
-    }
-    justificationPoints.push(`Power: ${property.availablePower || 'N/A'} kVA provided.`);
-
-    // Amenities (Ceiling Height, Docks, Building Type, Crane)
-    const amenityScores: number[] = [];
-    if (demand.ceilingHeight && property.ceilingHeight) {
-        amenityScores.push(Math.min(property.ceilingHeight, demand.ceilingHeight) / Math.max(property.ceilingHeight, demand.ceilingHeight));
-    }
-    if (demand.docks !== undefined && property.docks !== undefined) {
-        amenityScores.push(demand.docks === 0 ? 1.0 : Math.min(property.docks, demand.docks) / Math.max(property.docks, demand.docks));
-    }
-    if(demand.buildingType && property.buildingType){
-        amenityScores.push(demand.buildingType === property.buildingType ? 1.0 : 0.2);
-    }
-    if(demand.optionals?.crane?.required) {
-        amenityScores.push(property.optionals?.crane?.required ? 1.0 : 0.0);
-    }
-    breakdown.amenities = amenityScores.length > 0 ? amenityScores.reduce((a, b) => a + b, 0) / amenityScores.length : 0.9;
-    justificationPoints.push(`Amenities: Blended score based on ceiling height, docks, and other features.`);
-
-    const allScores = Object.values(breakdown);
-    const overallScore = allScores.reduce((a,b) => a+b, 0) / allScores.length;
-
-    return {
-        overallScore: parseFloat(overallScore.toFixed(2)),
-        scoreBreakdown: breakdown,
-        justification: "Locally generated score. " + justificationPoints.join(' '),
-    };
-}
+const ComplianceToggle = ({ field, form }: { form: any, field: any }) => (
+    <div className="grid grid-cols-3 gap-1 rounded-full p-1 bg-muted w-fit">
+        <Button type="button" variant={field.value === 'Acceptable' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'Acceptable')} className="rounded-full">Acceptable</Button>
+        <Button type="button" variant={field.value === 'May Be' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'May Be')} className="rounded-full">May Be</Button>
+        <Button type="button" variant={field.value === 'No' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'No')} className="rounded-full">No</Button>
+    </div>
+  );
 
 
 export function PropertyForm() {
@@ -261,9 +145,6 @@ export function PropertyForm() {
   const { demands, addSubmission } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
-  const [submissionData, setSubmissionData] = React.useState<PropertySchema | null>(null);
-  const [matchResult, setMatchResult] = React.useState<GetPropertyMatchScoreOutput | null>(null);
   
   const [isEssentialsOpen, setIsEssentialsOpen] = React.useState(true);
   const [isOptionalsOpen, setIsOptionalsOpen] = React.useState(false);
@@ -317,26 +198,6 @@ export function PropertyForm() {
     },
   });
 
-  const priorityCounts = React.useMemo(() => {
-    if (!demandToMatch) return { optionals: 0, operations: 0 };
-    
-    const basePriorities = [
-        ...(demandToMatch.preferences.nonCompromisable || []),
-        ...(demandToMatch.optionals?.crane?.required ? ['crane'] : []),
-        ...(demandToMatch.operationType === 'Manufacturing' ? ['operations'] : []),
-    ];
-    const uniquePriorities = Array.from(new Set(basePriorities));
-
-    return uniquePriorities.reduce((acc, item) => {
-        if (['crane'].includes(item) || demandToMatch.optionals?.hasOwnProperty(item as any)) {
-            acc.optionals++;
-        } else if (['operations'].includes(item) || demandToMatch.operations?.hasOwnProperty(item as any)) {
-            acc.operations++;
-        }
-        return acc;
-    }, { optionals: 0, operations: 0 });
-  }, [demandToMatch]);
-  
   React.useEffect(() => {
     const newId = `PS-${Date.now()}`;
     form.setValue("propertyId", newId);
@@ -355,28 +216,16 @@ export function PropertyForm() {
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
   
-  const handleFinalSubmit = async () => {
+  async function onSubmit(data: PropertySchema) {
     setIsLoading(true);
-    if (!submissionData || !matchResult) {
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Missing submission data or match score.",
-        });
-        setIsLoading(false);
-        return;
-    }
-    
     try {
         const submission = {
-          property: submissionData,
-          matchResult: matchResult,
-          demandId: submissionData.o2oDealDemandId!,
+          property: data,
+          demandId: data.o2oDealDemandId!,
           demandUserEmail: demandToMatch?.userEmail,
         };
 
         addSubmission(submission, user?.email);
-        setIsConfirmOpen(false);
         setIsDialogOpen(true);
         toast({
             title: "Success!",
@@ -391,51 +240,16 @@ export function PropertyForm() {
       });
     } finally {
       setIsLoading(false);
-      setSubmissionData(null);
-    }
-  };
-
-  const onAttemptSubmit = async (data: PropertySchema) => {
-    setIsLoading(true);
-    setMatchResult(null); 
-    setSubmissionData(data); 
-
-    try {
-        if(!demandToMatch) throw new Error("Demand to match not found");
-        
-        // Use the client-side scoring function
-        const result = calculateClientSideScore(data, demandToMatch);
-        
-        setMatchResult(result);
-        setIsConfirmOpen(true);
-    } catch (error) {
-       const e = error as Error;
-       toast({
-        variant: "destructive",
-        title: "Score Calculation Failed",
-        description: e.message,
-      });
-    } finally {
-        setIsLoading(false);
     }
   }
   
   const onInvalidSubmit = (errors: FieldErrors<PropertySchema>) => {
     const errorFields = Object.keys(errors);
-    const fieldNameMapping: { [key: string]: string } = {
-        'size': 'Size',
-        'rentPerSft': 'Rent per Sq.Ft.',
-        'rentalSecurityDeposit': 'Security Deposit',
-        'isLocationConfirmed': 'Location Confirmation',
-        'optionals.crane.required': 'Crane Information'
-    };
 
     const formattedErrorFields = errorFields.map(field => {
-        const path = field as keyof typeof fieldNameMapping;
-        return fieldNameMapping[path] || field;
+        return field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
     }).join(', ');
     
-
     toast({
         variant: 'destructive',
         title: 'Missing Required Fields',
@@ -466,104 +280,6 @@ export function PropertyForm() {
     }, 100); 
   }
   
-  const ComplianceToggle = ({ field, form }: { form: any, field: any }) => (
-    <div className="grid grid-cols-3 gap-1 rounded-full p-1 bg-muted w-fit">
-        <Button type="button" variant={field.value === 'Acceptable' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'Acceptable')} className="rounded-full">Acceptable</Button>
-        <Button type="button" variant={field.value === 'May Be' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'May Be')} className="rounded-full">May Be</Button>
-        <Button type="button" variant={field.value === 'No' ? 'default' : 'ghost'} size="sm" onClick={() => form.setValue(field.name, 'No')} className="rounded-full">No</Button>
-    </div>
-  );
-
-  const watchedValues = form.watch();
-
-  const scoreCache = React.useMemo(() => {
-    const scores: Record<string, number | null> = {};
-    if (!demandToMatch) return scores;
-
-    const calculateScore = (field: string, value: any): number | null => {
-      if (value === undefined || value === null || value === '') return null;
-      let score = 0;
-      try {
-          switch (field) {
-              case 'size': {
-                  const propertySize = Number(value);
-                  const demandSize = demandToMatch.size;
-                  const variation = demandToMatch.sizeVariationPercentage ?? 10;
-                  const lowerBound = demandToMatch.sizeMin || demandSize * (1 - variation / 100);
-                  const upperBound = demandToMatch.sizeMax || demandSize * (1 + variation / 100);
-                  if (propertySize >= lowerBound && propertySize <= upperBound) {
-                    score = 1.0 - (Math.abs(demandSize - propertySize) / (upperBound - lowerBound));
-                  } else {
-                    score = 0.1; // Penalize if outside range
-                  }
-                  break;
-              }
-              case 'ceilingHeight': {
-                  const propertyHeight = Number(value);
-                  const demandHeight = demandToMatch.ceilingHeight;
-                  if (!propertyHeight || !demandHeight) return null;
-                  score = Math.min(propertyHeight, demandHeight) / Math.max(propertyHeight, demandHeight);
-                  break;
-              }
-              case 'docks': {
-                  const propertyDocks = Number(value);
-                  const demandDocks = demandToMatch.docks;
-                  if (propertyDocks === undefined || propertyDocks === null || demandDocks === undefined) return null;
-                  if (demandDocks === 0) return 1;
-                  score = Math.min(propertyDocks, demandDocks) / demandDocks;
-                  break;
-              }
-              case 'fireNoc':
-              case 'approvalStatus': {
-                  if (value === 'Obtained') score = 1.0;
-                  else if (value === 'Applied For') score = 0.6;
-                  else if (value === 'To Apply') score = 0.3;
-                  else score = 0.1;
-                  break;
-              }
-              case 'operations.mpcbEcCategory':
-              case 'operations.etpDetails':
-              case 'operations.effluentCharacteristics':
-                  if (!demandToMatch.operations || !Object.values(demandToMatch.operations).some(v => v)) return null;
-                  if (value === 'Acceptable') score = 1.0;
-                  else if (value === 'May Be') score = 0.5;
-                  else score = 0.1;
-                  break;
-              case 'optionals.crane.required':
-                  const craneDemand = demandToMatch.optionals?.crane?.required;
-                  if(!craneDemand) return null;
-                  score = value ? 1.0 : 0.0;
-                  break;
-              default:
-                  return null;
-          }
-      } catch(e) {
-          return null;
-      }
-      return isNaN(score) ? null : score;
-    }
-    
-    const flattenObject = (obj: any, prefix = ''): Record<string, any> =>
-        Object.keys(obj).reduce((acc, k) => {
-            const pre = prefix.length ? prefix + '.' : '';
-            if (k === 'crane' && typeof obj[k] === 'object' && obj[k] !== null) {
-                 acc[pre + k + '.required'] = obj[k].required;
-            } else if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
-                Object.assign(acc, flattenObject(obj[k], pre + k));
-            } else {
-                acc[pre + k] = obj[k];
-            }
-            return acc;
-        }, {} as Record<string, any>);
-  
-    const flatWatchedValues = flattenObject(watchedValues);
-
-    for (const key in flatWatchedValues) {
-        scores[key] = calculateScore(key, flatWatchedValues[key]);
-    }
-    return scores;
-  }, [watchedValues, demandToMatch]);
-
 
   if (!isMatchingMode || !demandToMatch) {
     return (
@@ -578,22 +294,10 @@ export function PropertyForm() {
     )
   }
 
-  const scoreItems = matchResult && submissionData ? [
-      { criterion: "Location", demand: `${demandToMatch.locationName} (within ${demandToMatch.radius}km)`, property: submissionData.isLocationConfirmed ? "Confirmed by Provider" : "Not Confirmed", score: matchResult.scoreBreakdown.location },
-      { criterion: "Size (Sq. Ft.)", demand: `${demandToMatch.size.toLocaleString()}`, property: `${submissionData.size.toLocaleString()}`, score: matchResult.scoreBreakdown.size },
-      { criterion: "Building Type", demand: `${demandToMatch.buildingType}${demandToMatch.floorPreference ? ` (${demandToMatch.floorPreference})` : ''}`, property: `${submissionData.buildingType} (${submissionData.floor})`, score: (matchResult.scoreBreakdown.amenities) },
-      { criterion: "Ceiling Height", demand: `${demandToMatch.ceilingHeight || 'N/A'} ${demandToMatch.ceilingHeightUnit || 'ft'}`, property: `${submissionData.ceilingHeight} ft`, score: matchResult.scoreBreakdown.amenities },
-      { criterion: "Docks", demand: `${demandToMatch.docks || 'N/A'}`, property: `${submissionData.docks}`, score: matchResult.scoreBreakdown.amenities },
-      { criterion: "Power (kVA)", demand: `${demandToMatch.powerMin || '...'} - ${demandToMatch.powerMax || '...'}`, property: `${submissionData.availablePower}`, score: matchResult.scoreBreakdown.power },
-      { criterion: "Approvals", demand: demandToMatch.preferences.approvals || 'Good to have', property: submissionData.approvalStatus, score: matchResult.scoreBreakdown.approvals },
-      { criterion: "Fire Safety (NOC)", demand: demandToMatch.preferences.fireNoc || 'Good to have', property: submissionData.fireNoc, score: matchResult.scoreBreakdown.fireSafety },
-  ] : [];
-
-
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onAttemptSubmit, onInvalidSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)} className="space-y-6">
           <DemandSummaryCard demand={demandToMatch}/>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -629,7 +333,6 @@ export function PropertyForm() {
                                     {...field} value={field.value ?? ''} 
                                 />
                             </FormControl>
-                            <ScoreBadge score={scoreCache.size ?? null} />
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -693,7 +396,6 @@ export function PropertyForm() {
                                 disabled={!demandToMatch.ceilingHeight}
                             />
                         </FormControl>
-                        <ScoreBadge score={scoreCache.ceilingHeight ?? null} />
                         <FormMessage />
                         </FormItem>
                     )}
@@ -709,7 +411,6 @@ export function PropertyForm() {
                                 disabled={demandToMatch.docks === undefined}
                             />
                         </FormControl>
-                        <ScoreBadge score={scoreCache.docks ?? null} />
                         <FormMessage />
                         </FormItem>
                     )} />
@@ -752,7 +453,6 @@ export function PropertyForm() {
                         <Badge variant={demandToMatch.preferences.approvals === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.approvals}</Badge>
                         </div>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select>
-                        <ScoreBadge score={scoreCache.approvalStatus ?? null} />
                         <FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem className="relative">
                         <div className="flex items-center justify-between">
@@ -760,7 +460,6 @@ export function PropertyForm() {
                             <Badge variant={demandToMatch.preferences.fireNoc === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.fireNoc}</Badge>
                         </div>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select>
-                        <ScoreBadge score={scoreCache.fireNoc ?? null} />
                         <FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
@@ -778,7 +477,6 @@ export function PropertyForm() {
                       <div className="flex items-center gap-2">
                           <PlusCircle className="h-4 w-4" />
                           Optionals &amp; Preferences
-                           {priorityCounts.optionals > 0 && <Badge>{priorityCounts.optionals} priorities</Badge>}
                       </div>
                       <ChevronsUpDown className="h-4 w-4" />
                       </Button>
@@ -829,7 +527,6 @@ export function PropertyForm() {
                                         </CollapsibleContent>
                                     </Collapsible>
                                 </div>
-                                <ScoreBadge score={scoreCache['optionals.crane.required'] ?? null} />
                               </div>
                               {/* Office & Amenities */}
                               <div className="space-y-4">
@@ -928,7 +625,6 @@ export function PropertyForm() {
                         <div className="flex items-center gap-2">
                             <Factory className="h-4 w-4" />
                             Operational Details
-                             {priorityCounts.operations > 0 && <Badge>{priorityCounts.operations} priorities</Badge>}
                         </div>
                         <ChevronsUpDown className="h-4 w-4" />
                         </Button>
@@ -946,7 +642,6 @@ export function PropertyForm() {
                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
-                                      <ScoreBadge score={scoreCache['operations.mpcbEcCategory'] ?? null} />
                                   </FormItem>
                                   )}/>
                                  <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
@@ -955,7 +650,6 @@ export function PropertyForm() {
                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.etpDetails ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
-                                      <ScoreBadge score={scoreCache['operations.etpDetails'] ?? null} />
                                   </FormItem>
                                   )}/>
                                  <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
@@ -964,7 +658,6 @@ export function PropertyForm() {
                                        <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.effluentCharacteristics ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
                                       <FormMessage />
-                                      <ScoreBadge score={scoreCache['operations.effluentCharacteristics'] ?? null} />
                                   </FormItem>
                                   )}/>
                             </CardContent>
@@ -1035,89 +728,18 @@ export function PropertyForm() {
               {isLoading ? (
                 <>
                   <Sparkles className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
+                  Submitting...
                 </>
               ) : (
                 <>
                   <Wand className="mr-2 h-4 w-4" />
-                  Review &amp; Submit Match
+                  Submit Match
                 </>
               )}
             </Button>
           </div>
         </form>
       </Form>
-      <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <AlertDialogContent className="max-w-4xl">
-            <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> Submission Review</AlertDialogTitle>
-                <AlertDialogDescription>
-                    Review the match scores below and confirm to send it for approval.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            {matchResult ? (
-                <div className="space-y-6">
-                    <div className="text-center p-4 border rounded-md bg-primary/5">
-                      <p className="text-sm text-muted-foreground">Overall Match Score</p>
-                      <p className="text-6xl font-bold text-primary">{(matchResult.overallScore * 100).toFixed(0)}%</p>
-                      <Progress value={matchResult.overallScore * 100} className="h-2 mt-2" />
-                    </div>
-                    <div className="space-y-4">
-                        <h4 className="font-semibold">Scorecard</h4>
-                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-1/4">Criterion</TableHead>
-                                    <TableHead>Customer Requirement</TableHead>
-                                    <TableHead>Property Specification</TableHead>
-                                    <TableHead className="text-right w-[100px]">Match</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {scoreItems.map(item => {
-                                    const score = Math.round(item.score * 100);
-                                    const scoreColor = score > 85 ? 'bg-green-500' : score > 60 ? 'bg-amber-500' : 'bg-muted';
-                                    
-                                    return (
-                                        <TableRow key={item.criterion}>
-                                            <TableCell className="font-semibold">{item.criterion}</TableCell>
-                                            <TableCell>{item.demand}</TableCell>
-                                            <TableCell>{item.property}</TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex items-center gap-2 justify-end">
-                                                    <span className="font-bold text-sm">{score}%</span>
-                                                    <Progress value={score} className={cn("h-2 w-12", scoreColor)} indicatorClassName={scoreColor} />
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                })}
-                            </TableBody>
-                         </Table>
-                    </div>
-                     <div className="space-y-2">
-                        <h4 className="font-semibold">Justification</h4>
-                         <p className="text-sm text-muted-foreground bg-secondary p-3 rounded-md mt-2">
-                            {matchResult.justification}
-                        </p>
-                    </div>
-                </div>
-            ) : (
-                 <div className="space-y-4 mt-4">
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-3/4" />
-                  </div>
-            )}
-            <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setMatchResult(null)}>Go Back &amp; Edit</AlertDialogCancel>
-                <AlertDialogAction onClick={handleFinalSubmit} disabled={isLoading}>
-                    {isLoading ? "Submitting..." : "Confirm &amp; Submit"}
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
       <Dialog open={isDialogOpen} onOpenChange={() => {
             if (isDialogOpen) { // only trigger on close
                 router.push('/dashboard');
