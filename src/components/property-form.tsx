@@ -47,7 +47,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { propertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
 import { generateDescriptionAction, getPropertyMatchScoreAction } from "@/lib/actions";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, MapPin, Copy, Check, Sparkles, Wand, Percent, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building } from 'lucide-react';
 import { Skeleton } from "./ui/skeleton";
 import type { GetPropertyMatchScoreOutput } from "@/ai/flows/get-property-match-score";
 import { Progress } from "./ui/progress";
@@ -171,6 +171,14 @@ function DemandSummaryCard({ demandId }: { demandId: string }) {
                         <p className="font-semibold">Radius</p>
                         <p className="text-muted-foreground">{demand.radius} km</p>
                     </div>
+                     {demand.buildingType && <div>
+                        <p className="font-semibold">Building Type</p>
+                        <p className="text-muted-foreground">{demand.buildingType}</p>
+                    </div>}
+                     {demand.floorPreference && <div>
+                        <p className="font-semibold">Floor Preference</p>
+                        <p className="text-muted-foreground">{demand.floorPreference}</p>
+                    </div>}
                 </div>
                  {demand.description && (
                     <div className="text-sm">

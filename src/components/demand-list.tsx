@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Mail, Info, ListChecks } from 'lucide-react';
+import { ArrowRight, Mail, Info, ListChecks, Building } from 'lucide-react';
 import { useData } from '@/contexts/data-context';
 import type { DemandSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
@@ -90,7 +90,7 @@ Size: ${demand.size.toLocaleString()} Sq. Ft.
 Location: Near ${demand.locationName || demand.location} (within a ${demand.radius} km radius)
 Readiness: ${demand.readiness}
 Description: ${demand.description || 'No additional description provided.'}
-${(demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0) ? `\nNon-Compromisable Items: ${demand.preferences.nonCompromisable.join(', ')}` : ''}
+${(demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0) ? `\nNon-Compromisable Items: ${demand.preferences.nonCompromisable.map(item => priorityLabels[item] || item).join(', ')}` : ''}
 
 If you have a suitable property, please submit it using the link below:
 ${submitUrl}
@@ -122,7 +122,10 @@ WareHouse Origin
               <CardHeader>
                 <CardTitle>{demand.demandId}</CardTitle>
                 <CardDescription asChild>
-                  <div><Badge variant="secondary">{demand.propertyType}</Badge></div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="secondary">{demand.propertyType}</Badge>
+                    {demand.buildingType && <Badge variant="outline" className="flex items-center gap-1.5"><Building className="h-3 w-3" />{demand.buildingType}</Badge>}
+                  </div>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 flex-grow">
