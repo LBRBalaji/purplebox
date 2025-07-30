@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { AdminNotifier } from '@/components/admin-notifier';
 import { ApprovalQueue } from '@/components/approval-queue';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AgentWaitlist } from '@/components/agent-waitlist';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -58,6 +59,16 @@ export default function DashboardPage() {
   const isO2O = user?.role === 'O2O';
 
   if (isMainAdmin || isO2O) {
+    const adminTabs = isMainAdmin
+      ? [
+          { value: 'demands', label: 'Circulate Demands' },
+          { value: 'approvals', label: 'Approval Queue' },
+          { value: 'agent-waitlist', label: 'Agent Waitlist' },
+        ]
+      : [{ value: 'approvals', label: 'Approval Queue' }];
+    
+    const defaultTab = isMainAdmin ? "demands" : "approvals";
+
     return (
       <>
         <AdminNotifier />
@@ -68,16 +79,17 @@ export default function DashboardPage() {
                     <CardTitle>{isMainAdmin ? 'Admin Dashboard' : 'O2O Dashboard'}</CardTitle>
                     <CardDescription>
                         {isMainAdmin 
-                            ? "Welcome, Admin. Your primary role is to circulate new demands and approve/reject property submissions."
+                            ? "Welcome, Admin. Your primary role is to circulate new demands, manage approvals, and review agent applications."
                             : "Welcome, O2O Manager. Your role is to manage warehouse listings and the submission approval queue."
                         }
                     </CardDescription>
                 </CardHeader>
              </Card>
-             <Tabs defaultValue={isMainAdmin ? "demands" : "approvals"} className="w-full mt-6">
-                <TabsList className="grid w-full grid-cols-2">
-                    {isMainAdmin && <TabsTrigger value="demands">Circulate Demands</TabsTrigger>}
-                    <TabsTrigger value="approvals">Approval Queue</TabsTrigger>
+             <Tabs defaultValue={defaultTab} className="w-full mt-6">
+                <TabsList className={`grid w-full grid-cols-${adminTabs.length}`}>
+                    {adminTabs.map(tab => (
+                        <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
+                    ))}
                 </TabsList>
                 {isMainAdmin && (
                     <TabsContent value="demands">
@@ -87,6 +99,11 @@ export default function DashboardPage() {
                 <TabsContent value="approvals">
                     <ApprovalQueue />
                 </TabsContent>
+                {isMainAdmin && (
+                    <TabsContent value="agent-waitlist">
+                        <AgentWaitlist />
+                    </TabsContent>
+                )}
              </Tabs>
           </div>
         </main>

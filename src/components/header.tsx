@@ -81,6 +81,11 @@ export function Header() {
                         <NavLink href="/map-search">
                             <Map className="h-4 w-4" /> Map Search
                         </NavLink>
+                        {!user && (
+                            <NavLink href="/agent-signup">
+                                <Briefcase className="h-4 w-4" /> Agent Signup
+                            </NavLink>
+                        )}
                         {(isAdmin || isO2O) && (
                             <>
                                 <NavLink href="/dashboard/manage-warehouses">
@@ -106,7 +111,7 @@ export function Header() {
           </nav>
 
            <div className="flex items-center gap-4 flex-shrink-0">
-              {user?.role !== 'SuperAdmin' && user?.role !== 'O2O' && (
+              {user && user.email !== 'admin@example.com' && user?.role !== 'O2O' && (
                 <Link href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline">
                       <WhatsAppIcon className="mr-2 h-5 w-5" />
