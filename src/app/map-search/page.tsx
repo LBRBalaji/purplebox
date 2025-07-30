@@ -25,7 +25,7 @@ export default function MapSearchPage() {
 
   return (
     <div className="flex-grow flex flex-col">
-      <APIProvider apiKey={apiKey} libraries={['places', 'marker', 'geometry']}>
+      <APIProvider apiKey={apiKey} libraries={['places', 'marker', 'geometry', 'visualization']}>
         <MapSearch mapId={mapId}/>
       </APIProvider>
     </div>

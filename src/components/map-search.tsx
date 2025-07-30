@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, FileText, Share2, MailCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
+import { warehouses } from '@/lib/warehouse-mock-data';
 
 
 type RegionalSummary = {
@@ -247,6 +248,7 @@ function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng
 function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
   const places = useMapsLibrary('places');
+  const viz = useMapsLibrary('visualization');
   const router = useRouter();
   const { user } = useAuth();
   
@@ -255,9 +257,49 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
   const [lastSearchedCenter, setLastSearchedCenter] = React.useState<{ lat: number, lng: number } | null>(null);
   const [circle, setCircle] = React.useState<google.maps.Circle | null>(null);
+  const [heatmap, setHeatmap] = React.useState<google.maps.visualization.HeatmapLayer | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
   const [pendingRedirectCenter, setPendingRedirectCenter] = React.useState<{ lat: number; lng: number } | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  // Initialize Heatmap
+  React.useEffect(() => {
+    if (!map || !viz) return;
+
+    const heatmapData = warehouses
+        .filter(w => w.isActive)
+        .map(w => new google.maps.LatLng(w.generalizedLocation.lat, w.generalizedLocation.lng));
+
+    const newHeatmap = new viz.HeatmapLayer({
+        map,
+        data: heatmapData,
+        radius: 40,
+        opacity: 0.8,
+        gradient: [
+          'rgba(0, 255, 255, 0)',
+          'rgba(0, 255, 255, 1)',
+          'rgba(0, 191, 255, 1)',
+          'rgba(0, 127, 255, 1)',
+          'rgba(0, 63, 255, 1)',
+          'rgba(0, 0, 255, 1)',
+          'rgba(0, 0, 223, 1)',
+          'rgba(0, 0, 191, 1)',
+          'rgba(0, 0, 159, 1)',
+          'rgba(0, 0, 127, 1)',
+          'rgba(63, 0, 91, 1)',
+          'rgba(127, 0, 63, 1)',
+          'rgba(191, 0, 31, 1)',
+          'rgba(255, 0, 0, 1)',
+        ],
+    });
+    setHeatmap(newHeatmap);
+
+    return () => {
+        if (newHeatmap) {
+            newHeatmap.setMap(null);
+        }
+    };
+  }, [map, viz]);
 
   // Initialize SearchBox
   React.useEffect(() => {
