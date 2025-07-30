@@ -51,6 +51,7 @@ import { useData } from "@/contexts/data-context";
 import { useAuth } from "@/contexts/auth-context";
 import { Badge } from "./ui/badge";
 import { Switch } from "./ui/switch";
+import { getPropertyMatchScore } from "@/ai/flows/get-property-match-score";
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
@@ -81,9 +82,8 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
     
     const basePriorities = [
         ...(demand.preferences?.nonCompromisable || []),
-        ...(demand.optionals?.crane?.required ? ['crane'] : []),
-        ...(demand.operationType === 'Manufacturing' && Object.values(demand.operations || {}).some(v => v) ? ['operations'] : []),
     ];
+    // Use a Set to ensure keys are unique, preventing the React key error
     const priorityItems = Array.from(new Set(basePriorities));
     
     const getSection = (priority: string) => {
@@ -116,7 +116,6 @@ function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
                         {priorityItems.length > 0 ? priorityItems.map(p => (
                             <div key={p} className="p-2 rounded-md bg-secondary border text-xs">
                                 <span className="font-semibold">{priorityLabels[p] || p}</span>
-                                <span className="text-muted-foreground"> (in {getSection(p)} section)</span>
                             </div>
                         )) : (
                             <p className="text-xs text-muted-foreground">No specific high-priority items were marked by the customer.</p>
@@ -198,6 +197,29 @@ export function PropertyForm() {
     },
   });
 
+  const optionalPrioritiesCount = React.useMemo(() => {
+    if (!demandToMatch) return 0;
+    const nonCompromisable = demandToMatch.preferences?.nonCompromisable || [];
+    let count = 0;
+    if (nonCompromisable.includes('crane')) count++;
+    // Add other optional priorities here if they are added to the non-compromisable list
+    return count;
+  }, [demandToMatch]);
+
+  const operationPrioritiesCount = React.useMemo(() => {
+      if (!demandToMatch || demandToMatch.operationType !== 'Manufacturing') return 0;
+      const nonCompromisable = demandToMatch.preferences?.nonCompromisable || [];
+      let count = 0;
+      if (nonCompromisable.includes('operations')) count++; 
+      // A more granular check could be added here if specific operation fields are added to nonCompromisable
+      else if (demandToMatch.operations?.mpcbEcCategory || demandToMatch.operations?.etpDetails || demandToMatch.operations?.effluentCharacteristics) {
+          // If the section has any data, we can consider it a priority area for manufacturing
+          count = 1; 
+      }
+      return count;
+  }, [demandToMatch]);
+
+
   React.useEffect(() => {
     const newId = `PS-${Date.now()}`;
     form.setValue("propertyId", newId);
@@ -216,9 +238,8 @@ export function PropertyForm() {
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
   
-  async function onSubmit(data: PropertySchema) {
-    setIsLoading(true);
-    try {
+  const onFinalSubmit = (data: PropertySchema) => {
+      try {
         const submission = {
           property: data,
           demandId: data.o2oDealDemandId!,
@@ -226,7 +247,7 @@ export function PropertyForm() {
         };
 
         addSubmission(submission, user?.email);
-        setIsDialogOpen(true);
+        setIsDialogOpen(true); // This dialog now confirms the direct submission
         toast({
             title: "Success!",
             description: "Property match submitted for approval.",
@@ -242,20 +263,12 @@ export function PropertyForm() {
       setIsLoading(false);
     }
   }
+
   
   const onInvalidSubmit = (errors: FieldErrors<PropertySchema>) => {
     const errorFields = Object.keys(errors);
-
-    const formattedErrorFields = errorFields.map(field => {
-        return field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-    }).join(', ');
     
-    toast({
-        variant: 'destructive',
-        title: 'Missing Required Fields',
-        description: `Please fill out: ${formattedErrorFields}`
-    });
-
+    // Auto-expand sections with errors
     if(errorFields.some(field => field.startsWith('optionals') || field === 'optionals')) {
         setIsOptionalsOpen(true);
     }
@@ -266,15 +279,25 @@ export function PropertyForm() {
         setIsCommercialsOpen(true);
     }
 
+    const errorFieldNames = Object.keys(errors).join(', ');
+    toast({
+        variant: 'destructive',
+        title: 'Missing Required Fields',
+        description: `Please fill out: ${errorFieldNames}`
+    });
+
+
     setTimeout(() => {
         const firstErrorField = errorFields[0];
-        const element = document.querySelector(`[name="${firstErrorField}"]`);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            try {
-              (element as HTMLElement).focus({ preventScroll: true });
-            } catch (e) {
-                // ignore errors on elements that can't be focused
+        if (firstErrorField) {
+            const element = document.querySelector(`[name="${firstErrorField}"]`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                try {
+                (element as HTMLElement).focus({ preventScroll: true });
+                } catch (e) {
+                    // ignore errors on elements that can't be focused
+                }
             }
         }
     }, 100); 
@@ -297,7 +320,7 @@ export function PropertyForm() {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onFinalSubmit, onInvalidSubmit)} className="space-y-6">
           <DemandSummaryCard demand={demandToMatch}/>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -353,7 +376,7 @@ export function PropertyForm() {
                         <FormMessage />
                         </FormItem>
                     )} />
-                    <FormField control={form.control} name="buildingType" render={({ field }) => (
+                     <FormField control={form.control} name="buildingType" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Building Type</FormLabel>
                         <FormDescription>Req: {demandToMatch.buildingType || "N/A"}</FormDescription>
@@ -436,7 +459,7 @@ export function PropertyForm() {
                         <FormItem>
                             <FormLabel>Compound/Boundary Wall Safety</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select safety status"/></SelectTrigger></FormControl>
                                 <SelectContent>
                                     <SelectItem value="Fully Compounded">Fully Compounded</SelectItem>
                                     <SelectItem value="Partially Compounded">Partially Compounded</SelectItem>
@@ -452,6 +475,7 @@ export function PropertyForm() {
                         <FormLabel>Approval Status</FormLabel>
                         <Badge variant={demandToMatch.preferences.approvals === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.approvals}</Badge>
                         </div>
+                         <FormDescription>What is the current status of approvals?</FormDescription>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select>
                         <FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem className="relative">
@@ -459,13 +483,14 @@ export function PropertyForm() {
                             <FormLabel>Fire NOC</FormLabel>
                             <Badge variant={demandToMatch.preferences.fireNoc === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.fireNoc}</Badge>
                         </div>
-                        <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select>
-                        <FormMessage /></FormItem>)} />
+                         <FormDescription>What is the current status of the Fire NOC?</FormDescription>
+                        <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
                             <FormLabel>Fire Safety Infrastructure</FormLabel>
                             <Badge variant={demandToMatch.preferences.fireSafety === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.fireSafety}</Badge>
                         </div>
+                        <FormDescription>Are fire hydrants/sprinklers available?</FormDescription>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                     </div>
                 </CardContent>
@@ -477,6 +502,9 @@ export function PropertyForm() {
                       <div className="flex items-center gap-2">
                           <PlusCircle className="h-4 w-4" />
                           Optionals &amp; Preferences
+                           {optionalPrioritiesCount > 0 && (
+                            <Badge variant="secondary">{optionalPrioritiesCount} Priority Item{optionalPrioritiesCount > 1 && 's'}</Badge>
+                          )}
                       </div>
                       <ChevronsUpDown className="h-4 w-4" />
                       </Button>
@@ -625,6 +653,9 @@ export function PropertyForm() {
                         <div className="flex items-center gap-2">
                             <Factory className="h-4 w-4" />
                             Operational Details
+                             {operationPrioritiesCount > 0 && (
+                              <Badge variant="secondary">{operationPrioritiesCount} Priority Item{operationPrioritiesCount > 1 && 's'}</Badge>
+                            )}
                         </div>
                         <ChevronsUpDown className="h-4 w-4" />
                         </Button>
