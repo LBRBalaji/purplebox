@@ -28,7 +28,7 @@ const priorityLabels: { [key: string]: string } = {
 
 const ScoreDisplay = ({ label, score, icon: Icon }: { label: string, score: number, icon: React.ElementType }) => {
     const displayScore = Math.round(score * 100);
-    const colorClass = displayScore >= 85 ? 'text-green-600' : displayScore >= 60 ? 'text-amber-600' : 'text-red-600';
+    const colorClass = displayScore >= 85 ? 'text-green-600' : displayScore >= 60 ? 'text-amber-600' : 'text-muted-foreground';
     
     return (
         <div className="flex justify-between items-center text-sm">
@@ -170,7 +170,7 @@ export function ApprovalQueue() {
                                         <TableBody>
                                             {scoreItems.map(item => {
                                                 const score = Math.round(item.score * 100);
-                                                const scoreColor = score > 85 ? 'bg-green-500' : score > 60 ? 'bg-amber-500' : 'bg-red-500';
+                                                const scoreColor = score > 85 ? 'bg-green-500' : score > 60 ? 'bg-amber-500' : 'bg-muted';
                                                 
                                                 return (
                                                     <TableRow key={item.criterion}>
@@ -192,7 +192,7 @@ export function ApprovalQueue() {
                              </div>
                         </CardContent>
                         <CardFooter className="flex justify-end gap-3">
-                            <Button variant="destructive" onClick={() => handleApproval(submission.property.propertyId, false)}>
+                            <Button variant="outline" onClick={() => handleApproval(submission.property.propertyId, false)}>
                                 <ThumbsDown className="mr-2" /> Reject
                             </Button>
                             <Button onClick={() => handleApproval(submission.property.propertyId, true)}>

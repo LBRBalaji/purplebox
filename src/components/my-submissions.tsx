@@ -24,7 +24,7 @@ const StatusIndicator = ({ status }: { status: SubmissionStatus }) => {
     const statusConfig = {
         Approved: { icon: CheckCircle2, color: 'text-green-600', bgColor: 'bg-green-100', text: 'Approved' },
         Pending: { icon: Clock, color: 'text-amber-600', bgColor: 'bg-amber-100', text: 'Pending Review' },
-        Rejected: { icon: XCircle, color: 'text-red-600', bgColor: 'bg-red-100', text: 'Rejected' },
+        Rejected: { icon: XCircle, color: 'text-muted-foreground', bgColor: 'bg-secondary', text: 'Rejected' },
     };
 
     const config = statusConfig[status];

@@ -28,7 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 const statusConfig: { [key in AgentStatus]: { icon: React.ElementType, color: string, text: string } } = {
     Pending: { icon: PauseCircle, color: 'text-amber-600', text: 'Pending' },
     Approved: { icon: CheckCircle, color: 'text-green-600', text: 'Approved' },
-    Rejected: { icon: XCircle, color: 'text-red-600', text: 'Rejected' },
+    Rejected: { icon: XCircle, color: 'text-muted-foreground', text: 'Rejected' },
     Hold: { icon: PauseCircle, color: 'text-gray-500', text: 'On Hold' },
 };
 
