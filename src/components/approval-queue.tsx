@@ -7,8 +7,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Check, Info, ListChecks, Percent, ThumbsDown, ThumbsUp, X, MapPin, Scaling, CalendarCheck, HandCoins, Zap, ShieldCheck, Truck, Flame } from 'lucide-react';
+import { Check, Info, ListChecks, Percent, ThumbsDown, ThumbsUp, X, MapPin, Scaling, CalendarCheck, HandCoins, Zap, ShieldCheck, Truck, Flame, Building, Construction } from 'lucide-react';
 import { Separator } from './ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Progress } from './ui/progress';
+import { cn } from '@/lib/utils';
+
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size',
@@ -79,6 +83,57 @@ export function ApprovalQueue() {
                 if (!demand) return null;
 
                 const breakdown = submission.matchResult.scoreBreakdown;
+                const scoreItems = [
+                    {
+                        criterion: "Location",
+                        demand: `${demand.locationName} (within ${demand.radius}km)`,
+                        property: submission.property.isLocationConfirmed ? "Confirmed by Provider" : "Not Confirmed",
+                        score: breakdown.location
+                    },
+                    {
+                        criterion: "Size (Sq. Ft.)",
+                        demand: `${demand.size.toLocaleString()}`,
+                        property: `${submission.property.size.toLocaleString()}`,
+                        score: breakdown.size
+                    },
+                    {
+                        criterion: "Building Type",
+                        demand: `${demand.buildingType}${demand.floorPreference ? ` (${demand.floorPreference})` : ''}`,
+                        property: `${submission.property.buildingType} (${submission.property.floor})`,
+                         score: (breakdown.amenities) // This is a blended score
+                    },
+                    {
+                        criterion: "Ceiling Height",
+                        demand: `${demand.ceilingHeight || 'N/A'} ${demand.ceilingHeightUnit || 'ft'}`,
+                        property: `${submission.property.ceilingHeight} ft`,
+                        score: breakdown.amenities // This is a blended score
+                    },
+                    {
+                        criterion: "Docks",
+                        demand: `${demand.docks || 'N/A'}`,
+                        property: `${submission.property.docks}`,
+                        score: breakdown.amenities // This is a blended score
+                    },
+                    {
+                        criterion: "Power (kVA)",
+                        demand: `${demand.powerMin || '...'} - ${demand.powerMax || '...'}`,
+                        property: `${submission.property.availablePower}`,
+                        score: breakdown.power
+                    },
+                    {
+                        criterion: "Approvals",
+                        demand: demand.preferences.approvals || 'Good to have',
+                        property: submission.property.approvalStatus,
+                        score: breakdown.approvals
+                    },
+                    {
+                        criterion: "Fire Safety (NOC)",
+                        demand: demand.preferences.fireNoc || 'Good to have',
+                        property: submission.property.fireNoc,
+                        score: breakdown.fireSafety
+                    },
+                ];
+
 
                 return (
                     <Card key={submission.property.propertyId}>
@@ -89,41 +144,11 @@ export function ApprovalQueue() {
                              </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* Demand Side */}
-                                <div className="space-y-4">
-                                    <h3 className="font-semibold text-lg">Customer Demand</h3>
-                                    <div className="p-4 border rounded-md bg-secondary/50 space-y-3">
-                                        <p><strong>Property Type:</strong> {demand.propertyType}</p>
-                                        <p><strong>Location:</strong> {demand.locationName || demand.location} (within {demand.radius}km)</p>
-                                        <p><strong>Size:</strong> {demand.size.toLocaleString()} sq. ft.</p>
-                                        <p><strong>Readiness:</strong> {demand.readiness}</p>
-                                        {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
-                                            <div className="text-sm space-y-2 pt-2">
-                                            <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Priorities:</p>
-                                            <div className="flex flex-wrap gap-1.5 pl-1">
-                                                {demand.preferences.nonCompromisable.map(item => <Badge key={item} variant="outline" className="font-normal">{priorityLabels[item] || item}</Badge>)}
-                                            </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                {/* Property Side */}
-                                <div className="space-y-4">
-                                    <h3 className="font-semibold text-lg">Submitted Property ({submission.property.propertyId})</h3>
-                                    <div className="p-4 border rounded-md space-y-3">
-                                        <p><strong>Location:</strong> {submission.property.isLocationConfirmed ? <span className="text-green-600 font-semibold">Confirmed by Provider</span> : <span className="text-red-600 font-semibold">Not Confirmed</span>}</p>
-                                        <p><strong>Size:</strong> {submission.property.size.toLocaleString()} sq. ft.</p>
-                                        <p><strong>Readiness:</strong> {submission.property.readinessToOccupy}</p>
-                                        <p><strong>Ceiling Height:</strong> {submission.property.ceilingHeight} ft</p>
-                                        <p><strong>Docks:</strong> {submission.property.docks}</p>
-                                        <p><strong>Rent:</strong> ₹{submission.property.rentPerSft}/sft</p>
-                                    </div>
-                                </div>
-                            </div>
-                             {/* AI Analysis */}
                              <div className="mt-6">
-                                <h3 className="font-semibold text-lg mb-2">AI Match Analysis</h3>
+                                <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                                    <Percent className="h-5 w-5 text-primary" />
+                                    AI Match Scorecard
+                                </h3>
                                 <div className="p-4 border rounded-md bg-primary/5 space-y-4">
                                      <div className="flex items-center gap-3">
                                         <Badge className="text-lg py-1 px-4">
@@ -133,15 +158,36 @@ export function ApprovalQueue() {
                                         <p className="text-sm text-muted-foreground italic line-clamp-2">{submission.matchResult.justification}</p>
                                      </div>
                                      <Separator />
-                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
-                                        <ScoreDisplay label="Location" score={breakdown.location} icon={MapPin} />
-                                        <ScoreDisplay label="Size" score={breakdown.size} icon={Scaling} />
-                                        <ScoreDisplay label="Amenities" score={breakdown.amenities} icon={Truck} />
-                                        <ScoreDisplay label="Commercials" score={breakdown.commercials} icon={HandCoins} />
-                                        <ScoreDisplay label="Power" score={breakdown.power} icon={Zap} />
-                                        <ScoreDisplay label="Fire Safety" score={breakdown.fireSafety} icon={Flame} />
-                                        <ScoreDisplay label="Approvals" score={breakdown.approvals} icon={ShieldCheck} />
-                                     </div>
+                                     <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="w-1/4">Criterion</TableHead>
+                                                <TableHead>Customer Requirement</TableHead>
+                                                <TableHead>Property Specification</TableHead>
+                                                <TableHead className="text-right w-[100px]">Match</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {scoreItems.map(item => {
+                                                const score = Math.round(item.score * 100);
+                                                const scoreColor = score > 85 ? 'bg-green-500' : score > 60 ? 'bg-amber-500' : 'bg-red-500';
+                                                
+                                                return (
+                                                    <TableRow key={item.criterion}>
+                                                        <TableCell className="font-semibold">{item.criterion}</TableCell>
+                                                        <TableCell>{item.demand}</TableCell>
+                                                        <TableCell>{item.property}</TableCell>
+                                                        <TableCell className="text-right">
+                                                            <div className="flex items-center gap-2 justify-end">
+                                                                <span className="font-bold text-sm">{score}%</span>
+                                                                <Progress value={score} className={cn("h-2 w-12", scoreColor)} indicatorClassName={scoreColor} />
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )
+                                            })}
+                                        </TableBody>
+                                     </Table>
                                 </div>
                              </div>
                         </CardContent>
