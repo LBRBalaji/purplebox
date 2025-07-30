@@ -173,6 +173,7 @@ export function PropertyForm() {
       buildingType: undefined,
       safety: "Fully Compounded",
       ceilingHeight: undefined,
+      ceilingHeightUnit: 'ft',
       rentPerSft: undefined,
       rentalSecurityDeposit: undefined,
       userType: "Developer",
@@ -235,6 +236,9 @@ export function PropertyForm() {
   React.useEffect(() => {
     if (demandIdFromUrl) {
       form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
+    }
+    if (demandToMatch) {
+       form.setValue('ceilingHeightUnit', demandToMatch.ceilingHeightUnit || 'ft');
     }
   }, [searchParams, form, demandIdFromUrl, demandToMatch]);
   
@@ -345,7 +349,7 @@ export function PropertyForm() {
                     )} />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField control={form.control} name="size" render={({ field }) => (
-                        <FormItem className="relative">
+                        <FormItem>
                             <FormLabel>Size (Sq. Ft.)</FormLabel>
                              <FormDescription>
                                 Req: {demandToMatch.sizeMin || demandToMatch.size} - {demandToMatch.sizeMax || demandToMatch.size} sq.ft.
@@ -378,38 +382,38 @@ export function PropertyForm() {
                     )} />
                      <FormField control={form.control} name="buildingType" render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Building Type</FormLabel>
-                        <FormDescription>Req: {demandToMatch.buildingType || "N/A"}</FormDescription>
-                        <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.buildingType}>
-                            <FormControl><SelectTrigger><SelectValue placeholder="Select building type"/></SelectTrigger></FormControl>
-                            <SelectContent>
-                            <SelectItem value="PEB">PEB</SelectItem>
-                            <SelectItem value="RCC">RCC</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
+                          <FormLabel>Building Type</FormLabel>
+                          <FormDescription>Req: {demandToMatch.buildingType || "N/A"}</FormDescription>
+                          <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.buildingType}>
+                              <FormControl><SelectTrigger><SelectValue placeholder="Select building type"/></SelectTrigger></FormControl>
+                              <SelectContent>
+                              <SelectItem value="PEB">PEB</SelectItem>
+                              <SelectItem value="RCC">RCC</SelectItem>
+                              </SelectContent>
+                          </Select>
+                          <FormMessage />
                         </FormItem>
-                    )} />
-                    {form.getValues('buildingType') === 'RCC' && (
-                        <FormField control={form.control} name="floor" render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Floor Preference</FormLabel>
-                            <FormDescription>Req: {demandToMatch.floorPreference ?? 'N/A'}</FormDescription>
-                            <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.floorPreference}>
-                                <FormControl><SelectTrigger><SelectValue placeholder="Select floor preference" /></SelectTrigger></FormControl>
-                                <SelectContent>
-                                <SelectItem value="Ground">Ground</SelectItem>
-                                <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
-                                <SelectItem value="Any">Any</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                    )}
+                      )} />
+                      {form.watch('buildingType') === 'RCC' && (
+                          <FormField control={form.control} name="floor" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Floor Preference</FormLabel>
+                                <FormDescription>Req: {demandToMatch.floorPreference ?? 'N/A'}</FormDescription>
+                                <Select onValueChange={field.onChange} value={field.value} disabled={!demandToMatch.floorPreference}>
+                                  <FormControl><SelectTrigger><SelectValue placeholder="Select floor preference" /></SelectTrigger></FormControl>
+                                  <SelectContent>
+                                  <SelectItem value="Ground">Ground</SelectItem>
+                                  <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
+                                  <SelectItem value="Any">Any</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                          />
+                      )}
                     <FormField control={form.control} name="ceilingHeight" render={({ field }) => (
-                        <FormItem className="relative">
+                        <FormItem>
                         <FormLabel>Ceiling Height ({demandToMatch.ceilingHeightUnit || 'ft'})</FormLabel>
                         <FormDescription>Req: {demandToMatch.ceilingHeight ? `${demandToMatch.ceilingHeight} ${demandToMatch.ceilingHeightUnit || 'ft'}` : "N/A"}</FormDescription>
                         <FormControl>
@@ -424,7 +428,7 @@ export function PropertyForm() {
                     )}
                     />
                     <FormField control={form.control} name="docks" render={({ field }) => (
-                        <FormItem className="relative">
+                        <FormItem>
                             <FormLabel>Number of Docks</FormLabel>
                             <FormDescription>Req: {demandToMatch.docks !== undefined ? `${demandToMatch.docks}` : "N/A"}</FormDescription>
                         <FormControl>
@@ -470,7 +474,7 @@ export function PropertyForm() {
                             <FormMessage />
                         </FormItem>
                      )}/>
-                    <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem className="relative">
+                    <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
                         <FormLabel>Approval Status</FormLabel>
                         <Badge variant={demandToMatch.preferences.approvals === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.approvals}</Badge>
@@ -478,7 +482,7 @@ export function PropertyForm() {
                          <FormDescription>What is the current status of approvals?</FormDescription>
                         <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select>
                         <FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem className="relative">
+                    <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem>
                         <div className="flex items-center justify-between">
                             <FormLabel>Fire NOC</FormLabel>
                             <Badge variant={demandToMatch.preferences.fireNoc === "Must to have" ? "destructive" : "secondary"} className="text-xs">{demandToMatch.preferences.fireNoc}</Badge>
@@ -668,7 +672,7 @@ export function PropertyForm() {
                             </CardHeader>
                             <CardContent className="space-y-6">
                                  <FormField control={form.control} name="operations.mpcbEcCategory" render={({ field }) => (
-                                  <FormItem className="relative">
+                                  <FormItem>
                                       <FormLabel>Unit Categorization (MPCB/EC)</FormLabel>
                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.mpcbEcCategory ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
@@ -676,7 +680,7 @@ export function PropertyForm() {
                                   </FormItem>
                                   )}/>
                                  <FormField control={form.control} name="operations.etpDetails" render={({ field }) => (
-                                  <FormItem className="relative">
+                                  <FormItem>
                                       <FormLabel>Effluent Treatment Plant (ETP)</FormLabel>
                                       <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.etpDetails ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
@@ -684,7 +688,7 @@ export function PropertyForm() {
                                   </FormItem>
                                   )}/>
                                  <FormField control={form.control} name="operations.effluentCharacteristics" render={({ field }) => (
-                                  <FormItem className="relative">
+                                  <FormItem>
                                       <FormLabel>Effluent Characteristics</FormLabel>
                                        <FormDescription>Requirement: <span className="font-semibold">{demandToMatch.operations?.effluentCharacteristics ?? 'N/A'}</span></FormDescription>
                                       <FormControl><ComplianceToggle field={field} form={form} /></FormControl>
@@ -795,3 +799,5 @@ export function PropertyForm() {
     </>
   );
 }
+
+    

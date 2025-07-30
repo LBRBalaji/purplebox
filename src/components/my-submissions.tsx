@@ -66,7 +66,7 @@ export function MySubmissions() {
                     group = {
                         demandId: submission.demandId,
                         demandDetails: {
-                            propertyType: demand.propertyType,
+                            propertyType: demand.operationType,
                             location: demand.locationName || demand.location,
                         },
                         properties: [],
@@ -132,7 +132,7 @@ export function MySubmissions() {
                                                 </div>
                                                  <div className="space-y-1">
                                                     <p className="font-semibold flex items-center gap-1.5 text-muted-foreground"><Building2 className="w-4 h-4"/>Ceiling</p>
-                                                    <p>{property.property.ceilingHeight} ft</p>
+                                                    <p>{property.property.ceilingHeight} {property.property.ceilingHeightUnit || 'ft'}</p>
                                                 </div>
                                                  <div className="space-y-1">
                                                     <p className="font-semibold flex items-center gap-1.5 text-muted-foreground"><Truck className="w-4 h-4"/>Docks</p>
@@ -170,3 +170,5 @@ export function MySubmissions() {
     </div>
   );
 }
+
+    

@@ -13,6 +13,7 @@ export const propertySchemaBase = z.object({
   buildingType: z.enum(['PEB', 'RCC']).optional(),
   floor: z.string().optional(),
   ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height must be a number."}).positive('Ceiling height must be positive.').optional(),
+  ceilingHeightUnit: z.enum(['ft', 'm']).default('ft'),
   docks: z.coerce.number({invalid_type_error: "Docks must be a number."}).int().nonnegative('Docks cannot be negative.').optional(),
   availablePower: z.coerce.number({invalid_type_error: "Power must be a number."}).positive('Power must be positive.').optional(),
   approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']),
@@ -76,29 +77,53 @@ export const propertySchemaBase = z.object({
 export const createPropertySchema = (demand: DemandSchema | undefined) => {
     if (!demand) return propertySchemaBase; // Return base schema if no demand context
 
-    return propertySchemaBase.superRefine((data, ctx) => {
-        if (demand.buildingType && !data.buildingType) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Building type is required for this demand.", path: ["buildingType"] });
-        }
-        if (demand.floorPreference && !data.floor) {
-             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Floor preference is required for this demand.", path: ["floor"] });
-        }
-        if (demand.ceilingHeight && data.ceilingHeight === undefined) {
-             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Ceiling height is required for this demand.", path: ["ceilingHeight"] });
-        }
-        if (demand.docks !== undefined && data.docks === undefined) {
-             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Number of docks is required for this demand.", path: ["docks"] });
-        }
-        if ((demand.powerMin || demand.powerMax) && data.availablePower === undefined) {
-             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Available power is required for this demand.", path: ["availablePower"] });
-        }
-        if (demand.optionals?.crane?.required && !data.optionals?.crane?.required) {
-             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Crane information is required for this demand.", path: ["optionals.crane.required"] });
-        }
-        if (demand.operations?.mpcbEcCategory && !data.operations?.mpcbEcCategory) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "MPCB/EC category compliance is required.", path: ["operations.mpcbEcCategory"] });
-        }
-    });
+    let schema = propertySchemaBase;
+
+    // Dynamically add requirement checks based on demand
+    if (demand.buildingType) {
+        schema = schema.refine(data => !!data.buildingType, {
+            message: "Building type is required for this demand.",
+            path: ["buildingType"],
+        });
+    }
+    if (demand.floorPreference) {
+        schema = schema.refine(data => !!data.floor, {
+            message: "Floor preference is required for this demand.",
+            path: ["floor"],
+        });
+    }
+    if (demand.ceilingHeight) {
+        schema = schema.refine(data => data.ceilingHeight !== undefined, {
+            message: "Ceiling height is required for this demand.",
+            path: ["ceilingHeight"],
+        });
+    }
+    if (demand.docks !== undefined) {
+        schema = schema.refine(data => data.docks !== undefined, {
+            message: "Number of docks is required for this demand.",
+            path: ["docks"],
+        });
+    }
+    if (demand.powerMin || demand.powerMax) {
+        schema = schema.refine(data => data.availablePower !== undefined, {
+            message: "Available power is required for this demand.",
+            path: ["availablePower"],
+        });
+    }
+    if (demand.optionals?.crane?.required) {
+        schema = schema.refine(data => !!data.optionals?.crane?.required, {
+            message: "Crane information is required for this demand.",
+            path: ["optionals.crane.required"],
+        });
+    }
+    if (demand.operations?.mpcbEcCategory) {
+        schema = schema.refine(data => !!data.operations?.mpcbEcCategory, {
+            message: "MPCB/EC category compliance is required.",
+            path: ["operations.mpcbEcCategory"],
+        });
+    }
+
+    return schema;
 };
 
 export type PropertySchema = z.infer<typeof propertySchemaBase>;
@@ -227,6 +252,8 @@ export const warehouseSchema = warehouseFormSchema.transform(data => {
 
 
 export type WarehouseSchema = z.infer<typeof warehouseSchema>;
+
+    
 
     
 
