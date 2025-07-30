@@ -577,5 +577,228 @@ export const warehouses: WarehouseSchema[] = [
     readiness: 'Available in 3 months',
     specifications: { ceilingHeight: 40, docks: 15, officeSpace: true, flooringType: 'FM2 Grade' },
     imageUrls: ['https://placehold.co/600x400.png'],
-  })
+  }),
+
+    // Delhi NCR
+    ...[
+        { name: 'Bilaspur', lat: 28.37, lng: 76.85 },
+        { name: 'Pataudi Road', lat: 28.36, lng: 76.78 },
+        { name: 'Farrukhnagar', lat: 28.45, lng: 76.82 },
+        { name: 'Ghaziabad', lat: 28.67, lng: 77.45 },
+        { name: 'Noida', lat: 28.53, lng: 77.39 },
+        { name: 'Greater Noida', lat: 28.47, lng: 77.50 },
+        { name: 'Sonipat', lat: 28.99, lng: 77.02 },
+        { name: 'Panipat', lat: 29.39, lng: 76.96 },
+        { name: 'Faridabad', lat: 28.41, lng: 77.32 },
+    ].flatMap((loc, i) => Array.from({ length: 7 }, (_, j) => createWarehouseEntry({
+        id: `WH-NCR-${i * 7 + j + 1}`,
+        locationName: loc.name,
+        isActive: true,
+        lat: loc.lat + (Math.random() - 0.5) * 0.1,
+        lng: loc.lng + (Math.random() - 0.5) * 0.1,
+        size: Math.floor(Math.random() * 40 + 2) * 5000, // 10k to 200k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 15 + 25), // 25-40 ft
+            docks: Math.floor(Math.random() * 20 + 5), // 5-25
+            officeSpace: j % 2 === 0,
+            flooringType: ['Standard', 'FM2 Grade'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    }))),
+
+    // Mumbai MMR
+    ...[
+        { name: 'Bhiwandi', lat: 19.29, lng: 73.06 },
+        { name: 'Panvel', lat: 18.99, lng: 73.12 },
+        { name: 'Taloja', lat: 19.09, lng: 73.13 },
+        { name: 'Vasai-Virar', lat: 19.47, lng: 72.80 },
+    ].flatMap((loc, i) => Array.from({ length: 8 }, (_, j) => createWarehouseEntry({
+        id: `WH-MMR-${i * 8 + j + 1}`,
+        locationName: loc.name,
+        isActive: true,
+        lat: loc.lat + (Math.random() - 0.5) * 0.1,
+        lng: loc.lng + (Math.random() - 0.5) * 0.1,
+        size: Math.floor(Math.random() * 50 + 10) * 10000, // 100k to 600k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 20 + 30), // 30-50 ft
+            docks: Math.floor(Math.random() * 30 + 10), // 10-40
+            officeSpace: j % 2 === 0,
+            flooringType: ['FM2 Grade', 'Heavy Duty'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    }))),
+
+    // Pune
+    ...[
+        { name: 'Chakan-Talegaon', lat: 18.75, lng: 73.81 },
+        { name: 'Ranjangaon', lat: 18.75, lng: 74.22 },
+        { name: 'Sanaswadi', lat: 18.66, lng: 74.05 },
+        { name: 'Wagholi', lat: 18.57, lng: 73.98 },
+    ].flatMap((loc, i) => Array.from({ length: 6 }, (_, j) => createWarehouseEntry({
+        id: `WH-PUN-${i * 6 + j + 1}`,
+        locationName: loc.name,
+        isActive: true,
+        lat: loc.lat + (Math.random() - 0.5) * 0.1,
+        lng: loc.lng + (Math.random() - 0.5) * 0.1,
+        size: Math.floor(Math.random() * 30 + 5) * 10000, // 50k to 350k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 20 + 30), // 30-50 ft
+            docks: Math.floor(Math.random() * 25 + 5), // 5-30
+            officeSpace: j % 2 === 0,
+            flooringType: ['FM2 Grade', 'Standard'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    }))),
+    
+    // Bengaluru
+    ...[
+        { name: 'Hosur-Attibele Road', lat: 12.75, lng: 77.82 },
+        { name: 'Dabaspet', lat: 13.23, lng: 77.30 },
+        { name: 'Nelamangala', lat: 13.09, lng: 77.40 },
+        { name: 'Hoskote', lat: 13.07, lng: 77.79 },
+    ].flatMap((loc, i) => Array.from({ length: 8 }, (_, j) => createWarehouseEntry({
+        id: `WH-BLR-${i * 8 + j + 1}`,
+        locationName: loc.name,
+        isActive: true,
+        lat: loc.lat + (Math.random() - 0.5) * 0.1,
+        lng: loc.lng + (Math.random() - 0.5) * 0.1,
+        size: Math.floor(Math.random() * 40 + 10) * 10000, // 100k to 500k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 20 + 35), // 35-55 ft
+            docks: Math.floor(Math.random() * 30 + 10), // 10-40
+            officeSpace: j % 2 === 0,
+            flooringType: ['FM2 Grade', 'Heavy Duty'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    }))),
+    
+    // Chennai
+    ...[
+        { name: 'Mevalurkuppam', lat: 13.01, lng: 80.01 },
+        { name: 'Kuthambakkam', lat: 13.05, lng: 80.05 },
+        { name: 'Thirumazhisai', lat: 13.05, lng: 80.03 },
+        { name: 'Kunnvakkam', lat: 12.78, lng: 79.94 },
+        { name: 'Palur', lat: 12.69, lng: 79.91 },
+        { name: 'Maraimalai Nagar', lat: 12.79, lng: 79.98 },
+        { name: 'Singaperumal Kovil', lat: 12.82, lng: 79.96 },
+        { name: 'Chengalpet', lat: 12.68, lng: 79.98 },
+        { name: 'Madhavaram', lat: 13.14, lng: 80.23 },
+        { name: 'Karanodai', lat: 13.26, lng: 80.20 },
+        { name: 'Thamaraipakkam', lat: 13.20, lng: 80.08 },
+        { name: 'Sothupakkam', lat: 12.65, lng: 79.90 },
+        { name: 'Vishnuvakkam', lat: 13.17, lng: 79.95 },
+    ].flatMap((loc, i) => Array.from({ length: 6 }, (_, j) => createWarehouseEntry({
+        id: `WH-CHE-${i * 6 + j + 1}`,
+        locationName: loc.name,
+        isActive: j % 5 !== 0, // make some inactive
+        lat: loc.lat + (Math.random() - 0.5) * 0.05,
+        lng: loc.lng + (Math.random() - 0.5) * 0.05,
+        size: Math.floor(Math.random() * 25 + 5) * 10000, // 50k to 300k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 15 + 30), // 30-45 ft
+            docks: Math.floor(Math.random() * 20 + 5), // 5-25
+            officeSpace: j % 2 === 0,
+            flooringType: ['FM2 Grade', 'Standard'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    }))),
+    
+    // Hyderabad
+    ...[
+        { name: 'Patancheru', lat: 17.52, lng: 78.26 },
+        { name: 'Medchal', lat: 17.62, lng: 78.48 },
+        { name: 'Shamshabad', lat: 17.25, lng: 78.40 },
+        { name: 'Kompally', lat: 17.54, lng: 78.50 },
+    ].flatMap((loc, i) => Array.from({ length: 7 }, (_, j) => createWarehouseEntry({
+        id: `WH-HYD-${i * 7 + j + 1}`,
+        locationName: loc.name,
+        isActive: true,
+        lat: loc.lat + (Math.random() - 0.5) * 0.1,
+        lng: loc.lng + (Math.random() - 0.5) * 0.1,
+        size: Math.floor(Math.random() * 30 + 10) * 10000, // 100k to 400k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 15 + 30), // 30-45 ft
+            docks: Math.floor(Math.random() * 25 + 5), // 5-30
+            officeSpace: j % 2 === 0,
+            flooringType: ['FM2 Grade', 'Heavy Duty'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    }))),
+    
+    // Kolkata
+    ...[
+        { name: 'Dankuni', lat: 22.68, lng: 88.31 },
+        { name: 'Taratala', lat: 22.50, lng: 88.30 },
+        { name: 'Uluberia', lat: 22.47, lng: 88.11 },
+    ].flatMap((loc, i) => Array.from({ length: 8 }, (_, j) => createWarehouseEntry({
+        id: `WH-KOL-${i * 8 + j + 1}`,
+        locationName: loc.name,
+        isActive: true,
+        lat: loc.lat + (Math.random() - 0.5) * 0.1,
+        lng: loc.lng + (Math.random() - 0.5) * 0.1,
+        size: Math.floor(Math.random() * 20 + 5) * 10000, // 50k to 250k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 15 + 25), // 25-40 ft
+            docks: Math.floor(Math.random() * 15 + 5), // 5-20
+            officeSpace: j % 2 === 0,
+            flooringType: ['Standard', 'FM2 Grade'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    }))),
+    
+    // Ahmedabad
+    ...[
+        { name: 'Ahmedabad', lat: 23.02, lng: 72.57 },
+        { name: 'Sanand', lat: 22.98, lng: 72.38 },
+        { name: 'Changodar', lat: 22.89, lng: 72.46 },
+        { name: 'Aslali', lat: 22.93, lng: 72.58 },
+    ].flatMap((loc, i) => Array.from({ length: 7 }, (_, j) => createWarehouseEntry({
+        id: `WH-AMD-${i * 7 + j + 1}`,
+        locationName: loc.name,
+        isActive: true,
+        lat: loc.lat + (Math.random() - 0.5) * 0.1,
+        lng: loc.lng + (Math.random() - 0.5) * 0.1,
+        size: Math.floor(Math.random() * 45 + 5) * 10000, // 50k to 500k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 20 + 30), // 30-50 ft
+            docks: Math.floor(Math.random() * 30 + 10), // 10-40
+            officeSpace: j % 2 === 0,
+            flooringType: ['FM2 Grade', 'Heavy Duty'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    }))),
+    
+    // Other Major Cities
+    ...[
+        { name: 'Nagpur (MIHAN)', lat: 21.09, lng: 79.05 },
+        { name: 'Coimbatore', lat: 11.01, lng: 76.95 },
+        { name: 'Lucknow', lat: 26.84, lng: 80.94 },
+        { name: 'Indore', lat: 22.71, lng: 75.85 },
+        { name: 'Jaipur', lat: 26.91, lng: 75.78 },
+        { name: 'Visakhapatnam', lat: 17.68, lng: 83.21 },
+        { name: 'Guwahati', lat: 26.14, lng: 91.73 },
+    ].flatMap((loc, i) => Array.from({ length: 5 }, (_, j) => createWarehouseEntry({
+        id: `WH-OTH-${i * 5 + j + 1}`,
+        locationName: loc.name,
+        isActive: true,
+        lat: loc.lat + (Math.random() - 0.5) * 0.1,
+        lng: loc.lng + (Math.random() - 0.5) * 0.1,
+        size: Math.floor(Math.random() * 20 + 5) * 10000, // 50k to 250k
+        readiness: ['Ready for Occupancy', 'Under Construction', 'Available in 3 months'][j % 3],
+        specifications: {
+            ceilingHeight: Math.floor(Math.random() * 15 + 25), // 25-40 ft
+            docks: Math.floor(Math.random() * 15 + 5), // 5-20
+            officeSpace: j % 2 === 0,
+            flooringType: ['Standard', 'FM2 Grade'][j % 2],
+        },
+        imageUrls: ['https://placehold.co/600x400.png'],
+    })))
 ];
