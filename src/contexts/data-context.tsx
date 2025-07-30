@@ -25,6 +25,7 @@ export type AgentLead = {
     email: string;
     phone: string;
     address: string;
+    socialProfileId: string;
 }
 
 type DataEvent = {

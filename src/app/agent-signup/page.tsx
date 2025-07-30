@@ -16,11 +16,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { Building, Sparkles, UserPlus, ClipboardCheck } from 'lucide-react';
+import { Building, Sparkles, UserPlus, ClipboardCheck, Star, Linkedin } from 'lucide-react';
 import Link from 'next/link';
 import { useData } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
 import type { AgentLead } from '@/contexts/data-context';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function AgentSignupPage() {
   const { addAgentLead } = useData();
@@ -33,6 +34,7 @@ export default function AgentSignupPage() {
     email: '',
     phone: '',
     address: '',
+    socialProfileId: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -78,7 +80,7 @@ export default function AgentSignupPage() {
 
   return (
     <div className="flex-grow bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <div className="mx-auto flex flex-col items-center mb-4">
             <div className="flex items-center gap-2">
@@ -91,9 +93,13 @@ export default function AgentSignupPage() {
             <p className="text-xs text-muted-foreground mt-1">Join the WareHouse Origin Network</p>
           </div>
           <CardTitle className="text-2xl">Become an Agent Partner</CardTitle>
-          <CardDescription>
-            Register your interest and we'll add you to our waitlist.
-          </CardDescription>
+          <Alert className="mt-4 text-left bg-primary/5 border-primary/20">
+            <Star className="h-5 w-5 text-primary/80" />
+            <AlertTitle className="font-semibold text-primary/90">Waitlist Registration</AlertTitle>
+            <AlertDescription className="text-primary/80">
+                Register your interest and we'll add you to our waitlist for platform onboarding.
+            </AlertDescription>
+          </Alert>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -139,13 +145,19 @@ export default function AgentSignupPage() {
                   <Input id="companyName" placeholder="Your Agency LLC" required={formData.agentType === 'Company'} onChange={handleChange} value={formData.companyName} />
                 </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Official Email</Label>
-              <Input id="email" type="email" placeholder="john.doe@agency.com" required onChange={handleChange} value={formData.email} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="email">Official Email</Label>
+                    <Input id="email" type="email" placeholder="john.doe@agency.com" required onChange={handleChange} value={formData.email} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="phone">Mobile Number</Label>
+                    <Input id="phone" type="tel" placeholder="+1 234 567 890" required onChange={handleChange} value={formData.phone} />
+                </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Mobile Number</Label>
-              <Input id="phone" type="tel" placeholder="+1 234 567 890" required onChange={handleChange} value={formData.phone} />
+             <div className="space-y-2">
+              <Label htmlFor="socialProfileId">Social Profile ID (LinkedIn)</Label>
+              <Input id="socialProfileId" placeholder="linkedin.com/in/yourprofile" onChange={handleChange} value={formData.socialProfileId} />
             </div>
              <div className="space-y-2">
               <Label htmlFor="address">Office Address</Label>

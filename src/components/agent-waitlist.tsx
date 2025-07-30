@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useData } from '@/contexts/data-context';
-import { Mail, Phone, Building, User } from 'lucide-react';
+import { Mail, Phone, Building, User, Linkedin } from 'lucide-react';
 
 export function AgentWaitlist() {
   const { agentLeads } = useData();
@@ -24,6 +24,13 @@ export function AgentWaitlist() {
             <CardDescription className="mt-2">New agent registrations will appear here for your review.</CardDescription>
         </Card>
       )
+  }
+
+  const formatUrl = (url: string) => {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return `https://${url}`;
+    }
+    return url;
   }
 
   return (
@@ -40,6 +47,7 @@ export function AgentWaitlist() {
                 <TableHead>Company</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Contact Details</TableHead>
+                <TableHead>Social Profile</TableHead>
                 <TableHead>Address</TableHead>
               </TableRow>
             </TableHeader>
@@ -73,6 +81,16 @@ export function AgentWaitlist() {
                         </a>
                     </div>
                   </TableCell>
+                   <TableCell>
+                    {lead.socialProfileId ? (
+                         <a href={formatUrl(lead.socialProfileId)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-blue-600 hover:underline">
+                            <Linkedin className="h-4 w-4" />
+                            View Profile
+                        </a>
+                    ) : (
+                        <span className="text-sm text-muted-foreground">N/A</span>
+                    )}
+                   </TableCell>
                   <TableCell>{lead.address}</TableCell>
                 </TableRow>
               ))}
