@@ -783,7 +783,7 @@ export function PropertyForm() {
       }}>
         <DialogContent>
             <DialogHeader>
-              <DialogTitle>Submission Sent for Approval!</DialogTitle>
+              <DialogTitle>Submission Success</DialogTitle>
               <DialogDescription>
                 Your property match has been sent to the admin for review. You can track its status in the "My Submissions" tab.
               </DialogDescription>
