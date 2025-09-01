@@ -336,7 +336,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return { success: true, limitReached: false };
   }
 
-  const logListingView = (user: User, listingId: string) => {
+  const logListingView = React.useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {
       return prevAnalytics.map(analytic => {
         if (analytic.listingId === listingId) {
@@ -369,7 +369,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return analytic;
       });
     });
-  };
+  }, []);
 
   const toggleSelectedForDownload = (listing: WarehouseSchema): { limitReached: boolean } => {
     const isSelected = selectedForDownload.some(item => item.id === listing.id);
@@ -378,11 +378,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
       return { limitReached: false };
     } else {
-      // **Strictly enforce a total selection limit of 3.**
       if (selectedForDownload.length >= 3) {
         return { limitReached: true };
       }
-      
       setSelectedForDownload(prev => [...prev, listing]);
       return { limitReached: false };
     }
