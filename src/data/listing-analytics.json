@@ -41,7 +41,9 @@
           "Textiles": 2
         },
         "downloadedBy": [
-            { "name": "Mei Lin", "company": "FrostyFoods Logistics" }
+            { "name": "Mei Lin", "company": "FrostyFoods Logistics" },
+            { "name": "Test Customer", "company": "Test Customer Co." },
+            { "name": "Vikram Singh", "company": "Heavy-Lift Manufacturing" }
         ]
     }
 ]
