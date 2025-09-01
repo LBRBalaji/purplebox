@@ -81,7 +81,7 @@ type DataContextType = {
   updateAgentLeadStatus: (leadId: string, status: AgentStatus) => void;
   isLoading: boolean;
   // Download tracking
-  logDownload: (userId: string, listing: WarehouseSchema) => { success: boolean; limitReached: boolean };
+  logDownload: (userId: string) => { success: boolean; limitReached: boolean };
   selectedForDownload: WarehouseSchema[];
   toggleSelectedForDownload: (listing: WarehouseSchema, user: User) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
@@ -293,11 +293,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
         d => d.userId === userId && d.location === location && d.timestamp >= startOfDay
     ).length;
   }
+  
+  const getTodaysTotalDownloads = (userId: string): number => {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    return downloadHistory.filter(
+        d => d.userId === userId && d.timestamp >= startOfDay
+    ).length;
+  };
 
-  const logDownload = (userId: string, listing: WarehouseSchema): { success: boolean; limitReached: boolean } => {
-    const todaysDownloads = getTodaysDownloadsForLocation(userId, listing.locationName);
+  const logDownload = (userId: string): { success: boolean; limitReached: boolean } => {
+    const todaysTotalDownloads = getTodaysTotalDownloads(userId);
 
-    if (todaysDownloads >= 3) {
+    if (todaysTotalDownloads >= 2) {
         setLastEvent({
             type: 'download_limit_exceeded',
             id: userId,
@@ -307,10 +315,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return { success: false, limitReached: true };
     }
     
+    // We only create one record for the entire download action, not per file.
+    // The details of which files were downloaded are in the selection.
     const newRecord: DownloadRecord = {
         userId,
-        listingId: listing.id,
-        location: listing.locationName,
+        listingId: "batch_download",
+        location: "multiple",
         timestamp: new Date().getTime(),
     };
     
@@ -318,12 +328,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setDownloadHistory(updatedHistory);
     localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
 
-    setListingAnalytics(prev => prev.map(analytic => 
-        analytic.listingId === listing.id
-            ? { ...analytic, downloads: analytic.downloads + 1 }
-            : analytic
-    ));
-    
     return { success: true, limitReached: false };
   }
 
@@ -369,10 +373,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
       return { limitReached: false };
     } else {
-      const todaysDownloads = getTodaysDownloadsForLocation(user.email, listing.locationName);
-      const alreadySelectedFromLocation = selectedForDownload.filter(l => l.locationName === listing.locationName).length;
-      
-      if ((todaysDownloads + alreadySelectedFromLocation) >= 3) {
+      const todaysDownloadsInLocation = getTodaysDownloadsForLocation(user.email, listing.locationName);
+      const alreadySelectedInLocation = selectedForDownload.filter(l => l.locationName === listing.locationName).length;
+
+      if ((todaysDownloadsInLocation + alreadySelectedInLocation) >= 3) {
         return { limitReached: true };
       }
       

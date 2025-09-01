@@ -23,6 +23,7 @@ import { LimitExceededDialog } from '../limit-exceeded-dialog';
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
   const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
+  const { user } = useAuth();
 
   return (
     <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary")}>
@@ -37,12 +38,14 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
               data-ai-hint="modern warehouse"
             />
           </div>
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={() => onSelectionChange(listing)}
-            aria-label={`Select warehouse ${listing.id}`}
-            className="w-5 h-5"
-          />
+          {user?.role === 'User' && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelectionChange(listing)}
+              aria-label={`Select warehouse ${listing.id}`}
+              className="w-5 h-5"
+            />
+          )}
         </div>
         <CardTitle>{listing.locationName}</CardTitle>
         <CardDescription>ID: {listing.id}</CardDescription>
@@ -84,7 +87,7 @@ function DownloadBar() {
     const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-    if (selectedForDownload.length === 0) {
+    if (selectedForDownload.length === 0 || user?.role !== 'User') {
         return null;
     }
     
@@ -111,22 +114,9 @@ function DownloadBar() {
             return;
         }
 
-        let successfulDownloads: WarehouseSchema[] = [];
-        let failedDownloadsCount = 0;
-        const failedLocations = new Set<string>();
-
-        selectedForDownload.forEach(listing => {
-            const { success } = logDownload(user!.email!, listing);
-            if (success) {
-                successfulDownloads.push(listing);
-            } else {
-                failedDownloadsCount++;
-                failedLocations.add(listing.locationName);
-            }
-        });
-
-        if (successfulDownloads.length > 0) {
-            const dataToExport = successfulDownloads.map(l => ({
+        const { success } = logDownload(user!.email!);
+        if (success) {
+            const dataToExport = selectedForDownload.map(l => ({
                 'Property ID': l.id,
                 'Size (Sq. Ft.)': l.size,
                 'Readiness': l.readiness,
@@ -142,19 +132,16 @@ function DownloadBar() {
 
             toast({
                 title: "Download Started",
-                description: `${successfulDownloads.length} listing(s) have been exported.`
+                description: `${selectedForDownload.length} listing(s) have been exported. This counts as one download for today.`
             });
-        }
-
-        if (failedDownloadsCount > 0) {
-            toast({
+             clearSelectedForDownload();
+        } else {
+             toast({
                 variant: 'destructive',
-                title: 'Some Downloads Failed',
-                description: `Could not download from: ${Array.from(failedLocations).join(', ')} due to daily limits.`
+                title: 'Daily Download Limit Reached',
+                description: `You have already downloaded twice today. Please try again tomorrow.`
             });
         }
-        
-        clearSelectedForDownload();
     }
 
     return (
@@ -276,11 +263,11 @@ export default function ListingsPage() {
           toast({
               variant: 'destructive',
               title: 'Download Not Available',
-              description: 'While you can browse listings, only Customer accounts are permitted to select and download property details.'
+              description: 'While you can browse listings, only Customer accounts are permitted to download property details.'
           });
           return;
       }
-      const { limitReached } = toggleSelectedForDownload(listing);
+      const { limitReached } = toggleSelectedForDownload(listing, user);
       if (limitReached) {
         setLimitExceededLocation(listing.locationName);
         setIsLimitExceededDialogOpen(true);
@@ -407,3 +394,4 @@ export default function ListingsPage() {
     </>
   );
 }
+
