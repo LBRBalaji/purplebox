@@ -30,7 +30,6 @@ export function ShortlistedProperties() {
         'Site Type': item.property.siteType,
         'Approval Status': item.property.approvalStatus,
         'Fire NOC': item.property.fireNoc,
-        'Image Link': `https://placehold.co/600x400.png`,
     }));
     
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -38,11 +37,13 @@ export function ShortlistedProperties() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Shortlisted Properties");
     
     // Auto-fit columns
-    const cols = Object.keys(dataToExport[0]);
-    const colWidths = cols.map(col => ({
-        wch: Math.max(...dataToExport.map(row => row[col as keyof typeof row]?.toString().length ?? 0), col.length)
-    }));
-    worksheet["!cols"] = colWidths;
+    if (dataToExport.length > 0) {
+      const cols = Object.keys(dataToExport[0]);
+      const colWidths = cols.map(col => ({
+          wch: Math.max(...dataToExport.map(row => row[col as keyof typeof row]?.toString().length ?? 0), col.length)
+      }));
+      worksheet["!cols"] = colWidths;
+    }
     
     // Use writeFile with type 'csv' to generate a CSV file
     XLSX.writeFile(workbook, "shortlisted_properties.csv", { bookType: "csv" });
