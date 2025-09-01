@@ -14,6 +14,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 140000,
       "mezzanineArea1": 5000,
@@ -75,6 +76,7 @@
     "rentalSecurityDeposit": 10,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
+     "serviceModel": "Both",
     "area": {
       "plinthArea": 280000,
       "mezzanineArea1": 10000,
@@ -128,6 +130,7 @@
     "rentalSecurityDeposit": 8,
     "availabilityDate": "2025-Q1",
     "constructionProgress": "75%",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 230000,
       "mezzanineArea1": 10000,
@@ -177,6 +180,7 @@
     "description": "An older facility that was submitted for listing but did not meet the required quality standards for Grade-A classification. The listing has been rejected due to compliance issues.",
     "availabilityDate": "Immediate",
     "constructionProgress": "100%",
+    "serviceModel": "Standard",
     "area": {
       "totalChargeableArea": 80000
     },
@@ -215,6 +219,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Available in 3 months",
     "constructionProgress": "90%",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 90000,
       "mezzanineArea1": 2500,
@@ -250,7 +255,83 @@
     "developerMobile": "555-111-2222",
     "developerEmail": "provider@example.com",
     "projectName": "Hoskote Tech Park"
+  },
+  {
+    "listingId": "LST-006",
+    "developerId": "provider@example.com",
+    "status": "pending",
+    "warehouseBoxId": "WBX-FRBD-D-1189",
+    "name": "Gateway Logistics Hub",
+    "location": "Faridabad, Haryana",
+    "latLng": "28.4089, 77.3178",
+    "sizeSqFt": 120000,
+    "description": "New facility pending approval. Located strategically to serve the NCR region. High-quality construction.",
+    "rentPerSqFt": 24,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Both",
+    "area": {
+      "totalChargeableArea": 120000
+    },
+    "buildingSpecifications": {
+      "buildingType": "PEB",
+      "numberOfDocksAndShutters": 15
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2 Grade"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": true,
+      "propertyTax": true
+    },
+    "documents": [],
+    "developerName": "Prime Properties",
+    "developerContactName": "Test Provider",
+    "developerMobile": "555-111-2222",
+    "developerEmail": "provider@example.com"
+  },
+  {
+    "listingId": "LST-007",
+    "developerId": "provider@example.com",
+    "status": "pending",
+    "warehouseBoxId": "WBX-COIM-E-7765",
+    "name": "Southern Cross Industrial",
+    "location": "Coimbatore, Tamil Nadu",
+    "latLng": "11.0168, 76.9558",
+    "sizeSqFt": 85000,
+    "description": "Awaiting approval. Well-suited for textiles or light engineering industries. Good access to labor and transport.",
+    "rentPerSqFt": 18,
+    "rentalSecurityDeposit": 5,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "area": {
+      "totalChargeableArea": 85000
+    },
+    "buildingSpecifications": {
+      "buildingType": "RCC",
+      "numberOfDocksAndShutters": 8
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "Standard Concrete"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": false,
+      "buildingInsurance": true,
+      "propertyTax": true
+    },
+    "documents": [],
+    "developerName": "Prime Properties",
+    "developerContactName": "Test Provider",
+    "developerMobile": "555-111-2222",
+    "developerEmail": "provider@example.com"
   }
 ]
-
-    

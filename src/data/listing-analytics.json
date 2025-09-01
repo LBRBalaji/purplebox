@@ -57,5 +57,21 @@
             { "name": "Test Customer", "company": "Test Customer Co.", "timestamp": 1718050000000 },
             { "name": "Vikram Singh", "company": "Heavy-Lift Manufacturing", "timestamp": 1718220000000 }
         ]
+    },
+    {
+      "listingId": "LST-006",
+      "views": 0,
+      "downloads": 0,
+      "customerIndustries": {},
+      "downloadedBy": [],
+      "viewedBy": []
+    },
+    {
+      "listingId": "LST-007",
+      "views": 0,
+      "downloads": 0,
+      "customerIndustries": {},
+      "downloadedBy": [],
+      "viewedBy": []
     }
 ]
