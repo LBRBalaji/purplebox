@@ -142,7 +142,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <form id="listing-form" onSubmit={form.handleSubmit(handleSubmit)}>
             <ScrollArea className="h-[70vh] p-1 pr-6">
             <div className="space-y-8">
 
@@ -301,12 +301,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               )} />
             </div>
             </ScrollArea>
-            <DialogFooter className="sticky bottom-0 bg-background/95 p-6 -m-6 mt-6 pt-6 z-10 border-t">
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
-            </DialogFooter>
           </form>
         </Form>
+        <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="submit" form="listing-form">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
