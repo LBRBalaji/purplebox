@@ -53,10 +53,17 @@ const LogDemandButton = ({ center, onLogDemand, variant = "default" }: { center:
                     </>
                 )}
             </Button>
-            <p className="text-xs text-muted-foreground flex items-start gap-2">
-                <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>Get Detailed and <strong className="font-semibold text-foreground">Downloadable</strong> Warehouse Proposals in 72 Hours (excluding holidays) on your Dashboard. Simple and Easy.</span>
-            </p>
+            <div className="text-xs text-muted-foreground space-y-2">
+                <div className="flex items-start gap-2">
+                    <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>Get Detailed and <strong className="font-semibold text-foreground">Downloadable</strong> Warehouse Proposals in 72 Hours (excluding holidays) on your Dashboard.</span>
+                </div>
+                 <p>
+                    Prefer to browse now?{' '}
+                    <Link href="/listings" className="text-primary underline hover:text-primary/80">Explore all listings</Link>
+                    {' '}and instantly download details for your top picks.
+                </p>
+            </div>
         </div>
     );
 };

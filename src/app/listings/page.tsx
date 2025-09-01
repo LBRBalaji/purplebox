@@ -279,10 +279,10 @@ export default function ListingsPage() {
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
             <Alert className="mb-8 bg-primary/5 border-primary/20">
-                <Info className="h-5 w-5 text-primary/80" />
-                <AlertTitle className="font-semibold text-primary/90">Streamline Your Search</AlertTitle>
+                <Download className="h-5 w-5 text-primary/80" />
+                <AlertTitle className="font-semibold text-primary/90">Ready to find your perfect space?</AlertTitle>
                 <AlertDescription className="text-primary/80">
-                    You can select up to 3 listings to download their details at once. This action can be performed twice per day to ensure fair usage. For more extensive needs, please log a demand to receive tailored proposals.
+                    Select up to 3 of your favorite listings to instantly download their details as a single file. For more tailored options, our demand logging service is always available.
                 </AlertDescription>
             </Alert>
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
