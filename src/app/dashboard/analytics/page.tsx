@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BarChart, Users, List, Clock, FileText, CheckCircle, Eye, Download, PieChart, Star, Calendar as CalendarIcon } from 'lucide-react';
+import { BarChart, Users, List, Clock, FileText, CheckCircle, Eye, Download, PieChart, Star, Calendar as CalendarIcon, Factory, Warehouse } from 'lucide-react';
 import { type User } from '@/contexts/auth-context';
 import {
   ChartContainer,
@@ -15,7 +15,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
-import { Bar, Pie, Cell, ResponsiveContainer } from "recharts"
+import { Bar, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip } from "recharts"
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -238,7 +238,7 @@ export default function AnalyticsPage() {
         return Object.entries(industryMap).map(([name, value], index) => ({ name, value, fill: COLORS[index % COLORS.length] }));
     }, [filteredListingAnalytics]);
     
-    const chartConfig = React.useMemo(() => {
+    const industryChartConfig = React.useMemo(() => {
         const config: any = {};
         industryInterestData.forEach(item => {
             config[item.name.toLowerCase().replace(/ /g, '-')] = {
@@ -248,6 +248,36 @@ export default function AnalyticsPage() {
         });
         return config;
     }, [industryInterestData]);
+
+    const demandTypeData = React.useMemo(() => {
+        const counts = filteredDemands.reduce((acc, demand) => {
+            const type = demand.operationType;
+            acc[type] = (acc[type] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+
+        return [
+            { type: 'Warehousing', count: counts['Warehousing'] || 0, fill: 'hsl(var(--chart-1))' },
+            { type: 'Manufacturing', count: counts['Manufacturing'] || 0, fill: 'hsl(var(--chart-2))' },
+        ];
+    }, [filteredDemands]);
+
+    const demandChartConfig = {
+      count: {
+        label: 'Demands',
+      },
+      warehousing: {
+        label: 'Warehousing',
+        color: 'hsl(var(--chart-1))',
+        icon: Warehouse,
+      },
+      manufacturing: {
+        label: 'Manufacturing',
+        color: 'hsl(var(--chart-2))',
+        icon: Factory,
+      },
+    };
+
 
     if (isAuthLoading || user?.email !== 'admin@example.com') {
         return null; // Or a loading skeleton
@@ -368,7 +398,7 @@ export default function AnalyticsPage() {
                         </CardHeader>
                         <CardContent>
                              {industryInterestData.length > 0 ? (
-                                <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[250px]">
+                                <ChartContainer config={industryChartConfig} className="mx-auto aspect-square h-[250px]">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <Pie
                                             data={industryInterestData}
@@ -391,34 +421,61 @@ export default function AnalyticsPage() {
                         </CardContent>
                     </Card>
                 </div>
-
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Recent Activity</CardTitle>
-                         <CardDescription>
-                            Showing the 10 most recent activities within the selected date range.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            {recentActivities.map(activity => (
-                                <div key={`${activity.type}-${activity.id}`} className="flex items-center gap-4">
-                                    <div className="p-2 bg-muted rounded-full">
-                                        {activity.type === 'Demand' ? <FileText className="h-5 w-5 text-primary" /> : <CheckCircle className="h-5 w-5 text-green-600" />}
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <CardTitle>Recent Activity</CardTitle>
+                             <CardDescription>
+                                Showing the 10 most recent activities within the selected date range.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {recentActivities.map(activity => (
+                                    <div key={`${activity.type}-${activity.id}`} className="flex items-center gap-4">
+                                        <div className="p-2 bg-muted rounded-full">
+                                            {activity.type === 'Demand' ? <FileText className="h-5 w-5 text-primary" /> : <CheckCircle className="h-5 w-5 text-green-600" />}
+                                        </div>
+                                        <div className="flex-grow">
+                                            <p className="font-medium text-sm">{activity.details}</p>
+                                            <p className="text-xs text-muted-foreground">{activity.user} - {activity.timestamp.toLocaleString()}</p>
+                                        </div>
                                     </div>
-                                    <div className="flex-grow">
-                                        <p className="font-medium text-sm">{activity.details}</p>
-                                        <p className="text-xs text-muted-foreground">{activity.user} - {activity.timestamp.toLocaleString()}</p>
-                                    </div>
-                                </div>
-                            ))}
-                             {recentActivities.length === 0 && (
-                                <p className="text-sm text-muted-foreground text-center py-4">No recent activity to display for this period.</p>
+                                ))}
+                                 {recentActivities.length === 0 && (
+                                    <p className="text-sm text-muted-foreground text-center py-4">No recent activity to display for this period.</p>
+                                 )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><BarChart className="text-primary"/> Demand Trends</CardTitle>
+                            <CardDescription>Breakdown of demand types.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                             {filteredDemands.length > 0 ? (
+                                <ChartContainer config={demandChartConfig} className="h-[250px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart accessibilityLayer data={demandTypeData} margin={{ top: 20 }}>
+                                            <XAxis dataKey="type" tickLine={false} axisLine={false} tickMargin={8} />
+                                            <YAxis />
+                                            <ChartTooltip content={<ChartTooltipContent />} />
+                                            <Bar dataKey="count" radius={4}>
+                                                {demandTypeData.map((entry) => (
+                                                    <Cell key={entry.type} fill={entry.fill} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </ChartContainer>
+                             ) : (
+                                 <p className="text-sm text-muted-foreground text-center py-4">No demand data to display.</p>
                              )}
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </main>
     )
