@@ -9,10 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useData, type DownloadedByRecord, type ViewedByRecord } from '@/contexts/data-context';
+import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -22,15 +22,35 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from './ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 function AdminListingCard({ listing, analytics, providerName }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string }) {
-  
+  const { updateListingStatus } = useData();
+  const { toast } = useToast();
+
   const statusConfig = {
     approved: { text: "Approved", className: "bg-green-100 text-green-800" },
     pending: { text: "Pending Review", className: "bg-amber-100 text-amber-800" },
     rejected: { text: "Rejected", className: "bg-red-100 text-red-800" }
   };
   const status = statusConfig[listing.status] || { text: 'Unknown', className: 'bg-gray-100 text-gray-800' };
+
+  const handleStatusChange = (newStatus: ListingStatus) => {
+    updateListingStatus(listing.listingId, newStatus);
+    toast({
+      title: 'Listing Status Updated',
+      description: `Listing "${listing.name}" has been set to ${newStatus}.`,
+    });
+  }
 
   return (
     <Card className="flex flex-col">
@@ -44,7 +64,30 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
               </CardTitle>
               <CardDescription>{listing.location} - {providerName}</CardDescription>
             </div>
-            <Badge className={status.className}>{status.text}</Badge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Manage Status</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleStatusChange('approved')}>
+                  <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Approve
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange('rejected')}>
+                  <XCircle className="mr-2 h-4 w-4 text-red-500" /> Reject
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange('pending')}>
+                  <PauseCircle className="mr-2 h-4 w-4 text-amber-500" /> Set to Pending
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+        <div className="mt-2">
+           <Badge className={status.className}>{status.text}</Badge>
         </div>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
@@ -154,7 +197,7 @@ export function AdminListings() {
         <div className="mb-8">
           <h2 className="text-3xl font-bold font-headline tracking-tight">All Listings &amp; Performance</h2>
           <p className="text-muted-foreground mt-2">
-            An overview of all listings on the platform, their status, and performance metrics.
+            An overview of all listings on the platform. Use the actions menu on each card to approve or reject them.
           </p>
         </div>
         {listings.length > 0 ? (
