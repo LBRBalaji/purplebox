@@ -6,7 +6,7 @@ import type { WarehouseSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Check, Download, MapPin, Scaling, Search, SlidersHorizontal, Trash2, X } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Download, MapPin, Scaling, Search, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,9 +17,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { LoginDialog } from '@/components/login-dialog';
 
 
-function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
+function ListingCard({ listing, isSelected, onSelectionChange, showCheckbox }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void, showCheckbox: boolean }) {
   const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
 
   return (
@@ -35,12 +36,14 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
               data-ai-hint="modern warehouse"
             />
           </div>
-           <Checkbox
-            checked={isSelected}
-            onCheckedChange={() => onSelectionChange(listing)}
-            aria-label={`Select warehouse ${listing.id}`}
-            className="w-5 h-5"
-          />
+          {showCheckbox && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelectionChange(listing)}
+              aria-label={`Select warehouse ${listing.id}`}
+              className="w-5 h-5"
+            />
+          )}
         </div>
         <CardTitle>{listing.locationName}</CardTitle>
         <CardDescription>ID: {listing.id}</CardDescription>
@@ -80,14 +83,38 @@ function DownloadBar() {
     const { user } = useAuth();
     const { toast } = useToast();
     const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
 
     if (selectedForDownload.length === 0) {
         return null;
     }
+    
+    const handleLoginSuccess = () => {
+        setIsLoginOpen(false);
+        toast({
+            title: "Logged In Successfully",
+            description: "You can now proceed with your download."
+        })
+    }
 
     const handleDownload = () => {
+        if (!user) {
+            setIsLoginOpen(true);
+            return;
+        }
+
+        if (user.role !== 'User') {
+            toast({
+                variant: 'destructive',
+                title: 'Download Not Available',
+                description: 'Only Customer accounts can download listings.'
+            });
+            return;
+        }
+
         let successfulDownloads: WarehouseSchema[] = [];
         let failedDownloadsCount = 0;
+        const failedLocations = new Set<string>();
 
         selectedForDownload.forEach(listing => {
             const { success } = logDownload(user!.email!, listing);
@@ -95,6 +122,7 @@ function DownloadBar() {
                 successfulDownloads.push(listing);
             } else {
                 failedDownloadsCount++;
+                failedLocations.add(listing.locationName);
             }
         });
 
@@ -123,7 +151,7 @@ function DownloadBar() {
             toast({
                 variant: 'destructive',
                 title: 'Some Downloads Failed',
-                description: `${failedDownloadsCount} listing(s) could not be downloaded due to daily limits.`
+                description: `Could not download from: ${Array.from(failedLocations).join(', ')} due to daily limits.`
             });
         }
         
@@ -131,31 +159,36 @@ function DownloadBar() {
     }
 
     return (
-        <div className="fixed bottom-4 inset-x-0 z-50 flex justify-center">
-            <div className="flex items-center justify-between gap-6 p-4 rounded-lg shadow-2xl bg-card border w-full max-w-2xl animate-in slide-in-from-bottom-5">
-                <p className="font-semibold text-sm">
-                    {selectedForDownload.length} listing{selectedForDownload.length > 1 ? 's' : ''} selected
-                </p>
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={clearSelectedForDownload}>
-                        <X className="mr-2 h-4 w-4" /> Clear
-                    </Button>
-                    <Button onClick={handleDownload}>
-                        <Download className="mr-2 h-4 w-4" /> Download Selected
-                    </Button>
+        <>
+            <div className="fixed bottom-4 inset-x-0 z-50 flex justify-center">
+                <div className="flex items-center justify-between gap-6 p-4 rounded-lg shadow-2xl bg-card border w-full max-w-2xl animate-in slide-in-from-bottom-5">
+                    <p className="font-semibold text-sm">
+                        {selectedForDownload.length} listing{selectedForDownload.length > 1 ? 's' : ''} selected
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" onClick={clearSelectedForDownload}>
+                            <X className="mr-2 h-4 w-4" /> Clear
+                        </Button>
+                        <Button onClick={handleDownload}>
+                            <Download className="mr-2 h-4 w-4" /> Download Selected
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div>
+            <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess}/>
+        </>
     )
 }
 
 export default function ListingsPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [allWarehouses, setAllWarehouses] = useState<WarehouseSchema[]>([]);
   const [filteredListings, setFilteredListings] = useState<WarehouseSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
   
   const { selectedForDownload, toggleSelectedForDownload } = useData();
   const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.id)), [selectedForDownload]);
@@ -232,6 +265,32 @@ export default function ListingsPage() {
     const max = Math.max(...allWarehouses.map(w => w.size), 0);
     return max > 0 ? Math.ceil(max / 100000) * 100000 : 1000000;
   }, [allWarehouses]);
+
+  const handleSelectionChange = (listing: WarehouseSchema) => {
+      if (!user) {
+          setIsLoginOpen(true);
+          return;
+      }
+      if (user.role !== 'User') {
+          toast({
+              variant: 'destructive',
+              title: 'Download Not Available',
+              description: 'Only Customer accounts can select and download listings.'
+          })
+          return;
+      }
+      toggleSelectedForDownload(listing);
+  }
+
+  const handleLoginSuccess = () => {
+      setIsLoginOpen(false);
+      toast({
+          title: "Logged In Successfully",
+          description: "You can now select properties to download."
+      });
+  }
+
+  const showCheckboxes = user?.role === 'User';
 
 
   return (
@@ -319,7 +378,8 @@ export default function ListingsPage() {
                             key={listing.id} 
                             listing={listing} 
                             isSelected={selectedIds.has(listing.id)}
-                            onSelectionChange={toggleSelectedForDownload}
+                            onSelectionChange={handleSelectionChange}
+                            showCheckbox={showCheckboxes}
                         />
                     ))}
                 </div>
@@ -337,6 +397,7 @@ export default function ListingsPage() {
         </div>
     </main>
     {user?.role === 'User' && <DownloadBar />}
+     <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess} />
     </>
   );
 }
