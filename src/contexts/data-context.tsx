@@ -341,7 +341,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           
           let updatedViewers;
           if (viewerIndex > -1) {
-            // This user has viewed before, update their timestamp
+            // This user has viewed before, just update their timestamp
             updatedViewers = [...existingViewers];
             updatedViewers[viewerIndex] = newViewer;
           } else {
