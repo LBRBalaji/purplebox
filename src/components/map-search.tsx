@@ -13,10 +13,10 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft, Star, Ruler, ZoomIn, ZoomOut } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft, Star, Ruler, ZoomIn, ZoomOut, MapPin } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
-import type { WarehouseSchema, ListingSchema } from '@/lib/schema';
+import type { ListingSchema } from '@/lib/schema';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Badge } from './ui/badge';
 import Image from 'next/image';
@@ -115,7 +115,7 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
     )
 }
 
-function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: ListingSchema, onBack: () => void, onLogDemand: (center: { lat: number; lng: number }) => void }) {
+function WarehouseDetailCard({ warehouse, onLogDemand }: { warehouse: ListingSchema, onLogDemand: (center: { lat: number; lng: number }) => void }) {
     const mainImage = warehouse.documents?.find(doc => doc.type === 'image')?.url || 'https://placehold.co/600x400.png';
     const latLngParts = warehouse.latLng?.split(',').map(s => parseFloat(s.trim()));
     const center = latLngParts && latLngParts.length === 2 && !isNaN(latLngParts[0]) && !isNaN(latLngParts[1]) 
@@ -125,10 +125,7 @@ function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: Li
     return (
         <Card className="shadow-none border-0 h-full flex flex-col bg-transparent">
             <CardHeader>
-                <Button variant="ghost" size="sm" onClick={onBack} className="mb-2 w-fit -ml-2">
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Summary
-                </Button>
-                <div className="aspect-video relative mb-2">
+                <div className="aspect-video relative mb-4">
                     <Image
                         src={mainImage}
                         alt={warehouse.name}
@@ -138,10 +135,13 @@ function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: Li
                     />
                 </div>
                  <CardTitle className="flex items-center gap-2 pt-2">
-                    <Building2 className="h-6 w-6 text-primary"/>
                     {warehouse.name}
                 </CardTitle>
-                <CardDescription>ID: {warehouse.warehouseBoxId}</CardDescription>
+                <CardDescription>
+                    <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" /> {warehouse.location}
+                    </div>
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 flex-grow">
                 {(warehouse.serviceModel === '3PL' || warehouse.serviceModel === 'Both') && (
@@ -159,9 +159,9 @@ function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: Li
                         <p className="text-muted-foreground flex items-center gap-1"><CalendarCheck className="h-4 w-4"/> Readiness</p>
                         <p className="font-semibold">{warehouse.availabilityDate}</p>
                     </div>
-                    <div className="space-y-1">
-                        <p className="text-muted-foreground flex items-center gap-1"><CheckCircle className="h-4 w-4"/> Ceiling Height</p>
-                        <p className="font-semibold">{warehouse.buildingSpecifications.shopFloorLevelDimension || 'N/A'} ft</p>
+                     <div className="space-y-1">
+                        <p className="text-muted-foreground flex items-center gap-1"><Building2 className="h-4 w-4"/> Building Type</p>
+                        <p className="font-semibold">{warehouse.buildingSpecifications.buildingType || 'N/A'}</p>
                     </div>
                      <div className="space-y-1">
                         <p className="text-muted-foreground flex items-center gap-1"><CheckCircle className="h-4 w-4"/> Docks</p>
@@ -176,9 +176,6 @@ function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: Li
                     </Button>
                 </div>
             </CardContent>
-            <CardFooter>
-                 <LogDemandButton center={center} onLogDemand={onLogDemand} variant="outline" />
-            </CardFooter>
         </Card>
     )
 }
@@ -282,13 +279,20 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         if (!latLngParts || latLngParts.length !== 2 || isNaN(latLngParts[0]) || isNaN(latLngParts[1])) {
             return null;
         }
-        const position = { lat: latLngParts[0], lng: latLngParts[1] };
+        
+        // Fuzz the location slightly to protect privacy
+        const fuzzFactor = 0.005; // Approx 500 meters
+        const position = { 
+            lat: latLngParts[0] + (Math.random() - 0.5) * fuzzFactor, 
+            lng: latLngParts[1] + (Math.random() - 0.5) * fuzzFactor 
+        };
         
         const marker = new google.maps.Marker({
             position,
         });
         marker.addListener('click', () => {
             setSelectedWarehouse(warehouse);
+            setSummaryData(null); // Clear regional summary when a specific warehouse is selected
         });
         return marker;
     }).filter((m): m is google.maps.Marker => m !== null);
@@ -348,12 +352,12 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
       if (nearbyWarehouses.length > 0) {
         const sizes = nearbyWarehouses.map(w => w.sizeSqFt);
-        const heights = nearbyWarehouses.map(w => w.buildingSpecifications.numberOfDocksAndShutters).filter(h => h && h > 0);
+        const docks = nearbyWarehouses.map(w => w.buildingSpecifications.numberOfDocksAndShutters).filter(d => d !== undefined && d > 0);
         
         const readinessCounts = nearbyWarehouses.reduce((acc, w) => {
             if (w.availabilityDate === 'Ready for Occupancy') acc.ready++;
             else if (w.availabilityDate === 'Available in 3 months') acc.soon++;
-            else if (w.availabilityDate === 'Under Construction' || w.availabilityDate === '2025-Q1') acc.underConstruction++;
+            else if (w.availabilityDate === 'Under Construction' || w.availabilityDate.includes('2025')) acc.underConstruction++;
             return acc;
         }, { ready: 0, soon: 0, underConstruction: 0 });
 
@@ -362,7 +366,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             totalListings: nearbyWarehouses.length,
             sizeRange: `${Math.min(...sizes).toLocaleString()} - ${Math.max(...sizes).toLocaleString()} sq. ft.`,
             readiness: readinessCounts,
-            avgCeilingHeight: heights.length > 0 ? Math.round(heights.reduce((a, b) => a + (b || 0), 0) / heights.length) : 0,
+            avgCeilingHeight: docks.length > 0 ? Math.round(docks.reduce((a, b) => a + (b || 0), 0) / docks.length) : 0,
             center: center,
         };
         setSummaryData(newSummary);
@@ -405,6 +409,9 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         const locationString = `${center.lat.toFixed(6)},${center.lng.toFixed(6)}`;
         url += `&location=${encodeURIComponent(locationString)}&radius=5`;
       }
+      if (summaryData) {
+        url += `&locationName=${encodeURIComponent(summaryData.regionName)}`;
+      }
       router.push(url);
     } else {
       setPendingRedirectCenter(center || null);
@@ -419,6 +426,9 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       const locationString = `${pendingRedirectCenter.lat.toFixed(6)},${pendingRedirectCenter.lng.toFixed(6)}`;
       url += `&location=${encodeURIComponent(locationString)}&radius=5`;
     }
+     if (summaryData) {
+        url += `&locationName=${encodeURIComponent(summaryData.regionName)}`;
+      }
     router.push(url);
     setPendingRedirectCenter(null);
   };
@@ -580,7 +590,6 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                  {selectedWarehouse ? (
                     <WarehouseDetailCard 
                         warehouse={selectedWarehouse} 
-                        onBack={handleBackToSummary} 
                         onLogDemand={handleLogDemandClick} 
                     />
                 ) : summaryData ? (
@@ -614,3 +623,5 @@ export function MapSearch({ mapId }: { mapId: string }) {
     </div>
   );
 }
+
+    
