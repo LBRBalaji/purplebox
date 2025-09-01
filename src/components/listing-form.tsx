@@ -104,7 +104,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             form.reset({
                 status: 'pending',
                 developerId: user?.email || '',
-                listingId: `LST-${Date.now()}`,
+                listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                 warehouseBoxId: `WBX-${user?.companyName?.substring(0,4).toUpperCase() || 'NEW'}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
                 certificatesAndApprovals: {
                   parkApproval: false,

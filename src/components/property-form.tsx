@@ -233,7 +233,7 @@ function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | und
     };
     
     const mapped: PropertySchema = {
-        propertyId: `PS-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        propertyId: `PS-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
         isLocationConfirmed: false, // Default to false, developer must confirm
         size: listing.sizeSqFt,
         readinessToOccupy: readinessMap[listing.availabilityDate] || "BTS",
@@ -392,7 +392,7 @@ export function PropertyForm() {
 
 
   React.useEffect(() => {
-    const newId = `PS-${Date.now()}`;
+    const newId = `PS-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
     form.setValue("propertyId", newId);
 
     if (user) {
