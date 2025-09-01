@@ -10,7 +10,8 @@
 
 import {z} from 'zod';
 import { warehouseSchema } from '@/lib/schema';
-import { warehouses } from '@/lib/warehouse-mock-data';
+import allWarehouses from '@/data/warehouses.json';
+import { type WarehouseSchema } from '@/lib/schema';
 
 const GetWarehousesInputSchema = z.object({
   sw_lat: z.number().describe('The southwest latitude of the map boundary.'),
@@ -28,7 +29,8 @@ export type GetWarehousesOutput = z.infer<typeof GetWarehousesOutputSchema>;
 export async function getWarehouses(input: GetWarehousesInput): Promise<GetWarehousesOutput> {
     // This function simulates a database query to find warehouses within the given map bounds.
     // In a real application, this would be a query to a geospatial database like PostGIS or Firestore with Geo-queries.
-    
+    const warehouses = allWarehouses as WarehouseSchema[];
+
     const visibleWarehouses = warehouses.filter(warehouse => {
         if (!warehouse.isActive) {
             return false;
