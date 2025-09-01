@@ -5,7 +5,7 @@ import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
-import type { ListingSchema, Document } from '@/lib/schema';
+import type { ListingSchema, Document, WarehouseSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -68,33 +68,75 @@ const DocumentRow = ({ doc, onDownload }: { doc: Document, onDownload: () => voi
     );
 }
 
+function mapWarehouseToListing(warehouse: WarehouseSchema): ListingSchema {
+  return {
+    listingId: warehouse.id,
+    developerId: 'provider@example.com', // Mocked as not in warehouse data
+    status: 'approved', // Assuming only active warehouses are shown
+    warehouseBoxId: warehouse.id,
+    name: warehouse.locationName,
+    location: warehouse.locationName,
+    latLng: `${warehouse.generalizedLocation.lat},${warehouse.generalizedLocation.lng}`,
+    sizeSqFt: warehouse.size,
+    description: `A prime warehouse facility in ${warehouse.locationName} with a total area of ${warehouse.size.toLocaleString()} sq. ft.`,
+    rentPerSqFt: 20, // Mock data
+    rentalSecurityDeposit: 6, // Mock data
+    availabilityDate: warehouse.readiness,
+    constructionProgress: warehouse.readiness === 'Ready for Occupancy' ? '100%' : 'In Progress',
+    area: {
+      totalChargeableArea: warehouse.size,
+    },
+    buildingSpecifications: {
+      buildingType: 'PEB', // Mock data
+      numberOfDocksAndShutters: warehouse.specifications.docks,
+      roofInsulationStatus: 'Fully Insulated', // Mock data
+      internalLighting: 'LED High-bay', // Mock data
+    },
+    siteSpecifications: {
+      typeOfFlooringInside: warehouse.specifications.flooringType,
+      typeOfRoad: 'Tar Road', // Mock data
+    },
+    certificatesAndApprovals: {
+      parkApproval: true,
+      buildingApproval: true,
+      fireLicense: true,
+      fireNOC: true,
+      buildingInsurance: true,
+      propertyTax: true,
+    },
+    documents: warehouse.imageUrls.map((url, i) => ({
+      type: 'image',
+      name: `Photo ${i + 1}`,
+      url: url,
+    })),
+  };
+}
+
 
 export default function ListingDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const { listings } = useData();
     const { user } = useAuth();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
 
     React.useEffect(() => {
         const listingId = params.listingId as string;
-        const foundListing = listings.find(l => l.listingId === listingId);
-        
-        if (foundListing) {
-            // Only approved listings can be viewed directly
-            if (foundListing.status === 'approved') {
-                setListing(foundListing);
-            } else {
-                // For other statuses, maybe redirect or show an error
-                // For now, let's redirect to listings page
-                router.push('/listings');
-            }
+        if (listingId) {
+            fetch('/api/warehouses')
+                .then(res => res.json())
+                .then((warehouses: WarehouseSchema[]) => {
+                    const foundWarehouse = warehouses.find(w => w.id === listingId);
+                    if (foundWarehouse && foundWarehouse.isActive) {
+                        setListing(mapWarehouseToListing(foundWarehouse));
+                    } else {
+                        router.push('/listings');
+                    }
+                });
         }
-    }, [params.listingId, listings, router]);
+    }, [params.listingId, router]);
 
     if (!listing) {
-        // Can show a skeleton loader here
         return (
              <div className="flex-grow flex items-center justify-center p-4">
                 <Card className="w-full max-w-4xl text-center p-8">
