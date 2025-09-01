@@ -38,11 +38,11 @@ export function LimitExceededDialog({ isOpen, onOpenChange, location }: LimitExc
                     <AlertTriangle className="h-6 w-6 text-amber-600" />
                 </div>
             </div>
-            <DialogTitle className="text-center text-xl">Download Limit Reached</DialogTitle>
+            <DialogTitle className="text-center text-xl">Selection Limit Reached</DialogTitle>
             <DialogDescription className="text-center">
-                You have reached your daily download limit of 3 properties for the location: <strong className="font-semibold text-foreground">{location}</strong>. 
+                You have reached your selection limit of 3 properties. 
                 <br/><br/>
-                To get details on more properties, you can log a specific demand, and we'll source matching options for you.
+                To get proposals for more properties that match your specific needs, please log a new demand.
             </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-center pt-4">

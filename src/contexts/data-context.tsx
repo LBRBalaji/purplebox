@@ -83,7 +83,7 @@ type DataContextType = {
   // Download tracking
   logDownload: (userId: string) => { success: boolean; limitReached: boolean };
   selectedForDownload: WarehouseSchema[];
-  toggleSelectedForDownload: (listing: WarehouseSchema, user: User) => { limitReached: boolean };
+  toggleSelectedForDownload: (listing: WarehouseSchema) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
   getTodaysDownloadsForLocation: (userId: string, location: string) => number;
 };
@@ -297,9 +297,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const getTodaysTotalDownloads = (userId: string): number => {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    return downloadHistory.filter(
-        d => d.userId === userId && d.timestamp >= startOfDay
-    ).length;
+    const downloadEntries = downloadHistory.filter(d => d.userId === userId && d.timestamp >= startOfDay);
+    // Count unique batch downloads to enforce the limit correctly.
+    const uniqueTimestamps = new Set(downloadEntries.map(d => d.timestamp));
+    return uniqueTimestamps.size;
   };
 
   const logDownload = (userId: string): { success: boolean; limitReached: boolean } => {
@@ -312,11 +313,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
             timestamp: new Date().toISOString(),
             triggeredBy: userId,
         });
+        toast({
+            variant: "destructive",
+            title: "Daily Download Limit Reached",
+            description: "You have already downloaded twice today. Please try again tomorrow.",
+        });
         return { success: false, limitReached: true };
     }
     
     // We only create one record for the entire download action, not per file.
-    // The details of which files were downloaded are in the selection.
     const newRecord: DownloadRecord = {
         userId,
         listingId: "batch_download",
@@ -366,17 +371,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const toggleSelectedForDownload = (listing: WarehouseSchema, user: User): { limitReached: boolean } => {
+  const toggleSelectedForDownload = (listing: WarehouseSchema): { limitReached: boolean } => {
     const isSelected = selectedForDownload.some(item => item.id === listing.id);
 
     if (isSelected) {
       setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
       return { limitReached: false };
     } else {
-      const todaysDownloadsInLocation = getTodaysDownloadsForLocation(user.email, listing.locationName);
-      const alreadySelectedInLocation = selectedForDownload.filter(l => l.locationName === listing.locationName).length;
-
-      if ((todaysDownloadsInLocation + alreadySelectedInLocation) >= 3) {
+      // **Strictly enforce a total selection limit of 3.**
+      if (selectedForDownload.length >= 3) {
         return { limitReached: true };
       }
       

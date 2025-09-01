@@ -23,7 +23,6 @@ import { LimitExceededDialog } from '@/components/limit-exceeded-dialog';
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
   const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
-  const { user } = useAuth();
 
   return (
     <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary")}>
@@ -38,14 +37,12 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
               data-ai-hint="modern warehouse"
             />
           </div>
-          {user?.role === 'User' && (
-            <Checkbox
-              checked={isSelected}
-              onCheckedChange={() => onSelectionChange(listing)}
-              aria-label={`Select warehouse ${listing.id}`}
-              className="w-5 h-5"
-            />
-          )}
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onSelectionChange(listing)}
+            aria-label={`Select warehouse ${listing.id}`}
+            className="w-5 h-5"
+          />
         </div>
         <CardTitle>{listing.locationName}</CardTitle>
         <CardDescription>ID: {listing.id}</CardDescription>
@@ -84,12 +81,10 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
 function DownloadBar() {
     const { user } = useAuth();
     const { toast } = useToast();
-    const { selectedForDownload, logDownload, clearSelectedForDownload, getTodaysDownloadsForLocation } = useData();
+    const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
-    const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
-    const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
 
-    if (selectedForDownload.length === 0 || user?.role !== 'User') {
+    if (selectedForDownload.length === 0) {
         return null;
     }
     
@@ -116,21 +111,9 @@ function DownloadBar() {
             return;
         }
 
-        let successfulDownloads: WarehouseSchema[] = [];
-        const failedLocations = new Set<string>();
-
-        selectedForDownload.forEach(listing => {
-            // The selection logic now prevents exceeding the limit, so this is a final check.
-            const { success } = logDownload(user!.email!, listing);
-            if (success) {
-                successfulDownloads.push(listing);
-            } else {
-                failedLocations.add(listing.locationName);
-            }
-        });
-
-        if (successfulDownloads.length > 0) {
-            const dataToExport = successfulDownloads.map(l => ({
+        const { success } = logDownload(user!.email!);
+        if (success) {
+            const dataToExport = selectedForDownload.map(l => ({
                 'Property ID': l.id,
                 'Size (Sq. Ft.)': l.size,
                 'Readiness': l.readiness,
@@ -146,17 +129,10 @@ function DownloadBar() {
 
             toast({
                 title: "Download Started",
-                description: `${successfulDownloads.length} listing(s) have been exported.`
+                description: `${selectedForDownload.length} listing(s) have been exported. This counts as one download for today.`
             });
+             clearSelectedForDownload();
         }
-        
-        if (failedLocations.size > 0) {
-            setLimitExceededLocation(Array.from(failedLocations)[0]);
-            setIsLimitExceededDialogOpen(true);
-        }
-        
-        // Clear only the listings that were successfully downloaded or attempted
-        clearSelectedForDownload();
     }
 
     return (
@@ -177,11 +153,6 @@ function DownloadBar() {
                 </div>
             </div>
             <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess}/>
-            <LimitExceededDialog 
-                isOpen={isLimitExceededDialogOpen} 
-                onOpenChange={setIsLimitExceededDialogOpen}
-                location={limitExceededLocation || ''}
-            />
         </>
     )
 }
@@ -287,7 +258,7 @@ export default function ListingsPage() {
           });
           return;
       }
-      const { limitReached } = toggleSelectedForDownload(listing, user);
+      const { limitReached } = toggleSelectedForDownload(listing);
       if (limitReached) {
         setLimitExceededLocation(listing.locationName);
         setIsLimitExceededDialogOpen(true);
