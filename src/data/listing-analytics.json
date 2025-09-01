@@ -73,5 +73,29 @@
       "customerIndustries": {},
       "downloadedBy": [],
       "viewedBy": []
+    },
+    {
+      "listingId": "LST-008",
+      "views": 75,
+      "downloads": 12,
+      "customerIndustries": { "Automotive": 5, "FMCG": 7 },
+      "downloadedBy": [],
+      "viewedBy": []
+    },
+    {
+      "listingId": "LST-009",
+      "views": 120,
+      "downloads": 22,
+      "customerIndustries": { "Electronics": 15, "Logistics": 7 },
+      "downloadedBy": [],
+      "viewedBy": []
+    },
+    {
+      "listingId": "LST-010",
+      "views": 95,
+      "downloads": 18,
+      "customerIndustries": { "Retail": 10, "E-commerce": 8 },
+      "downloadedBy": [],
+      "viewedBy": []
     }
 ]
