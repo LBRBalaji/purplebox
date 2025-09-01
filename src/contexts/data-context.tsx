@@ -20,8 +20,7 @@ export type Submission = {
 export type DownloadedByRecord = {
   name: string;
   company: string;
-  timestamp: number;
-  count: number;
+  timestamps: number[];
 };
 
 

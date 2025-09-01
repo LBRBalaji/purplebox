@@ -16,6 +16,12 @@ import { Eye, Download, Users, ChevronDown, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 function AdminListingCard({ listing, analytics, providerName }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[] }, providerName: string }) {
   
@@ -59,25 +65,47 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
               <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
             </CollapsibleTrigger>
             <CollapsibleContent>
+              <TooltipProvider>
               <div className="pt-3 space-y-2">
-                {analytics.downloadedBy.map((customer, index) => (
-                  <div key={index} className="text-xs p-2 bg-secondary rounded-md">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="font-semibold text-sm">{customer.name}</p>
-                            <p className="text-muted-foreground">{customer.company}</p>
-                        </div>
-                        <Badge variant="outline" className="text-xs">
-                          {customer.count} time{customer.count > 1 ? 's' : ''}
-                        </Badge>
+                {analytics.downloadedBy.map((customer, index) => {
+                  const downloadCount = customer.timestamps.length;
+                  const lastDownload = Math.max(...customer.timestamps);
+                  return (
+                    <div key={index} className="text-xs p-2 bg-secondary rounded-md">
+                      <div className="flex justify-between items-start">
+                          <div>
+                              <p className="font-semibold text-sm">{customer.name}</p>
+                              <p className="text-muted-foreground">{customer.company}</p>
+                          </div>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="outline" className="text-xs cursor-help">
+                                {downloadCount} Download{downloadCount > 1 ? 's' : ''}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="p-1">
+                                <p className="font-bold mb-2">Download History:</p>
+                                <ul className="list-disc list-inside space-y-1">
+                                  {customer.timestamps
+                                    .sort((a, b) => b - a) // Sort descending
+                                    .map((ts, i) => (
+                                      <li key={i}>{new Date(ts).toLocaleString()}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                      </div>
+                      <div className="flex items-center gap-1 text-muted-foreground mt-2">
+                        <Clock className="h-3 w-3" />
+                        <span>Last: {new Date(lastDownload).toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 text-muted-foreground mt-2">
-                      <Clock className="h-3 w-3" />
-                      <span>Last: {new Date(customer.timestamp).toLocaleString()}</span>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
+              </TooltipProvider>
             </CollapsibleContent>
           </Collapsible>
         )}
