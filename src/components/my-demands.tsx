@@ -40,7 +40,7 @@ const priorityLabels: { [key: string]: string } = {
   buildingType: 'Building Type',
 };
 
-export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: string) => void, newMatchCount: number }) {
+export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void }) {
   const { user } = useAuth();
   const { demands, submissions, shortlistedItems, toggleShortlist, clearNewSubmissions } = useData();
   const [myDemandsWithMatches, setMyDemandsWithMatches] = React.useState<DemandWithMatches[]>([]);
@@ -87,7 +87,7 @@ export function MyDemands({ onSwitchTab, newMatchCount }: { onSwitchTab: (tab: s
                     <div className="text-left space-y-3 flex-grow">
                       <div className="flex items-center gap-4 flex-wrap">
                         <h3 className="font-bold text-lg text-primary truncate" title={demand.demandId}>{demand.demandId}</h3>
-                        <Badge variant="secondary">{demand.propertyType}</Badge>
+                        <Badge variant="secondary">{demand.operationType}</Badge>
                          {demand.matches.some(m => m.isNew) && (
                             <Badge className="bg-accent text-accent-foreground animate-pulse">
                                 {demand.matches.filter(m => m.isNew).length} New Match

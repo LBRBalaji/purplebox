@@ -87,14 +87,12 @@ export const listingSchema = z.object({
 export type ListingSchema = z.infer<typeof listingSchema>;
 
 
-// The old schemas are kept for now to prevent breaking existing components
-// They will be removed in subsequent steps.
-
 export const propertySchemaBase = z.object({
   propertyId: z.string(),
   isLocationConfirmed: z.boolean().refine(val => val === true, {
     message: "You must confirm the location match."
   }),
+  latLng: z.string().optional(),
   
   // Property details mirroring demand questions
   size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be a positive number.'),

@@ -3,24 +3,17 @@
 
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
-import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { PlusCircle, List } from 'lucide-react';
-import Link from 'next/link';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSearchParams } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DemandForm } from '@/components/demand-form';
 import { MyDemands } from '@/components/my-demands';
 import { MySubmissions } from '@/components/my-submissions';
 import { ShortlistedProperties } from '@/components/shortlisted-properties';
 import { DemandList } from '@/components/demand-list';
 import { PropertyForm } from '@/components/property-form';
-import { AdminNotifier } from '@/components/admin-notifier';
-import { useSearchParams } from 'next/navigation';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DemandForm } from '@/components/demand-form';
 import { ProviderListings } from '@/components/provider-listings';
-import { ApprovalQueue } from '@/components/approval-queue';
-import { UserList } from '@/components/user-list';
-import { AgentWaitlist } from '@/components/agent-waitlist';
-import { AdminListings } from '@/components/admin-listings';
+import { AdminNotifier } from '@/components/admin-notifier';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -30,35 +23,37 @@ const MainDashboard = () => {
     const propertyMatchDemandId = searchParams.get('demandId');
 
     const isProvider = user?.role === 'SuperAdmin' && user.email !== 'admin@example.com';
-    const isAdmin = user?.email === 'admin@example.com';
     const isTenant = user?.role === 'User';
-    const isO2O = user?.role === 'O2O';
+    const isAdminOrO2O = user?.role === 'SuperAdmin' || user?.role === 'O2O';
 
-    const [activeTab, setActiveTab] = React.useState('active-demands');
-    const [myDemandsTab, setMyDemandsTab] = React.useState('my-demands');
-    const [adminTab, setAdminTab] = React.useState('approval-queue');
-    const [newMatchCount, setNewMatchCount] = React.useState(0); // This would be derived from data context in a real app
+    const [providerTab, setProviderTab] = React.useState('active-demands');
+    const [tenantTab, setTenantTab] = React.useState('my-demands');
+    
+    // This state now controls the tab for Admin & O2O users.
+    const [adminTab, setAdminTab] = React.useState('active-demands');
+
 
     const handleSwitchToMyDemands = React.useCallback(() => {
-        setMyDemandsTab('my-demands');
+        setTenantTab('my-demands');
     }, []);
 
     // Effect to switch tab based on URL params
     React.useEffect(() => {
       if (logNewDemand || editDemandId) {
-        setMyDemandsTab('log-demand');
+        setTenantTab('log-demand');
       } else if (propertyMatchDemandId) {
-        setActiveTab('submit-match');
+        setProviderTab('submit-match');
+        setAdminTab('submit-match');
       }
     }, [logNewDemand, editDemandId, propertyMatchDemandId]);
 
 
     const renderProviderContent = () => (
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={providerTab} onValueChange={setProviderTab}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
           <TabsTrigger value="my-submissions">My Submissions</TabsTrigger>
-           <TabsTrigger value="my-listings">My Listings & Performance</TabsTrigger>
+           <TabsTrigger value="my-listings">My Listings</TabsTrigger>
           <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
         <TabsContent value="active-demands"><DemandList /></TabsContent>
@@ -69,14 +64,14 @@ const MainDashboard = () => {
     );
 
     const renderTenantContent = () => (
-      <Tabs value={myDemandsTab} onValueChange={setMyDemandsTab}>
+      <Tabs value={tenantTab} onValueChange={setTenantTab}>
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="my-demands">My Demands & Matches {newMatchCount > 0 && <span className="ml-2 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">{newMatchCount}</span>}</TabsTrigger>
+          <TabsTrigger value="my-demands">My Demands & Matches</TabsTrigger>
           <TabsTrigger value="log-demand">Log New Demand</TabsTrigger>
           <TabsTrigger value="shortlisted">Shortlisted</TabsTrigger>
         </TabsList>
         <TabsContent value="my-demands">
-            <MyDemands onSwitchTab={setMyDemandsTab} newMatchCount={newMatchCount} />
+            <MyDemands onSwitchTab={setTenantTab} />
         </TabsContent>
         <TabsContent value="log-demand">
           <DemandForm onDemandLogged={handleSwitchToMyDemands} />
@@ -86,27 +81,19 @@ const MainDashboard = () => {
         </TabsContent>
       </Tabs>
     );
-
-    const renderAdminContent = () => (
+    
+    // Main Admin and O2O Manager now see the same core provider dashboard.
+    // Their special pages (User Mgmt, Analytics etc.) are accessed via the main site header.
+    const renderAdminAndO2OContent = () => (
       <Tabs value={adminTab} onValueChange={setAdminTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="approval-queue">Approval Queue</TabsTrigger>
-          <TabsTrigger value="listings-performance">Listings & Performance</TabsTrigger>
-          <TabsTrigger value="user-management">User Management</TabsTrigger>
-          <TabsTrigger value="agent-waitlist">Agent Waitlist</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
+            <TabsTrigger value="my-submissions">All Submissions</TabsTrigger>
+            <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
-        <TabsContent value="approval-queue" className="mt-6">
-            <ApprovalQueue />
-        </TabsContent>
-        <TabsContent value="listings-performance" className="mt-6">
-            <AdminListings />
-        </TabsContent>
-        <TabsContent value="user-management" className="mt-6">
-            <UserList />
-        </TabsContent>
-        <TabsContent value="agent-waitlist" className="mt-6">
-            <AgentWaitlist />
-        </TabsContent>
+        <TabsContent value="active-demands"><DemandList /></TabsContent>
+        <TabsContent value="my-submissions"><MySubmissions /></TabsContent>
+        <TabsContent value="submit-match"><PropertyForm /></TabsContent>
       </Tabs>
     );
     
@@ -116,8 +103,8 @@ const MainDashboard = () => {
     if (isTenant) {
         return renderTenantContent();
     }
-    if (isAdmin || isO2O) {
-        return renderAdminContent();
+    if (isAdminOrO2O) {
+        return renderAdminAndO2OContent();
     }
 
     return (

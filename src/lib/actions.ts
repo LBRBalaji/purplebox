@@ -5,7 +5,7 @@ import { generatePropertyDescription, type GeneratePropertyDescriptionInput } fr
 import { improvePropertyDemandDescription, type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-property-demand";
 import { getPropertyMatchScore, type GetPropertyMatchScoreOutput, type GetPropertyMatchScoreInput } from "@/ai/flows/get-property-match-score";
 import { getWarehouses, type GetWarehousesInput, type GetWarehousesOutput } from "@/ai/flows/get-warehouses";
-import { type PropertySchema, type DemandSchema, type WarehouseSchema } from "./schema";
+import { type PropertySchema, type DemandSchema, type WarehouseSchema, type ListingSchema } from "./schema";
 
 export async function getImprovedDemandDescriptionAction(
   input: ImprovePropertyDemandDescriptionInput
@@ -31,18 +31,5 @@ export async function logDemandAction(
     console.error("Error logging demand:", error);
     const e = error as Error;
     return { error: e.message || "An unexpected error occurred while logging the demand." };
-  }
-}
-
-export async function getWarehousesAction(
-  input: GetWarehousesInput
-): Promise<{ warehouses?: WarehouseSchema[]; error?: string }> {
-  try {
-    const result: GetWarehousesOutput = await getWarehouses(input);
-    return { warehouses: result.warehouses };
-  } catch (error) {
-    console.error("Error fetching warehouses:", error);
-    const e = error as Error;
-    return { error: e.message || "An unexpected error occurred while fetching warehouses." };
   }
 }
