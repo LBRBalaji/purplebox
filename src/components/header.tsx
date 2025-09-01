@@ -97,12 +97,6 @@ export function Header() {
                         )}
                         {isAdmin && (
                             <>
-                                 <NavLink href="/dashboard/approval">
-                                    <ShieldCheck className="h-4 w-4" /> Approval Queue
-                                </NavLink>
-                                <NavLink href="/dashboard/manage-users">
-                                    <Users className="h-4 w-4" /> Manage Users
-                                </NavLink>
                                 <NavLink href="/dashboard/analytics">
                                     <BarChart className="h-4 w-4" /> Analytics
                                 </NavLink>
