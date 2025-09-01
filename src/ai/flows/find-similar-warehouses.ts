@@ -60,19 +60,24 @@ const findSimilarWarehousesFlow = ai.defineFlow(
         .filter(w => w.isActive)
         .map(w => {
             const specs = w.specifications;
-            return `Warehouse named ${w.locationName} of size ${w.size} sq. ft. is located in ${w.locationName}. It is ${w.readiness} with ceiling height of ${specs.ceilingHeight} ft, ${specs.docks} docks, and flooring is ${specs.flooringType}. Office space is ${specs.officeSpace ? 'available' : 'not available'}.`;
+            const ceilingHeight = specs.ceilingHeight ?? 'N/A';
+            const docks = specs.docks ?? 'N/A';
+            const flooringType = specs.flooringType ?? 'N/A';
+            const officeSpace = specs.officeSpace ? 'available' : 'not available';
+            
+            return `Warehouse named ${w.locationName} of size ${w.size} sq. ft. is located in ${w.locationName}. It is ${w.readiness} with ceiling height of ${ceilingHeight} ft, ${docks} docks, and flooring is ${flooringType}. Office space is ${officeSpace}.`;
         });
 
     // 2. Generate embeddings for the user's query and all warehouse documents
-    const [queryEmbedding, warehouseEmbeddings] = await Promise.all([
+    const [queryEmbeddingResponse, warehouseEmbeddingsResponse] = await Promise.all([
         ai.embed({ model: embeddingModel, content: query }),
         ai.embed({ model: embeddingModel, content: warehouseDocs }),
     ]);
 
     // 3. Calculate similarities and rank
-    const similarities = warehouseEmbeddings.map((docEmbedding, i) => ({
+    const similarities = warehouseEmbeddingsResponse.map((docEmbedding, i) => ({
         index: i,
-        similarity: cosineSimilarity(queryEmbedding, docEmbedding),
+        similarity: cosineSimilarity(queryEmbeddingResponse, docEmbedding),
     }));
 
     similarities.sort((a, b) => b.similarity - a.similarity);
