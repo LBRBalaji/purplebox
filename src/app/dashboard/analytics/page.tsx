@@ -50,7 +50,7 @@ export default function AnalyticsPage() {
     const [allUsers, setAllUsers] = React.useState<User[]>([]);
     
     React.useEffect(() => {
-        if (!isAuthLoading && user?.role !== 'SuperAdmin') {
+        if (!isAuthLoading && user?.email !== 'admin@example.com') {
             router.push('/dashboard');
         }
     }, [user, isAuthLoading, router]);
@@ -165,7 +165,7 @@ export default function AnalyticsPage() {
         return config;
     }, [industryInterestData]);
 
-    if (isAuthLoading || user?.role !== 'SuperAdmin') {
+    if (isAuthLoading || user?.email !== 'admin@example.com') {
         return null; // Or a loading skeleton
     }
 

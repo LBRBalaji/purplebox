@@ -25,6 +25,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from '@/lib/utils';
+import { Separator } from './ui/separator';
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
@@ -155,7 +156,7 @@ WareHouse Origin
   };
 
   return (
-    <Card className={cn("flex flex-col", potentialMatches.length > 0 && "bg-green-50 border-green-200")}>
+    <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>{demand.demandId}</CardTitle>
         <CardDescription asChild>
@@ -200,19 +201,20 @@ WareHouse Origin
         )}
         {potentialMatches.length > 0 && (
           <div className="text-sm space-y-2 pt-3 mt-3 border-t">
-              <p className="font-semibold flex items-center gap-1.5 text-green-700"><Target className="h-4 w-4"/> Potential Match Found!</p>
-              <div className="flex flex-wrap gap-1.5 pl-1">
+              <p className="font-semibold flex items-center gap-1.5 text-green-700"><Target className="h-4 w-4"/> Potential Match Found in Your Listings!</p>
+              <p className="text-xs text-muted-foreground pl-1">Your listing is within the location radius. Review and click to submit.</p>
+              <div className="flex flex-wrap gap-1.5 pl-1 pt-2">
                 <TooltipProvider>
                     {potentialMatches.map(match => (
-                        <Tooltip key={match.listingId}>
+                        <Tooltip key={match.listingId} delayDuration={0}>
                             <TooltipTrigger asChild>
-                                <Badge variant="secondary" className="border-green-300 cursor-pointer" onClick={() => handleSubmitMatch(demand.demandId)}>
+                                <Badge variant="secondary" className="border-green-300 cursor-pointer text-green-800 bg-green-100 hover:bg-green-200" onClick={() => handleSubmitMatch(demand.demandId)}>
                                   <MapPin className="h-3 w-3 mr-1.5" />
                                   {match.name}
                                 </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>Your listing "{match.name}" is within the location radius. Click to submit.</p>
+                                <p>Click to submit your listing "{match.name}" against this demand.</p>
                             </TooltipContent>
                         </Tooltip>
                     ))}
