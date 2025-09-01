@@ -1,3 +1,4 @@
+
 // src/app/dashboard/analytics/page.tsx
 'use client';
 
@@ -5,9 +6,18 @@ import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Users, List, Clock, FileText, CheckCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { BarChart, Users, List, Clock, FileText, CheckCircle, Eye, Download, PieChart, Star } from 'lucide-react';
 import { type User } from '@/contexts/auth-context';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart"
+import { Bar, Pie, Cell, ResponsiveContainer } from "recharts"
+
 
 type Activity = {
     type: 'Demand' | 'Submission';
@@ -35,7 +45,7 @@ function StatCard({ title, value, icon: Icon, description }: { title: string, va
 
 export default function AnalyticsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
-    const { demands, submissions } = useData();
+    const { demands, submissions, listingAnalytics, listings } = useData();
     const router = useRouter();
     const [allUsers, setAllUsers] = React.useState<User[]>([]);
     
@@ -102,7 +112,7 @@ export default function AnalyticsPage() {
                     id: d.demandId,
                     user: d.userName,
                     timestamp: new Date(parseInt(d.demandId.split('-')[1])),
-                    details: `Logged demand for ${d.size.toLocaleString()} sq. ft. in ${d.location}`
+                    details: `Logged demand for ${d.size.toLocaleString()} sq. ft. in ${d.locationName}`
                 });
             } catch (e) { /* ignore format errors */ }
         });
@@ -121,6 +131,39 @@ export default function AnalyticsPage() {
 
         return combined.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 10);
     }, [demands, submissions]);
+
+    const topPerformingListings = React.useMemo(() => {
+        return listingAnalytics
+            .map(analytic => {
+                const listing = listings.find(l => l.listingId === analytic.listingId);
+                return { ...analytic, name: listing?.name || 'Unknown Listing' };
+            })
+            .sort((a,b) => b.views - a.views)
+            .slice(0, 5);
+    }, [listingAnalytics, listings]);
+
+
+    const industryInterestData = React.useMemo(() => {
+        const industryMap: Record<string, number> = {};
+        listingAnalytics.forEach(analytic => {
+            Object.entries(analytic.customerIndustries).forEach(([industry, count]) => {
+                industryMap[industry] = (industryMap[industry] || 0) + count;
+            });
+        });
+
+        return Object.entries(industryMap).map(([name, value]) => ({ name, value, fill: `var(--color-${name.toLowerCase()})` }));
+    }, [listingAnalytics]);
+    
+    const chartConfig = React.useMemo(() => {
+        const config: any = {};
+        industryInterestData.forEach(item => {
+            config[item.name.toLowerCase()] = {
+                label: item.name,
+                color: item.fill,
+            };
+        });
+        return config;
+    }, [industryInterestData]);
 
     if (isAuthLoading || user?.role !== 'SuperAdmin') {
         return null; // Or a loading skeleton
@@ -162,6 +205,72 @@ export default function AnalyticsPage() {
                         description="Demand logged to first proposal."
                     />
                 </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Star className="text-amber-400" /> Top Performing Listings</CardTitle>
+                            <CardDescription>Most viewed listings on the platform.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                             {topPerformingListings.length > 0 ? (
+                                <div className="space-y-4">
+                                    {topPerformingListings.map(item => (
+                                        <div key={item.listingId} className="flex items-center justify-between gap-4 p-3 rounded-lg bg-secondary/50">
+                                            <div>
+                                                <p className="font-semibold">{item.name}</p>
+                                                <p className="text-xs text-muted-foreground">{item.listingId}</p>
+                                            </div>
+                                            <div className="flex items-center gap-6 text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <Eye className="h-4 w-4 text-primary" />
+                                                    <span>{item.views} views</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Download className="h-4 w-4 text-primary" />
+                                                    <span>{item.downloads} downloads</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                             ) : (
+                                <p className="text-sm text-muted-foreground text-center py-4">No listing performance data available yet.</p>
+                             )}
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><PieChart className="text-primary"/> Customer Industry Interest</CardTitle>
+                            <CardDescription>Breakdown of industries viewing listings.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                             {industryInterestData.length > 0 ? (
+                                <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[250px]">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <Pie
+                                            data={industryInterestData}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={80}
+                                            label
+                                            >
+                                            {industryInterestData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                            ))}
+                                        </Pie>
+                                    </ResponsiveContainer>
+                                    <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+                                </ChartContainer>
+                             ) : (
+                                 <p className="text-sm text-muted-foreground text-center py-4">No industry data to display.</p>
+                             )}
+                        </CardContent>
+                    </Card>
+                </div>
+
 
                 <Card>
                     <CardHeader>

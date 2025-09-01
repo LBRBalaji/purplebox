@@ -1,0 +1,33 @@
+
+[
+    {
+      "listingId": "LST-001",
+      "views": 152,
+      "downloads": 25,
+      "customerIndustries": {
+        "Logistics": 10,
+        "Retail": 8,
+        "E-commerce": 7
+      }
+    },
+    {
+      "listingId": "LST-002",
+      "views": 340,
+      "downloads": 55,
+      "customerIndustries": {
+        "FMCG": 20,
+        "Electronics": 15,
+        "Automotive": 10
+      }
+    },
+    {
+        "listingId": "LST-005",
+        "views": 88,
+        "downloads": 12,
+        "customerIndustries": {
+          "Light Manufacturing": 5,
+          "Electronics": 4,
+          "Last-Mile Delivery": 3
+        }
+    }
+]

@@ -17,6 +17,7 @@ export const listingSchema = z.object({
   warehouseBoxId: z.string(),
   name: z.string().min(1, "Warehouse name is required."),
   location: z.string().min(1, "Location is required."),
+  latLng: z.string().optional(),
   sizeSqFt: z.coerce.number().positive("Size must be a positive number."),
   description: z.string().optional(),
   
@@ -339,5 +340,3 @@ export const warehouseSchema = warehouseFormSchema.transform(data => {
 
 
 export type WarehouseSchema = z.infer<typeof warehouseSchema>;
-
-    

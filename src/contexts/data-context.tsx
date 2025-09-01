@@ -17,6 +17,14 @@ export type Submission = {
     status: SubmissionStatus;
 }
 
+export type ListingAnalytics = {
+  listingId: string;
+  views: number;
+  downloads: number;
+  customerIndustries: Record<string, number>;
+};
+
+
 type DataEvent = {
   type: 'new_demand' | 'new_submission' | 'new_listing';
   id: string; // The ID of the demand or submission
@@ -30,6 +38,8 @@ type DataContextType = {
   addListing: (listing: ListingSchema, userEmail?: string) => void;
   updateListing: (listing: ListingSchema) => void;
   updateListingStatus: (listingId: string, status: ListingStatus) => void;
+  listingAnalytics: ListingAnalytics[];
+
 
   // Old demand-centric state (to be phased out)
   demands: DemandSchema[];
@@ -65,6 +75,7 @@ export type AgentLead = {
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [listings, setListings] = useState<ListingSchema[]>([]);
+  const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>([]);
   const [demands, setDemands] = useState<DemandSchema[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
@@ -79,23 +90,28 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 listingsRes,
                 demandsRes,
                 submissionsRes,
-                agentLeadsRes
+                agentLeadsRes,
+                analyticsRes
             ] = await Promise.all([
                 fetch('/api/listings'),
                 fetch('/api/demands'),
                 fetch('/api/submissions'),
-                fetch('/api/agent-leads')
+                fetch('/api/agent-leads'),
+                fetch('/api/listing-analytics')
             ]);
 
             const listingsData = await listingsRes.json();
             const demandsData = await demandsRes.json();
             const submissionsData = await submissionsRes.json();
             const agentLeadsData = await agentLeadsRes.json();
+            const analyticsData = await analyticsRes.json();
+
 
             setListings(listingsData);
             setDemands(demandsData);
             setSubmissions(submissionsData);
             setAgentLeads(agentLeadsData);
+            setListingAnalytics(analyticsData);
             
             // Persist agent leads to localStorage for demo purposes
             localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(agentLeadsData));
@@ -238,7 +254,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   return (
     <DataContext.Provider value={{ 
-        listings, addListing, updateListing, updateListingStatus,
+        listings, addListing, updateListing, updateListingStatus, listingAnalytics,
         demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading }}>
       {children}
     </DataContext.Provider>
