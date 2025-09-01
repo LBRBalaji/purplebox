@@ -27,9 +27,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
         
-        // Manage Users is only for the main admin
-        if (pathname.startsWith('/dashboard/manage-users') && !isMainAdmin) {
-            router.push('/dashboard');
+        // Manage Users is only for the main admin - this page is now part of the main dashboard
+        if (pathname.startsWith('/dashboard/manage-users')) {
+            if (!isMainAdmin) {
+              router.push('/dashboard');
+            } else {
+              // Redirect to the main dashboard to show the correct tab
+              router.push('/dashboard'); 
+            }
         }
 
         // Manage Warehouses is for providers (SuperAdmin) and O2O
@@ -37,9 +42,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
         
-        // Approval Queue is for main admin and O2O
-        if (pathname.startsWith('/dashboard/approval') && !isMainAdmin && !isO2O) {
-            router.push('/dashboard');
+        // Approval Queue is for main admin and O2O - this page is now part of the main dashboard
+        if (pathname.startsWith('/dashboard/approval')) {
+            if (!isMainAdmin && !isO2O) {
+                router.push('/dashboard');
+            } else {
+                router.push('/dashboard');
+            }
         }
     }
   }, [user, isLoading, router, pathname]);

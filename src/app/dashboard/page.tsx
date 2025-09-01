@@ -17,6 +17,9 @@ import { useSearchParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DemandForm } from '@/components/demand-form';
 import { ProviderListings } from '@/components/provider-listings';
+import { ApprovalQueue } from '@/components/approval-queue';
+import { UserList } from '@/components/user-list';
+import { AgentWaitlist } from '@/components/agent-waitlist';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -32,6 +35,7 @@ const MainDashboard = () => {
 
     const [activeTab, setActiveTab] = React.useState('active-demands');
     const [myDemandsTab, setMyDemandsTab] = React.useState('my-demands');
+    const [adminTab, setAdminTab] = React.useState('approval-queue');
     const [newMatchCount, setNewMatchCount] = React.useState(0); // This would be derived from data context in a real app
 
     const handleSwitchToMyDemands = React.useCallback(() => {
@@ -83,20 +87,22 @@ const MainDashboard = () => {
     );
 
     const renderAdminContent = () => (
-        <Card>
-            <CardHeader>
-                <CardTitle>O2O Manager Dashboard</CardTitle>
-                <CardDescription>
-                    Manage listings, users, and platform settings from the navigation menu.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="text-center p-8 text-muted-foreground">
-                    <p>Admin-specific dashboard components are available in the header.</p>
-                     <p className="text-xs mt-2">(e.g., Approval Queue, User Management, Analytics)</p>
-                </div>
-            </CardContent>
-        </Card>
+      <Tabs value={adminTab} onValueChange={setAdminTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="approval-queue">Approval Queue</TabsTrigger>
+          <TabsTrigger value="user-management">User Management</TabsTrigger>
+          <TabsTrigger value="agent-waitlist">Agent Waitlist</TabsTrigger>
+        </TabsList>
+        <TabsContent value="approval-queue" className="mt-6">
+            <ApprovalQueue />
+        </TabsContent>
+        <TabsContent value="user-management" className="mt-6">
+            <UserList />
+        </TabsContent>
+        <TabsContent value="agent-waitlist" className="mt-6">
+            <AgentWaitlist />
+        </TabsContent>
+      </Tabs>
     );
     
     if (isProvider) {
