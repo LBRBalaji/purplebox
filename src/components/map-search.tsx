@@ -16,7 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft, Star, Ruler, ZoomIn, ZoomOut } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
-import type { WarehouseSchema } from '@/lib/schema';
+import type { WarehouseSchema, ListingSchema } from '@/lib/schema';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Badge } from './ui/badge';
 import Image from 'next/image';
@@ -108,8 +108,13 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
     )
 }
 
-function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: WarehouseSchema, onBack: () => void, onLogDemand: (center: { lat: number; lng: number }) => void }) {
-    const mainImage = warehouse.imageUrls?.[0] || 'https://placehold.co/600x400.png';
+function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: ListingSchema, onBack: () => void, onLogDemand: (center: { lat: number; lng: number }) => void }) {
+    const mainImage = warehouse.documents?.find(doc => doc.type === 'image')?.url || 'https://placehold.co/600x400.png';
+    const latLngParts = warehouse.latLng?.split(',').map(s => parseFloat(s.trim()));
+    const center = latLngParts && latLngParts.length === 2 && !isNaN(latLngParts[0]) && !isNaN(latLngParts[1]) 
+        ? { lat: latLngParts[0], lng: latLngParts[1] } 
+        : { lat: 0, lng: 0 };
+
     return (
         <Card className="shadow-none border-0 h-full flex flex-col bg-transparent">
             <CardHeader>
@@ -119,7 +124,7 @@ function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: Wa
                 <div className="aspect-video relative mb-2">
                     <Image
                         src={mainImage}
-                        alt={warehouse.locationName}
+                        alt={warehouse.name}
                         fill
                         className="rounded-lg object-cover"
                         data-ai-hint="warehouse exterior"
@@ -127,12 +132,12 @@ function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: Wa
                 </div>
                  <CardTitle className="flex items-center gap-2 pt-2">
                     <Building2 className="h-6 w-6 text-primary"/>
-                    {warehouse.locationName}
+                    {warehouse.name}
                 </CardTitle>
-                <CardDescription>ID: {warehouse.id}</CardDescription>
+                <CardDescription>ID: {warehouse.warehouseBoxId}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 flex-grow">
-                {warehouse.is3pl && (
+                {(warehouse.serviceModel === '3PL' || warehouse.serviceModel === 'Both') && (
                     <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20 text-sm">
                         <Star className="mr-1.5 h-4 w-4" />
                         3PL Operated
@@ -141,31 +146,31 @@ function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: Wa
                  <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="space-y-1">
                         <p className="text-muted-foreground flex items-center gap-1"><Scaling className="h-4 w-4"/> Size</p>
-                        <p className="font-semibold">{warehouse.size.toLocaleString()} sq. ft.</p>
+                        <p className="font-semibold">{warehouse.sizeSqFt.toLocaleString()} sq. ft.</p>
                     </div>
                     <div className="space-y-1">
                         <p className="text-muted-foreground flex items-center gap-1"><CalendarCheck className="h-4 w-4"/> Readiness</p>
-                        <p className="font-semibold">{warehouse.readiness}</p>
+                        <p className="font-semibold">{warehouse.availabilityDate}</p>
                     </div>
                     <div className="space-y-1">
                         <p className="text-muted-foreground flex items-center gap-1"><CheckCircle className="h-4 w-4"/> Ceiling Height</p>
-                        <p className="font-semibold">{warehouse.specifications.ceilingHeight} ft</p>
+                        <p className="font-semibold">{warehouse.buildingSpecifications.shopFloorLevelDimension || 'N/A'} ft</p>
                     </div>
                      <div className="space-y-1">
                         <p className="text-muted-foreground flex items-center gap-1"><CheckCircle className="h-4 w-4"/> Docks</p>
-                        <p className="font-semibold">{warehouse.specifications.docks}</p>
+                        <p className="font-semibold">{warehouse.buildingSpecifications.numberOfDocksAndShutters || 'N/A'}</p>
                     </div>
                 </div>
                 <div className="pt-4">
                     <Button asChild className="w-full">
-                        <Link href={`/listings/${warehouse.id}`} target="_blank">
+                        <Link href={`/listings/${warehouse.listingId}`} target="_blank">
                             View Full Details
                         </Link>
                     </Button>
                 </div>
             </CardContent>
             <CardFooter>
-                 <LogDemandButton center={warehouse.generalizedLocation} onLogDemand={onLogDemand} variant="outline" />
+                 <LogDemandButton center={center} onLogDemand={onLogDemand} variant="outline" />
             </CardFooter>
         </Card>
     )
@@ -231,7 +236,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const { user } = useAuth();
   const { listings } = useData(); // Use live data from context
   
-  const [warehouses, setWarehouses] = React.useState<WarehouseSchema[]>([]);
+  const [warehouses, setWarehouses] = React.useState<ListingSchema[]>([]);
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
   const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
@@ -242,7 +247,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [markers, setMarkers] = React.useState<google.maps.Marker[]>([]);
   const [markerClusterer, setMarkerClusterer] = React.useState<MarkerClusterer | null>(null);
-  const [selectedWarehouse, setSelectedWarehouse] = React.useState<WarehouseSchema | null>(null);
+  const [selectedWarehouse, setSelectedWarehouse] = React.useState<ListingSchema | null>(null);
   
   // States for Distance Calculator
   const [isMeasuring, setIsMeasuring] = React.useState(false);
@@ -253,48 +258,33 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   // Filter listings to only show approved ones
   React.useEffect(() => {
-    const approvedListings = listings
-        .filter(l => l.status === 'approved')
-        .map(l => ({
-            id: l.listingId,
-            locationName: l.location,
-            isActive: true, // Only approved are considered active for the map
-            is3pl: l.serviceModel === '3PL' || l.serviceModel === 'Both',
-            generalizedLocation: {
-                lat: parseFloat(l.latLng?.split(',')[0] || '0'),
-                lng: parseFloat(l.latLng?.split(',')[1] || '0')
-            },
-            size: l.sizeSqFt,
-            readiness: l.availabilityDate,
-            specifications: {
-                ceilingHeight: l.buildingSpecifications.numberOfDocksAndShutters, // Placeholder
-                docks: l.buildingSpecifications.numberOfDocksAndShutters, // Placeholder
-                officeSpace: true, // Placeholder
-                flooringType: l.siteSpecifications.typeOfFlooringInside
-            },
-            imageUrls: l.documents?.filter(d => d.type === 'image').map(d => d.url) || []
-        }));
-
+    const approvedListings = listings.filter(l => l.status === 'approved');
     setWarehouses(approvedListings);
   }, [listings]);
 
   // Init marker clusterer
   React.useEffect(() => {
-    if (!map || !markerLibrary || warehouses.length === 0) return;
+    if (!map || !markerLibrary || warehouses.length === 0 || !geometry) return;
 
     if (markerClusterer) {
         markerClusterer.clearMarkers();
     }
     
     const newMarkers = warehouses.map(warehouse => {
+        const latLngParts = warehouse.latLng?.split(',').map(s => parseFloat(s.trim()));
+        if (!latLngParts || latLngParts.length !== 2 || isNaN(latLngParts[0]) || isNaN(latLngParts[1])) {
+            return null;
+        }
+        const position = { lat: latLngParts[0], lng: latLngParts[1] };
+        
         const marker = new google.maps.Marker({
-            position: warehouse.generalizedLocation,
+            position,
         });
         marker.addListener('click', () => {
             setSelectedWarehouse(warehouse);
         });
         return marker;
-    });
+    }).filter((m): m is google.maps.Marker => m !== null);
 
     setMarkers(newMarkers);
     const newClusterer = new MarkerClusterer({ map, markers: newMarkers });
@@ -305,7 +295,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             newClusterer.clearMarkers();
         }
     };
-  }, [map, markerLibrary, warehouses]);
+  }, [map, markerLibrary, warehouses, geometry]);
 
   // Initialize SearchBox
   React.useEffect(() => {
@@ -341,19 +331,22 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       const searchCenterLatLng = new google.maps.LatLng(center.lat, center.lng);
 
       const nearbyWarehouses = warehouses.filter(w => {
-          if (!w.isActive) return false;
-          const warehouseLatLng = new google.maps.LatLng(w.generalizedLocation.lat, w.generalizedLocation.lng);
+          const latLngParts = w.latLng?.split(',').map(s => parseFloat(s.trim()));
+          if (!latLngParts || latLngParts.length !== 2 || isNaN(latLngParts[0]) || isNaN(latLngParts[1])) {
+            return false;
+          }
+          const warehouseLatLng = new google.maps.LatLng(latLngParts[0], latLngParts[1]);
           return geometry.spherical.computeDistanceBetween(searchCenterLatLng, warehouseLatLng) <= searchRadius;
       });
 
       if (nearbyWarehouses.length > 0) {
-        const sizes = nearbyWarehouses.map(w => w.size);
-        const heights = nearbyWarehouses.map(w => w.specifications.ceilingHeight).filter(h => h > 0);
+        const sizes = nearbyWarehouses.map(w => w.sizeSqFt);
+        const heights = nearbyWarehouses.map(w => w.buildingSpecifications.numberOfDocksAndShutters).filter(h => h && h > 0);
         
         const readinessCounts = nearbyWarehouses.reduce((acc, w) => {
-            if (w.readiness === 'Ready for Occupancy') acc.ready++;
-            else if (w.readiness === 'Available in 3 months') acc.soon++;
-            else if (w.readiness === 'Under Construction' || w.readiness === '2025-Q1') acc.underConstruction++;
+            if (w.availabilityDate === 'Ready for Occupancy') acc.ready++;
+            else if (w.availabilityDate === 'Available in 3 months') acc.soon++;
+            else if (w.availabilityDate === 'Under Construction' || w.availabilityDate === '2025-Q1') acc.underConstruction++;
             return acc;
         }, { ready: 0, soon: 0, underConstruction: 0 });
 
@@ -362,7 +355,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             totalListings: nearbyWarehouses.length,
             sizeRange: `${Math.min(...sizes).toLocaleString()} - ${Math.max(...sizes).toLocaleString()} sq. ft.`,
             readiness: readinessCounts,
-            avgCeilingHeight: heights.length > 0 ? Math.round(heights.reduce((a, b) => a + b, 0) / heights.length) : 0,
+            avgCeilingHeight: heights.length > 0 ? Math.round(heights.reduce((a, b) => a + (b || 0), 0) / heights.length) : 0,
             center: center,
         };
         setSummaryData(newSummary);

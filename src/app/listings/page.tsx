@@ -6,7 +6,7 @@ import type { WarehouseSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Download, MapPin, Scaling, Search, SlidersHorizontal, Star, X } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +21,7 @@ import { LoginDialog } from '@/components/login-dialog';
 import { LimitExceededDialog } from '@/components/limit-exceeded-dialog';
 import { Badge } from '@/components/ui/badge';
 import { type ListingSchema } from '@/lib/schema';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
@@ -55,7 +56,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                 </Badge>
             )}
         </div>
-        <CardDescription>ID: {listing.listingId}</CardDescription>
+        <CardDescription>ID: {listing.warehouseBoxId}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -277,6 +278,13 @@ export default function ListingsPage() {
     <>
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
+            <Alert className="mb-8 bg-primary/5 border-primary/20">
+                <Info className="h-5 w-5 text-primary/80" />
+                <AlertTitle className="font-semibold text-primary/90">Streamline Your Search</AlertTitle>
+                <AlertDescription className="text-primary/80">
+                    You can select up to 3 listings to download their details at once. This action can be performed twice per day to ensure fair usage. For more extensive needs, please log a demand to receive tailored proposals.
+                </AlertDescription>
+            </Alert>
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className='w-full'>
