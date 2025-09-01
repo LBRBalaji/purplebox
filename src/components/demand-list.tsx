@@ -66,14 +66,14 @@ function DemandCard({ demand }: { demand: DemandSchema }) {
   const [potentialMatches, setPotentialMatches] = React.useState<ListingSchema[]>([]);
 
   React.useEffect(() => {
-      if (user?.role === 'SuperAdmin' && user.email) {
+      if (user?.role === 'SuperAdmin' && user.email && demand.location) {
           const providerListings = listings.filter(l => l.developerId === user.email && l.status === 'approved');
           const [demandLat, demandLng] = demand.location.split(',').map(Number);
           
           if (!isNaN(demandLat) && !isNaN(demandLng)) {
               const matches = providerListings.filter(listing => {
                   if(!listing.latLng) return false;
-                  const [listingLat, listingLng] = (listing as any).latLng?.split(',').map(Number) ?? [0,0];
+                  const [listingLat, listingLng] = listing.latLng.split(',').map(Number);
                   if (!isNaN(listingLat) && !isNaN(listingLng)) {
                       const distance = haversineDistance(
                           { lat: demandLat, lon: demandLng },
@@ -200,7 +200,7 @@ WareHouse Origin
             </div>
         )}
         {potentialMatches.length > 0 && (
-          <div className="text-sm space-y-2 pt-3 mt-3 border-t">
+          <div className="text-sm space-y-2 pt-4 mt-4 border-t border-dashed">
               <p className="font-semibold flex items-center gap-1.5 text-green-700"><Target className="h-4 w-4"/> Potential Match Found in Your Listings!</p>
               <p className="text-xs text-muted-foreground pl-1">Your listing is within the location radius. Review and click to submit.</p>
               <div className="flex flex-wrap gap-1.5 pl-1 pt-2">
@@ -260,3 +260,5 @@ export function DemandList() {
     </div>
   );
 }
+
+    

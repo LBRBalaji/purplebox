@@ -7,6 +7,7 @@
     "warehouseBoxId": "WBX-PRIME-A-8732",
     "name": "Prime Logistics Park - Unit A",
     "location": "Oragadam, Chennai",
+    "latLng": "12.83, 79.95",
     "sizeSqFt": 150000,
     "description": "A Grade-A warehouse facility located in the prime industrial hub of Oragadam. Features state-of-the-art infrastructure, ample parking, and excellent connectivity to major highways. Ideal for large-scale distribution and logistics operations.",
     "rentPerSqFt": 25,
@@ -67,6 +68,7 @@
     "warehouseBoxId": "WBX-BHIW-B-4815",
     "name": "Bhiwandi MegaHub",
     "location": "Bhiwandi, Mumbai",
+    "latLng": "19.30, 73.06",
     "sizeSqFt": 300000,
     "description": "A massive, state-of-the-art warehousing facility in the logistical heart of the Mumbai Metropolitan Region. Perfect for national distribution centers.",
     "rentPerSqFt": 30,
@@ -119,6 +121,7 @@
     "warehouseBoxId": "WBX-INDUS-B-9104",
     "name": "IndusConnect Logistics - Phase 2",
     "location": "Sriperumbudur, Chennai",
+    "latLng": "12.96, 79.95",
     "sizeSqFt": 250000,
     "description": "Upcoming large-scale warehousing space in the heart of Sriperumbudur. This listing is currently under review for approval. It promises excellent connectivity and modern specifications suitable for a variety of industries.",
     "rentPerSqFt": 28,
@@ -169,6 +172,7 @@
     "warehouseBoxId": "WBX-VALUE-C-1552",
     "name": "Value Storage Unit",
     "location": "Ambattur, Chennai",
+    "latLng": "13.11, 80.16",
     "sizeSqFt": 80000,
     "description": "An older facility that was submitted for listing but did not meet the required quality standards for Grade-A classification. The listing has been rejected due to compliance issues.",
     "availabilityDate": "Immediate",
@@ -204,6 +208,7 @@
     "warehouseBoxId": "WBX-HOSKOTE-C-1121",
     "name": "Hoskote Tech Park - Bay 5",
     "location": "Hoskote, Bengaluru",
+    "latLng": "13.07, 77.79",
     "sizeSqFt": 95000,
     "description": "A modern, mid-sized warehouse suitable for electronics assembly, last-mile delivery, or light manufacturing. Located in a secured tech park with reliable power and infrastructure.",
     "rentPerSqFt": 22,
@@ -247,3 +252,5 @@
     "projectName": "Hoskote Tech Park"
   }
 ]
+
+    
