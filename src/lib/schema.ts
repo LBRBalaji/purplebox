@@ -53,6 +53,7 @@ export const listingSchema = z.object({
 
   // Site Specifications
   siteSpecifications: z.object({
+    siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project', '3PL Operated Warehouse']).optional(),
     typeOfFlooringInside: z.string().optional(),
     typeOfFlooringOutside: z.string().optional(),
     typeOfRoad: z.string().optional(),
@@ -340,5 +341,3 @@ export const warehouseSchema = warehouseFormSchema.transform(data => {
 
 
 export type WarehouseSchema = z.infer<typeof warehouseSchema>;
-
-    

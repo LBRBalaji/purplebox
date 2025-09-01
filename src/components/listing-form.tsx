@@ -235,6 +235,21 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                      <div className="space-y-4">
                         <FormLabel className="text-lg font-semibold">Site Specifications</FormLabel>
                         <div className="space-y-4 p-4 border rounded-md">
+                            <FormField control={form.control} name="siteSpecifications.siteType" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Site Type</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Select site type"/></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="Standalone">Standalone</SelectItem>
+                                            <SelectItem value="Part of Industrial Park">Part of Industrial Park</SelectItem>
+                                            <SelectItem value="Part of Commercial Project">Part of Commercial Project</SelectItem>
+                                            <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}/>
                              <FormField control={form.control} name="siteSpecifications.typeOfFlooringInside" render={({ field }) => (
                                 <FormItem><FormLabel>Inside Flooring Type</FormLabel><FormControl><Input {...field} placeholder="e.g., FM2 Grade, 8-ton point load" /></FormControl><FormMessage /></FormItem>
                             )} />
