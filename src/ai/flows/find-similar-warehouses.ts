@@ -9,11 +9,10 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z, embed} from 'genkit';
 import { warehouseSchema } from '@/lib/schema';
 import allWarehouses from '@/data/warehouses.json';
 import { type WarehouseSchema } from '@/lib/schema';
-import { embed } from 'genkit/ai';
 
 const FindSimilarWarehousesInputSchema = z.object({
   query: z.string().describe('The user\'s search query.'),
