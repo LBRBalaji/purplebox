@@ -275,8 +275,10 @@ export default function ListingsPage() {
           toast({
               variant: 'destructive',
               title: 'Download Not Available',
-              description: 'Only Customer accounts can select and download listings.'
+              description: 'While you can select properties to compare, only Customer accounts are permitted to download listing data.'
           })
+          // Still allow selection for non-customers, but the download bar will handle the final restriction.
+          toggleSelectedForDownload(listing);
           return;
       }
       toggleSelectedForDownload(listing);
@@ -289,9 +291,6 @@ export default function ListingsPage() {
           description: "You can now select properties to download."
       });
   }
-
-  const showCheckboxes = user?.role === 'User';
-
 
   return (
     <>
@@ -379,7 +378,7 @@ export default function ListingsPage() {
                             listing={listing} 
                             isSelected={selectedIds.has(listing.id)}
                             onSelectionChange={handleSelectionChange}
-                            showCheckbox={showCheckboxes}
+                            showCheckbox={true}
                         />
                     ))}
                 </div>
