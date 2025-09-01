@@ -11,8 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
 import {
   Table,
@@ -119,22 +120,39 @@ export default function ListingDetailPage() {
     const { user } = useAuth();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
+    const [allListings, setAllListings] = React.useState<WarehouseSchema[]>([]);
+    const [currentIndex, setCurrentIndex] = React.useState(-1);
 
     React.useEffect(() => {
         const listingId = params.listingId as string;
-        if (listingId) {
-            fetch('/api/warehouses')
-                .then(res => res.json())
-                .then((warehouses: WarehouseSchema[]) => {
+        
+        fetch('/api/warehouses')
+            .then(res => res.json())
+            .then((warehouses: WarehouseSchema[]) => {
+                const activeWarehouses = warehouses.filter(w => w.isActive).sort((a,b) => a.id.localeCompare(b.id));
+                setAllListings(activeWarehouses);
+
+                const foundIndex = activeWarehouses.findIndex(w => w.id === listingId);
+                setCurrentIndex(foundIndex);
+
+                if (foundIndex !== -1) {
+                    const foundWarehouse = activeWarehouses[foundIndex];
+                    setListing(mapWarehouseToListing(foundWarehouse));
+                } else {
+                    // Temporarily keep the original fetch logic as a fallback
                     const foundWarehouse = warehouses.find(w => w.id === listingId);
                     if (foundWarehouse && foundWarehouse.isActive) {
                         setListing(mapWarehouseToListing(foundWarehouse));
                     } else {
                         router.push('/listings');
                     }
-                });
-        }
+                }
+            });
+
     }, [params.listingId, router]);
+
+    const prevListingId = currentIndex > 0 ? allListings[currentIndex - 1].id : null;
+    const nextListingId = currentIndex < allListings.length - 1 ? allListings[currentIndex + 1].id : null;
 
     if (!listing) {
         return (
@@ -162,13 +180,27 @@ export default function ListingDetailPage() {
         <>
             <main className="container mx-auto p-4 md:p-8">
                 <div className="max-w-6xl mx-auto space-y-8">
-                    {/* Header */}
-                    <div>
-                        <Badge variant="secondary">{listing.warehouseBoxId}</Badge>
-                        <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.name}</h1>
-                        <p className="text-lg text-muted-foreground flex items-center gap-2 mt-2">
-                            <MapPin className="h-5 w-5" /> {listing.location}
-                        </p>
+                    {/* Header with Navigation */}
+                    <div className="flex justify-between items-center flex-wrap gap-4">
+                        <div>
+                            <Badge variant="secondary">{listing.warehouseBoxId}</Badge>
+                            <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.name}</h1>
+                            <p className="text-lg text-muted-foreground flex items-center gap-2 mt-2">
+                                <MapPin className="h-5 w-5" /> {listing.location}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button asChild variant="outline" disabled={!prevListingId}>
+                                <Link href={prevListingId ? `/listings/${prevListingId}` : '#'}>
+                                    <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+                                </Link>
+                            </Button>
+                             <Button asChild variant="outline" disabled={!nextListingId}>
+                                <Link href={nextListingId ? `/listings/${nextListingId}` : '#'}>
+                                    Next <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
                     
                     {/* Main Content */}
