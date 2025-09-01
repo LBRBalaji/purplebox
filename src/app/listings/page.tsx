@@ -23,6 +23,7 @@ import { LimitExceededDialog } from '@/components/limit-exceeded-dialog';
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
   const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
+  const { user } = useAuth();
 
   return (
     <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary")}>
@@ -37,12 +38,14 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
               data-ai-hint="modern warehouse"
             />
           </div>
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={() => onSelectionChange(listing)}
-            aria-label={`Select warehouse ${listing.id}`}
-            className="w-5 h-5"
-          />
+          {user?.role === 'User' && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelectionChange(listing)}
+              aria-label={`Select warehouse ${listing.id}`}
+              className="w-5 h-5"
+            />
+          )}
         </div>
         <CardTitle>{listing.locationName}</CardTitle>
         <CardDescription>ID: {listing.id}</CardDescription>
@@ -86,7 +89,7 @@ function DownloadBar() {
     const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
     const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
 
-    if (selectedForDownload.length === 0) {
+    if (selectedForDownload.length === 0 || user?.role !== 'User') {
         return null;
     }
     

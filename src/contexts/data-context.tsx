@@ -363,7 +363,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const toggleSelectedForDownload = (listing: WarehouseSchema, user: User): { limitReached: boolean } => {
-    const isSelected = selectedForDownload.find(item => item.id === listing.id);
+    const isSelected = selectedForDownload.some(item => item.id === listing.id);
 
     if (isSelected) {
       setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
