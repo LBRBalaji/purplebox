@@ -20,6 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!isLoading && user) {
         const isMainAdmin = user.email === 'admin@example.com';
         const isO2O = user.role === 'O2O';
+        const isProvider = user.role === 'SuperAdmin';
 
         // Analytics is only for the main admin
         if (pathname.startsWith('/dashboard/analytics') && !isMainAdmin) {
@@ -31,8 +32,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
-        // Manage Warehouses is for SuperAdmin roles (main admin and providers) and O2O
-        if (pathname.startsWith('/dashboard/manage-warehouses') && user.role !== 'SuperAdmin' && !isO2O) {
+        // Manage Warehouses is for providers (SuperAdmin) and O2O
+        if (pathname.startsWith('/dashboard/manage-warehouses') && !isProvider && !isO2O) {
             router.push('/dashboard');
         }
         
