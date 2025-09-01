@@ -82,9 +82,24 @@ export default function ListingsPage() {
     const approved = listings.filter(l => l.status === 'approved');
     
     const results = approved.filter(listing => {
-        const matchesSearch = searchTerm === '' || 
-            listing.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            listing.location.toLowerCase().includes(searchTerm.toLowerCase());
+        const searchTermLower = searchTerm.toLowerCase();
+
+        // Create a single string of searchable content from various listing fields
+        const searchableContent = [
+            listing.name,
+            listing.location,
+            listing.description,
+            listing.warehouseBoxId,
+            listing.sizeSqFt.toString(),
+            listing.rentPerSqFt?.toString(),
+            listing.buildingSpecifications.buildingType,
+            listing.buildingSpecifications.internalLighting,
+            listing.siteSpecifications.typeOfFlooringInside,
+            listing.siteSpecifications.typeOfFlooringOutside,
+            listing.siteSpecifications.typeOfRoad,
+        ].join(' ').toLowerCase();
+
+        const matchesSearch = searchTerm === '' || searchableContent.includes(searchTermLower);
         
         const matchesAvailability = availability === 'all' || listing.availabilityDate === availability;
         
@@ -171,7 +186,7 @@ export default function ListingsPage() {
                  <div className="mt-6 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                        placeholder="Search by name or location (e.g., Prime Logistics, Oragadam)..." 
+                        placeholder="Search by name, location, size, or keyword (e.g., Prime Logistics, PEB, 150000)..." 
                         className="pl-9"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -197,5 +212,3 @@ export default function ListingsPage() {
     </main>
   );
 }
-
-    
