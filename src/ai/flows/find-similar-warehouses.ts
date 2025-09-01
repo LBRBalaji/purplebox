@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z, embed} from 'genkit';
+import {z} from 'genkit';
 import { warehouseSchema } from '@/lib/schema';
 import allWarehouses from '@/data/warehouses.json';
 import { type WarehouseSchema } from '@/lib/schema';
@@ -65,8 +65,8 @@ const findSimilarWarehousesFlow = ai.defineFlow(
 
     // 2. Generate embeddings for the user's query and all warehouse documents
     const [queryEmbedding, warehouseEmbeddings] = await Promise.all([
-        embed({ model: embeddingModel, content: query }),
-        embed({ model: embeddingModel, content: warehouseDocs }),
+        ai.embed({ model: embeddingModel, content: query }),
+        ai.embed({ model: embeddingModel, content: warehouseDocs }),
     ]);
 
     // 3. Calculate similarities and rank
