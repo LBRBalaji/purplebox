@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -47,8 +47,10 @@ const NavLink = ({ href, children }: { href: string, children: React.ReactNode }
 export function Header() {
   const { user, logout, isLoading } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
-  const isAdmin = user?.email === 'admin@example.com';
+  const isAdmin = user?.role === 'SuperAdmin' && user.email === 'admin@example.com';
+  const isDeveloper = user?.role === 'SuperAdmin';
   const isO2O = user?.role === 'O2O';
+
 
   return (
     <>
@@ -78,6 +80,9 @@ export function Header() {
                                 <LayoutDashboard className="h-4 w-4" /> Dashboard
                             </NavLink>
                         )}
+                        <NavLink href="/listings">
+                            <List className="h-4 w-4" /> Browse Listings
+                        </NavLink>
                         <NavLink href="/map-search">
                             <Map className="h-4 w-4" /> Map Search
                         </NavLink>
@@ -87,17 +92,15 @@ export function Header() {
                             </NavLink>
                         )}
                         {(isAdmin || isO2O) && (
-                            <>
-                                <NavLink href="/dashboard/manage-warehouses">
-                                    <Warehouse className="h-4 w-4" /> Manage Warehouses
-                                </NavLink>
-                                <NavLink href="/dashboard/approval">
-                                    <ShieldCheck className="h-4 w-4" /> Approval Queue
-                                </NavLink>
-                            </>
+                            <NavLink href="/dashboard/manage-warehouses">
+                                <Warehouse className="h-4 w-4" /> Manage Warehouses
+                            </NavLink>
                         )}
                         {isAdmin && (
                             <>
+                                 <NavLink href="/dashboard/approval">
+                                    <ShieldCheck className="h-4 w-4" /> Approval Queue
+                                </NavLink>
                                 <NavLink href="/dashboard/manage-users">
                                     <Users className="h-4 w-4" /> Manage Users
                                 </NavLink>
@@ -125,7 +128,9 @@ export function Header() {
                 <div className="flex items-center gap-4">
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">{user.userName}</p>
-                    <p className="text-xs text-muted-foreground">{user.companyName} ({user.role})</p>
+                    <p className="text-xs text-muted-foreground">
+                        {user.role === 'SuperAdmin' ? 'Developer' : user.role === 'User' ? 'Tenant' : user.role}
+                    </p>
                   </div>
                   <Button variant="outline" size="sm" onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />
@@ -144,3 +149,5 @@ export function Header() {
     </>
   );
 }
+
+    

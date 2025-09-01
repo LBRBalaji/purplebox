@@ -3,183 +3,103 @@
 
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
-import { useData } from '@/contexts/data-context';
-import { PropertyForm } from "@/components/property-form";
-import { DemandForm } from "@/components/demand-form";
-import { DemandList } from "@/components/demand-list";
-import { MyDemands } from "@/components/my-demands";
-import { MySubmissions } from "@/components/my-submissions";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import { ShortlistedProperties } from '@/components/shortlisted-properties';
-import { Badge } from '@/components/ui/badge';
-import { AdminNotifier } from '@/components/admin-notifier';
-import { ApprovalQueue } from '@/components/approval-queue';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PlusCircle, List } from 'lucide-react';
+import Link from 'next/link';
+
+// Placeholder components that will be built out later
+const MyListings = () => (
+    <Card className="mt-6">
+        <CardHeader>
+            <div className="flex justify-between items-center">
+                <CardTitle>My Listings</CardTitle>
+                <Button asChild>
+                    <Link href="/dashboard/create-listing">
+                        <PlusCircle className="mr-2 h-4 w-4" /> Create New Listing
+                    </Link>
+                </Button>
+            </div>
+            <CardDescription>View and manage the status of your warehouse listings.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="text-center p-8 text-muted-foreground">
+                <p>Listing management interface will be displayed here.</p>
+            </div>
+        </CardContent>
+    </Card>
+);
+
+const TenantDashboard = () => (
+     <Card>
+        <CardHeader>
+            <CardTitle>Welcome, Tenant</CardTitle>
+            <CardDescription>
+                You can browse all available public listings.
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+             <Button asChild>
+                <Link href="/listings">
+                    <List className="mr-2 h-4 w-4" /> Browse Listings
+                </Link>
+            </Button>
+        </CardContent>
+     </Card>
+)
+
+const AdminDashboard = () => (
+    <Card>
+       <CardHeader>
+           <CardTitle>Admin Dashboard</CardTitle>
+           <CardDescription>
+               Manage listings, users, and platform settings from here.
+           </CardDescription>
+       </CardHeader>
+       <CardContent>
+           <div className="text-center p-8 text-muted-foreground">
+               <p>Admin-specific dashboard components will be displayed here.</p>
+               <p className="text-xs">(e.g., Approval Queue, User Management)</p>
+           </div>
+       </CardContent>
+    </Card>
+)
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { submissions } = useData();
-  const searchParams = useSearchParams();
-  const router = useRouter();
   
-  // For SuperAdmin (Property Provider)
-  const propertySubmitDemandId = searchParams.get('demandId');
-  
-  // For User (Customer)
-  const editDemandId = searchParams.get('editDemandId');
-  const logNewFromMap = searchParams.get('logNew');
-
-  const initialUserTab = editDemandId || logNewFromMap ? 'log-demand' : 'my-demands';
-  const [userActiveTab, setUserActiveTab] = React.useState(initialUserTab);
-
-  const newMatchCount = React.useMemo(() => {
-    if (!user) return 0;
-    // Customer only sees new matches that are APPROVED
-    return submissions.filter(s => s.isNew && s.demandUserEmail === user.email && s.status === 'Approved').length;
-  }, [submissions, user]);
-
-
-  React.useEffect(() => {
-    const editId = searchParams.get('editDemandId');
-    const newFromMap = searchParams.get('logNew');
-    if (editId || newFromMap) {
-      setUserActiveTab('log-demand');
-    }
-  }, [searchParams]);
-
-  const onDemandUpserted = () => {
-    setUserActiveTab('my-demands');
-  };
-
-  const isMainAdmin = user?.email === 'admin@example.com';
+  const isDeveloper = user?.role === 'SuperAdmin' && user.email !== 'admin@example.com';
+  const isAdmin = user?.role === 'SuperAdmin' && user.email === 'admin@example.com';
+  const isTenant = user?.role === 'User';
   const isO2O = user?.role === 'O2O';
 
-  if (isMainAdmin || isO2O) {
-    const adminTabs = isMainAdmin
-      ? [
-          { value: 'demands', label: 'Circulate Demands' },
-          { value: 'approvals', label: 'Approval Queue' },
-        ]
-      : [{ value: 'approvals', label: 'Approval Queue' }];
-    
-    const defaultTab = isMainAdmin ? "demands" : "approvals";
-
+  const renderContent = () => {
+    if (isDeveloper) {
+      return <MyListings />;
+    }
+    if (isTenant) {
+      return <TenantDashboard />;
+    }
+    if (isAdmin || isO2O) {
+      return <AdminDashboard />;
+    }
     return (
-      <>
-        <AdminNotifier />
-        <main className="container mx-auto p-4 md:p-8">
-          <div className="max-w-7xl mx-auto">
-             <Card>
-                <CardHeader>
-                    <CardTitle>{isMainAdmin ? 'Admin Dashboard' : 'O2O Dashboard'}</CardTitle>
-                    <CardDescription>
-                        {isMainAdmin 
-                            ? "Welcome, Admin. Your primary role is to circulate new demands and manage the submission approval queue."
-                            : "Welcome, O2O Manager. Your role is to manage warehouse listings and the submission approval queue."
-                        }
-                    </CardDescription>
-                </CardHeader>
-             </Card>
-             <Tabs defaultValue={defaultTab} className="w-full mt-6">
-                <TabsList className={`grid w-full grid-cols-${adminTabs.length}`}>
-                    {adminTabs.map(tab => (
-                        <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
-                    ))}
-                </TabsList>
-                {isMainAdmin && (
-                    <TabsContent value="demands">
-                        <DemandList />
-                    </TabsContent>
-                )}
-                <TabsContent value="approvals">
-                    <ApprovalQueue />
-                </TabsContent>
-             </Tabs>
-          </div>
-        </main>
-      </>
+        <Card>
+            <CardHeader>
+                <CardTitle>Loading...</CardTitle>
+                <CardDescription>Please wait while we load your dashboard.</CardDescription>
+            </CardHeader>
+        </Card>
     );
-  }
+  };
 
-  if (user?.role === 'User') {
-    return (
-      <main className="container mx-auto p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          <Tabs value={userActiveTab} onValueChange={setUserActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="log-demand">{editDemandId ? 'Edit Demand' : 'Log New Demand'}</TabsTrigger>
-              <TabsTrigger value="my-demands" className="relative">
-                My Demands & Matches
-                {newMatchCount > 0 && (
-                    <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0 animate-pulse">{newMatchCount}</Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="shortlisted">Shortlisted</TabsTrigger>
-            </TabsList>
-            <TabsContent value="log-demand">
-              <div className="mt-8">
-                <div className="mb-8">
-                  <h2 className="text-3xl font-bold font-headline tracking-tight">{editDemandId ? 'Edit Your Demand' : 'Log a Property Demand'}</h2>
-                  <p className="text-muted-foreground mt-2">{editDemandId ? 'Modify your requirements and priorities below.' : 'Describe your property requirements to get the best matches.'}</p>
-                </div>
-                <DemandForm onDemandLogged={onDemandUpserted} />
-              </div>
-            </TabsContent>
-            <TabsContent value="my-demands">
-              <MyDemands onSwitchTab={setUserActiveTab} newMatchCount={newMatchCount} />
-            </TabsContent>
-            <TabsContent value="shortlisted">
-              <ShortlistedProperties />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
-    );
-  }
-
-  if (user?.role === 'SuperAdmin') { // This now correctly handles Property Providers who are not the main admin
-    return (
-        <main className="container mx-auto p-4 md:p-8">
-          <div className="max-w-7xl mx-auto">
-            <Tabs defaultValue="view-demands" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="view-demands">
-                  {propertySubmitDemandId ? 'Submit Match' : 'Active Demands'}
-                </TabsTrigger>
-                <TabsTrigger value="my-submissions">My Submissions</TabsTrigger>
-              </TabsList>
-              <TabsContent value="view-demands">
-                {propertySubmitDemandId ? (
-                  <div className="mt-8">
-                      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
-                        <div>
-                          <h2 className="text-3xl font-bold font-headline tracking-tight">Submit a Matching Property</h2>
-                          <p className="text-muted-foreground mt-2">
-                            Submit against Demand ID: <span className="font-mono text-primary bg-primary/10 px-2 py-1 rounded-md">{propertySubmitDemandId}</span>
-                          </p>
-                        </div>
-                        <Button variant="outline" onClick={() => router.push('/dashboard')}>
-                          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Demands
-                        </Button>
-                      </div>
-                      <PropertyForm />
-                    </div>
-                ) : (
-                  <DemandList />
-                )}
-              </TabsContent>
-              <TabsContent value="my-submissions">
-                <MySubmissions />
-              </TabsContent>
-            </Tabs>
-          </div>
-        </main>
-    );
-  }
-
-  // Fallback for when user is not loaded yet, or has no role.
-  return null;
+  return (
+    <main className="container mx-auto p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        {renderContent()}
+      </div>
+    </main>
+  );
 }
+
+    

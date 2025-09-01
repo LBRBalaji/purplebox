@@ -2,11 +2,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { type DemandSchema, type PropertySchema } from '@/lib/schema';
+import { type DemandSchema, type PropertySchema, type ListingSchema } from '@/lib/schema';
 import { mockDemands, mockSubmissions } from '@/lib/mock-data';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
+export type ListingStatus = 'pending' | 'approved' | 'rejected';
+
 
 export type Submission = {
     demandId: string;
@@ -24,6 +26,13 @@ type DataEvent = {
 };
 
 type DataContextType = {
+  // New listing-centric state
+  listings: ListingSchema[];
+  addListing: (listing: ListingSchema) => void;
+  updateListing: (listing: ListingSchema) => void;
+  updateListingStatus: (listingId: string, status: ListingStatus) => void;
+
+  // Old demand-centric state (to be phased out)
   demands: DemandSchema[];
   addDemand: (demand: DemandSchema, userEmail?: string) => void;
   updateDemand: (demand: DemandSchema) => void;
@@ -41,7 +50,21 @@ type DataContextType = {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
+export type AgentLead = {
+  id: string;
+  agentType: 'Individual' | 'Company';
+  name: string;
+  companyName: string;
+  email: string;
+  phone: string;
+  address: string;
+  socialProfileId: string;
+  status: AgentStatus;
+};
+
+
 export function DataProvider({ children }: { children: ReactNode }) {
+  const [listings, setListings] = useState<ListingSchema[]>([]);
   const [demands, setDemands] = useState<DemandSchema[]>(mockDemands as DemandSchema[]);
   const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
@@ -54,10 +77,35 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (storedLeads) {
             setAgentLeads(JSON.parse(storedLeads));
         }
+        const storedListings = localStorage.getItem('warehouseorigin_listings');
+        if (storedListings) {
+            setListings(JSON.parse(storedListings));
+        }
     } catch (e) {
-        console.error("Failed to parse agent leads from local storage", e);
+        console.error("Failed to parse data from local storage", e);
     }
   }, []);
+
+  const persistListings = (updatedListings: ListingSchema[]) => {
+      setListings(updatedListings);
+      localStorage.setItem('warehouseorigin_listings', JSON.stringify(updatedListings));
+  }
+
+  const addListing = (listing: ListingSchema) => {
+    const newListings = [listing, ...listings];
+    persistListings(newListings);
+  }
+
+  const updateListing = (updatedListing: ListingSchema) => {
+    const newListings = listings.map(l => l.listingId === updatedListing.listingId ? updatedListing : l);
+    persistListings(newListings);
+  }
+
+  const updateListingStatus = (listingId: string, status: ListingStatus) => {
+    const newListings = listings.map(l => l.listingId === listingId ? { ...l, status } : l);
+    persistListings(newListings);
+  }
+
 
   const persistAgentLeads = (updatedLeads: AgentLead[]) => {
       setAgentLeads(updatedLeads);
@@ -154,7 +202,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <DataContext.Provider value={{ demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus }}>
+    <DataContext.Provider value={{ 
+        listings, addListing, updateListing, updateListingStatus,
+        demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus }}>
       {children}
     </DataContext.Provider>
   );
@@ -167,3 +217,5 @@ export function useData() {
   }
   return context;
 }
+
+    

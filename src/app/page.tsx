@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { Building, Sparkles, Map } from 'lucide-react';
+import { Building, Sparkles, Map, List } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LandingPage() {
@@ -20,11 +20,17 @@ export default function LandingPage() {
                   </div>
                   <p className="text-lg text-muted-foreground mt-2">Sourcing Simplified</p>
               </div>
-              <div className="mt-8">
+              <div className="mt-8 flex items-center justify-center gap-4">
                   <Link href="/map-search">
                       <Button size="lg">
                           <Map className="mr-2 h-5 w-5" />
-                          Browse Warehouses on Map
+                          Browse on Map
+                      </Button>
+                  </Link>
+                  <Link href="/listings">
+                      <Button size="lg" variant="outline">
+                          <List className="mr-2 h-5 w-5" />
+                          View All Listings
                       </Button>
                   </Link>
               </div>
@@ -32,3 +38,5 @@ export default function LandingPage() {
     </div>
   );
 }
+
+    

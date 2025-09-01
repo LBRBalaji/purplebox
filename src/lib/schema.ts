@@ -1,6 +1,93 @@
 
 import { z } from 'zod';
 
+export const documentSchema = z.object({
+  type: z.enum(["layout", "image", "video"]),
+  name: z.string(),
+  url: z.string().url(),
+});
+
+export const listingSchema = z.object({
+  // System Metadata
+  listingId: z.string(),
+  developerId: z.string(), // references userId
+  status: z.enum(['pending', 'approved', 'rejected']),
+  
+  // General Information
+  warehouseBoxId: z.string(),
+  name: z.string().min(1, "Warehouse name is required."),
+  location: z.string().min(1, "Location is required."),
+  sizeSqFt: z.coerce.number().positive("Size must be a positive number."),
+  description: z.string().optional(),
+  
+  // Commercial Terms
+  rentPerSqFt: z.coerce.number().positive("Rent must be a positive number.").optional(),
+  rentalSecurityDeposit: z.coerce.number().positive("Deposit must be positive.").optional(),
+  
+  // Availability & Progress
+  availabilityDate: z.string().min(1, "Availability date is required."),
+  constructionProgress: z.string().optional(),
+
+  // Area
+  area: z.object({
+    plinthArea: z.coerce.number().optional(),
+    mezzanineArea1: z.coerce.number().optional(),
+    mezzanineArea2: z.coerce.number().optional(),
+    canopyArea: z.coerce.number().optional(),
+    driversRestRoomArea: z.coerce.number().optional(),
+    totalChargeableArea: z.coerce.number().positive("Total area is required."),
+  }),
+
+  // Building Specifications
+  buildingSpecifications: z.object({
+    buildingType: z.string().optional(),
+    shopFloorLevelDimension: z.string().optional(),
+    mezzanineFloorLevelHeightAndDimension: z.string().optional(),
+    numberOfDocksAndShutters: z.coerce.number().optional(),
+    canopyDimension: z.string().optional(),
+    naturalLightingAndVentilation: z.string().optional(),
+    roofInsulationStatus: z.string().optional(),
+    internalLighting: z.string().optional(),
+  }),
+
+  // Site Specifications
+  siteSpecifications: z.object({
+    typeOfFlooringInside: z.string().optional(),
+    typeOfFlooringOutside: z.string().optional(),
+    typeOfRoad: z.string().optional(),
+  }),
+  
+  // Certificates & Approvals
+  certificatesAndApprovals: z.object({
+    parkApproval: z.boolean().default(false),
+    buildingApproval: z.boolean().default(false),
+    fireLicense: z.boolean().default(false),
+    fireNOC: z.boolean().default(false),
+    buildingInsurance: z.boolean().default(false),
+    pcbForAir: z.boolean().default(false),
+    pcbForWater: z.boolean().default(false),
+    propertyTax: z.boolean().default(false),
+  }),
+  
+  // Documents & Media
+  documents: z.array(documentSchema).optional(),
+
+  // Internal Developer/Project Details
+  developerName: z.string().optional(),
+  developerContactName: z.string().optional(),
+  developerMobile: z.string().optional(),
+  developerEmail: z.string().email().optional(),
+  developerWebsite: z.string().url().optional(),
+  projectName: z.string().optional(),
+  siteDetails: z.string().optional(),
+});
+
+export type ListingSchema = z.infer<typeof listingSchema>;
+
+
+// The old schemas are kept for now to prevent breaking existing components
+// They will be removed in subsequent steps.
+
 export const propertySchemaBase = z.object({
   propertyId: z.string(),
   isLocationConfirmed: z.boolean().refine(val => val === true, {
@@ -252,11 +339,5 @@ export const warehouseSchema = warehouseFormSchema.transform(data => {
 
 
 export type WarehouseSchema = z.infer<typeof warehouseSchema>;
-
-    
-
-    
-
-    
 
     
