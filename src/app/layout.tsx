@@ -7,8 +7,8 @@ import { DataProvider } from '@/contexts/data-context';
 import { Header } from '@/components/header';
 
 export const metadata: Metadata = {
-  title: 'WareHouse Origin: Sourcing Simplified',
-  description: 'Sourcing Simplified',
+  title: 'WareHouse Origin: Sourcing & Leasing Simplified',
+  description: 'Sourcing & Leasing Simplified',
 };
 
 function Footer() {

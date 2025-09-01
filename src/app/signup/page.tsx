@@ -54,7 +54,7 @@ export default function SignupPage() {
               </div>
               <h1 className="text-3xl font-bold font-headline text-primary">WareHouse Origin</h1>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Sourcing Simplified</p>
+            <p className="text-xs text-muted-foreground mt-1">Sourcing & Leasing Simplified</p>
           </div>
           <CardTitle className="text-2xl">Create an Account</CardTitle>
           <CardDescription>

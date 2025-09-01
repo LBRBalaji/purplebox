@@ -18,7 +18,7 @@ export default function LandingPage() {
                     </div>
                     <h1 className="text-5xl font-bold font-headline text-primary">WareHouse Origin</h1>
                   </div>
-                  <p className="text-lg text-muted-foreground mt-2">Sourcing Simplified</p>
+                  <p className="text-lg text-muted-foreground mt-2">Sourcing & Leasing Simplified</p>
               </div>
               <div className="mt-8 flex items-center justify-center gap-4">
                   <Link href="/map-search">

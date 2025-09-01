@@ -95,7 +95,7 @@ export function Header() {
               </div>
               <div>
                   <h1 className="text-xl font-bold font-headline text-primary">WareHouse Origin</h1>
-                  <p className="text-xs text-muted-foreground">Sourcing Simplified</p>
+                  <p className="text-xs text-muted-foreground">Sourcing & Leasing Simplified</p>
               </div>
           </Link>
           

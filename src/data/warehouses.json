@@ -50,7 +50,7 @@
   {
     "id": "WH-GND-E4F5",
     "locationName": "Guindy",
-    "isActive": false,
+    "isActive": true,
     "is3pl": false,
     "latLng": "13.0102, 80.2156",
     "generalizedLocation": {
