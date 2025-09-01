@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -23,6 +23,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { cn } from '@/lib/utils';
 
 
 const InfoPill = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) => (
@@ -33,12 +40,12 @@ const InfoPill = ({ icon: Icon, label, value }: { icon: React.ElementType, label
     </div>
 );
 
-const DetailRow = ({ label, value }: { label: string, value: string | number | boolean | undefined }) => {
+const DetailRow = ({ label, value, isBlurred }: { label: string, value: string | number | boolean | undefined, isBlurred?: boolean }) => {
     const displayValue = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : (value || 'Not specified');
     return (
         <div className="flex justify-between items-center py-2">
             <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-sm font-medium text-right">{String(displayValue)}</p>
+            <p className={cn("text-sm font-medium text-right", isBlurred && "blur-sm")}>{String(displayValue)}</p>
         </div>
     );
 };
@@ -338,12 +345,26 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                      {user ? (
                                         <div>
-                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
-                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
-                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
-                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
-                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
-                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <div className="space-y-1">
+                                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} isBlurred />
+                                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} isBlurred />
+                                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} isBlurred />
+                                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} isBlurred />
+                                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} isBlurred />
+                                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} isBlurred />
+                                                        </div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side="top" align="start">
+                                                        <div className="flex items-center gap-2 max-w-xs">
+                                                            <EyeOff className="h-4 w-4" />
+                                                            <p className="text-xs">This data is sensitive. It is blurred for viewing purposes and cannot be downloaded.</p>
+                                                        </div>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         </div>
                                      ) : (
                                          <p className="text-sm text-muted-foreground text-center p-4">
