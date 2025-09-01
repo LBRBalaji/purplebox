@@ -15,6 +15,8 @@ import { PropertyForm } from '@/components/property-form';
 import { AdminNotifier } from '@/components/admin-notifier';
 import { useSearchParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DemandForm } from '@/components/demand-form';
+import { ProviderListings } from '@/components/provider-listings';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -48,13 +50,15 @@ const MainDashboard = () => {
 
     const renderProviderContent = () => (
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
           <TabsTrigger value="my-submissions">My Submissions</TabsTrigger>
+           <TabsTrigger value="my-listings">My Listings & Performance</TabsTrigger>
           <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
         <TabsContent value="active-demands"><DemandList /></TabsContent>
         <TabsContent value="my-submissions"><MySubmissions /></TabsContent>
+        <TabsContent value="my-listings"><ProviderListings /></TabsContent>
         <TabsContent value="submit-match"><PropertyForm /></TabsContent>
       </Tabs>
     );

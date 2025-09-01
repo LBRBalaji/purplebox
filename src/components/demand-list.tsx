@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction, Lightbulb, MapPin } from 'lucide-react';
+import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction, Lightbulb, MapPin, Target } from 'lucide-react';
 import { useData } from '@/contexts/data-context';
 import type { DemandSchema, ListingSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +24,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { cn } from '@/lib/utils';
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
@@ -70,6 +71,7 @@ function DemandCard({ demand }: { demand: DemandSchema }) {
           
           if (!isNaN(demandLat) && !isNaN(demandLng)) {
               const matches = providerListings.filter(listing => {
+                  if(!listing.latLng) return false;
                   const [listingLat, listingLng] = (listing as any).latLng?.split(',').map(Number) ?? [0,0];
                   if (!isNaN(listingLat) && !isNaN(listingLng)) {
                       const distance = haversineDistance(
@@ -153,7 +155,7 @@ WareHouse Origin
   };
 
   return (
-    <Card className="flex flex-col">
+    <Card className={cn("flex flex-col", potentialMatches.length > 0 && "bg-green-50 border-green-200")}>
       <CardHeader>
         <CardTitle>{demand.demandId}</CardTitle>
         <CardDescription asChild>
@@ -198,7 +200,7 @@ WareHouse Origin
         )}
         {potentialMatches.length > 0 && (
           <div className="text-sm space-y-2 pt-3 mt-3 border-t">
-              <p className="font-semibold flex items-center gap-1.5 text-green-700"><Lightbulb className="h-4 w-4"/> Potential Match Found!</p>
+              <p className="font-semibold flex items-center gap-1.5 text-green-700"><Target className="h-4 w-4"/> Potential Match Found!</p>
               <div className="flex flex-wrap gap-1.5 pl-1">
                 <TooltipProvider>
                     {potentialMatches.map(match => (
