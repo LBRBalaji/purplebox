@@ -4,85 +4,107 @@
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { PlusCircle, List } from 'lucide-react';
 import Link from 'next/link';
+import { MyDemands } from '@/components/my-demands';
+import { MySubmissions } from '@/components/my-submissions';
+import { ShortlistedProperties } from '@/components/shortlisted-properties';
+import { DemandList } from '@/components/demand-list';
+import { PropertyForm } from '@/components/property-form';
+import { AdminNotifier } from '@/components/admin-notifier';
+import { useSearchParams } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-// Placeholder components that will be built out later
-const MyListings = () => (
-    <Card className="mt-6">
-        <CardHeader>
-            <div className="flex justify-between items-center">
-                <CardTitle>My Listings</CardTitle>
-                <Button asChild>
-                    <Link href="/dashboard/create-listing">
-                        <PlusCircle className="mr-2 h-4 w-4" /> Create New Listing
-                    </Link>
-                </Button>
-            </div>
-            <CardDescription>View and manage the status of your warehouse listings.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div className="text-center p-8 text-muted-foreground">
-                <p>Listing management interface will be displayed here.</p>
-            </div>
-        </CardContent>
-    </Card>
-);
+const MainDashboard = () => {
+    const { user } = useAuth();
+    const searchParams = useSearchParams();
+    const logNewDemand = searchParams.get('logNew') === 'true';
+    const editDemandId = searchParams.get('editDemandId');
+    const propertyMatchDemandId = searchParams.get('demandId');
 
-const TenantDashboard = () => (
-     <Card>
-        <CardHeader>
-            <CardTitle>Welcome, Tenant</CardTitle>
-            <CardDescription>
-                You can browse all available public listings.
-            </CardDescription>
-        </CardHeader>
-        <CardContent>
-             <Button asChild>
-                <Link href="/listings">
-                    <List className="mr-2 h-4 w-4" /> Browse Listings
-                </Link>
-            </Button>
-        </CardContent>
-     </Card>
-)
+    const isProvider = user?.role === 'SuperAdmin' && user.email !== 'admin@example.com';
+    const isAdmin = user?.email === 'admin@example.com';
+    const isTenant = user?.role === 'User';
+    const isO2O = user?.role === 'O2O';
 
-const AdminDashboard = () => (
-    <Card>
-       <CardHeader>
-           <CardTitle>Admin Dashboard</CardTitle>
-           <CardDescription>
-               Manage listings, users, and platform settings from here.
-           </CardDescription>
-       </CardHeader>
-       <CardContent>
-           <div className="text-center p-8 text-muted-foreground">
-               <p>Admin-specific dashboard components will be displayed here.</p>
-               <p className="text-xs">(e.g., Approval Queue, User Management)</p>
-           </div>
-       </CardContent>
-    </Card>
-)
+    const [activeTab, setActiveTab] = React.useState('active-demands');
+    const [myDemandsTab, setMyDemandsTab] = React.useState('my-demands');
+    const [newMatchCount, setNewMatchCount] = React.useState(0); // This would be derived from data context in a real app
 
-export default function DashboardPage() {
-  const { user } = useAuth();
-  
-  const isDeveloper = user?.role === 'SuperAdmin' && user.email !== 'admin@example.com';
-  const isAdmin = user?.role === 'SuperAdmin' && user.email === 'admin@example.com';
-  const isTenant = user?.role === 'User';
-  const isO2O = user?.role === 'O2O';
+    const handleSwitchToMyDemands = React.useCallback(() => {
+        setMyDemandsTab('my-demands');
+    }, []);
 
-  const renderContent = () => {
-    if (isDeveloper) {
-      return <MyListings />;
+    // Effect to switch tab based on URL params
+    React.useEffect(() => {
+      if (logNewDemand || editDemandId) {
+        setMyDemandsTab('log-demand');
+      } else if (propertyMatchDemandId) {
+        setActiveTab('submit-match');
+      }
+    }, [logNewDemand, editDemandId, propertyMatchDemandId]);
+
+
+    const renderProviderContent = () => (
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
+          <TabsTrigger value="my-submissions">My Submissions</TabsTrigger>
+          <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
+        </TabsList>
+        <TabsContent value="active-demands"><DemandList /></TabsContent>
+        <TabsContent value="my-submissions"><MySubmissions /></TabsContent>
+        <TabsContent value="submit-match"><PropertyForm /></TabsContent>
+      </Tabs>
+    );
+
+    const renderTenantContent = () => (
+      <Tabs value={myDemandsTab} onValueChange={setMyDemandsTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="my-demands">My Demands & Matches {newMatchCount > 0 && <span className="ml-2 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">{newMatchCount}</span>}</TabsTrigger>
+          <TabsTrigger value="log-demand">Log New Demand</TabsTrigger>
+          <TabsTrigger value="shortlisted">Shortlisted</TabsTrigger>
+        </TabsList>
+        <TabsContent value="my-demands">
+            <MyDemands onSwitchTab={setMyDemandsTab} newMatchCount={newMatchCount} />
+        </TabsContent>
+        <TabsContent value="log-demand">
+          <DemandForm onDemandLogged={handleSwitchToMyDemands} />
+        </TabsContent>
+        <TabsContent value="shortlisted">
+            <ShortlistedProperties />
+        </TabsContent>
+      </Tabs>
+    );
+
+    const renderAdminContent = () => (
+        <Card>
+            <CardHeader>
+                <CardTitle>O2O Manager Dashboard</CardTitle>
+                <CardDescription>
+                    Manage listings, users, and platform settings from the navigation menu.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="text-center p-8 text-muted-foreground">
+                    <p>Admin-specific dashboard components are available in the header.</p>
+                     <p className="text-xs mt-2">(e.g., Approval Queue, User Management, Analytics)</p>
+                </div>
+            </CardContent>
+        </Card>
+    );
+    
+    if (isProvider) {
+        return renderProviderContent();
     }
     if (isTenant) {
-      return <TenantDashboard />;
+        return renderTenantContent();
     }
     if (isAdmin || isO2O) {
-      return <AdminDashboard />;
+        return renderAdminContent();
     }
+
     return (
         <Card>
             <CardHeader>
@@ -91,15 +113,18 @@ export default function DashboardPage() {
             </CardHeader>
         </Card>
     );
-  };
+};
 
+
+export default function DashboardPage() {
   return (
     <main className="container mx-auto p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        {renderContent()}
+        <React.Suspense fallback={<div>Loading...</div>}>
+            <MainDashboard />
+        </React.Suspense>
+        <AdminNotifier />
       </div>
     </main>
   );
 }
-
-    

@@ -47,8 +47,7 @@ const NavLink = ({ href, children }: { href: string, children: React.ReactNode }
 export function Header() {
   const { user, logout, isLoading } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
-  const isAdmin = user?.role === 'SuperAdmin' && user.email === 'admin@example.com';
-  const isDeveloper = user?.role === 'SuperAdmin';
+  const isAdmin = user?.email === 'admin@example.com';
   const isO2O = user?.role === 'O2O';
 
 
@@ -129,7 +128,7 @@ export function Header() {
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">{user.userName}</p>
                     <p className="text-xs text-muted-foreground">
-                        {user.role === 'SuperAdmin' ? 'Developer' : user.role === 'User' ? 'Tenant' : user.role}
+                        {user.role === 'SuperAdmin' ? 'Property Provider' : user.role === 'User' ? 'Customer' : user.role}
                     </p>
                   </div>
                   <Button variant="outline" size="sm" onClick={logout}>
@@ -149,5 +148,3 @@ export function Header() {
     </>
   );
 }
-
-    

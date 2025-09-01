@@ -77,7 +77,7 @@ export default function SignupPage() {
                         htmlFor="role-user"
                         className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                     >
-                        Demand Customer
+                        Customer (Tenant)
                     </Label>
                     </div>
                     <div>
