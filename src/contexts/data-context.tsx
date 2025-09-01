@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { type DemandSchema, type PropertySchema, type ListingSchema, type WarehouseSchema } from '@/lib/schema';
 import { type User } from './auth-context';
+import { useToast } from '@/hooks/use-toast';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -82,7 +83,7 @@ type DataContextType = {
   // Download tracking
   logDownload: (userId: string, listing: WarehouseSchema) => { success: boolean; limitReached: boolean };
   selectedForDownload: WarehouseSchema[];
-  toggleSelectedForDownload: (listing: WarehouseSchema) => void;
+  toggleSelectedForDownload: (listing: WarehouseSchema, user: User | null) => void;
   clearSelectedForDownload: () => void;
   getTodaysDownloadsForLocation: (userId: string, location: string) => number;
 };
@@ -103,6 +104,7 @@ export type AgentLead = {
 
 
 export function DataProvider({ children }: { children: ReactNode }) {
+  const { toast } = useToast();
   const [listings, setListings] = useState<ListingSchema[]>([]);
   const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>([]);
   const [demands, setDemands] = useState<DemandSchema[]>([]);
@@ -360,15 +362,44 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const toggleSelectedForDownload = (listing: WarehouseSchema) => {
-    setSelectedForDownload(prev => {
-        const isSelected = prev.find(item => item.id === listing.id);
-        if (isSelected) {
-            return prev.filter(item => item.id !== listing.id);
-        } else {
-            return [...prev, listing];
-        }
-    });
+  const toggleSelectedForDownload = (listing: WarehouseSchema, user: User | null) => {
+    const isSelected = selectedForDownload.find(item => item.id === listing.id);
+
+    if (isSelected) {
+      // If it's already selected, remove it
+      setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
+    } else {
+      // If it's not selected, check the limit before adding it
+      if (!user) {
+          // This case should be handled by the UI, but as a fallback:
+          toast({ variant: 'destructive', title: 'Login Required', description: 'You must be logged in to select properties for download.' });
+          return;
+      }
+      
+      const todaysDownloads = getTodaysDownloadsForLocation(user.email, listing.locationName);
+      if (todaysDownloads >= 3) {
+          toast({
+              variant: 'destructive',
+              title: `Download Limit Reached for ${listing.locationName}`,
+              description: `You have already downloaded 3 properties from this location today. Please try again tomorrow.`,
+          });
+          return; // Block selection
+      }
+
+      // Check if adding this selection would exceed the limit when combined with already selected items from the same location
+      const alreadySelectedFromLocation = selectedForDownload.filter(l => l.locationName === listing.locationName).length;
+      if (todaysDownloads + alreadySelectedFromLocation >= 3) {
+        toast({
+              variant: 'destructive',
+              title: `Selection Limit for ${listing.locationName}`,
+              description: `You can only select a total of 3 properties from the same location per day. You have already downloaded ${todaysDownloads} and selected ${alreadySelectedFromLocation}.`,
+          });
+          return; // Block selection
+      }
+
+      // If limit is not reached, add it to selection
+      setSelectedForDownload(prev => [...prev, listing]);
+    }
   };
 
   const clearSelectedForDownload = () => {
