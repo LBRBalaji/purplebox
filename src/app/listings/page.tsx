@@ -20,10 +20,11 @@ import { cn } from '@/lib/utils';
 import { LoginDialog } from '@/components/login-dialog';
 import { LimitExceededDialog } from '@/components/limit-exceeded-dialog';
 import { Badge } from '@/components/ui/badge';
+import { type ListingSchema } from '@/lib/schema';
 
 
-function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
-  const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
+function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
+  const previewImage = listing.documents?.[0]?.url || 'https://placehold.co/600x400.png';
 
   return (
     <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary")}>
@@ -32,7 +33,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
           <div className="aspect-video relative mb-4 flex-grow">
             <Image
               src={previewImage}
-              alt={listing.locationName}
+              alt={listing.name}
               fill
               className="rounded-t-lg object-cover"
               data-ai-hint="modern warehouse"
@@ -41,44 +42,44 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
           <Checkbox
             checked={isSelected}
             onCheckedChange={() => onSelectionChange(listing)}
-            aria-label={`Select warehouse ${listing.id}`}
+            aria-label={`Select warehouse ${listing.listingId}`}
             className="w-5 h-5"
           />
         </div>
         <div className="flex items-center justify-between">
-            <CardTitle>{listing.locationName}</CardTitle>
-            {listing.is3pl && (
+            <CardTitle>{listing.name}</CardTitle>
+            {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
                 <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20">
                     <Star className="mr-1.5 h-3 w-3" />
                     3PL Operated
                 </Badge>
             )}
         </div>
-        <CardDescription>ID: {listing.id}</CardDescription>
+        <CardDescription>ID: {listing.listingId}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
         <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
                 <Scaling className="h-4 w-4 text-primary" />
-                <span>{listing.size.toLocaleString()} sq. ft.</span>
+                <span>{listing.sizeSqFt.toLocaleString()} sq. ft.</span>
             </div>
             <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-primary" />
-                <span>{listing.specifications.flooringType || 'N/A'}</span>
+                <span>{listing.buildingSpecifications.buildingType || 'N/A'}</span>
             </div>
             <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
-                <span className="truncate">{listing.locationName}</span>
+                <span className="truncate">{listing.location}</span>
             </div>
             <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-primary" />
-                <span>{listing.readiness}</span>
+                <span>{listing.availabilityDate}</span>
             </div>
         </div>
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full">
-            <Link href={`/listings/${listing.id}`}>
+            <Link href={`/listings/${listing.listingId}`}>
                 View Details <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
         </Button>
@@ -123,12 +124,12 @@ function DownloadBar() {
         const { success } = logDownload(user!.email!);
         if (success) {
             const dataToExport = selectedForDownload.map(l => ({
-                'Property ID': l.id,
-                'Size (Sq. Ft.)': l.size,
-                'Readiness': l.readiness,
-                'Docks': l.specifications.docks,
-                'Ceiling Height (ft)': l.specifications.ceilingHeight,
-                'Flooring Type': l.specifications.flooringType,
+                'Property ID': l.listingId,
+                'Name': l.name,
+                'Location': l.location,
+                'Size (Sq. Ft.)': l.sizeSqFt,
+                'Availability': l.availabilityDate,
+                'Rent (per Sq. Ft.)': l.rentPerSqFt || 'Contact for details',
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -175,8 +176,8 @@ function DownloadBar() {
 export default function ListingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [allWarehouses, setAllWarehouses] = useState<WarehouseSchema[]>([]);
-  const [filteredListings, setFilteredListings] = useState<WarehouseSchema[]>([]);
+  const { listings: allListings, selectedForDownload, toggleSelectedForDownload } = useData();
+  const [filteredListings, setFilteredListings] = useState<ListingSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
@@ -184,71 +185,51 @@ export default function ListingsPage() {
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   
-  const { selectedForDownload, toggleSelectedForDownload } = useData();
-  const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.id)), [selectedForDownload]);
+  const approvedListings = useMemo(() => allListings.filter(l => l.status === 'approved'), [allListings]);
 
-  const uniqueLocations = useMemo(() => {
-    const locations = new Set(allWarehouses.map(l => l.locationName));
-    return Array.from(locations);
-  }, [allWarehouses]);
-  
-  useEffect(() => {
-    fetch('/api/warehouses')
-      .then(res => res.json())
-      .then(data => {
-          const activeWarehouses = data.filter((w: WarehouseSchema) => w.isActive);
-          setAllWarehouses(activeWarehouses);
-          setFilteredListings(activeWarehouses);
-          
-          const maxArea = Math.max(...activeWarehouses.map((w: WarehouseSchema) => w.size), 0);
-          if (maxArea > 0) {
-            setSizeRange([0, Math.ceil(maxArea / 100000) * 100000]);
-          }
-      });
-  }, []);
+  const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.listingId)), [selectedForDownload]);
 
   useEffect(() => {
-    let results = allWarehouses;
+    let results = approvedListings;
 
     if (searchTerm) {
         results = results.filter(listing => {
             const searchHaystack = [
-                listing.locationName,
-                listing.id,
-                listing.readiness,
-                listing.specifications.flooringType,
-                listing.size.toString(),
-                listing.specifications.ceilingHeight.toString(),
-                listing.specifications.docks.toString(),
-                listing.is3pl ? "3pl operated" : ""
+                listing.name,
+                listing.location,
+                listing.listingId,
+                listing.availabilityDate,
+                listing.buildingSpecifications.buildingType,
+                listing.sizeSqFt.toString(),
+                (listing.serviceModel === '3PL' || listing.serviceModel === 'Both') ? "3pl operated" : ""
             ].join(' ').toLowerCase();
             return searchHaystack.includes(searchTerm.toLowerCase());
         });
     }
 
     if (availability !== 'all') {
-        results = results.filter(l => l.readiness === availability);
+        results = results.filter(l => l.availabilityDate === availability);
     }
     
-    results = results.filter(l => l.size >= sizeRange[0] && l.size <= sizeRange[1]);
+    results = results.filter(l => l.sizeSqFt >= sizeRange[0] && l.sizeSqFt <= sizeRange[1]);
 
     setFilteredListings(results);
 
     // Store search results in session storage for detail page navigation
     try {
-        const resultIds = results.map(r => r.id);
+        const resultIds = results.map(r => r.listingId);
         sessionStorage.setItem('warehouse_search_results', JSON.stringify(resultIds));
     } catch (e) {
         console.error("Could not write to sessionStorage", e);
     }
-  }, [searchTerm, availability, sizeRange, allWarehouses]);
+  }, [searchTerm, availability, sizeRange, approvedListings]);
 
 
   const resetFilters = () => {
     setSearchTerm('');
     setAvailability('all');
     
-    const maxArea = Math.max(...allWarehouses.map(w => w.size), 0);
+    const maxArea = Math.max(...approvedListings.map(w => w.sizeSqFt), 0);
     if (maxArea > 0) {
         setSizeRange([0, Math.ceil(maxArea / 100000) * 100000]);
     } else {
@@ -257,11 +238,11 @@ export default function ListingsPage() {
   }
 
   const maxSliderSize = useMemo(() => {
-    const max = Math.max(...allWarehouses.map(w => w.size), 0);
+    const max = Math.max(...approvedListings.map(w => w.sizeSqFt), 0);
     return max > 0 ? Math.ceil(max / 100000) * 100000 : 1000000;
-  }, [allWarehouses]);
+  }, [approvedListings]);
 
-  const handleSelectionChange = (listing: WarehouseSchema) => {
+  const handleSelectionChange = (listing: ListingSchema) => {
     if (!user) {
       setIsLoginOpen(true);
       return;
@@ -279,7 +260,7 @@ export default function ListingsPage() {
     
     const { limitReached } = toggleSelectedForDownload(listing);
     if (limitReached) {
-      setLimitExceededLocation(listing.locationName); // Use locationName for the dialog
+      setLimitExceededLocation(listing.location); // Use locationName for the dialog
       setIsLimitExceededDialogOpen(true);
     }
   };
@@ -374,9 +355,9 @@ export default function ListingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredListings.map(listing => (
                         <ListingCard 
-                            key={listing.id} 
+                            key={listing.listingId} 
                             listing={listing} 
-                            isSelected={selectedIds.has(listing.id)}
+                            isSelected={selectedIds.has(listing.listingId)}
                             onSelectionChange={handleSelectionChange}
                         />
                     ))}
@@ -404,5 +385,3 @@ export default function ListingsPage() {
     </>
   );
 }
-
-    

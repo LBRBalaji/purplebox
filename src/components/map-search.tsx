@@ -21,6 +21,7 @@ import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Badge } from './ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useData } from '@/contexts/data-context';
 
 type RegionalSummary = {
     regionName: string;
@@ -228,6 +229,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const geometry = useMapsLibrary('geometry');
   const router = useRouter();
   const { user } = useAuth();
+  const { listings } = useData(); // Use live data from context
   
   const [warehouses, setWarehouses] = React.useState<WarehouseSchema[]>([]);
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
@@ -249,12 +251,32 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [measureMarkers, setMeasureMarkers] = React.useState<google.maps.Marker[]>([]);
   const [totalDistance, setTotalDistance] = React.useState(0);
 
+  // Filter listings to only show approved ones
   React.useEffect(() => {
-    fetch('/api/warehouses')
-      .then(res => res.json())
-      .then(data => setWarehouses(data.filter((w: WarehouseSchema) => w.isActive)))
-      .catch(err => console.error("Failed to fetch warehouses", err));
-  }, []);
+    const approvedListings = listings
+        .filter(l => l.status === 'approved')
+        .map(l => ({
+            id: l.listingId,
+            locationName: l.location,
+            isActive: true, // Only approved are considered active for the map
+            is3pl: l.serviceModel === '3PL' || l.serviceModel === 'Both',
+            generalizedLocation: {
+                lat: parseFloat(l.latLng?.split(',')[0] || '0'),
+                lng: parseFloat(l.latLng?.split(',')[1] || '0')
+            },
+            size: l.sizeSqFt,
+            readiness: l.availabilityDate,
+            specifications: {
+                ceilingHeight: l.buildingSpecifications.numberOfDocksAndShutters, // Placeholder
+                docks: l.buildingSpecifications.numberOfDocksAndShutters, // Placeholder
+                officeSpace: true, // Placeholder
+                flooringType: l.siteSpecifications.typeOfFlooringInside
+            },
+            imageUrls: l.documents?.filter(d => d.type === 'image').map(d => d.url) || []
+        }));
+
+    setWarehouses(approvedListings);
+  }, [listings]);
 
   // Init marker clusterer
   React.useEffect(() => {
@@ -331,7 +353,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         const readinessCounts = nearbyWarehouses.reduce((acc, w) => {
             if (w.readiness === 'Ready for Occupancy') acc.ready++;
             else if (w.readiness === 'Available in 3 months') acc.soon++;
-            else if (w.readiness === 'Under Construction') acc.underConstruction++;
+            else if (w.readiness === 'Under Construction' || w.readiness === '2025-Q1') acc.underConstruction++;
             return acc;
         }, { ready: 0, soon: 0, underConstruction: 0 });
 
@@ -592,5 +614,3 @@ export function MapSearch({ mapId }: { mapId: string }) {
     </div>
   );
 }
-
-    
