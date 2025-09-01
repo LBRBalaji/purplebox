@@ -83,7 +83,7 @@ type DataContextType = {
   // Download tracking
   logDownload: (userId: string, listing: WarehouseSchema) => { success: boolean; limitReached: boolean };
   selectedForDownload: WarehouseSchema[];
-  toggleSelectedForDownload: (listing: WarehouseSchema) => void;
+  toggleSelectedForDownload: (listing: WarehouseSchema) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
   getTodaysDownloadsForLocation: (userId: string, location: string) => number;
 };
@@ -362,16 +362,29 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const toggleSelectedForDownload = (listing: WarehouseSchema) => {
-    setSelectedForDownload(prev => {
-      const isSelected = prev.find(item => item.id === listing.id);
-      if (isSelected) {
-        return prev.filter(item => item.id !== listing.id);
-      } else {
-        return [...prev, listing];
-      }
-    });
-  };
+  const toggleSelectedForDownload = (listing: WarehouseSchema, user?: User | null): { limitReached: boolean } => {
+    // This function is now only called for authenticated 'User' roles
+    const isSelected = selectedForDownload.find(item => item.id === listing.id);
+
+    if (isSelected) {
+      // If it's already selected, allow deselection
+      setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
+      return { limitReached: false };
+    }
+
+    // If not selected, check the limit before adding
+    const todaysDownloads = user ? getTodaysDownloadsForLocation(user.email, listing.locationName) : 0;
+    const selectedFromLocation = selectedForDownload.filter(l => l.locationName === listing.locationName).length;
+    
+    if (todaysDownloads + selectedFromLocation >= 3) {
+      return { limitReached: true };
+    }
+
+    // If limit is not reached, add to selection
+    setSelectedForDownload(prev => [...prev, listing]);
+    return { limitReached: false };
+};
+
 
   const clearSelectedForDownload = () => {
     setSelectedForDownload([]);

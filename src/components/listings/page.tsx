@@ -1,12 +1,12 @@
 
 'use client';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useData } from '@/contexts/data-context';
 import type { WarehouseSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Check, Download, MapPin, Scaling, Search, SlidersHorizontal, Trash2, X, AlertTriangle, LogIn } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Download, MapPin, Scaling, Search, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -18,30 +18,14 @@ import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { LoginDialog } from '../login-dialog';
+import { LimitExceededDialog } from '../limit-exceeded-dialog';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
   const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
-  const { user } = useAuth();
-  const { getTodaysDownloadsForLocation, selectedForDownload } = useData();
-  const [isDisabled, setIsDisabled] = useState(false);
-
-  useEffect(() => {
-    if (user?.role === 'User') {
-      const todaysDownloads = getTodaysDownloadsForLocation(user.email, listing.locationName);
-      const selectedFromLocation = selectedForDownload.filter(l => l.locationName === listing.locationName).length;
-      // Disable if the user tries to select a 4th item, OR if they have already downloaded 3 and this one is not among those selected.
-      if (todaysDownloads + selectedFromLocation >= 3 && !isSelected) {
-        setIsDisabled(true);
-      } else {
-        setIsDisabled(false);
-      }
-    }
-  }, [user, listing.locationName, getTodaysDownloadsForLocation, selectedForDownload, isSelected]);
-
 
   return (
-    <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary", isDisabled && "opacity-50")}>
+    <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary")}>
        <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="aspect-video relative mb-4 flex-grow">
@@ -53,12 +37,11 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
               data-ai-hint="modern warehouse"
             />
           </div>
-           <Checkbox
+          <Checkbox
             checked={isSelected}
             onCheckedChange={() => onSelectionChange(listing)}
             aria-label={`Select warehouse ${listing.id}`}
             className="w-5 h-5"
-            disabled={isDisabled && !isSelected}
           />
         </div>
         <CardTitle>{listing.locationName}</CardTitle>
@@ -107,7 +90,6 @@ function DownloadBar() {
     
     const handleLoginSuccess = () => {
         setIsLoginOpen(false);
-        // The user can now proceed with their download. No need to re-trigger.
         toast({
             title: "Logged In Successfully",
             description: "You can now proceed with your download."
@@ -117,6 +99,15 @@ function DownloadBar() {
     const handleDownload = () => {
         if (!user) {
             setIsLoginOpen(true);
+            return;
+        }
+
+        if (user.role !== 'User') {
+            toast({
+                variant: 'destructive',
+                title: 'Download Not Available',
+                description: 'Only Customer accounts can download listings.'
+            });
             return;
         }
 
@@ -163,7 +154,6 @@ function DownloadBar() {
             });
         }
         
-        // This clears the entire selection bar after attempting a download.
         clearSelectedForDownload();
     }
 
@@ -198,6 +188,8 @@ export default function ListingsPage() {
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
+  const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   
   const { selectedForDownload, toggleSelectedForDownload } = useData();
   const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.id)), [selectedForDownload]);
@@ -284,17 +276,24 @@ export default function ListingsPage() {
           toast({
               variant: 'destructive',
               title: 'Download Not Available',
-              description: 'Only Customer accounts can select and download listings.'
-          })
+              description: 'While you can browse listings, only Customer accounts are permitted to select and download property details.'
+          });
           return;
       }
-      toggleSelectedForDownload(listing, user);
+      const { limitReached } = toggleSelectedForDownload(listing);
+      if (limitReached) {
+        setLimitExceededLocation(listing.locationName);
+        setIsLimitExceededDialogOpen(true);
+      }
   }
 
   const handleLoginSuccess = () => {
       setIsLoginOpen(false);
+      toast({
+          title: "Logged In Successfully",
+          description: "You can now select properties to download."
+      });
   }
-
 
   return (
     <>
@@ -381,7 +380,7 @@ export default function ListingsPage() {
                             key={listing.id} 
                             listing={listing} 
                             isSelected={selectedIds.has(listing.id)}
-                            onSelectionChange={() => handleSelectionChange(listing)}
+                            onSelectionChange={handleSelectionChange}
                         />
                     ))}
                 </div>
@@ -398,8 +397,13 @@ export default function ListingsPage() {
             )}
         </div>
     </main>
-    {user?.role === 'User' && <DownloadBar />}
+    <DownloadBar />
      <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess} />
+     <LimitExceededDialog 
+        isOpen={isLimitExceededDialogOpen} 
+        onOpenChange={setIsLimitExceededDialogOpen}
+        location={limitExceededLocation || ''}
+      />
     </>
   );
 }
