@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling } from 'lucide-react';
 import Image from 'next/image';
 import { LoginDialog } from '@/components/login-dialog';
 import {
