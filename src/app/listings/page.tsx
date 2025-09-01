@@ -48,7 +48,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
           />
         </div>
         <div className="flex items-center justify-between">
-            <CardTitle>{listing.name}</CardTitle>
+            <CardTitle>{listing.location}</CardTitle>
             {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
                 <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20">
                     <Star className="mr-1.5 h-3 w-3" />
