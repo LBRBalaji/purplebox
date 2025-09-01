@@ -28,6 +28,7 @@ export const listingSchema = z.object({
   // Availability & Progress
   availabilityDate: z.string().min(1, "Availability date is required."),
   constructionProgress: z.string().optional(),
+  serviceModel: z.enum(['Standard', '3PL', 'Both']).optional(),
 
   // Area
   area: z.object({
@@ -53,7 +54,6 @@ export const listingSchema = z.object({
 
   // Site Specifications
   siteSpecifications: z.object({
-    siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project', '3PL Operated Warehouse']).optional(),
     typeOfFlooringInside: z.string().optional(),
     typeOfFlooringOutside: z.string().optional(),
     typeOfRoad: z.string().optional(),
@@ -121,7 +121,7 @@ export const propertySchemaBase = z.object({
   userPhoneNumber: z.string().min(1, 'Phone number is required.'),
   userEmail: z.string().email('Invalid email address.'),
   
-  siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project', '3PL Operated Warehouse']),
+  serviceModel: z.enum(['Standard', '3PL', 'Both']).optional(),
   safety: z.enum(['Fully Compounded', 'Partially Compounded', '3-Side Compounded', 'Not Compounded']),
   approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']),
   genSetBackup: z.enum(['Available', 'Can be provided']),

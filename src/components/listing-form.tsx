@@ -67,6 +67,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
       rentalSecurityDeposit: undefined,
       availabilityDate: 'Ready for Occupancy',
       constructionProgress: '',
+      serviceModel: 'Standard',
       area: {
         plinthArea: undefined,
         mezzanineArea1: undefined,
@@ -235,16 +236,16 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                      <div className="space-y-4">
                         <FormLabel className="text-lg font-semibold">Site Specifications</FormLabel>
                         <div className="space-y-4 p-4 border rounded-md">
-                            <FormField control={form.control} name="siteSpecifications.siteType" render={({ field }) => (
+                            <FormField control={form.control} name="serviceModel" render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Site Type</FormLabel>
+                                    <FormLabel>Service Model</FormLabel>
+                                    <FormDescription>How can this warehouse be leased?</FormDescription>
                                     <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Select site type"/></SelectTrigger></FormControl>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Select service model"/></SelectTrigger></FormControl>
                                         <SelectContent>
-                                            <SelectItem value="Standalone">Standalone</SelectItem>
-                                            <SelectItem value="Part of Industrial Park">Part of Industrial Park</SelectItem>
-                                            <SelectItem value="Part of Commercial Project">Part of Commercial Project</SelectItem>
-                                            <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
+                                            <SelectItem value="Standard">Standard Warehouse</SelectItem>
+                                            <SelectItem value="3PL">3PL Operated</SelectItem>
+                                            <SelectItem value="Both">Both Standard and 3PL</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />

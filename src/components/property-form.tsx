@@ -255,7 +255,7 @@ function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | und
         userEmail: user?.email || "",
 
         o2oDealDemandId: demand?.demandId,
-        siteType: listing.siteSpecifications.siteType || "Part of Industrial Park",
+        serviceModel: listing.serviceModel,
         safety: "Fully Compounded", // default
         approvalAuthority: "DTCP", // default
         genSetBackup: "Available", // default
@@ -304,7 +304,7 @@ export function PropertyForm() {
       size: undefined,
       floor: "Ground",
       readinessToOccupy: "Immediate",
-      siteType: "Standalone",
+      serviceModel: "Standard",
       buildingType: undefined,
       safety: "Fully Compounded",
       ceilingHeight: undefined,
@@ -547,16 +547,16 @@ export function PropertyForm() {
                         <FormMessage />
                         </FormItem>
                     )} />
-                     <FormField control={form.control} name="siteType" render={({ field }) => (
+                     <FormField control={form.control} name="serviceModel" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Site Type</FormLabel>
+                            <FormLabel>Service Model</FormLabel>
+                            <FormDescription>Classify the service model for this property.</FormDescription>
                             <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl><SelectTrigger><SelectValue placeholder="Select site type"/></SelectTrigger></FormControl>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select service model"/></SelectTrigger></FormControl>
                                 <SelectContent>
-                                    <SelectItem value="Standalone">Standalone</SelectItem>
-                                    <SelectItem value="Part of Industrial Park">Part of Industrial Park</SelectItem>
-                                    <SelectItem value="Part of Commercial Project">Part of Commercial Project</SelectItem>
-                                    <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
+                                    <SelectItem value="Standard">Standard Warehouse</SelectItem>
+                                    <SelectItem value="3PL">3PL Operated</SelectItem>
+                                    <SelectItem value="Both">Both</SelectItem>
                                 </SelectContent>
                             </Select>
                             <FormMessage />
