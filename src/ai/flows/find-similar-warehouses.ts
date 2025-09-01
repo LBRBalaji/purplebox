@@ -74,10 +74,12 @@ const findSimilarWarehousesFlow = ai.defineFlow(
         ai.embed({ model: embeddingModel, content: warehouseDocs }),
     ]);
 
+    const queryEmbedding = queryEmbeddingResponse;
+
     // 3. Calculate similarities and rank
     const similarities = warehouseEmbeddingsResponse.map((docEmbedding, i) => ({
         index: i,
-        similarity: cosineSimilarity(queryEmbeddingResponse, docEmbedding),
+        similarity: cosineSimilarity(queryEmbedding, docEmbedding),
     }));
 
     similarities.sort((a, b) => b.similarity - a.similarity);
