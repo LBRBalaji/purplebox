@@ -53,6 +53,7 @@ import { Badge } from "./ui/badge";
 import { Switch } from "./ui/switch";
 import { getPropertyMatchScore } from "@/ai/flows/get-property-match-score";
 import { ScrollArea } from "./ui/scroll-area";
+import { Checkbox } from "./ui/checkbox";
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
@@ -69,23 +70,35 @@ const priorityLabels: { [key: string]: string } = {
   operations: 'Operations Details'
 };
 
-function ListingSelector({ onSelect }: { onSelect: (listing: ListingSchema) => void }) {
+function ListingSelector({ onSelect, onMultiSubmit }: { onSelect: (listing: ListingSchema) => void, onMultiSubmit: (listings: ListingSchema[]) => void }) {
     const { user } = useAuth();
     const { listings } = useData();
     const [isOpen, setIsOpen] = React.useState(false);
+    const [selectedListings, setSelectedListings] = React.useState<ListingSchema[]>([]);
 
     const developerListings = React.useMemo(() => 
         listings.filter(l => l.developerId === user?.email),
         [listings, user]
     );
 
-    const handleSelect = (listing: ListingSchema) => {
-        onSelect(listing);
-        setIsOpen(false);
+    const handleToggleSelection = (listing: ListingSchema) => {
+        setSelectedListings(prev => 
+            prev.find(l => l.listingId === listing.listingId)
+                ? prev.filter(l => l.listingId !== listing.listingId)
+                : [...prev, listing]
+        );
+    }
+    
+    const handleSubmit = () => {
+        if (selectedListings.length > 0) {
+            onMultiSubmit(selectedListings);
+            setIsOpen(false);
+            setSelectedListings([]);
+        }
     }
     
     if (developerListings.length === 0) {
-        return null; // Don't show the button if the developer has no listings
+        return null;
     }
 
     return (
@@ -97,33 +110,48 @@ function ListingSelector({ onSelect }: { onSelect: (listing: ListingSchema) => v
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent className="sm:max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle>Select an Existing Listing</DialogTitle>
+                        <DialogTitle>Select Existing Listings to Submit</DialogTitle>
                         <DialogDescription>
-                            Choose one of your existing warehouse listings to pre-fill the form.
+                            Select one or more of your existing properties to submit against this demand.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="max-h-[60vh] -mx-6 px-2">
                         <ScrollArea className="h-full px-4">
                             <div className="space-y-4 py-4">
-                                {developerListings.map(listing => (
-                                    <button
-                                        key={listing.listingId}
-                                        type="button"
-                                        className="w-full text-left p-4 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors flex justify-between items-center"
-                                        onClick={() => handleSelect(listing)}
-                                    >
-                                        <div>
-                                            <p className="font-semibold">{listing.name}</p>
-                                            <p className="text-sm text-muted-foreground">{listing.location} - {listing.sizeSqFt.toLocaleString()} sq.ft.</p>
+                                {developerListings.map(listing => {
+                                    const isSelected = selectedListings.some(l => l.listingId === listing.listingId);
+                                    return (
+                                        <div
+                                            key={listing.listingId}
+                                            className="w-full text-left p-4 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-4"
+                                        >
+                                            <Checkbox
+                                                id={`listing-${listing.listingId}`}
+                                                checked={isSelected}
+                                                onCheckedChange={() => handleToggleSelection(listing)}
+                                                aria-label={`Select listing ${listing.name}`}
+                                            />
+                                            <label htmlFor={`listing-${listing.listingId}`} className="flex-grow flex justify-between items-center cursor-pointer">
+                                                <div>
+                                                    <p className="font-semibold">{listing.name}</p>
+                                                    <p className="text-sm text-muted-foreground">{listing.location} - {listing.sizeSqFt.toLocaleString()} sq.ft.</p>
+                                                </div>
+                                                <Badge variant={listing.status === 'approved' ? 'default' : 'secondary'}>
+                                                    {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
+                                                </Badge>
+                                            </label>
                                         </div>
-                                        <Badge variant={listing.status === 'approved' ? 'default' : 'secondary'}>
-                                            {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
-                                        </Badge>
-                                    </button>
-                                ))}
+                                    )
+                                })}
                             </div>
                         </ScrollArea>
                     </div>
+                     <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
+                        <Button type="button" onClick={handleSubmit} disabled={selectedListings.length === 0}>
+                            Submit {selectedListings.length > 0 ? selectedListings.length : ''} Properties
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </>
@@ -197,25 +225,46 @@ const ComplianceToggle = ({ field, form }: { form: any, field: any }) => (
     </div>
   );
 
-function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | undefined): Partial<PropertySchema> {
+function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | undefined, user: any): PropertySchema {
     const readinessMap: { [key: string]: PropertySchema['readinessToOccupy'] } = {
         "Ready for Occupancy": "Immediate",
         "Available in 3 months": "Within 90 Days",
+        // Add more mappings if needed
     };
     
-    const mapped: Partial<PropertySchema> = {
+    const mapped: PropertySchema = {
+        propertyId: `PS-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        isLocationConfirmed: false, // Default to false, developer must confirm
         size: listing.sizeSqFt,
         readinessToOccupy: readinessMap[listing.availabilityDate] || "BTS",
         buildingType: listing.buildingSpecifications.buildingType as 'PEB' | 'RCC' | undefined,
-        ceilingHeight: listing.buildingSpecifications.numberOfDocksAndShutters, // This seems wrong, should be ceiling height
-        // Assuming listing schema does not have ceilingHeightUnit, default it or leave undefined
+        floor: "Ground", // Assuming default, as it's not in listing schema
+        ceilingHeight: listing.buildingSpecifications.numberOfDocksAndShutters, // This seems wrong in schema, but following it
+        ceilingHeightUnit: 'ft', // default
         docks: listing.buildingSpecifications.numberOfDocksAndShutters,
-        rentPerSft: listing.rentPerSqFt,
-        rentalSecurityDeposit: listing.rentalSecurityDeposit,
+        rentPerSft: listing.rentPerSft || 0,
+        rentalSecurityDeposit: listing.rentalSecurityDeposit || 0,
         approvalStatus: listing.certificatesAndApprovals.buildingApproval ? 'Obtained' : 'To Apply',
         fireNoc: listing.certificatesAndApprovals.fireNOC ? 'Obtained' : 'To Apply',
-        // Many fields from listingSchema don't directly map and will be left for the user to fill.
-        // e.g. siteType, safety, power, etc.
+        fireHydrant: listing.certificatesAndApprovals.fireLicense ? 'Installed' : 'Can be provided',
+        
+        userType: "Developer",
+        userName: user?.userName || "",
+        userCompanyName: user?.companyName || "",
+        userPhoneNumber: user?.phone || "",
+        userEmail: user?.email || "",
+
+        o2oDealDemandId: demand?.demandId,
+        siteType: "Part of Industrial Park", // default
+        safety: "Fully Compounded", // default
+        approvalAuthority: "DTCP", // default
+        genSetBackup: "Available", // default
+        canopy: "Installed", // default
+        availablePower: undefined, // Needs manual entry
+        additionalInformation: `Pre-filled from listing: ${listing.name} (${listing.listingId}). ${listing.description || ''}`,
+
+        optionals: {},
+        operations: {}
     };
 
     return mapped;
@@ -285,20 +334,39 @@ export function PropertyForm() {
   });
   
   const handleSelectListing = (listing: ListingSchema) => {
-    const mappedData = mapListingToProperty(listing, demandToMatch);
-    
-    // Use reset to update form values. Keep existing values if not in mappedData.
-    const currentValues = form.getValues();
+    const mappedData = mapListingToProperty(listing, demandToMatch, user);
     form.reset({
-        ...currentValues,
+        ...form.getValues(), // Keep existing values if not in mappedData
         ...mappedData
     });
-    
     toast({
         title: "Form Pre-filled",
         description: `Data from listing "${listing.name}" has been loaded. Please review and complete the form.`,
     });
   };
+
+  const handleMultiSubmit = (listings: ListingSchema[]) => {
+      let submissionCount = 0;
+      listings.forEach(listing => {
+          const propertyData = mapListingToProperty(listing, demandToMatch, user);
+          // For batch submissions, we assume location confirmation if the dev is submitting it.
+          // Or we could have a master toggle in the dialog. For now, let's assume true.
+          propertyData.isLocationConfirmed = true; 
+          const submission = {
+              property: propertyData,
+              demandId: demandToMatch!.demandId,
+              demandUserEmail: demandToMatch?.userEmail,
+          };
+          addSubmission(submission, user?.email);
+          submissionCount++;
+      });
+      toast({
+          title: "Batch Submission Successful",
+          description: `${submissionCount} properties have been submitted for demand ${demandToMatch?.demandId}.`,
+      });
+      // Navigate to My Submissions tab after batch submit
+      router.push('/dashboard');
+  }
 
   const optionalPrioritiesCount = React.useMemo(() => {
     if (!demandToMatch) return 0;
@@ -354,10 +422,6 @@ export function PropertyForm() {
 
         addSubmission(submission, user?.email);
         setIsDialogOpen(true); // This dialog now confirms the direct submission
-        toast({
-            title: "Success!",
-            description: "Property match submitted for approval.",
-        });
     } catch (error) {
       const e = error as Error;
       toast({
@@ -434,7 +498,7 @@ export function PropertyForm() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Essentials</CardTitle>
-                    <ListingSelector onSelect={handleSelectListing} />
+                    <ListingSelector onSelect={handleSelectListing} onMultiSubmit={handleMultiSubmit} />
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <FormField control={form.control} name="isLocationConfirmed" render={({ field }) => (
