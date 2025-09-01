@@ -53,8 +53,8 @@ function ListingCard({ listing }: { listing: WarehouseSchema }) {
         </div>
       </CardContent>
       <CardFooter>
-        <Button asChild className="w-full" disabled>
-            <Link href={`/listings/`}>
+        <Button asChild className="w-full">
+            <Link href={`/listings/${listing.id}`}>
                 View Details <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
         </Button>
