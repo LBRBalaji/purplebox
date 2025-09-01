@@ -82,8 +82,8 @@ type DataContextType = {
   isLoading: boolean;
   // Download tracking
   logDownload: (userId: string) => { success: boolean; limitReached: boolean };
-  selectedForDownload: WarehouseSchema[];
-  toggleSelectedForDownload: (listing: WarehouseSchema) => { limitReached: boolean };
+  selectedForDownload: ListingSchema[];
+  toggleSelectedForDownload: (listing: ListingSchema) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
   getTodaysDownloadsForLocation: (userId: string, location: string) => number;
 };
@@ -113,7 +113,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
-  const [selectedForDownload, setSelectedForDownload] = useState<WarehouseSchema[]>([]);
+  const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -371,11 +371,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const toggleSelectedForDownload = (listing: WarehouseSchema): { limitReached: boolean } => {
-    const isSelected = selectedForDownload.some(item => item.id === listing.id);
+  const toggleSelectedForDownload = (listing: ListingSchema): { limitReached: boolean } => {
+    const isSelected = selectedForDownload.some(item => item.listingId === listing.listingId);
 
     if (isSelected) {
-      setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
+      setSelectedForDownload(prev => prev.filter(item => item.listingId !== listing.listingId));
       return { limitReached: false };
     } else {
       if (selectedForDownload.length >= 3) {
