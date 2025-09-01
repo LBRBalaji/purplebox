@@ -3,8 +3,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { type DemandSchema, type PropertySchema, type ListingSchema } from '@/lib/schema';
-import { mockDemands, mockSubmissions } from '@/lib/mock-data';
-import { mockListings } from '@/lib/listing-mock-data';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -47,6 +45,7 @@ type DataContextType = {
   agentLeads: AgentLead[];
   addAgentLead: (lead: Omit<AgentLead, 'id' | 'status'>) => void;
   updateAgentLeadStatus: (leadId: string, status: AgentStatus) => void;
+  isLoading: boolean;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -65,40 +64,65 @@ export type AgentLead = {
 
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [listings, setListings] = useState<ListingSchema[]>(mockListings);
-  const [demands, setDemands] = useState<DemandSchema[]>(mockDemands as DemandSchema[]);
-  const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
+  const [listings, setListings] = useState<ListingSchema[]>([]);
+  const [demands, setDemands] = useState<DemandSchema[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
   const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    async function fetchData() {
+        try {
+            const [
+                listingsRes,
+                demandsRes,
+                submissionsRes,
+                agentLeadsRes
+            ] = await Promise.all([
+                fetch('/api/listings'),
+                fetch('/api/demands'),
+                fetch('/api/submissions'),
+                fetch('/api/agent-leads')
+            ]);
+
+            const listingsData = await listingsRes.json();
+            const demandsData = await demandsRes.json();
+            const submissionsData = await submissionsRes.json();
+            const agentLeadsData = await agentLeadsRes.json();
+
+            setListings(listingsData);
+            setDemands(demandsData);
+            setSubmissions(submissionsData);
+            setAgentLeads(agentLeadsData);
+            
+            // Persist agent leads to localStorage for demo purposes
+            localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(agentLeadsData));
+
+        } catch (error) {
+            console.error("Failed to fetch initial data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    fetchData();
+    
+    // Load agent leads from local storage on initial load as a fallback/cache
     try {
         const storedLeads = localStorage.getItem('warehouseorigin_agent_leads');
         if (storedLeads) {
             setAgentLeads(JSON.parse(storedLeads));
         }
-        const storedListings = localStorage.getItem('warehouseorigin_listings');
-        if (storedListings) {
-            setListings(JSON.parse(storedListings));
-        } else {
-            // If nothing in storage, initialize with mock data
-            setListings(mockListings);
-            localStorage.setItem('warehouseorigin_listings', JSON.stringify(mockListings));
-        }
     } catch (e) {
-        console.error("Failed to parse data from local storage", e);
+        console.error("Failed to parse agent leads from local storage", e);
     }
   }, []);
 
-  const persistListings = (updatedListings: ListingSchema[]) => {
-      setListings(updatedListings);
-      localStorage.setItem('warehouseorigin_listings', JSON.stringify(updatedListings));
-  }
-
   const addListing = (listing: ListingSchema, userEmail?: string) => {
     const newListings = [{ ...listing, status: 'pending' as const }, ...listings];
-    persistListings(newListings);
+    setListings(newListings);
     setLastEvent({
       type: 'new_listing',
       id: listing.listingId,
@@ -109,12 +133,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const updateListing = (updatedListing: ListingSchema) => {
     const newListings = listings.map(l => l.listingId === updatedListing.listingId ? updatedListing : l);
-    persistListings(newListings);
+    setListings(newListings);
   }
 
   const updateListingStatus = (listingId: string, status: ListingStatus) => {
     const newListings = listings.map(l => l.listingId === listingId ? { ...l, status } : l);
-    persistListings(newListings);
+    setListings(newListings);
   }
 
 
@@ -215,7 +239,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   return (
     <DataContext.Provider value={{ 
         listings, addListing, updateListing, updateListingStatus,
-        demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus }}>
+        demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading }}>
       {children}
     </DataContext.Provider>
   );

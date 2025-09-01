@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { warehouses as initialWarehouses } from '@/lib/warehouse-mock-data';
 import type { WarehouseSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from './ui/button';
@@ -32,10 +31,17 @@ import { WarehouseForm } from './warehouse-form';
 
 
 export function WarehouseList() {
-  const [warehouses, setWarehouses] = React.useState<WarehouseSchema[]>(initialWarehouses);
+  const [warehouses, setWarehouses] = React.useState<WarehouseSchema[]>([]);
   const { toast } = useToast();
   const [selectedWarehouse, setSelectedWarehouse] = React.useState<WarehouseSchema | null>(null);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch('/api/warehouses')
+      .then(res => res.json())
+      .then(data => setWarehouses(data))
+      .catch(err => console.error("Failed to fetch warehouses", err));
+  }, []);
 
 
   const handleToggleActive = (id: string, isActive: boolean) => {

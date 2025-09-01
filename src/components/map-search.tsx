@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
-import { warehouses } from '@/lib/warehouse-mock-data';
+import type { WarehouseSchema } from '@/lib/schema';
 
 
 type RegionalSummary = {
@@ -161,6 +161,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const router = useRouter();
   const { user } = useAuth();
   
+  const [warehouses, setWarehouses] = React.useState<WarehouseSchema[]>([]);
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
   const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
@@ -171,9 +172,16 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [pendingRedirectCenter, setPendingRedirectCenter] = React.useState<{ lat: number; lng: number } | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  React.useEffect(() => {
+    fetch('/api/warehouses')
+      .then(res => res.json())
+      .then(data => setWarehouses(data))
+      .catch(err => console.error("Failed to fetch warehouses", err));
+  }, []);
+
   // Initialize Heatmap
   React.useEffect(() => {
-    if (!map || !viz) return;
+    if (!map || !viz || warehouses.length === 0) return;
 
     const heatmapData = warehouses
         .filter(w => w.isActive)
@@ -208,7 +216,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             newHeatmap.setMap(null);
         }
     };
-  }, [map, viz]);
+  }, [map, viz, warehouses]);
 
   // Initialize SearchBox
   React.useEffect(() => {
@@ -225,7 +233,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   // Handle search box places changing
   React.useEffect(() => {
-    if (!searchBox || !map || !geometry) return;
+    if (!searchBox || !map || !geometry || warehouses.length === 0) return;
 
     const listener = searchBox.addListener('places_changed', async () => {
       const places = searchBox.getPlaces();
@@ -298,7 +306,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     return () => {
       google.maps.event.removeListener(listener);
     }
-  }, [searchBox, map, circle, geometry]);
+  }, [searchBox, map, circle, geometry, warehouses]);
 
   const handleLogDemandClick = (center?: { lat: number; lng: number } | null) => {
     if (user && user.role === 'User') {
