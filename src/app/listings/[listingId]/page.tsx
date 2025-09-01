@@ -172,10 +172,22 @@ export default function ListingDetailPage() {
             }];
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+            // Add branding
+            const footer = [
+                [], // Empty row for spacing
+                ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
+            ];
+            XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
+
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Listing Details");
 
-            XLSX.writeFile(workbook, `listing_${listing.listingId}.csv`, { bookType: "csv" });
+            const now = new Date();
+            const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+            const filename = `Lakshmi_Balaji_O2O_Listing_${listing.listingId}_${timestamp}.csv`;
+            
+            XLSX.writeFile(workbook, filename, { bookType: "csv" });
 
             toast({
                 title: "Download Started",

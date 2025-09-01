@@ -27,24 +27,25 @@ export function ShortlistedProperties() {
         'Docks': item.property.docks,
         'Readiness': item.property.readinessToOccupy,
         'Site Type': item.property.siteType,
-        // Sensitive fields like Approval Status and Fire NOC are now removed.
     }));
     
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    // Add branding
+    const footer = [
+        [], // Empty row for spacing
+        ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
+    ];
+    XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Shortlisted Properties");
     
-    // Auto-fit columns
-    if (dataToExport.length > 0) {
-      const cols = Object.keys(dataToExport[0]);
-      const colWidths = cols.map(col => ({
-          wch: Math.max(...dataToExport.map(row => row[col as keyof typeof row]?.toString().length ?? 0), col.length)
-      }));
-      worksheet["!cols"] = colWidths;
-    }
-    
-    // Use writeFile with type 'csv' to generate a CSV file
-    XLSX.writeFile(workbook, "shortlisted_properties.csv", { bookType: "csv" });
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+    const filename = `Lakshmi_Balaji_O2O_Shortlisted_Properties_${timestamp}.csv`;
+
+    XLSX.writeFile(workbook, filename, { bookType: "csv" });
   };
 
   return (
