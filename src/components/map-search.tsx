@@ -115,7 +115,7 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
     )
 }
 
-function WarehouseDetailCard({ warehouse, onLogDemand }: { warehouse: ListingSchema, onLogDemand: (center: { lat: number; lng: number }) => void }) {
+function WarehouseDetailCard({ warehouse }: { warehouse: ListingSchema }) {
     const mainImage = warehouse.documents?.find(doc => doc.type === 'image')?.url || 'https://placehold.co/600x400.png';
     const latLngParts = warehouse.latLng?.split(',').map(s => parseFloat(s.trim()));
     const center = latLngParts && latLngParts.length === 2 && !isNaN(latLngParts[0]) && !isNaN(latLngParts[1]) 
@@ -448,10 +448,6 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     map?.setZoom(5);
   };
 
-  const handleBackToSummary = () => {
-      setSelectedWarehouse(null);
-  }
-
   // --- Distance Calculator Logic ---
 
     // Toggle measurement mode
@@ -590,7 +586,6 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                  {selectedWarehouse ? (
                     <WarehouseDetailCard 
                         warehouse={selectedWarehouse} 
-                        onLogDemand={handleLogDemandClick} 
                     />
                 ) : summaryData ? (
                     <RegionalSummaryCard data={summaryData} onLogDemand={handleLogDemandClick} />
@@ -623,5 +618,3 @@ export function MapSearch({ mapId }: { mapId: string }) {
     </div>
   );
 }
-
-    
