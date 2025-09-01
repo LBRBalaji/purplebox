@@ -242,7 +242,7 @@ function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | und
         ceilingHeight: listing.buildingSpecifications.numberOfDocksAndShutters, // This seems wrong in schema, but following it
         ceilingHeightUnit: 'ft', // default
         docks: listing.buildingSpecifications.numberOfDocksAndShutters,
-        rentPerSft: listing.rentPerSft || 0,
+        rentPerSft: listing.rentPerSqFt || 0,
         rentalSecurityDeposit: listing.rentalSecurityDeposit || 0,
         approvalStatus: listing.certificatesAndApprovals.buildingApproval ? 'Obtained' : 'To Apply',
         fireNoc: listing.certificatesAndApprovals.fireNOC ? 'Obtained' : 'To Apply',
@@ -547,6 +547,21 @@ export function PropertyForm() {
                         <FormMessage />
                         </FormItem>
                     )} />
+                     <FormField control={form.control} name="siteType" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Site Type</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select site type"/></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    <SelectItem value="Standalone">Standalone</SelectItem>
+                                    <SelectItem value="Part of Industrial Park">Part of Industrial Park</SelectItem>
+                                    <SelectItem value="Part of Commercial Project">Part of Commercial Project</SelectItem>
+                                    <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                     )}/>
                      <FormField control={form.control} name="buildingType" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Building Type</FormLabel>

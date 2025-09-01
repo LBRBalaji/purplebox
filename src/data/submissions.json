@@ -174,5 +174,40 @@
     "status": "Pending",
     "isNew": false,
     "demandUserEmail": "logistics.pro@example.com"
+  },
+  {
+    "demandId": "DMD-1700000000003",
+    "property": {
+      "propertyId": "PS-3PL-001",
+      "isLocationConfirmed": true,
+      "propertyGeoLocation": "New Delhi, Delhi, India",
+      "size": 15000,
+      "floor": "Ground",
+      "readinessToOccupy": "Immediate",
+      "siteType": "3PL Operated Warehouse",
+      "safety": "Fully Compounded with 24/7 Security",
+      "ceilingHeight": 22,
+      "rentPerSft": 40,
+      "rentalSecurityDeposit": 4,
+      "userType": "Developer",
+      "userName": "Test Provider",
+      "userCompanyName": "Prime Properties",
+      "userPhoneNumber": "555-111-2222",
+      "userEmail": "provider@example.com",
+      "o2oDealDemandId": "DMD-1700000000003",
+      "approvalStatus": "Obtained",
+      "approvalAuthority": "DTCP",
+      "installedCapacity": "100 kva",
+      "availablePower": 100,
+      "genSetBackup": "Available",
+      "fireHydrant": "Installed",
+      "fireNoc": "Obtained",
+      "docks": 3,
+      "canopy": "Installed",
+      "additionalInformation": "Full-service 3PL warehouse with inventory management and last-mile delivery services included. Ideal for e-commerce clients."
+    },
+    "status": "Pending",
+    "isNew": true,
+    "demandUserEmail": "user@example.com"
   }
 ]

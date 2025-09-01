@@ -120,7 +120,7 @@ export const propertySchemaBase = z.object({
   userPhoneNumber: z.string().min(1, 'Phone number is required.'),
   userEmail: z.string().email('Invalid email address.'),
   
-  siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project']),
+  siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project', '3PL Operated Warehouse']),
   safety: z.enum(['Fully Compounded', 'Partially Compounded', '3-Side Compounded', 'Not Compounded']),
   approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']),
   genSetBackup: z.enum(['Available', 'Can be provided']),
