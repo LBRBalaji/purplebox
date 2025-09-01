@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { type DemandSchema, type PropertySchema, type ListingSchema } from '@/lib/schema';
 import { mockDemands, mockSubmissions } from '@/lib/mock-data';
+import { mockListings } from '@/lib/listing-mock-data';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -19,7 +20,7 @@ export type Submission = {
 }
 
 type DataEvent = {
-  type: 'new_demand' | 'new_submission';
+  type: 'new_demand' | 'new_submission' | 'new_listing';
   id: string; // The ID of the demand or submission
   timestamp: string;
   triggeredBy: string | undefined; // The email of the user who triggered the event
@@ -28,7 +29,7 @@ type DataEvent = {
 type DataContextType = {
   // New listing-centric state
   listings: ListingSchema[];
-  addListing: (listing: ListingSchema) => void;
+  addListing: (listing: ListingSchema, userEmail?: string) => void;
   updateListing: (listing: ListingSchema) => void;
   updateListingStatus: (listingId: string, status: ListingStatus) => void;
 
@@ -64,7 +65,7 @@ export type AgentLead = {
 
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [listings, setListings] = useState<ListingSchema[]>([]);
+  const [listings, setListings] = useState<ListingSchema[]>(mockListings);
   const [demands, setDemands] = useState<DemandSchema[]>(mockDemands as DemandSchema[]);
   const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions as Submission[]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
@@ -80,6 +81,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const storedListings = localStorage.getItem('warehouseorigin_listings');
         if (storedListings) {
             setListings(JSON.parse(storedListings));
+        } else {
+            // If nothing in storage, initialize with mock data
+            setListings(mockListings);
+            localStorage.setItem('warehouseorigin_listings', JSON.stringify(mockListings));
         }
     } catch (e) {
         console.error("Failed to parse data from local storage", e);
@@ -91,9 +96,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('warehouseorigin_listings', JSON.stringify(updatedListings));
   }
 
-  const addListing = (listing: ListingSchema) => {
-    const newListings = [listing, ...listings];
+  const addListing = (listing: ListingSchema, userEmail?: string) => {
+    const newListings = [{ ...listing, status: 'pending' as const }, ...listings];
     persistListings(newListings);
+    setLastEvent({
+      type: 'new_listing',
+      id: listing.listingId,
+      timestamp: new Date().toISOString(),
+      triggeredBy: userEmail,
+    });
   }
 
   const updateListing = (updatedListing: ListingSchema) => {
@@ -217,5 +228,3 @@ export function useData() {
   }
   return context;
 }
-
-    
