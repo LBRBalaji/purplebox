@@ -3,31 +3,45 @@
     {
       "listingId": "LST-001",
       "views": 152,
-      "downloads": 25,
+      "downloads": 28,
       "customerIndustries": {
         "Logistics": 10,
         "Retail": 8,
-        "E-commerce": 7
-      }
+        "E-commerce": 7,
+        "Pharma": 3
+      },
+      "downloadedBy": [
+        { "name": "Test Customer", "company": "Test Customer Co." },
+        { "name": "Sunil Patel", "company": "ProLogistics Solutions" }
+      ]
     },
     {
       "listingId": "LST-002",
       "views": 340,
-      "downloads": 55,
+      "downloads": 57,
       "customerIndustries": {
         "FMCG": 20,
         "Electronics": 15,
-        "Automotive": 10
-      }
+        "Automotive": 10,
+        "Retail": 12
+      },
+       "downloadedBy": [
+        { "name": "Dr. Evelyn Reed", "company": "PharmaSafe Inc." },
+        { "name": "Rajesh Singh", "company": "AutoParts Express" }
+      ]
     },
     {
         "listingId": "LST-005",
         "views": 88,
-        "downloads": 12,
+        "downloads": 14,
         "customerIndustries": {
           "Light Manufacturing": 5,
           "Electronics": 4,
-          "Last-Mile Delivery": 3
-        }
+          "Last-Mile Delivery": 3,
+          "Textiles": 2
+        },
+        "downloadedBy": [
+            { "name": "Mei Lin", "company": "FrostyFoods Logistics" }
+        ]
     }
 ]

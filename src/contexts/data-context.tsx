@@ -22,6 +22,7 @@ export type ListingAnalytics = {
   views: number;
   downloads: number;
   customerIndustries: Record<string, number>;
+  downloadedBy?: { name: string; company: string }[];
 };
 
 

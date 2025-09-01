@@ -20,6 +20,7 @@ import { ProviderListings } from '@/components/provider-listings';
 import { ApprovalQueue } from '@/components/approval-queue';
 import { UserList } from '@/components/user-list';
 import { AgentWaitlist } from '@/components/agent-waitlist';
+import { AdminListings } from '@/components/admin-listings';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -88,13 +89,17 @@ const MainDashboard = () => {
 
     const renderAdminContent = () => (
       <Tabs value={adminTab} onValueChange={setAdminTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="approval-queue">Approval Queue</TabsTrigger>
+          <TabsTrigger value="listings-performance">Listings & Performance</TabsTrigger>
           <TabsTrigger value="user-management">User Management</TabsTrigger>
           <TabsTrigger value="agent-waitlist">Agent Waitlist</TabsTrigger>
         </TabsList>
         <TabsContent value="approval-queue" className="mt-6">
             <ApprovalQueue />
+        </TabsContent>
+        <TabsContent value="listings-performance" className="mt-6">
+            <AdminListings />
         </TabsContent>
         <TabsContent value="user-management" className="mt-6">
             <UserList />
