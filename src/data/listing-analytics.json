@@ -11,8 +11,8 @@
         "Pharma": 3
       },
       "downloadedBy": [
-        { "name": "Test Customer", "company": "Test Customer Co." },
-        { "name": "Sunil Patel", "company": "ProLogistics Solutions" }
+        { "name": "Test Customer", "company": "Test Customer Co.", "timestamp": 1718100000000, "count": 2 },
+        { "name": "Sunil Patel", "company": "ProLogistics Solutions", "timestamp": 1718190000000, "count": 1 }
       ]
     },
     {
@@ -26,8 +26,8 @@
         "Retail": 12
       },
        "downloadedBy": [
-        { "name": "Dr. Evelyn Reed", "company": "PharmaSafe Inc." },
-        { "name": "Rajesh Singh", "company": "AutoParts Express" }
+        { "name": "Dr. Evelyn Reed", "company": "PharmaSafe Inc.", "timestamp": 1718280000000, "count": 1 },
+        { "name": "Rajesh Singh", "company": "AutoParts Express", "timestamp": 1718370000000, "count": 3 }
       ]
     },
     {
@@ -41,9 +41,9 @@
           "Textiles": 2
         },
         "downloadedBy": [
-            { "name": "Mei Lin", "company": "FrostyFoods Logistics" },
-            { "name": "Test Customer", "company": "Test Customer Co." },
-            { "name": "Vikram Singh", "company": "Heavy-Lift Manufacturing" }
+            { "name": "Mei Lin", "company": "FrostyFoods Logistics", "timestamp": 1718000000000, "count": 1 },
+            { "name": "Test Customer", "company": "Test Customer Co.", "timestamp": 1718050000000, "count": 1 },
+            { "name": "Vikram Singh", "company": "Heavy-Lift Manufacturing", "timestamp": 1718220000000, "count": 1 }
         ]
     }
 ]

@@ -17,12 +17,20 @@ export type Submission = {
     status: SubmissionStatus;
 }
 
+export type DownloadedByRecord = {
+  name: string;
+  company: string;
+  timestamp: number;
+  count: number;
+};
+
+
 export type ListingAnalytics = {
   listingId: string;
   views: number;
   downloads: number;
   customerIndustries: Record<string, number>;
-  downloadedBy?: { name: string; company: string }[];
+  downloadedBy?: DownloadedByRecord[];
 };
 
 export type DownloadRecord = {

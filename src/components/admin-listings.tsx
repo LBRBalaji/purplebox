@@ -9,15 +9,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useData } from '@/contexts/data-context';
+import { useData, type DownloadedByRecord } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
 
-function AdminListingCard({ listing, analytics, providerName }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: { name: string; company: string }[] }, providerName: string }) {
+function AdminListingCard({ listing, analytics, providerName }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[] }, providerName: string }) {
   
   const statusConfig = {
     approved: { text: "Approved", className: "bg-green-100 text-green-800" },
@@ -62,8 +62,19 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
               <div className="pt-3 space-y-2">
                 {analytics.downloadedBy.map((customer, index) => (
                   <div key={index} className="text-xs p-2 bg-secondary rounded-md">
-                    <p className="font-semibold">{customer.name}</p>
-                    <p className="text-muted-foreground">{customer.company}</p>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="font-semibold text-sm">{customer.name}</p>
+                            <p className="text-muted-foreground">{customer.company}</p>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {customer.count} time{customer.count > 1 ? 's' : ''}
+                        </Badge>
+                    </div>
+                    <div className="flex items-center gap-1 text-muted-foreground mt-2">
+                      <Clock className="h-3 w-3" />
+                      <span>Last: {new Date(customer.timestamp).toLocaleString()}</span>
+                    </div>
                   </div>
                 ))}
               </div>
