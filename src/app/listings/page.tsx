@@ -56,7 +56,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                 </Badge>
             )}
         </div>
-        <CardDescription>ID: {listing.warehouseBoxId}</CardDescription>
+        <CardDescription>ID: {listing.listingId}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
         <div className="grid grid-cols-2 gap-4 text-sm">
