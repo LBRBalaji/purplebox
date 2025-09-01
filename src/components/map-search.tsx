@@ -137,7 +137,7 @@ function WarehouseDetailCard({ warehouse, onLogDemand }: { warehouse: ListingSch
                  <CardTitle className="flex items-center gap-2 pt-2">
                     {warehouse.name}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription asChild>
                     <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4" /> {warehouse.location}
                     </div>
