@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BarChart, Users, List, Clock, FileText, CheckCircle, Eye, Download, PieChart, Star } from 'lucide-react';
+import { BarChart, Users, List, Clock, FileText, CheckCircle, Eye, Download, PieChart, Star, Calendar as CalendarIcon } from 'lucide-react';
 import { type User } from '@/contexts/auth-context';
 import {
   ChartContainer,
@@ -16,6 +16,12 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart"
 import { Bar, Pie, Cell, ResponsiveContainer } from "recharts"
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { format, subDays } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 
 
 type Activity = {
@@ -47,6 +53,10 @@ export default function AnalyticsPage() {
     const { demands, submissions, listingAnalytics, listings } = useData();
     const router = useRouter();
     const [allUsers, setAllUsers] = React.useState<User[]>([]);
+    const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+        from: subDays(new Date(), 29),
+        to: new Date(),
+    });
     
     React.useEffect(() => {
         if (!isAuthLoading && user?.email !== 'admin@example.com') {
@@ -64,6 +74,69 @@ export default function AnalyticsPage() {
             console.error("Failed to parse users from local storage", error);
         }
     }, []);
+    
+    const filteredDemands = React.useMemo(() => {
+        return demands.filter(d => {
+            if (!dateRange?.from || !dateRange?.to) return true;
+            try {
+                const demandTime = new Date(parseInt(d.demandId.split('-')[1]));
+                return demandTime >= dateRange.from && demandTime <= dateRange.to;
+            } catch { return false; }
+        });
+    }, [demands, dateRange]);
+
+    const filteredSubmissions = React.useMemo(() => {
+        return submissions.filter(s => {
+            if (!dateRange?.from || !dateRange?.to) return true;
+            try {
+                const subTime = new Date(parseInt(s.property.propertyId.split('-')[1]));
+                return subTime >= dateRange.from && subTime <= dateRange.to;
+            } catch { return false; }
+        });
+    }, [submissions, dateRange]);
+    
+    const filteredListingAnalytics = React.useMemo(() => {
+        if (!dateRange?.from || !dateRange?.to) return listingAnalytics;
+        
+        return listingAnalytics.map(analytic => {
+            const filteredViews = (analytic.viewedBy || []).filter(v => {
+                const viewDate = new Date(v.timestamp);
+                return viewDate >= dateRange.from! && viewDate <= dateRange.to!;
+            });
+
+            const filteredDownloads = (analytic.downloadedBy || []).filter(d => {
+                return d.timestamps.some(ts => {
+                    const downloadDate = new Date(ts);
+                    return downloadDate >= dateRange.from! && downloadDate <= dateRange.to!;
+                });
+            });
+            
+            const filteredIndustries: Record<string, number> = {};
+            // Note: Industry data isn't timestamped in mock data, so we can't filter it by date.
+            // In a real system, each view event would have an associated industry.
+            // For now, we show all industry data.
+            Object.assign(filteredIndustries, analytic.customerIndustries);
+
+            return {
+                ...analytic,
+                views: filteredViews.length,
+                downloads: filteredDownloads.reduce((sum, d) => sum + d.timestamps.filter(ts => {
+                     const downloadDate = new Date(ts);
+                    return downloadDate >= dateRange.from! && downloadDate <= dateRange.to!;
+                }).length, 0),
+                viewedBy: filteredViews,
+                downloadedBy: filteredDownloads.map(d => ({
+                    ...d,
+                    timestamps: d.timestamps.filter(ts => {
+                        const downloadDate = new Date(ts);
+                        return downloadDate >= dateRange.from! && downloadDate <= dateRange.to!;
+                    })
+                })).filter(d => d.timestamps.length > 0),
+                customerIndustries: filteredIndustries,
+            };
+        });
+    }, [listingAnalytics, dateRange]);
+
 
     const userStats = React.useMemo(() => {
         const total = allUsers.length;
@@ -73,12 +146,12 @@ export default function AnalyticsPage() {
     }, [allUsers]);
 
     const averageResponseTime = React.useMemo(() => {
-        if (submissions.length === 0) return 'N/A';
+        if (filteredSubmissions.length === 0) return 'N/A';
 
         let totalDiff = 0;
         let count = 0;
 
-        submissions.forEach(sub => {
+        filteredSubmissions.forEach(sub => {
             const demand = demands.find(d => d.demandId === sub.demandId);
             if (demand && demand.demandId && sub.property.propertyId) {
                  try {
@@ -99,12 +172,12 @@ export default function AnalyticsPage() {
         const avgHours = avgMilliseconds / (1000 * 60 * 60);
         return `${avgHours.toFixed(1)} hours`;
 
-    }, [submissions, demands]);
+    }, [filteredSubmissions, demands]);
 
     const recentActivities = React.useMemo(() => {
         const combined: Activity[] = [];
 
-        demands.forEach(d => {
+        filteredDemands.forEach(d => {
             try {
                 if (d.demandId) {
                     combined.push({
@@ -118,7 +191,7 @@ export default function AnalyticsPage() {
             } catch (e) { /* ignore format errors */ }
         });
 
-        submissions.forEach(s => {
+        filteredSubmissions.forEach(s => {
              try {
                 if (s.property.propertyId) {
                     combined.push({
@@ -133,22 +206,22 @@ export default function AnalyticsPage() {
         });
 
         return combined.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 10);
-    }, [demands, submissions]);
+    }, [filteredDemands, filteredSubmissions]);
 
     const topPerformingListings = React.useMemo(() => {
-        return listingAnalytics
+        return filteredListingAnalytics
             .map(analytic => {
                 const listing = listings.find(l => l.listingId === analytic.listingId);
                 return { ...analytic, name: listing?.name || 'Unknown Listing' };
             })
             .sort((a,b) => b.views - a.views)
             .slice(0, 5);
-    }, [listingAnalytics, listings]);
+    }, [filteredListingAnalytics, listings]);
 
 
     const industryInterestData = React.useMemo(() => {
         const industryMap: Record<string, number> = {};
-        listingAnalytics.forEach(analytic => {
+        filteredListingAnalytics.forEach(analytic => {
             Object.entries(analytic.customerIndustries).forEach(([industry, count]) => {
                 industryMap[industry] = (industryMap[industry] || 0) + count;
             });
@@ -163,7 +236,7 @@ export default function AnalyticsPage() {
         ];
 
         return Object.entries(industryMap).map(([name, value], index) => ({ name, value, fill: COLORS[index % COLORS.length] }));
-    }, [listingAnalytics]);
+    }, [filteredListingAnalytics]);
     
     const chartConfig = React.useMemo(() => {
         const config: any = {};
@@ -183,11 +256,49 @@ export default function AnalyticsPage() {
     return (
         <main className="container mx-auto p-4 md:p-8">
             <div className="max-w-7xl mx-auto space-y-8">
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold font-headline tracking-tight">Analytics Dashboard</h2>
-                    <p className="text-muted-foreground mt-2">
-                        An overview of platform activity and performance.
-                    </p>
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <h2 className="text-3xl font-bold font-headline tracking-tight">Analytics Dashboard</h2>
+                        <p className="text-muted-foreground mt-2">
+                            An overview of platform activity and performance.
+                        </p>
+                    </div>
+                     <Popover>
+                        <PopoverTrigger asChild>
+                        <Button
+                            id="date"
+                            variant={"outline"}
+                            className={cn(
+                            "w-[300px] justify-start text-left font-normal",
+                            !dateRange && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.from ? (
+                            dateRange.to ? (
+                                <>
+                                {format(dateRange.from, "LLL dd, y")} -{" "}
+                                {format(dateRange.to, "LLL dd, y")}
+                                </>
+                            ) : (
+                                format(dateRange.from, "LLL dd, y")
+                            )
+                            ) : (
+                            <span>Pick a date</span>
+                            )}
+                        </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                        <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={dateRange?.from}
+                            selected={dateRange}
+                            onSelect={setDateRange}
+                            numberOfMonths={2}
+                        />
+                        </PopoverContent>
+                    </Popover>
                 </div>
                 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -199,21 +310,21 @@ export default function AnalyticsPage() {
                     />
                     <StatCard 
                         title="Active Demands" 
-                        value={demands.length} 
+                        value={filteredDemands.length} 
                         icon={List} 
-                        description="Total demands logged by customers."
+                        description="Demands in the selected period"
                     />
                     <StatCard 
                         title="Total Submissions" 
-                        value={submissions.length} 
+                        value={filteredSubmissions.length} 
                         icon={CheckCircle}
-                        description="Properties matched against demands."
+                        description="Submissions in the selected period"
                     />
                      <StatCard 
                         title="Avg. Response Time" 
                         value={averageResponseTime} 
                         icon={Clock}
-                        description="Demand logged to first proposal."
+                        description="Demand logged to first proposal"
                     />
                 </div>
 
@@ -221,7 +332,7 @@ export default function AnalyticsPage() {
                     <Card className="lg:col-span-2">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2"><Star className="text-amber-400" /> Top Performing Listings</CardTitle>
-                            <CardDescription>Most viewed listings on the platform.</CardDescription>
+                            <CardDescription>Most viewed listings in the selected period.</CardDescription>
                         </CardHeader>
                         <CardContent>
                              {topPerformingListings.length > 0 ? (
@@ -246,7 +357,7 @@ export default function AnalyticsPage() {
                                     ))}
                                 </div>
                              ) : (
-                                <p className="text-sm text-muted-foreground text-center py-4">No listing performance data available yet.</p>
+                                <p className="text-sm text-muted-foreground text-center py-4">No listing performance data available for this period.</p>
                              )}
                         </CardContent>
                     </Card>
@@ -285,6 +396,9 @@ export default function AnalyticsPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Recent Activity</CardTitle>
+                         <CardDescription>
+                            Showing the 10 most recent activities within the selected date range.
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
@@ -300,7 +414,7 @@ export default function AnalyticsPage() {
                                 </div>
                             ))}
                              {recentActivities.length === 0 && (
-                                <p className="text-sm text-muted-foreground text-center py-4">No recent activity to display.</p>
+                                <p className="text-sm text-muted-foreground text-center py-4">No recent activity to display for this period.</p>
                              )}
                         </div>
                     </CardContent>
