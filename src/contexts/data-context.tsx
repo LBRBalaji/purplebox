@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { type DemandSchema, type PropertySchema, type ListingSchema } from '@/lib/schema';
+import { type DemandSchema, type PropertySchema, type ListingSchema, type WarehouseSchema } from '@/lib/schema';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -71,7 +71,11 @@ type DataContextType = {
   updateAgentLeadStatus: (leadId: string, status: AgentStatus) => void;
   isLoading: boolean;
   // Download tracking
-  logDownload: (userId: string, listing: ListingSchema) => { success: boolean; limitReached: boolean };
+  logDownload: (userId: string, listing: WarehouseSchema) => { success: boolean; limitReached: boolean };
+  selectedForDownload: WarehouseSchema[];
+  toggleSelectedForDownload: (listing: WarehouseSchema) => void;
+  clearSelectedForDownload: () => void;
+  getTodaysDownloadsForLocation: (userId: string, location: string) => number;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -98,6 +102,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
+  const [selectedForDownload, setSelectedForDownload] = useState<WarehouseSchema[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -270,15 +275,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
     );
   }
   
-  const logDownload = (userId: string, listing: ListingSchema): { success: boolean; limitReached: boolean } => {
+  const getTodaysDownloadsForLocation = (userId: string, location: string): number => {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    return downloadHistory.filter(
+        d => d.userId === userId && d.location === location && d.timestamp >= startOfDay
+    ).length;
+  }
 
-    const todaysDownloads = downloadHistory.filter(
-      (d) => d.userId === userId && d.timestamp >= startOfDay && d.location === listing.location
-    );
+  const logDownload = (userId: string, listing: WarehouseSchema): { success: boolean; limitReached: boolean } => {
+    const todaysDownloads = getTodaysDownloadsForLocation(userId, listing.locationName);
 
-    if (todaysDownloads.length >= 3) {
+    if (todaysDownloads >= 3) {
         setLastEvent({
             type: 'download_limit_exceeded',
             id: userId,
@@ -290,9 +298,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     
     const newRecord: DownloadRecord = {
         userId,
-        listingId: listing.listingId,
-        location: listing.location,
-        timestamp: now.getTime(),
+        listingId: listing.id,
+        location: listing.locationName,
+        timestamp: new Date().getTime(),
     };
     
     const updatedHistory = [...downloadHistory, newRecord];
@@ -300,7 +308,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
 
     setListingAnalytics(prev => prev.map(analytic => 
-        analytic.listingId === listing.listingId
+        analytic.listingId === listing.id
             ? { ...analytic, downloads: analytic.downloads + 1 }
             : analytic
     ));
@@ -308,11 +316,30 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return { success: true, limitReached: false };
   }
 
+  const toggleSelectedForDownload = (listing: WarehouseSchema) => {
+    setSelectedForDownload(prev => {
+        const isSelected = prev.find(item => item.id === listing.id);
+        if (isSelected) {
+            return prev.filter(item => item.id !== listing.id);
+        } else {
+            return [...prev, listing];
+        }
+    });
+  };
+
+  const clearSelectedForDownload = () => {
+    setSelectedForDownload([]);
+  };
+
   return (
     <DataContext.Provider value={{ 
         listings, addListing, updateListing, updateListingStatus, listingAnalytics,
         demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading,
-        logDownload
+        logDownload,
+        selectedForDownload,
+        toggleSelectedForDownload,
+        clearSelectedForDownload,
+        getTodaysDownloadsForLocation
         }}>
       {children}
     </DataContext.Provider>

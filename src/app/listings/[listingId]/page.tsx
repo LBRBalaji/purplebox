@@ -129,7 +129,7 @@ export default function ListingDetailPage() {
     const { user } = useAuth();
     const { toast } = useToast();
     const { logDownload } = useData();
-    const [listing, setListing] = React.useState<ListingSchema | null>(null);
+    const [listing, setListing] = React.useState<WarehouseSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [navigationList, setNavigationList] = React.useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = React.useState(-1);
@@ -144,7 +144,7 @@ export default function ListingDetailPage() {
 
                 const foundWarehouse = activeWarehouses.find(w => w.id === listingId);
                  if (foundWarehouse) {
-                    setListing(mapWarehouseToListing(foundWarehouse));
+                    setListing(foundWarehouse);
                 } else {
                     router.push('/listings');
                 }
@@ -191,6 +191,7 @@ export default function ListingDetailPage() {
              toast({
                 title: "Download Not Applicable",
                 description: "Only customer accounts can download listing details.",
+                variant: 'destructive',
             });
             return;
         }
@@ -199,28 +200,26 @@ export default function ListingDetailPage() {
         
         if (success) {
             const dataToExport = [{
-                'Property ID': listing.listingId,
-                'Size (Sq. Ft.)': listing.sizeSqFt,
-                'Rent (per Sq. Ft.)': listing.rentPerSqFt,
-                'Security Deposit (Months)': listing.rentalSecurityDeposit,
-                'Availability': listing.availabilityDate,
-                'Construction Progress': listing.constructionProgress,
-                'Building Type': listing.buildingSpecifications.buildingType,
-                'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
-                'Ceiling Height (ft)': listing.buildingSpecifications.shopFloorLevelDimension,
-                'Flooring Type': listing.siteSpecifications.typeOfFlooringInside,
-                'Access Road': listing.siteSpecifications.typeOfRoad,
+                'Property ID': listing.id,
+                'Size (Sq. Ft.)': listing.size,
+                'Readiness': listing.readiness,
+                'Building Type': listing.specifications.flooringType, // Simplified for CSV
+                'Docks': listing.specifications.docks,
+                'Ceiling Height (ft)': listing.specifications.ceilingHeight,
+                'Flooring Type': listing.specifications.flooringType,
+                'Rent (per Sq. Ft.)': 'Contact for details',
+                'Security Deposit': 'Contact for details',
             }];
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Listing Details");
 
-            XLSX.writeFile(workbook, `listing_${listing.listingId}.csv`, { bookType: "csv" });
+            XLSX.writeFile(workbook, `listing_${listing.id}.csv`, { bookType: "csv" });
 
             toast({
                 title: "Download Started",
-                description: `Details for ${listing.listingId} are being downloaded.`,
+                description: `Details for ${listing.id} are being downloaded.`,
             });
         }
 
@@ -228,12 +227,13 @@ export default function ListingDetailPage() {
              toast({
                 variant: 'destructive',
                 title: "Download Limit Reached",
-                description: `You have reached your daily limit of 3 downloads for the location "${listing.location}".`,
+                description: `You have reached your daily limit of 3 downloads for the location "${listing.locationName}".`,
             });
         }
     };
-
-    const mainImage = listing.documents?.find(doc => doc.type === 'image')?.url || 'https://placehold.co/1200x600.png';
+    
+    const mappedListing = mapWarehouseToListing(listing);
+    const mainImage = listing.imageUrls?.[0] || 'https://placehold.co/1200x600.png';
 
     return (
         <>
@@ -242,10 +242,10 @@ export default function ListingDetailPage() {
                     {/* Header with Navigation */}
                     <div className="flex justify-between items-center flex-wrap gap-4">
                         <div>
-                            <Badge variant="secondary">{listing.warehouseBoxId}</Badge>
-                            <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.name}</h1>
+                            <Badge variant="secondary">{listing.id}</Badge>
+                            <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.locationName}</h1>
                             <p className="text-lg text-muted-foreground flex items-center gap-2 mt-2">
-                                <MapPin className="h-5 w-5" /> {listing.location}
+                                <MapPin className="h-5 w-5" /> {listing.locationName}
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -271,17 +271,17 @@ export default function ListingDetailPage() {
                                      <div className="aspect-video relative mb-6">
                                         <Image
                                             src={mainImage}
-                                            alt={listing.name}
+                                            alt={listing.locationName}
                                             fill
                                             className="rounded-lg object-cover"
                                             data-ai-hint="warehouse exterior"
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <InfoPill icon={Scaling} label="Total Area" value={`${listing.area.totalChargeableArea.toLocaleString()} sft`} />
-                                        <InfoPill icon={Building2} label="Building Type" value={listing.buildingSpecifications.buildingType} />
-                                        <InfoPill icon={Calendar} label="Availability" value={listing.availabilityDate} />
-                                        <InfoPill icon={HardHat} label="Docks" value={listing.buildingSpecifications.numberOfDocksAndShutters} />
+                                        <InfoPill icon={Scaling} label="Total Area" value={`${listing.size.toLocaleString()} sft`} />
+                                        <InfoPill icon={Building2} label="Building Type" value={mappedListing.buildingSpecifications.buildingType} />
+                                        <InfoPill icon={Calendar} label="Availability" value={listing.readiness} />
+                                        <InfoPill icon={HardHat} label="Docks" value={listing.specifications.docks} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -292,7 +292,7 @@ export default function ListingDetailPage() {
                                     <CardTitle>Property Overview</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-muted-foreground">{listing.description}</p>
+                                    <p className="text-muted-foreground">{mappedListing.description}</p>
                                 </CardContent>
                             </Card>
 
@@ -306,18 +306,18 @@ export default function ListingDetailPage() {
                                         <div>
                                             <h4 className="font-semibold mb-2">Building</h4>
                                             <Separator />
-                                            <DetailRow label="Shop Floor Dimension" value={listing.buildingSpecifications.shopFloorLevelDimension} />
-                                            <DetailRow label="Roof Insulation" value={listing.buildingSpecifications.roofInsulationStatus} />
-                                            <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} />
-                                            {user && <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} />}
-                                            {user && <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />}
+                                            <DetailRow label="Shop Floor Dimension" value={mappedListing.buildingSpecifications.shopFloorLevelDimension} />
+                                            <DetailRow label="Roof Insulation" value={mappedListing.buildingSpecifications.roofInsulationStatus} />
+                                            <DetailRow label="Natural Light/Ventilation" value={mappedListing.buildingSpecifications.naturalLightingAndVentilation} />
+                                            {user && <DetailRow label="Internal Lighting" value={mappedListing.buildingSpecifications.internalLighting} />}
+                                            {user && <DetailRow label="Mezzanine Details" value={mappedListing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />}
                                         </div>
                                          <div>
                                             <h4 className="font-semibold mb-2">Site</h4>
                                             <Separator />
-                                            <DetailRow label="Inside Flooring" value={listing.siteSpecifications.typeOfFlooringInside} />
-                                            <DetailRow label="Outside Flooring" value={listing.siteSpecifications.typeOfFlooringOutside} />
-                                            <DetailRow label="Access Road" value={listing.siteSpecifications.typeOfRoad} />
+                                            <DetailRow label="Inside Flooring" value={mappedListing.siteSpecifications.typeOfFlooringInside} />
+                                            <DetailRow label="Outside Flooring" value={mappedListing.siteSpecifications.typeOfFlooringOutside} />
+                                            <DetailRow label="Access Road" value={mappedListing.siteSpecifications.typeOfRoad} />
                                         </div>
                                     </div>
                                 </CardContent>
@@ -332,7 +332,7 @@ export default function ListingDetailPage() {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    {listing.documents && listing.documents.length > 0 ? (
+                                    {listing.imageUrls && listing.imageUrls.length > 0 ? (
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
@@ -341,9 +341,10 @@ export default function ListingDetailPage() {
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {listing.documents.map((doc, index) => (
-                                                   <DocumentRow key={index} doc={doc} onDownload={handleDownloadRequest} />
-                                                ))}
+                                                {listing.imageUrls.map((url, index) => {
+                                                    const doc = { type: 'image', name: `Photo ${index + 1}`, url };
+                                                    return <DocumentRow key={index} doc={doc} onDownload={handleDownloadRequest} />
+                                                })}
                                             </TableBody>
                                         </Table>
                                     ) : (
@@ -363,12 +364,12 @@ export default function ListingDetailPage() {
                                     {user ? (
                                         <div className="space-y-4">
                                             <div className="flex items-baseline justify-center text-center">
-                                                <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
+                                                <span className="text-4xl font-bold">₹{mappedListing.rentPerSqFt}</span>
                                                 <span className="text-sm text-muted-foreground">/sq.ft./month</span>
                                             </div>
                                             <Separator/>
-                                            <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit} months`} />
-                                            <DetailRow label="Construction Progress" value={listing.constructionProgress} />
+                                            <DetailRow label="Security Deposit" value={`${mappedListing.rentalSecurityDeposit} months`} />
+                                            <DetailRow label="Construction Progress" value={mappedListing.constructionProgress} />
                                         </div>
                                     ) : (
                                         <Alert>
@@ -401,12 +402,12 @@ export default function ListingDetailPage() {
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <div className="space-y-1">
-                                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} isBlurred />
-                                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} isBlurred />
-                                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} isBlurred />
-                                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} isBlurred />
-                                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} isBlurred />
-                                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} isBlurred />
+                                                            <DetailRow label="Park Approval" value={mappedListing.certificatesAndApprovals.parkApproval} isBlurred />
+                                                            <DetailRow label="Building Approval" value={mappedListing.certificatesAndApprovals.buildingApproval} isBlurred />
+                                                            <DetailRow label="Fire License" value={mappedListing.certificatesAndApprovals.fireLicense} isBlurred />
+                                                            <DetailRow label="Fire NOC" value={mappedListing.certificatesAndApprovals.fireNOC} isBlurred />
+                                                            <DetailRow label="Building Insurance" value={mappedListing.certificatesAndApprovals.buildingInsurance} isBlurred />
+                                                            <DetailRow label="Property Tax Paid" value={mappedListing.certificatesAndApprovals.propertyTax} isBlurred />
                                                         </div>
                                                     </TooltipTrigger>
                                                     <TooltipContent side="top" align="start">

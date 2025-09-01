@@ -6,27 +6,40 @@ import type { WarehouseSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, MapPin, Scaling, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Check, Download, MapPin, Scaling, Search, SlidersHorizontal, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
+import { useAuth } from '@/contexts/auth-context';
+import { Checkbox } from '@/components/ui/checkbox';
+import * as XLSX from 'xlsx';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 
-function ListingCard({ listing }: { listing: WarehouseSchema }) {
+function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
   const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader>
-        <div className="aspect-video relative mb-4">
-          <Image
-            src={previewImage}
-            alt={listing.locationName}
-            fill
-            className="rounded-t-lg object-cover"
-            data-ai-hint="modern warehouse"
+    <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary")}>
+       <CardHeader>
+        <div className="flex items-start justify-between gap-4">
+          <div className="aspect-video relative mb-4 flex-grow">
+            <Image
+              src={previewImage}
+              alt={listing.locationName}
+              fill
+              className="rounded-t-lg object-cover"
+              data-ai-hint="modern warehouse"
+            />
+          </div>
+           <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onSelectionChange(listing)}
+            aria-label={`Select warehouse ${listing.id}`}
+            className="w-5 h-5"
           />
         </div>
         <CardTitle>{listing.locationName}</CardTitle>
@@ -63,12 +76,89 @@ function ListingCard({ listing }: { listing: WarehouseSchema }) {
   );
 }
 
+function DownloadBar() {
+    const { user } = useAuth();
+    const { toast } = useToast();
+    const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
+
+    if (selectedForDownload.length === 0) {
+        return null;
+    }
+
+    const handleDownload = () => {
+        let successfulDownloads: WarehouseSchema[] = [];
+        let failedDownloadsCount = 0;
+
+        selectedForDownload.forEach(listing => {
+            const { success } = logDownload(user!.email!, listing);
+            if (success) {
+                successfulDownloads.push(listing);
+            } else {
+                failedDownloadsCount++;
+            }
+        });
+
+        if (successfulDownloads.length > 0) {
+            const dataToExport = successfulDownloads.map(l => ({
+                'Property ID': l.id,
+                'Size (Sq. Ft.)': l.size,
+                'Readiness': l.readiness,
+                'Docks': l.specifications.docks,
+                'Ceiling Height (ft)': l.specifications.ceilingHeight,
+                'Flooring Type': l.specifications.flooringType,
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Listings");
+            XLSX.writeFile(workbook, `selected_listings_${Date.now()}.csv`, { bookType: "csv" });
+
+            toast({
+                title: "Download Started",
+                description: `${successfulDownloads.length} listing(s) have been exported.`
+            });
+        }
+
+        if (failedDownloadsCount > 0) {
+            toast({
+                variant: 'destructive',
+                title: 'Some Downloads Failed',
+                description: `${failedDownloadsCount} listing(s) could not be downloaded due to daily limits.`
+            });
+        }
+        
+        clearSelectedForDownload();
+    }
+
+    return (
+        <div className="fixed bottom-4 inset-x-0 z-50 flex justify-center">
+            <div className="flex items-center justify-between gap-6 p-4 rounded-lg shadow-2xl bg-card border w-full max-w-2xl animate-in slide-in-from-bottom-5">
+                <p className="font-semibold text-sm">
+                    {selectedForDownload.length} listing{selectedForDownload.length > 1 ? 's' : ''} selected
+                </p>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={clearSelectedForDownload}>
+                        <X className="mr-2 h-4 w-4" /> Clear
+                    </Button>
+                    <Button onClick={handleDownload}>
+                        <Download className="mr-2 h-4 w-4" /> Download Selected
+                    </Button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export default function ListingsPage() {
+  const { user } = useAuth();
   const [allWarehouses, setAllWarehouses] = useState<WarehouseSchema[]>([]);
   const [filteredListings, setFilteredListings] = useState<WarehouseSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
+  
+  const { selectedForDownload, toggleSelectedForDownload } = useData();
+  const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.id)), [selectedForDownload]);
 
   const uniqueLocations = useMemo(() => {
     const locations = new Set(allWarehouses.map(l => l.locationName));
@@ -145,6 +235,7 @@ export default function ListingsPage() {
 
 
   return (
+    <>
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
@@ -224,7 +315,12 @@ export default function ListingsPage() {
             {filteredListings.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredListings.map(listing => (
-                        <ListingCard key={listing.id} listing={listing} />
+                        <ListingCard 
+                            key={listing.id} 
+                            listing={listing} 
+                            isSelected={selectedIds.has(listing.id)}
+                            onSelectionChange={toggleSelectedForDownload}
+                        />
                     ))}
                 </div>
             ) : (
@@ -240,5 +336,7 @@ export default function ListingsPage() {
             )}
         </div>
     </main>
+    {user?.role === 'User' && <DownloadBar />}
+    </>
   );
 }
