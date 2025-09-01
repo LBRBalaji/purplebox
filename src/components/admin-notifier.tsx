@@ -5,7 +5,7 @@ import * as React from 'react';
 import { useData } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, ShieldAlert } from 'lucide-react';
 
 export function AdminNotifier() {
   const { lastEvent } = useData();
@@ -15,7 +15,7 @@ export function AdminNotifier() {
   const [lastNotifiedTimestamp, setLastNotifiedTimestamp] = React.useState(averyLongTimeAgo);
 
   React.useEffect(() => {
-    if (user?.role !== 'SuperAdmin' || !lastEvent || lastEvent.timestamp <= lastNotifiedTimestamp) {
+    if ((user?.role !== 'SuperAdmin' && user?.email !== 'admin@example.com') || !lastEvent || lastEvent.timestamp <= lastNotifiedTimestamp) {
       return;
     }
 
@@ -44,7 +44,19 @@ export function AdminNotifier() {
         ),
         description: `A new match was submitted for demand: ${lastEvent.id}`,
       });
+    } else if (lastEvent.type === 'download_limit_exceeded') {
+        toast({
+            variant: 'destructive',
+            title: (
+                <div className="flex items-center gap-2">
+                    <ShieldAlert className="h-5 w-5" />
+                    <span>User Download Limit Reached</span>
+                </div>
+            ),
+            description: `User ${lastEvent.id} has reached their daily download limit.`,
+        });
     }
+
 
     setLastNotifiedTimestamp(lastEvent.timestamp);
 

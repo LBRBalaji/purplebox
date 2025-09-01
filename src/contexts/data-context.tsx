@@ -25,10 +25,16 @@ export type ListingAnalytics = {
   downloadedBy?: { name: string; company: string }[];
 };
 
+export type DownloadRecord = {
+    userId: string;
+    listingId: string;
+    location: string;
+    timestamp: number;
+}
 
 type DataEvent = {
-  type: 'new_demand' | 'new_submission' | 'new_listing';
-  id: string; // The ID of the demand or submission
+  type: 'new_demand' | 'new_submission' | 'new_listing' | 'download_limit_exceeded';
+  id: string; // The ID of the demand, submission, or user email
   timestamp: string;
   triggeredBy: string | undefined; // The email of the user who triggered the event
 };
@@ -57,6 +63,8 @@ type DataContextType = {
   addAgentLead: (lead: Omit<AgentLead, 'id' | 'status'>) => void;
   updateAgentLeadStatus: (leadId: string, status: AgentStatus) => void;
   isLoading: boolean;
+  // Download tracking
+  logDownload: (userId: string, listing: ListingSchema) => { success: boolean; limitReached: boolean };
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -82,6 +90,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
   const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
+  const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -126,14 +135,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     fetchData();
     
-    // Load agent leads from local storage on initial load as a fallback/cache
+    // Load data from local storage on initial load as a fallback/cache
     try {
         const storedLeads = localStorage.getItem('warehouseorigin_agent_leads');
-        if (storedLeads) {
-            setAgentLeads(JSON.parse(storedLeads));
-        }
+        if (storedLeads) setAgentLeads(JSON.parse(storedLeads));
+        const storedDownloads = localStorage.getItem('warehouseorigin_downloads');
+        if(storedDownloads) setDownloadHistory(JSON.parse(storedDownloads));
+
     } catch (e) {
-        console.error("Failed to parse agent leads from local storage", e);
+        console.error("Failed to parse data from local storage", e);
     }
   }, []);
 
@@ -252,11 +262,51 @@ export function DataProvider({ children }: { children: ReactNode }) {
         )
     );
   }
+  
+  const logDownload = (userId: string, listing: ListingSchema): { success: boolean; limitReached: boolean } => {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+    const todaysDownloads = downloadHistory.filter(
+      (d) => d.userId === userId && d.timestamp >= startOfDay && d.location === listing.location
+    );
+
+    if (todaysDownloads.length >= 3) {
+        setLastEvent({
+            type: 'download_limit_exceeded',
+            id: userId,
+            timestamp: new Date().toISOString(),
+            triggeredBy: userId,
+        });
+        return { success: false, limitReached: true };
+    }
+    
+    const newRecord: DownloadRecord = {
+        userId,
+        listingId: listing.listingId,
+        location: listing.location,
+        timestamp: now.getTime(),
+    };
+    
+    const updatedHistory = [...downloadHistory, newRecord];
+    setDownloadHistory(updatedHistory);
+    localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
+
+    setListingAnalytics(prev => prev.map(analytic => 
+        analytic.listingId === listing.listingId
+            ? { ...analytic, downloads: analytic.downloads + 1 }
+            : analytic
+    ));
+    
+    return { success: true, limitReached: false };
+  }
 
   return (
     <DataContext.Provider value={{ 
         listings, addListing, updateListing, updateListingStatus, listingAnalytics,
-        demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading }}>
+        demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading,
+        logDownload
+        }}>
       {children}
     </DataContext.Provider>
   );

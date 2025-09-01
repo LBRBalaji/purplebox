@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -30,6 +30,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import * as XLSX from 'xlsx';
 
 
 const InfoPill = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) => (
@@ -125,9 +127,10 @@ export default function ListingDetailPage() {
     const params = useParams();
     const router = useRouter();
     const { user } = useAuth();
+    const { toast } = useToast();
+    const { logDownload } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
-    const [allListings, setAllListings] = React.useState<WarehouseSchema[]>([]);
     const [navigationList, setNavigationList] = React.useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = React.useState(-1);
 
@@ -138,7 +141,6 @@ export default function ListingDetailPage() {
             .then(res => res.json())
             .then((warehouses: WarehouseSchema[]) => {
                 const activeWarehouses = warehouses.filter(w => w.isActive);
-                setAllListings(activeWarehouses);
 
                 const foundWarehouse = activeWarehouses.find(w => w.id === listingId);
                  if (foundWarehouse) {
@@ -182,9 +184,52 @@ export default function ListingDetailPage() {
     const handleDownloadRequest = () => {
         if (!user) {
             setIsLoginDialogOpen(true);
-        } else {
-            // In a real app, this would trigger a secure download link generation
-            alert('Download functionality is for demonstration. You have access!');
+            return;
+        }
+
+        if (user.role !== 'User') {
+             toast({
+                title: "Download Not Applicable",
+                description: "Only customer accounts can download listing details.",
+            });
+            return;
+        }
+
+        const { success, limitReached } = logDownload(user.email, listing);
+        
+        if (success) {
+            const dataToExport = [{
+                'Property ID': listing.listingId,
+                'Size (Sq. Ft.)': listing.sizeSqFt,
+                'Rent (per Sq. Ft.)': listing.rentPerSqFt,
+                'Security Deposit (Months)': listing.rentalSecurityDeposit,
+                'Availability': listing.availabilityDate,
+                'Construction Progress': listing.constructionProgress,
+                'Building Type': listing.buildingSpecifications.buildingType,
+                'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
+                'Ceiling Height (ft)': listing.buildingSpecifications.shopFloorLevelDimension,
+                'Flooring Type': listing.siteSpecifications.typeOfFlooringInside,
+                'Access Road': listing.siteSpecifications.typeOfRoad,
+            }];
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Listing Details");
+
+            XLSX.writeFile(workbook, `listing_${listing.listingId}.csv`, { bookType: "csv" });
+
+            toast({
+                title: "Download Started",
+                description: `Details for ${listing.listingId} are being downloaded.`,
+            });
+        }
+
+        if (limitReached) {
+             toast({
+                variant: 'destructive',
+                title: "Download Limit Reached",
+                description: `You have reached your daily limit of 3 downloads for the location "${listing.location}".`,
+            });
         }
     };
 
@@ -283,7 +328,7 @@ export default function ListingDetailPage() {
                                 <CardHeader>
                                     <CardTitle>Documents & Media</CardTitle>
                                     <CardDescription>
-                                        {user ? "You have access to download all documents." : "Log in to download layouts and other sensitive documents."}
+                                        {user ? "You have access to download media files." : "Log in to download layouts and other sensitive documents."}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -336,6 +381,13 @@ export default function ListingDetailPage() {
                                         </Alert>
                                     )}
                                 </CardContent>
+                                {user && user.role === 'User' && (
+                                    <CardFooter>
+                                        <Button className="w-full" onClick={handleDownloadRequest}>
+                                            <Download className="mr-2 h-4 w-4" /> Download Details as CSV
+                                        </Button>
+                                    </CardFooter>
+                                )}
                             </Card>
 
                             <Card>
