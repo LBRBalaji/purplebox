@@ -1,0 +1,281 @@
+
+'use client';
+
+import * as React from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useData } from '@/contexts/data-context';
+import { useAuth } from '@/contexts/auth-context';
+import type { ListingSchema, Document } from '@/lib/schema';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout } from 'lucide-react';
+import Image from 'next/image';
+import { LoginDialog } from '@/components/login-dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+
+const InfoPill = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) => (
+    <div className="flex flex-col items-center justify-center p-3 text-center rounded-lg bg-secondary/50 border">
+        <Icon className="h-6 w-6 text-primary mb-2" />
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="font-bold text-sm text-foreground">{value || 'N/A'}</p>
+    </div>
+);
+
+const DetailRow = ({ label, value }: { label: string, value: string | number | boolean | undefined }) => {
+    const displayValue = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : (value || 'Not specified');
+    return (
+        <div className="flex justify-between items-center py-2">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p className="text-sm font-medium text-right">{String(displayValue)}</p>
+        </div>
+    );
+};
+
+const DocumentRow = ({ doc, onDownload }: { doc: Document, onDownload: () => void }) => {
+    const getIcon = () => {
+        switch (doc.type) {
+            case 'image': return <ImageIcon className="h-5 w-5 text-primary" />;
+            case 'video': return <Video className="h-5 w-5 text-primary" />;
+            case 'layout': return <Layout className="h-5 w-5 text-primary" />;
+            default: return <FileText className="h-5 w-5 text-primary" />;
+        }
+    }
+    
+    return (
+        <TableRow>
+            <TableCell className="font-medium flex items-center gap-3">
+                {getIcon()}
+                {doc.name}
+            </TableCell>
+            <TableCell className="text-right">
+                <Button variant="outline" size="sm" onClick={onDownload}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                </Button>
+            </TableCell>
+        </TableRow>
+    );
+}
+
+
+export default function ListingDetailPage() {
+    const params = useParams();
+    const router = useRouter();
+    const { listings } = useData();
+    const { user } = useAuth();
+    const [listing, setListing] = React.useState<ListingSchema | null>(null);
+    const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
+
+    React.useEffect(() => {
+        const listingId = params.listingId as string;
+        const foundListing = listings.find(l => l.listingId === listingId);
+        
+        if (foundListing) {
+            // Only approved listings can be viewed directly
+            if (foundListing.status === 'approved') {
+                setListing(foundListing);
+            } else {
+                // For other statuses, maybe redirect or show an error
+                // For now, let's redirect to listings page
+                router.push('/listings');
+            }
+        }
+    }, [params.listingId, listings, router]);
+
+    if (!listing) {
+        // Can show a skeleton loader here
+        return (
+             <div className="flex-grow flex items-center justify-center p-4">
+                <Card className="w-full max-w-4xl text-center p-8">
+                    <CardTitle>Loading Listing...</CardTitle>
+                    <CardDescription>Or the listing could not be found.</CardDescription>
+                </Card>
+            </div>
+        );
+    }
+    
+    const handleDownloadRequest = () => {
+        if (!user) {
+            setIsLoginDialogOpen(true);
+        } else {
+            // In a real app, this would trigger a secure download link generation
+            alert('Download functionality is for demonstration. You have access!');
+        }
+    };
+
+    const mainImage = listing.documents?.find(doc => doc.type === 'image')?.url || 'https://placehold.co/1200x600.png';
+
+    return (
+        <>
+            <main className="container mx-auto p-4 md:p-8">
+                <div className="max-w-6xl mx-auto space-y-8">
+                    {/* Header */}
+                    <div>
+                        <Badge variant="secondary">{listing.warehouseBoxId}</Badge>
+                        <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.name}</h1>
+                        <p className="text-lg text-muted-foreground flex items-center gap-2 mt-2">
+                            <MapPin className="h-5 w-5" /> {listing.location}
+                        </p>
+                    </div>
+                    
+                    {/* Main Content */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* Image and High-level stats */}
+                            <Card>
+                                <CardContent className="p-4">
+                                     <div className="aspect-video relative mb-6">
+                                        <Image
+                                            src={mainImage}
+                                            alt={listing.name}
+                                            fill
+                                            className="rounded-lg object-cover"
+                                            data-ai-hint="warehouse exterior"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <InfoPill icon={Scaling} label="Total Area" value={`${listing.area.totalChargeableArea.toLocaleString()} sft`} />
+                                        <InfoPill icon={Building2} label="Building Type" value={listing.buildingSpecifications.buildingType} />
+                                        <InfoPill icon={Calendar} label="Availability" value={listing.availabilityDate} />
+                                        <InfoPill icon={HardHat} label="Docks" value={listing.buildingSpecifications.numberOfDocksAndShutters} />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            
+                            {/* Description */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Property Overview</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-muted-foreground">{listing.description}</p>
+                                </CardContent>
+                            </Card>
+
+                             {/* Building and Site Specifications */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Specifications</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                        <div>
+                                            <h4 className="font-semibold mb-2">Building</h4>
+                                            <Separator />
+                                            <DetailRow label="Shop Floor Dimension" value={listing.buildingSpecifications.shopFloorLevelDimension} />
+                                            <DetailRow label="Roof Insulation" value={listing.buildingSpecifications.roofInsulationStatus} />
+                                            <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} />
+                                            {user && <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} />}
+                                            {user && <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />}
+                                        </div>
+                                         <div>
+                                            <h4 className="font-semibold mb-2">Site</h4>
+                                            <Separator />
+                                            <DetailRow label="Inside Flooring" value={listing.siteSpecifications.typeOfFlooringInside} />
+                                            <DetailRow label="Outside Flooring" value={listing.siteSpecifications.typeOfFlooringOutside} />
+                                            <DetailRow label="Access Road" value={listing.siteSpecifications.typeOfRoad} />
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Documents */}
+                             <Card>
+                                <CardHeader>
+                                    <CardTitle>Documents & Media</CardTitle>
+                                    <CardDescription>
+                                        {user ? "You have access to download all documents." : "Log in to download layouts and other sensitive documents."}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    {listing.documents && listing.documents.length > 0 ? (
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>File Name</TableHead>
+                                                    <TableHead className="text-right">Action</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {listing.documents.map((doc, index) => (
+                                                   <DocumentRow key={index} doc={doc} onDownload={handleDownloadRequest} />
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    ) : (
+                                        <p className="text-muted-foreground text-sm">No documents have been uploaded for this listing.</p>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                        
+                        {/* Sticky Sidebar */}
+                        <div className="lg:col-span-1 space-y-6">
+                            <Card className="sticky top-8">
+                                <CardHeader>
+                                    <CardTitle>Commercials</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {user ? (
+                                        <div className="space-y-4">
+                                            <div className="flex items-baseline justify-center text-center">
+                                                <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
+                                                <span className="text-sm text-muted-foreground">/sq.ft./month</span>
+                                            </div>
+                                            <Separator/>
+                                            <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit} months`} />
+                                            <DetailRow label="Construction Progress" value={listing.constructionProgress} />
+                                        </div>
+                                    ) : (
+                                        <Alert>
+                                            <Lock className="h-4 w-4" />
+                                            <AlertTitle>Login Required</AlertTitle>
+                                            <AlertDescription>
+                                                Please log in or sign up to view detailed commercial terms and other sensitive data.
+                                            </AlertDescription>
+                                            <Button className="w-full mt-4" onClick={() => setIsLoginDialogOpen(true)}>Login</Button>
+                                        </Alert>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Certificates & Approvals</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                     {user ? (
+                                        <div>
+                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
+                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
+                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
+                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
+                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
+                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
+                                        </div>
+                                     ) : (
+                                         <p className="text-sm text-muted-foreground text-center p-4">
+                                            Login to view compliance details.
+                                         </p>
+                                     )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => setIsLoginDialogOpen(false)} />
+        </>
+    );
+}
