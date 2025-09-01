@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { type DemandSchema, type PropertySchema, type ListingSchema, type WarehouseSchema } from '@/lib/schema';
+import { type User } from './auth-context';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -17,6 +18,12 @@ export type Submission = {
     status: SubmissionStatus;
 }
 
+export type ViewedByRecord = {
+  name: string;
+  company: string;
+  timestamp: number;
+};
+
 export type DownloadedByRecord = {
   name: string;
   company: string;
@@ -30,6 +37,7 @@ export type ListingAnalytics = {
   downloads: number;
   customerIndustries: Record<string, number>;
   downloadedBy?: DownloadedByRecord[];
+  viewedBy?: ViewedByRecord[];
 };
 
 export type DownloadRecord = {
@@ -53,6 +61,7 @@ type DataContextType = {
   updateListing: (listing: ListingSchema) => void;
   updateListingStatus: (listingId: string, status: ListingStatus) => void;
   listingAnalytics: ListingAnalytics[];
+  logListingView: (user: User, listingId: string) => void;
 
 
   // Old demand-centric state (to be phased out)
@@ -316,6 +325,41 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return { success: true, limitReached: false };
   }
 
+  const logListingView = (user: User, listingId: string) => {
+    setListingAnalytics(prevAnalytics => {
+      return prevAnalytics.map(analytic => {
+        if (analytic.listingId === listingId) {
+          const newViewer: ViewedByRecord = {
+            name: user.userName,
+            company: user.companyName,
+            timestamp: Date.now(),
+          };
+
+          // Update existing viewer's timestamp or add new viewer
+          const existingViewers = analytic.viewedBy || [];
+          const viewerIndex = existingViewers.findIndex(v => v.name === newViewer.name && v.company === newViewer.company);
+          
+          let updatedViewers;
+          if (viewerIndex > -1) {
+            // This user has viewed before, update their timestamp
+            updatedViewers = [...existingViewers];
+            updatedViewers[viewerIndex] = newViewer;
+          } else {
+            // New viewer for this listing
+             updatedViewers = [...existingViewers, newViewer];
+          }
+
+          return {
+            ...analytic,
+            views: (analytic.views || 0) + 1, // Increment view count
+            viewedBy: updatedViewers,
+          };
+        }
+        return analytic;
+      });
+    });
+  };
+
   const toggleSelectedForDownload = (listing: WarehouseSchema) => {
     setSelectedForDownload(prev => {
         const isSelected = prev.find(item => item.id === listing.id);
@@ -333,7 +377,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   return (
     <DataContext.Provider value={{ 
-        listings, addListing, updateListing, updateListingStatus, listingAnalytics,
+        listings, addListing, updateListing, updateListingStatus, listingAnalytics, logListingView,
         demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading,
         logDownload,
         selectedForDownload,

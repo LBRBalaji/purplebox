@@ -128,7 +128,7 @@ export default function ListingDetailPage() {
     const router = useRouter();
     const { user } = useAuth();
     const { toast } = useToast();
-    const { logDownload } = useData();
+    const { logDownload, logListingView } = useData();
     const [listing, setListing] = React.useState<WarehouseSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [navigationList, setNavigationList] = React.useState<string[]>([]);
@@ -137,6 +137,10 @@ export default function ListingDetailPage() {
     React.useEffect(() => {
         const listingId = params.listingId as string;
         
+        if (user && listingId) {
+            logListingView(user, listingId);
+        }
+
         fetch('/api/warehouses')
             .then(res => res.json())
             .then((warehouses: WarehouseSchema[]) => {
@@ -165,7 +169,7 @@ export default function ListingDetailPage() {
 
             });
 
-    }, [params.listingId, router]);
+    }, [params.listingId, router, user, logListingView]);
 
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
