@@ -303,7 +303,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             </ScrollArea>
             <DialogFooter className="sticky bottom-0 bg-background/95 p-6 -m-6 mt-6 pt-6 z-10 border-t">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit">{isEditMode ? 'Save Changes' : 'Submit for Approval'}</Button>
+                <Button type="submit">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
             </DialogFooter>
           </form>
         </Form>
