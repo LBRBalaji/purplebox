@@ -83,7 +83,7 @@ type DataContextType = {
   // Download tracking
   logDownload: (userId: string, listing: WarehouseSchema) => { success: boolean; limitReached: boolean };
   selectedForDownload: WarehouseSchema[];
-  toggleSelectedForDownload: (listing: WarehouseSchema) => void;
+  toggleSelectedForDownload: (listing: WarehouseSchema, user: User) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
   getTodaysDownloadsForLocation: (userId: string, location: string) => number;
 };
@@ -362,15 +362,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const toggleSelectedForDownload = (listing: WarehouseSchema) => {
-      setSelectedForDownload(prev => {
-        const isSelected = prev.find(item => item.id === listing.id);
-        if (isSelected) {
-            return prev.filter(item => item.id !== listing.id);
-        } else {
-            return [...prev, listing];
-        }
-      });
+  const toggleSelectedForDownload = (listing: WarehouseSchema, user: User): { limitReached: boolean } => {
+    const isSelected = selectedForDownload.find(item => item.id === listing.id);
+
+    if (isSelected) {
+      setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
+      return { limitReached: false };
+    } else {
+      const todaysDownloads = getTodaysDownloadsForLocation(user.email, listing.locationName);
+      const alreadySelectedFromLocation = selectedForDownload.filter(l => l.locationName === listing.locationName).length;
+      
+      if ((todaysDownloads + alreadySelectedFromLocation) >= 3) {
+        return { limitReached: true };
+      }
+      
+      setSelectedForDownload(prev => [...prev, listing]);
+      return { limitReached: false };
+    }
   };
 
 
@@ -400,5 +408,3 @@ export function useData() {
   }
   return context;
 }
-
-    

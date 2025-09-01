@@ -114,32 +114,15 @@ function DownloadBar() {
         }
 
         let successfulDownloads: WarehouseSchema[] = [];
-        let failedDownloadsCount = 0;
         const failedLocations = new Set<string>();
 
-        const downloadsPerLocation: Record<string, number> = {};
-
         selectedForDownload.forEach(listing => {
-            const location = listing.locationName;
-            const todaysDownloads = getTodaysDownloadsForLocation(user!.email!, location);
-            
-            if (!downloadsPerLocation[location]) {
-                downloadsPerLocation[location] = todaysDownloads;
-            }
-
-            if (downloadsPerLocation[location] < 3) {
-                 const { success } = logDownload(user!.email!, listing);
-                 if (success) {
-                    successfulDownloads.push(listing);
-                    downloadsPerLocation[location]++;
-                 } else {
-                     // This case should theoretically not be hit if checks are right, but as a fallback
-                    failedDownloadsCount++;
-                    failedLocations.add(location);
-                 }
+            // The selection logic now prevents exceeding the limit, so this is a final check.
+            const { success } = logDownload(user!.email!, listing);
+            if (success) {
+                successfulDownloads.push(listing);
             } else {
-                failedDownloadsCount++;
-                failedLocations.add(location);
+                failedLocations.add(listing.locationName);
             }
         });
 
@@ -209,6 +192,8 @@ export default function ListingsPage() {
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
+  const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   
   const { selectedForDownload, toggleSelectedForDownload } = useData();
   const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.id)), [selectedForDownload]);
@@ -297,10 +282,13 @@ export default function ListingsPage() {
               title: 'Download Not Available',
               description: 'While you can browse listings, only Customer accounts are permitted to download property details.'
           });
-          // Do not toggle selection for non-customers
           return;
       }
-      toggleSelectedForDownload(listing);
+      const { limitReached } = toggleSelectedForDownload(listing, user);
+      if (limitReached) {
+        setLimitExceededLocation(listing.locationName);
+        setIsLimitExceededDialogOpen(true);
+      }
   }
 
   const handleLoginSuccess = () => {
@@ -415,6 +403,11 @@ export default function ListingsPage() {
     </main>
     <DownloadBar />
      <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess} />
+     <LimitExceededDialog 
+        isOpen={isLimitExceededDialogOpen} 
+        onOpenChange={setIsLimitExceededDialogOpen}
+        location={limitExceededLocation || ''}
+      />
     </>
   );
 }
