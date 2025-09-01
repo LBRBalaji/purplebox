@@ -20,7 +20,6 @@ export function ShortlistedProperties() {
 
   const handleDownload = () => {
     const dataToExport = shortlistedItems.map(item => ({
-        'Demand ID': item.demandId,
         'Property ID': item.property.propertyId,
         'Size (Sq. Ft.)': item.property.size,
         'Rent (per Sq. Ft.)': item.property.rentPerSft,
@@ -28,8 +27,7 @@ export function ShortlistedProperties() {
         'Docks': item.property.docks,
         'Readiness': item.property.readinessToOccupy,
         'Site Type': item.property.siteType,
-        'Approval Status': item.property.approvalStatus,
-        'Fire NOC': item.property.fireNoc,
+        // Sensitive fields like Approval Status and Fire NOC are now removed.
     }));
     
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
