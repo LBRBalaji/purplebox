@@ -1,10 +1,10 @@
 
 [
   {
-    "listingId": "LST-001",
+    "listingId": "LST-8K3J5M1P",
     "developerId": "provider@example.com",
     "status": "approved",
-    "warehouseBoxId": "WBX-PRIME-A-8732",
+    "warehouseBoxId": "WBX-A9B1C2D3",
     "name": "Warehouse in Oragadam",
     "location": "Oragadam, Chennai",
     "latLng": "12.83, 79.95",
@@ -53,20 +53,13 @@
       { "type": "image", "name": "Dock Area", "url": "https://placehold.co/800x600/210D42/FFFFFF?text=Dock+Area" },
       { "type": "image", "name": "Interior Shot", "url": "https://placehold.co/800x600/210D42/FFFFFF?text=Interior" },
       { "type": "layout", "name": "Floor Plan Layout", "url": "#" }
-    ],
-    "developerName": "Prime Properties",
-    "developerContactName": "Test Provider",
-    "developerMobile": "555-111-2222",
-    "developerEmail": "provider@example.com",
-    "developerWebsite": "https://example.com",
-    "projectName": "Prime Logistics Park",
-    "siteDetails": "Site located on main Oragadam highway with easy access for 40ft trailers."
+    ]
   },
   {
-    "listingId": "LST-002",
+    "listingId": "LST-F4G7H9N2",
     "developerId": "provider@example.com",
     "status": "approved",
-    "warehouseBoxId": "WBX-BHIW-B-4815",
+    "warehouseBoxId": "WBX-B4H8I1W5",
     "name": "Warehouse in Bhiwandi",
     "location": "Bhiwandi, Mumbai",
     "latLng": "19.30, 73.06",
@@ -109,18 +102,13 @@
        { "type": "image", "name": "Aerial View", "url": "https://placehold.co/800x600/4F46E5/FFFFFF?text=Aerial+View" },
        { "type": "image", "name": "Loading Bays", "url": "https://placehold.co/800x600/4F46E5/FFFFFF?text=Loading+Bays" },
        { "type": "layout", "name": "Site Master Plan", "url": "#" }
-    ],
-    "developerName": "Prime Properties",
-    "developerContactName": "Test Provider",
-    "developerMobile": "555-111-2222",
-    "developerEmail": "provider@example.com",
-    "projectName": "Bhiwandi MegaHub"
+    ]
   },
   {
-    "listingId": "LST-003",
+    "listingId": "LST-QW3R5T7Y",
     "developerId": "provider@example.com",
     "status": "pending",
-    "warehouseBoxId": "WBX-INDUS-B-9104",
+    "warehouseBoxId": "WBX-I9N1D0U4",
     "name": "Warehouse in Sriperumbudur",
     "location": "Sriperumbudur, Chennai",
     "latLng": "12.96, 79.95",
@@ -161,18 +149,13 @@
     },
     "documents": [
       { "type": "image", "name": "Construction Site", "url": "https://placehold.co/800x600/D97706/FFFFFF?text=Under+Construction" }
-    ],
-    "developerName": "Prime Properties",
-    "developerContactName": "Test Provider",
-    "developerMobile": "555-111-2222",
-    "developerEmail": "provider@example.com",
-    "projectName": "IndusConnect Logistics"
+    ]
   },
   {
-    "listingId": "LST-004",
+    "listingId": "LST-Z2X4C6V8",
     "developerId": "provider@example.com",
     "status": "rejected",
-    "warehouseBoxId": "WBX-VALUE-C-1552",
+    "warehouseBoxId": "WBX-V1A5L2U9",
     "name": "Warehouse in Ambattur",
     "location": "Ambattur, Chennai",
     "latLng": "13.11, 80.16",
@@ -199,14 +182,10 @@
       "buildingInsurance": true,
       "propertyTax": true
     },
-    "documents": [],
-    "developerName": "Prime Properties",
-    "developerContactName": "Test Provider",
-    "developerMobile": "555-111-2222",
-    "developerEmail": "provider@example.com"
+    "documents": []
   },
   {
-    "listingId": "LST-005",
+    "listingId": "LST-M1N3B5V7",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-HOSKOTE-C-1121",
@@ -249,18 +228,13 @@
     "documents": [
        { "type": "image", "name": "Exterior View", "url": "https://placehold.co/800x600/10B981/FFFFFF?text=Exterior+View" },
        { "type": "layout", "name": "Unit Layout", "url": "#" }
-    ],
-    "developerName": "Prime Properties",
-    "developerContactName": "Test Provider",
-    "developerMobile": "555-111-2222",
-    "developerEmail": "provider@example.com",
-    "projectName": "Hoskote Tech Park"
+    ]
   },
   {
-    "listingId": "LST-006",
+    "listingId": "LST-P9O7I5U3",
     "developerId": "provider@example.com",
     "status": "pending",
-    "warehouseBoxId": "WBX-FRBD-D-1189",
+    "warehouseBoxId": "WBX-F1R8D9B9",
     "name": "Warehouse in Faridabad",
     "location": "Faridabad, Haryana",
     "latLng": "28.4089, 77.3178",
@@ -289,17 +263,13 @@
       "buildingInsurance": true,
       "propertyTax": true
     },
-    "documents": [],
-    "developerName": "Prime Properties",
-    "developerContactName": "Test Provider",
-    "developerMobile": "555-111-2222",
-    "developerEmail": "provider@example.com"
+    "documents": []
   },
   {
-    "listingId": "LST-007",
+    "listingId": "LST-A1S2D3F4",
     "developerId": "provider@example.com",
     "status": "pending",
-    "warehouseBoxId": "WBX-COIM-E-7765",
+    "warehouseBoxId": "WBX-C0IM-E-7765",
     "name": "Warehouse in Coimbatore",
     "location": "Coimbatore, Tamil Nadu",
     "latLng": "11.0168, 76.9558",
@@ -328,14 +298,10 @@
       "buildingInsurance": true,
       "propertyTax": true
     },
-    "documents": [],
-    "developerName": "Prime Properties",
-    "developerContactName": "Test Provider",
-    "developerMobile": "555-111-2222",
-    "developerEmail": "provider@example.com"
+    "documents": []
   },
    {
-    "listingId": "LST-008",
+    "listingId": "LST-G5H6J7K8",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-GURGAON-F-1234",
@@ -356,7 +322,7 @@
     "documents": [{ "type": "image", "name": "Facility View", "url": "https://placehold.co/800x600/059669/FFFFFF?text=NCR+Logistics" }]
   },
   {
-    "listingId": "LST-009",
+    "listingId": "LST-L9K1J2H3",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-CHAKAN-G-5678",
@@ -377,7 +343,7 @@
     "documents": [{ "type": "image", "name": "Facility Frontage", "url": "https://placehold.co/800x600/BE123C/FFFFFF?text=Chakan+Auto+Hub" }]
   },
   {
-    "listingId": "LST-010",
+    "listingId": "LST-Y4U5I6O7",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-HOSUR-H-9101",
@@ -398,7 +364,7 @@
     "documents": [{ "type": "image", "name": "Estate View", "url": "https://placehold.co/800x600/9A3412/FFFFFF?text=Hosur+Industrial" }]
   },
   {
-    "listingId": "LST-011",
+    "listingId": "LST-P8A9S1D2",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-PUN-3PL-4411",
@@ -419,7 +385,7 @@
     "documents": [{ "type": "image", "name": "3PL Operations", "url": "https://placehold.co/800x600/6D28D9/FFFFFF?text=3PL+Services" }]
   },
   {
-    "listingId": "LST-012",
+    "listingId": "LST-F3G4H5J6",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-AHMD-A-3141",
@@ -440,7 +406,7 @@
     "documents": [{ "type": "image", "name": "Park Entrance", "url": "https://placehold.co/800x600/DB2777/FFFFFF?text=Ahmedabad+Logistics" }]
   },
   {
-    "listingId": "LST-013",
+    "listingId": "LST-K7L8M9N1",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-HYD-B-9422",
@@ -461,7 +427,7 @@
     "documents": [{ "type": "image", "name": "Pharma Hub", "url": "https://placehold.co/800x600/1D4ED8/FFFFFF?text=Pharma+Hub" }]
   },
   {
-    "listingId": "LST-014",
+    "listingId": "LST-B2V3C4X5",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-LUD-C-7531",
@@ -482,7 +448,7 @@
     "documents": [{ "type": "image", "name": "Industrial Unit", "url": "https://placehold.co/800x600/EA580C/FFFFFF?text=Ludhiana+Unit" }]
   },
   {
-    "listingId": "LST-015",
+    "listingId": "LST-Z6A7S8D9",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-KOL-D-8823",
@@ -503,7 +469,7 @@
     "documents": [{ "type": "image", "name": "Kolkata Logistics", "url": "https://placehold.co/800x600/0891B2/FFFFFF?text=Kolkata+Logistics" }]
   },
   {
-    "listingId": "LST-016",
+    "listingId": "LST-F1G2H3J4",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-NAG-E-9512",
@@ -524,7 +490,7 @@
     "documents": [{ "type": "image", "name": "Nagpur Hub", "url": "https://placehold.co/800x600/CA8A04/FFFFFF?text=Nagpur+Central" }]
   },
   {
-    "listingId": "LST-017",
+    "listingId": "LST-K5L6M7N8",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-IND-F-6371",
@@ -545,7 +511,7 @@
     "documents": [{ "type": "image", "name": "Indore Cargo", "url": "https://placehold.co/800x600/65A30D/FFFFFF?text=Indore+Express" }]
   },
   {
-    "listingId": "LST-018",
+    "listingId": "LST-B9V1C2X3",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-VIZ-G-2288",
@@ -566,7 +532,7 @@
     "documents": [{ "type": "image", "name": "Vizag Storage", "url": "https://placehold.co/800x600/3B82F6/FFFFFF?text=Vizag+Portside" }]
   },
   {
-    "listingId": "LST-019",
+    "listingId": "LST-Z4A5S6D7",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-NOIDA-H-3399",
@@ -587,7 +553,7 @@
     "documents": [{ "type": "image", "name": "Noida Tech", "url": "https://placehold.co/800x600/A855F7/FFFFFF?text=Noida+Tech+Warehouse" }]
   },
   {
-    "listingId": "LST-020",
+    "listingId": "LST-F8G9H1J2",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-GUW-I-4477",
@@ -608,7 +574,7 @@
     "documents": [{ "type": "image", "name": "Guwahati Hub", "url": "https://placehold.co/800x600/16A34A/FFFFFF?text=Guwahati+Hub" }]
   },
   {
-    "listingId": "LST-021",
+    "listingId": "LST-K3L4M5N6",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-LUCK-J-5588",
@@ -629,7 +595,7 @@
     "documents": [{ "type": "image", "name": "Lucknow Logistics", "url": "https://placehold.co/800x600/DC2626/FFFFFF?text=Lucknow+Logistics" }]
   },
   {
-    "listingId": "LST-022",
+    "listingId": "LST-B7V8C9X1",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-JAI-K-6699",
@@ -650,7 +616,7 @@
     "documents": [{ "type": "image", "name": "Jaipur Storage", "url": "https://placehold.co/800x600/F97316/FFFFFF?text=Jaipur+Storage" }]
   },
   {
-    "listingId": "LST-023",
+    "listingId": "LST-Z2A3S4D5",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-BGLR-3PL-7700",
@@ -671,7 +637,7 @@
     "documents": [{ "type": "image", "name": "E-commerce Hub", "url": "https://placehold.co/800x600/8B5CF6/FFFFFF?text=E-commerce+3PL" }]
   },
   {
-    "listingId": "LST-024",
+    "listingId": "LST-F6G7H8J9",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-PAT-L-8811",
@@ -692,7 +658,7 @@
     "documents": [{ "type": "image", "name": "Patna Logistics", "url": "https://placehold.co/800x600/EC4899/FFFFFF?text=Patna+Logistics" }]
   },
   {
-    "listingId": "LST-025",
+    "listingId": "LST-K1L2M3N4",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-RAI-M-9922",
@@ -713,7 +679,7 @@
     "documents": [{ "type": "image", "name": "Raipur Unit", "url": "https://placehold.co/800x600/F43F5E/FFFFFF?text=Raipur+Industrial" }]
   },
   {
-    "listingId": "LST-026",
+    "listingId": "LST-B5V6C7X8",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-BHO-N-1133",
@@ -734,7 +700,7 @@
     "documents": [{ "type": "image", "name": "Bhopal Storage", "url": "https://placehold.co/800x600/14B8A6/FFFFFF?text=Bhopal+Storage" }]
   },
   {
-    "listingId": "LST-027",
+    "listingId": "LST-Z9A1S2D3",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-KOC-O-2244",
@@ -755,7 +721,7 @@
     "documents": [{ "type": "image", "name": "Kochi Connect", "url": "https://placehold.co/800x600/84CC16/FFFFFF?text=Kochi+Port+Connect" }]
   },
   {
-    "listingId": "LST-028",
+    "listingId": "LST-F4G5H6J7",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-DEH-P-3355",
@@ -776,7 +742,7 @@
     "documents": [{ "type": "image", "name": "Dehradun Logistics", "url": "https://placehold.co/800x600/F9A8D4/FFFFFF?text=Dehradun+Logistics" }]
   },
   {
-    "listingId": "LST-029",
+    "listingId": "LST-K8L9M1N2",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-SUR-Q-4466",
@@ -797,7 +763,7 @@
     "documents": [{ "type": "image", "name": "Surat Warehousing", "url": "https://placehold.co/800x600/22D3EE/FFFFFF?text=Surat+Warehousing" }]
   },
   {
-    "listingId": "LST-030",
+    "listingId": "LST-B3V4C5X6",
     "developerId": "provider@example.com",
     "status": "approved",
     "warehouseBoxId": "WBX-CHN-3PL-5577",
