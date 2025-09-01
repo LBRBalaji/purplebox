@@ -25,7 +25,7 @@
     "companyName": "TechCorp",
     "userName": "Jane Smith",
     "userPhone": "123-456-7890",
-    "operationType": "Industrial Building",
+    "operationType": "Manufacturing",
     "location": "13.0827, 80.2707",
     "locationName": "Chennai, Tamil Nadu, India",
     "radius": 10,
@@ -63,7 +63,7 @@
     "companyName": "Global Industries",
     "userName": "Mary Williams",
     "userPhone": "123-456-7890",
-    "operationType": "Industrial Building",
+    "operationType": "Manufacturing",
     "location": "13.0827, 80.2707",
     "locationName": "Chennai, Tamil Nadu, India",
     "radius": 25,
@@ -120,7 +120,7 @@
       "companyName": "AutoParts Express",
       "userName": "Rajesh Singh",
       "userPhone": "555-555-6666",
-      "operationType": "Industrial Building",
+      "operationType": "Manufacturing",
       "location": "12.83, 79.95",
       "locationName": "Oragadam Industrial Corridor",
       "radius": 5,
@@ -196,7 +196,7 @@
   {
       "demandId": "DMD-1750000000010",
       "userEmail": "logistics.pro@example.com",
-      "companyName": "AgroFresh Cold Storage",
+      "companyName": "ProLogistics Solutions",
       "userName": "Priya Sharma",
       "userPhone": "555-222-8888",
       "operationType": "Warehousing",
@@ -223,5 +223,43 @@
           "tenantSpecificImprovements": "Requires installation of insulated panels and additional power outlets for cold storage units."
       },
       "description": "Specialized requirement for a cold chain logistics provider. The entire warehouse area must be temperature-controlled (HVAC). Immediate readiness is key to meeting a new contract requirement. A ground floor RCC building is preferred for better insulation and stability."
+  },
+  {
+      "demandId": "DMD-1750000000011",
+      "userEmail": "logistics.pro@example.com",
+      "companyName": "ProLogistics Solutions",
+      "userName": "Sunil Patel",
+      "userPhone": "555-987-6543",
+      "operationType": "Warehousing",
+      "location": "12.83, 79.95",
+      "locationName": "Oragadam",
+      "radius": 25,
+      "size": 300000,
+      "readiness": "Immediate",
+      "ceilingHeight": 50,
+      "docks": 25,
+      "description": "Second major requirement for a large-scale distribution hub in the southern corridor. Similar to our previous demand, but for a different client. High-grade specs are essential.",
+      "preferences": {
+          "nonCompromisable": ["size", "readiness"]
+      }
+  },
+  {
+      "demandId": "DMD-1750000000012",
+      "userEmail": "user@example.com",
+      "companyName": "PharmaSafe Inc.",
+      "userName": "Dr. Evelyn Reed",
+      "userPhone": "555-333-4444",
+      "operationType": "Warehousing",
+      "location": "18.75, 73.81",
+      "locationName": "Chakan, Pune",
+      "radius": 15,
+      "size": 75000,
+      "readiness": "Within 45 Days",
+      "ceilingHeight": 35,
+      "docks": 8,
+      "description": "Expansion requirement for our pharmaceutical distribution network in the Pune region.",
+      "preferences": {
+          "nonCompromisable": ["location", "approvals"]
+      }
   }
 ]
