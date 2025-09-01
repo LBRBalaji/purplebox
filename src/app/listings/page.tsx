@@ -1,21 +1,24 @@
 
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useData } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, MapPin, Scaling, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, MapPin, Scaling, Search, SlidersHorizontal, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
+import { findSimilarWarehouses } from '@/ai/flows/find-similar-warehouses';
+import { useToast } from '@/hooks/use-toast';
+import { type WarehouseSchema } from '@/lib/schema';
 
-function ListingCard({ listing }: { listing: ListingSchema }) {
-  const previewImage = listing.documents?.find(doc => doc.type === 'image')?.url || 'https://placehold.co/600x400.png';
+function ListingCard({ listing }: { listing: WarehouseSchema }) {
+  const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
 
   return (
     <Card className="flex flex-col">
@@ -23,41 +26,38 @@ function ListingCard({ listing }: { listing: ListingSchema }) {
         <div className="aspect-video relative mb-4">
           <Image
             src={previewImage}
-            alt={listing.name}
+            alt={listing.locationName}
             fill
             className="rounded-t-lg object-cover"
             data-ai-hint="modern warehouse"
           />
         </div>
-        <CardTitle>{listing.name}</CardTitle>
-        <CardDescription>{listing.location}</CardDescription>
+        <CardTitle>{listing.locationName}</CardTitle>
+        <CardDescription>ID: {listing.id}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
-         <div className="text-sm text-muted-foreground line-clamp-3">
-          {listing.description}
-        </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
                 <Scaling className="h-4 w-4 text-primary" />
-                <span>{listing.sizeSqFt.toLocaleString()} sq. ft.</span>
+                <span>{listing.size.toLocaleString()} sq. ft.</span>
             </div>
             <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-primary" />
-                <span>{listing.buildingSpecifications.buildingType || 'N/A'}</span>
+                <span>{listing.specifications.flooringType || 'N/A'}</span>
             </div>
             <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
-                <span className="truncate">{listing.location}</span>
+                <span className="truncate">{listing.locationName}</span>
             </div>
             <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-primary" />
-                <span>{listing.availabilityDate}</span>
+                <span>{listing.readiness}</span>
             </div>
         </div>
       </CardContent>
       <CardFooter>
-        <Button asChild className="w-full">
-            <Link href={`/listings/${listing.listingId}`}>
+        <Button asChild className="w-full" disabled>
+            <Link href={`/listings/`}>
                 View Details <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
         </Button>
@@ -67,54 +67,58 @@ function ListingCard({ listing }: { listing: ListingSchema }) {
 }
 
 export default function ListingsPage() {
-  const { listings } = useData();
-  const [filteredListings, setFilteredListings] = useState<ListingSchema[]>([]);
+  const { listings: allApiListings } = useData(); // This is the old listings data, which we might not need anymore
+  const [allWarehouses, setAllWarehouses] = useState<WarehouseSchema[]>([]);
+  const [filteredListings, setFilteredListings] = useState<WarehouseSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
+  const [isSearching, setIsSearching] = useState(false);
+  const { toast } = useToast();
 
   const uniqueLocations = useMemo(() => {
-    const locations = new Set(listings.map(l => l.location));
+    const locations = new Set(allWarehouses.map(l => l.locationName));
     return Array.from(locations);
-  }, [listings]);
-
+  }, [allWarehouses]);
+  
   useEffect(() => {
-    const approved = listings.filter(l => l.status === 'approved');
-    
-    const results = approved.filter(listing => {
-        const searchTermLower = searchTerm.toLowerCase();
+    fetch('/api/warehouses')
+      .then(res => res.json())
+      .then(data => {
+          setAllWarehouses(data);
+          setFilteredListings(data.filter((w: WarehouseSchema) => w.isActive));
+      });
+  }, []);
+  
+  const handleSearch = useCallback(async () => {
+    if (!searchTerm) {
+        // If search term is cleared, reset to all active warehouses
+        setFilteredListings(allWarehouses.filter(w => w.isActive));
+        return;
+    }
 
-        // Create a single string of searchable content from various listing fields
-        const searchableContent = [
-            listing.name,
-            listing.location,
-            listing.description,
-            listing.warehouseBoxId,
-            listing.sizeSqFt.toString(),
-            listing.rentPerSqFt?.toString(),
-            listing.buildingSpecifications.buildingType,
-            listing.buildingSpecifications.internalLighting,
-            listing.siteSpecifications.typeOfFlooringInside,
-            listing.siteSpecifications.typeOfFlooringOutside,
-            listing.siteSpecifications.typeOfRoad,
-        ].join(' ').toLowerCase();
+    setIsSearching(true);
+    try {
+        const results = await findSimilarWarehouses({ query: searchTerm });
+        setFilteredListings(results.warehouses || []);
+    } catch (error) {
+        console.error("Semantic search failed:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Search Failed',
+            description: 'Could not perform the search. Please try again.'
+        });
+    } finally {
+        setIsSearching(false);
+    }
+  }, [searchTerm, allWarehouses, toast]);
 
-        const matchesSearch = searchTerm === '' || searchableContent.includes(searchTermLower);
-        
-        const matchesAvailability = availability === 'all' || listing.availabilityDate === availability;
-        
-        const matchesSize = listing.sizeSqFt >= sizeRange[0] && listing.sizeSqFt <= sizeRange[1];
-
-        return matchesSearch && matchesAvailability && matchesSize;
-    });
-
-    setFilteredListings(results);
-  }, [listings, searchTerm, availability, sizeRange]);
 
   const resetFilters = () => {
     setSearchTerm('');
     setAvailability('all');
     setSizeRange([0, 1000000]);
+    setFilteredListings(allWarehouses.filter(w => w.isActive));
   }
 
   return (
@@ -125,86 +129,46 @@ export default function ListingsPage() {
                     <div className='w-full'>
                         <h1 className="text-2xl font-bold font-headline tracking-tight">Search Warehouse Listings</h1>
                         <p className="text-muted-foreground mt-1">
-                            Find the perfect property using our advanced filters.
+                           Use our AI-powered search to find warehouses by features, location, size, or any other criteria.
                         </p>
                     </div>
-                    <div className="flex w-full md:w-auto items-center gap-2">
-                        {(searchTerm || availability !== 'all' || sizeRange[0] > 0 || sizeRange[1] < 1000000) && (
-                            <Button variant="ghost" onClick={resetFilters}>
-                                <X className="mr-2 h-4 w-4" /> Reset
-                            </Button>
-                        )}
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className="w-full md:w-auto">
-                                    <SlidersHorizontal className="mr-2 h-4 w-4" /> Filters
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                                <div className="grid gap-4">
-                                    <div className="space-y-2">
-                                        <h4 className="font-medium leading-none">Filters</h4>
-                                        <p className="text-sm text-muted-foreground">
-                                            Adjust the filters to refine your search.
-                                        </p>
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <div className="grid grid-cols-3 items-center gap-4">
-                                            <label htmlFor="availability" className="col-span-1">Availability</label>
-                                            <Select value={availability} onValueChange={setAvailability}>
-                                                <SelectTrigger className="col-span-2 h-8">
-                                                    <SelectValue placeholder="Select availability" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="all">All</SelectItem>
-                                                    <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
-                                                    <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
-                                                    <SelectItem value="Under Construction">Under Construction</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="grid grid-cols-1 items-center gap-4">
-                                             <label htmlFor="width">Size (sq. ft.)</label>
-                                             <div className='text-sm text-center font-medium'>
-                                                {sizeRange[0].toLocaleString()} - {sizeRange[1].toLocaleString()}
-                                             </div>
-                                            <Slider
-                                                defaultValue={[0, 1000000]}
-                                                min={0}
-                                                max={1000000}
-                                                step={50000}
-                                                value={sizeRange}
-                                                onValueChange={(value) => setSizeRange(value)}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
                 </div>
-                 <div className="mt-6 relative">
+                 <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="mt-6 relative flex gap-2">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                        placeholder="Search by name, location, size, or keyword (e.g., Prime Logistics, PEB, 150000)..." 
+                        placeholder="Search by any keyword (e.g., 'large PEB warehouse near Chennai port with high ceilings')..." 
                         className="pl-9"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                </div>
+                    <Button type="submit" disabled={isSearching} className="min-w-[100px]">
+                        {isSearching ? <Loader2 className="animate-spin" /> : 'Search'}
+                    </Button>
+                     {(searchTerm) && (
+                        <Button variant="ghost" onClick={resetFilters} type="button">
+                            <X className="mr-2 h-4 w-4" /> Reset
+                        </Button>
+                    )}
+                </form>
             </div>
 
-            {filteredListings.length > 0 ? (
+            {isSearching ? (
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {[...Array(6)].map((_, i) => (
+                        <Card key={i}><CardHeader><div className="aspect-video relative mb-4 bg-muted animate-pulse rounded-t-lg"></div><div className="h-6 w-3/4 bg-muted animate-pulse rounded-md"></div><div className="h-4 mt-2 w-1/2 bg-muted animate-pulse rounded-md"></div></CardHeader><CardContent className="space-y-4"><div className="h-16 bg-muted animate-pulse rounded-md"></div></CardContent><CardFooter><div className="h-10 w-full bg-muted animate-pulse rounded-md"></div></CardFooter></Card>
+                    ))}
+                </div>
+            ) : filteredListings.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredListings.map(listing => (
-                        <ListingCard key={listing.listingId} listing={listing} />
+                        <ListingCard key={listing.id} listing={listing} />
                     ))}
                 </div>
             ) : (
                 <Card className="text-center p-12 col-span-full">
                     <CardTitle>No Listings Found</CardTitle>
                     <CardDescription className="mt-2">
-                        No listings match your current filters. Try adjusting your search criteria.
+                        No listings match your current search. Try different keywords or reset the search.
                     </CardDescription>
                 </Card>
             )}
