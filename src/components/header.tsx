@@ -4,12 +4,18 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -27,9 +33,9 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
   );
 
-const NavLink = ({ href, children }: { href: string, children: React.ReactNode }) => {
+const NavLink = ({ href, children, exact = false }: { href: string, children: React.ReactNode, exact?: boolean }) => {
     const pathname = usePathname();
-    const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
+    const isActive = exact ? pathname === href : pathname.startsWith(href);
 
     return (
         <Link 
@@ -43,6 +49,33 @@ const NavLink = ({ href, children }: { href: string, children: React.ReactNode }
         </Link>
     )
 }
+
+const AnalyticsDropdown = () => {
+    const pathname = usePathname();
+    const isActive = pathname.startsWith('/dashboard/analytics');
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button className={cn(
+                    "text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2",
+                     isActive && "text-primary"
+                )}>
+                    <BarChart className="h-4 w-4" /> Analytics <ChevronDown className="h-4 w-4" />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
+                    <Link href="/dashboard/analytics/listings">Listing Analytics</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/dashboard/analytics/demands">Demand Analytics</Link>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
 
 export function Header() {
   const { user, logout, isLoading } = useAuth();
@@ -75,7 +108,7 @@ export function Header() {
                 ) : (
                     <>
                         {user && (
-                            <NavLink href="/dashboard">
+                            <NavLink href="/dashboard" exact={true}>
                                 <LayoutDashboard className="h-4 w-4" /> Dashboard
                             </NavLink>
                         )}
@@ -91,9 +124,7 @@ export function Header() {
                             </NavLink>
                         )}
                         {isAdmin && (
-                            <NavLink href="/dashboard/analytics">
-                                <BarChart className="h-4 w-4" /> Analytics
-                            </NavLink>
+                            <AnalyticsDropdown />
                         )}
                     </>
                 )}
