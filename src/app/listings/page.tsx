@@ -18,9 +18,10 @@ import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { LoginDialog } from '@/components/login-dialog';
+import { LimitExceededDialog } from '@/components/limit-exceeded-dialog';
 
 
-function ListingCard({ listing, isSelected, onSelectionChange, showCheckbox }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void, showCheckbox: boolean }) {
+function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
   const previewImage = listing.imageUrls?.[0] || 'https://placehold.co/600x400.png';
 
   return (
@@ -36,14 +37,12 @@ function ListingCard({ listing, isSelected, onSelectionChange, showCheckbox }: {
               data-ai-hint="modern warehouse"
             />
           </div>
-          {showCheckbox && (
-            <Checkbox
-              checked={isSelected}
-              onCheckedChange={() => onSelectionChange(listing)}
-              aria-label={`Select warehouse ${listing.id}`}
-              className="w-5 h-5"
-            />
-          )}
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onSelectionChange(listing)}
+            aria-label={`Select warehouse ${listing.id}`}
+            className="w-5 h-5"
+          />
         </div>
         <CardTitle>{listing.locationName}</CardTitle>
         <CardDescription>ID: {listing.id}</CardDescription>
@@ -82,8 +81,10 @@ function ListingCard({ listing, isSelected, onSelectionChange, showCheckbox }: {
 function DownloadBar() {
     const { user } = useAuth();
     const { toast } = useToast();
-    const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
+    const { selectedForDownload, logDownload, clearSelectedForDownload, getTodaysDownloadsForLocation } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
+    const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
 
     if (selectedForDownload.length === 0) {
         return null;
@@ -116,13 +117,29 @@ function DownloadBar() {
         let failedDownloadsCount = 0;
         const failedLocations = new Set<string>();
 
+        const downloadsPerLocation: Record<string, number> = {};
+
         selectedForDownload.forEach(listing => {
-            const { success } = logDownload(user!.email!, listing);
-            if (success) {
-                successfulDownloads.push(listing);
+            const location = listing.locationName;
+            const todaysDownloads = getTodaysDownloadsForLocation(user!.email!, location);
+            
+            if (!downloadsPerLocation[location]) {
+                downloadsPerLocation[location] = todaysDownloads;
+            }
+
+            if (downloadsPerLocation[location] < 3) {
+                 const { success } = logDownload(user!.email!, listing);
+                 if (success) {
+                    successfulDownloads.push(listing);
+                    downloadsPerLocation[location]++;
+                 } else {
+                     // This case should theoretically not be hit if checks are right, but as a fallback
+                    failedDownloadsCount++;
+                    failedLocations.add(location);
+                 }
             } else {
                 failedDownloadsCount++;
-                failedLocations.add(listing.locationName);
+                failedLocations.add(location);
             }
         });
 
@@ -146,15 +163,13 @@ function DownloadBar() {
                 description: `${successfulDownloads.length} listing(s) have been exported.`
             });
         }
-
-        if (failedDownloadsCount > 0) {
-            toast({
-                variant: 'destructive',
-                title: 'Some Downloads Failed',
-                description: `Could not download from: ${Array.from(failedLocations).join(', ')} due to daily limits.`
-            });
+        
+        if (failedLocations.size > 0) {
+            setLimitExceededLocation(Array.from(failedLocations)[0]);
+            setIsLimitExceededDialogOpen(true);
         }
         
+        // Clear only the listings that were successfully downloaded or attempted
         clearSelectedForDownload();
     }
 
@@ -176,6 +191,11 @@ function DownloadBar() {
                 </div>
             </div>
             <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess}/>
+            <LimitExceededDialog 
+                isOpen={isLimitExceededDialogOpen} 
+                onOpenChange={setIsLimitExceededDialogOpen}
+                location={limitExceededLocation || ''}
+            />
         </>
     )
 }
@@ -275,10 +295,9 @@ export default function ListingsPage() {
           toast({
               variant: 'destructive',
               title: 'Download Not Available',
-              description: 'While you can select properties to compare, only Customer accounts are permitted to download listing data.'
-          })
-          // Still allow selection for non-customers, but the download bar will handle the final restriction.
-          toggleSelectedForDownload(listing);
+              description: 'While you can browse listings, only Customer accounts are permitted to download property details.'
+          });
+          // Do not toggle selection for non-customers
           return;
       }
       toggleSelectedForDownload(listing);
@@ -378,7 +397,6 @@ export default function ListingsPage() {
                             listing={listing} 
                             isSelected={selectedIds.has(listing.id)}
                             onSelectionChange={handleSelectionChange}
-                            showCheckbox={true}
                         />
                     ))}
                 </div>
@@ -395,8 +413,10 @@ export default function ListingsPage() {
             )}
         </div>
     </main>
-    {user?.role === 'User' && <DownloadBar />}
+    <DownloadBar />
      <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess} />
     </>
   );
 }
+
+    
