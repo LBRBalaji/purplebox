@@ -255,7 +255,7 @@ function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | und
         userEmail: user?.email || "",
 
         o2oDealDemandId: demand?.demandId,
-        siteType: "Part of Industrial Park", // default
+        siteType: listing.siteSpecifications.siteType || "Part of Industrial Park",
         safety: "Fully Compounded", // default
         approvalAuthority: "DTCP", // default
         genSetBackup: "Available", // default
