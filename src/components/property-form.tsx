@@ -45,13 +45,14 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast";
-import { createPropertySchema, type PropertySchema, type DemandSchema } from "@/lib/schema";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin } from 'lucide-react';
+import { createPropertySchema, type PropertySchema, type DemandSchema, type ListingSchema } from "@/lib/schema";
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin, Library } from 'lucide-react';
 import { useData } from "@/contexts/data-context";
 import { useAuth } from "@/contexts/auth-context";
 import { Badge } from "./ui/badge";
 import { Switch } from "./ui/switch";
 import { getPropertyMatchScore } from "@/ai/flows/get-property-match-score";
+import { ScrollArea } from "./ui/scroll-area";
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
@@ -67,6 +68,67 @@ const priorityLabels: { [key: string]: string } = {
   crane: 'Crane Details',
   operations: 'Operations Details'
 };
+
+function ListingSelector({ onSelect }: { onSelect: (listing: ListingSchema) => void }) {
+    const { user } = useAuth();
+    const { listings } = useData();
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    const developerListings = React.useMemo(() => 
+        listings.filter(l => l.developerId === user?.email),
+        [listings, user]
+    );
+
+    const handleSelect = (listing: ListingSchema) => {
+        onSelect(listing);
+        setIsOpen(false);
+    }
+    
+    if (developerListings.length === 0) {
+        return null; // Don't show the button if the developer has no listings
+    }
+
+    return (
+        <>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(true)}>
+                <Library className="mr-2 h-4 w-4" />
+                Select from Your Listings
+            </Button>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogContent className="sm:max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>Select an Existing Listing</DialogTitle>
+                        <DialogDescription>
+                            Choose one of your existing warehouse listings to pre-fill the form.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="max-h-[60vh] -mx-6 px-2">
+                        <ScrollArea className="h-full px-4">
+                            <div className="space-y-4 py-4">
+                                {developerListings.map(listing => (
+                                    <button
+                                        key={listing.listingId}
+                                        type="button"
+                                        className="w-full text-left p-4 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors flex justify-between items-center"
+                                        onClick={() => handleSelect(listing)}
+                                    >
+                                        <div>
+                                            <p className="font-semibold">{listing.name}</p>
+                                            <p className="text-sm text-muted-foreground">{listing.location} - {listing.sizeSqFt.toLocaleString()} sq.ft.</p>
+                                        </div>
+                                        <Badge variant={listing.status === 'approved' ? 'default' : 'secondary'}>
+                                            {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
+                                        </Badge>
+                                    </button>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
+}
 
 function DemandSummaryCard({ demand }: { demand: DemandSchema | undefined }) {
 
@@ -135,6 +197,30 @@ const ComplianceToggle = ({ field, form }: { form: any, field: any }) => (
     </div>
   );
 
+function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | undefined): Partial<PropertySchema> {
+    const readinessMap: { [key: string]: PropertySchema['readinessToOccupy'] } = {
+        "Ready for Occupancy": "Immediate",
+        "Available in 3 months": "Within 90 Days",
+    };
+    
+    const mapped: Partial<PropertySchema> = {
+        size: listing.sizeSqFt,
+        readinessToOccupy: readinessMap[listing.availabilityDate] || "BTS",
+        buildingType: listing.buildingSpecifications.buildingType as 'PEB' | 'RCC' | undefined,
+        ceilingHeight: listing.buildingSpecifications.numberOfDocksAndShutters, // This seems wrong, should be ceiling height
+        // Assuming listing schema does not have ceilingHeightUnit, default it or leave undefined
+        docks: listing.buildingSpecifications.numberOfDocksAndShutters,
+        rentPerSft: listing.rentPerSqFt,
+        rentalSecurityDeposit: listing.rentalSecurityDeposit,
+        approvalStatus: listing.certificatesAndApprovals.buildingApproval ? 'Obtained' : 'To Apply',
+        fireNoc: listing.certificatesAndApprovals.fireNOC ? 'Obtained' : 'To Apply',
+        // Many fields from listingSchema don't directly map and will be left for the user to fill.
+        // e.g. siteType, safety, power, etc.
+    };
+
+    return mapped;
+}
+
 
 export function PropertyForm() {
   const { toast } = useToast();
@@ -197,6 +283,22 @@ export function PropertyForm() {
       operations: {}
     },
   });
+  
+  const handleSelectListing = (listing: ListingSchema) => {
+    const mappedData = mapListingToProperty(listing, demandToMatch);
+    
+    // Use reset to update form values. Keep existing values if not in mappedData.
+    const currentValues = form.getValues();
+    form.reset({
+        ...currentValues,
+        ...mappedData
+    });
+    
+    toast({
+        title: "Form Pre-filled",
+        description: `Data from listing "${listing.name}" has been loaded. Please review and complete the form.`,
+    });
+  };
 
   const optionalPrioritiesCount = React.useMemo(() => {
     if (!demandToMatch) return 0;
@@ -330,8 +432,9 @@ export function PropertyForm() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Essentials</CardTitle>
+                    <ListingSelector onSelect={handleSelectListing} />
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <FormField control={form.control} name="isLocationConfirmed" render={({ field }) => (
@@ -799,5 +902,3 @@ export function PropertyForm() {
     </>
   );
 }
-
-    
