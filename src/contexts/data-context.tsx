@@ -83,7 +83,7 @@ type DataContextType = {
   // Download tracking
   logDownload: (userId: string, listing: WarehouseSchema) => { success: boolean; limitReached: boolean };
   selectedForDownload: WarehouseSchema[];
-  toggleSelectedForDownload: (listing: WarehouseSchema, user: User | null) => void;
+  toggleSelectedForDownload: (listing: WarehouseSchema, user: User) => void;
   clearSelectedForDownload: () => void;
   getTodaysDownloadsForLocation: (userId: string, location: string) => number;
 };
@@ -362,7 +362,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const toggleSelectedForDownload = (listing: WarehouseSchema, user: User | null) => {
+  const toggleSelectedForDownload = (listing: WarehouseSchema, user: User) => {
     const isSelected = selectedForDownload.find(item => item.id === listing.id);
 
     if (isSelected) {
@@ -370,12 +370,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setSelectedForDownload(prev => prev.filter(item => item.id !== listing.id));
     } else {
       // If it's not selected, check the limit before adding it
-      if (!user) {
-          // This case should be handled by the UI, but as a fallback:
-          toast({ variant: 'destructive', title: 'Login Required', description: 'You must be logged in to select properties for download.' });
-          return;
-      }
-      
       const todaysDownloads = getTodaysDownloadsForLocation(user.email, listing.locationName);
       if (todaysDownloads >= 3) {
           toast({

@@ -191,6 +191,7 @@ function DownloadBar() {
 
 export default function ListingsPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [allWarehouses, setAllWarehouses] = useState<WarehouseSchema[]>([]);
   const [filteredListings, setFilteredListings] = useState<WarehouseSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -275,8 +276,16 @@ export default function ListingsPage() {
   }, [allWarehouses]);
 
   const handleSelectionChange = (listing: WarehouseSchema) => {
-      if (user?.role !== 'User') {
+      if (!user) {
           setIsLoginOpen(true);
+          return;
+      }
+      if (user.role !== 'User') {
+          toast({
+              variant: 'destructive',
+              title: 'Download Not Available',
+              description: 'Only Customer accounts can select and download listings.'
+          })
           return;
       }
       toggleSelectedForDownload(listing, user);
