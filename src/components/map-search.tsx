@@ -5,17 +5,22 @@ import {
   Map,
   useMap,
   useMapsLibrary,
+  Marker,
+  InfoWindow,
 } from '@vis.gl/react-google-maps';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 import type { WarehouseSchema } from '@/lib/schema';
-
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { Badge } from './ui/badge';
+import Image from 'next/image';
+import Link from 'next/link';
 
 type RegionalSummary = {
     regionName: string;
@@ -102,6 +107,63 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
     )
 }
 
+function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: WarehouseSchema, onBack: () => void, onLogDemand: (center: { lat: number, lng: number }) => void }) {
+    const mainImage = warehouse.imageUrls?.[0] || 'https://placehold.co/600x400.png';
+    return (
+        <Card className="shadow-none border-0 h-full flex flex-col bg-transparent">
+            <CardHeader>
+                <Button variant="ghost" size="sm" onClick={onBack} className="mb-2 w-fit -ml-2">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Summary
+                </Button>
+                <div className="aspect-video relative mb-2">
+                    <Image
+                        src={mainImage}
+                        alt={warehouse.locationName}
+                        fill
+                        className="rounded-lg object-cover"
+                        data-ai-hint="warehouse exterior"
+                    />
+                </div>
+                 <CardTitle className="flex items-center gap-2 pt-2">
+                    <Building2 className="h-6 w-6 text-primary"/>
+                    {warehouse.locationName}
+                </CardTitle>
+                <CardDescription>ID: {warehouse.id}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 flex-grow">
+                 <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-1">
+                        <p className="text-muted-foreground flex items-center gap-1"><Scaling className="h-4 w-4"/> Size</p>
+                        <p className="font-semibold">{warehouse.size.toLocaleString()} sq. ft.</p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-muted-foreground flex items-center gap-1"><CalendarCheck className="h-4 w-4"/> Readiness</p>
+                        <p className="font-semibold">{warehouse.readiness}</p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-muted-foreground flex items-center gap-1"><CheckCircle className="h-4 w-4"/> Ceiling Height</p>
+                        <p className="font-semibold">{warehouse.specifications.ceilingHeight} ft</p>
+                    </div>
+                     <div className="space-y-1">
+                        <p className="text-muted-foreground flex items-center gap-1"><CheckCircle className="h-4 w-4"/> Docks</p>
+                        <p className="font-semibold">{warehouse.specifications.docks}</p>
+                    </div>
+                </div>
+                <div className="pt-4">
+                    <Button asChild className="w-full">
+                        <Link href={`/listings/${warehouse.id}`} target="_blank">
+                            View Full Details
+                        </Link>
+                    </Button>
+                </div>
+            </CardContent>
+            <CardFooter>
+                 <LogDemandButton center={warehouse.generalizedLocation} onLogDemand={onLogDemand} variant="outline" />
+            </CardFooter>
+        </Card>
+    )
+}
+
 function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng: number } | null) => void }) {
     const steps = [
         {
@@ -156,7 +218,7 @@ function HowItWorks({ onLogDemand }: { onLogDemand: (center?: { lat: number; lng
 function MapSearchContent({ mapId }: { mapId: string }) {
   const map = useMap();
   const places = useMapsLibrary('places');
-  const viz = useMapsLibrary('visualization');
+  const markerLibrary = useMapsLibrary('marker');
   const geometry = useMapsLibrary('geometry');
   const router = useRouter();
   const { user } = useAuth();
@@ -167,56 +229,48 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
   const [lastSearchedCenter, setLastSearchedCenter] = React.useState<{ lat: number; lng: number } | null>(null);
   const [circle, setCircle] = React.useState<google.maps.Circle | null>(null);
-  const [heatmap, setHeatmap] = React.useState<google.maps.visualization.HeatmapLayer | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
   const [pendingRedirectCenter, setPendingRedirectCenter] = React.useState<{ lat: number; lng: number } | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const [markers, setMarkers] = React.useState<google.maps.Marker[]>([]);
+  const [markerClusterer, setMarkerClusterer] = React.useState<MarkerClusterer | null>(null);
+  const [selectedWarehouse, setSelectedWarehouse] = React.useState<WarehouseSchema | null>(null);
 
   React.useEffect(() => {
     fetch('/api/warehouses')
       .then(res => res.json())
-      .then(data => setWarehouses(data))
+      .then(data => setWarehouses(data.filter((w: WarehouseSchema) => w.isActive)))
       .catch(err => console.error("Failed to fetch warehouses", err));
   }, []);
 
-  // Initialize Heatmap
+  // Init marker clusterer
   React.useEffect(() => {
-    if (!map || !viz || warehouses.length === 0) return;
+    if (!map || !markerLibrary || warehouses.length === 0) return;
 
-    const heatmapData = warehouses
-        .filter(w => w.isActive)
-        .map(w => new google.maps.LatLng(w.generalizedLocation.lat, w.generalizedLocation.lng));
-
-    const newHeatmap = new viz.HeatmapLayer({
-        map,
-        data: heatmapData,
-        radius: 40,
-        opacity: 0.9,
-        gradient: [
-            'rgba(0, 255, 255, 0)',
-            'rgba(0, 255, 255, 1)',
-            'rgba(0, 191, 255, 1)',
-            'rgba(0, 127, 255, 1)',
-            'rgba(0, 63, 255, 1)',
-            'rgba(0, 0, 255, 1)',
-            'rgba(0, 0, 223, 1)',
-            'rgba(0, 0, 191, 1)',
-            'rgba(0, 0, 159, 1)',
-            'rgba(0, 0, 127, 1)',
-            'rgba(63, 0, 91, 1)',
-            'rgba(127, 0, 63, 1)',
-            'rgba(191, 0, 31, 1)',
-            'rgba(255, 0, 0, 1)',
-        ]
+    if (markerClusterer) {
+        markerClusterer.clearMarkers();
+    }
+    
+    const newMarkers = warehouses.map(warehouse => {
+        const marker = new google.maps.Marker({
+            position: warehouse.generalizedLocation,
+        });
+        marker.addListener('click', () => {
+            setSelectedWarehouse(warehouse);
+        });
+        return marker;
     });
-    setHeatmap(newHeatmap);
+
+    setMarkers(newMarkers);
+    const newClusterer = new MarkerClusterer({ map, markers: newMarkers });
+    setMarkerClusterer(newClusterer);
 
     return () => {
-        if (newHeatmap) {
-            newHeatmap.setMap(null);
+        if (newClusterer) {
+            newClusterer.clearMarkers();
         }
     };
-  }, [map, viz, warehouses]);
+  }, [map, markerLibrary, warehouses]);
 
   // Initialize SearchBox
   React.useEffect(() => {
@@ -245,6 +299,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       const location = place.geometry.location;
       const center = { lat: location.lat(), lng: location.lng() };
       setLastSearchedCenter(center);
+      setSelectedWarehouse(null);
       
       // Dynamic summary calculation
       const searchRadius = 25000; // 25km
@@ -258,7 +313,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
       if (nearbyWarehouses.length > 0) {
         const sizes = nearbyWarehouses.map(w => w.size);
-        const heights = nearbyWarehouses.map(w => w.specifications.ceilingHeight);
+        const heights = nearbyWarehouses.map(w => w.specifications.ceilingHeight).filter(h => h > 0);
         
         const readinessCounts = nearbyWarehouses.reduce((acc, w) => {
             if (w.readiness === 'Ready for Occupancy') acc.ready++;
@@ -272,7 +327,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             totalListings: nearbyWarehouses.length,
             sizeRange: `${Math.min(...sizes).toLocaleString()} - ${Math.max(...sizes).toLocaleString()} sq. ft.`,
             readiness: readinessCounts,
-            avgCeilingHeight: Math.round(heights.reduce((a, b) => a + b, 0) / heights.length),
+            avgCeilingHeight: heights.length > 0 ? Math.round(heights.reduce((a, b) => a + b, 0) / heights.length) : 0,
             center: center,
         };
         setSummaryData(newSummary);
@@ -338,6 +393,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     setSearchInput('');
     setSummaryData(null);
     setLastSearchedCenter(null);
+    setSelectedWarehouse(null);
     if (circle) {
       circle.setMap(null);
       setCircle(null);
@@ -346,6 +402,10 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     map?.setCenter({ lat: 20.5937, lng: 78.9629 });
     map?.setZoom(5);
   };
+
+  const handleBackToSummary = () => {
+      setSelectedWarehouse(null);
+  }
 
   return (
     <>
@@ -385,7 +445,13 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 </Map>
             </div>
             <aside className="w-[400px] h-full border-l bg-card/80 backdrop-blur-sm p-8 flex flex-col justify-center">
-                {summaryData ? (
+                 {selectedWarehouse ? (
+                    <WarehouseDetailCard 
+                        warehouse={selectedWarehouse} 
+                        onBack={handleBackToSummary} 
+                        onLogDemand={handleLogDemandClick} 
+                    />
+                ) : summaryData ? (
                     <RegionalSummaryCard data={summaryData} onLogDemand={handleLogDemandClick} />
                 ) : lastSearchedCenter ? (
                     <div className="text-center">
