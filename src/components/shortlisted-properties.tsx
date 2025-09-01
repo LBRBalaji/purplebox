@@ -44,7 +44,8 @@ export function ShortlistedProperties() {
     }));
     worksheet["!cols"] = colWidths;
     
-    XLSX.writeFile(workbook, "shortlisted_properties.xlsx");
+    // Use writeFile with type 'csv' to generate a CSV file
+    XLSX.writeFile(workbook, "shortlisted_properties.csv", { bookType: "csv" });
   };
 
   return (
@@ -62,7 +63,7 @@ export function ShortlistedProperties() {
               {shortlistedItems.length > 0 && (
                 <Button onClick={handleDownload}>
                   <Download className="mr-2 h-4 w-4" />
-                  Download as Excel
+                  Download as CSV
                 </Button>
               )}
             </div>
