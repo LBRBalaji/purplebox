@@ -16,7 +16,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
-import { Bar, Pie, Cell, ResponsiveContainer } from "recharts"
+import { Bar, Pie, Cell, ResponsiveContainer, PieLabel } from "recharts"
 
 
 type Activity = {
@@ -81,17 +81,17 @@ export default function AnalyticsPage() {
 
         submissions.forEach(sub => {
             const demand = demands.find(d => d.demandId === sub.demandId);
-            if (demand) {
-                try {
+            if (demand && demand.demandId && sub.property.propertyId) {
+                 try {
                     const demandTime = parseInt(demand.demandId.split('-')[1]);
                     const subTime = parseInt(sub.property.propertyId.split('-')[1]);
-                    if (!isNaN(demandTime) && !isNaN(subTime)) {
+                     if (!isNaN(demandTime) && !isNaN(subTime)) {
                         totalDiff += (subTime - demandTime);
                         count++;
                     }
-                } catch (e) {
-                    // Ignore if IDs are not in the expected format
-                }
+                 } catch(e) {
+                     // ignore if IDs are not in the expected format
+                 }
             }
         });
 
@@ -107,25 +107,29 @@ export default function AnalyticsPage() {
 
         demands.forEach(d => {
             try {
-                combined.push({
-                    type: 'Demand',
-                    id: d.demandId,
-                    user: d.userName,
-                    timestamp: new Date(parseInt(d.demandId.split('-')[1])),
-                    details: `Logged demand for ${d.size.toLocaleString()} sq. ft. in ${d.locationName}`
-                });
+                if (d.demandId) {
+                    combined.push({
+                        type: 'Demand',
+                        id: d.demandId,
+                        user: d.userName,
+                        timestamp: new Date(parseInt(d.demandId.split('-')[1])),
+                        details: `Logged demand for ${d.size.toLocaleString()} sq. ft. in ${d.locationName}`
+                    });
+                }
             } catch (e) { /* ignore format errors */ }
         });
 
         submissions.forEach(s => {
              try {
-                combined.push({
-                    type: 'Submission',
-                    id: s.property.propertyId,
-                    user: s.property.userName,
-                    timestamp: new Date(parseInt(s.property.propertyId.split('-')[1])),
-                    details: `Submitted property for demand ${s.demandId}`
-                });
+                if (s.property.propertyId) {
+                    combined.push({
+                        type: 'Submission',
+                        id: s.property.propertyId,
+                        user: s.property.userName,
+                        timestamp: new Date(parseInt(s.property.propertyId.split('-')[1])),
+                        details: `Submitted property for demand ${s.demandId}`
+                    });
+                }
             } catch (e) { /* ignore format errors */ }
         });
 
@@ -151,13 +155,21 @@ export default function AnalyticsPage() {
             });
         });
 
-        return Object.entries(industryMap).map(([name, value]) => ({ name, value, fill: `var(--color-${name.toLowerCase()})` }));
+        const COLORS = [
+            'hsl(var(--chart-1))',
+            'hsl(var(--chart-2))',
+            'hsl(var(--chart-3))',
+            'hsl(var(--chart-4))',
+            'hsl(var(--chart-5))',
+        ];
+
+        return Object.entries(industryMap).map(([name, value], index) => ({ name, value, fill: COLORS[index % COLORS.length] }));
     }, [listingAnalytics]);
     
     const chartConfig = React.useMemo(() => {
         const config: any = {};
         industryInterestData.forEach(item => {
-            config[item.name.toLowerCase()] = {
+            config[item.name.toLowerCase().replace(/ /g, '-')] = {
                 label: item.name,
                 color: item.fill,
             };
@@ -255,7 +267,6 @@ export default function AnalyticsPage() {
                                             cx="50%"
                                             cy="50%"
                                             outerRadius={80}
-                                            label
                                             >
                                             {industryInterestData.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -299,3 +310,5 @@ export default function AnalyticsPage() {
         </main>
     )
 }
+
+    

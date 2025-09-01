@@ -29,7 +29,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const NavLink = ({ href, children }: { href: string, children: React.ReactNode }) => {
     const pathname = usePathname();
-    const isActive = pathname === href;
+    const isActive = pathname === href || pathname.startsWith(href + '/');
 
     return (
         <Link 
@@ -90,17 +90,10 @@ export function Header() {
                                 <Briefcase className="h-4 w-4" /> Agent Signup
                             </NavLink>
                         )}
-                        {(isAdmin || isO2O) && (
-                            <NavLink href="/dashboard/manage-warehouses">
-                                <Warehouse className="h-4 w-4" /> Manage Warehouses
-                            </NavLink>
-                        )}
                         {isAdmin && (
-                            <>
-                                <NavLink href="/dashboard/analytics">
-                                    <BarChart className="h-4 w-4" /> Analytics
-                                </NavLink>
-                            </>
+                            <NavLink href="/dashboard/analytics">
+                                <BarChart className="h-4 w-4" /> Analytics
+                            </NavLink>
                         )}
                     </>
                 )}
@@ -142,3 +135,5 @@ export function Header() {
     </>
   );
 }
+
+    
