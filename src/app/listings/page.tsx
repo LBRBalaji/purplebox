@@ -115,6 +115,14 @@ export default function ListingsPage() {
     results = results.filter(l => l.size >= sizeRange[0] && l.size <= sizeRange[1]);
 
     setFilteredListings(results);
+
+    // Store search results in session storage for detail page navigation
+    try {
+        const resultIds = results.map(r => r.id);
+        sessionStorage.setItem('warehouse_search_results', JSON.stringify(resultIds));
+    } catch (e) {
+        console.error("Could not write to sessionStorage", e);
+    }
   }, [searchTerm, availability, sizeRange, allWarehouses]);
 
 

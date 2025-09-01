@@ -121,6 +121,7 @@ export default function ListingDetailPage() {
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [allListings, setAllListings] = React.useState<WarehouseSchema[]>([]);
+    const [navigationList, setNavigationList] = React.useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = React.useState(-1);
 
     React.useEffect(() => {
@@ -129,30 +130,36 @@ export default function ListingDetailPage() {
         fetch('/api/warehouses')
             .then(res => res.json())
             .then((warehouses: WarehouseSchema[]) => {
-                const activeWarehouses = warehouses.filter(w => w.isActive).sort((a,b) => a.id.localeCompare(b.id));
+                const activeWarehouses = warehouses.filter(w => w.isActive);
                 setAllListings(activeWarehouses);
 
-                const foundIndex = activeWarehouses.findIndex(w => w.id === listingId);
-                setCurrentIndex(foundIndex);
-
-                if (foundIndex !== -1) {
-                    const foundWarehouse = activeWarehouses[foundIndex];
+                const foundWarehouse = activeWarehouses.find(w => w.id === listingId);
+                 if (foundWarehouse) {
                     setListing(mapWarehouseToListing(foundWarehouse));
                 } else {
-                    // Temporarily keep the original fetch logic as a fallback
-                    const foundWarehouse = warehouses.find(w => w.id === listingId);
-                    if (foundWarehouse && foundWarehouse.isActive) {
-                        setListing(mapWarehouseToListing(foundWarehouse));
-                    } else {
-                        router.push('/listings');
-                    }
+                    router.push('/listings');
                 }
+
+                // Logic for previous/next navigation
+                const storedResultIds = sessionStorage.getItem('warehouse_search_results');
+                let listToNavigate: string[];
+
+                if (storedResultIds) {
+                    listToNavigate = JSON.parse(storedResultIds);
+                } else {
+                    listToNavigate = activeWarehouses.map(w => w.id).sort((a,b) => a.localeCompare(b.id));
+                }
+                
+                setNavigationList(listToNavigate);
+                const foundIndex = listToNavigate.findIndex(id => id === listingId);
+                setCurrentIndex(foundIndex);
+
             });
 
     }, [params.listingId, router]);
 
-    const prevListingId = currentIndex > 0 ? allListings[currentIndex - 1].id : null;
-    const nextListingId = currentIndex < allListings.length - 1 ? allListings[currentIndex + 1].id : null;
+    const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
+    const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
 
     if (!listing) {
         return (
