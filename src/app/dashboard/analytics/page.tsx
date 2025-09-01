@@ -1,4 +1,3 @@
-
 // src/app/dashboard/analytics/page.tsx
 'use client';
 
@@ -16,7 +15,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
-import { Bar, Pie, Cell, ResponsiveContainer, PieLabel } from "recharts"
+import { Bar, Pie, Cell, ResponsiveContainer } from "recharts"
 
 
 type Activity = {
@@ -310,5 +309,3 @@ export default function AnalyticsPage() {
         </main>
     )
 }
-
-    
