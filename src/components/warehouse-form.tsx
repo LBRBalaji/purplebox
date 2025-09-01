@@ -52,6 +52,7 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
       locationName: '',
       latLng: '',
       isActive: true,
+      is3pl: false,
       generalizedLocation: { lat: 0, lng: 0 },
       size: 0,
       readiness: 'Ready for Occupancy',
@@ -78,6 +79,7 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
                 locationName: '',
                 latLng: '',
                 isActive: true,
+                is3pl: false,
                 generalizedLocation: { lat: 0, lng: 0 },
                 size: undefined,
                 readiness: 'Ready for Occupancy',
@@ -241,20 +243,35 @@ export function WarehouseForm({ isOpen, onOpenChange, warehouse, onSubmit }: War
                 <FormMessage />
               </FormItem>
 
-              {/* Active Toggle */}
-              <FormField control={form.control} name="isActive" render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Publicly Visible</FormLabel>
-                    <p className="text-sm text-muted-foreground">
-                      Control if this warehouse appears on the public map search.
-                    </p>
-                  </div>
-                  <FormControl>
-                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                </FormItem>
-              )} />
+              {/* Toggles */}
+               <div className="space-y-4">
+                <FormField control={form.control} name="is3pl" render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">3PL Operated Warehouse</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Enable this if the warehouse is operated by a Third-Party Logistics provider.
+                      </p>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="isActive" render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Publicly Visible</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Control if this warehouse appears on the public map search.
+                      </p>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  </FormItem>
+                )} />
+              </div>
               
             <DialogFooter className="sticky bottom-0 bg-background/95 p-6 -m-6 mt-6 pt-6 z-10">
                 <DialogClose asChild>

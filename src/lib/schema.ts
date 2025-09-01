@@ -319,6 +319,7 @@ const warehouseFormSchema = z.object({
     latLng: z.string().min(1, 'Lat/Lng is required.')
       .regex(/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}, ?-?([1]?[0-7]?[0-9]|[1-9]?[0-9])\.{1}\d{1,6}$/, 'Invalid Lat/Lng format. Use "lat, lng".'),
     isActive: z.boolean(),
+    is3pl: z.boolean().optional().default(false),
     size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive(),
     readiness: z.enum(['Ready for Occupancy', 'Under Construction', 'Available in 3 months']),
     specifications: z.object({

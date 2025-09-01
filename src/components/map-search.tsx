@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft, Star } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 import type { WarehouseSchema } from '@/lib/schema';
@@ -107,7 +107,7 @@ function RegionalSummaryCard({ data, onLogDemand }: { data: RegionalSummary; onL
     )
 }
 
-function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: WarehouseSchema, onBack: () => void, onLogDemand: (center: { lat: number, lng: number }) => void }) {
+function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: WarehouseSchema, onBack: () => void, onLogDemand: (center: { lat: number; lng: number }) => void }) {
     const mainImage = warehouse.imageUrls?.[0] || 'https://placehold.co/600x400.png';
     return (
         <Card className="shadow-none border-0 h-full flex flex-col bg-transparent">
@@ -131,6 +131,12 @@ function WarehouseDetailCard({ warehouse, onBack, onLogDemand }: { warehouse: Wa
                 <CardDescription>ID: {warehouse.id}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 flex-grow">
+                {warehouse.is3pl && (
+                    <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20 text-sm">
+                        <Star className="mr-1.5 h-4 w-4" />
+                        3PL Operated
+                    </Badge>
+                )}
                  <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="space-y-1">
                         <p className="text-muted-foreground flex items-center gap-1"><Scaling className="h-4 w-4"/> Size</p>

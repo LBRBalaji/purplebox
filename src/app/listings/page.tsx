@@ -6,7 +6,7 @@ import type { WarehouseSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Download, MapPin, Scaling, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Download, MapPin, Scaling, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { LoginDialog } from '@/components/login-dialog';
 import { LimitExceededDialog } from '@/components/limit-exceeded-dialog';
+import { Badge } from '@/components/ui/badge';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: WarehouseSchema, isSelected: boolean, onSelectionChange: (listing: WarehouseSchema) => void }) {
@@ -44,7 +45,15 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: Ware
             className="w-5 h-5"
           />
         </div>
-        <CardTitle>{listing.locationName}</CardTitle>
+        <div className="flex items-center justify-between">
+            <CardTitle>{listing.locationName}</CardTitle>
+            {listing.is3pl && (
+                <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20">
+                    <Star className="mr-1.5 h-3 w-3" />
+                    3PL Operated
+                </Badge>
+            )}
+        </div>
         <CardDescription>ID: {listing.id}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
@@ -132,6 +141,12 @@ function DownloadBar() {
                 description: `${selectedForDownload.length} listing(s) have been exported. This counts as one download for today.`
             });
              clearSelectedForDownload();
+        } else {
+             toast({
+                variant: 'destructive',
+                title: 'Daily Download Limit Reached',
+                description: `You have already downloaded twice today. Please try again tomorrow.`
+            });
         }
     }
 
@@ -204,7 +219,8 @@ export default function ListingsPage() {
                 listing.specifications.flooringType,
                 listing.size.toString(),
                 listing.specifications.ceilingHeight.toString(),
-                listing.specifications.docks.toString()
+                listing.specifications.docks.toString(),
+                listing.is3pl ? "3pl operated" : ""
             ].join(' ').toLowerCase();
             return searchHaystack.includes(searchTerm.toLowerCase());
         });
@@ -246,24 +262,27 @@ export default function ListingsPage() {
   }, [allWarehouses]);
 
   const handleSelectionChange = (listing: WarehouseSchema) => {
-      if (!user) {
-          setIsLoginOpen(true);
-          return;
-      }
-      if (user.role !== 'User') {
-          toast({
-              variant: 'destructive',
-              title: 'Download Not Available',
-              description: 'While you can browse listings, only Customer accounts are permitted to download property details.'
-          });
-          return;
-      }
-      const { limitReached } = toggleSelectedForDownload(listing);
-      if (limitReached) {
-        setLimitExceededLocation(listing.locationName);
-        setIsLimitExceededDialogOpen(true);
-      }
-  }
+    if (!user) {
+      setIsLoginOpen(true);
+      return;
+    }
+
+    if (user.role !== 'User') {
+      toast({
+        variant: 'destructive',
+        title: 'Selection Not Available',
+        description:
+          'While you can browse, only Customer accounts can select properties for download.',
+      });
+      return;
+    }
+    
+    const { limitReached } = toggleSelectedForDownload(listing);
+    if (limitReached) {
+      setLimitExceededLocation(listing.locationName); // Use locationName for the dialog
+      setIsLimitExceededDialogOpen(true);
+    }
+  };
 
   const handleLoginSuccess = () => {
       setIsLoginOpen(false);
@@ -290,7 +309,7 @@ export default function ListingsPage() {
                     <div className="relative flex-grow">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input 
-                            placeholder="Search by location, ID, size, etc..." 
+                            placeholder="Search by location, ID, size, or '3PL'..." 
                             className="pl-9"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}

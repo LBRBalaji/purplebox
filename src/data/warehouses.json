@@ -4,6 +4,7 @@
     "id": "WH-ORG-A9B1",
     "locationName": "Oragadam",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.83, 79.95",
     "generalizedLocation": {
       "lat": 12.83,
@@ -27,6 +28,7 @@
     "id": "WH-SRP-C2D3",
     "locationName": "Sriperumbudur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.96, 79.95",
     "generalizedLocation": {
       "lat": 12.96,
@@ -49,6 +51,7 @@
     "id": "WH-GND-E4F5",
     "locationName": "Guindy",
     "isActive": false,
+    "is3pl": false,
     "latLng": "13.0102, 80.2156",
     "generalizedLocation": {
       "lat": 13.0102,
@@ -70,6 +73,7 @@
     "id": "WH-BHI-G6H7",
     "locationName": "Bhiwandi",
     "isActive": true,
+    "is3pl": true,
     "latLng": "19.30, 73.06",
     "generalizedLocation": {
       "lat": 19.3,
@@ -94,6 +98,7 @@
     "id": "WH-HOS-I8J9",
     "locationName": "Hosur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.75, 77.82",
     "generalizedLocation": {
       "lat": 12.75,
@@ -116,6 +121,7 @@
     "id": "WH-THR-K1L2",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.13, 79.91",
     "generalizedLocation": {
       "lat": 13.13,
@@ -137,6 +143,7 @@
     "id": "WH-VLV-M3N4",
     "locationName": "Vallam-Vadagal",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.92, 79.93",
     "generalizedLocation": {
       "lat": 12.92,
@@ -159,6 +166,7 @@
     "id": "WH-MAN-O5P6",
     "locationName": "Mannur",
     "isActive": true,
+    "is3pl": true,
     "latLng": "13.04, 79.99",
     "generalizedLocation": {
       "lat": 13.04,
@@ -180,6 +188,7 @@
     "id": "WH-MAP-Q7R8",
     "locationName": "Mappedu",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.09, 79.95",
     "generalizedLocation": {
       "lat": 13.09,
@@ -201,6 +210,7 @@
     "id": "WH-SUN-S9T1",
     "locationName": "Sunguvarchatram",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.97, 79.84",
     "generalizedLocation": {
       "lat": 12.97,
@@ -222,6 +232,7 @@
     "id": "WH-WAL-U2V3",
     "locationName": "Walajabad",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.80, 79.83",
     "generalizedLocation": {
       "lat": 12.8,
@@ -243,6 +254,7 @@
     "id": "WH-RED-W4X5",
     "locationName": "Redhills",
     "isActive": true,
+    "is3pl": true,
     "latLng": "13.17, 80.20",
     "generalizedLocation": {
       "lat": 13.17,
@@ -263,6 +275,7 @@
   {
     "id": "WH-PAD-Y6Z7",
     "isActive": true,
+    "is3pl": false,
     "locationName": "Padianallur (Redhills)",
     "latLng": "13.23, 80.17",
     "generalizedLocation": {
@@ -284,6 +297,7 @@
   {
     "id": "WH-PON-A1B2",
     "isActive": true,
+    "is3pl": false,
     "locationName": "Ponneri (Redhills)",
     "latLng": "13.21, 80.19",
     "generalizedLocation": {
@@ -305,6 +319,7 @@
   {
     "id": "WH-MIN-C3D4",
     "isActive": true,
+    "is3pl": false,
     "locationName": "Minjur (Redhills)",
     "latLng": "13.15, 80.05",
     "generalizedLocation": {
@@ -327,6 +342,7 @@
     "id": "WH-VEN-E5F6",
     "locationName": "Vengal",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.21, 79.98",
     "generalizedLocation": {
       "lat": 13.21,
@@ -348,6 +364,7 @@
     "id": "WH-PER-G7H8",
     "locationName": "Periyapalayam",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.31, 80.09",
     "generalizedLocation": {
       "lat": 13.31,
@@ -368,6 +385,7 @@
   {
     "id": "WH-OR2-I9J1",
     "isActive": true,
+    "is3pl": false,
     "locationName": "Oragadam",
     "latLng": "12.84, 79.96",
     "generalizedLocation": {
@@ -391,6 +409,7 @@
     "id": "WH-SR2-K2L3",
     "locationName": "Sriperumbudur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.97, 79.94",
     "generalizedLocation": {
       "lat": 12.97,
@@ -412,6 +431,7 @@
     "id": "WH-MA2-M4N5",
     "locationName": "Mannur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.05, 80.01",
     "generalizedLocation": {
       "lat": 13.05,
@@ -433,6 +453,7 @@
     "id": "WH-RE2-O6P7",
     "locationName": "Redhills",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.18, 80.21",
     "generalizedLocation": {
       "lat": 13.18,
@@ -454,6 +475,7 @@
     "id": "WH-VE2-Q8R9",
     "locationName": "Vengal",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.22, 79.97",
     "generalizedLocation": {
       "lat": 13.22,
@@ -476,6 +498,7 @@
     "id": "WH-SU2-S1T2",
     "locationName": "Sunguvarchatram",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.98, 79.85",
     "generalizedLocation": {
       "lat": 12.98,
@@ -497,6 +520,7 @@
     "id": "WH-POO-U3V4",
     "locationName": "Poonamallee",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.06, 80.11",
     "generalizedLocation": {
       "lat": 13.06,
@@ -518,6 +542,7 @@
     "id": "WH-GUR-W5X6",
     "locationName": "Gurgaon",
     "isActive": true,
+    "is3pl": false,
     "latLng": "28.45, 76.82",
     "generalizedLocation": {
       "lat": 28.45,
@@ -540,6 +565,7 @@
     "id": "WH-PUN-Y7Z8",
     "locationName": "Pune",
     "isActive": true,
+    "is3pl": true,
     "latLng": "18.75, 73.81",
     "generalizedLocation": {
       "lat": 18.75,
@@ -561,6 +587,7 @@
     "id": "WH-TAU-A9B1",
     "locationName": "Tauranga",
     "isActive": true,
+    "is3pl": false,
     "latLng": "-37.74, 176.09",
     "generalizedLocation": {
       "lat": -37.74,
@@ -582,6 +609,7 @@
     "id": "WH-AUC-C2D3",
     "locationName": "Auckland",
     "isActive": true,
+    "is3pl": false,
     "latLng": "-37.00, 174.79",
     "generalizedLocation": {
       "lat": -37,
@@ -603,6 +631,7 @@
     "id": "WH-POL-E4F5",
     "locationName": "Polivakkam",
     "isActive": true,
+    "is3pl": false,
     "latLng": "12.92, 80.08",
     "generalizedLocation": {
       "lat": 12.92,
@@ -624,6 +653,7 @@
     "id": "WH-ARA-G6H7",
     "locationName": "Aranvoyal",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.11, 79.94",
     "generalizedLocation": {
       "lat": 13.11,
@@ -645,6 +675,7 @@
     "id": "WH-KOP-I8J9",
     "locationName": "Koppur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.43, 80.12",
     "generalizedLocation": {
       "lat": 13.43,
@@ -666,6 +697,7 @@
     "id": "WH-PUT-K1L2",
     "locationName": "Putlur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.59, 80.02",
     "generalizedLocation": {
       "lat": 13.59,
@@ -687,6 +719,7 @@
     "id": "WH-THV-POL-M3N4",
     "locationName": "Polivakkam (Thiruvallur)",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.131, 79.905",
     "generalizedLocation": {
       "lat": 13.131,
@@ -708,6 +741,7 @@
     "id": "WH-THV-ARA-O5P6",
     "locationName": "Aranvoyal (Thiruvallur)",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.133, 79.912",
     "generalizedLocation": {
       "lat": 13.133,
@@ -729,6 +763,7 @@
     "id": "WH-THV-KOP-Q7R8",
     "locationName": "Koppur (Thiruvallur)",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.118, 79.938",
     "generalizedLocation": {
       "lat": 13.118,
@@ -750,6 +785,7 @@
     "id": "WH-THV-PUT-S9T1",
     "locationName": "Putlur (Thiruvallur)",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.105, 79.955",
     "generalizedLocation": {
       "lat": 13.105,
@@ -771,6 +807,7 @@
     "id": "WH-THV-MAI-U2V3",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.109, 79.971",
     "generalizedLocation": {
       "lat": 13.109,
@@ -792,6 +829,7 @@
     "id": "WH-THV-MA2-W4X5",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.145, 79.921",
     "generalizedLocation": {
       "lat": 13.145,
@@ -814,6 +852,7 @@
     "id": "WH-THV-MA3-Y6Z7",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.138, 79.899",
     "generalizedLocation": {
       "lat": 13.138,
@@ -835,6 +874,7 @@
     "id": "WH-THV-MA4-A1B2",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.151, 79.908",
     "generalizedLocation": {
       "lat": 13.151,
@@ -856,6 +896,7 @@
     "id": "WH-THV-MA5-C3D4",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.085, 79.885",
     "generalizedLocation": {
       "lat": 13.085,
@@ -877,6 +918,7 @@
     "id": "WH-THV-MA6-E5F6",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.075, 79.865",
     "generalizedLocation": {
       "lat": 13.075,
@@ -898,6 +940,7 @@
     "id": "WH-THV-MA7-G7H8",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.160, 79.940",
     "generalizedLocation": {
       "lat": 13.16,
@@ -919,6 +962,7 @@
     "id": "WH-THV-MA8-I9J1",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.128, 79.880",
     "generalizedLocation": {
       "lat": 13.128,
@@ -940,6 +984,7 @@
     "id": "WH-THV-MA9-K2L3",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.175, 79.915",
     "generalizedLocation": {
       "lat": 13.175,
@@ -961,6 +1006,7 @@
     "id": "WH-THV-MA10-M4N5",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.030, 79.890",
     "generalizedLocation": {
       "lat": 13.03,
@@ -982,6 +1028,7 @@
     "id": "WH-THV-MA11-O6P7",
     "locationName": "Thiruvallur",
     "isActive": true,
+    "is3pl": false,
     "latLng": "13.155, 79.995",
     "generalizedLocation": {
       "lat": 13.155,
