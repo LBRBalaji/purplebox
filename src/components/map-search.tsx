@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft, Star } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft, Star, Ruler, ZoomIn, ZoomOut } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 import type { WarehouseSchema } from '@/lib/schema';
@@ -241,6 +241,13 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [markers, setMarkers] = React.useState<google.maps.Marker[]>([]);
   const [markerClusterer, setMarkerClusterer] = React.useState<MarkerClusterer | null>(null);
   const [selectedWarehouse, setSelectedWarehouse] = React.useState<WarehouseSchema | null>(null);
+  
+  // States for Distance Calculator
+  const [isMeasuring, setIsMeasuring] = React.useState(false);
+  const [measurePoints, setMeasurePoints] = React.useState<google.maps.LatLng[]>([]);
+  const [measurePolyline, setMeasurePolyline] = React.useState<google.maps.Polyline | null>(null);
+  const [measureMarkers, setMeasureMarkers] = React.useState<google.maps.Marker[]>([]);
+  const [totalDistance, setTotalDistance] = React.useState(0);
 
   React.useEffect(() => {
     fetch('/api/warehouses')
@@ -413,33 +420,130 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       setSelectedWarehouse(null);
   }
 
+  // --- Distance Calculator Logic ---
+
+    // Toggle measurement mode
+    const toggleMeasurement = () => {
+        clearMeasurement();
+        setIsMeasuring(prev => !prev);
+    };
+
+    // Clear measurement data
+    const clearMeasurement = () => {
+        measurePolyline?.setMap(null);
+        measureMarkers.forEach(marker => marker.setMap(null));
+        setMeasurePoints([]);
+        setMeasurePolyline(null);
+        setMeasureMarkers([]);
+        setTotalDistance(0);
+    };
+
+    // Effect to handle map clicks for measurement
+    React.useEffect(() => {
+        if (!map || !isMeasuring) return;
+
+        map.setOptions({ draggableCursor: 'crosshair' });
+        const clickListener = map.addListener('click', (e: google.maps.MapMouseEvent) => {
+            if (e.latLng) {
+                setMeasurePoints(prev => [...prev, e.latLng!]);
+            }
+        });
+
+        return () => {
+            map.setOptions({ draggableCursor: 'grab' });
+            google.maps.event.removeListener(clickListener);
+        };
+    }, [map, isMeasuring]);
+
+    // Effect to update polyline and distance
+    React.useEffect(() => {
+        if (!map || !geometry || !isMeasuring) return;
+
+        // Draw markers
+        measureMarkers.forEach(marker => marker.setMap(null)); // Clear old markers
+        const newMarkers = measurePoints.map(point => new google.maps.Marker({
+            position: point,
+            map: map,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 4,
+                fillColor: 'hsl(var(--primary))',
+                fillOpacity: 1,
+                strokeColor: 'white',
+                strokeWeight: 2,
+            },
+        }));
+        setMeasureMarkers(newMarkers);
+
+        // Draw polyline
+        if (!measurePolyline) {
+            const newPolyline = new google.maps.Polyline({
+                path: measurePoints,
+                geodesic: true,
+                strokeColor: 'hsl(var(--primary))',
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+                map: map,
+            });
+            setMeasurePolyline(newPolyline);
+        } else {
+            measurePolyline.setPath(measurePoints);
+        }
+        
+        // Calculate distance
+        if (measurePoints.length > 1) {
+            const distance = google.maps.geometry.spherical.computeLength(measurePoints);
+            setTotalDistance(distance / 1000); // convert meters to kilometers
+        } else {
+            setTotalDistance(0);
+        }
+
+    }, [measurePoints, map, geometry, isMeasuring, measurePolyline]);
+
+
   return (
     <>
         <div className="flex h-full w-full">
             <div className="flex-grow h-full relative">
-                <div className="absolute top-4 left-4 z-10 w-full max-w-sm">
-                    <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        ref={inputRef}
-                        placeholder="Search for a region..."
-                        className="pl-9 shadow-md bg-background"
-                        value={searchInput}
-                        onChange={e => setSearchInput(e.target.value)}
-                    />
-                    {searchInput && (
-                        <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                        onClick={clearSearch}
-                        >
-                        <X className="h-4 w-4" />
-                        </Button>
-                    )}
+                <div className="absolute top-4 left-4 z-10 w-full max-w-sm flex items-center gap-2">
+                    <div className="relative flex-grow">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            ref={inputRef}
+                            placeholder="Search for a region..."
+                            className="pl-9 shadow-md bg-background"
+                            value={searchInput}
+                            onChange={e => setSearchInput(e.target.value)}
+                        />
+                        {searchInput && (
+                            <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                            onClick={clearSearch}
+                            >
+                            <X className="h-4 w-4" />
+                            </Button>
+                        )}
                     </div>
                 </div>
-
+                 <div className="absolute top-4 right-[420px] z-10 flex flex-col gap-2">
+                    <Button variant="outline" size="icon" className="bg-background shadow-md" onClick={() => map?.setZoom((map.getZoom() || 10) + 1)}><ZoomIn/></Button>
+                    <Button variant="outline" size="icon" className="bg-background shadow-md" onClick={() => map?.setZoom((map.getZoom() || 10) - 1)}><ZoomOut/></Button>
+                    <Button variant={isMeasuring ? "default" : "outline"} size="icon" className="bg-background shadow-md" onClick={toggleMeasurement} title="Measure distance"><Ruler/></Button>
+                </div>
+                {isMeasuring && (
+                    <div className="absolute bottom-4 left-4 z-10 bg-background/80 backdrop-blur-sm p-3 rounded-lg shadow-md border">
+                        <div className="flex items-center gap-4">
+                             <div>
+                                <p className="text-xs text-muted-foreground">Total Distance</p>
+                                <p className="text-lg font-bold text-primary">{totalDistance.toFixed(2)} km</p>
+                            </div>
+                            <Button variant="ghost" size="sm" onClick={clearMeasurement}>Clear</Button>
+                        </div>
+                         <p className="text-xs text-muted-foreground mt-2">Click points on the map to measure.</p>
+                    </div>
+                )}
                 <Map
                     defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
                     defaultZoom={5}
