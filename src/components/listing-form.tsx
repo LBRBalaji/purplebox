@@ -105,7 +105,18 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 status: 'pending',
                 developerId: user?.email || '',
                 listingId: `LST-${Date.now()}`,
-                warehouseBoxId: `WBX-${user?.companyName?.substring(0,4).toUpperCase() || 'NEW'}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+                warehouseBoxId: `WBX-${user?.companyName?.substring(0,4).toUpperCase() || 'NEW'}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+                certificatesAndApprovals: {
+                  parkApproval: false,
+                  buildingApproval: false,
+                  fireLicense: false,
+                  fireNOC: false,
+                  buildingInsurance: false,
+                  pcbForAir: false,
+                  pcbForWater: false,
+                  propertyTax: false,
+                },
+                documents: [],
             });
         }
     }
@@ -119,7 +130,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     })
   };
 
-  const approvalFields = Object.keys(form.getValues().certificatesAndApprovals) as (keyof ListingSchema['certificatesAndApprovals'])[];
+  const approvalFields = Object.keys(form.getValues().certificatesAndApprovals || {}) as (keyof ListingSchema['certificatesAndApprovals'])[];
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
