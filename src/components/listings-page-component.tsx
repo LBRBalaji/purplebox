@@ -5,7 +5,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -101,7 +101,13 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                 <Building2 className="h-4 w-4 text-primary" />
                 <span className="font-medium">{listing.buildingSpecifications.buildingType || 'N/A'}</span>
             </div>
-            <div className="flex items-center gap-2 col-span-2">
+             <div className="flex items-center gap-2">
+                <ChevronsUp className="h-4 w-4 text-primary" />
+                <span className="font-medium">
+                  {listing.buildingSpecifications.eveHeightMeters ? `${listing.buildingSpecifications.eveHeightMeters}m Eve Height` : 'N/A'}
+                </span>
+            </div>
+            <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-primary" />
                 <span className="font-medium">{listing.availabilityDate}</span>
             </div>
