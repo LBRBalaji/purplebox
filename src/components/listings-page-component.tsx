@@ -45,19 +45,19 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
              <Checkbox
                 checked={isSelected}
                 onCheckedChange={() => onSelectionChange(listing)}
-                aria-label={`Select warehouse ${listing.listingId}`}
+                aria-label={`Select warehouse ${listing.name}`}
                 className="w-6 h-6 bg-background/80 hover:bg-background border-muted-foreground/50 data-[state=checked]:bg-primary"
             />
           </div>
-           {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
-            <Badge variant="secondary" className="absolute top-3 left-3 bg-amber-100 text-amber-800 border-amber-200">
+        </div>
+       </CardHeader>
+       <CardContent className="flex-grow p-6 space-y-4">
+        {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
+            <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 mb-2">
                 <Star className="mr-1.5 h-3 w-3" />
                 3PL Operated
             </Badge>
         )}
-        </div>
-       </CardHeader>
-       <CardContent className="flex-grow p-6 space-y-4">
         <div className="space-y-2">
             <CardTitle className="leading-tight">{listing.name}</CardTitle>
             <CardDescription className="flex items-center gap-1.5 pt-1">
