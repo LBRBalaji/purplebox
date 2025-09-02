@@ -4,6 +4,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as React from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,13 +33,6 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter as TableResultFooter } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown, Warehouse } from "lucide-react";
@@ -57,6 +58,7 @@ type CalculatorValues = z.infer<typeof calculatorSchema>;
 
 export function CommercialCalculator() {
   const { listings } = useData();
+  const searchParams = useSearchParams();
   const [results, setResults] = React.useState<any>(null);
   const [selectedListingId, setSelectedListingId] = React.useState<string>("");
 
@@ -81,7 +83,7 @@ export function CommercialCalculator() {
     name: "deductibleAreas",
   });
 
-  const handleListingSelect = (listingId: string) => {
+  const handleListingSelect = React.useCallback((listingId: string) => {
     const listing = approvedListings.find(l => l.listingId === listingId);
     if (!listing) return;
 
@@ -90,7 +92,6 @@ export function CommercialCalculator() {
     const deductibles = [];
     if(listing.area.canopyArea) deductibles.push({ name: 'Canopy', area: listing.area.canopyArea});
     if(listing.area.driversRestRoomArea) deductibles.push({ name: 'Driver Rest Room', area: listing.area.driversRestRoomArea});
-    // Add a default empty one if none exist
     if (deductibles.length === 0) deductibles.push({ name: 'Deductible Area', area: 0 });
 
     form.reset({
@@ -100,7 +101,15 @@ export function CommercialCalculator() {
         securityDepositMonths: listing.rentalSecurityDeposit || undefined,
         deductibleAreas: deductibles,
     });
-  }
+  }, [approvedListings, form]);
+
+  React.useEffect(() => {
+    const listingIdFromUrl = searchParams.get('listingId');
+    if (listingIdFromUrl) {
+        handleListingSelect(listingIdFromUrl);
+    }
+  }, [searchParams, handleListingSelect]);
+
 
   const onSubmit = (data: CalculatorValues) => {
     const totalDeductible = data.deductibleAreas.reduce((sum, item) => sum + item.area, 0);
@@ -172,7 +181,7 @@ export function CommercialCalculator() {
                 <FormItem>
                   <FormLabel>Gross Shop Floor Area (sq. ft.)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="e.g., 100000" {...field} onChange={e => field.onChange(e.target.value === '' ? undefined : e.target.value)} />
+                    <Input type="number" placeholder="e.g., 100000" {...field} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -234,7 +243,7 @@ export function CommercialCalculator() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
              <FormField control={form.control} name="rentPerSft" render={({ field }) => (
-                <FormItem><FormLabel>Rent per sq. ft./month</FormLabel><FormControl><Input type="number" placeholder="e.g., 25" {...field} onChange={e => field.onChange(e.target.value === '' ? undefined : e.target.value)} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Rent per sq. ft./month</FormLabel><FormControl><Input type="number" placeholder="e.g., 25" {...field} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
             )} />
              <FormField control={form.control} name="camPerSft" render={({ field }) => (
                 <FormItem><FormLabel>CAM per sq. ft./month</FormLabel><FormControl><Input type="number" placeholder="e.g., 2.5" {...field} /></FormControl><FormMessage /></FormItem>
