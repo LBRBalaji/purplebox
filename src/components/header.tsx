@@ -5,7 +5,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -35,13 +35,10 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const NavLink = ({ href, children, exact = false }: { href: string, children: React.ReactNode, exact?: boolean }) => {
     const pathname = usePathname();
-    const isActive = exact ? pathname === href : pathname.startsWith(href);
+    // For the root path, we consider it active if it's the exact path.
+    // For other paths, we can check if the path starts with the href.
+    const isActive = href === '/' ? pathname === href : pathname.startsWith(href);
     
-    // Hide links on the root path (new split-view landing page)
-    if (pathname === '/') {
-        return null;
-    }
-
     return (
         <Link 
             href={href} 
@@ -58,10 +55,6 @@ const NavLink = ({ href, children, exact = false }: { href: string, children: Re
 const AnalyticsDropdown = () => {
     const pathname = usePathname();
     const isActive = pathname.startsWith('/dashboard/analytics');
-
-    if (pathname === '/') {
-        return null;
-    }
 
     return (
         <DropdownMenu>
@@ -90,9 +83,6 @@ export function Header() {
   const { user, logout, isLoading } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isAdmin = user?.email === 'admin@example.com';
-  const isO2O = user?.role === 'O2O';
-  const pathname = usePathname();
-
 
   return (
     <>
@@ -118,11 +108,11 @@ export function Header() {
                 ) : (
                     <>
                         {user && (
-                            <NavLink href="/dashboard" exact={true}>
+                            <NavLink href="/dashboard">
                                 <LayoutDashboard className="h-4 w-4" /> Dashboard
                             </NavLink>
                         )}
-                        <NavLink href="/listings">
+                        <NavLink href="/" exact={true}>
                             <List className="h-4 w-4" /> Browse Listings
                         </NavLink>
                         <NavLink href="/map-search">
@@ -165,16 +155,9 @@ export function Header() {
                   </Button>
                 </div>
               ) : (
-                 <div className="flex items-center gap-2">
-                    {pathname !== '/' && (
-                        <Link href="/" className={cn(buttonVariants({ variant: 'ghost' }))}>
-                            Home
-                        </Link>
-                    )}
-                    <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
-                        <LogIn className="mr-2 h-4 w-4" /> Login
-                    </Button>
-                 </div>
+                 <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
+                    <LogIn className="mr-2 h-4 w-4" /> Login
+                </Button>
               )}
             </div>
         </div>
