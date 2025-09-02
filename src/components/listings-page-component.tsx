@@ -251,9 +251,9 @@ const searchPlaceholders = [
     'e.g., search "RCC building"',
     'e.g., search "fire NOC approved"',
     'e.g., search "FM2 grade flooring"',
-    'e.g., search "pharma compliant"',
-    'e.g., search "superflat floor"',
-    'e.g., search "building approval"',
+    'e.g., search "Galvalume roof"',
+    'e.g., search "Insulated roof"',
+    'e.g., search "Turbo ventilation"',
 ];
 
 export function ListingsPage() {
@@ -297,6 +297,8 @@ export function ListingsPage() {
                 listing.serviceModel,
                 listing.buildingSpecifications.eveHeightMeters ? `eve height ${listing.buildingSpecifications.eveHeightMeters}m` : '',
                 listing.buildingSpecifications.roofType,
+                listing.buildingSpecifications.ventilation,
+                listing.buildingSpecifications.roofInsulation,
                 listing.buildingSpecifications.craneAvailable ? "crane available" : "",
                 listing.siteSpecifications.typeOfFlooringInside,
                 listing.certificatesAndApprovals.fireNOC ? "fire NOC approved" : "",
@@ -541,3 +543,4 @@ export function ListingsPage() {
     </>
   );
 }
+
