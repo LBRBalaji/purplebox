@@ -118,11 +118,9 @@ export function Header() {
                         <NavLink href="/map-search">
                             <Map className="h-4 w-4" /> Map Search
                         </NavLink>
-                         {isCustomer && (
-                            <NavLink href="/dashboard/commercial-calculator">
-                                <Calculator className="h-4 w-4" /> Commercials Calculator
-                            </NavLink>
-                         )}
+                         <NavLink href="/commercial-calculator">
+                            <Calculator className="h-4 w-4" /> Commercials Calculator
+                         </NavLink>
                          {!user && (
                             <NavLink href="/agent-signup">
                                 <UserPlus className="h-4 w-4" /> Agent Signup

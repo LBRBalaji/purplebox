@@ -108,7 +108,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
       </CardContent>
       <CardFooter className="p-6 pt-0 grid grid-cols-2 gap-2">
         <Button asChild className="w-full" variant="outline">
-            <Link href={`/dashboard/commercial-calculator?listingId=${listing.listingId}`}>
+            <Link href={`/commercial-calculator?listingId=${listing.listingId}`}>
                 <Calculator className="mr-2 h-4 w-4" /> Calculate
             </Link>
         </Button>
