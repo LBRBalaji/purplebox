@@ -33,9 +33,14 @@ export function ShortlistedProperties() {
     
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
 
-    // Add branding
+    // Add branding and contact details
     const footer = [
         [], // Empty row for spacing
+        ["For Leasing, Contact"],
+        ["Lakshmi Balaji Realty"],
+        ["Email: balaji@lakshmibalajio2o.com"],
+        ["Mobile: +91 98410 98170"],
+        [],
         ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
     ];
     XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
@@ -125,3 +130,5 @@ export function ShortlistedProperties() {
     </>
   );
 }
+
+    

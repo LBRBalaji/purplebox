@@ -133,6 +133,11 @@ function DownloadBar() {
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             
             const footer = [
+                [], // Empty row for spacing
+                ["For Leasing, Contact"],
+                ["Lakshmi Balaji Realty"],
+                ["Email: balaji@lakshmibalajio2o.com"],
+                ["Mobile: +91 98410 98170"],
                 [],
                 ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
             ];
@@ -424,3 +429,5 @@ export function ListingsPage() {
     </>
   );
 }
+
+    

@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, AlertCircle } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, AlertCircle, Construction } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -183,9 +183,14 @@ export default function ListingDetailPage() {
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
 
-            // Add branding
+            // Add branding and contact details
             const footer = [
                 [], // Empty row for spacing
+                ["For Leasing, Contact"],
+                ["Lakshmi Balaji Realty"],
+                ["Email: balaji@lakshmibalajio2o.com"],
+                ["Mobile: +91 98410 98170"],
+                [],
                 ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
@@ -416,3 +421,5 @@ export default function ListingDetailPage() {
         </>
     );
 }
+
+    
