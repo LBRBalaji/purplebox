@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -128,6 +128,7 @@ export function Header() {
                         )}
                          {(isAdmin || isO2O) && (
                             <>
+                                <NavLink href="/dashboard/manage-listings"><FileCheck className="h-4 w-4" /> Manage Listings</NavLink>
                                 <NavLink href="/dashboard/approval"><CheckCircle className="h-4 w-4" /> Approval Queue</NavLink>
                                 <AnalyticsDropdown />
                             </>
