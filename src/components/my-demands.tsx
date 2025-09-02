@@ -188,7 +188,7 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                             <Card key={match.submissionId} className={cn(match.isNew && "border-primary border-2")}>
                             <CardHeader>
                                 <div className="aspect-video relative rounded-md overflow-hidden mb-4">
-                                <Image src={listing.documents?.[0]?.url || "https://placehold.co/600x400.png"} alt={`Property ${listing.listingId}`} data-ai-hint="modern office" fill className="object-cover" />
+                                <Image src={listing.documents?.[0]?.url || "https://placehold.co/600x400.png"} alt={`Property ${listing.listingId}`} data-ai-hint="warehouse industrial building" fill className="object-cover" />
                                     {match.isNew && <Badge className="absolute top-2 right-2 bg-primary animate-pulse">New</Badge>}
                                 </div>
                                 <CardTitle>{listing.name}</CardTitle>
