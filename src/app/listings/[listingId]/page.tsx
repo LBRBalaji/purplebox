@@ -421,27 +421,13 @@ export default function ListingDetailPage() {
                                 </CardHeader>
                                 <CardContent>
                                      {user ? (
-                                        <div>
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <div className="space-y-1">
-                                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} isBlurred />
-                                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} isBlurred />
-                                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} isBlurred />
-                                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} isBlurred />
-                                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} isBlurred />
-                                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} isBlurred />
-                                                        </div>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent side="top" align="start">
-                                                        <div className="flex items-center gap-2 max-w-xs">
-                                                            <EyeOff className="h-4 w-4" />
-                                                            <p className="text-xs">This data is sensitive. It is blurred for viewing purposes and cannot be downloaded.</p>
-                                                        </div>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
+                                        <div className="space-y-1">
+                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
+                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
+                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
+                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
+                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
+                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
                                         </div>
                                      ) : (
                                          <p className="text-sm text-muted-foreground text-center p-4">
@@ -458,3 +444,5 @@ export default function ListingDetailPage() {
         </>
     );
 }
+
+    
