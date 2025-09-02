@@ -245,12 +245,15 @@ function DownloadBar() {
 }
 
 const searchPlaceholders = [
-    'Search by ID, e.g., "LST-8K3J5M1P"',
-    'Search by height, e.g., "12m eve height"',
-    'Search by service, e.g., "3PL Operated"',
-    'Search by building, e.g., "RCC building"',
-    'Search by roof, e.g., "Galvalume roof"',
-    'Search by spec, e.g., "crane available"',
+    'e.g., search "12m eve height"',
+    'e.g., search "crane available"',
+    'e.g., search "3PL operated"',
+    'e.g., search "RCC building"',
+    'e.g., search "fire NOC approved"',
+    'e.g., search "FM2 grade flooring"',
+    'e.g., search "pharma compliant"',
+    'e.g., search "superflat floor"',
+    'e.g., search "building approval"',
 ];
 
 export function ListingsPage() {
@@ -295,6 +298,9 @@ export function ListingsPage() {
                 listing.buildingSpecifications.eveHeightMeters ? `eve height ${listing.buildingSpecifications.eveHeightMeters}m` : '',
                 listing.buildingSpecifications.roofType,
                 listing.buildingSpecifications.craneAvailable ? "crane available" : "",
+                listing.siteSpecifications.typeOfFlooringInside,
+                listing.certificatesAndApprovals.fireNOC ? "fire NOC approved" : "",
+                listing.certificatesAndApprovals.buildingApproval ? "building approval" : ""
             ].join(' ').toLowerCase();
             return searchHaystack.includes(searchTerm.toLowerCase());
         });
