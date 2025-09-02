@@ -2,7 +2,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { useData } from '@/contexts/data-context';
-import type { WarehouseSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -26,7 +25,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
-  const previewImage = listing.documents?.[0]?.url || 'https://placehold.co/600x400.png';
+  const previewImage = listing.documents?.find(d => d.type === 'image')?.url || 'https://placehold.co/600x400/210D42/FFFFFF?text=Image+Not+Available';
 
   return (
     <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary")}>
@@ -35,10 +34,10 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
           <div className="aspect-video relative mb-4 flex-grow">
             <Image
               src={previewImage}
-              alt={listing.location}
+              alt={listing.name || 'Warehouse image'}
               fill
               className="rounded-t-lg object-cover"
-              data-ai-hint="modern warehouse"
+              data-ai-hint="warehouse industrial building"
             />
           </div>
           <Checkbox
@@ -49,7 +48,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
           />
         </div>
         <div className="flex items-center justify-between">
-            <CardTitle>{listing.location}</CardTitle>
+            <CardTitle>{listing.name}</CardTitle>
             {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
                 <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20">
                     <Star className="mr-1.5 h-3 w-3" />
@@ -407,5 +406,3 @@ export function ListingsPage() {
     </>
   );
 }
-
-    

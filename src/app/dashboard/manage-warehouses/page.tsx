@@ -1,9 +1,9 @@
 
 'use client';
-import { WarehouseList } from "@/components/warehouse-list";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import * as React from 'react';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function ManageWarehousesPage() {
     const { user, isLoading } = useAuth();
@@ -11,13 +11,10 @@ export default function ManageWarehousesPage() {
 
     React.useEffect(() => {
         if (!isLoading && user?.role !== 'SuperAdmin') {
-            // This is a redundant check as the layout also protects this route,
-            // but it's good practice for page-level security.
             router.push('/dashboard');
         }
     }, [user, isLoading, router]);
     
-    // Render nothing or a loading state until the redirect can happen
     if (isLoading || user?.role !== 'SuperAdmin') {
         return null;
     }
@@ -25,13 +22,12 @@ export default function ManageWarehousesPage() {
     return (
         <main className="container mx-auto p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold font-headline tracking-tight">Manage Warehouse Listings</h2>
-                    <p className="text-muted-foreground mt-2">
-                        Here you can activate or deactivate warehouse listings on the public map search.
-                    </p>
-                </div>
-                <WarehouseList />
+                 <Card className="text-center p-12">
+                    <CardTitle>Feature Deprecated</CardTitle>
+                    <CardDescription className="mt-2">
+                        Warehouse management is now handled via the "My Listings" tab on the main dashboard for providers.
+                    </CardDescription>
+                </Card>
             </div>
         </main>
     );

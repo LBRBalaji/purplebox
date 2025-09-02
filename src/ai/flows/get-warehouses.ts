@@ -9,9 +9,9 @@
  */
 
 import {z} from 'zod';
-import { warehouseSchema } from '@/lib/schema';
-import allWarehouses from '@/data/warehouses.json';
-import { type WarehouseSchema } from '@/lib/schema';
+import { listingSchema } from '@/lib/schema';
+import allListings from '@/data/listings.json';
+import { type ListingSchema } from '@/lib/schema';
 
 const GetWarehousesInputSchema = z.object({
   sw_lat: z.number().describe('The southwest latitude of the map boundary.'),
@@ -22,20 +22,22 @@ const GetWarehousesInputSchema = z.object({
 export type GetWarehousesInput = z.infer<typeof GetWarehousesInputSchema>;
 
 const GetWarehousesOutputSchema = z.object({
-  warehouses: z.array(warehouseSchema).describe('A list of warehouses within the specified boundaries.'),
+  warehouses: z.array(listingSchema).describe('A list of warehouses within the specified boundaries.'),
 });
 export type GetWarehousesOutput = z.infer<typeof GetWarehousesOutputSchema>;
 
 export async function getWarehouses(input: GetWarehousesInput): Promise<GetWarehousesOutput> {
     // This function simulates a database query to find warehouses within the given map bounds.
     // In a real application, this would be a query to a geospatial database like PostGIS or Firestore with Geo-queries.
-    const warehouses = allWarehouses as WarehouseSchema[];
+    const listings = allListings as ListingSchema[];
 
-    const visibleWarehouses = warehouses.filter(warehouse => {
-        if (!warehouse.isActive) {
+    const visibleWarehouses = listings.filter(listing => {
+        if (listing.status !== 'approved' || !listing.latLng) {
             return false;
         }
-        const { lat, lng } = warehouse.generalizedLocation;
+        const [lat, lng] = listing.latLng.split(',').map(Number);
+        if(isNaN(lat) || isNaN(lng)) return false;
+
         const isInLatitude = lat >= input.sw_lat && lat <= input.ne_lat;
         const isInLongitude = lng >= input.sw_lng && lng <= input.ne_lng;
         return isInLatitude && isInLongitude;
