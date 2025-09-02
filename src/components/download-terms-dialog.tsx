@@ -61,13 +61,13 @@ export function DownloadTermsDialog({ isOpen, onOpenChange, onAccept }: Download
                     <li className="flex items-start gap-3">
                         <Star className="h-4 w-4 shrink-0 mt-0.5" />
                         <span>
-                            <strong className="font-semibold">Zero Fee for Startups:</strong> Government of India recognized startups enjoy a zero transaction fee on their first deal with us.
+                            <strong className="font-semibold">Zero Brokerage Charges for Startups:</strong> Government of India recognized startups enjoy a zero transaction fee on their first deal with us.
                         </span>
                     </li>
                     <li className="flex items-start gap-3">
                         <Truck className="h-4 w-4 shrink-0 mt-0.5" />
                         <span>
-                           <strong className="font-semibold">Zero Fee for Logistics Companies:</strong> As a token of our long-term association, logistics companies are offered a zero transaction fee on all deals.
+                           <strong className="font-semibold">Zero Brokerage Charges for Logistics Companies:</strong> As a token of our long-term association, logistics companies are offered a zero transaction fee on all deals.
                         </span>
                     </li>
                 </ul>
@@ -94,5 +94,3 @@ export function DownloadTermsDialog({ isOpen, onOpenChange, onAccept }: Download
     </Dialog>
   );
 }
-
-    

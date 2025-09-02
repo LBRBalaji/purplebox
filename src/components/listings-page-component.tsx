@@ -355,7 +355,7 @@ export function ListingsPage() {
                     </AlertDescription>
                 </div>
                 <div className="md:col-span-4 space-y-4 p-4 rounded-md bg-green-50 border border-green-200">
-                     <h4 className="font-bold text-green-800 flex items-center gap-2"><Award className="h-5 w-5"/> Zero Service Charge</h4>
+                     <h4 className="font-bold text-green-800 flex items-center gap-2"><Award className="h-5 w-5"/> Zero Brokerage Charges</h4>
                      <ul className="text-xs text-green-700/90 list-none space-y-2">
                         <li className="flex items-start gap-2">
                             <Award className="h-4 w-4 shrink-0 mt-0.5 text-green-600"/>
@@ -483,5 +483,3 @@ export function ListingsPage() {
     </>
   );
 }
-
-    
