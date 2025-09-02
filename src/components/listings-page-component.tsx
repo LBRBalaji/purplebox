@@ -29,57 +29,57 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
   const previewImage = listing.documents?.[0]?.url || 'https://placehold.co/600x400.png';
 
   return (
-    <Card className={cn("flex flex-col transition-all", isSelected && "ring-2 ring-primary")}>
-       <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <div className="aspect-video relative mb-4 flex-grow">
+    <Card className={cn("flex flex-col transition-all overflow-hidden group", isSelected && "ring-2 ring-primary")}>
+       <CardHeader className="p-0">
+        <div className="relative">
+          <div className="aspect-video relative">
             <Image
               src={previewImage}
               alt={listing.name}
               fill
-              className="rounded-t-lg object-cover"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
               data-ai-hint="modern warehouse"
             />
           </div>
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={() => onSelectionChange(listing)}
-            aria-label={`Select warehouse ${listing.listingId}`}
-            className="w-5 h-5"
-          />
+          <div className="absolute top-3 right-3">
+             <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onSelectionChange(listing)}
+                aria-label={`Select warehouse ${listing.listingId}`}
+                className="w-6 h-6 bg-background/80 hover:bg-background border-muted-foreground/50 data-[state=checked]:bg-primary"
+            />
+          </div>
         </div>
-        <div className="flex items-center justify-between">
-            <CardTitle>{listing.name}</CardTitle>
+       </CardHeader>
+       <CardContent className="flex-grow p-6 space-y-4">
+        <div className="space-y-2">
             {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
                 <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20">
                     <Star className="mr-1.5 h-3 w-3" />
                     3PL Operated
                 </Badge>
             )}
+            <CardTitle className="leading-tight">{listing.name}</CardTitle>
+            <CardDescription className="flex items-center gap-1.5 pt-1">
+                <MapPin className="h-4 w-4" /> {listing.location}
+            </CardDescription>
         </div>
-        <CardDescription>ID: {listing.listingId}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow space-y-4">
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 gap-4 text-sm pt-2">
             <div className="flex items-center gap-2">
                 <Scaling className="h-4 w-4 text-primary" />
-                <span>{listing.sizeSqFt.toLocaleString()} sq. ft.</span>
+                <span className="font-medium">{listing.sizeSqFt.toLocaleString()} sq. ft.</span>
             </div>
             <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-primary" />
-                <span>{listing.buildingSpecifications.buildingType || 'N/A'}</span>
+                <span className="font-medium">{listing.buildingSpecifications.buildingType || 'N/A'}</span>
             </div>
-            <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary" />
-                <span className="truncate">{listing.location}</span>
-            </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 col-span-2">
                 <Calendar className="h-4 w-4 text-primary" />
-                <span>{listing.availabilityDate}</span>
+                <span className="font-medium">{listing.availabilityDate}</span>
             </div>
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="p-6 pt-0">
         <Button asChild className="w-full">
             <Link href={`/listings/${listing.listingId}`} target="_blank">
                 View Details <ArrowRight className="ml-2 h-4 w-4" />
@@ -348,13 +348,11 @@ export function ListingsPage() {
                 </div>
             </Alert>
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className='w-full'>
-                        <h1 className="text-2xl font-bold font-headline tracking-tight">Search Listings</h1>
-                        <p className="text-muted-foreground mt-1">
-                           Use our advanced filters to find the perfect Warehouse, 3PL Operated Warehouse and Industrial Buildings for your needs.
-                        </p>
-                    </div>
+                <div className="w-full">
+                    <h1 className="text-2xl font-bold font-headline tracking-tight">Search Listings</h1>
+                    <p className="text-muted-foreground mt-1">
+                        Use our advanced filters to find the perfect Warehouse, 3PL Operated Warehouse and Industrial Buildings for your needs.
+                    </p>
                 </div>
                 <div className="mt-6 flex flex-col md:flex-row gap-4">
                     <div className="relative flex-grow">
