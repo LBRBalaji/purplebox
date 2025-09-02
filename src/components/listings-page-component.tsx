@@ -251,6 +251,7 @@ export function ListingsPage() {
   const { toast } = useToast();
   const [filteredListings, setFilteredListings] = useState<ListingSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -261,18 +262,16 @@ export function ListingsPage() {
 
   const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.listingId)), [selectedForDownload]);
 
-  useEffect(() => {
+ useEffect(() => {
     let results = approvedListings;
 
+    // Filter by general search term
     if (searchTerm) {
         results = results.filter(listing => {
             const searchHaystack = [
                 listing.name,
-                listing.location,
                 listing.listingId,
-                listing.availabilityDate,
                 listing.buildingSpecifications.buildingType,
-                listing.sizeSqFt.toString(),
                 listing.serviceModel,
                 listing.buildingSpecifications.eveHeightMeters ? `eve height ${listing.buildingSpecifications.eveHeightMeters}m` : '',
             ].join(' ').toLowerCase();
@@ -280,10 +279,19 @@ export function ListingsPage() {
         });
     }
 
+    // Filter by location
+    if (locationFilter) {
+      results = results.filter(listing =>
+        listing.location.toLowerCase().includes(locationFilter.toLowerCase())
+      );
+    }
+    
+    // Filter by availability
     if (availability !== 'all') {
         results = results.filter(l => l.availabilityDate === availability);
     }
     
+    // Filter by size
     results = results.filter(l => l.sizeSqFt >= sizeRange[0] && l.sizeSqFt <= sizeRange[1]);
 
     setFilteredListings(results);
@@ -294,11 +302,12 @@ export function ListingsPage() {
     } catch (e) {
         console.error("Could not write to sessionStorage", e);
     }
-  }, [searchTerm, availability, sizeRange, approvedListings]);
+  }, [searchTerm, locationFilter, availability, sizeRange, approvedListings]);
 
 
   const resetFilters = () => {
     setSearchTerm('');
+    setLocationFilter('');
     setAvailability('all');
     
     const maxArea = Math.max(...approvedListings.map(w => w.sizeSqFt), 0);
@@ -446,68 +455,50 @@ export function ListingsPage() {
                         Use our advanced filters to find the perfect Warehouse, 3PL Operated Warehouse and Industrial Buildings for your needs.
                     </p>
                 </div>
-                <div className="mt-6 flex flex-col md:flex-row gap-4">
-                    <div className="relative flex-grow">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                    <div className="lg:col-span-2 space-y-2">
+                        <label className="text-sm font-medium">Keyword Search</label>
                         <Input 
-                            placeholder="Search by name, location, ID, size, type (e.g. '3PL'), or eve height..."
-                            className="pl-9"
+                            placeholder="Search name, ID, type, height..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                     <Popover>
-                        <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full md:w-auto justify-start text-left font-normal">
-                            <SlidersHorizontal className="mr-2 h-4 w-4" />
-                            <span>Filters</span>
-                        </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80" align="start">
-                            <div className="grid gap-4">
-                                <div className="space-y-2">
-                                <h4 className="font-medium leading-none">Filters</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Adjust the filters to narrow down your search.
-                                </p>
-                                </div>
-                                <div className="grid gap-2">
-                                    <div className="grid grid-cols-3 items-center gap-4">
-                                        <label htmlFor="availability" className="col-span-1">Availability</label>
-                                        <Select value={availability} onValueChange={setAvailability}>
-                                            <SelectTrigger id="availability" className="col-span-2 h-8">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">All</SelectItem>
-                                                <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
-                                                <SelectItem value="Under Construction">Under Construction</SelectItem>
-                                                <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="grid grid-cols-1 items-center gap-2">
-                                        <label htmlFor="size" className="col-span-1">Size (sq. ft.)</label>
-                                        <div className="col-span-3">
-                                            <Slider
-                                                id="size"
-                                                min={0}
-                                                max={maxSliderSize}
-                                                step={10000}
-                                                value={sizeRange}
-                                                onValueChange={(value) => setSizeRange(value as [number, number])}
-                                            />
-                                            <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                                                <span>{sizeRange[0].toLocaleString()}</span>
-                                                <span>{sizeRange[1].toLocaleString()}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                 <Button onClick={resetFilters} variant="ghost" className="w-full justify-center">Reset Filters</Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                     <div className="space-y-2">
+                        <label className="text-sm font-medium">Location</label>
+                        <Input 
+                            placeholder="e.g. Chennai, Oragadam"
+                            value={locationFilter}
+                            onChange={(e) => setLocationFilter(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Availability</label>
+                        <Select value={availability} onValueChange={setAvailability}>
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
+                                <SelectItem value="Under Construction">Under Construction</SelectItem>
+                                <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="lg:col-span-3 space-y-2">
+                         <label className="text-sm font-medium">Size (sq. ft.) - from {sizeRange[0].toLocaleString()} to {sizeRange[1].toLocaleString()}</label>
+                         <Slider
+                            min={0}
+                            max={maxSliderSize}
+                            step={10000}
+                            value={sizeRange}
+                            onValueChange={(value) => setSizeRange(value as [number, number])}
+                        />
+                    </div>
+                    <div>
+                         <Button onClick={resetFilters} variant="ghost" className="w-full">Reset Filters</Button>
+                    </div>
                 </div>
             </div>
             {renderContent()}
