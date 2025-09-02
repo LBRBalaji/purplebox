@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from '@/hooks/use-toast';
 
 export type User = {
   email: string;
@@ -36,6 +37,15 @@ const defaultUsers: { [email: string]: User } = {
   'provider@example.com': { email: 'provider@example.com', role: 'SuperAdmin', companyName: 'Prime Properties', userName: 'Test Provider', phone: '555-111-2222' },
   'o2o@example.com': { email: 'o2o@example.com', role: 'O2O', companyName: 'Warehouse Origin', userName: 'O2O Manager', phone: '555-020-0202' },
 };
+
+const personalEmailDomains = [
+    'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'live.com', 'msn.com', 'protonmail.com'
+];
+
+const competitorKeywords = [
+    'realtor', 'realty', 'real estate', 'cbre', 'jll', 'knightfrank', 'savils', 'hrr', 'hanu reddy', 'consulting', 'consultant'
+];
+
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -90,12 +100,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push('/dashboard');
       }
     } else {
-      alert('This email is not registered. Please sign up.');
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "This email is not registered. Please sign up.",
+      })
     }
   };
 
   const signup = (details: NewUser) => {
+    const email = details.email.toLowerCase();
+    const companyName = details.companyName.toLowerCase();
+    const emailDomain = email.split('@')[1];
+
+    // 1. Check for personal email domains
+    if (personalEmailDomains.includes(emailDomain)) {
+        toast({
+            variant: "destructive",
+            title: "Invalid Email",
+            description: "Please sign up using your official company email ID. Personal email addresses are not permitted.",
+        });
+        return;
+    }
+
+    // 2. Check for competitor keywords
+    const searchString = `${email} ${companyName}`;
+    const foundKeyword = competitorKeywords.find(keyword => searchString.includes(keyword));
+    if (foundKeyword) {
+        toast({
+            variant: "destructive",
+            title: "Registration Not Permitted",
+            description: "Based on your details, please register as an Agent Partner through the Agent Signup page.",
+            duration: 8000,
+        });
+        router.push('/agent-signup');
+        return;
+    }
+
+    // 3. Add user if validation passes
     addUser(details);
+
     // Log the new user in
     setUser(details);
     sessionStorage.setItem('user', JSON.stringify(details));
@@ -110,7 +154,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const addUser = (details: NewUser) => {
     if (users[details.email.toLowerCase()]) {
-      alert("An account with this email already exists.");
+      toast({
+        variant: "destructive",
+        title: "Registration Failed",
+        description: "An account with this email already exists.",
+      })
       return;
     }
     const newUsers = { ...users, [details.email.toLowerCase()]: details };
@@ -119,7 +167,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
   const updateUser = (details: NewUser) => {
     if (!users[details.email.toLowerCase()]) {
-      alert("Cannot update a non-existent user.");
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: "Cannot update a non-existent user.",
+      })
       return;
     }
     const newUsers = { ...users, [details.email.toLowerCase()]: details };
@@ -134,7 +186,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteUser = (email: string) => {
     if (email === 'admin@example.com') {
-        alert("The main admin account cannot be deleted.");
+        toast({
+            variant: "destructive",
+            title: "Action Forbidden",
+            description: "The main admin account cannot be deleted.",
+        });
         return;
     }
     const newUsers = { ...users };
