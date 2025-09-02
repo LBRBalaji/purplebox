@@ -4,6 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as React from "react";
+import * as XLSX from 'xlsx';
 import {
   Select,
   SelectContent,
@@ -33,7 +34,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter as TableResultFooter } from "@/components/ui/table";
-import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown, Warehouse, Users, FileText, BarChart2 } from "lucide-react";
+import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown, Warehouse, Users, FileText, BarChart2, Download } from "lucide-react";
 import { useData } from "@/contexts/data-context";
 import type { ListingSchema } from "@/lib/schema";
 import { Separator } from "./ui/separator";
@@ -131,6 +132,59 @@ export function CommercialCalculator() {
     onSubmit(data, comparisonListings);
   }
 
+    const handleDownload = () => {
+        if (results.length === 0) return;
+
+        const tableHeader = ["Metric", ...results.map(r => `${r.listing.name} (${r.listing.listingId})`)];
+        const tableRows = [
+            ["Net Chargeable Area (Sq. Ft.)", ...results.map(r => r.netChargeableArea.toLocaleString())],
+            ["Rent (per Sq. Ft./Month)", ...results.map(r => `₹${r.listing.rentPerSqFt?.toLocaleString() ?? 'N/A'}`)],
+            ["Security Deposit (Months)", ...results.map(r => r.listing.rentalSecurityDeposit?.toLocaleString() ?? 'N/A')],
+            ["One-Time Security Deposit", ...results.map(r => `₹${r.oneTimeOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`)],
+            ["Initial Monthly Outflow", ...results.map(r => `₹${parseFloat(r.initialTotalMonthlyOutflow).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`)],
+            ["Total Outflow for Lease Period", ...results.map(r => `₹${parseFloat(r.totalOutflow).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`)]
+        ];
+        
+        const worksheet = XLSX.utils.aoa_to_sheet([]);
+
+        // Add header
+        XLSX.utils.sheet_add_aoa(worksheet, [["Tool Name: Commercials Calculator"]], { origin: 'A1' });
+
+        // Add main data table
+        XLSX.utils.sheet_add_aoa(worksheet, [tableHeader, ...tableRows], { origin: 'A3' });
+
+        // Add yearly breakdown
+        let breakdownStartRow = 4 + tableRows.length;
+        results.forEach((result, index) => {
+            const col = String.fromCharCode(66 + index); // B, C, D...
+            XLSX.utils.sheet_add_aoa(worksheet, [[`Yearly Breakdown for ${result.listing.name}`]], { origin: `A${breakdownStartRow}` });
+            const breakdownHeader = ["Year", "Monthly Outflow", "Annual Outflow"];
+            const breakdownData = result.yearlyBreakdown.map(bd => [
+                bd.year, 
+                `₹${parseFloat(bd.totalMonthlyOutflow).toLocaleString('en-IN', {maximumFractionDigits: 0})}`,
+                `₹${parseFloat(bd.annualOutflow).toLocaleString('en-IN', {maximumFractionDigits: 0})}`
+            ]);
+            XLSX.utils.sheet_add_aoa(worksheet, [breakdownHeader, ...breakdownData], { origin: `A${breakdownStartRow + 1}` });
+            breakdownStartRow += breakdownData.length + 3;
+        });
+
+        // Add footer
+        const finalRow = breakdownStartRow;
+        XLSX.utils.sheet_add_aoa(worksheet, [[]], { origin: `A${finalRow}` });
+        XLSX.utils.sheet_add_aoa(worksheet, [["Source:", "Lakshmi Balaji O2O", "URL:", "www.lakshmibalajio2o.com"]], { origin: `A${finalRow + 1}` });
+        XLSX.utils.sheet_add_aoa(worksheet, [["Page Number:", "1"]], { origin: `A${finalRow + 2}` });
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Commercial Calculation");
+
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+        const filename = `Lakshmi_Balaji_O2O_Commercial_Calculation_${timestamp}.csv`;
+        
+        XLSX.writeFile(workbook, filename, { bookType: "csv" });
+    };
+
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
@@ -160,8 +214,13 @@ export function CommercialCalculator() {
             <FormField control={form.control} name="escalationPercentage" render={({ field }) => (
                 <FormItem><FormLabel>Rental Escalation (%)</FormLabel><FormControl><Input type="number" placeholder="e.g., 15" {...field} /></FormControl><FormMessage /></FormItem>
             )} />
-             <div className="md:mt-8">
+             <div className="md:mt-8 flex gap-2">
                 <Button type="submit" size="lg" className="w-full"><Calculator className="mr-2 h-4 w-4" /> Recalculate</Button>
+                 {results.length > 0 && (
+                    <Button type="button" size="lg" variant="outline" className="w-full" onClick={handleDownload}>
+                        <Download className="mr-2 h-4 w-4" /> Download
+                    </Button>
+                )}
             </div>
           </CardContent>
         </Card>
@@ -180,7 +239,7 @@ export function CommercialCalculator() {
                           {results.map(r => (
                               <TableHead key={r.listing.listingId} className="w-[200px] text-center">
                                  <p className="font-semibold text-primary truncate">{r.listing.name}</p>
-                                 <p className="text-xs text-muted-foreground">{r.listing.location}</p>
+                                 <p className="text-xs text-muted-foreground">{r.listing.listingId}</p>
                               </TableHead>
                           ))}
                         </TableRow>
