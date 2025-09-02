@@ -2,11 +2,10 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { useData } from '@/contexts/data-context';
-import type { WarehouseSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Download, MapPin, Scaling, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,11 +16,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { LoginDialog } from '../login-dialog';
-import { LimitExceededDialog } from '../limit-exceeded-dialog';
-import { Badge } from '../ui/badge';
+import { LoginDialog } from './login-dialog';
+import { LimitExceededDialog } from './limit-exceeded-dialog';
+import { Badge } from '@/components/ui/badge';
 import { type ListingSchema } from '@/lib/schema';
-import { Star } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
@@ -81,7 +79,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full">
-            <Link href={`/listings/${listing.listingId}`}>
+            <Link href={`/listings/${listing.listingId}`} target="_blank">
                 View Details <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
         </Button>
@@ -292,13 +290,6 @@ export function ListingsPage() {
     <>
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-            <Alert className="mb-8 bg-primary/5 border-primary/20">
-                <Download className="h-5 w-5 text-primary/80" />
-                <AlertTitle className="font-semibold text-primary/90">Ready to find your perfect space?</AlertTitle>
-                <AlertDescription className="text-primary/80">
-                    Select up to 3 of your favorite listings to instantly download their details as a single file. For more tailored options, our demand logging service is always available.
-                </AlertDescription>
-            </Alert>
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className='w-full'>
@@ -407,5 +398,3 @@ export function ListingsPage() {
     </>
   );
 }
-
-    

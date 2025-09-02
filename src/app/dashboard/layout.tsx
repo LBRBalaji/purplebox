@@ -24,6 +24,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (pathname.startsWith('/dashboard/analytics') && !isMainAdmin) {
             router.push('/dashboard');
         }
+        
+        // Redirect non-admins away from user management
+        if (pathname.startsWith('/dashboard/manage-users') && !isMainAdmin) {
+            router.push('/dashboard');
+        }
     }
   }, [user, isLoading, router, pathname]);
 

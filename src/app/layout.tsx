@@ -37,12 +37,11 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="antialiased flex flex-col h-full">
+      <body className="antialiased flex flex-col h-full bg-background">
         <AuthProvider>
           <DataProvider>
             <Header />
             <main className="flex-grow flex flex-col">{children}</main>
-            <Footer />
           </DataProvider>
         </AuthProvider>
         <Toaster />

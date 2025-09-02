@@ -36,6 +36,11 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 const NavLink = ({ href, children, exact = false }: { href: string, children: React.ReactNode, exact?: boolean }) => {
     const pathname = usePathname();
     const isActive = exact ? pathname === href : pathname.startsWith(href);
+    
+    // Hide links on the root path (new split-view landing page)
+    if (pathname === '/') {
+        return null;
+    }
 
     return (
         <Link 
@@ -53,6 +58,10 @@ const NavLink = ({ href, children, exact = false }: { href: string, children: Re
 const AnalyticsDropdown = () => {
     const pathname = usePathname();
     const isActive = pathname.startsWith('/dashboard/analytics');
+
+    if (pathname === '/') {
+        return null;
+    }
 
     return (
         <DropdownMenu>
@@ -82,6 +91,7 @@ export function Header() {
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isAdmin = user?.email === 'admin@example.com';
   const isO2O = user?.role === 'O2O';
+  const pathname = usePathname();
 
 
   return (
@@ -155,9 +165,16 @@ export function Header() {
                   </Button>
                 </div>
               ) : (
-                <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
-                    <LogIn className="mr-2 h-4 w-4" /> Login
-                </Button>
+                 <div className="flex items-center gap-2">
+                    {pathname !== '/' && (
+                        <Link href="/" className={cn(buttonVariants({ variant: 'ghost' }))}>
+                            Home
+                        </Link>
+                    )}
+                    <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
+                        <LogIn className="mr-2 h-4 w-4" /> Login
+                    </Button>
+                 </div>
               )}
             </div>
         </div>
