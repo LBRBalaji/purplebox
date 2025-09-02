@@ -453,7 +453,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                          <FormField control={form.control} name="size" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Total Area (Sq. Ft.)</FormLabel>
-                                <FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} /></FormControl>
+                                <FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -474,7 +474,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                           <FormField control={form.control} name="radius" render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Radius (km)</FormLabel>
-                                <FormControl><Input type="number" placeholder="e.g. 10" {...field} value={field.value ?? ''} /></FormControl>
+                                <FormControl><Input type="number" placeholder="e.g. 10" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -522,8 +522,8 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                     <PriorityCard title="Size Range" icon={Scaling} form={form} field="preferences.nonCompromisable" fieldName="size">
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="sizeMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 80000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="sizeMax" render={({ field }) => (<FormItem><FormLabel>Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 100000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="sizeMin" render={({ field }) => (<FormItem><FormLabel>Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 80000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="sizeMax" render={({ field }) => (<FormItem><FormLabel>Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 100000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                             </div>
                                             <div className="p-3 rounded-md bg-secondary">
                                                 <FormLabel>Effective Usable Area</FormLabel>
@@ -588,7 +588,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                     <PriorityCard title="Ceiling Height" icon={Building} form={form} field="preferences.nonCompromisable" fieldName="ceilingHeight">
                                         <div className="flex gap-2">
                                             <FormField control={form.control} name="ceilingHeight" render={({ field: heightField }) => (
-                                                <FormItem className="flex-grow"><FormControl><Input type="number" placeholder="Enter min height" {...heightField} value={heightField.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                                                <FormItem className="flex-grow"><FormControl><Input type="number" placeholder="Enter min height" {...heightField} value={heightField.value ?? ''} onChange={e => heightField.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
                                             )} />
                                             <FormField control={form.control} name="ceilingHeightUnit" render={({ field: unitField }) => (
                                                 <FormItem><Select onValueChange={unitField.onChange} value={unitField.value}><FormControl><SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="ft">ft</SelectItem><SelectItem value="m">m</SelectItem></SelectContent></Select></FormItem>
@@ -599,15 +599,15 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                     {/* Docks */}
                                     <PriorityCard title="Number of Docks" icon={Warehouse} form={form} field="preferences.nonCompromisable" fieldName="docks">
                                         <FormField control={form.control} name="docks" render={({ field }) => (
-                                            <FormItem><FormControl><Input type="number" placeholder="Enter min number of docks" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                                            <FormItem><FormControl><Input type="number" placeholder="Enter min number of docks" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
                                         )} />
                                     </PriorityCard>
                                     
                                     {/* Power */}
                                     <PriorityCard title="Power Requirement" icon={Zap} form={form} field="preferences.nonCompromisable" fieldName="power">
                                         <div className="grid grid-cols-2 gap-4">
-                                            <FormField control={form.control} name="powerMin" render={({ field }) => (<FormItem><FormLabel>Min kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 100" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                            <FormField control={form.control} name="powerMax" render={({ field }) => (<FormItem><FormLabel>Max kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 500" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            <FormField control={form.control} name="powerMin" render={({ field }) => (<FormItem><FormLabel>Min kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 100" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                            <FormField control={form.control} name="powerMax" render={({ field }) => (<FormItem><FormLabel>Max kVA</FormLabel><FormControl><Input type="number" placeholder="e.g. 500" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                         </div>
                                         {operationType === 'Warehousing' && (
                                             <FormDescription className="text-xs pt-2">
@@ -665,8 +665,8 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                         <div className="space-y-2">
                                             <FormLabel className="text-sm">Office Space</FormLabel>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 2000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.officeSpaceMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 2000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.officeSpaceMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-x-4 items-end">
@@ -681,13 +681,13 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                                     </FormControl>
                                                 </FormItem>
                                             )}/>
-                                            <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder="e.g. 50" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                            <FormField control={form.control} name="optionals.seatingCapacity" render={({ field }) => (<FormItem className="space-y-2"><FormLabel className="text-sm">Seating Capacity</FormLabel><FormControl><Input type="number" placeholder="e.g. 50" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                         </div>
                                         <div className="space-y-2">
                                             <FormLabel className="text-sm">Additional Toilets</FormLabel>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Men (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Women (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.additionalToiletsMen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Men (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.additionalToiletsWomen" render={({ field }) => (<FormItem><FormLabel className="text-xs">For Women (count)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                             </div>
                                         </div>
                                     </div>
@@ -700,15 +700,15 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                         <div className="space-y-2">
                                             <FormLabel className="text-sm">Truck Parking Yard</FormLabel>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 20000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.truckParkingYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.truckParkingYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 20000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                             </div>
                                         </div>
                                         <div className="space-y-2">
                                             <FormLabel className="text-sm">Open Storage Yard</FormLabel>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.openStorageYardMin" render={({ field }) => (<FormItem><FormLabel className="text-xs">Min Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 5000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.openStorageYardMax" render={({ field }) => (<FormItem><FormLabel className="text-xs">Max Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 10000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                             </div>
                                         </div>
                                     </div>
@@ -718,7 +718,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                 <div className="space-y-4">
                                     <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities & Infrastructure</FormLabel>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
-                                        <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder="e.g., 100" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder="e.g., 100" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                         <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder="e.g., 10,000" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                         <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormControl><Input placeholder="Requirement & Type" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                         <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormControl><Input placeholder="Type & LUX Levels" {...field} /></FormControl><FormMessage /></FormItem>)} />
@@ -764,11 +764,11 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                                 <FormField control={form.control} name="optionals.crane.type" render={({ field }) => (
                                                     <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="EOT / Gantry" /></SelectTrigger></FormControl><SelectContent><SelectItem value="EOT">EOT</SelectItem><SelectItem value="Gantry">Gantry</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                                                 )}/>
-                                                <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
-                                                <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.count" render={({ field }) => (<FormItem><FormLabel>No. of Cranes</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.transverseLength" render={({ field }) => (<FormItem><FormLabel>Transverse (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.span" render={({ field }) => (<FormItem><FormLabel>Span (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.underhookHeight" render={({ field }) => (<FormItem><FormLabel>Underhook (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name="optionals.crane.capacity" render={({ field }) => (<FormItem><FormLabel>Capacity (Tons)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
                                             </div>
                                         </CollapsibleContent>
                                     </Collapsible>
