@@ -719,9 +719,9 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                     <FormLabel className="flex items-center gap-2 text-base"><Lightbulb className="w-4 h-4"/> Utilities & Infrastructure</FormLabel>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pl-6">
                                         <FormField control={form.control} name="optionals.processWaterRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Droplets className="w-4 h-4"/> Process Water Requirement (KL/Day)</FormLabel><FormControl><Input type="number" placeholder="e.g., 100" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder="e.g., 10,000" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormControl><Input placeholder="Requirement & Type" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormControl><Input placeholder="Type & LUX Levels" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.hvacArea" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Wind className="w-4 h-4"/> HVAC Area Planned (Sq. Ft.)</FormLabel><FormControl><Input placeholder="e.g., 10,000" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.sprinklerRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><CircuitBoard className="w-4 h-4"/> Sprinklers</FormLabel><FormControl><Input placeholder="Requirement & Type" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                                        <FormField control={form.control} name="optionals.lightingRequirement" render={({ field }) => (<FormItem><FormLabel className="text-sm flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Lighting Requirement</FormLabel><FormControl><Input placeholder="Type & LUX Levels" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                                     </div>
                                 </div>
 
@@ -732,7 +732,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
                                         <FormField control={form.control} name="optionals.tenantSpecificImprovements" render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <Textarea placeholder="Describe any specific modifications or improvements required..." className="min-h-[100px]" {...field} />
+                                                <Textarea placeholder="Describe any specific modifications or improvements required..." className="min-h-[100px]" {...field} value={field.value ?? ''} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
