@@ -5,7 +5,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -108,7 +108,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
       </CardContent>
       <CardFooter className="p-6 pt-0 grid grid-cols-2 gap-2">
         <Button asChild className="w-full" variant="outline">
-            <Link href={`/commercial-calculator?listingId=${listing.listingId}`}>
+            <Link href={`/commercial-calculator?compare=${listing.listingId}`}>
                 <Calculator className="mr-2 h-4 w-4" /> Calculate
             </Link>
         </Button>
@@ -124,6 +124,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
 
 function DownloadBar() {
     const { user } = useAuth();
+    const router = useRouter();
     const { toast } = useToast();
     const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -137,8 +138,21 @@ function DownloadBar() {
         setIsLoginOpen(false);
         toast({
             title: "Logged In Successfully",
-            description: "You can now proceed with your download."
+            description: "You can now proceed with your download or comparison."
         })
+    }
+    
+    const handleCompare = () => {
+        if (selectedForDownload.length < 2) {
+             toast({
+                variant: 'destructive',
+                title: 'Select More Properties',
+                description: 'Please select at least two properties to compare.'
+            });
+            return;
+        }
+        const idsToCompare = selectedForDownload.map(l => l.listingId).join(',');
+        router.push(`/commercial-calculator?compare=${idsToCompare}`);
     }
 
     const proceedWithDownload = () => {
@@ -239,8 +253,11 @@ function DownloadBar() {
                         <Button variant="ghost" size="sm" onClick={clearSelectedForDownload}>
                             <X className="mr-2 h-4 w-4" /> Clear
                         </Button>
+                        <Button variant="outline" onClick={handleCompare}>
+                            <Users className="mr-2 h-4 w-4" /> Compare
+                        </Button>
                         <Button onClick={handleDownloadClick}>
-                            <Download className="mr-2 h-4 w-4" /> Download Selected
+                            <Download className="mr-2 h-4 w-4" /> Download
                         </Button>
                     </div>
                 </div>
@@ -368,10 +385,10 @@ export function ListingsPage() {
                     <div className="flex-grow">
                         <div className="flex items-center gap-3">
                             <Download className="h-5 w-5 text-primary/80" />
-                            <AlertTitle className="font-semibold text-primary/90 text-lg">Download up to 5 listings at once!</AlertTitle>
+                            <AlertTitle className="font-semibold text-primary/90 text-lg">Select up to 5 listings to download or compare!</AlertTitle>
                         </div>
                         <AlertDescription className="text-primary/80 mt-2 pl-8 space-y-3">
-                           <p>Select your favorite listings to instantly download their details. For more tailored options, our demand-specific sourcing is always available.</p>
+                           <p>Select your favorite listings to instantly download their details or run a side-by-side financial comparison.</p>
                             <div className="flex flex-col md:flex-row gap-4 pt-2">
                                 <div className="flex items-center gap-2 text-sm">
                                     <Award className="h-5 w-5 text-amber-500" />
