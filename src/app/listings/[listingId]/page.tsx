@@ -32,6 +32,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import * as XLSX from 'xlsx';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 
 const InfoPill = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) => (
@@ -219,7 +220,7 @@ export default function ListingDetailPage() {
         }
     };
     
-    const mainImage = listing.documents?.[0]?.url || 'https://placehold.co/1200x600.png';
+    const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
 
     return (
         <>
@@ -254,16 +255,38 @@ export default function ListingDetailPage() {
                             {/* Image and High-level stats */}
                             <Card>
                                 <CardContent className="p-4">
-                                     <div className="aspect-video relative mb-6">
-                                        <Image
-                                            src={mainImage}
-                                            alt={listing.name}
-                                            fill
-                                            className="rounded-lg object-cover"
-                                            data-ai-hint="warehouse exterior"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                     <Carousel className="rounded-lg overflow-hidden">
+                                        <CarouselContent>
+                                            {imageDocuments.length > 0 ? imageDocuments.map((doc, index) => (
+                                                <CarouselItem key={index}>
+                                                    <div className="aspect-video relative">
+                                                        <Image
+                                                            src={doc.url}
+                                                            alt={doc.name || listing.name}
+                                                            fill
+                                                            className="object-cover"
+                                                            data-ai-hint="warehouse exterior"
+                                                        />
+                                                    </div>
+                                                </CarouselItem>
+                                            )) : (
+                                                <CarouselItem>
+                                                    <div className="aspect-video relative">
+                                                        <Image
+                                                            src="https://placehold.co/1200x600.png"
+                                                            alt="Placeholder image"
+                                                            fill
+                                                            className="object-cover"
+                                                            data-ai-hint="warehouse building"
+                                                        />
+                                                    </div>
+                                                </CarouselItem>
+                                            )}
+                                        </CarouselContent>
+                                        <CarouselPrevious className="left-4" />
+                                        <CarouselNext className="right-4" />
+                                    </Carousel>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                                         <InfoPill icon={Scaling} label="Total Area" value={`${listing.sizeSqFt.toLocaleString()} sft`} />
                                         <InfoPill icon={Building2} label="Building Type" value={listing.buildingSpecifications.buildingType} />
                                         <InfoPill icon={Calendar} label="Availability" value={listing.availabilityDate} />
@@ -421,5 +444,3 @@ export default function ListingDetailPage() {
         </>
     );
 }
-
-    

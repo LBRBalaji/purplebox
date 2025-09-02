@@ -19,29 +19,56 @@ import { cn } from '@/lib/utils';
 import { LoginDialog } from './login-dialog';
 import { LimitExceededDialog } from './limit-exceeded-dialog';
 import { Badge } from '@/components/ui/badge';
-import { type ListingSchema } from '@/lib/schema';
+import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DownloadTermsDialog } from './download-terms-dialog';
 import { useRouter } from 'next/navigation';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
-  const previewImage = listing.documents?.[0]?.url || 'https://placehold.co/600x400.png';
+  const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
 
   return (
     <Card className={cn("flex flex-col transition-all overflow-hidden group", isSelected && "ring-2 ring-primary")}>
        <CardHeader className="p-0">
         <div className="relative">
-          <div className="aspect-video relative">
-            <Image
-              src={previewImage}
-              alt={listing.name}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-              data-ai-hint="modern warehouse"
-            />
-          </div>
-          <div className="absolute top-3 right-3">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {imageDocuments.length > 0 ? imageDocuments.map((doc, index) => (
+                  <CarouselItem key={index}>
+                    <div className="aspect-video relative">
+                      <Image
+                        src={doc.url}
+                        alt={doc.name || listing.name}
+                        fill
+                        className="object-cover"
+                        data-ai-hint="warehouse exterior"
+                      />
+                    </div>
+                  </CarouselItem>
+                )) : (
+                   <CarouselItem>
+                    <div className="aspect-video relative">
+                      <Image
+                        src="https://placehold.co/800x600/210D42/FFFFFF?text=No+Image"
+                        alt="Placeholder"
+                        fill
+                        className="object-cover"
+                        data-ai-hint="warehouse building"
+                      />
+                    </div>
+                  </CarouselItem>
+                )}
+              </CarouselContent>
+              {imageDocuments.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CarouselNext className="right-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </>
+              )}
+            </Carousel>
+          <div className="absolute top-3 right-3 z-10">
              <Checkbox
                 checked={isSelected}
                 onCheckedChange={() => onSelectionChange(listing)}
