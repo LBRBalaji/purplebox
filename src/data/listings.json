@@ -25,6 +25,7 @@
     },
     "buildingSpecifications": {
       "buildingType": "PEB (Pre-Engineered Building)",
+      "eveHeightMeters": 12,
       "shopFloorLevelDimension": "250m x 52m",
       "mezzanineFloorLevelHeightAndDimension": "4.5m height, 100m x 5m",
       "numberOfDocksAndShutters": 20,
@@ -81,6 +82,7 @@
     },
     "buildingSpecifications": {
       "buildingType": "PEB",
+      "eveHeightMeters": 14,
       "shopFloorLevelDimension": "400m x 70m",
       "numberOfDocksAndShutters": 40,
       "naturalLightingAndVentilation": "Yes, extensive skylights",
@@ -132,6 +134,7 @@
     },
     "buildingSpecifications": {
       "buildingType": "PEB",
+      "eveHeightMeters": 13,
       "shopFloorLevelDimension": "400m x 57.5m",
       "numberOfDocksAndShutters": 30,
       "roofInsulationStatus": "To be installed",
@@ -178,6 +181,7 @@
     },
     "buildingSpecifications": {
       "buildingType": "RCC",
+      "eveHeightMeters": 8,
       "numberOfDocksAndShutters": 4
     },
     "siteSpecifications": {
@@ -222,6 +226,7 @@
     },
     "buildingSpecifications": {
       "buildingType": "PEB",
+      "eveHeightMeters": 10,
       "shopFloorLevelDimension": "150m x 60m",
       "numberOfDocksAndShutters": 10,
       "roofInsulationStatus": "Partially insulated",
@@ -269,6 +274,7 @@
     },
     "buildingSpecifications": {
       "buildingType": "PEB",
+      "eveHeightMeters": 11,
       "numberOfDocksAndShutters": 15
     },
     "siteSpecifications": {
@@ -310,6 +316,7 @@
     },
     "buildingSpecifications": {
       "buildingType": "RCC",
+      "eveHeightMeters": 9,
       "numberOfDocksAndShutters": 8
     },
     "siteSpecifications": {
@@ -347,7 +354,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 200000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 25 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 13.5, "numberOfDocksAndShutters": 25 },
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -374,7 +381,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Both",
     "area": { "totalChargeableArea": 180000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 20 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 12.5, "numberOfDocksAndShutters": 20 },
     "siteSpecifications": { "typeOfFlooringInside": "Heavy Duty" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -401,7 +408,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 110000 },
-    "buildingSpecifications": { "buildingType": "RCC", "numberOfDocksAndShutters": 10 },
+    "buildingSpecifications": { "buildingType": "RCC", "eveHeightMeters": 9.5, "numberOfDocksAndShutters": 10 },
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
@@ -428,7 +435,7 @@
     "constructionProgress": "100%",
     "serviceModel": "3PL",
     "area": { "totalChargeableArea": 125000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 18 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 11, "numberOfDocksAndShutters": 18 },
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -455,7 +462,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 220000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 28 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 12, "numberOfDocksAndShutters": 28 },
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -482,7 +489,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 150000 },
-    "buildingSpecifications": { "buildingType": "RCC", "numberOfDocksAndShutters": 16 },
+    "buildingSpecifications": { "buildingType": "RCC", "eveHeightMeters": 10, "numberOfDocksAndShutters": 16 },
     "siteSpecifications": { "typeOfFlooringInside": "Epoxy Coated" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -509,7 +516,7 @@
     "constructionProgress": "85%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 80000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 8 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 11.5, "numberOfDocksAndShutters": 8 },
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
@@ -536,7 +543,7 @@
     "constructionProgress": "100%",
     "serviceModel": "3PL",
     "area": { "totalChargeableArea": 250000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 30 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 15, "numberOfDocksAndShutters": 30 },
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -563,7 +570,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Both",
     "area": { "totalChargeableArea": 350000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 40 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 14, "numberOfDocksAndShutters": 40 },
     "siteSpecifications": { "typeOfFlooringInside": "Superflat" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -590,7 +597,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 100000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 12 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 10.5, "numberOfDocksAndShutters": 12 },
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -617,7 +624,7 @@
     "constructionProgress": "90%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 180000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 20 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 12, "numberOfDocksAndShutters": 20 },
     "siteSpecifications": { "typeOfFlooringInside": "Heavy Duty" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
@@ -644,7 +651,7 @@
     "constructionProgress": "100%",
     "serviceModel": "3PL",
     "area": { "totalChargeableArea": 130000 },
-    "buildingSpecifications": { "buildingType": "RCC", "numberOfDocksAndShutters": 14 },
+    "buildingSpecifications": { "buildingType": "RCC", "eveHeightMeters": 10, "numberOfDocksAndShutters": 14 },
     "siteSpecifications": { "typeOfFlooringInside": "Epoxy Coated, Anti-static" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -671,7 +678,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 90000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 10 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 11, "numberOfDocksAndShutters": 10 },
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -698,7 +705,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 110000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 12 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 12, "numberOfDocksAndShutters": 12 },
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -725,7 +732,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 95000 },
-    "buildingSpecifications": { "buildingType": "RCC", "numberOfDocksAndShutters": 8 },
+    "buildingSpecifications": { "buildingType": "RCC", "eveHeightMeters": 8.5, "numberOfDocksAndShutters": 8 },
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
@@ -752,7 +759,7 @@
     "constructionProgress": "100%",
     "serviceModel": "3PL",
     "area": { "totalChargeableArea": 180000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 24 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 13, "numberOfDocksAndShutters": 24 },
     "siteSpecifications": { "typeOfFlooringInside": "Superflat, Anti-static" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -779,7 +786,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 75000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 7 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 9, "numberOfDocksAndShutters": 7 },
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -806,7 +813,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 105000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 10 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 10, "numberOfDocksAndShutters": 10 },
     "siteSpecifications": { "typeOfFlooringInside": "Heavy Duty" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -833,7 +840,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 60000 },
-    "buildingSpecifications": { "buildingType": "RCC", "numberOfDocksAndShutters": 5 },
+    "buildingSpecifications": { "buildingType": "RCC", "eveHeightMeters": 7, "numberOfDocksAndShutters": 5 },
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": false, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
@@ -860,7 +867,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Both",
     "area": { "totalChargeableArea": 140000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 15 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 11, "numberOfDocksAndShutters": 15 },
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -887,7 +894,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 50000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 6 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 9, "numberOfDocksAndShutters": 6 },
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -914,7 +921,7 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "area": { "totalChargeableArea": 160000 },
-    "buildingSpecifications": { "buildingType": "RCC", "numberOfDocksAndShutters": 18 },
+    "buildingSpecifications": { "buildingType": "RCC", "eveHeightMeters": 10, "numberOfDocksAndShutters": 18 },
     "siteSpecifications": { "typeOfFlooringInside": "Heavy Duty, VDF" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
@@ -941,7 +948,7 @@
     "constructionProgress": "100%",
     "serviceModel": "3PL",
     "area": { "totalChargeableArea": 200000 },
-    "buildingSpecifications": { "buildingType": "PEB", "numberOfDocksAndShutters": 30 },
+    "buildingSpecifications": { "buildingType": "PEB", "eveHeightMeters": 14, "numberOfDocksAndShutters": 30 },
     "siteSpecifications": { "typeOfFlooringInside": "Superflat, Laser-screed" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
