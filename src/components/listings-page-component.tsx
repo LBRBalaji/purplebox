@@ -341,20 +341,22 @@ export function ListingsPage() {
     <>
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-             <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                    <div className="flex-grow">
-                        <div className="flex items-center gap-3">
-                            <Download className="h-5 w-5 text-primary/80" />
-                            <AlertTitle className="font-semibold text-primary/90 text-lg">Download multiple listings at once!</AlertTitle>
-                        </div>
-                        <AlertDescription className="text-primary/80 mt-2 pl-8 space-y-3">
-                           <p>Select up to 5 of your favorite listings to instantly download their key details as a single CSV file. For more tailored options, our demand logging service is always available.</p>
-                        </AlertDescription>
-                    </div>
-                    <Button onClick={handleLogDemandClick} size="sm" className="shrink-0 mt-2 sm:mt-0 ml-8 sm:ml-0">
-                        <ClipboardPlus className="mr-2 h-4 w-4" /> Log a Demand
-                    </Button>
+             <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2">
+                    <AlertTitle className="font-semibold text-primary/90 text-lg flex items-center gap-3">
+                        <Download className="h-5 w-5 text-primary/80" />
+                        Download up to 5 listings at once!
+                    </AlertTitle>
+                    <AlertDescription className="text-primary/80 mt-2 space-y-3">
+                        <p>Select your favorite listings to instantly download their key details as a single CSV file. For more tailored options, our demand logging service is always available.</p>
+                    </AlertDescription>
+                </div>
+                <div className="space-y-3 p-4 rounded-md bg-primary/10 border border-primary/20">
+                     <h4 className="font-bold text-primary flex items-center gap-2"><Award className="h-4 w-4"/> Zero Service Charge</h4>
+                     <ul className="text-xs text-primary/80 list-disc pl-5 space-y-1">
+                        <li>For <strong className="font-semibold">Startups</strong> on their first transaction.</li>
+                        <li>For <strong className="font-semibold">Logistics Companies</strong> on all transactions.</li>
+                     </ul>
                 </div>
             </Alert>
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
