@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,10 +31,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter as TableResultFooter } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown, Warehouse } from "lucide-react";
+import { useData } from "@/contexts/data-context";
+import type { ListingSchema } from "@/lib/schema";
 
 
 const calculatorSchema = z.object({
@@ -53,7 +55,11 @@ const calculatorSchema = z.object({
 type CalculatorValues = z.infer<typeof calculatorSchema>;
 
 export function CommercialCalculator() {
+  const { listings } = useData();
   const [results, setResults] = React.useState<any>(null);
+  const [selectedListingId, setSelectedListingId] = React.useState<string>("");
+
+  const approvedListings = React.useMemo(() => listings.filter(l => l.status === 'approved'), [listings]);
 
   const form = useForm<CalculatorValues>({
     resolver: zodResolver(calculatorSchema),
@@ -74,6 +80,27 @@ export function CommercialCalculator() {
     name: "deductibleAreas",
   });
 
+  const handleListingSelect = (listingId: string) => {
+    const listing = approvedListings.find(l => l.listingId === listingId);
+    if (!listing) return;
+
+    setSelectedListingId(listingId);
+
+    const deductibles = [];
+    if(listing.area.canopyArea) deductibles.push({ name: 'Canopy', area: listing.area.canopyArea});
+    if(listing.area.driversRestRoomArea) deductibles.push({ name: 'Driver Rest Room', area: listing.area.driversRestRoomArea});
+    // Add a default empty one if none exist
+    if (deductibles.length === 0) deductibles.push({ name: 'Deductible Area', area: 0 });
+
+    form.reset({
+        ...form.getValues(),
+        grossArea: listing.sizeSqFt,
+        rentPerSft: listing.rentPerSqFt || undefined,
+        securityDepositMonths: listing.rentalSecurityDeposit || undefined,
+        deductibleAreas: deductibles,
+    });
+  }
+
   const onSubmit = (data: CalculatorValues) => {
     const totalDeductible = data.deductibleAreas.reduce((sum, item) => sum + item.area, 0);
     const netChargeableArea = data.grossArea - totalDeductible;
@@ -83,6 +110,7 @@ export function CommercialCalculator() {
     
     let currentRentSft = data.rentPerSft;
     const yearlyBreakdown = [];
+    let totalOutflow = 0;
     
     for (let year = 1; year <= data.leasePeriodYears; year++) {
       if (year > 1 && (year - 1) % parseInt(data.escalationCycle, 10) === 0) {
@@ -90,26 +118,46 @@ export function CommercialCalculator() {
       }
       const monthlyRent = currentRentSft * netChargeableArea;
       const totalMonthlyOutflow = monthlyRent + monthlyCam;
+      const annualOutflow = totalMonthlyOutflow * 12;
+      totalOutflow += annualOutflow;
+      
       yearlyBreakdown.push({
         year,
         monthlyRent: monthlyRent.toFixed(2),
         totalMonthlyOutflow: totalMonthlyOutflow.toFixed(2),
-        annualOutflow: (totalMonthlyOutflow * 12).toFixed(2),
+        annualOutflow: annualOutflow.toFixed(2),
       });
     }
 
     setResults({
       netChargeableArea,
       oneTimeOutflow,
-      initialMonthlyRent: (currentRentSft * netChargeableArea).toFixed(2),
-      initialTotalMonthlyOutflow: ((currentRentSft * netChargeableArea) + monthlyCam).toFixed(2),
+      initialMonthlyRent: (data.rentPerSft * netChargeableArea).toFixed(2),
+      initialTotalMonthlyOutflow: ((data.rentPerSft * netChargeableArea) + monthlyCam).toFixed(2),
       yearlyBreakdown,
+      totalOutflow: totalOutflow.toFixed(2),
     });
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="space-y-2">
+            <Label>Pre-fill from an Existing Listing (Optional)</Label>
+            <Select onValueChange={handleListingSelect} value={selectedListingId}>
+                <SelectTrigger>
+                    <SelectValue placeholder="Select a warehouse listing..." />
+                </SelectTrigger>
+                <SelectContent>
+                    {approvedListings.map(listing => (
+                        <SelectItem key={listing.listingId} value={listing.listingId}>
+                           {listing.name} ({listing.location}) - {listing.sizeSqFt.toLocaleString()} sq.ft.
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary"/> Net Area Calculator</CardTitle>
@@ -263,6 +311,12 @@ export function CommercialCalculator() {
                           </TableRow>
                         ))}
                       </TableBody>
+                      <TableResultFooter>
+                        <TableRow>
+                            <TableCell colSpan={2} className="font-bold text-right">Total Outflow for Lease Period</TableCell>
+                            <TableCell className="font-bold text-right text-lg text-primary">₹{parseFloat(results.totalOutflow).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</TableCell>
+                        </TableRow>
+                      </TableResultFooter>
                     </Table>
                   </div>
                 </div>
