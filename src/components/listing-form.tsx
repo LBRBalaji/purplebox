@@ -165,7 +165,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
                     )} />
                      <FormField control={form.control} name="sizeSqFt" render={({ field }) => (
-                        <FormItem><FormLabel>Total Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Total Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="description" render={({ field }) => (
                         <FormItem className="md:col-span-2"><FormLabel>Description</FormLabel><FormControl><Textarea {...field} placeholder="Describe the key features of your property..." /></FormControl><FormMessage /></FormItem>
@@ -185,13 +185,13 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         </SelectContent></Select><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="constructionProgress" render={({ field }) => (
-                        <FormItem><FormLabel>Construction Progress</FormLabel><FormControl><Input {...field} placeholder="e.g., 80% or 'Structure Complete'" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Construction Progress</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., 80% or 'Structure Complete'" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="rentPerSqFt" render={({ field }) => (
-                        <FormItem><FormLabel>Rent per Sq. Ft.</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g., 25" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Rent per Sq. Ft.</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} placeholder="e.g., 25" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (
-                        <FormItem><FormLabel>Security Deposit (Months)</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g., 6" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Security Deposit (Months)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} placeholder="e.g., 6" /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
               </div>
@@ -201,22 +201,22 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 <FormLabel className="text-lg font-semibold">Area Specifications (in Sq. Ft.)</FormLabel>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 p-4 border rounded-md">
                     <FormField control={form.control} name="area.plinthArea" render={({ field }) => (
-                        <FormItem><FormLabel>Plinth Area (Shop Floor)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Plinth Area (Shop Floor)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="area.mezzanineArea1" render={({ field }) => (
-                        <FormItem><FormLabel>Mezzanine Area 1</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Mezzanine Area 1</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )} />
                      <FormField control={form.control} name="area.mezzanineArea2" render={({ field }) => (
-                        <FormItem><FormLabel>Mezzanine Area 2</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Mezzanine Area 2</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )} />
                      <FormField control={form.control} name="area.canopyArea" render={({ field }) => (
-                        <FormItem><FormLabel>Canopy Area</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Canopy Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="area.driversRestRoomArea" render={({ field }) => (
-                        <FormItem><FormLabel>Driver's Rest Room Area</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Driver's Rest Room Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="area.totalChargeableArea" render={({ field }) => (
-                        <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
               </div>
@@ -227,16 +227,16 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         <FormLabel className="text-lg font-semibold">Building Specifications</FormLabel>
                         <div className="space-y-4 p-4 border rounded-md">
                              <FormField control={form.control} name="buildingSpecifications.buildingType" render={({ field }) => (
-                                <FormItem><FormLabel>Building Type</FormLabel><FormControl><Input {...field} placeholder="e.g., PEB" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Building Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., PEB" /></FormControl><FormMessage /></FormItem>
                             )} />
                             <FormField control={form.control} name="buildingSpecifications.numberOfDocksAndShutters" render={({ field }) => (
-                                <FormItem><FormLabel>Number of Docks/Shutters</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Number of Docks/Shutters</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name="buildingSpecifications.roofInsulationStatus" render={({ field }) => (
-                                <FormItem><FormLabel>Roof Insulation</FormLabel><FormControl><Input {...field} placeholder="e.g., Fully insulated" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Roof Insulation</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., Fully insulated" /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name="buildingSpecifications.internalLighting" render={({ field }) => (
-                                <FormItem><FormLabel>Internal Lighting</FormLabel><FormControl><Input {...field} placeholder="e.g., LED High-bay, 200 LUX" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Internal Lighting</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., LED High-bay, 200 LUX" /></FormControl><FormMessage /></FormItem>
                             )} />
                             <FormField control={form.control} name="buildingSpecifications.craneSupportStructureAvailable" render={({ field }) => (
                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
@@ -281,13 +281,13 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                 </FormItem>
                             )}/>
                              <FormField control={form.control} name="siteSpecifications.typeOfFlooringInside" render={({ field }) => (
-                                <FormItem><FormLabel>Inside Flooring Type</FormLabel><FormControl><Input {...field} placeholder="e.g., FM2 Grade, 8-ton point load" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Inside Flooring Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., FM2 Grade, 8-ton point load" /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name="siteSpecifications.typeOfFlooringOutside" render={({ field }) => (
-                                <FormItem><FormLabel>Outside Flooring Type</FormLabel><FormControl><Input {...field} placeholder="e.g., VDF Concrete" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Outside Flooring Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., VDF Concrete" /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name="siteSpecifications.typeOfRoad" render={({ field }) => (
-                                <FormItem><FormLabel>Access Road Type</FormLabel><FormControl><Input {...field} placeholder="e.g., Tar road, 4-lane access" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Access Road Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., Tar road, 4-lane access" /></FormControl><FormMessage /></FormItem>
                             )} />
                         </div>
                     </div>
