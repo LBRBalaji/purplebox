@@ -213,7 +213,7 @@ export function CommercialCalculator() {
         ]);
 
         const worksheet = XLSX.utils.aoa_to_sheet([]);
-        XLSX.utils.sheet_add_aoa(worksheet, [["Tool Name: Commercials Calculator - Standalone"]], { origin: 'A1' });
+        XLSX.utils.sheet_add_aoa(worksheet, [["Tool Name: Area & Commercials Calculator - Standalone"]], { origin: 'A1' });
         XLSX.utils.sheet_add_aoa(worksheet, mainData, { origin: 'A3' });
         XLSX.utils.sheet_add_aoa(worksheet, [[]], { origin: -1 }); // Spacer
         XLSX.utils.sheet_add_aoa(worksheet, [["Yearly Outflow Breakdown"]], { origin: -1 });
@@ -393,6 +393,7 @@ export function ComparisonCalculator() {
 
         const tableHeader = ["Metric", ...results.map(r => `${r.listing.name} (${r.listing.listingId})`)];
         const tableRows = [
+            ["Listing ID", ...results.map(r => r.listing.listingId)],
             ["Net Chargeable Area (Sq. Ft.)", ...results.map(r => r.netChargeableArea.toLocaleString())],
             ["Rent (per Sq. Ft./Month)", ...results.map(r => `₹${r.listing.rentPerSqFt?.toLocaleString() ?? 'N/A'}`)],
             ["Security Deposit (Months)", ...results.map(r => r.listing.rentalSecurityDeposit?.toLocaleString() ?? 'N/A')],
@@ -403,7 +404,7 @@ export function ComparisonCalculator() {
         
         const worksheet = XLSX.utils.aoa_to_sheet([]);
 
-        XLSX.utils.sheet_add_aoa(worksheet, [["Tool Name: Commercials Calculator - Comparison"]], { origin: 'A1' });
+        XLSX.utils.sheet_add_aoa(worksheet, [["Tool Name: Commercials Comparison For Listings"]], { origin: 'A1' });
         XLSX.utils.sheet_add_aoa(worksheet, [tableHeader, ...tableRows], { origin: 'A3' });
 
         let breakdownStartRow = 4 + tableRows.length;
@@ -486,19 +487,28 @@ export function ComparisonCalculator() {
                         </Command>
                     </PopoverContent>
                 </Popover>
-                 <div className="flex flex-wrap gap-2">
-                     {selectedListings.map(l => (
-                        <Badge key={l.listingId} variant="secondary" className="gap-1">
-                            {l.name}
-                            <button
-                                type="button"
-                                className="rounded-full hover:bg-muted-foreground/20 p-0.5"
-                                onClick={() => toggleListingSelection(l)}
-                            >
-                                <X className="h-3 w-3"/>
-                            </button>
-                        </Badge>
-                     ))}
+                 <div className="flex flex-wrap items-center gap-2 min-h-[2.5rem]">
+                     {selectedListings.length > 0 ? (
+                        <>
+                            {selectedListings.map(l => (
+                                <Badge key={l.listingId} variant="secondary" className="gap-1">
+                                    {l.name}
+                                    <button
+                                        type="button"
+                                        className="rounded-full hover:bg-muted-foreground/20 p-0.5"
+                                        onClick={() => toggleListingSelection(l)}
+                                    >
+                                        <X className="h-3 w-3"/>
+                                    </button>
+                                </Badge>
+                            ))}
+                            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setSelectedListings([])}>
+                                Clear All
+                            </Button>
+                        </>
+                     ) : (
+                        <p className="text-sm text-muted-foreground px-2">No properties selected.</p>
+                     )}
                  </div>
              </CardContent>
         </Card>
@@ -608,5 +618,3 @@ export function ComparisonCalculator() {
     </Form>
   );
 }
-
-    

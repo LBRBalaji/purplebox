@@ -97,7 +97,7 @@ const ToolsDropdown = () => {
                 </DropdownMenuItem>
                 {user && (
                   <DropdownMenuItem asChild>
-                      <Link href="/listing-comparison">Listing Comparison</Link>
+                      <Link href="/listing-comparison">Commercials Comparison For Listings</Link>
                   </DropdownMenuItem>
                 )}
             </DropdownMenuContent>
