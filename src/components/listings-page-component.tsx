@@ -244,6 +244,15 @@ function DownloadBar() {
     )
 }
 
+const searchPlaceholders = [
+    'Search by ID, e.g., "LST-8K3J5M1P"',
+    'Search by height, e.g., "12m eve height"',
+    'Search by service, e.g., "3PL Operated"',
+    'Search by building, e.g., "RCC building"',
+    'Search by roof, e.g., "Galvalume roof"',
+    'Search by spec, e.g., "crane available"',
+];
+
 export function ListingsPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -257,10 +266,20 @@ export function ListingsPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
+  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
   
   const approvedListings = useMemo(() => allListings.filter(l => l.status === 'approved'), [allListings]);
 
   const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.listingId)), [selectedForDownload]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentPlaceholderIndex((prevIndex) => (prevIndex + 1) % searchPlaceholders.length);
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
 
  useEffect(() => {
     let results = approvedListings;
@@ -274,6 +293,8 @@ export function ListingsPage() {
                 listing.buildingSpecifications.buildingType,
                 listing.serviceModel,
                 listing.buildingSpecifications.eveHeightMeters ? `eve height ${listing.buildingSpecifications.eveHeightMeters}m` : '',
+                listing.buildingSpecifications.roofType,
+                listing.buildingSpecifications.craneAvailable ? "crane available" : "",
             ].join(' ').toLowerCase();
             return searchHaystack.includes(searchTerm.toLowerCase());
         });
@@ -459,7 +480,7 @@ export function ListingsPage() {
                     <div className="lg:col-span-2 space-y-2">
                         <label className="text-sm font-medium">Keyword Search</label>
                         <Input 
-                            placeholder='e.g. "Oragadam", "LST-8K3", "12m eve height", or "3PL"'
+                            placeholder={searchPlaceholders[currentPlaceholderIndex]}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
