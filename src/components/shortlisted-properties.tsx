@@ -21,12 +21,12 @@ export function ShortlistedProperties() {
   const handleDownload = () => {
     const dataToExport = shortlistedItems.map(item => ({
         'Property ID': item.property.propertyId,
-        'Size (Sq. Ft.)': item.property.size,
-        'Rent (per Sq. Ft.)': item.property.rentPerSft,
-        'Ceiling Height (ft)': item.property.ceilingHeight,
+        'Total Area (Sq. Ft.)': item.property.size,
+        'Building Type': item.property.buildingType,
+        'Availability': item.property.readinessToOccupy,
         'Docks': item.property.docks,
-        'Readiness': item.property.readinessToOccupy,
-        'Site Type': item.property.siteType,
+        'Ceiling Height (ft)': item.property.ceilingHeight,
+        'Rent (per Sq. Ft.)': item.property.rentPerSft,
     }));
     
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);

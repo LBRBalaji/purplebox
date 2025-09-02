@@ -47,7 +47,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
           />
         </div>
         <div className="flex items-center justify-between">
-            <CardTitle>{listing.location}</CardTitle>
+            <CardTitle>{listing.name}</CardTitle>
             {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
                 <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20">
                     <Star className="mr-1.5 h-3 w-3" />
@@ -127,8 +127,16 @@ function DownloadBar() {
                 'Property ID': l.listingId,
                 'Name': l.name,
                 'Location': l.location,
-                'Size (Sq. Ft.)': l.sizeSqFt,
+                'Total Area (Sq. Ft.)': l.sizeSqFt,
+                'Building Type': l.buildingSpecifications.buildingType,
                 'Availability': l.availabilityDate,
+                'Docks': l.buildingSpecifications.numberOfDocksAndShutters,
+                'Shop Floor Dimension': l.buildingSpecifications.shopFloorLevelDimension,
+                'Roof Insulation': l.buildingSpecifications.roofInsulationStatus,
+                'Natural Light/Ventilation': l.buildingSpecifications.naturalLightingAndVentilation,
+                'Inside Flooring': l.siteSpecifications.typeOfFlooringInside,
+                'Outside Flooring': l.siteSpecifications.typeOfFlooringOutside,
+                'Access Road': l.siteSpecifications.typeOfRoad,
                 'Rent (per Sq. Ft.)': l.rentPerSqFt || 'Contact for details',
             }));
 
@@ -303,7 +311,7 @@ export function ListingsPage() {
                     <div className="relative flex-grow">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input 
-                            placeholder="Search by location, ID, size, or '3PL'..." 
+                            placeholder="Search by name, location, ID, size, or '3PL'..." 
                             className="pl-9"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
