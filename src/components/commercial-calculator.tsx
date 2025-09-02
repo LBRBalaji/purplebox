@@ -33,7 +33,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter as TableResultFooter } from "@/components/ui/table";
-import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown, Warehouse, Users, FileText, BarChart2, Download, Search, X } from "lucide-react";
+import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown, Warehouse, Users, FileText, BarChart2, Download, Search, X, Check } from "lucide-react";
 import { useData } from "@/contexts/data-context";
 import type { ListingSchema } from "@/lib/schema";
 import { Separator } from "./ui/separator";
@@ -41,6 +41,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
+import { Label } from "./ui/label";
 
 const areaSchema = z.object({
   name: z.string().min(1, "Area name is required."),
@@ -607,3 +608,5 @@ export function ComparisonCalculator() {
     </Form>
   );
 }
+
+    
