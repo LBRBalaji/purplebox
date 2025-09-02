@@ -43,7 +43,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                         alt={doc.name || listing.name}
                         fill
                         className="object-cover"
-                        data-ai-hint="warehouse exterior"
+                        data-ai-hint={doc.name?.toLowerCase().replace(/ /g, ' ') || "warehouse exterior"}
                       />
                     </div>
                   </CarouselItem>

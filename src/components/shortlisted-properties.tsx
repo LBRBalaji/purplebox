@@ -95,7 +95,7 @@ export function ShortlistedProperties() {
                     <Card key={match.submissionId} className="flex flex-col">
                         <CardHeader>
                         <div className="aspect-video relative rounded-md overflow-hidden mb-4">
-                            <Image src={listing.documents?.[0]?.url || "https://placehold.co/600x400.png"} alt={`Property ${listing.listingId}`} data-ai-hint="modern office" fill className="object-cover" />
+                            <Image src={listing.documents?.[0]?.url || "https://placehold.co/600x400.png"} alt={`Property ${listing.listingId}`} data-ai-hint={listing.documents?.[0]?.name?.toLowerCase() || "modern office"} fill className="object-cover" />
                         </div>
                         <CardTitle>{listing.name}</CardTitle>
                         <CardDescription>

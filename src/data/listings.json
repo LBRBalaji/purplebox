@@ -49,11 +49,11 @@
       "propertyTax": true
     },
     "documents": [
-      { "type": "image", "name": "Front View", "url": "https://picsum.photos/800/600?random=1" },
-      { "type": "image", "name": "Dock Area", "url": "https://picsum.photos/800/600?random=2" },
-      { "type": "image", "name": "Interior Shot", "url": "https://picsum.photos/800/600?random=3" },
-      { "type": "image", "name": "Warehouse Aisle", "url": "https://picsum.photos/800/600?random=4" },
-      { "type": "image", "name": "Loading Bay", "url": "https://picsum.photos/800/600?random=5" },
+      { "type": "image", "name": "Warehouse Exterior", "url": "https://picsum.photos/seed/exterior1/800/600" },
+      { "type": "image", "name": "Loading Docks", "url": "https://picsum.photos/seed/docks1/800/600" },
+      { "type": "image", "name": "Industrial Interior", "url": "https://picsum.photos/seed/interior1/800/600" },
+      { "type": "image", "name": "Warehouse Aisle", "url": "https://picsum.photos/seed/aisle1/800/600" },
+      { "type": "image", "name": "Loading Bay", "url": "https://picsum.photos/seed/bay1/800/600" },
       { "type": "layout", "name": "Floor Plan Layout", "url": "#" }
     ]
   },
@@ -101,11 +101,11 @@
       "propertyTax": true
     },
     "documents": [
-       { "type": "image", "name": "Aerial View", "url": "https://picsum.photos/800/600?random=6" },
-       { "type": "image", "name": "Loading Bays", "url": "https://picsum.photos/800/600?random=7" },
-       { "type": "image", "name": "Interior expanse", "url": "https://picsum.photos/800/600?random=8" },
-       { "type": "image", "name": "Security Gate", "url": "https://picsum.photos/800/600?random=9" },
-       { "type": "image", "name": "Office Block", "url": "https://picsum.photos/800/600?random=10" },
+       { "type": "image", "name": "Aerial View", "url": "https://picsum.photos/seed/aerial2/800/600" },
+       { "type": "image", "name": "Loading Bays", "url": "https://picsum.photos/seed/bays2/800/600" },
+       { "type": "image", "name": "Industrial expanse", "url": "https://picsum.photos/seed/expanse2/800/600" },
+       { "type": "image", "name": "Security Gate", "url": "https://picsum.photos/seed/gate2/800/600" },
+       { "type": "image", "name": "Office Block", "url": "https://picsum.photos/seed/office2/800/600" },
        { "type": "layout", "name": "Site Master Plan", "url": "#" }
     ]
   },
@@ -153,11 +153,11 @@
       "propertyTax": false
     },
     "documents": [
-      { "type": "image", "name": "Construction Site", "url": "https://picsum.photos/800/600?random=11" },
-      { "type": "image", "name": "Foundation work", "url": "https://picsum.photos/800/600?random=12" },
-      { "type": "image", "name": "Steel structure", "url": "https://picsum.photos/800/600?random=13" },
-      { "type": "image", "name": "Roofing progress", "url": "https://picsum.photos/800/600?random=14" },
-      { "type": "image", "name": "Site overview", "url": "https://picsum.photos/800/600?random=15" }
+      { "type": "image", "name": "Construction Site", "url": "https://picsum.photos/seed/construction3/800/600" },
+      { "type": "image", "name": "Foundation work", "url": "https://picsum.photos/seed/foundation3/800/600" },
+      { "type": "image", "name": "Steel structure", "url": "https://picsum.photos/seed/steel3/800/600" },
+      { "type": "image", "name": "Roofing progress", "url": "https://picsum.photos/seed/roof3/800/600" },
+      { "type": "image", "name": "Site overview", "url": "https://picsum.photos/seed/site3/800/600" }
     ]
   },
   {
@@ -192,11 +192,11 @@
       "propertyTax": true
     },
     "documents": [
-        { "type": "image", "name": "Exterior", "url": "https://picsum.photos/800/600?random=16" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=17" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=18" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=19" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=20" }
+        { "type": "image", "name": "Warehouse Exterior", "url": "https://picsum.photos/seed/exterior4/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior4/800/600" },
+        { "type": "image", "name": "Building Side View", "url": "https://picsum.photos/seed/side4/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard4/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate4/800/600" }
     ]
   },
   {
@@ -241,11 +241,11 @@
       "propertyTax": true
     },
     "documents": [
-       { "type": "image", "name": "Exterior View", "url": "https://picsum.photos/800/600?random=21" },
-       { "type": "image", "name": "Side Angle", "url": "https://picsum.photos/800/600?random=22" },
-       { "type": "image", "name": "Loading Docks", "url": "https://picsum.photos/800/600?random=23" },
-       { "type": "image", "name": "Empty Interior", "url": "https://picsum.photos/800/600?random=24" },
-       { "type": "image", "name": "Ceiling and Lighting", "url": "https://picsum.photos/800/600?random=25" },
+       { "type": "image", "name": "Warehouse Exterior", "url": "https://picsum.photos/seed/exterior5/800/600" },
+       { "type": "image", "name": "Side Angle", "url": "https://picsum.photos/seed/side5/800/600" },
+       { "type": "image", "name": "Loading Docks", "url": "https://picsum.photos/seed/docks5/800/600" },
+       { "type": "image", "name": "Empty Interior", "url": "https://picsum.photos/seed/empty5/800/600" },
+       { "type": "image", "name": "Ceiling and Lighting", "url": "https://picsum.photos/seed/ceiling5/800/600" },
        { "type": "layout", "name": "Unit Layout", "url": "#" }
     ]
   },
@@ -283,11 +283,11 @@
       "propertyTax": true
     },
     "documents": [
-        { "type": "image", "name": "Exterior", "url": "https://picsum.photos/800/600?random=26" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=27" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=28" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=29" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=30" }
+        { "type": "image", "name": "Warehouse Exterior", "url": "https://picsum.photos/seed/exterior6/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior6/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side6/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard6/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate6/800/600" }
     ]
   },
   {
@@ -324,11 +324,11 @@
       "propertyTax": true
     },
     "documents": [
-        { "type": "image", "name": "Exterior", "url": "https://picsum.photos/800/600?random=31" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=32" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=33" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=34" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=35" }
+        { "type": "image", "name": "Industrial Building Exterior", "url": "https://picsum.photos/seed/exterior7/800/600" },
+        { "type": "image", "name": "Manufacturing Floor", "url": "https://picsum.photos/seed/mfg7/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side7/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard7/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate7/800/600" }
     ]
   },
    {
@@ -351,11 +351,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Facility View", "url": "https://picsum.photos/800/600?random=36" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=37" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=38" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=39" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=40" }
+        { "type": "image", "name": "Facility View", "url": "https://picsum.photos/seed/facility8/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior8/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side8/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard8/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate8/800/600" }
     ]
   },
   {
@@ -378,11 +378,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Heavy Duty" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Facility Frontage", "url": "https://picsum.photos/800/600?random=41" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=42" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=43" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=44" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=45" }
+        { "type": "image", "name": "Facility Frontage", "url": "https://picsum.photos/seed/frontage9/800/600" },
+        { "type": "image", "name": "Manufacturing Floor", "url": "https://picsum.photos/seed/mfg9/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side9/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard9/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate9/800/600" }
     ]
   },
   {
@@ -405,11 +405,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Estate View", "url": "https://picsum.photos/800/600?random=46" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=47" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=48" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=49" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=50" }
+        { "type": "image", "name": "Industrial Estate", "url": "https://picsum.photos/seed/estate10/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior10/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side10/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard10/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate10/800/600" }
     ]
   },
   {
@@ -432,11 +432,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "3PL Operations", "url": "https://picsum.photos/800/600?random=51" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=52" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=53" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=54" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=55" }
+        { "type": "image", "name": "3PL Operations", "url": "https://picsum.photos/seed/3pl11/800/600" },
+        { "type": "image", "name": "Warehouse Racking", "url": "https://picsum.photos/seed/racking11/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side11/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard11/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate11/800/600" }
     ]
   },
   {
@@ -459,11 +459,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Park Entrance", "url": "https://picsum.photos/800/600?random=56" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=57" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=58" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=59" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=60" }
+        { "type": "image", "name": "Park Entrance", "url": "https://picsum.photos/seed/entrance12/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior12/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side12/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard12/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate12/800/600" }
     ]
   },
   {
@@ -486,11 +486,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Epoxy Coated" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Pharma Hub", "url": "https://picsum.photos/800/600?random=61" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=62" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=63" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=64" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=65" }
+        { "type": "image", "name": "Pharma Hub", "url": "https://picsum.photos/seed/pharma13/800/600" },
+        { "type": "image", "name": "Clean Room", "url": "https://picsum.photos/seed/clean13/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side13/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard13/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate13/800/600" }
     ]
   },
   {
@@ -513,11 +513,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Industrial Unit", "url": "https://picsum.photos/800/600?random=66" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=67" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=68" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=69" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=70" }
+        { "type": "image", "name": "Industrial Unit", "url": "https://picsum.photos/seed/unit14/800/600" },
+        { "type": "image", "name": "Manufacturing Floor", "url": "https://picsum.photos/seed/mfg14/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side14/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard14/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate14/800/600" }
     ]
   },
   {
@@ -540,11 +540,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Kolkata Logistics", "url": "https://picsum.photos/800/600?random=71" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=72" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=73" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=74" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=75" }
+        { "type": "image", "name": "Kolkata Logistics", "url": "https://picsum.photos/seed/kolkata15/800/600" },
+        { "type": "image", "name": "Warehouse Racking", "url": "https://picsum.photos/seed/racking15/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side15/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard15/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate15/800/600" }
     ]
   },
   {
@@ -567,11 +567,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Superflat" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Nagpur Hub", "url": "https://picsum.photos/800/600?random=76" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=77" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=78" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=79" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=80" }
+        { "type": "image", "name": "Nagpur Hub", "url": "https://picsum.photos/seed/nagpur16/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior16/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side16/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard16/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate16/800/600" }
     ]
   },
   {
@@ -594,11 +594,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Indore Cargo", "url": "https://picsum.photos/800/600?random=81" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=82" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=83" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=84" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=85" }
+        { "type": "image", "name": "Indore Cargo", "url": "https://picsum.photos/seed/cargo17/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior17/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side17/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard17/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate17/800/600" }
     ]
   },
   {
@@ -621,11 +621,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Heavy Duty" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Vizag Storage", "url": "https://picsum.photos/800/600?random=86" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=87" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=88" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=89" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=90" }
+        { "type": "image", "name": "Vizag Storage", "url": "https://picsum.photos/seed/storage18/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior18/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side18/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard18/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate18/800/600" }
     ]
   },
   {
@@ -648,11 +648,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Epoxy Coated, Anti-static" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Noida Tech", "url": "https://picsum.photos/800/600?random=91" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=92" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=93" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=94" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=95" }
+        { "type": "image", "name": "Noida Tech Park", "url": "https://picsum.photos/seed/tech19/800/600" },
+        { "type": "image", "name": "Clean Room", "url": "https://picsum.photos/seed/clean19/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side19/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard19/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate19/800/600" }
     ]
   },
   {
@@ -675,11 +675,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Guwahati Hub", "url": "https://picsum.photos/800/600?random=96" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=97" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=98" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=99" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=100" }
+        { "type": "image", "name": "Guwahati Hub", "url": "https://picsum.photos/seed/hub20/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior20/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side20/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard20/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate20/800/600" }
     ]
   },
   {
@@ -702,11 +702,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Lucknow Logistics", "url": "https://picsum.photos/800/600?random=101" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=102" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=103" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=104" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=105" }
+        { "type": "image", "name": "Lucknow Logistics", "url": "https://picsum.photos/seed/lucknow21/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior21/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side21/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard21/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate21/800/600" }
     ]
   },
   {
@@ -729,11 +729,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Jaipur Storage", "url": "https://picsum.photos/800/600?random=106" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=107" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=108" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=109" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=110" }
+        { "type": "image", "name": "Jaipur Storage", "url": "https://picsum.photos/seed/jaipur22/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior22/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side22/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard22/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate22/800/600" }
     ]
   },
   {
@@ -756,11 +756,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Superflat, Anti-static" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "E-commerce Hub", "url": "https://picsum.photos/800/600?random=111" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=112" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=113" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=114" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=115" }
+        { "type": "image", "name": "E-commerce Hub", "url": "https://picsum.photos/seed/ecommerce23/800/600" },
+        { "type": "image", "name": "Conveyor System", "url": "https://picsum.photos/seed/conveyor23/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side23/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard23/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate23/800/600" }
     ]
   },
   {
@@ -783,11 +783,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Patna Logistics", "url": "https://picsum.photos/800/600?random=116" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=117" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=118" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=119" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=120" }
+        { "type": "image", "name": "Patna Logistics", "url": "https://picsum.photos/seed/patna24/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior24/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side24/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard24/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate24/800/600" }
     ]
   },
   {
@@ -810,11 +810,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Heavy Duty" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Raipur Unit", "url": "https://picsum.photos/800/600?random=121" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=122" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=123" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=124" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=125" }
+        { "type": "image", "name": "Raipur Industrial Unit", "url": "https://picsum.photos/seed/raipur25/800/600" },
+        { "type": "image", "name": "Manufacturing Floor", "url": "https://picsum.photos/seed/mfg25/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side25/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard25/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate25/800/600" }
     ]
   },
   {
@@ -837,11 +837,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": false, "buildingApproval": true, "fireNOC": false, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Bhopal Storage", "url": "https://picsum.photos/800/600?random=126" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=127" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=128" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=129" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=130" }
+        { "type": "image", "name": "Bhopal Storage", "url": "https://picsum.photos/seed/bhopal26/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior26/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side26/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard26/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate26/800/600" }
     ]
   },
   {
@@ -864,11 +864,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "FM2 Grade" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Kochi Connect", "url": "https://picsum.photos/800/600?random=131" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=132" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=133" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=134" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=135" }
+        { "type": "image", "name": "Kochi Connect", "url": "https://picsum.photos/seed/kochi27/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior27/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side27/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard27/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate27/800/600" }
     ]
   },
   {
@@ -891,11 +891,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Standard Concrete" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Dehradun Logistics", "url": "https://picsum.photos/800/600?random=136" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=137" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=138" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=139" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=140" }
+        { "type": "image", "name": "Dehradun Logistics", "url": "https://picsum.photos/seed/dehradun28/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior28/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side28/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard28/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate28/800/600" }
     ]
   },
   {
@@ -918,11 +918,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Heavy Duty, VDF" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Surat Warehousing", "url": "https://picsum.photos/800/600?random=141" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=142" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=143" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=144" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=145" }
+        { "type": "image", "name": "Surat Warehousing", "url": "https://picsum.photos/seed/surat29/800/600" },
+        { "type": "image", "name": "Warehouse Interior", "url": "https://picsum.photos/seed/interior29/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side29/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard29/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate29/800/600" }
     ]
   },
   {
@@ -945,11 +945,11 @@
     "siteSpecifications": { "typeOfFlooringInside": "Superflat, Laser-screed" },
     "certificatesAndApprovals": { "parkApproval": true, "buildingApproval": true, "fireNOC": true, "propertyTax": true },
     "documents": [
-        { "type": "image", "name": "Chennai 3PL", "url": "https://picsum.photos/800/600?random=146" },
-        { "type": "image", "name": "Interior", "url": "https://picsum.photos/800/600?random=147" },
-        { "type": "image", "name": "Side View", "url": "https://picsum.photos/800/600?random=148" },
-        { "type": "image", "name": "Yard", "url": "https://picsum.photos/800/600?random=149" },
-        { "type": "image", "name": "Gate", "url": "https://picsum.photos/800/600?random=150" }
+        { "type": "image", "name": "Chennai 3PL", "url": "https://picsum.photos/seed/chennai30/800/600" },
+        { "type": "image", "name": "Automated Sorting", "url": "https://picsum.photos/seed/sorting30/800/600" },
+        { "type": "image", "name": "Side View", "url": "https://picsum.photos/seed/side30/800/600" },
+        { "type": "image", "name": "Parking Yard", "url": "https://picsum.photos/seed/yard30/800/600" },
+        { "type": "image", "name": "Entrance Gate", "url": "https://picsum.photos/seed/gate30/800/600" }
     ]
   }
 ]
