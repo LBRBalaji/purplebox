@@ -5,7 +5,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -341,21 +341,34 @@ export function ListingsPage() {
     <>
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-             <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
-                    <AlertTitle className="font-semibold text-primary/90 text-lg flex items-center gap-3">
-                        <Download className="h-5 w-5 text-primary/80" />
+             <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div className="md:col-span-8">
+                    <AlertTitle className="font-bold text-primary/90 text-xl flex items-center gap-3">
+                        <Download className="h-6 w-6 text-primary/80" />
                         Download up to 5 listings at once!
                     </AlertTitle>
                     <AlertDescription className="text-primary/80 mt-2 space-y-3">
-                        <p>Select your favorite listings to instantly download their key details as a single CSV file. For more tailored options, our demand logging service is always available.</p>
+                        <p>Select your favorite listings to instantly download their key details. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
+                        <Button onClick={handleLogDemandClick}>
+                            <ClipboardPlus className="mr-2 h-4 w-4" /> Log Your Demand
+                        </Button>
                     </AlertDescription>
                 </div>
-                <div className="space-y-3 p-4 rounded-md bg-primary/10 border border-primary/20">
-                     <h4 className="font-bold text-primary flex items-center gap-2"><Award className="h-4 w-4"/> Zero Service Charge</h4>
-                     <ul className="text-xs text-primary/80 list-disc pl-5 space-y-1">
-                        <li>For <strong className="font-semibold">Startups</strong> on their first transaction.</li>
-                        <li>For <strong className="font-semibold">Logistics Companies</strong> on all transactions.</li>
+                <div className="md:col-span-4 space-y-4 p-4 rounded-md bg-green-50 border border-green-200">
+                     <h4 className="font-bold text-green-800 flex items-center gap-2"><Award className="h-5 w-5"/> Zero Service Charge</h4>
+                     <ul className="text-xs text-green-700/90 list-none space-y-2">
+                        <li className="flex items-start gap-2">
+                            <Award className="h-4 w-4 shrink-0 mt-0.5 text-green-600"/>
+                            <div>
+                                <strong className="font-semibold text-green-800">For Startups</strong> on their first transaction.
+                            </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                             <Truck className="h-4 w-4 shrink-0 mt-0.5 text-green-600"/>
+                            <div>
+                                <strong className="font-semibold text-green-800">For Logistics Companies</strong> on all transactions.
+                            </div>
+                        </li>
                      </ul>
                 </div>
             </Alert>

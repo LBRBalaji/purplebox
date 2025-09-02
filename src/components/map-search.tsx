@@ -60,7 +60,7 @@ const LogDemandButton = ({ center, onLogDemand, variant = "default" }: { center:
                 </div>
                  <p>
                     Prefer to browse now?{' '}
-                    <Link href="/listings" className="text-primary underline hover:text-primary/80">Explore all listings</Link>
+                    <Link href="/" className="text-primary underline hover:text-primary/80">Explore all listings</Link>
                     {' '}and instantly download details for your top picks.
                 </p>
             </div>
@@ -604,7 +604,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                             This is an Untapped Opportunity!
                         </h3>
                         <p className="text-sm mt-2 mb-6 text-muted-foreground">
-                           While we don't have aggregated supply data here yet, our sourcing network is always expanding. Log your demand, and we'll activate our network to find a match for you.
+                           While we don't have aggregated supply data here yet, our sourcing network is always expanding. Log your demand through our demand specific warehouse sourcing service, and we'll activate our network to find a match for you.
                         </p>
                         <LogDemandButton center={lastSearchedCenter} onLogDemand={handleLogDemandClick} variant="default"/>
                     </div>
