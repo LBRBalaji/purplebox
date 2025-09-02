@@ -93,7 +93,7 @@ const ToolsDropdown = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
                 <DropdownMenuItem asChild>
-                    <Link href="/commercial-calculator">Commercials Calculator</Link>
+                    <Link href="/commercial-calculator">Area & Commercials Calculator</Link>
                 </DropdownMenuItem>
                 {user && (
                   <DropdownMenuItem asChild>
