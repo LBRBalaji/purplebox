@@ -28,8 +28,6 @@ const MainDashboard = () => {
 
     const [providerTab, setProviderTab] = React.useState('active-demands');
     const [tenantTab, setTenantTab] = React.useState('my-demands');
-    
-    // This state now controls the tab for Admin & O2O users.
     const [adminTab, setAdminTab] = React.useState('active-demands');
 
 
@@ -86,13 +84,11 @@ const MainDashboard = () => {
     // Their special pages (User Mgmt, Analytics etc.) are accessed via the main site header.
     const renderAdminAndO2OContent = () => (
       <Tabs value={adminTab} onValueChange={setAdminTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
-            <TabsTrigger value="my-submissions">All Submissions</TabsTrigger>
             <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
         <TabsContent value="active-demands"><DemandList /></TabsContent>
-        <TabsContent value="my-submissions"><MySubmissions /></TabsContent>
         <TabsContent value="submit-match"><PropertyForm /></TabsContent>
       </Tabs>
     );

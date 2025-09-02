@@ -58,7 +58,6 @@ type DataEvent = {
 };
 
 type DataContextType = {
-  // New listing-centric state
   listings: ListingSchema[];
   addListing: (listing: ListingSchema, userEmail?: string) => void;
   updateListing: (listing: ListingSchema) => void;
@@ -66,8 +65,6 @@ type DataContextType = {
   listingAnalytics: ListingAnalytics[];
   logListingView: (user: User, listingId: string) => void;
 
-
-  // Old demand-centric state (to be phased out)
   demands: DemandSchema[];
   addDemand: (demand: DemandSchema, userEmail?: string) => void;
   updateDemand: (demand: DemandSchema) => void;
@@ -82,12 +79,10 @@ type DataContextType = {
   addAgentLead: (lead: Omit<AgentLead, 'id' | 'status'>) => void;
   updateAgentLeadStatus: (leadId: string, status: AgentStatus) => void;
   isLoading: boolean;
-  // Download tracking
   logDownload: (userId: string) => { success: boolean; limitReached: boolean };
   selectedForDownload: ListingSchema[];
   toggleSelectedForDownload: (listing: ListingSchema) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
-  getTodaysDownloadsForLocation: (userId: string, location: string) => number;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -148,7 +143,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
             setAgentLeads(agentLeadsData);
             setListingAnalytics(analyticsData);
             
-            // Persist agent leads to localStorage for demo purposes
             localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(agentLeadsData));
 
         } catch (error) {
@@ -160,7 +154,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     fetchData();
     
-    // Load data from local storage on initial load as a fallback/cache
     try {
         const storedLeads = localStorage.getItem('warehouseorigin_agent_leads');
         if (storedLeads) setAgentLeads(JSON.parse(storedLeads));
@@ -184,13 +177,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   const updateListing = (updatedListing: ListingSchema) => {
-    const newListings = listings.map(l => l.listingId === updatedListing.listingId ? updatedListing : l);
-    setListings(newListings);
+    setListings(prev => prev.map(l => l.listingId === updatedListing.listingId ? updatedListing : l));
   }
 
   const updateListingStatus = (listingId: string, status: ListingStatus) => {
-    const newListings = listings.map(l => l.listingId === listingId ? { ...l, status } : l);
-    setListings(newListings);
+    setListings(prev => prev.map(l => l.listingId === listingId ? { ...l, status } : l));
   }
 
 
@@ -234,7 +225,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addSubmission = (submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => {
     const demand = demands.find(d => d.demandId === submission.demandId);
-    // All new submissions are pending
     const submissionWithDefaults: Submission = {
         ...submission,
         submissionId: `SUB-${Date.now()}`,
@@ -254,17 +244,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const updateSubmissionStatus = (submissionId: string, status: SubmissionStatus) => {
     setSubmissions(prev =>
       prev.map(sub =>
-        sub.submissionId === submissionId ? { ...sub, status } : sub
+        sub.submissionId === submissionId ? { ...sub, status, isNew: status === 'Approved' ? true : sub.isNew } : sub
       )
     );
-     // If a property is rejected, remove it from the shortlist
     if (status === 'Rejected') {
       setShortlistedItems(prev => prev.filter(item => item.submissionId !== submissionId));
     }
   };
 
   const toggleShortlist = (submissionToToggle: Submission) => {
-    // A customer can only shortlist an approved submission
     if (submissionToToggle.status !== 'Approved') return;
 
     setShortlistedItems((prev) => {
@@ -282,26 +270,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const clearNewSubmissions = (submissionIds: string[]) => {
+    const idsToClear = new Set(submissionIds);
     setSubmissions(prev => 
         prev.map(sub => 
-            submissionIds.includes(sub.submissionId) ? { ...sub, isNew: false } : sub
+            idsToClear.has(sub.submissionId) ? { ...sub, isNew: false } : sub
         )
     );
-  }
-  
-  const getTodaysDownloadsForLocation = (userId: string, location: string): number => {
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    return downloadHistory.filter(
-        d => d.userId === userId && d.location === location && d.timestamp >= startOfDay
-    ).length;
   }
   
   const getTodaysTotalDownloads = (userId: string): number => {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const downloadEntries = downloadHistory.filter(d => d.userId === userId && d.timestamp >= startOfDay);
-    // Count unique batch downloads to enforce the limit correctly.
     const uniqueTimestamps = new Set(downloadEntries.map(d => d.timestamp));
     return uniqueTimestamps.size;
   };
@@ -324,7 +304,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return { success: false, limitReached: true };
     }
     
-    // We only create one record for the entire download action, not per file.
     const newRecord: DownloadRecord = {
         userId,
         listingId: "batch_download",
@@ -341,7 +320,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const logListingView = React.useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {
-      return prevAnalytics.map(analytic => {
+      const newAnalytics = prevAnalytics.map(analytic => {
         if (analytic.listingId === listingId) {
           const newViewer: ViewedByRecord = {
             name: user.userName,
@@ -349,28 +328,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
             timestamp: Date.now(),
           };
 
-          // Update existing viewer's timestamp or add new viewer
           const existingViewers = analytic.viewedBy || [];
           const viewerIndex = existingViewers.findIndex(v => v.name === newViewer.name && v.company === newViewer.company);
           
           let updatedViewers;
           if (viewerIndex > -1) {
-            // This user has viewed before, just update their timestamp
             updatedViewers = [...existingViewers];
             updatedViewers[viewerIndex] = newViewer;
           } else {
-            // New viewer for this listing
              updatedViewers = [...existingViewers, newViewer];
           }
 
           return {
             ...analytic,
-            views: (analytic.views || 0) + 1, // Increment view count
+            views: (analytic.views || 0) + 1,
             viewedBy: updatedViewers,
           };
         }
         return analytic;
       });
+      return newAnalytics;
     });
   }, []);
 
@@ -402,7 +379,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         selectedForDownload,
         toggleSelectedForDownload,
         clearSelectedForDownload,
-        getTodaysDownloadsForLocation
         }}>
       {children}
     </DataContext.Provider>

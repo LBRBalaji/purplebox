@@ -67,7 +67,13 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
   React.useEffect(() => {
     if (isOpen) {
         if (isEditMode && user) {
-            form.reset(user);
+            form.reset({
+                email: user.email,
+                companyName: user.companyName,
+                userName: user.userName,
+                phone: user.phone,
+                role: user.role,
+            });
         } else {
             form.reset({
               email: '',

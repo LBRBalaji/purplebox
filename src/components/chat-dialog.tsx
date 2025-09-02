@@ -16,8 +16,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Submission } from '@/contexts/data-context';
+import { type Submission } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
+import type { ListingSchema } from '@/lib/schema';
+
+type ChatSubmission = Submission & { listing?: ListingSchema };
 
 type Message = {
   id: number;
@@ -31,7 +34,7 @@ export function ChatDialog({
   isOpen,
   onOpenChange,
 }: {
-  submission: Submission | null;
+  submission: ChatSubmission | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -41,12 +44,12 @@ export function ChatDialog({
   const scrollViewportRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (submission) {
+    if (submission?.listing) {
       setMessages([
         {
           id: 1,
           sender: 'SuperAdmin',
-          text: `Hi ${user?.userName || 'there'}, I see you're interested in property ${submission.property.propertyId} for your demand ${submission.demandId}. How can I help?`,
+          text: `Hi ${user?.userName || 'there'}, I see you're interested in property ${submission.listing.listingId}. How can I help?`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -86,13 +89,13 @@ export function ChatDialog({
     }, 1500);
   };
 
-  if (!submission) return null;
+  if (!submission?.listing) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg h-[70vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-2">
-          <DialogTitle>Chat about Property: {submission.property.propertyId}</DialogTitle>
+          <DialogTitle>Chat about Property: {submission.listing.listingId}</DialogTitle>
           <DialogDescription>
             For Demand ID: {submission.demandId}. Your messages will be sent to the admin.
           </DialogDescription>

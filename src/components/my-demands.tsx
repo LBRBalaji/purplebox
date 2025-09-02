@@ -61,12 +61,15 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
   }, [demands, submissions, user, listings]);
 
   const handleAccordionChange = (demandId: string) => {
-    const submissionIdsToClear = myDemandsWithMatches
-        .find(d => d.demandId === demandId)
-        ?.matches.map(s => s.submissionId) || [];
+    const demand = myDemandsWithMatches.find(d => d.demandId === demandId);
+    if (!demand) return;
+
+    const newSubmissionIds = demand.matches
+        .filter(m => m.isNew)
+        .map(m => m.submissionId);
     
-    if (submissionIdsToClear.length > 0) {
-        clearNewSubmissions(submissionIdsToClear);
+    if (newSubmissionIds.length > 0) {
+        clearNewSubmissions(newSubmissionIds);
     }
   };
   

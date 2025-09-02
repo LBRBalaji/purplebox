@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -83,6 +83,8 @@ export function Header() {
   const { user, logout, isLoading } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isAdmin = user?.email === 'admin@example.com';
+  const isO2O = user?.role === 'O2O';
+  const isProvider = user?.role === 'SuperAdmin';
 
   return (
     <>
@@ -118,14 +120,23 @@ export function Header() {
                         <NavLink href="/map-search">
                             <Map className="h-4 w-4" /> Map Search
                         </NavLink>
-                        {!user && (
+                         {!user && (
                             <NavLink href="/agent-signup">
-                                <Briefcase className="h-4 w-4" /> Agent Signup
+                                <UserPlus className="h-4 w-4" /> Agent Signup
                             </NavLink>
                         )}
                         {isAdmin && (
-                            <AnalyticsDropdown />
+                            <>
+                                <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
+                                <AnalyticsDropdown />
+                            </>
                         )}
+                         {(isAdmin || isO2O) && (
+                            <NavLink href="/dashboard/approval"><CheckCircle className="h-4 w-4" /> Approval Queue</NavLink>
+                         )}
+                         {isProvider && !isAdmin && (
+                            <NavLink href="/dashboard/manage-warehouses"><Warehouse className="h-4 w-4" /> Manage Warehouses</NavLink>
+                         )}
                     </>
                 )}
           </nav>
