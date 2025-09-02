@@ -1,6 +1,12 @@
 
 import { z } from 'zod';
 
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
+
+function asOptionalField<T extends z.ZodTypeAny>(schema: T) {
+  return schema.optional().or(emptyStringToUndefined);
+}
+
 export const documentSchema = z.object({
   type: z.enum(["layout", "image", "video"]),
   name: z.string(),
@@ -22,8 +28,8 @@ export const listingSchema = z.object({
   description: z.string().optional(),
   
   // Commercial Terms
-  rentPerSqFt: z.coerce.number().positive("Rent must be a positive number.").optional(),
-  rentalSecurityDeposit: z.coerce.number().positive("Deposit must be positive.").optional(),
+  rentPerSqFt: asOptionalField(z.coerce.number().positive("Rent must be a positive number.")),
+  rentalSecurityDeposit: asOptionalField(z.coerce.number().positive("Deposit must be positive.")),
   
   // Availability & Progress
   availabilityDate: z.string().min(1, "Availability date is required."),
@@ -32,11 +38,11 @@ export const listingSchema = z.object({
 
   // Area
   area: z.object({
-    plinthArea: z.coerce.number().optional(),
-    mezzanineArea1: z.coerce.number().optional(),
-    mezzanineArea2: z.coerce.number().optional(),
-    canopyArea: z.coerce.number().optional(),
-    driversRestRoomArea: z.coerce.number().optional(),
+    plinthArea: asOptionalField(z.coerce.number()),
+    mezzanineArea1: asOptionalField(z.coerce.number()),
+    mezzanineArea2: asOptionalField(z.coerce.number()),
+    canopyArea: asOptionalField(z.coerce.number()),
+    driversRestRoomArea: asOptionalField(z.coerce.number()),
     totalChargeableArea: z.coerce.number().positive("Total area is required."),
   }),
 
@@ -45,7 +51,7 @@ export const listingSchema = z.object({
     buildingType: z.string().optional(),
     shopFloorLevelDimension: z.string().optional(),
     mezzanineFloorLevelHeightAndDimension: z.string().optional(),
-    numberOfDocksAndShutters: z.coerce.number().optional(),
+    numberOfDocksAndShutters: asOptionalField(z.coerce.number()),
     canopyDimension: z.string().optional(),
     naturalLightingAndVentilation: z.string().optional(),
     roofInsulationStatus: z.string().optional(),
