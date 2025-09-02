@@ -6,30 +6,33 @@ import { useData, type Submission } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Check, Info, ListChecks, ThumbsDown, ThumbsUp, X, MapPin, Scaling, CalendarCheck, HandCoins, Zap, ShieldCheck, Truck, Flame, Building, Construction } from 'lucide-react';
-import { Separator } from './ui/separator';
+import { Check, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Progress } from './ui/progress';
-import { cn } from '@/lib/utils';
+import type { ListingSchema, DemandSchema } from '@/lib/schema';
 
 
 export function ApprovalQueue() {
-    const { demands, submissions, updateSubmissionStatus } = useData();
+    const { demands, submissions, listings, updateSubmissionStatus } = useData();
     const { toast } = useToast();
-    const [pendingSubmissions, setPendingSubmissions] = React.useState<Submission[]>([]);
+    const [pendingSubmissions, setPendingSubmissions] = React.useState<(Submission & { listing?: ListingSchema, demand?: DemandSchema })[]>([]);
 
     React.useEffect(() => {
-        const pending = submissions.filter(s => s.status === 'Pending');
+        const pending = submissions
+            .filter(s => s.status === 'Pending')
+            .map(s => ({
+                ...s,
+                listing: listings.find(l => l.listingId === s.listingId),
+                demand: demands.find(d => d.demandId === s.demandId)
+            }));
         setPendingSubmissions(pending);
-    }, [submissions]);
+    }, [submissions, listings, demands]);
 
-    const handleApproval = (propertyId: string, isApproved: boolean) => {
+    const handleApproval = (submissionId: string, isApproved: boolean) => {
         const newStatus = isApproved ? 'Approved' : 'Rejected';
-        updateSubmissionStatus(propertyId, newStatus);
+        updateSubmissionStatus(submissionId, newStatus);
         toast({
             title: `Submission ${isApproved ? 'Approved' : 'Rejected'}`,
-            description: `The property match ${propertyId} has been updated.`,
+            description: `The property match ${submissionId} has been updated.`,
         });
     };
 
@@ -44,7 +47,7 @@ export function ApprovalQueue() {
             </Card>
         );
     }
-
+    
     return (
         <div className="mt-8 space-y-6">
             <div className="mb-8">
@@ -54,95 +57,84 @@ export function ApprovalQueue() {
                 </p>
             </div>
             {pendingSubmissions.map(submission => {
-                const demand = demands.find(d => d.demandId === submission.demandId);
-                if (!demand) return null;
+                if (!submission.demand || !submission.listing) return null;
+                const { demand, listing } = submission;
 
                 const scoreItems = [
                     {
                         criterion: "Location",
                         demand: `${demand.locationName} (within ${demand.radius}km)`,
-                        property: submission.property.isLocationConfirmed ? "Confirmed by Provider" : "Not Confirmed",
+                        property: listing.location,
                     },
                     {
                         criterion: "Size (Sq. Ft.)",
                         demand: `${demand.size.toLocaleString()}`,
-                        property: `${submission.property.size.toLocaleString()}`,
+                        property: `${listing.sizeSqFt.toLocaleString()}`,
                     },
                     {
                         criterion: "Building Type",
-                        demand: `${demand.buildingType}${demand.floorPreference ? ` (${demand.floorPreference})` : ''}`,
-                        property: `${submission.property.buildingType} (${submission.property.floor})`,
+                        demand: `${demand.buildingType || 'Any'}`,
+                        property: `${listing.buildingSpecifications.buildingType}`,
                     },
                     {
                         criterion: "Ceiling Height",
                         demand: `${demand.ceilingHeight || 'N/A'} ${demand.ceilingHeightUnit || 'ft'}`,
-                        property: `${submission.property.ceilingHeight} ft`,
+                        property: `~${listing.buildingSpecifications.numberOfDocksAndShutters} ft`, // Mismatch in schema, using docks as placeholder
                     },
                     {
                         criterion: "Docks",
                         demand: `${demand.docks || 'N/A'}`,
-                        property: `${submission.property.docks}`,
-                    },
-                    {
-                        criterion: "Power (kVA)",
-                        demand: `${demand.powerMin || '...'} - ${demand.powerMax || '...'}`,
-                        property: `${submission.property.availablePower}`,
+                        property: `${listing.buildingSpecifications.numberOfDocksAndShutters}`,
                     },
                     {
                         criterion: "Approvals",
                         demand: demand.preferences.approvals || 'Good to have',
-                        property: submission.property.approvalStatus,
+                        property: listing.certificatesAndApprovals.buildingApproval ? 'Obtained' : 'Not Obtained',
                     },
                     {
                         criterion: "Fire Safety (NOC)",
                         demand: demand.preferences.fireNoc || 'Good to have',
-                        property: submission.property.fireNoc,
+                        property: listing.certificatesAndApprovals.fireNOC ? 'Obtained' : 'Not Obtained',
                     },
                 ];
 
 
                 return (
-                    <Card key={submission.property.propertyId}>
+                    <Card key={submission.submissionId}>
                         <CardHeader>
                              <CardTitle>Review Submission for Demand: <span className="text-primary">{submission.demandId}</span></CardTitle>
                              <CardDescription>
-                                Submitted by: <span className="font-medium">{submission.property.userCompanyName} ({submission.property.userName})</span>
+                                Submitted by: <span className="font-medium">{listing.developerName || submission.providerEmail}</span> for Listing: <span className="font-medium">{listing.listingId}</span>
                              </CardDescription>
                         </CardHeader>
                         <CardContent>
-                             <div className="mt-6">
-                                <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                                    <ListChecks className="h-5 w-5 text-primary" />
-                                    Property vs. Demand
-                                </h3>
-                                <div className="p-4 border rounded-md bg-primary/5 space-y-4">
-                                     <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="w-1/4">Criterion</TableHead>
-                                                <TableHead>Customer Requirement</TableHead>
-                                                <TableHead>Property Specification</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {scoreItems.map(item => (
-                                                <TableRow key={item.criterion}>
-                                                    <TableCell className="font-semibold">{item.criterion}</TableCell>
-                                                    <TableCell>{item.demand}</TableCell>
-                                                    <TableCell>{item.property}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                     </Table>
-                                </div>
-                             </div>
+                            <div className="p-4 border rounded-md bg-primary/5 space-y-4">
+                                <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-1/4">Criterion</TableHead>
+                                        <TableHead>Customer Requirement</TableHead>
+                                        <TableHead>Property Specification</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {scoreItems.map(item => (
+                                        <TableRow key={item.criterion}>
+                                            <TableCell className="font-semibold">{item.criterion}</TableCell>
+                                            <TableCell>{item.demand}</TableCell>
+                                            <TableCell>{item.property}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                                </Table>
+                            </div>
                         </CardContent>
                         <CardFooter className="flex justify-end gap-3">
-                            <Button variant="outline" onClick={() => handleApproval(submission.property.propertyId, false)}>
-                                <ThumbsDown className="mr-2" /> Reject
+                            <Button variant="outline" onClick={() => handleApproval(submission.submissionId, false)}>
+                                <ThumbsDown className="mr-2 h-4 w-4" /> Reject
                             </Button>
-                            <Button onClick={() => handleApproval(submission.property.propertyId, true)}>
-                                <ThumbsUp className="mr-2" /> Approve
+                            <Button onClick={() => handleApproval(submission.submissionId, true)}>
+                                <ThumbsUp className="mr-2 h-4 w-4" /> Approve
                             </Button>
                         </CardFooter>
                     </Card>

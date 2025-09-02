@@ -11,11 +11,11 @@
 import {ai} from '@/ai/genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
-import { demandSchema, propertySchemaBase } from '@/lib/schema';
+import { demandSchema, listingSchema } from '@/lib/schema';
 
 const GetPropertyMatchScoreInputSchema = z.object({
   demand: demandSchema.describe("The user's property demand details, including preferences."),
-  property: propertySchemaBase.describe("The details of the property being submitted for matching."),
+  listing: listingSchema.describe("The details of the property being submitted for matching."),
 });
 export type GetPropertyMatchScoreInput = z.infer<typeof GetPropertyMatchScoreInputSchema>;
 

@@ -5,13 +5,13 @@ import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
-import type { ListingSchema, Document, WarehouseSchema } from '@/lib/schema';
+import type { ListingSchema, Document } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, Milestone, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, AlertCircle, Construction } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -119,7 +119,7 @@ export default function ListingDetailPage() {
             if (storedResultIds) {
                 listToNavigate = JSON.parse(storedResultIds);
             } else {
-                listToNavigate = activeListings.map(w => w.listingId).sort((a,b) => a.localeCompare(b.id));
+                listToNavigate = activeListings.map(w => w.listingId).sort((a,b) => a.localeCompare(b));
             }
             
             setNavigationList(listToNavigate);

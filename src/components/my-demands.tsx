@@ -16,7 +16,7 @@ import { Star, MessageSquare, Pencil, MapPin, CalendarCheck, Scaling, ClipboardL
 import Image from 'next/image';
 import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
-import { type DemandSchema } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema } from '@/lib/schema';
 import { type Submission } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from './ui/button';
@@ -24,7 +24,7 @@ import { ChatDialog } from './chat-dialog';
 
 
 type DemandWithMatches = DemandSchema & {
-  matches: Submission[];
+  matches: (Submission & { listing: ListingSchema | undefined })[];
 }
 
 const priorityLabels: { [key: string]: string } = {
@@ -42,7 +42,7 @@ const priorityLabels: { [key: string]: string } = {
 
 export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void }) {
   const { user } = useAuth();
-  const { demands, submissions, shortlistedItems, toggleShortlist, clearNewSubmissions } = useData();
+  const { demands, submissions, listings, shortlistedItems, toggleShortlist, clearNewSubmissions } = useData();
   const [myDemandsWithMatches, setMyDemandsWithMatches] = React.useState<DemandWithMatches[]>([]);
   const [selectedChat, setSelectedChat] = React.useState<Submission | null>(null);
   const router = useRouter();
@@ -51,19 +51,19 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
     if (user?.email) {
       const userDemands = demands.filter(d => d.userEmail === user.email);
       const demandsWithSubmissions = userDemands.map(demand => {
-        // Customers only see APPROVED submissions
-        const demandSubmissions = submissions.filter(sub => sub.demandId === demand.demandId && sub.status === 'Approved');
+        const demandSubmissions = submissions
+          .filter(sub => sub.demandId === demand.demandId && sub.status === 'Approved')
+          .map(sub => ({ ...sub, listing: listings.find(l => l.listingId === sub.listingId) }));
         return { ...demand, matches: demandSubmissions };
       });
       setMyDemandsWithMatches(demandsWithSubmissions);
     }
-  }, [demands, submissions, user]);
+  }, [demands, submissions, user, listings]);
 
   const handleAccordionChange = (demandId: string) => {
-    // When the user opens an accordion, mark all submissions for that demand as "not new"
     const submissionIdsToClear = myDemandsWithMatches
         .find(d => d.demandId === demandId)
-        ?.matches.map(s => s.property.propertyId) || [];
+        ?.matches.map(s => s.submissionId) || [];
     
     if (submissionIdsToClear.length > 0) {
         clearNewSubmissions(submissionIdsToClear);
@@ -177,25 +177,29 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                         <h4 className="font-semibold text-lg text-foreground mb-4">Approved Matches</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {demand.matches.map(match => {
-                            const isShortlisted = shortlistedItems.some(item => item.property.propertyId === match.property.propertyId);
+                            if (!match.listing) return null;
+                            const isShortlisted = shortlistedItems.some(item => item.submissionId === match.submissionId);
+                            const listing = match.listing;
+                            
                             return (
-                            <Card key={match.property.propertyId} className={cn(match.isNew && "border-primary border-2")}>
+                            <Card key={match.submissionId} className={cn(match.isNew && "border-primary border-2")}>
                             <CardHeader>
                                 <div className="aspect-video relative rounded-md overflow-hidden mb-4">
-                                <Image src="https://placehold.co/600x400.png" alt={`Property ${match.property.propertyId}`} data-ai-hint="modern office" fill className="object-cover" />
+                                <Image src={listing.documents?.[0]?.url || "https://placehold.co/600x400.png"} alt={`Property ${listing.listingId}`} data-ai-hint="modern office" fill className="object-cover" />
                                     {match.isNew && <Badge className="absolute top-2 right-2 bg-primary animate-pulse">New</Badge>}
                                 </div>
-                                <CardTitle>Property ID: {match.property.propertyId}</CardTitle>
+                                <CardTitle>{listing.name}</CardTitle>
+                                <CardDescription>Listing ID: {listing.listingId}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4 text-sm pt-2">
                                 <div>
                                     <p className="text-muted-foreground">Size</p>
-                                    <p className="font-medium">{match.property.size} Sq. Ft.</p>
+                                    <p className="font-medium">{listing.sizeSqFt} Sq. Ft.</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Rent</p>
-                                    <p className="font-medium">₹{match.property.rentPerSft}/sft</p>
+                                    <p className="font-medium">₹{listing.rentPerSqFt}/sft</p>
                                 </div>
                                 </div>
                             </CardContent>

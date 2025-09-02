@@ -89,133 +89,103 @@ export const listingSchema = z.object({
 export type ListingSchema = z.infer<typeof listingSchema>;
 
 
-export const propertySchemaBase = z.object({
-  propertyId: z.string(),
-  isLocationConfirmed: z.boolean().refine(val => val === true, {
-    message: "You must confirm the location match."
-  }),
-  latLng: z.string().optional(),
-  
-  // Property details mirroring demand questions
-  size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive('Size must be a positive number.'),
-  readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
-  buildingType: z.enum(['PEB', 'RCC']).optional(),
-  floor: z.string().optional(),
-  ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height must be a number."}).positive('Ceiling height must be positive.').optional(),
-  ceilingHeightUnit: z.enum(['ft', 'm']).default('ft'),
-  docks: z.coerce.number({invalid_type_error: "Docks must be a number."}).int().nonnegative('Docks cannot be negative.').optional(),
-  availablePower: z.coerce.number({invalid_type_error: "Power must be a number."}).positive('Power must be positive.').optional(),
-  approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']),
-  fireNoc: z.enum(['Obtained', 'Applied For', 'To Apply']),
-  fireHydrant: z.enum(['Installed', 'Can be provided']),
+const optionalCraneSchema = z.object({
+    required: z.boolean().default(false),
+    type: z.enum(['EOT', 'Gantry']).optional(),
+    count: z.coerce.number().optional(),
+    transverseLength: z.coerce.number().optional(),
+    span: z.coerce.number().optional(),
+    underhookHeight: z.coerce.number().optional(),
+    capacity: z.coerce.number().optional(),
+}).optional();
 
-  // Commercials
-  rentPerSft: z.coerce.number({invalid_type_error: "Rent must be a number."}).positive('Rent must be positive.'),
-  rentalSecurityDeposit: z.coerce.number({invalid_type_error: "Deposit must be a number."}).positive('Deposit must be positive.'),
+// Function to dynamically create the property schema based on demand
+export const createPropertySchema = (demand?: DemandSchema) => {
+    let schema = z.object({
+        propertyId: z.string(),
+        isLocationConfirmed: z.boolean().refine(val => val === true, { message: "You must confirm the location match." }),
+        size: z.coerce.number().positive(),
+        floor: z.enum(['Ground', 'First Floor', 'Multi-Floor']),
+        readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
+        serviceModel: z.enum(['Standard', '3PL', 'Both']),
+        buildingType: z.enum(['PEB', 'RCC']).optional(),
+        safety: z.string().min(1),
+        ceilingHeight: z.coerce.number().optional(),
+        ceilingHeightUnit: z.enum(['ft', 'm']),
+        docks: z.coerce.number().optional(),
+        rentPerSft: z.coerce.number().positive(),
+        rentalSecurityDeposit: z.coerce.number().positive(),
+        userType: z.enum(['Developer', 'Owner']),
+        userName: z.string(),
+        userCompanyName: z.string(),
+        userPhoneNumber: z.string(),
+        userEmail: z.string().email(),
+        o2oDealDemandId: z.string().optional(),
+        approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']),
+        approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']).optional(),
+        availablePower: z.coerce.number().optional(),
+        genSetBackup: z.enum(['Available', 'Can be provided']),
+        fireHydrant: z.enum(['Installed', 'Can be provided']),
+        fireNoc: z.enum(['Obtained', 'Applied For', 'To Apply']),
+        canopy: z.enum(['Installed', 'Can be provided']),
+        additionalInformation: z.string().optional(),
+        optionals: z.object({
+          crane: optionalCraneSchema,
+          officeSpaceMin: z.coerce.number().optional(),
+          officeSpaceMax: z.coerce.number().optional(),
+          cafeteriaOrCanteen: z.enum(['Cafeteria', 'Canteen']).optional(),
+          seatingCapacity: z.coerce.number().optional(),
+          additionalToiletsMen: z.coerce.number().optional(),
+          additionalToiletsWomen: z.coerce.number().optional(),
+          truckParkingYardMin: z.coerce.number().optional(),
+          truckParkingYardMax: z.coerce.number().optional(),
+          openStorageYardMin: z.coerce.number().optional(),
+          openStorageYardMax: z.coerce.number().optional(),
+          tenantSpecificImprovements: z.string().optional(),
+          processWaterRequirement: z.coerce.number().optional(),
+          hvacArea: z.string().optional(),
+          sprinklerRequirement: z.string().optional(),
+          lightingRequirement: z.string().optional(),
+        }).optional(),
+        operations: z.object({
+          mpcbEcCategory: z.enum(['Acceptable', 'May Be', 'No']).optional(),
+          etpDetails: z.enum(['Acceptable', 'May Be', 'No']).optional(),
+          effluentCharacteristics: z.enum(['Acceptable', 'May Be', 'No']).optional(),
+        }).optional(),
+    });
 
-  // Provider's own details
-  userType: z.enum(['Developer', 'Owner']),
-  userName: z.string().min(1, 'User name is required.'),
-  userCompanyName: z.string().min(1, 'Company name is required.'),
-  o2oDealDemandId: z.string().optional(),
-  userPhoneNumber: z.string().min(1, 'Phone number is required.'),
-  userEmail: z.string().email('Invalid email address.'),
-  
-  serviceModel: z.enum(['Standard', '3PL', 'Both']).optional(),
-  safety: z.enum(['Fully Compounded', 'Partially Compounded', '3-Side Compounded', 'Not Compounded']),
-  approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']),
-  genSetBackup: z.enum(['Available', 'Can be provided']),
-  canopy: z.enum(['Installed', 'Can be provided']),
-  additionalInformation: z.string().optional(),
-
-  optionals: z.object({
-    officeSpaceMin: z.coerce.number().optional(),
-    officeSpaceMax: z.coerce.number().optional(),
-    cafeteriaOrCanteen: z.enum(['Cafeteria', 'Canteen']).optional(),
-    seatingCapacity: z.coerce.number().optional(),
-    additionalToiletsMen: z.coerce.number().optional(),
-    additionalToiletsWomen: z.coerce.number().optional(),
-    truckParkingYardMin: z.coerce.number().optional(),
-    truckParkingYardMax: z.coerce.number().optional(),
-    openStorageYardMin: z.coerce.number().optional(),
-    openStorageYardMax: z.coerce.number().optional(),
-    tenantSpecificImprovements: z.string().optional(),
-    processWaterRequirement: z.coerce.number().optional(),
-    hvacArea: z.string().optional(),
-    sprinklerRequirement: z.string().optional(),
-    crane: z.object({
-        required: z.boolean().default(false),
-        type: z.enum(['EOT', 'Gantry']).optional(),
-        count: z.coerce.number().optional(),
-        transverseLength: z.coerce.number().optional(),
-        span: z.coerce.number().optional(),
-        underhookHeight: z.coerce.number().optional(),
-        capacity: z.coerce.number().optional(),
-    }).optional(),
-    lightingRequirement: z.string().optional(),
-  }).optional(),
-  
-  operations: z.object({
-      mpcbEcCategory: z.enum(['Acceptable', 'May Be', 'No']).optional(),
-      etpDetails: z.enum(['Acceptable', 'May Be', 'No']).optional(),
-      effluentCharacteristics: z.enum(['Acceptable', 'May Be', 'No']).optional(),
-  }).optional(),
-});
-
-
-export const createPropertySchema = (demand: DemandSchema | undefined) => {
-    if (!demand) return propertySchemaBase; // Return base schema if no demand context
-
-    let schema = propertySchemaBase;
-
-    // Dynamically add requirement checks based on demand
-    if (demand.buildingType) {
-        schema = schema.refine(data => !!data.buildingType, {
-            message: "Building type is required for this demand.",
-            path: ["buildingType"],
+    if (demand?.preferences?.nonCompromisable?.includes('crane')) {
+        schema = schema.extend({
+            optionals: schema.shape.optionals.extend({
+                crane: optionalCraneSchema.refine(data => data?.required === true, {
+                    message: "Crane is a priority and must be provided.",
+                    path: ['required']
+                })
+            })
         });
     }
-    if (demand.floorPreference) {
-        schema = schema.refine(data => !!data.floor, {
-            message: "Floor preference is required for this demand.",
-            path: ["floor"],
-        });
-    }
-    if (demand.ceilingHeight) {
-        schema = schema.refine(data => data.ceilingHeight !== undefined, {
-            message: "Ceiling height is required for this demand.",
-            path: ["ceilingHeight"],
-        });
-    }
-    if (demand.docks !== undefined) {
-        schema = schema.refine(data => data.docks !== undefined, {
-            message: "Number of docks is required for this demand.",
-            path: ["docks"],
-        });
-    }
-    if (demand.powerMin || demand.powerMax) {
-        schema = schema.refine(data => data.availablePower !== undefined, {
-            message: "Available power is required for this demand.",
-            path: ["availablePower"],
-        });
-    }
-    if (demand.optionals?.crane?.required) {
-        schema = schema.refine(data => !!data.optionals?.crane?.required, {
-            message: "Crane information is required for this demand.",
-            path: ["optionals.crane.required"],
-        });
-    }
-    if (demand.operations?.mpcbEcCategory) {
-        schema = schema.refine(data => !!data.operations?.mpcbEcCategory, {
-            message: "MPCB/EC category compliance is required.",
-            path: ["operations.mpcbEcCategory"],
+
+    if (demand?.operationType === 'Manufacturing') {
+         schema = schema.extend({
+            operations: schema.shape.operations.refine(data => {
+                if (demand.operations?.mpcbEcCategory) return data?.mpcbEcCategory !== undefined;
+                return true;
+            }, { message: "MPCB/EC category compliance must be specified.", path: ['mpcbEcCategory']})
+            .refine(data => {
+                if (demand.operations?.etpDetails) return data?.etpDetails !== undefined;
+                return true;
+            }, { message: "ETP details compliance must be specified.", path: ['etpDetails']})
+             .refine(data => {
+                if (demand.operations?.effluentCharacteristics) return data?.effluentCharacteristics !== undefined;
+                return true;
+            }, { message: "Effluent characteristics compliance must be specified.", path: ['effluentCharacteristics']})
         });
     }
 
     return schema;
 };
 
-export type PropertySchema = z.infer<typeof propertySchemaBase>;
+export type PropertySchema = z.infer<ReturnType<typeof createPropertySchema>>;
 
 
 export const demandSchema = z.object({
@@ -312,33 +282,3 @@ export const demandSchema = z.object({
 });
 
 export type DemandSchema = z.infer<typeof demandSchema>;
-
-const warehouseFormSchema = z.object({
-    id: z.string(),
-    locationName: z.string().min(1, 'Location name is required.'),
-    latLng: z.string().min(1, 'Lat/Lng is required.')
-      .regex(/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}, ?-?([1]?[0-7]?[0-9]|[1-9]?[0-9])\.{1}\d{1,6}$/, 'Invalid Lat/Lng format. Use "lat, lng".'),
-    isActive: z.boolean(),
-    is3pl: z.boolean().optional().default(false),
-    size: z.coerce.number({invalid_type_error: "Size must be a number."}).positive(),
-    readiness: z.enum(['Ready for Occupancy', 'Under Construction', 'Available in 3 months']),
-    specifications: z.object({
-        ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height must be a number."}).positive(),
-        docks: z.coerce.number({invalid_type_error: "Docks must be a number."}).int().nonnegative(),
-        officeSpace: z.boolean(),
-        flooringType: z.string().min(1, 'Flooring type is required.'),
-    }),
-    imageUrls: z.array(z.string().url().or(z.literal(''))).optional(),
-});
-
-export const warehouseSchema = warehouseFormSchema.transform(data => {
-    const [lat, lng] = data.latLng.split(',').map(s => parseFloat(s.trim()));
-    return {
-        ...data,
-        imageUrls: data.imageUrls?.filter(url => url), // Filter out empty strings
-        generalizedLocation: { lat, lng },
-    };
-});
-
-
-export type WarehouseSchema = z.infer<typeof warehouseSchema>;

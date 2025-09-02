@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { type DemandSchema, type PropertySchema, type ListingSchema, type WarehouseSchema } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema } from '@/lib/schema';
 import { type User } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,8 +12,10 @@ export type ListingStatus = 'pending' | 'approved' | 'rejected';
 
 
 export type Submission = {
+    submissionId: string;
+    listingId: string;
     demandId: string;
-    property: PropertySchema;
+    providerEmail: string;
     isNew?: boolean;
     demandUserEmail?: string;
     status: SubmissionStatus;
@@ -70,11 +72,11 @@ type DataContextType = {
   addDemand: (demand: DemandSchema, userEmail?: string) => void;
   updateDemand: (demand: DemandSchema) => void;
   submissions: Submission[];
-  addSubmission: (submission: Omit<Submission, 'status'>, userEmail?: string) => void;
-  updateSubmissionStatus: (propertyId: string, status: SubmissionStatus) => void;
+  addSubmission: (submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => void;
+  updateSubmissionStatus: (submissionId: string, status: SubmissionStatus) => void;
   shortlistedItems: Submission[];
   toggleShortlist: (submission: Submission) => void;
-  clearNewSubmissions: (propertyIds: string[]) => void;
+  clearNewSubmissions: (submissionIds: string[]) => void;
   lastEvent: DataEvent | null;
   agentLeads: AgentLead[];
   addAgentLead: (lead: Omit<AgentLead, 'id' | 'status'>) => void;
@@ -230,11 +232,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const addSubmission = (submission: Omit<Submission, 'status'>, userEmail?: string) => {
+  const addSubmission = (submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => {
     const demand = demands.find(d => d.demandId === submission.demandId);
     // All new submissions are pending
     const submissionWithDefaults: Submission = {
         ...submission,
+        submissionId: `SUB-${Date.now()}`,
         isNew: true,
         demandUserEmail: demand?.userEmail,
         status: 'Pending', 
@@ -248,15 +251,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const updateSubmissionStatus = (propertyId: string, status: SubmissionStatus) => {
+  const updateSubmissionStatus = (submissionId: string, status: SubmissionStatus) => {
     setSubmissions(prev =>
       prev.map(sub =>
-        sub.property.propertyId === propertyId ? { ...sub, status } : sub
+        sub.submissionId === submissionId ? { ...sub, status } : sub
       )
     );
      // If a property is rejected, remove it from the shortlist
     if (status === 'Rejected') {
-      setShortlistedItems(prev => prev.filter(item => item.property.propertyId !== propertyId));
+      setShortlistedItems(prev => prev.filter(item => item.submissionId !== submissionId));
     }
   };
 
@@ -266,11 +269,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     setShortlistedItems((prev) => {
       const isShortlisted = prev.some(
-        (item) => item.property.propertyId === submissionToToggle.property.propertyId
+        (item) => item.submissionId === submissionToToggle.submissionId
       );
       if (isShortlisted) {
         return prev.filter(
-          (item) => item.property.propertyId !== submissionToToggle.property.propertyId
+          (item) => item.submissionId !== submissionToToggle.submissionId
         );
       } else {
         return [...prev, submissionToToggle];
@@ -278,10 +281,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const clearNewSubmissions = (propertyIds: string[]) => {
+  const clearNewSubmissions = (submissionIds: string[]) => {
     setSubmissions(prev => 
         prev.map(sub => 
-            propertyIds.includes(sub.property.propertyId) ? { ...sub, isNew: false } : sub
+            submissionIds.includes(sub.submissionId) ? { ...sub, isNew: false } : sub
         )
     );
   }
