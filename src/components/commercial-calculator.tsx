@@ -39,16 +39,43 @@ import { useData } from "@/contexts/data-context";
 import type { ListingSchema } from "@/lib/schema";
 import { Separator } from "./ui/separator";
 
+const areaSchema = z.object({
+  name: z.string().min(1, "Area name is required."),
+  size: z.coerce.number().positive("Size must be positive."),
+});
 
-const calculatorSchema = z.object({
+const standaloneCalculatorSchema = z.object({
+  grossArea: z.coerce.number().positive("Gross area is required."),
+  deductibleAreas: z.array(areaSchema).max(10),
+  rentPerSft: z.coerce.number().positive(),
+  camPerSft: z.coerce.number().min(0).default(0),
+  leasePeriodYears: z.coerce.number().int().positive(),
+  escalationCycle: z.enum(['1', '2', '3']),
+  escalationPercentage: z.coerce.number().min(0),
+  securityDepositMonths: z.coerce.number().int().positive(),
+});
+
+type StandaloneCalculatorValues = z.infer<typeof standaloneCalculatorSchema>;
+
+type StandaloneResult = {
+    netChargeableArea: number;
+    oneTimeOutflow: number;
+    initialMonthlyRent: number;
+    initialCam: number;
+    initialTotalMonthlyOutflow: number;
+    yearlyBreakdown: { year: number; totalMonthlyOutflow: number; annualOutflow: number }[];
+    totalOutflow: number;
+};
+
+const comparisonCalculatorSchema = z.object({
   leasePeriodYears: z.coerce.number().int().positive("Lease period must be a positive integer."),
   escalationCycle: z.enum(['1', '2', '3']),
   escalationPercentage: z.coerce.number().min(0, "Escalation must be non-negative."),
 });
 
-type CalculatorValues = z.infer<typeof calculatorSchema>;
+type ComparisonCalculatorValues = z.infer<typeof comparisonCalculatorSchema>;
 
-type Result = {
+type ComparisonResult = {
     listing: ListingSchema;
     netChargeableArea: number;
     oneTimeOutflow: number;
@@ -58,15 +85,216 @@ type Result = {
     totalOutflow: string;
 }
 
+const generateCsvFilename = (toolName: string) => {
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+    return `Lakshmi_Balaji_O2O_${toolName}_${timestamp}.csv`;
+};
 
-export function CommercialCalculator() {
+const addCsvFooter = (worksheet: XLSX.WorkSheet) => {
+    const footer = [
+        [], // Empty row for spacing
+        ["Source:", "Lakshmi Balaji O2O", "URL:", "www.lakshmibalajio2o.com"],
+        ["Page Number:", 1]
+    ];
+    XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
+};
+
+function StandaloneCalculator() {
+    const [result, setResult] = React.useState<StandaloneResult | null>(null);
+
+    const form = useForm<StandaloneCalculatorValues>({
+        resolver: zodResolver(standaloneCalculatorSchema),
+        defaultValues: {
+            grossArea: 100000,
+            deductibleAreas: [
+                { name: 'Security Room', size: 200 },
+                { name: 'Washrooms', size: 300 },
+            ],
+            rentPerSft: 20,
+            camPerSft: 2,
+            leasePeriodYears: 5,
+            escalationCycle: '3',
+            escalationPercentage: 15,
+            securityDepositMonths: 6,
+        },
+    });
+
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "deductibleAreas",
+    });
+
+    const onSubmit = (data: StandaloneCalculatorValues) => {
+        const totalDeducted = data.deductibleAreas.reduce((sum, area) => sum + area.size, 0);
+        const netChargeableArea = data.grossArea - totalDeducted;
+        const oneTimeOutflow = data.securityDepositMonths * (data.rentPerSft * netChargeableArea);
+        
+        let currentRentSft = data.rentPerSft;
+        const yearlyBreakdown = [];
+        let totalOutflow = 0;
+
+        for (let year = 1; year <= data.leasePeriodYears; year++) {
+            if (year > 1 && (year - 1) % parseInt(data.escalationCycle, 10) === 0) {
+                currentRentSft *= (1 + data.escalationPercentage / 100);
+            }
+            const monthlyRent = currentRentSft * netChargeableArea;
+            const monthlyCam = data.camPerSft * netChargeableArea;
+            const totalMonthlyOutflow = monthlyRent + monthlyCam;
+            const annualOutflow = totalMonthlyOutflow * 12;
+            totalOutflow += annualOutflow;
+
+            yearlyBreakdown.push({
+                year,
+                totalMonthlyOutflow,
+                annualOutflow,
+            });
+        }
+
+        setResult({
+            netChargeableArea,
+            oneTimeOutflow,
+            initialMonthlyRent: data.rentPerSft * netChargeableArea,
+            initialCam: data.camPerSft * netChargeableArea,
+            initialTotalMonthlyOutflow: (data.rentPerSft * netChargeableArea) + (data.camPerSft * netChargeableArea),
+            yearlyBreakdown,
+            totalOutflow,
+        });
+    }
+
+    const handleDownload = () => {
+        if (!result) return;
+        
+        const data = form.getValues();
+        const mainData = [
+            ["Metric", "Value"],
+            ["Gross Area (Sq. Ft.)", data.grossArea],
+            ...data.deductibleAreas.map(a => [`(less) ${a.name}`, -a.size]),
+            ["Net Chargeable Area (Sq. Ft.)", result.netChargeableArea],
+            ["Lease Period (Years)", data.leasePeriodYears],
+            ["Security Deposit (Months)", data.securityDepositMonths],
+            ["One-Time Outflow (Security)", `₹${result.oneTimeOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`],
+            ["Total Outflow (Lease Period)", `₹${result.totalOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`],
+        ];
+        
+        const yearlyHeader = ["Year", "Avg. Monthly Outflow", "Total Annual Outflow"];
+        const yearlyData = result.yearlyBreakdown.map(bd => [
+            bd.year,
+            `₹${bd.totalMonthlyOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+            `₹${bd.annualOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+        ]);
+
+        const worksheet = XLSX.utils.aoa_to_sheet([]);
+        XLSX.utils.sheet_add_aoa(worksheet, [["Tool Name: Commercials Calculator - Standalone"]], { origin: 'A1' });
+        XLSX.utils.sheet_add_aoa(worksheet, mainData, { origin: 'A3' });
+        XLSX.utils.sheet_add_aoa(worksheet, [[]], { origin: -1 }); // Spacer
+        XLSX.utils.sheet_add_aoa(worksheet, [["Yearly Outflow Breakdown"]], { origin: -1 });
+        XLSX.utils.sheet_add_aoa(worksheet, [yearlyHeader, ...yearlyData], { origin: -1 });
+
+        addCsvFooter(worksheet);
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Standalone Calculation");
+        XLSX.writeFile(workbook, generateCsvFilename("Standalone_Calculator"), { bookType: "csv" });
+    }
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* INPUTS */}
+                    <div className="space-y-6">
+                        <Card>
+                             <CardHeader><CardTitle className="flex items-center gap-2"><Warehouse className="h-6 w-6 text-primary"/> Area Calculation</CardTitle></CardHeader>
+                             <CardContent className="space-y-4">
+                                <FormField control={form.control} name="grossArea" render={({ field }) => (<FormItem><FormLabel>Gross Area (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                <Separator />
+                                <div className="space-y-2">
+                                    <FormLabel>Deductible Areas</FormLabel>
+                                    {fields.map((field, index) => (
+                                        <div key={field.id} className="flex gap-2 items-end">
+                                            <FormField control={form.control} name={`deductibleAreas.${index}.name`} render={({ field }) => (<FormItem className="flex-grow"><FormControl><Input placeholder="Area Name" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                            <FormField control={form.control} name={`deductibleAreas.${index}.size`} render={({ field }) => (<FormItem><FormControl><Input type="number" placeholder="Size (Sq. Ft.)" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                            <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4" /></Button>
+                                        </div>
+                                    ))}
+                                    {fields.length < 10 && <Button type="button" variant="outline" size="sm" onClick={() => append({ name: '', size: 0 })}><PlusCircle className="mr-2 h-4 w-4" /> Add Area</Button>}
+                                </div>
+                             </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader><CardTitle className="flex items-center gap-2"><HandCoins className="h-6 w-6 text-primary"/> Commercial Terms</CardTitle></CardHeader>
+                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <FormField control={form.control} name="rentPerSft" render={({ field }) => (<FormItem><FormLabel>Rent (per Sq.Ft/Month)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="camPerSft" render={({ field }) => (<FormItem><FormLabel>CAM (per Sq.Ft/Month)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="leasePeriodYears" render={({ field }) => (<FormItem><FormLabel>Lease Period (Years)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="securityDepositMonths" render={({ field }) => (<FormItem><FormLabel>Security Deposit (Months)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="escalationCycle" render={({ field }) => (<FormItem><FormLabel>Escalation Cycle</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="1">Every Year</SelectItem><SelectItem value="2">Every 2 Years</SelectItem><SelectItem value="3">Every 3 Years</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="escalationPercentage" render={({ field }) => (<FormItem><FormLabel>Escalation (%)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            </CardContent>
+                        </Card>
+                        <div className="flex gap-2">
+                             <Button type="submit" size="lg" className="w-full"><Calculator className="mr-2 h-4 w-4" /> Calculate</Button>
+                             {result && <Button type="button" size="lg" variant="outline" className="w-full" onClick={handleDownload}><Download className="mr-2 h-4 w-4" /> Download</Button>}
+                        </div>
+                    </div>
+                     {/* RESULTS */}
+                    <div className="space-y-6">
+                         {result ? (
+                            <Card className="sticky top-24">
+                                <CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-6 w-6 text-primary"/> Calculation Results</CardTitle></CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="bg-primary/10 p-4 rounded-lg text-center">
+                                        <p className="text-sm text-primary font-semibold">Net Chargeable Area</p>
+                                        <p className="text-3xl font-bold text-primary">{result.netChargeableArea.toLocaleString()} Sq. Ft.</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-secondary/50 p-3 rounded-lg text-center">
+                                            <p className="text-xs text-muted-foreground">One-Time Outflow</p>
+                                            <p className="font-bold">₹{result.oneTimeOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                                        </div>
+                                        <div className="bg-secondary/50 p-3 rounded-lg text-center">
+                                            <p className="text-xs text-muted-foreground">Total Outflow (Lease)</p>
+                                            <p className="font-bold">₹{result.totalOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                                        </div>
+                                    </div>
+                                    <div className="border rounded-lg overflow-hidden">
+                                        <Table>
+                                            <TableHeader><TableRow><TableHead>Year</TableHead><TableHead className="text-right">Annual Outflow</TableHead></TableRow></TableHeader>
+                                            <TableBody>
+                                                {result.yearlyBreakdown.map(bd => (
+                                                    <TableRow key={bd.year}><TableCell>Year {bd.year}</TableCell><TableCell className="text-right">₹{bd.annualOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</TableCell></TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                         ) : (
+                            <Card className="flex items-center justify-center h-full text-center p-8 border-dashed">
+                                <div>
+                                    <Calculator className="mx-auto h-12 w-12 text-muted-foreground" />
+                                    <h3 className="mt-4 text-lg font-semibold">Results will appear here</h3>
+                                    <p className="mt-1 text-sm text-muted-foreground">Fill in the details and click "Calculate".</p>
+                                </div>
+                            </Card>
+                         )}
+                    </div>
+                </div>
+            </form>
+        </Form>
+    );
+}
+
+
+function ComparisonCalculator() {
   const { listings } = useData();
   const searchParams = useSearchParams();
-  const [results, setResults] = React.useState<Result[]>([]);
+  const [results, setResults] = React.useState<ComparisonResult[]>([]);
   const [comparisonListings, setComparisonListings] = React.useState<ListingSchema[]>([]);
 
-  const form = useForm<CalculatorValues>({
-    resolver: zodResolver(calculatorSchema),
+  const form = useForm<ComparisonCalculatorValues>({
+    resolver: zodResolver(comparisonCalculatorSchema),
     defaultValues: {
       leasePeriodYears: 5,
       escalationCycle: '3',
@@ -79,7 +307,6 @@ export function CommercialCalculator() {
     if (compareIds.length > 0) {
         const foundListings = listings.filter(l => compareIds.includes(l.listingId));
         setComparisonListings(foundListings);
-        // Automatically trigger calculation when comparison starts
         if(foundListings.length > 0) {
             onSubmit(form.getValues(), foundListings);
         }
@@ -87,11 +314,11 @@ export function CommercialCalculator() {
   }, [searchParams, listings, form]);
 
 
-  const onSubmit = (data: CalculatorValues, listingsToCompare: ListingSchema[]) => {
+  const onSubmit = (data: ComparisonCalculatorValues, listingsToCompare: ListingSchema[]) => {
     const newResults = listingsToCompare.map(listing => {
-        const netChargeableArea = listing.area.totalChargeableArea || listing.sizeSqFt;
+        const netChargeableArea = listing.area?.totalChargeableArea || listing.sizeSqFt;
         const oneTimeOutflow = (listing.rentalSecurityDeposit || 0) * ((listing.rentPerSqFt || 0) * netChargeableArea);
-        const monthlyCam = 0; // Assuming 0 CAM for now as it's not in the listing data
+        const monthlyCam = 0;
 
         let currentRentSft = listing.rentPerSqFt || 0;
         const yearlyBreakdown = [];
@@ -128,7 +355,7 @@ export function CommercialCalculator() {
     setResults(newResults);
   }
 
-  const handleFormSubmit = (data: CalculatorValues) => {
+  const handleFormSubmit = (data: ComparisonCalculatorValues) => {
     onSubmit(data, comparisonListings);
   }
 
@@ -147,16 +374,11 @@ export function CommercialCalculator() {
         
         const worksheet = XLSX.utils.aoa_to_sheet([]);
 
-        // Add header
-        XLSX.utils.sheet_add_aoa(worksheet, [["Tool Name: Commercials Calculator"]], { origin: 'A1' });
-
-        // Add main data table
+        XLSX.utils.sheet_add_aoa(worksheet, [["Tool Name: Commercials Calculator - Comparison"]], { origin: 'A1' });
         XLSX.utils.sheet_add_aoa(worksheet, [tableHeader, ...tableRows], { origin: 'A3' });
 
-        // Add yearly breakdown
         let breakdownStartRow = 4 + tableRows.length;
-        results.forEach((result, index) => {
-            const col = String.fromCharCode(66 + index); // B, C, D...
+        results.forEach((result) => {
             XLSX.utils.sheet_add_aoa(worksheet, [[`Yearly Breakdown for ${result.listing.name}`]], { origin: `A${breakdownStartRow}` });
             const breakdownHeader = ["Year", "Monthly Outflow", "Annual Outflow"];
             const breakdownData = result.yearlyBreakdown.map(bd => [
@@ -168,22 +390,25 @@ export function CommercialCalculator() {
             breakdownStartRow += breakdownData.length + 3;
         });
 
-        // Add footer
-        const finalRow = breakdownStartRow;
-        XLSX.utils.sheet_add_aoa(worksheet, [[]], { origin: `A${finalRow}` });
-        XLSX.utils.sheet_add_aoa(worksheet, [["Source:", "Lakshmi Balaji O2O", "URL:", "www.lakshmibalajio2o.com"]], { origin: `A${finalRow + 1}` });
-        XLSX.utils.sheet_add_aoa(worksheet, [["Page Number:", "1"]], { origin: `A${finalRow + 2}` });
+        addCsvFooter(worksheet);
 
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Commercial Calculation");
-
-        const now = new Date();
-        const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
-        const filename = `Lakshmi_Balaji_O2O_Commercial_Calculation_${timestamp}.csv`;
-        
-        XLSX.writeFile(workbook, filename, { bookType: "csv" });
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Comparison Calculation");
+        XLSX.writeFile(workbook, generateCsvFilename("Comparison_Calculator"), { bookType: "csv" });
     };
 
+    if (comparisonListings.length === 0) {
+         return (
+            <div className="text-center p-12 border rounded-lg">
+                <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-xl font-semibold">Start Your Comparison</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Go to the listings page, select up to 5 properties, and click "Compare" to see your analysis here.</p>
+                <Button asChild className="mt-4">
+                    <a href="/">Browse Listings</a>
+                </Button>
+            </div>
+         );
+    }
 
   return (
     <Form {...form}>
@@ -191,9 +416,9 @@ export function CommercialCalculator() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl"><BarChart2 className="h-6 w-6 text-primary"/> Lease Outflow Comparison</CardTitle>
-             <CardDescription>Adjust the lease terms below to compare the financial outflow for your selected properties. Up to 5 properties can be compared at a time.</CardDescription>
+             <CardDescription>Adjust the lease terms below to compare the financial outflow for your selected properties.</CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-6">
+          <CardContent className="grid grid-cols-1 md:grid-cols-4 items-end gap-x-8 gap-y-6">
              <FormField control={form.control} name="leasePeriodYears" render={({ field }) => (
                 <FormItem><FormLabel>Lease Period (in years)</FormLabel><FormControl><Input type="number" placeholder="e.g., 5" {...field} /></FormControl><FormMessage /></FormItem>
             )} />
@@ -214,7 +439,7 @@ export function CommercialCalculator() {
             <FormField control={form.control} name="escalationPercentage" render={({ field }) => (
                 <FormItem><FormLabel>Rental Escalation (%)</FormLabel><FormControl><Input type="number" placeholder="e.g., 15" {...field} /></FormControl><FormMessage /></FormItem>
             )} />
-             <div className="md:mt-8 flex gap-2">
+             <div className="flex items-center gap-2">
                 <Button type="submit" size="lg" className="w-full"><Calculator className="mr-2 h-4 w-4" /> Recalculate</Button>
                  {results.length > 0 && (
                     <Button type="button" size="lg" variant="outline" className="w-full" onClick={handleDownload}>
@@ -230,7 +455,7 @@ export function CommercialCalculator() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary"/> Financial Analysis</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent>
                 <div className="border rounded-md overflow-x-auto">
                     <Table>
                       <TableHeader>
@@ -280,7 +505,7 @@ export function CommercialCalculator() {
                         <TableRow className="bg-primary/10 hover:bg-primary/10">
                             <TableCell className="font-bold text-lg text-primary sticky left-0 bg-primary/10 z-10">Total Outflow for Lease Period</TableCell>
                             {results.map(r => (
-                                <TableCell key={r.listing.listingId} className="font-bold text-right text-lg text-primary text-center">₹{parseFloat(r.totalOutflow).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</TableCell>
+                                <TableCell key={r.listing.listingId} className="font-bold text-lg text-primary text-center">₹{parseFloat(r.totalOutflow).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</TableCell>
                             ))}
                         </TableRow>
                       </TableResultFooter>
@@ -289,24 +514,18 @@ export function CommercialCalculator() {
             </CardContent>
           </Card>
         )}
-
-        {results.length === 0 && comparisonListings.length > 0 && (
-            <div className="text-center p-8 border rounded-lg border-dashed">
-                <p className="text-muted-foreground">Click "Recalculate" to generate the comparison.</p>
-            </div>
-        )}
-
-         {comparisonListings.length === 0 && (
-            <div className="text-center p-12 border rounded-lg">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-xl font-semibold">Start Your Comparison</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Go to the listings page, select up to 5 properties, and click "Compare" to see your analysis here.</p>
-                <Button asChild className="mt-4">
-                    <a href="/">Browse Listings</a>
-                </Button>
-            </div>
-         )}
       </form>
     </Form>
   );
+}
+
+export function CommercialCalculator() {
+    const searchParams = useSearchParams();
+    const compareIds = searchParams.get('compare');
+
+    return (
+        <div className="space-y-12">
+            {compareIds ? <ComparisonCalculator /> : <StandaloneCalculator />}
+        </div>
+    )
 }
