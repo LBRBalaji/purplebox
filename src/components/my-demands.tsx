@@ -85,13 +85,13 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
           <Accordion type="single" collapsible className="w-full space-y-4" onValueChange={handleAccordionChange}>
             {myDemandsWithMatches.map((demand) => (
               <AccordionItem value={demand.demandId} key={demand.demandId} className="border rounded-lg bg-card">
-                <AccordionTrigger className="p-6 hover:no-underline data-[state=open]:border-b">
-                  <div className="flex justify-between items-start w-full gap-4">
-                    <div className="text-left space-y-3 flex-grow">
+                <div className="flex items-center p-6 data-[state=open]:border-b">
+                  <AccordionTrigger className="p-0 hover:no-underline flex-grow">
+                    <div className="text-left space-y-3">
                       <div className="flex items-center gap-4 flex-wrap">
                         <h3 className="font-bold text-lg text-primary truncate" title={demand.demandId}>{demand.demandId}</h3>
                         <Badge variant="secondary">{demand.operationType}</Badge>
-                         {demand.matches.some(m => m.isNew) && (
+                        {demand.matches.some(m => m.isNew) && (
                             <Badge className="bg-accent text-accent-foreground animate-pulse">
                                 {demand.matches.filter(m => m.isNew).length} New Match
                             </Badge>
@@ -114,25 +114,24 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                           </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2 shrink-0">
-                       <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/dashboard?editDemandId=${demand.demandId}`, { scroll: false });
-                            onSwitchTab('log-demand');
-                          }}
-                        >
-                          <Pencil className="mr-2 h-4 w-4" /> Edit
-                        </Button>
-                      <Badge variant={demand.matches.length > 0 ? 'default' : 'secondary'} className="w-[110px] justify-center">
-                        {demand.matches.length} {demand.matches.length === 1 ? 'Match' : 'Matches'}
-                      </Badge>
-                    </div>
+                  </AccordionTrigger>
+                  <div className="flex flex-col items-end gap-2 shrink-0 ml-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          router.push(`/dashboard?editDemandId=${demand.demandId}`, { scroll: false });
+                          onSwitchTab('log-demand');
+                        }}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" /> Edit
+                      </Button>
+                    <Badge variant={demand.matches.length > 0 ? 'default' : 'secondary'} className="w-[110px] justify-center">
+                      {demand.matches.length} {demand.matches.length === 1 ? 'Match' : 'Matches'}
+                    </Badge>
                   </div>
-                </AccordionTrigger>
-                <AccordionContent className="p-6 pt-4 space-y-6">
+                </div>
+                <AccordionContent className="p-6 pt-0 space-y-6">
                     <Card className="bg-secondary/50">
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center gap-2">
