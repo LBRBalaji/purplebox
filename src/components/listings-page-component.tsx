@@ -21,6 +21,7 @@ import { LimitExceededDialog } from './limit-exceeded-dialog';
 import { Badge } from '@/components/ui/badge';
 import { type ListingSchema } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { DownloadTermsDialog } from './download-terms-dialog';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
@@ -93,6 +94,7 @@ function DownloadBar() {
     const { toast } = useToast();
     const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isTermsOpen, setIsTermsOpen] = useState(false);
 
     if (selectedForDownload.length === 0) {
         return null;
@@ -106,21 +108,7 @@ function DownloadBar() {
         })
     }
 
-    const handleDownload = () => {
-        if (!user) {
-            setIsLoginOpen(true);
-            return;
-        }
-
-        if (user.role !== 'User') {
-            toast({
-                variant: 'destructive',
-                title: 'Download Not Available',
-                description: 'Only Customer accounts can download listings.'
-            });
-            return;
-        }
-
+    const proceedWithDownload = () => {
         const { success } = logDownload(user!.email!);
         if (success) {
             const dataToExport = selectedForDownload.map(l => ({
@@ -144,9 +132,8 @@ function DownloadBar() {
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             
-            // Add branding
             const footer = [
-                [], // Empty row for spacing
+                [],
                 ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
@@ -174,6 +161,35 @@ function DownloadBar() {
         }
     }
 
+    const handleDownloadClick = () => {
+        if (!user) {
+            setIsLoginOpen(true);
+            return;
+        }
+
+        if (user.role !== 'User') {
+            toast({
+                variant: 'destructive',
+                title: 'Download Not Available',
+                description: 'Only Customer accounts can download listings.'
+            });
+            return;
+        }
+
+        const hasAcceptedTerms = sessionStorage.getItem('warehouse_download_terms_accepted');
+        if (hasAcceptedTerms) {
+            proceedWithDownload();
+        } else {
+            setIsTermsOpen(true);
+        }
+    };
+
+    const onTermsAccept = () => {
+        sessionStorage.setItem('warehouse_download_terms_accepted', 'true');
+        setIsTermsOpen(false);
+        proceedWithDownload();
+    };
+
     return (
         <>
             <div className="fixed bottom-4 inset-x-0 z-50 flex justify-center">
@@ -185,13 +201,14 @@ function DownloadBar() {
                         <Button variant="ghost" size="sm" onClick={clearSelectedForDownload}>
                             <X className="mr-2 h-4 w-4" /> Clear
                         </Button>
-                        <Button onClick={handleDownload}>
+                        <Button onClick={handleDownloadClick}>
                             <Download className="mr-2 h-4 w-4" /> Download Selected
                         </Button>
                     </div>
                 </div>
             </div>
             <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess}/>
+            <DownloadTermsDialog isOpen={isTermsOpen} onOpenChange={setIsTermsOpen} onAccept={onTermsAccept} />
         </>
     )
 }
@@ -238,7 +255,6 @@ export function ListingsPage() {
 
     setFilteredListings(results);
 
-    // Store search results in session storage for detail page navigation
     try {
         const resultIds = results.map(r => r.listingId);
         sessionStorage.setItem('warehouse_search_results', JSON.stringify(resultIds));
@@ -283,7 +299,7 @@ export function ListingsPage() {
     
     const { limitReached } = toggleSelectedForDownload(listing);
     if (limitReached) {
-      setLimitExceededLocation(listing.location); // Use locationName for the dialog
+      setLimitExceededLocation(listing.location); 
       setIsLimitExceededDialogOpen(true);
     }
   };
