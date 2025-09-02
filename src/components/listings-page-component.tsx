@@ -267,7 +267,8 @@ export function ListingsPage() {
                 listing.availabilityDate,
                 listing.buildingSpecifications.buildingType,
                 listing.sizeSqFt.toString(),
-                listing.serviceModel
+                listing.serviceModel,
+                listing.buildingSpecifications.eveHeightMeters ? `eve height ${listing.buildingSpecifications.eveHeightMeters}m` : '',
             ].join(' ').toLowerCase();
             return searchHaystack.includes(searchTerm.toLowerCase());
         });
@@ -443,7 +444,7 @@ export function ListingsPage() {
                     <div className="relative flex-grow">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input 
-                            placeholder="Search by name, location, ID, size, or type (e.g. '3PL', 'Industrial')" 
+                            placeholder="Search by name, location, ID, size, type (e.g. '3PL'), or eve height..."
                             className="pl-9"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -516,5 +517,3 @@ export function ListingsPage() {
     </>
   );
 }
-
-    

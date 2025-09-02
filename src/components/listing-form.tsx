@@ -36,9 +36,12 @@ import { Textarea } from "./ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
-import { Trash2 } from "lucide-react";
+import { Trash2, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
+import { generateListingDescriptionAction } from "@/lib/actions";
+import type { GenerateListingDescriptionInput } from "@/ai/flows/generate-listing-description";
+import { Sparkles } from "lucide-react";
 
 
 type ListingFormProps = {
@@ -52,6 +55,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const { user } = useAuth();
   const { toast } = useToast();
   const isEditMode = !!listing;
+  const [isGenerating, setIsGenerating] = React.useState(false);
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
@@ -79,6 +83,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
       buildingSpecifications: {
         craneSupportStructureAvailable: false,
         craneAvailable: false,
+        louvers: false,
       },
       siteSpecifications: {},
       certificatesAndApprovals: {
@@ -130,6 +135,44 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     }
   }, [isOpen, isEditMode, listing, form, user]);
 
+  const handleGenerateDescription = async () => {
+    setIsGenerating(true);
+    try {
+        const data = form.getValues();
+        const input: GenerateListingDescriptionInput = {
+            propertyId: data.listingId,
+            name: data.name,
+            location: data.location,
+            sizeSqFt: data.sizeSqFt,
+            availabilityDate: data.availabilityDate,
+            serviceModel: data.serviceModel,
+            rentPerSqFt: data.rentPerSqFt,
+            buildingType: data.buildingSpecifications.buildingType,
+            roofType: data.buildingSpecifications.roofType,
+            eveHeightMeters: data.buildingSpecifications.eveHeightMeters,
+        };
+
+        const result = await generateListingDescriptionAction(input);
+        if (result.error || !result.generatedDescription) {
+            throw new Error(result.error || "Failed to generate description");
+        }
+
+        form.setValue("description", result.generatedDescription, { shouldValidate: true });
+        toast({ title: "Description generated successfully!" });
+
+    } catch (e) {
+        const error = e as Error;
+        toast({
+            variant: "destructive",
+            title: "Generation Failed",
+            description: error.message,
+        });
+    } finally {
+        setIsGenerating(false);
+    }
+  };
+
+
   const handleSubmit = (data: ListingSchema) => {
     onSubmit(data);
     toast({
@@ -166,9 +209,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                     )} />
                      <FormField control={form.control} name="sizeSqFt" render={({ field }) => (
                         <FormItem><FormLabel>Total Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="description" render={({ field }) => (
-                        <FormItem className="md:col-span-2"><FormLabel>Description</FormLabel><FormControl><Textarea {...field} placeholder="Describe the key features of your property..." /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
               </div>
@@ -232,9 +272,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             <FormField control={form.control} name="buildingSpecifications.numberOfDocksAndShutters" render={({ field }) => (
                                 <FormItem><FormLabel>Number of Docks/Shutters</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
                             )} />
-                             <FormField control={form.control} name="buildingSpecifications.roofInsulationStatus" render={({ field }) => (
-                                <FormItem><FormLabel>Roof Insulation</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., Fully insulated" /></FormControl><FormMessage /></FormItem>
-                            )} />
                              <FormField control={form.control} name="buildingSpecifications.internalLighting" render={({ field }) => (
                                 <FormItem><FormLabel>Internal Lighting</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., LED High-bay, 200 LUX" /></FormControl><FormMessage /></FormItem>
                             )} />
@@ -263,23 +300,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         </div>
                     </div>
                      <div className="space-y-4">
-                        <FormLabel className="text-lg font-semibold">Site Specifications</FormLabel>
+                        <FormLabel className="text-lg font-semibold">Site &amp; Roof</FormLabel>
                         <div className="space-y-4 p-4 border rounded-md">
-                            <FormField control={form.control} name="serviceModel" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Service Model</FormLabel>
-                                    <FormDescription>How can this warehouse be leased?</FormDescription>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Select service model"/></SelectTrigger></FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="Standard">Standard Warehouse</SelectItem>
-                                            <SelectItem value="3PL">3PL Operated</SelectItem>
-                                            <SelectItem value="Both">Both Standard and 3PL</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}/>
                              <FormField control={form.control} name="siteSpecifications.typeOfFlooringInside" render={({ field }) => (
                                 <FormItem><FormLabel>Inside Flooring Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., FM2 Grade, 8-ton point load" /></FormControl><FormMessage /></FormItem>
                             )} />
@@ -289,6 +311,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                              <FormField control={form.control} name="siteSpecifications.typeOfRoad" render={({ field }) => (
                                 <FormItem><FormLabel>Access Road Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., Tar road, 4-lane access" /></FormControl><FormMessage /></FormItem>
                             )} />
+                             <Separator />
+                            <FormField control={form.control} name="buildingSpecifications.roofType" render={({ field }) => (<FormItem><FormLabel>Roof Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Galvalume">Galvalume</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="ACC">ACC</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="buildingSpecifications.eveHeightMeters" render={({ field }) => (<FormItem><FormLabel>Eve Height (in Meters)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                             <FormField control={form.control} name="buildingSpecifications.roofInsulation" render={({ field }) => (<FormItem><FormLabel>Roof Insulation</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Insulated">Insulated</SelectItem><SelectItem value="Non-Insulated">Non-Insulated</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="buildingSpecifications.ventilation" render={({ field }) => (<FormItem><FormLabel>Ventilation</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Turbo">Turbo</SelectItem><SelectItem value="Ridge">Ridge</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="buildingSpecifications.louvers" render={({ field }) => (<FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm"><FormLabel>Louvers</FormLabel><FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl></FormItem>)} />
                         </div>
                     </div>
                 </div>
@@ -327,6 +355,23 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                     ))}
                      <Button type="button" variant="outline" size="sm" onClick={() => append({ type: 'image', name: '', url: '' })}>
                         Add Document
+                    </Button>
+                 </div>
+              </div>
+               {/* Description */}
+              <div className="space-y-4">
+                 <FormLabel className="text-lg font-semibold">Description</FormLabel>
+                 <div className="p-4 border rounded-md space-y-2">
+                    <FormField control={form.control} name="description" render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Textarea {...field} placeholder="Describe the key features of your property, or generate one with AI." className="min-h-32"/>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                     )} />
+                    <Button type="button" variant="outline" onClick={handleGenerateDescription} disabled={isGenerating}>
+                        {isGenerating ? <><Sparkles className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : <><Wand2 className="mr-2 h-4 w-4" /> Generate with AI</>}
                     </Button>
                  </div>
               </div>

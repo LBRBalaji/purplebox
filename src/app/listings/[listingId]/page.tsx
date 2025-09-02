@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -171,7 +171,6 @@ export default function ListingDetailPage() {
                 'Availability': listing.availabilityDate,
                 'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
                 'Shop Floor Dimension': listing.buildingSpecifications.shopFloorLevelDimension,
-                'Roof Insulation': listing.buildingSpecifications.roofInsulationStatus,
                 'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
                 'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
                 'Outside Flooring': listing.siteSpecifications.typeOfFlooringOutside,
@@ -180,6 +179,11 @@ export default function ListingDetailPage() {
                 'Security Deposit (Months)': listing.rentalSecurityDeposit || 'Contact for details',
                 'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
                 'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
+                'Roof Type': listing.buildingSpecifications.roofType,
+                'Eve Height (M)': listing.buildingSpecifications.eveHeightMeters,
+                'Roof Insulation': listing.buildingSpecifications.roofInsulation,
+                'Ventilation': listing.buildingSpecifications.ventilation,
+                'Louvers': listing.buildingSpecifications.louvers ? 'Yes' : 'No',
             }];
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -316,8 +320,7 @@ export default function ListingDetailPage() {
                                             <h4 className="font-semibold mb-2">Building</h4>
                                             <Separator />
                                             <DetailRow label="Shop Floor Dimension" value={listing.buildingSpecifications.shopFloorLevelDimension} />
-                                            <DetailRow label="Roof Insulation" value={listing.buildingSpecifications.roofInsulationStatus} />
-                                            <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} />
+                                            {user && <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} />}
                                             {user && <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} />}
                                             {user && <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />}
                                             <DetailRow label="Crane Support Structure" value={listing.buildingSpecifications.craneSupportStructureAvailable} />
@@ -329,6 +332,17 @@ export default function ListingDetailPage() {
                                             <DetailRow label="Inside Flooring" value={listing.siteSpecifications.typeOfFlooringInside} />
                                             <DetailRow label="Outside Flooring" value={listing.siteSpecifications.typeOfFlooringOutside} />
                                             <DetailRow label="Access Road" value={listing.siteSpecifications.typeOfRoad} />
+                                        </div>
+                                        <div className="md:col-span-2 pt-4">
+                                             <h4 className="font-semibold mb-2">Roof</h4>
+                                            <Separator />
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                                                <DetailRow label="Roof Type" value={listing.buildingSpecifications.roofType} />
+                                                <DetailRow label="Eve Height" value={listing.buildingSpecifications.eveHeightMeters ? `${listing.buildingSpecifications.eveHeightMeters} m` : 'N/A'} />
+                                                <DetailRow label="Roof Insulation" value={listing.buildingSpecifications.roofInsulation} />
+                                                <DetailRow label="Ventilation" value={listing.buildingSpecifications.ventilation} />
+                                                <DetailRow label="Louvers" value={listing.buildingSpecifications.louvers} />
+                                            </div>
                                         </div>
                                     </div>
                                 </CardContent>

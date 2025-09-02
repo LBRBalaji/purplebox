@@ -1,7 +1,7 @@
 
 "use server";
 
-import { generatePropertyDescription, type GeneratePropertyDescriptionInput } from "@/ai/flows/generate-property-description";
+import { generateListingDescription, type GenerateListingDescriptionInput } from "@/ai/flows/generate-listing-description";
 import { improvePropertyDemandDescription, type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-property-demand";
 import { getPropertyMatchScore, type GetPropertyMatchScoreOutput, type GetPropertyMatchScoreInput } from "@/ai/flows/get-property-match-score";
 import { getWarehouses, type GetWarehousesInput, type GetWarehousesOutput } from "@/ai/flows/get-warehouses";
@@ -31,5 +31,18 @@ export async function logDemandAction(
     console.error("Error logging demand:", error);
     const e = error as Error;
     return { error: e.message || "An unexpected error occurred while logging the demand." };
+  }
+}
+
+export async function generateListingDescriptionAction(
+  input: GenerateListingDescriptionInput
+): Promise<{ generatedDescription?: string; error?: string }> {
+  try {
+    const result = await generateListingDescription(input);
+    return { generatedDescription: result.generatedDescription };
+  } catch (error) {
+    console.error("Error generating listing description:", error);
+    const e = error as Error;
+    return { error: e.message || "An unexpected error occurred while generating the description." };
   }
 }

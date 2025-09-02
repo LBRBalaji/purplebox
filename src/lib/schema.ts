@@ -54,10 +54,17 @@ export const listingSchema = z.object({
     numberOfDocksAndShutters: asOptionalField(z.coerce.number()),
     canopyDimension: z.string().optional(),
     naturalLightingAndVentilation: z.string().optional(),
-    roofInsulationStatus: z.string().optional(),
     internalLighting: z.string().optional(),
     craneSupportStructureAvailable: z.boolean().optional(),
     craneAvailable: z.boolean().optional(),
+    // New Roof Section
+    roofType: z.enum(['Galvalume', 'RCC', 'ACC']).optional(),
+    eveHeightMeters: asOptionalField(z.coerce.number()),
+    roofInsulation: z.enum(['Insulated', 'Non-Insulated']).optional(),
+    ventilation: z.enum(['Turbo', 'Ridge']).optional(),
+    louvers: z.boolean().optional(),
+    // Old Roof field - to be deprecated but kept for compatibility for now
+    roofInsulationStatus: z.string().optional(),
   }),
 
   // Site Specifications
