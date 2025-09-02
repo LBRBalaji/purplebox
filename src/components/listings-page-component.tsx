@@ -5,7 +5,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { type ListingSchema } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DownloadTermsDialog } from './download-terms-dialog';
+import { useRouter } from 'next/navigation';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
@@ -220,8 +221,9 @@ function DownloadBar() {
 
 export function ListingsPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const { toast } = useToast();
-  const { listings: allListings, selectedForDownload, toggleSelectedForDownload } = useData();
+  const { listings: allListings, selectedForDownload, toggleSelectedForDownload, isLoading: isDataLoading } = useData();
   const [filteredListings, setFilteredListings] = useState<ListingSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [availability, setAvailability] = useState('all');
@@ -317,6 +319,14 @@ export function ListingsPage() {
       });
   }
 
+  const handleLogDemandClick = () => {
+      if (!user) {
+        setIsLoginOpen(true);
+        return;
+      }
+      router.push('/dashboard?logNew=true');
+  }
+
   return (
     <>
     <main className="container mx-auto p-4 md:p-8">
@@ -402,7 +412,22 @@ export function ListingsPage() {
                 </div>
             </div>
 
-            {filteredListings.length > 0 ? (
+            {!isDataLoading && filteredListings.length === 0 ? (
+                <Card className="text-center p-12 col-span-full">
+                    <CardTitle>No Listings Match Your Search</CardTitle>
+                    <CardDescription className="mt-2 max-w-md mx-auto">
+                        We couldn't find any properties matching your current filters. You can adjust your search, or log a detailed demand and let our team find the perfect match for you.
+                    </CardDescription>
+                    <div className="mt-6 flex justify-center items-center gap-4">
+                        <Button onClick={resetFilters} variant="outline">
+                            <X className="mr-2 h-4 w-4" /> Clear All Filters
+                        </Button>
+                        <Button onClick={handleLogDemandClick}>
+                            <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand
+                        </Button>
+                    </div>
+                </Card>
+            ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredListings.map(listing => (
                         <ListingCard 
@@ -413,16 +438,6 @@ export function ListingsPage() {
                         />
                     ))}
                 </div>
-            ) : (
-                <Card className="text-center p-12 col-span-full">
-                    <CardTitle>No Listings Found</CardTitle>
-                    <CardDescription className="mt-2">
-                        No active listings match your current filters. Try adjusting your search criteria.
-                    </CardDescription>
-                     <Button onClick={resetFilters} variant="outline" className="mt-4">
-                        <X className="mr-2 h-4 w-4" /> Clear All Filters
-                    </Button>
-                </Card>
             )}
         </div>
     </main>
@@ -436,4 +451,3 @@ export function ListingsPage() {
     </>
   );
 }
-
