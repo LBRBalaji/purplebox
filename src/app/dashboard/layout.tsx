@@ -19,9 +19,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     if (!isLoading && user) {
         const isMainAdmin = user.email === 'admin@example.com';
+        const isO2OManager = user.role === 'O2O';
         
-        // Analytics is only for the main admin
-        if (pathname.startsWith('/dashboard/analytics') && !isMainAdmin) {
+        // Analytics is only for the main admin and O2O
+        if (pathname.startsWith('/dashboard/analytics') && !(isMainAdmin || isO2OManager)) {
             router.push('/dashboard');
         }
         

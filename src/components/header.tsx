@@ -35,8 +35,6 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const NavLink = ({ href, children, exact = false }: { href: string, children: React.ReactNode, exact?: boolean }) => {
     const pathname = usePathname();
-    // For the root path, we consider it active if it's the exact path.
-    // For other paths, we can check if the path starts with the href.
     const isActive = href === '/' ? pathname === href : pathname.startsWith(href);
     
     return (
@@ -126,13 +124,13 @@ export function Header() {
                             </NavLink>
                         )}
                         {isAdmin && (
-                            <>
-                                <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
-                                <AnalyticsDropdown />
-                            </>
+                            <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
                         )}
                          {(isAdmin || isO2O) && (
-                            <NavLink href="/dashboard/approval"><CheckCircle className="h-4 w-4" /> Approval Queue</NavLink>
+                            <>
+                                <NavLink href="/dashboard/approval"><CheckCircle className="h-4 w-4" /> Approval Queue</NavLink>
+                                <AnalyticsDropdown />
+                            </>
                          )}
                          {isProvider && !isAdmin && (
                             <NavLink href="/dashboard/manage-warehouses"><Warehouse className="h-4 w-4" /> Manage Warehouses</NavLink>

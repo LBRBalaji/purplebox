@@ -1,15 +1,58 @@
 
 'use client';
-import { useRouter } from 'next/navigation';
+
 import * as React from 'react';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart, List, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
-// This component now acts as a redirector to the default analytics page.
-export default function AnalyticsRedirectPage() {
-    const router = useRouter();
+export default function AnalyticsHubPage() {
 
-    React.useEffect(() => {
-        router.replace('/dashboard/analytics/listings');
-    }, [router]);
-    
-    return null; // Render nothing while redirecting
+    return (
+        <main className="container mx-auto p-4 md:p-8">
+            <div className="max-w-7xl mx-auto space-y-8">
+                <div className="mb-8">
+                    <h2 className="text-3xl font-bold font-headline tracking-tight">Analytics Hub</h2>
+                    <p className="text-muted-foreground mt-2">
+                        Select a dashboard to view performance metrics for listings and demands.
+                    </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <Link href="/dashboard/analytics/listings" className="group">
+                        <Card className="h-full hover:border-primary transition-colors">
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <BarChart className="text-primary" />
+                                        Listing Analytics
+                                    </CardTitle>
+                                    <CardDescription className="mt-2">
+                                        Track views, downloads, and user engagement with properties.
+                                    </CardDescription>
+                                </div>
+                                <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
+                            </CardHeader>
+                        </Card>
+                   </Link>
+                    <Link href="/dashboard/analytics/demands" className="group">
+                        <Card className="h-full hover:border-primary transition-colors">
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <List className="text-primary" />
+                                        Demand Analytics
+                                    </CardTitle>
+                                    <CardDescription className="mt-2">
+                                        Analyze demand trends, success rates, and customer activity.
+                                    </CardDescription>
+                                </div>
+                                 <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                </div>
+            </div>
+        </main>
+    )
 }
