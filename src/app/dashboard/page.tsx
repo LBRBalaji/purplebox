@@ -15,6 +15,7 @@ import { PropertyForm } from '@/components/property-form';
 import { AdminNotifier } from '@/components/admin-notifier';
 import { ApprovalQueue } from '@/components/approval-queue';
 import { useData } from '@/contexts/data-context';
+import { ProviderListings } from '@/components/provider-listings';
 
 const MainDashboard = () => {
     const { user } = useAuth();
