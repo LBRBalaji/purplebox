@@ -34,7 +34,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
           <div className="aspect-video relative mb-4 flex-grow">
             <Image
               src={previewImage}
-              alt={listing.location}
+              alt={listing.name}
               fill
               className="rounded-t-lg object-cover"
               data-ai-hint="modern warehouse"
