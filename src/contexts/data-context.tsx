@@ -276,7 +276,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             idsToClear.has(sub.submissionId) ? { ...sub, isNew: false } : sub
         )
     );
-  }
+  };
   
   const getTodaysTotalDownloads = (userId: string): number => {
     const now = new Date();
@@ -358,7 +358,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setSelectedForDownload(prev => prev.filter(item => item.listingId !== listing.listingId));
       return { limitReached: false };
     } else {
-      if (selectedForDownload.length >= 3) {
+      if (selectedForDownload.length >= 5) {
         return { limitReached: true };
       }
       setSelectedForDownload(prev => [...prev, listing]);

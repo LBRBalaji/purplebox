@@ -40,7 +40,7 @@ export function LimitExceededDialog({ isOpen, onOpenChange, location }: LimitExc
             </div>
             <DialogTitle className="text-center text-xl">Selection Limit Reached</DialogTitle>
             <DialogDescription className="text-center">
-                You have reached your selection limit of 3 properties. 
+                You have reached your selection limit of 5 properties. 
                 <br/><br/>
                 To get proposals for more properties that match your specific needs, please log a new demand.
             </DialogDescription>

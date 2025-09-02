@@ -5,7 +5,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -49,16 +49,16 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                 className="w-6 h-6 bg-background/80 hover:bg-background border-muted-foreground/50 data-[state=checked]:bg-primary"
             />
           </div>
+           {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
+            <Badge variant="secondary" className="absolute top-3 left-3 bg-amber-100 text-amber-800 border-amber-200">
+                <Star className="mr-1.5 h-3 w-3" />
+                3PL Operated
+            </Badge>
+        )}
         </div>
        </CardHeader>
        <CardContent className="flex-grow p-6 space-y-4">
         <div className="space-y-2">
-            {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
-                <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
-                    <Star className="mr-1.5 h-3 w-3" />
-                    3PL Operated
-                </Badge>
-            )}
             <CardTitle className="leading-tight">{listing.name}</CardTitle>
             <CardDescription className="flex items-center gap-1.5 pt-1">
                 <MapPin className="h-4 w-4" /> {listing.location}
@@ -331,15 +331,29 @@ export function ListingsPage() {
     <>
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-            <Alert className="mb-8 bg-primary/5 border-primary/20">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+             <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                     <div className="flex-grow">
                         <div className="flex items-center gap-3">
                             <Download className="h-5 w-5 text-primary/80" />
-                            <AlertTitle className="font-semibold text-primary/90">Ready to find your perfect space?</AlertTitle>
+                            <AlertTitle className="font-semibold text-primary/90 text-lg">Download up to 5 listings at once!</AlertTitle>
                         </div>
-                        <AlertDescription className="text-primary/80 mt-2 pl-8">
-                            Select up to 3 of your favorite listings to instantly download their details as a single file. For more tailored options, our demand-specific sourcing is always available.
+                        <AlertDescription className="text-primary/80 mt-2 pl-8 space-y-3">
+                           <p>Select your favorite listings to instantly download their details. For more tailored options, our demand-specific sourcing is always available.</p>
+                            <div className="flex flex-col md:flex-row gap-4 pt-2">
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Award className="h-5 w-5 text-amber-500" />
+                                    <div>
+                                        <span className="font-semibold">Zero Fee for Startups:</span> First deal is on us.
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Zap className="h-5 w-5 text-green-500" />
+                                    <div>
+                                        <span className="font-semibold">Zero Fee for Logistics Co:</span> All deals are on us.
+                                    </div>
+                                </div>
+                            </div>
                         </AlertDescription>
                     </div>
                     <Button onClick={handleLogDemandClick} size="sm" className="shrink-0 mt-2 sm:mt-0 ml-8 sm:ml-0">
