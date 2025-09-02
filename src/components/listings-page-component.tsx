@@ -24,6 +24,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DownloadTermsDialog } from './download-terms-dialog';
 import { useRouter } from 'next/navigation';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Skeleton } from './ui/skeleton';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
@@ -337,6 +338,65 @@ export function ListingsPage() {
     }
   };
 
+  const renderContent = () => {
+    if (isDataLoading) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="p-0">
+                <Skeleton className="w-full aspect-video" />
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              </CardContent>
+              <CardFooter className="p-6 pt-0">
+                <Skeleton className="h-10 w-full" />
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      );
+    }
+
+    if (filteredListings.length > 0) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredListings.map(listing => (
+            <ListingCard 
+              key={listing.listingId} 
+              listing={listing} 
+              isSelected={selectedIds.has(listing.listingId)}
+              onSelectionChange={handleSelectionChange}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    return (
+       <Card className="text-center p-12 col-span-full">
+          <CardTitle>No Listings Match Your Search</CardTitle>
+          <CardDescription className="mt-2 max-w-md mx-auto">
+              We couldn't find any properties matching your current filters. You can adjust your search, or log a detailed demand and let our team find the perfect match for you.
+          </CardDescription>
+          <div className="mt-6 flex justify-center items-center gap-4">
+              <Button onClick={resetFilters} variant="outline">
+                  <X className="mr-2 h-4 w-4" /> Clear All Filters
+              </Button>
+              <Button onClick={handleLogDemandClick}>
+                  <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand
+              </Button>
+          </div>
+      </Card>
+    );
+  };
+
   return (
     <>
     <main className="container mx-auto p-4 md:p-8">
@@ -443,34 +503,7 @@ export function ListingsPage() {
                     </Popover>
                 </div>
             </div>
-
-            {!isDataLoading && filteredListings.length === 0 ? (
-                <Card className="text-center p-12 col-span-full">
-                    <CardTitle>No Listings Match Your Search</CardTitle>
-                    <CardDescription className="mt-2 max-w-md mx-auto">
-                        We couldn't find any properties matching your current filters. You can adjust your search, or log a detailed demand and let our team find the perfect match for you.
-                    </CardDescription>
-                    <div className="mt-6 flex justify-center items-center gap-4">
-                        <Button onClick={resetFilters} variant="outline">
-                            <X className="mr-2 h-4 w-4" /> Clear All Filters
-                        </Button>
-                        <Button onClick={handleLogDemandClick}>
-                            <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand
-                        </Button>
-                    </div>
-                </Card>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredListings.map(listing => (
-                        <ListingCard 
-                            key={listing.listingId} 
-                            listing={listing} 
-                            isSelected={selectedIds.has(listing.listingId)}
-                            onSelectionChange={handleSelectionChange}
-                        />
-                    ))}
-                </div>
-            )}
+            {renderContent()}
         </div>
     </main>
      <DownloadBar />
@@ -483,3 +516,5 @@ export function ListingsPage() {
     </>
   );
 }
+
+    
