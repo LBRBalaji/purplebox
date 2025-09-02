@@ -556,9 +556,9 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                     </div>
                 </div>
                  <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-                    <Button variant="outline" size="icon" className="bg-background shadow-md" onClick={() => map?.setZoom((map.getZoom() || 10) + 1)}><ZoomIn/></Button>
-                    <Button variant="outline" size="icon" className="bg-background shadow-md" onClick={() => map?.setZoom((map.getZoom() || 10) - 1)}><ZoomOut/></Button>
-                    <Button variant={isMeasuring ? "default" : "outline"} size="icon" className="bg-background shadow-md" onClick={toggleMeasurement} title="Measure distance"><Ruler/></Button>
+                    <Button variant="outline" size="icon" className="bg-background shadow-md" onClick={() => map?.setZoom((map.getZoom() || 10) + 1)}><ZoomIn className="h-4 w-4"/></Button>
+                    <Button variant="outline" size="icon" className="bg-background shadow-md" onClick={() => map?.setZoom((map.getZoom() || 10) - 1)}><ZoomOut className="h-4 w-4"/></Button>
+                    <Button variant={isMeasuring ? "default" : "outline"} size="icon" className="bg-background shadow-md" onClick={toggleMeasurement} title="Measure distance"><Ruler className="h-4 w-4"/></Button>
                 </div>
                 {isMeasuring && (
                     <div className="absolute bottom-4 left-4 z-10 bg-background/80 backdrop-blur-sm p-3 rounded-lg shadow-md border">

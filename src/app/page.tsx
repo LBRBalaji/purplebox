@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { Building, Sparkles, Map, List, ArrowRight } from 'lucide-react';
+import { Building, Sparkles, Map, List, ArrowRight, Expand } from 'lucide-react';
 import Link from 'next/link';
 import { APIProvider, Map as GoogleMap, AdvancedMarker } from '@vis.gl/react-google-maps';
 import { useData } from '@/contexts/data-context';
@@ -55,11 +55,27 @@ function LandingMap() {
 export default function LandingPage() {
   return (
     <div className="flex-grow grid grid-cols-1 lg:grid-cols-[40%_60%]">
-        <div className="h-full w-full hidden lg:block">
+        <div className="h-full w-full hidden lg:block relative group">
           <LandingMap />
+          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button asChild variant="secondary" size="icon">
+                <Link href="/map-search">
+                    <Expand className="h-4 w-4" />
+                    <span className="sr-only">Expand Map</span>
+                </Link>
+            </Button>
+          </div>
         </div>
-        <div className="flex flex-col h-full overflow-y-auto">
+        <div className="flex flex-col h-full overflow-y-auto relative group">
           <ListingsPage />
+           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+            <Button asChild variant="secondary" size="icon">
+                <Link href="/listings">
+                    <Expand className="h-4 w-4" />
+                    <span className="sr-only">Expand Listings</span>
+                </Link>
+            </Button>
+          </div>
         </div>
     </div>
   );
