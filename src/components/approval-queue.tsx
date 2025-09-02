@@ -9,6 +9,7 @@ import { Button } from './ui/button';
 import { Check, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import type { ListingSchema, DemandSchema } from '@/lib/schema';
+import Link from 'next/link';
 
 
 export function ApprovalQueue() {
@@ -104,7 +105,7 @@ export function ApprovalQueue() {
                         <CardHeader>
                              <CardTitle>Review Submission for Demand: <span className="text-primary">{submission.demandId}</span></CardTitle>
                              <CardDescription>
-                                Submitted by: <span className="font-medium">{listing.developerName || submission.providerEmail}</span> for Listing: <span className="font-medium">{listing.listingId}</span>
+                                Submitted by: <span className="font-medium">{listing.developerName || submission.providerEmail}</span> for Listing: <Link href={`/listings/${listing.listingId}`} className="font-medium text-primary hover:underline" target='_blank'>{listing.name} ({listing.listingId})</Link>
                              </CardDescription>
                         </CardHeader>
                         <CardContent>

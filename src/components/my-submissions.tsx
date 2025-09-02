@@ -89,7 +89,7 @@ export function MySubmissions() {
                             <TableRow key={submission.submissionId}>
                                 <TableCell className="font-medium">{submission.demandId}</TableCell>
                                 <TableCell>
-                                    <Link href={`/listings/${listing.listingId}`} target="_blank" className="hover:underline">
+                                    <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-medium text-primary hover:underline">
                                         {listing.name}
                                     </Link>
                                     <p className="text-xs text-muted-foreground">{listing.listingId}</p>
@@ -118,5 +118,3 @@ export function MySubmissions() {
     </div>
   );
 }
-
-    

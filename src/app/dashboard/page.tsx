@@ -12,11 +12,13 @@ import { MySubmissions } from '@/components/my-submissions';
 import { ShortlistedProperties } from '@/components/shortlisted-properties';
 import { DemandList } from '@/components/demand-list';
 import { PropertyForm } from '@/components/property-form';
-import { ProviderListings } from '@/components/provider-listings';
 import { AdminNotifier } from '@/components/admin-notifier';
+import { ApprovalQueue } from '@/components/approval-queue';
+import { useData } from '@/contexts/data-context';
 
 const MainDashboard = () => {
     const { user } = useAuth();
+    const { submissions } = useData();
     const searchParams = useSearchParams();
     const logNewDemand = searchParams.get('logNew') === 'true';
     const editDemandId = searchParams.get('editDemandId');
@@ -28,8 +30,11 @@ const MainDashboard = () => {
 
     const [providerTab, setProviderTab] = React.useState('active-demands');
     const [tenantTab, setTenantTab] = React.useState('my-demands');
-    const [adminTab, setAdminTab] = React.useState('active-demands');
+    const [adminTab, setAdminTab] = React.useState('approval-queue');
 
+    const hasPendingSubmissions = React.useMemo(() => {
+        return submissions.some(s => s.status === 'Pending');
+    }, [submissions]);
 
     const handleSwitchToMyDemands = React.useCallback(() => {
         setTenantTab('my-demands');
@@ -80,16 +85,27 @@ const MainDashboard = () => {
       </Tabs>
     );
     
-    // Main Admin and O2O Manager now see the same core provider dashboard.
-    // Their special pages (User Mgmt, Analytics etc.) are accessed via the main site header.
+    // Main Admin and O2O Manager now see a more focused dashboard.
+    // Urgent tasks (approvals) are shown first.
     const renderAdminAndO2OContent = () => (
       <Tabs value={adminTab} onValueChange={setAdminTab}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="approval-queue">
+                Approval Queue 
+                {hasPendingSubmissions && <span className="ml-2 h-2 w-2 rounded-full bg-destructive animate-ping"></span>}
+            </TabsTrigger>
             <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
             <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
-        <TabsContent value="active-demands"><DemandList /></TabsContent>
-        <TabsContent value="submit-match"><PropertyForm /></TabsContent>
+        <TabsContent value="approval-queue">
+            <ApprovalQueue />
+        </TabsContent>
+        <TabsContent value="active-demands">
+            <DemandList />
+        </TabsContent>
+        <TabsContent value="submit-match">
+            <PropertyForm />
+        </TabsContent>
       </Tabs>
     );
     

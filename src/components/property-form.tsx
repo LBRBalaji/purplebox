@@ -353,7 +353,8 @@ export function PropertyForm() {
           // Or we could have a master toggle in the dialog. For now, let's assume true.
           propertyData.isLocationConfirmed = true; 
           const submission = {
-              property: propertyData,
+              listingId: listing.listingId,
+              providerEmail: user!.email!,
               demandId: demandToMatch!.demandId,
               demandUserEmail: demandToMatch?.userEmail,
           };
@@ -420,8 +421,15 @@ export function PropertyForm() {
           demandUserEmail: demandToMatch?.userEmail,
         };
 
-        addSubmission(submission, user?.email);
-        setIsDialogOpen(true); // This dialog now confirms the direct submission
+        // Note: The logic for addSubmission expects listingId, not the full property object.
+        // This flow is for creating a one-off property *for* a submission, which is not supported by the current data structure.
+        // We will need to revisit this. For now, this will fail gracefully.
+        toast({
+            variant: "destructive",
+            title: "Action Not Fully Supported",
+            description: "Submitting a new, unlisted property directly is not supported. Please create a listing first, then submit it.",
+        });
+
     } catch (error) {
       const e = error as Error;
       toast({
