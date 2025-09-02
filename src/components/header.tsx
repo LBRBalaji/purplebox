@@ -76,6 +76,35 @@ const AnalyticsDropdown = () => {
     )
 }
 
+const ToolsDropdown = () => {
+    const { user } = useAuth();
+    const pathname = usePathname();
+    const isActive = pathname.startsWith('/commercial-calculator') || pathname.startsWith('/listing-comparison');
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                 <button className={cn(
+                    "text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2",
+                     isActive && "text-primary"
+                )}>
+                    <Calculator className="h-4 w-4" /> Tools <ChevronDown className="h-4 w-4" />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
+                    <Link href="/commercial-calculator">Commercials Calculator</Link>
+                </DropdownMenuItem>
+                {user && (
+                  <DropdownMenuItem asChild>
+                      <Link href="/listing-comparison">Listing Comparison</Link>
+                  </DropdownMenuItem>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
 
 export function Header() {
   const { user, logout, isLoading } = useAuth();
@@ -119,12 +148,7 @@ export function Header() {
                         <NavLink href="/map-search">
                             <Map className="h-4 w-4" /> Map Search
                         </NavLink>
-                         <NavLink href="/commercial-calculator">
-                            <Calculator className="h-4 w-4" /> Commercials Calculator
-                         </NavLink>
-                         <NavLink href="/listing-comparison">
-                            <Users className="h-4 w-4" /> Listing Comparison
-                         </NavLink>
+                         <ToolsDropdown />
                          {!user && (
                             <NavLink href="/agent-signup">
                                 <UserPlus className="h-4 w-4" /> Agent Signup
