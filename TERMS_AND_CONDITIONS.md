@@ -1,14 +1,15 @@
-# Terms and Conditions for WareHouse Origin
+
+# Terms and Conditions for WareHouse
 
 **Last Updated:** [Date]
 
-Welcome to WareHouse Origin, a platform operated by LAKSHMI BALAJI O2O ("Company", "we", "us", or "our"). These Terms and Conditions ("Terms") govern your access to and use of our website, services, and platform (collectively, the "Service").
+Welcome to WareHouse, a platform operated by LAKSHMI BALAJI O2O ("Company", "we", "us", or "our"). These Terms and Conditions ("Terms") govern your access to and use of our website, services, and platform (collectively, the "Service").
 
 By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the Service.
 
 ### 1. Description of Service
 
-Lakshmi Balaji O2O is a real estate brokerage firm. This online platform, WareHouse Origin, is used to manage the marketing of warehouses and other properties, enabling customers to list their demands and source properties, and allowing developers to list their properties to connect with customers.
+Lakshmi Balaji Realty is a real estate brokerage firm and Lakshmi Balaji O2O is an Online to Offline Platform to simplify real estate transactions. This online platform, WareHouse, is used to manage the marketing of warehouses and other properties, enabling customers to list their demands and source properties, and allowing developers to list their properties to connect with customers.
 
 In addition to this platform, our services include, but are not limited to:
 - Facilitating site visits for customers.
@@ -26,7 +27,7 @@ You are responsible for safeguarding your account information and for all activi
 
 ### 3. Data Accuracy and Information Disclaimer
 
-The information provided on the WareHouse Origin platform, including but not limited to property listings, specifications, and availability, is provided by third-party Providers. While we strive to ensure the information is current, we do not independently verify the complete accuracy of all data.
+The information provided on the WareHouse platform, including but not limited to property listings, specifications, and availability, is provided by third-party Providers. While we strive to ensure the information is current, we do not independently verify the complete accuracy of all data.
 
 All users are encouraged to conduct their own due diligence and verify all information independently before entering into any transaction or agreement.
 
@@ -80,4 +81,4 @@ By continuing to access or use our Service after those revisions become effectiv
 
 ### 11. Contact Us
 
-If you have any questions about these Terms, please contact us at [Your Contact Email/Address].
+If you have any questions about these Terms, please contact us at balaji@lakshmibalajio2o.com
