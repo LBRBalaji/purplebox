@@ -1,10 +1,9 @@
-
 'use client';
 
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -83,6 +82,7 @@ export function Header() {
   const isAdmin = user?.email === 'admin@example.com';
   const isO2O = user?.role === 'O2O';
   const isProvider = user?.role === 'SuperAdmin';
+  const isCustomer = user?.role === 'User';
 
   return (
     <>
@@ -118,6 +118,11 @@ export function Header() {
                         <NavLink href="/map-search">
                             <Map className="h-4 w-4" /> Map Search
                         </NavLink>
+                         {isCustomer && (
+                            <NavLink href="/dashboard/commercial-calculator">
+                                <Calculator className="h-4 w-4" /> Commercials Calculator
+                            </NavLink>
+                         )}
                          {!user && (
                             <NavLink href="/agent-signup">
                                 <UserPlus className="h-4 w-4" /> Agent Signup
