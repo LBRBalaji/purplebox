@@ -344,13 +344,13 @@ export function ListingsPage() {
                                 <div className="flex items-center gap-2 text-sm">
                                     <Award className="h-5 w-5 text-amber-500" />
                                     <div>
-                                        <span className="font-semibold">Zero Fee for Startups:</span> First deal is on us.
+                                        <span className="font-semibold">Zero Brokerage Fee for Startups:</span> First deal is on us.
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                     <Zap className="h-5 w-5 text-green-500" />
                                     <div>
-                                        <span className="font-semibold">Zero Fee for Logistics Co:</span> All deals are on us.
+                                        <span className="font-semibold">Zero Brokerage Fee for Logistics Co:</span> All deals are on us.
                                     </div>
                                 </div>
                             </div>
