@@ -55,7 +55,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                         alt="Placeholder"
                         fill
                         className="object-cover"
-                        data-ai-hint="warehouse building"
+                        data-ai-hint="warehouse industrial building"
                       />
                     </div>
                   </CarouselItem>
@@ -275,7 +275,7 @@ export function ListingsPage() {
                 listing.availabilityDate,
                 listing.buildingSpecifications.buildingType,
                 listing.sizeSqFt.toString(),
-                (listing.serviceModel === '3PL' || listing.serviceModel === 'Both') ? "3pl operated" : ""
+                listing.serviceModel
             ].join(' ').toLowerCase();
             return searchHaystack.includes(searchTerm.toLowerCase());
         });

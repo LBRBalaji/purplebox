@@ -129,6 +129,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 fetch('/api/agent-leads'),
                 fetch('/api/listing-analytics')
             ]);
+            
+            if (!listingsRes.ok || !demandsRes.ok || !submissionsRes.ok || !agentLeadsRes.ok || !analyticsRes.ok) {
+                throw new Error('Failed to fetch initial data from one or more endpoints.');
+            }
 
             const listingsData = await listingsRes.json();
             const demandsData = await demandsRes.json();
@@ -147,6 +151,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         } catch (error) {
             console.error("Failed to fetch initial data:", error);
+             toast({
+                variant: 'destructive',
+                title: "Error Loading Data",
+                description: "Could not load initial platform data. Some features may be unavailable.",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -163,7 +172,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } catch (e) {
         console.error("Failed to parse data from local storage", e);
     }
-  }, []);
+  }, [toast]);
 
   const addListing = (listing: ListingSchema, userEmail?: string) => {
     const newListings = [{ ...listing, status: 'pending' as const }, ...listings];

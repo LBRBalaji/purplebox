@@ -80,7 +80,7 @@ export function ApprovalQueue() {
                     {
                         criterion: "Ceiling Height",
                         demand: `${demand.ceilingHeight || 'N/A'} ${demand.ceilingHeightUnit || 'ft'}`,
-                        property: `~${listing.buildingSpecifications.numberOfDocksAndShutters} ft`, // Mismatch in schema, using docks as placeholder
+                        property: `~${listing.area.plinthArea} ft`, // Mismatch in schema, using docks as placeholder
                     },
                     {
                         criterion: "Docks",

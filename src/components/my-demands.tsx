@@ -115,27 +115,17 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2 shrink-0">
-                       <div
-                          role="button"
-                          aria-label={`Edit demand ${demand.demandId}`}
-                          tabIndex={0}
-                          className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                       <Button
+                          variant="outline"
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             router.push(`/dashboard?editDemandId=${demand.demandId}`, { scroll: false });
                             onSwitchTab('log-demand');
                           }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              router.push(`/dashboard?editDemandId=${demand.demandId}`, { scroll: false });
-                              onSwitchTab('log-demand');
-                            }
-                          }}
                         >
                           <Pencil className="mr-2 h-4 w-4" /> Edit
-                        </div>
+                        </Button>
                       <Badge variant={demand.matches.length > 0 ? 'default' : 'secondary'} className="w-[110px] justify-center">
                         {demand.matches.length} {demand.matches.length === 1 ? 'Match' : 'Matches'}
                       </Badge>
