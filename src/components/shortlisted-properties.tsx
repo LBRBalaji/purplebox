@@ -27,6 +27,8 @@ export function ShortlistedProperties() {
         'Docks': item.property.docks,
         'Ceiling Height (ft)': item.property.ceilingHeight,
         'Rent (per Sq. Ft.)': item.property.rentPerSft,
+        'Crane Support Structure': item.property.optionals?.crane?.required ? 'Yes' : 'No', // Note: This mapping might need adjustment based on final schema
+        'Crane Available': item.property.optionals?.crane?.required ? 'Yes' : 'No', // Assuming if support is there, crane is available for simplicity
     }));
     
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);

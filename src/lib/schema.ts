@@ -50,6 +50,8 @@ export const listingSchema = z.object({
     naturalLightingAndVentilation: z.string().optional(),
     roofInsulationStatus: z.string().optional(),
     internalLighting: z.string().optional(),
+    craneSupportStructureAvailable: z.boolean().optional(),
+    craneAvailable: z.boolean().optional(),
   }),
 
   // Site Specifications

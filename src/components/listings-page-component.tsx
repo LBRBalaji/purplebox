@@ -138,6 +138,8 @@ function DownloadBar() {
                 'Outside Flooring': l.siteSpecifications.typeOfFlooringOutside,
                 'Access Road': l.siteSpecifications.typeOfRoad,
                 'Rent (per Sq. Ft.)': l.rentPerSqFt || 'Contact for details',
+                'Crane Support Structure': l.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
+                'Crane Available': l.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);

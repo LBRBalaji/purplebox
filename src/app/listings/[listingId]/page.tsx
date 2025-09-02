@@ -177,6 +177,8 @@ export default function ListingDetailPage() {
                 'Access Road': listing.siteSpecifications.typeOfRoad,
                 'Rent (per Sq. Ft.)': listing.rentPerSqFt || 'Contact for details',
                 'Security Deposit (Months)': listing.rentalSecurityDeposit || 'Contact for details',
+                'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
+                'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
             }];
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -290,6 +292,8 @@ export default function ListingDetailPage() {
                                             <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} />
                                             {user && <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} />}
                                             {user && <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />}
+                                            <DetailRow label="Crane Support Structure" value={listing.buildingSpecifications.craneSupportStructureAvailable} />
+                                            <DetailRow label="Crane Available" value={listing.buildingSpecifications.craneAvailable} />
                                         </div>
                                          <div>
                                             <h4 className="font-semibold mb-2">Site</h4>

@@ -76,7 +76,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
         driversRestRoomArea: undefined,
         totalChargeableArea: undefined,
       },
-      buildingSpecifications: {},
+      buildingSpecifications: {
+        craneSupportStructureAvailable: false,
+        craneAvailable: false,
+      },
       siteSpecifications: {},
       certificatesAndApprovals: {
         parkApproval: false,
@@ -107,6 +110,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 developerId: user?.email || '',
                 listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                 warehouseBoxId: `WBX-${user?.companyName?.substring(0,4).toUpperCase() || 'NEW'}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+                buildingSpecifications: {
+                    craneSupportStructureAvailable: false,
+                    craneAvailable: false,
+                },
                 certificatesAndApprovals: {
                   parkApproval: false,
                   buildingApproval: false,
@@ -231,6 +238,28 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                              <FormField control={form.control} name="buildingSpecifications.internalLighting" render={({ field }) => (
                                 <FormItem><FormLabel>Internal Lighting</FormLabel><FormControl><Input {...field} placeholder="e.g., LED High-bay, 200 LUX" /></FormControl><FormMessage /></FormItem>
                             )} />
+                            <FormField control={form.control} name="buildingSpecifications.craneSupportStructureAvailable" render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                  <div className="space-y-0.5">
+                                    <FormLabel>Crane Support Structure</FormLabel>
+                                  </div>
+                                  <FormControl>
+                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField control={form.control} name="buildingSpecifications.craneAvailable" render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                  <div className="space-y-0.5">
+                                    <FormLabel>Crane Available</FormLabel>
+                                  </div>
+                                  <FormControl>
+                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
                         </div>
                     </div>
                      <div className="space-y-4">
