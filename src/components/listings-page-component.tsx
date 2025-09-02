@@ -54,7 +54,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
        <CardContent className="flex-grow p-6 space-y-4">
         <div className="space-y-2">
             {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
-                <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20">
+                <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
                     <Star className="mr-1.5 h-3 w-3" />
                     3PL Operated
                 </Badge>
