@@ -303,9 +303,9 @@ export function ListingsPage() {
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className='w-full'>
-                        <h1 className="text-2xl font-bold font-headline tracking-tight">Search Warehouse Listings</h1>
+                        <h1 className="text-2xl font-bold font-headline tracking-tight">Search Listings</h1>
                         <p className="text-muted-foreground mt-1">
-                           Use our advanced filters to find the perfect warehouse for your needs.
+                           Use our advanced filters to find the perfect warehouse, 3PL Operated Warehouse and Industrial Buildings for your needs.
                         </p>
                     </div>
                 </div>
@@ -313,7 +313,7 @@ export function ListingsPage() {
                     <div className="relative flex-grow">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input 
-                            placeholder="Search by name, location, ID, size, or '3PL'..." 
+                            placeholder="Search by name, location, ID, size, or type (e.g. '3PL', 'Industrial')" 
                             className="pl-9"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
