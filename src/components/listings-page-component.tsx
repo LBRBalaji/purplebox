@@ -326,7 +326,7 @@ export function ListingsPage() {
                     <div className='w-full'>
                         <h1 className="text-2xl font-bold font-headline tracking-tight">Search Listings</h1>
                         <p className="text-muted-foreground mt-1">
-                           Use our advanced filters to find the perfect warehouse, 3PL Operated Warehouse and Industrial Buildings for your needs.
+                           Use our advanced filters to find the perfect Warehouse, 3PL Operated Warehouse and Industrial Buildings for your needs.
                         </p>
                     </div>
                 </div>
@@ -429,5 +429,3 @@ export function ListingsPage() {
     </>
   );
 }
-
-    
