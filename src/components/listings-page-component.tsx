@@ -459,7 +459,7 @@ export function ListingsPage() {
                     <div className="lg:col-span-2 space-y-2">
                         <label className="text-sm font-medium">Keyword Search</label>
                         <Input 
-                            placeholder="Search name, ID, type, height..."
+                            placeholder='e.g. "Oragadam", "LST-8K3", "12m eve height", or "3PL"'
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
