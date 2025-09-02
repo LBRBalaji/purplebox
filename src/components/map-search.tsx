@@ -289,6 +289,14 @@ function MapSearchContent({ mapId }: { mapId: string }) {
         
         const marker = new google.maps.Marker({
             position,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 8,
+              fillColor: 'hsl(var(--primary))',
+              fillOpacity: 0.8,
+              strokeColor: 'hsl(var(--primary-foreground))',
+              strokeWeight: 1.5,
+            },
         });
         marker.addListener('click', () => {
             setSelectedWarehouse(warehouse);
