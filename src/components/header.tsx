@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -120,6 +121,9 @@ export function Header() {
                         </NavLink>
                          <NavLink href="/commercial-calculator">
                             <Calculator className="h-4 w-4" /> Commercials Calculator
+                         </NavLink>
+                         <NavLink href="/listing-comparison">
+                            <Users className="h-4 w-4" /> Listing Comparison
                          </NavLink>
                          {!user && (
                             <NavLink href="/agent-signup">

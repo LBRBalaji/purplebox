@@ -26,11 +26,87 @@ import { useRouter } from 'next/navigation';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 
-function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
+function ListingCard({ listing }: { listing: ListingSchema }) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+
   const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
 
+  const handleDownloadClick = () => {
+    if (!user) {
+        setIsLoginOpen(true);
+        return;
+    }
+     if (user.role !== 'User') {
+      toast({
+        variant: 'destructive',
+        title: 'Download Not Available',
+        description: 'Only Customer accounts can download listings.',
+      });
+      return;
+    }
+    const hasAcceptedTerms = sessionStorage.getItem('warehouse_download_terms_accepted');
+    if (hasAcceptedTerms) {
+        proceedWithDownload();
+    } else {
+        setIsTermsOpen(true);
+    }
+  }
+
+  const onTermsAccept = () => {
+    sessionStorage.setItem('warehouse_download_terms_accepted', 'true');
+    setIsTermsOpen(false);
+    proceedWithDownload();
+  };
+
+  const proceedWithDownload = () => {
+    const dataToExport = [{
+        'Property ID': listing.listingId,
+        'Name': listing.name,
+        'Location': listing.location,
+        'Total Area (Sq. Ft.)': listing.sizeSqFt,
+        'Building Type': listing.buildingSpecifications.buildingType,
+        'Availability': listing.availabilityDate,
+        'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
+        'Shop Floor Dimension': listing.buildingSpecifications.shopFloorLevelDimension,
+        'Roof Insulation': listing.buildingSpecifications.roofInsulationStatus,
+        'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
+        'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
+        'Outside Flooring': listing.siteSpecifications.typeOfFlooringOutside,
+        'Access Road': listing.siteSpecifications.typeOfRoad,
+        'Rent (per Sq. Ft.)': listing.rentPerSqFt || 'Contact for details',
+        'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
+        'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
+    }];
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const footer = [
+        [],
+        ["For Leasing, Contact"],
+        ["Lakshmi Balaji Realty"],
+        ["Email: balaji@lakshmibalajio2o.com"],
+        ["Mobile: +91 98410 98170"],
+        [],
+        ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
+    ];
+    XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Listing Details");
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+    const filename = `Lakshmi_Balaji_O2O_Listing_${listing.listingId}_${timestamp}.csv`;
+    XLSX.writeFile(workbook, filename, { bookType: "csv" });
+    toast({
+        title: "Download Started",
+        description: `Details for ${listing.name} are being downloaded.`,
+    });
+  }
+
+
   return (
-    <Card className={cn("flex flex-col transition-all overflow-hidden group", isSelected && "ring-2 ring-primary")}>
+    <>
+    <Card className={cn("flex flex-col transition-all overflow-hidden group")}>
        <CardHeader className="p-0">
         <div className="relative">
             <Carousel className="w-full">
@@ -68,14 +144,6 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                   </>
               )}
             </Carousel>
-          <div className="absolute top-3 right-3 z-10">
-             <Checkbox
-                checked={isSelected}
-                onCheckedChange={() => onSelectionChange(listing)}
-                aria-label={`Select warehouse ${listing.name}`}
-                className="w-6 h-6 bg-background/80 hover:bg-background border-muted-foreground/50 data-[state=checked]:bg-primary"
-            />
-          </div>
         </div>
        </CardHeader>
        <CardContent className="flex-grow p-6 space-y-4">
@@ -112,178 +180,33 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                 <Calculator className="mr-2 h-4 w-4" /> Calculate
             </Link>
         </Button>
-        <Button asChild className="w-full">
+        <Button className="w-full" variant="outline" onClick={handleDownloadClick}>
+            <Download className="mr-2 h-4 w-4" /> Download
+        </Button>
+         <Button asChild className="w-full col-span-2">
             <Link href={`/listings/${listing.listingId}`} target="_blank">
-                View Details <ArrowRight className="ml-2 h-4 w-4" />
+                View Full Details <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
         </Button>
       </CardFooter>
     </Card>
+     <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
+     <DownloadTermsDialog isOpen={isTermsOpen} onOpenChange={setIsTermsOpen} onAccept={onTermsAccept} />
+    </>
   );
-}
-
-function DownloadBar() {
-    const { user } = useAuth();
-    const router = useRouter();
-    const { toast } = useToast();
-    const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
-    const [isLoginOpen, setIsLoginOpen] = useState(false);
-    const [isTermsOpen, setIsTermsOpen] = useState(false);
-
-    if (selectedForDownload.length === 0) {
-        return null;
-    }
-    
-    const handleLoginSuccess = () => {
-        setIsLoginOpen(false);
-        toast({
-            title: "Logged In Successfully",
-            description: "You can now proceed with your download or comparison."
-        })
-    }
-    
-    const handleCompare = () => {
-        if (selectedForDownload.length < 2) {
-             toast({
-                variant: 'destructive',
-                title: 'Select More Properties',
-                description: 'Please select at least two properties to compare.'
-            });
-            return;
-        }
-        const idsToCompare = selectedForDownload.map(l => l.listingId).join(',');
-        router.push(`/commercial-calculator?compare=${idsToCompare}`);
-    }
-
-    const proceedWithDownload = () => {
-        const { success } = logDownload(user!.email!);
-        if (success) {
-            const dataToExport = selectedForDownload.map(l => ({
-                'Property ID': l.listingId,
-                'Name': l.name,
-                'Location': l.location,
-                'Total Area (Sq. Ft.)': l.sizeSqFt,
-                'Building Type': l.buildingSpecifications.buildingType,
-                'Availability': l.availabilityDate,
-                'Docks': l.buildingSpecifications.numberOfDocksAndShutters,
-                'Shop Floor Dimension': l.buildingSpecifications.shopFloorLevelDimension,
-                'Roof Insulation': l.buildingSpecifications.roofInsulationStatus,
-                'Natural Light/Ventilation': l.buildingSpecifications.naturalLightingAndVentilation,
-                'Inside Flooring': l.siteSpecifications.typeOfFlooringInside,
-                'Outside Flooring': l.siteSpecifications.typeOfFlooringOutside,
-                'Access Road': l.siteSpecifications.typeOfRoad,
-                'Rent (per Sq. Ft.)': l.rentPerSqFt || 'Contact for details',
-                'Crane Support Structure': l.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
-                'Crane Available': l.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
-            }));
-
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            
-            const footer = [
-                [], // Empty row for spacing
-                ["For Leasing, Contact"],
-                ["Lakshmi Balaji Realty"],
-                ["Email: balaji@lakshmibalajio2o.com"],
-                ["Mobile: +91 98410 98170"],
-                [],
-                ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
-            ];
-            XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
-
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Listings");
-
-            const now = new Date();
-            const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
-            const filename = `Lakshmi_Balaji_O2O_Selected_Listings_${timestamp}.csv`;
-            
-            XLSX.writeFile(workbook, filename, { bookType: "csv" });
-
-            toast({
-                title: "Download Started",
-                description: `${selectedForDownload.length} listing(s) have been exported. This counts as one download for today.`
-            });
-             clearSelectedForDownload();
-        } else {
-             toast({
-                variant: 'destructive',
-                title: 'Daily Download Limit Reached',
-                description: `You have already downloaded twice today. Please try again tomorrow.`
-            });
-        }
-    }
-
-    const handleDownloadClick = () => {
-        if (!user) {
-            setIsLoginOpen(true);
-            return;
-        }
-
-        if (user.role !== 'User') {
-            toast({
-                variant: 'destructive',
-                title: 'Download Not Available',
-                description: 'Only Customer accounts can download listings.'
-            });
-            return;
-        }
-
-        const hasAcceptedTerms = sessionStorage.getItem('warehouse_download_terms_accepted');
-        if (hasAcceptedTerms) {
-            proceedWithDownload();
-        } else {
-            setIsTermsOpen(true);
-        }
-    };
-
-    const onTermsAccept = () => {
-        sessionStorage.setItem('warehouse_download_terms_accepted', 'true');
-        setIsTermsOpen(false);
-        proceedWithDownload();
-    };
-
-    return (
-        <>
-            <div className="fixed bottom-4 inset-x-0 z-50 flex justify-center">
-                <div className="flex items-center justify-between gap-6 p-4 rounded-lg shadow-2xl bg-card border w-full max-w-2xl animate-in slide-in-from-bottom-5">
-                    <p className="font-semibold text-sm">
-                        {selectedForDownload.length} listing{selectedForDownload.length > 1 ? 's' : ''} selected
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" onClick={clearSelectedForDownload}>
-                            <X className="mr-2 h-4 w-4" /> Clear
-                        </Button>
-                        <Button variant="outline" onClick={handleCompare}>
-                            <Users className="mr-2 h-4 w-4" /> Compare
-                        </Button>
-                        <Button onClick={handleDownloadClick}>
-                            <Download className="mr-2 h-4 w-4" /> Download
-                        </Button>
-                    </div>
-                </div>
-            </div>
-            <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess}/>
-            <DownloadTermsDialog isOpen={isTermsOpen} onOpenChange={setIsTermsOpen} onAccept={onTermsAccept} />
-        </>
-    )
 }
 
 export function ListingsPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { toast } = useToast();
-  const { listings: allListings, selectedForDownload, toggleSelectedForDownload, isLoading: isDataLoading } = useData();
+  const { listings: allListings, isLoading: isDataLoading } = useData();
   const [filteredListings, setFilteredListings] = useState<ListingSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
-  const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   
   const approvedListings = useMemo(() => allListings.filter(l => l.status === 'approved'), [allListings]);
-
-  const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.listingId)), [selectedForDownload]);
 
   useEffect(() => {
     let results = approvedListings;
@@ -336,38 +259,7 @@ export function ListingsPage() {
     const max = Math.max(...approvedListings.map(w => w.sizeSqFt), 0);
     return max > 0 ? Math.ceil(max / 100000) * 100000 : 1000000;
   }, [approvedListings]);
-
-  const handleSelectionChange = (listing: ListingSchema) => {
-    if (!user) {
-      setIsLoginOpen(true);
-      return;
-    }
-
-    if (user.role !== 'User') {
-      toast({
-        variant: 'destructive',
-        title: 'Selection Not Available',
-        description:
-          'While you can browse, only Customer accounts can select properties for download.',
-      });
-      return;
-    }
-    
-    const { limitReached } = toggleSelectedForDownload(listing);
-    if (limitReached) {
-      setLimitExceededLocation(listing.location); 
-      setIsLimitExceededDialogOpen(true);
-    }
-  };
-
-  const handleLoginSuccess = () => {
-      setIsLoginOpen(false);
-      toast({
-          title: "Logged In Successfully",
-          description: "You can now select properties to download."
-      });
-  }
-
+  
   const handleLogDemandClick = () => {
       if (!user) {
         setIsLoginOpen(true);
@@ -385,10 +277,10 @@ export function ListingsPage() {
                     <div className="flex-grow">
                         <div className="flex items-center gap-3">
                             <Download className="h-5 w-5 text-primary/80" />
-                            <AlertTitle className="font-semibold text-primary/90 text-lg">Select up to 5 listings to download or compare!</AlertTitle>
+                            <AlertTitle className="font-semibold text-primary/90 text-lg">Analyze listings with our powerful tools!</AlertTitle>
                         </div>
                         <AlertDescription className="text-primary/80 mt-2 pl-8 space-y-3">
-                           <p>Select your favorite listings to instantly download their details or run a side-by-side financial comparison.</p>
+                           <p>Use the "Calculate" button on any listing for a detailed financial breakdown, or visit our "Listing Comparison" page to analyze multiple properties side-by-side.</p>
                             <div className="flex flex-col md:flex-row gap-4 pt-2">
                                 <div className="flex items-center gap-2 text-sm">
                                     <Award className="h-5 w-5 text-amber-500" />
@@ -503,21 +395,13 @@ export function ListingsPage() {
                         <ListingCard 
                             key={listing.listingId} 
                             listing={listing} 
-                            isSelected={selectedIds.has(listing.listingId)}
-                            onSelectionChange={handleSelectionChange}
                         />
                     ))}
                 </div>
             )}
         </div>
     </main>
-    <DownloadBar />
-     <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess} />
-     <LimitExceededDialog 
-        isOpen={isLimitExceededDialogOpen} 
-        onOpenChange={setIsLimitExceededDialogOpen}
-        location={limitExceededLocation || ''}
-      />
+     <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
     </>
   );
 }

@@ -31,13 +31,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter as TableResultFooter } from "@/components/ui/table";
-import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown, Warehouse, Users, FileText, BarChart2, Download } from "lucide-react";
+import { Calculator, PlusCircle, Trash2, TrendingUp, HandCoins, Building, ArrowDown, Warehouse, Users, FileText, BarChart2, Download, Search, X } from "lucide-react";
 import { useData } from "@/contexts/data-context";
 import type { ListingSchema } from "@/lib/schema";
 import { Separator } from "./ui/separator";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { cn } from "@/lib/utils";
+import { Badge } from "./ui/badge";
 
 const areaSchema = z.object({
   name: z.string().min(1, "Area name is required."),
@@ -100,8 +103,11 @@ const addCsvFooter = (worksheet: XLSX.WorkSheet) => {
     XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 };
 
-function StandaloneCalculator() {
+export function CommercialCalculator() {
+    const { listings } = useData();
+    const searchParams = useSearchParams();
     const [result, setResult] = React.useState<StandaloneResult | null>(null);
+    const [selectedListingId, setSelectedListingId] = React.useState('');
 
     const form = useForm<StandaloneCalculatorValues>({
         resolver: zodResolver(standaloneCalculatorSchema),
@@ -119,11 +125,32 @@ function StandaloneCalculator() {
             securityDepositMonths: 6,
         },
     });
+    
+    React.useEffect(() => {
+        const compareId = searchParams.get('compare');
+        if (compareId) {
+            handleListingSelect(compareId);
+        }
+    }, [searchParams, listings]);
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: "deductibleAreas",
     });
+
+    const handleListingSelect = (listingId: string) => {
+        const listing = listings.find(l => l.listingId === listingId);
+        if (listing) {
+            form.reset({
+                ...form.getValues(),
+                grossArea: listing.sizeSqFt,
+                rentPerSft: listing.rentPerSqFt || 0,
+                securityDepositMonths: listing.rentalSecurityDeposit || 0,
+            });
+            setSelectedListingId(listingId);
+            setResult(null); // Clear previous results
+        }
+    };
 
     const onSubmit = (data: StandaloneCalculatorValues) => {
         const totalDeducted = data.deductibleAreas.reduce((sum, area) => sum + area.size, 0);
@@ -201,6 +228,21 @@ function StandaloneCalculator() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                 <div className="space-y-2">
+                    <Label>Pre-fill from an Existing Listing (Optional)</Label>
+                    <Select onValueChange={handleListingSelect} value={selectedListingId}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a warehouse listing..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                             {listings.filter(l => l.status === 'approved').map(listing => (
+                                <SelectItem key={listing.listingId} value={listing.listingId}>
+                                    {listing.name} ({listing.location})
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* INPUTS */}
                     <div className="space-y-6">
@@ -286,12 +328,11 @@ function StandaloneCalculator() {
     );
 }
 
-
-function ComparisonCalculator() {
+export function ComparisonCalculator() {
   const { listings } = useData();
-  const searchParams = useSearchParams();
   const [results, setResults] = React.useState<ComparisonResult[]>([]);
-  const [comparisonListings, setComparisonListings] = React.useState<ListingSchema[]>([]);
+  const [selectedListings, setSelectedListings] = React.useState<ListingSchema[]>([]);
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<ComparisonCalculatorValues>({
     resolver: zodResolver(comparisonCalculatorSchema),
@@ -301,18 +342,6 @@ function ComparisonCalculator() {
       escalationPercentage: 15,
     },
   });
-
-  React.useEffect(() => {
-    const compareIds = searchParams.get('compare')?.split(',') || [];
-    if (compareIds.length > 0) {
-        const foundListings = listings.filter(l => compareIds.includes(l.listingId));
-        setComparisonListings(foundListings);
-        if(foundListings.length > 0) {
-            onSubmit(form.getValues(), foundListings);
-        }
-    }
-  }, [searchParams, listings, form]);
-
 
   const onSubmit = (data: ComparisonCalculatorValues, listingsToCompare: ListingSchema[]) => {
     const newResults = listingsToCompare.map(listing => {
@@ -351,12 +380,11 @@ function ComparisonCalculator() {
             totalOutflow: totalOutflow.toFixed(2),
         }
     });
-
     setResults(newResults);
   }
 
   const handleFormSubmit = (data: ComparisonCalculatorValues) => {
-    onSubmit(data, comparisonListings);
+    onSubmit(data, selectedListings);
   }
 
     const handleDownload = () => {
@@ -397,63 +425,124 @@ function ComparisonCalculator() {
         XLSX.writeFile(workbook, generateCsvFilename("Comparison_Calculator"), { bookType: "csv" });
     };
 
-    if (comparisonListings.length === 0) {
-         return (
-            <div className="text-center p-12 border rounded-lg">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-xl font-semibold">Start Your Comparison</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Go to the listings page, select up to 5 properties, and click "Compare" to see your analysis here.</p>
-                <Button asChild className="mt-4">
-                    <a href="/">Browse Listings</a>
-                </Button>
-            </div>
-         );
+    const toggleListingSelection = (listing: ListingSchema) => {
+        setSelectedListings(prev => {
+            const isSelected = prev.some(l => l.listingId === listing.listingId);
+            if (isSelected) {
+                return prev.filter(l => l.listingId !== listing.listingId);
+            }
+            if (prev.length < 5) {
+                return [...prev, listing];
+            }
+            return prev; // Limit to 5
+        })
     }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl"><BarChart2 className="h-6 w-6 text-primary"/> Lease Outflow Comparison</CardTitle>
-             <CardDescription>Adjust the lease terms below to compare the financial outflow for your selected properties.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-4 items-end gap-x-8 gap-y-6">
-             <FormField control={form.control} name="leasePeriodYears" render={({ field }) => (
-                <FormItem><FormLabel>Lease Period (in years)</FormLabel><FormControl><Input type="number" placeholder="e.g., 5" {...field} /></FormControl><FormMessage /></FormItem>
-            )} />
-            <FormField control={form.control} name="escalationCycle" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rental Escalation Cycle</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl>
-                  <SelectContent>
-                    <SelectItem value="1">Every Year</SelectItem>
-                    <SelectItem value="2">Every 2 Years</SelectItem>
-                    <SelectItem value="3">Every 3 Years</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="escalationPercentage" render={({ field }) => (
-                <FormItem><FormLabel>Rental Escalation (%)</FormLabel><FormControl><Input type="number" placeholder="e.g., 15" {...field} /></FormControl><FormMessage /></FormItem>
-            )} />
-             <div className="flex items-center gap-2">
-                <Button type="submit" size="lg" className="w-full"><Calculator className="mr-2 h-4 w-4" /> Recalculate</Button>
-                 {results.length > 0 && (
-                    <Button type="button" size="lg" variant="outline" className="w-full" onClick={handleDownload}>
-                        <Download className="mr-2 h-4 w-4" /> Download
-                    </Button>
-                )}
-            </div>
-          </CardContent>
+         <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl"><Users className="h-6 w-6 text-primary"/> Select Properties to Compare</CardTitle>
+                <CardDescription>You can select up to 5 properties. The comparison table will appear below once you make a selection.</CardDescription>
+            </CardHeader>
+             <CardContent className="flex flex-col gap-4">
+                 <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={open}
+                            className="w-full justify-between"
+                        >
+                            {selectedListings.length > 0 ? `${selectedListings.length} selected` : "Select listings..."}
+                             <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                            <CommandInput placeholder="Search listings..." />
+                            <CommandList>
+                                <CommandEmpty>No listings found.</CommandEmpty>
+                                <CommandGroup>
+                                    {listings.filter(l=>l.status==='approved').map((listing) => (
+                                        <CommandItem
+                                            key={listing.listingId}
+                                            value={`${listing.name} ${listing.location} ${listing.listingId}`}
+                                            onSelect={() => {
+                                                toggleListingSelection(listing);
+                                                setOpen(true);
+                                            }}
+                                        >
+                                            <div className={cn("mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary", selectedListings.some(l => l.listingId === listing.listingId) ? "bg-primary text-primary-foreground" : "opacity-50 [&_svg]:invisible")}>
+                                                <Check className={cn("h-4 w-4")} />
+                                            </div>
+                                            <span>{listing.name} ({listing.location})</span>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+                 <div className="flex flex-wrap gap-2">
+                     {selectedListings.map(l => (
+                        <Badge key={l.listingId} variant="secondary" className="gap-1">
+                            {l.name}
+                            <button
+                                type="button"
+                                className="rounded-full hover:bg-muted-foreground/20 p-0.5"
+                                onClick={() => toggleListingSelection(l)}
+                            >
+                                <X className="h-3 w-3"/>
+                            </button>
+                        </Badge>
+                     ))}
+                 </div>
+             </CardContent>
         </Card>
+        
+        {selectedListings.length > 0 && (
+            <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl"><HandCoins className="h-6 w-6 text-primary"/> Lease Terms</CardTitle>
+                <CardDescription>Adjust the lease terms below to compare the financial outflow for your selected properties.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-4 items-end gap-x-8 gap-y-6">
+                <FormField control={form.control} name="leasePeriodYears" render={({ field }) => (
+                    <FormItem><FormLabel>Lease Period (in years)</FormLabel><FormControl><Input type="number" placeholder="e.g., 5" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="escalationCycle" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Rental Escalation Cycle</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl>
+                    <SelectContent>
+                        <SelectItem value="1">Every Year</SelectItem>
+                        <SelectItem value="2">Every 2 Years</SelectItem>
+                        <SelectItem value="3">Every 3 Years</SelectItem>
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )} />
+                <FormField control={form.control} name="escalationPercentage" render={({ field }) => (
+                    <FormItem><FormLabel>Rental Escalation (%)</FormLabel><FormControl><Input type="number" placeholder="e.g., 15" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <div className="flex items-center gap-2">
+                    <Button type="submit" size="lg" className="w-full" disabled={selectedListings.length === 0}><Calculator className="mr-2 h-4 w-4" /> Recalculate</Button>
+                </div>
+            </CardContent>
+            </Card>
+        )}
         
         {results.length > 0 && (
           <Card className="animate-in fade-in-0 duration-500">
-            <CardHeader>
+            <CardHeader className="flex flex-row justify-between items-center">
               <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary"/> Financial Analysis</CardTitle>
+               <Button type="button" size="sm" variant="outline" onClick={handleDownload}>
+                    <Download className="mr-2 h-4 w-4" /> Download Results
+                </Button>
             </CardHeader>
             <CardContent>
                 <div className="border rounded-md overflow-x-auto">
@@ -517,15 +606,4 @@ function ComparisonCalculator() {
       </form>
     </Form>
   );
-}
-
-export function CommercialCalculator() {
-    const searchParams = useSearchParams();
-    const compareIds = searchParams.get('compare');
-
-    return (
-        <div className="space-y-12">
-            {compareIds ? <ComparisonCalculator /> : <StandaloneCalculator />}
-        </div>
-    )
 }
