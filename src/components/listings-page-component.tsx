@@ -463,7 +463,7 @@ export function ListingsPage() {
                     <Download className="w-6 h-6"/>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight">Search-Select-Download</h1>
-                <p className="mt-4 text-lg text-muted-foreground">All the data you need, in a single CSV.</p>
+                <p className="mt-4 text-lg text-muted-foreground">Warehouse-Technical-Commercials, in a single CSV</p>
             </div>
              <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <div className="md:col-span-8">
@@ -563,4 +563,3 @@ export function ListingsPage() {
   );
 }
 
-    
