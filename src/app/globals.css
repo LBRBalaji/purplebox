@@ -91,6 +91,8 @@ body {
 @media print {
   body {
     background: white;
+    padding-top: 4rem; 
+    padding-bottom: 3rem;
   }
   
   header, footer, .no-print {
