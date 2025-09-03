@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, List, ArrowRight, Sparkles } from 'lucide-react';
+import { BarChart, List, ArrowRight, Sparkles, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AnalyticsHubPage() {
@@ -19,16 +19,16 @@ export default function AnalyticsHubPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <Link href="/dashboard/analytics/listings" className="group">
+                   <Link href="/dashboard/analytics/listings-performance" className="group">
                         <Card className="h-full hover:border-primary transition-colors">
                             <CardHeader className="flex flex-row items-center justify-between">
                                 <div>
                                     <CardTitle className="flex items-center gap-2">
                                         <BarChart className="text-primary" />
-                                        Listing Analytics
+                                        Listings Performance
                                     </CardTitle>
                                     <CardDescription className="mt-2">
-                                        Track views, downloads, and user engagement with properties.
+                                        Analyze views, downloads, and engagement with your properties.
                                     </CardDescription>
                                 </div>
                                 <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
@@ -62,7 +62,7 @@ export default function AnalyticsHubPage() {
                                         Predictive Demand Analytics (AI)
                                     </CardTitle>
                                     <CardDescription className="mt-2">
-                                        Leverage AI to analyze historical data and forecast future market trends, demand hotspots, and specification requirements.
+                                        Leverage AI to forecast future market trends, demand hotspots, and specification requirements.
                                     </CardDescription>
                                 </div>
                                  <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
