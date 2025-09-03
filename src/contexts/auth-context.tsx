@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 
 export type User = {
   email: string;
-  role: 'SuperAdmin' | 'User' | 'O2O';
+  role: 'SuperAdmin' | 'User' | 'O2O' | 'Warehouse Developer';
   companyName: string;
   userName: string;
   phone: string;
@@ -31,10 +31,10 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const defaultUsers: { [email: string]: User } = {
-  'admin@example.com': { email: 'admin@example.com', role: 'O2O', companyName: 'Origin Depot', userName: 'Platform Admin', phone: 'N/A' },
+  'superadmin@example.com': { email: 'superadmin@example.com', role: 'SuperAdmin', companyName: 'Origin Depot', userName: 'Platform Super Admin', phone: 'N/A' },
   'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test Customer', phone: '555-123-4567' },
   'logistics.pro@example.com': { email: 'logistics.pro@example.com', role: 'User', companyName: 'ProLogistics Solutions', userName: 'Sunil Patel', phone: '555-987-6543' },
-  'provider@example.com': { email: 'provider@example.com', role: 'SuperAdmin', companyName: 'Prime Properties', userName: 'Test Provider', phone: '555-111-2222' },
+  'provider@example.com': { email: 'provider@example.com', role: 'Warehouse Developer', companyName: 'Prime Properties', userName: 'Test Provider', phone: '555-111-2222' },
   'o2o@example.com': { email: 'o2o@example.com', role: 'O2O', companyName: 'Lakshmi Balaji O2O', userName: 'O2O Manager', phone: '555-020-0202' },
 };
 
@@ -185,11 +185,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteUser = (email: string) => {
-    if (email === 'admin@example.com') {
+    if (email === 'superadmin@example.com') {
         toast({
             variant: "destructive",
             title: "Action Forbidden",
-            description: "The main admin account cannot be deleted.",
+            description: "The super admin account cannot be deleted.",
         });
         return;
     }

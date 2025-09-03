@@ -80,17 +80,13 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <Button type="button" variant="outline" onClick={() => handleTestUserLogin('user@example.com')}>
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    Customer
-                </Button>
-                 <Button type="button" variant="outline" onClick={() => handleTestUserLogin('provider@example.com')}>
-                    <UserCog className="mr-2 h-4 w-4" />
-                    Property Provider
-                </Button>
-                 <Button type="button" variant="outline" className="col-span-2" onClick={() => handleTestUserLogin('o2o@example.com')}>
+                <Button type="button" variant="outline" onClick={() => handleTestUserLogin('o2o@example.com')}>
                     <Briefcase className="mr-2 h-4 w-4" />
                     O2O Manager
+                </Button>
+                 <Button type="button" variant="outline" onClick={() => handleTestUserLogin('superadmin@example.com')}>
+                    <UserCog className="mr-2 h-4 w-4" />
+                    O2O Super Admin
                 </Button>
             </div>
 
