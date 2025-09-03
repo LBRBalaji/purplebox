@@ -40,7 +40,43 @@
                 "status": "Pending"
             }
         ]
+    },
+    {
+        "id": "LDR-GLOBEX789",
+        "customerId": "logistics.pro@example.com",
+        "leadName": "Globex Corporation",
+        "leadContact": "Hank Scorpio",
+        "leadEmail": "h.scorpio@globex.com",
+        "leadPhone": "555-456-1234",
+        "requirementsSummary": "Requirement for a 50,000 sq.ft. 3PL-operated warehouse near Bhiwandi. Must have advanced security features and be ready for occupancy within 45 days. High priority.",
+        "registeredBy": "o2o@example.com",
+        "registeredAt": "2023-11-15T09:00:00Z",
+        "providers": [
+            {
+                "providerEmail": "provider@example.com",
+                "status": "Pending"
+            }
+        ]
+    },
+    {
+        "id": "LDR-CYBERDYNE",
+        "customerId": "user@example.com",
+        "leadName": "Cyberdyne Systems",
+        "leadContact": "Miles Dyson",
+        "leadEmail": "m.dyson@cyberdyne.net",
+        "leadPhone": "555-888-2029",
+        "requirementsSummary": "Build-to-Suit (BTS) requirement for a 200,000 sq.ft. R&D and light assembly facility. High power availability and fibre optic connectivity are critical.",
+        "registeredBy": "o2o@example.com",
+        "registeredAt": "2023-11-20T11:30:00Z",
+        "providers": [
+            {
+                "providerEmail": "provider@example.com",
+                "status": "Rejected",
+                "rejectionReason": "BTS requirement does not fit current portfolio."
+            }
+        ]
     }
 ]
 
     
+

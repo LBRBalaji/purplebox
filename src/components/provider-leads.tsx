@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck } from 'lucide-react';
+import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus } from '@/contexts/data-context';
@@ -21,6 +21,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: string } } = {
   Pending: { text: 'Pending Your Acknowledgment', color: 'bg-amber-100 text-amber-800' },
@@ -64,8 +75,8 @@ export function ProviderLeads() {
     if (!selectedLead || !user?.email) return;
     updateRegisteredLeadStatus(selectedLead.id, user.email, 'Acknowledged', details);
     toast({
-        title: 'Lead Acknowledged',
-        description: `Thank you for formally acknowledging the lead.`,
+        title: 'Lead Acknowledged!',
+        description: `Thank you for your confirmation. We look forward to a successful collaboration on this transaction.`,
     });
     setIsDialogOpen(false);
     setSelectedLead(null);
@@ -153,9 +164,35 @@ export function ProviderLeads() {
                                                     <Button size="sm" variant="outline" onClick={() => handleReject(lead.id, user!.email)}>
                                                         <X className="mr-2 h-4 w-4" /> Reject
                                                     </Button>
-                                                    <Button size="sm" onClick={() => handleAcknowledgeClick(lead)}>
-                                                        <Check className="mr-2 h-4 w-4" /> Acknowledge
-                                                    </Button>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button size="sm">
+                                                                <Check className="mr-2 h-4 w-4" /> Acknowledge
+                                                            </Button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle className="flex items-center gap-2">
+                                                                    <Handshake className="h-5 w-5 text-primary"/>
+                                                                    Confirm Lead Acknowledgment
+                                                                </AlertDialogTitle>
+                                                                <AlertDialogDescription className="text-left pt-2 space-y-3">
+                                                                    <p>
+                                                                        By proceeding, you are formally acknowledging this lead registration. This step confirms your agreement to collaborate with Lakshmi Balaji O2O on this transaction.
+                                                                    </p>
+                                                                    <p className="font-semibold text-foreground">
+                                                                        Please be aware that this action signifies the start of our professional engagement for this specific lead and is non-revocable.
+                                                                    </p>
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleAcknowledgeClick(lead)}>
+                                                                    I Understand, Proceed
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
                                                 </div>
                                             ) : (
                                                 <Button asChild variant="outline" size="sm">
