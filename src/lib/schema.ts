@@ -313,7 +313,10 @@ const negotiableTermSchema = z.object({
     details: z.string().optional(),
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
+    agreedTerms: z.string().optional(),
     remarks: z.string().optional(),
+    isCostFactor: z.boolean().default(false).optional(),
+    cost: z.coerce.number().optional(),
 }).optional();
 
 const customTermSchema = z.object({
@@ -321,11 +324,20 @@ const customTermSchema = z.object({
     details: z.string().optional(),
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
+    agreedTerms: z.string().optional(),
     remarks: z.string().optional(),
+    isCostFactor: z.boolean().default(false).optional(),
+    cost: z.coerce.number().optional(),
+});
+
+const negotiationSessionSchema = z.object({
+    date: z.string().datetime(),
+    attendees: z.string(),
 });
 
 
 export const commercialTermsSchema = z.object({
+    sessions: z.array(negotiationSessionSchema).optional(),
     siteInfo: z.object({
         postalAddress: negotiableTermSchema,
         buildingNumber: negotiableTermSchema,
@@ -372,6 +384,7 @@ export const commercialTermsSchema = z.object({
         commitmentPhase2: negotiableTermSchema,
         additionalCharges: negotiableTermSchema,
         capexItems: z.array(customTermSchema).optional(),
+        netCostPerMonth: z.number().optional(),
     }),
     electricalInfrastructure: z.object({
         installedCapacity: negotiableTermSchema,
