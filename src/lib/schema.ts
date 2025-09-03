@@ -43,7 +43,7 @@ export const listingSchema = z.object({
     mezzanineArea2: asOptionalField(z.coerce.number()),
     canopyArea: asOptionalField(z.coerce.number()),
     driversRestRoomArea: asOptionalField(z.coerce.number()),
-    totalChargeableArea: z.coerce.number().positive("Total area is required."),
+    totalChargeableArea: asOptionalField(z.coerce.number().positive("Total area is required.")),
   }),
 
   // Building Specifications
@@ -101,7 +101,6 @@ export const listingSchema = z.object({
 
 export type ListingSchema = z.infer<typeof listingSchema>;
 
-
 const optionalCraneSchema = z.object({
     required: z.boolean().default(false),
     type: z.enum(['EOT', 'Gantry']).optional(),
@@ -111,6 +110,21 @@ const optionalCraneSchema = z.object({
     underhookHeight: z.coerce.number().optional(),
     capacity: z.coerce.number().optional(),
 }).optional();
+
+export const GenerateListingDescriptionInputSchema = z.object({
+  propertyId: z.string().describe('The unique identifier for the property.'),
+  name: z.string().describe("The name of the warehouse or listing."),
+  location: z.string().describe('The geographical location of the property.'),
+  sizeSqFt: z.coerce.number().describe('The size of the property in square feet.'),
+  availabilityDate: z.string().describe('The readiness of the property for occupancy (e.g., "Ready for Occupancy").'),
+  serviceModel: z.enum(['Standard', '3PL', 'Both']).optional().describe('The service model (Standard warehouse, 3PL, or both).'),
+  rentPerSqFt: z.number().optional().describe('The rent per square foot.'),
+  buildingType: z.string().optional().describe('The type of building (e.g., "PEB").'),
+  roofType: z.string().optional().describe("The material and type of the roof."),
+  eveHeightMeters: z.number().optional().describe("The eve height in meters."),
+});
+export type GenerateListingDescriptionInput = z.infer<typeof GenerateListingDescriptionInputSchema>;
+
 
 // Function to dynamically create the property schema based on demand
 export const createPropertySchema = (demand?: DemandSchema) => {

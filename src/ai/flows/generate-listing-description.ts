@@ -11,21 +11,8 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-
-export const GenerateListingDescriptionInputSchema = z.object({
-  propertyId: z.string().describe('The unique identifier for the property.'),
-  name: z.string().describe("The name of the warehouse or listing."),
-  location: z.string().describe('The geographical location of the property.'),
-  sizeSqFt: z.coerce.number().describe('The size of the property in square feet.'),
-  availabilityDate: z.string().describe('The readiness of the property for occupancy (e.g., "Ready for Occupancy").'),
-  serviceModel: z.enum(['Standard', '3PL', 'Both']).optional().describe('The service model (Standard warehouse, 3PL, or both).'),
-  rentPerSqFt: z.number().optional().describe('The rent per square foot.'),
-  buildingType: z.string().optional().describe('The type of building (e.g., "PEB").'),
-  roofType: z.string().optional().describe("The material and type of the roof."),
-  eveHeightMeters: z.number().optional().describe("The eve height in meters."),
-});
-
-export type GenerateListingDescriptionInput = z.infer<typeof GenerateListingDescriptionInputSchema>;
+import { GenerateListingDescriptionInputSchema } from '@/lib/schema';
+import type { GenerateListingDescriptionInput } from '@/lib/schema';
 
 const GenerateListingDescriptionOutputSchema = z.object({
   generatedDescription: z.string().describe('The AI-generated description of the property.'),

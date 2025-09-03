@@ -1,7 +1,8 @@
 
 "use server";
 
-import { generateListingDescription, type GenerateListingDescriptionInput } from "@/ai/flows/generate-listing-description";
+import { generateListingDescription } from "@/ai/flows/generate-listing-description";
+import type { GenerateListingDescriptionInput } from "@/lib/schema";
 import { improvePropertyDemandDescription, type ImprovePropertyDemandDescriptionInput } from "@/ai/flows/improve-property-demand";
 import { getPropertyMatchScore, type GetPropertyMatchScoreOutput, type GetPropertyMatchScoreInput } from "@/ai/flows/get-property-match-score";
 import { getWarehouses, type GetWarehousesInput, type GetWarehousesOutput } from "@/ai/flows/get-warehouses";

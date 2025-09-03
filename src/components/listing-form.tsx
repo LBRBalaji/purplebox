@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from './ui/input';
-import { listingSchema, type ListingSchema } from '@/lib/schema';
+import { listingSchema, type ListingSchema, type GenerateListingDescriptionInput } from '@/lib/schema';
 import {
   Select,
   SelectContent,
@@ -40,7 +40,6 @@ import { Trash2, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { generateListingDescriptionAction } from "@/lib/actions";
-import type { GenerateListingDescriptionInput } from "@/ai/flows/generate-listing-description";
 import { Sparkles } from "lucide-react";
 
 
