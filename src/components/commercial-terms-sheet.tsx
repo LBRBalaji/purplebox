@@ -11,12 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from './ui/table';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
+import { Separator } from './ui/separator';
 
 const SectionHeader = ({ icon, title }: { icon: React.ElementType; title: string }) => {
     const Icon = icon;
@@ -75,32 +76,33 @@ const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch }: { na
     </TableRow>
 )};
 
-const CustomFormRow = ({ control, index, remove, isCostFactor, watch }: { control: any, index: number, remove: (index: number) => void, isCostFactor?: boolean, watch: any}) => {
-    const showCostInput = watch(`commercialTerms.capexItems.${index}.isCostFactor`);
+const CustomFormRow = ({ control, index, remove, isCostFactor, watch, arrayName }: { control: any, index: number, remove: (index: number) => void, isCostFactor?: boolean, watch: any, arrayName: string }) => {
+    const showCostInput = watch(`${arrayName}.${index}.isCostFactor`);
     return (
     <TableRow>
-        <TableCell><FormField control={control} name={`commercialTerms.capexItems.${index}.particulars`} render={({ field }) => <Input placeholder={`Custom Item ${index+1}`} {...field} />} /></TableCell>
-        <TableCell><FormField control={control} name={`commercialTerms.capexItems.${index}.details`} render={({ field }) => <Textarea placeholder="Details..." {...field} className="h-10 p-2"/>} /></TableCell>
-        <TableCell><FormField control={control} name={`commercialTerms.capexItems.${index}.proposedBy`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select> )} /></TableCell>
-        <TableCell><FormField control={control} name={`commercialTerms.capexItems.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select> )} /></TableCell>
+        <TableCell><FormField control={control} name={`${arrayName}.${index}.particulars`} render={({ field }) => <Input placeholder={`Custom Item ${index+1}`} {...field} />} /></TableCell>
+        <TableCell><FormField control={control} name={`${arrayName}.${index}.details`} render={({ field }) => <Textarea placeholder="Details..." {...field} className="h-10 p-2"/>} /></TableCell>
+        <TableCell><FormField control={control} name={`${arrayName}.${index}.proposedBy`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select> )} /></TableCell>
+        <TableCell><FormField control={control} name={`${arrayName}.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select> )} /></TableCell>
         <TableCell>
             <div className="flex items-center gap-2">
                 {isCostFactor && (
-                   <FormField control={control} name={`commercialTerms.capexItems.${index}.isCostFactor`} render={({ field }) => ( <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl> )} />
+                   <FormField control={control} name={`${arrayName}.${index}.isCostFactor`} render={({ field }) => ( <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl> )} />
                 )}
-                <FormField control={control} name={`commercialTerms.capexItems.${index}.agreedTerms`} render={({ field }) => (
+                <FormField control={control} name={`${arrayName}.${index}.agreedTerms`} render={({ field }) => (
                     <FormItem className="flex-grow"><FormControl><Input placeholder="Final terms..." {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 {showCostInput && (
-                   <FormField control={control} name={`commercialTerms.capexItems.${index}.cost`} render={({ field }) => (
+                   <FormField control={control} name={`${arrayName}.${index}.cost`} render={({ field }) => (
                        <FormItem><FormControl><Input type="number" placeholder="Cost" {...field} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} className="w-24"/></FormControl><FormMessage /></FormItem>
                    )}/>
                 )}
             </div>
         </TableCell>
-        <TableCell className="flex items-center gap-2"><FormField control={control} name={`commercialTerms.capexItems.${index}.remarks`} render={({ field }) => <Textarea placeholder="Remarks..." {...field} className="h-10 p-2 flex-grow"/>} /><Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
+        <TableCell className="flex items-center gap-2"><FormField control={control} name={`${arrayName}.${index}.remarks`} render={({ field }) => <Textarea placeholder="Remarks..." {...field} className="h-10 p-2 flex-grow"/>} /><Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
     </TableRow>
 )};
+
 
 export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
     const { listings, submissions } = useData();
@@ -121,8 +123,11 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
      const { fields: tenantImprovementFields, append: appendTenantImprovement, remove: removeTenantImprovement } = useFieldArray({ name: "tenantImprovements.customItems", control: form.control });
      const { fields: leaseTermFields, append: appendLeaseTerm, remove: removeLeaseTerm } = useFieldArray({ name: "leaseTerms.customItems", control: form.control });
      const { fields: capexFields, append: appendCapex, remove: removeCapex } = useFieldArray({ name: "commercialTerms.capexItems", control: form.control });
-     const { fields: sessionFields, append: appendSession } = useFieldArray({ name: "sessions", control: form.control });
+     const { fields: sessionFields, append: appendSession, remove: removeSession } = useFieldArray({ name: "sessions", control: form.control });
 
+     const { fields: customerFields, append: appendCustomer, remove: removeCustomer } = useFieldArray({ name: `sessions.${sessionFields.length - 1}.customerAttendees`, control: form.control });
+     const { fields: providerFields, append: appendProvider, remove: removeProvider } = useFieldArray({ name: `sessions.${sessionFields.length - 1}.providerAttendees`, control: form.control });
+     const { fields: facilitatorFields, append: appendFacilitator, remove: removeFacilitator } = useFieldArray({ name: `sessions.${sessionFields.length - 1}.facilitatorAttendees`, control: form.control });
 
     React.useEffect(() => {
         if (primaryListing) {
@@ -207,9 +212,13 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
 
         console.log("Generated Follow-up Sheet Data:", newSheetData);
         alert("Check the console for the generated follow-up sheet data. In a real app, this would create a new version.");
-        // In a real application, you would probably save this as a new version or update the UI state.
-        // For now, we'll just log it.
     }
+    
+    const handleFinalizeMoM = () => {
+        const momData = form.getValues();
+        console.log("Finalized Minutes of Meeting:", momData);
+        alert("Minutes of Meeting finalized. Check the console for the data object that would be shared/stored.");
+    };
 
     return (
         <Form {...form}>
@@ -229,7 +238,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                     <FileSymlink className="mr-2 h-4 w-4" />
                                     Generate Follow-up
                                 </Button>
-                                <Button type="button" onClick={() => appendSession({ date: new Date().toISOString(), attendees: '' })}>
+                                <Button type="button" onClick={() => appendSession({ date: new Date().toISOString(), venue: '', customerAttendees: [], providerAttendees: [], facilitatorAttendees: [] })}>
                                     <Calendar className="mr-2 h-4 w-4"/>
                                     Add Session
                                 </Button>
@@ -240,14 +249,52 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                         {sessionFields.length > 0 && (
                             <div className="space-y-4 mb-6">
                                 {sessionFields.map((field, index) => (
-                                    <div key={field.id} className="p-3 border rounded-lg bg-secondary/50">
+                                    <div key={field.id} className="p-4 border rounded-lg bg-secondary/50 space-y-4">
                                         <div className="flex justify-between items-center">
                                             <p className="font-semibold text-sm">Negotiation Session {index + 1}: {new Date(form.watch(`sessions.${index}.date`)).toLocaleString()}</p>
-                                             <Button type="button" variant="ghost" size="icon" onClick={() => console.log('This would remove a session')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                             <Button type="button" variant="ghost" size="icon" onClick={() => removeSession(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                         </div>
-                                        <FormField control={form.control} name={`sessions.${index}.attendees`} render={({ field }) => (
-                                            <FormItem className="mt-2"><FormLabel className="text-xs">Attendees</FormLabel><FormControl><Input placeholder="e.g., John (Customer), Jane (Provider)" {...field} /></FormControl></FormItem>
-                                        )} />
+                                         <Separator />
+                                         <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} /></FormControl></FormItem> )} />
+                                        
+                                        {/* Customer Attendees */}
+                                        <div className="space-y-2">
+                                            <FormLabel>Customer Represented By</FormLabel>
+                                            {customerFields.map((item, cIndex) => (
+                                                <div key={item.id} className="flex items-center gap-2">
+                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
+                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                </div>
+                                            ))}
+                                            <Button type="button" size="sm" variant="outline" onClick={() => appendCustomer({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                        </div>
+                                        
+                                         {/* Provider Attendees */}
+                                        <div className="space-y-2">
+                                            <FormLabel>Provider Represented By</FormLabel>
+                                            {providerFields.map((item, pIndex) => (
+                                                <div key={item.id} className="flex items-center gap-2">
+                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
+                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                </div>
+                                            ))}
+                                            <Button type="button" size="sm" variant="outline" onClick={() => appendProvider({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                        </div>
+
+                                        {/* Facilitator Attendees */}
+                                        <div className="space-y-2">
+                                            <FormLabel>Transaction Facilitated By</FormLabel>
+                                            {facilitatorFields.map((item, fIndex) => (
+                                                <div key={item.id} className="flex items-center gap-2">
+                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
+                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                </div>
+                                            ))}
+                                            <Button type="button" size="sm" variant="outline" onClick={() => appendFacilitator({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -283,19 +330,19 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                 <TableRow><SectionHeader icon={HardHat} title="Tenant Improvement Items" /></TableRow>
                                 <FormRow name="tenantImprovements.electricityPower" label="Electricity Power" control={form.control} watch={form.watch}/>
                                 <FormRow name="tenantImprovements.internalCabling" label="Internal Cabling & Power Gear" control={form.control} watch={form.watch}/>
-                                {tenantImprovementFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeTenantImprovement} watch={form.watch} /> ))}
+                                {tenantImprovementFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeTenantImprovement} watch={form.watch} arrayName="tenantImprovements.customItems" /> ))}
                                 <TableRow><TableCell colSpan={6}><Button type="button" variant="outline" size="sm" onClick={() => appendTenantImprovement({ particulars: '' })}><PlusCircle className="mr-2 h-4 w-4"/> Add Improvement Item</Button></TableCell></TableRow>
 
                                 <TableRow><SectionHeader icon={ListChecks} title="Lease Terms" /></TableRow>
                                 <FormRow name="leaseTerms.leaseTenure" label="Lease Tenure" control={form.control} watch={form.watch}/>
-                                {leaseTermFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeLeaseTerm} watch={form.watch} /> ))}
+                                {leaseTermFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeLeaseTerm} watch={form.watch} arrayName="leaseTerms.customItems" /> ))}
                                 <TableRow><TableCell colSpan={6}><Button type="button" variant="outline" size="sm" onClick={() => appendLeaseTerm({ particulars: '' })}><PlusCircle className="mr-2 h-4 w-4"/> Add Lease Term</Button></TableCell></TableRow>
 
                                 <TableRow><SectionHeader icon={HandCoins} title="Commercial Terms" /></TableRow>
                                 <FormRow name="commercialTerms.chargeableArea" label="Chargeable Area (SFT)" control={form.control} watch={form.watch}/>
                                 <FormRow name="commercialTerms.buildingRentPerSft" label="Building Rent per SFT (INR)" control={form.control} isCostFactor watch={form.watch}/>
                                 <FormRow name="commercialTerms.totalRentPerMonth" label="Total Rent per Month (INR)" control={form.control} isCostFactor watch={form.watch}/>
-                                {capexFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeCapex} isCostFactor watch={form.watch} /> ))}
+                                {capexFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeCapex} isCostFactor watch={form.watch} arrayName="commercialTerms.capexItems" /> ))}
                                 <TableRow><TableCell colSpan={6}><Button type="button" variant="outline" size="sm" onClick={() => appendCapex({ particulars: '' })}><PlusCircle className="mr-2 h-4 w-4"/> Add CAPEX Item</Button></TableCell></TableRow>
                                 <FormRow name="commercialTerms.camCharges" label="CAM Charges per SFT" control={form.control} isCostFactor watch={form.watch}/>
                                 <FormRow name="commercialTerms.ifrsd" label="IFRSD (Security Deposit)" control={form.control} watch={form.watch}/>
@@ -332,7 +379,10 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                 )}
                             />
                         </div>
-                         <Button type="submit"><Save className="mr-2 h-4 w-4" /> Save Commercial Terms</Button>
+                         <div className="flex items-center gap-2">
+                             <Button type="submit" variant="secondary"><Save className="mr-2 h-4 w-4" /> Save Draft</Button>
+                             <Button type="button" onClick={handleFinalizeMoM}><Share className="mr-2 h-4 w-4" /> Finalize as MoM</Button>
+                         </div>
                     </CardFooter>
                 </Card>
             </form>

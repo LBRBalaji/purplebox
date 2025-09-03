@@ -330,9 +330,17 @@ const customTermSchema = z.object({
     cost: z.coerce.number().optional(),
 });
 
+const attendeeSchema = z.object({
+    name: z.string().optional(),
+    title: z.string().optional(),
+});
+
 const negotiationSessionSchema = z.object({
     date: z.string().datetime(),
-    attendees: z.string(),
+    venue: z.string().optional(),
+    customerAttendees: z.array(attendeeSchema).optional(),
+    providerAttendees: z.array(attendeeSchema).optional(),
+    facilitatorAttendees: z.array(attendeeSchema).optional(),
 });
 
 
