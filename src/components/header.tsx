@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator, UserCheck } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator, UserCheck, FileText } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -87,7 +87,7 @@ const AnalyticsDropdown = () => {
 const ToolsDropdown = () => {
     const { user } = useAuth();
     const pathname = usePathname();
-    const isActive = pathname.startsWith('/commercial-calculator') || pathname.startsWith('/listing-comparison');
+    const isActive = pathname.startsWith('/commercial-calculator') || pathname.startsWith('/listing-comparison') || pathname.startsWith('/registration-calculator');
 
     return (
         <DropdownMenu>
@@ -108,6 +108,9 @@ const ToolsDropdown = () => {
                       <Link href="/listing-comparison">Commercials Comparison For Listings</Link>
                   </DropdownMenuItem>
                 )}
+                 <DropdownMenuItem asChild>
+                    <Link href="/registration-calculator">Registration Charges Calculator</Link>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
