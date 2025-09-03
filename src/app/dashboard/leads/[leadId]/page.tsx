@@ -97,7 +97,7 @@ export default function LeadDetailPage() {
             </Button>
             <h2 className="text-3xl font-bold font-headline tracking-tight">Lead Transaction Details</h2>
             <p className="text-muted-foreground mt-2">
-                Tracking all activities for Lead ID: <span className="font-mono text-primary">{lead.id}</span>
+                Tracking all activities for Transaction ID: <span className="font-mono text-primary">{lead.id}</span>
             </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
