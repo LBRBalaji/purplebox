@@ -244,7 +244,11 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                     capexItems: [],
                     netCostPerMonth: 0,
                 },
-                leaseTerms: { customItems: [] },
+                leaseTerms: {
+                    leaseTenure: { agreedTerms: '5 years'},
+                    rentEscalation: { agreedTerms: '15% every 3 years'},
+                    customItems: [] 
+                },
                 tenantImprovements: { customItems: [] },
                 sessions: [],
                 actionableItems: [],
