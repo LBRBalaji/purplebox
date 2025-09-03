@@ -58,28 +58,53 @@ export default function SearchConsolePage() {
         let foundListings = new Set<ListingSchema>();
         let foundDemands = new Set<DemandSchema>();
 
-        // Step 1: Direct Search
+        // Step 1: Direct Search with Comprehensive Haystack
         Object.values(allUsers).forEach(u => {
-            if (u.userName.toLowerCase().includes(lowerCaseSearch) || 
-                u.companyName.toLowerCase().includes(lowerCaseSearch) ||
-                u.email.toLowerCase().includes(lowerCaseSearch)) {
+            const userHaystack = [
+                u.userName,
+                u.companyName,
+                u.email,
+                u.phone,
+                u.role
+            ].join(' ').toLowerCase();
+
+            if (userHaystack.includes(lowerCaseSearch)) {
                 foundUsers.add(u);
             }
         });
 
         listings.forEach(l => {
-            if (l.listingId.toLowerCase().includes(lowerCaseSearch) || 
-                l.name.toLowerCase().includes(lowerCaseSearch) ||
-                l.location.toLowerCase().includes(lowerCaseSearch)) {
+            const listingHaystack = [
+                l.listingId,
+                l.name,
+                l.location,
+                l.description,
+                l.buildingSpecifications.buildingType,
+                l.serviceModel,
+                l.availabilityDate,
+                l.status,
+                l.developerName
+            ].join(' ').toLowerCase();
+
+            if (listingHaystack.includes(lowerCaseSearch)) {
                 foundListings.add(l);
             }
         });
 
         demands.forEach(d => {
-            if (d.demandId.toLowerCase().includes(lowerCaseSearch) ||
-                d.locationName?.toLowerCase().includes(lowerCaseSearch) ||
-                d.companyName.toLowerCase().includes(lowerCaseSearch) ||
-                d.userName.toLowerCase().includes(lowerCaseSearch)) {
+             const demandHaystack = [
+                d.demandId,
+                d.locationName,
+                d.companyName,
+                d.userName,
+                d.userEmail,
+                d.operationType,
+                d.description,
+                d.buildingType,
+                d.readiness
+            ].join(' ').toLowerCase();
+
+            if (demandHaystack.includes(lowerCaseSearch)) {
                 foundDemands.add(d);
             }
         });
@@ -109,10 +134,16 @@ export default function SearchConsolePage() {
             if (demandIds.has(sub.demandId)) {
                 const listing = listings.find(l => l.listingId === sub.listingId);
                 if(listing) foundListings.add(listing);
+                const provider = Object.values(allUsers).find(u => u.email === sub.providerEmail);
+                if (provider) foundUsers.add(provider);
             }
             if (listingIds.has(sub.listingId)) {
                 const demand = demands.find(d => d.demandId === sub.demandId);
-                if (demand) foundDemands.add(demand);
+                if (demand) {
+                    foundDemands.add(demand);
+                    const customer = Object.values(allUsers).find(u => u.email === demand.userEmail);
+                    if (customer) foundUsers.add(customer);
+                }
             }
         });
 
@@ -137,13 +168,13 @@ export default function SearchConsolePage() {
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold font-headline tracking-tight">Admin Search Console</h1>
                     <p className="text-muted-foreground mt-2">
-                        Enter a Listing ID, Demand ID, Customer/Provider Name or Email to track all related data.
+                        Enter a Listing ID, Demand ID, Customer/Provider Name, Email, or any keyword to track all related data.
                     </p>
                 </div>
                 
                 <form onSubmit={handleSearch} className="flex gap-2 mb-8">
                     <Input 
-                        placeholder="Search by ID, name, or email..." 
+                        placeholder="Search by any keyword..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="text-lg h-12"
