@@ -1,4 +1,3 @@
-
 // src/app/dashboard/analytics/predictive/page.tsx
 'use client';
 
@@ -35,7 +34,7 @@ export default function PredictiveAnalyticsPage() {
     // State for filters
     const [timeHorizon, setTimeHorizon] = React.useState<PredictDemandTrendsInput['timeHorizon']>('next quarter');
     const [location, setLocation] = React.useState('');
-    const [buildingType, setBuildingType] = React.useState('Any');
+    const [buildingType, setBuildingType] = React.useState<PredictDemandTrendsInput['buildingType']>('Any');
 
     React.useEffect(() => {
         if (!isAuthLoading && user?.email !== 'admin@example.com' && user?.role !== 'O2O') {
@@ -102,7 +101,7 @@ export default function PredictiveAnalyticsPage() {
                         </div>
                         <div className="space-y-2">
                              <Label htmlFor="building-type">Building Type (Optional)</Label>
-                            <Select onValueChange={setBuildingType} defaultValue={buildingType}>
+                            <Select onValueChange={(value) => setBuildingType(value as any)} defaultValue={buildingType}>
                                 <SelectTrigger id="building-type"><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Any">Any</SelectItem>
