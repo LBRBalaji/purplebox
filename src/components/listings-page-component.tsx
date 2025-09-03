@@ -5,7 +5,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare, Smile } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,6 +25,7 @@ import { DownloadTermsDialog } from './download-terms-dialog';
 import { useRouter } from 'next/navigation';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Skeleton } from './ui/skeleton';
+import { Label } from './ui/label';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
@@ -34,14 +35,6 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
     <Card className={cn("flex flex-col transition-all overflow-hidden group", isSelected && "ring-2 ring-primary")}>
        <CardHeader className="p-0">
         <div className="relative">
-            <div className="absolute top-2 right-2 z-10 bg-background/50 backdrop-blur-sm rounded-full">
-                <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={() => onSelectionChange(listing)}
-                    aria-label={`Select warehouse ${listing.listingId}`}
-                    className="w-6 h-6"
-                />
-            </div>
             <Carousel className="w-full">
               <CarouselContent>
                 {listing.documents && listing.documents.filter(d => d.type === 'image').length > 0 ? listing.documents.filter(d => d.type === 'image').map((doc, index) => (
@@ -80,18 +73,32 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
         </div>
        </CardHeader>
        <CardContent className="flex-grow p-6 space-y-4">
-        {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
-            <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 mb-2">
-                <Star className="mr-1.5 h-3 w-3" />
-                3PL Operated
-            </Badge>
-        )}
-        <div className="space-y-2">
-            <CardTitle className="leading-tight">{listing.name}</CardTitle>
-            <CardDescription className="flex items-center gap-1.5 pt-1">
-                <MapPin className="h-4 w-4" /> {listing.location}
-            </CardDescription>
+        <div className="flex justify-between items-start gap-4">
+            <div className="flex-grow space-y-2">
+                {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 mb-2">
+                        <Star className="mr-1.5 h-3 w-3" />
+                        3PL Operated
+                    </Badge>
+                )}
+                <CardTitle className="leading-tight">{listing.name}</CardTitle>
+                <CardDescription className="flex items-center gap-1.5 pt-1">
+                    <MapPin className="h-4 w-4" /> {listing.location}
+                </CardDescription>
+            </div>
+             <div className="flex items-center space-x-2 shrink-0 pt-1">
+                <Checkbox
+                    id={`select-${listing.listingId}`}
+                    checked={isSelected}
+                    onCheckedChange={() => onSelectionChange(listing)}
+                    aria-label={`Select warehouse ${listing.listingId}`}
+                />
+                <Label htmlFor={`select-${listing.listingId}`} className="text-sm font-medium flex items-center gap-1 cursor-pointer">
+                    Select <Smile className="h-4 w-4 text-amber-500" />
+                </Label>
+            </div>
         </div>
+
         <div className="grid grid-cols-2 gap-4 text-sm pt-2">
             <div className="flex items-center gap-2">
                 <Scaling className="h-4 w-4 text-primary" />
