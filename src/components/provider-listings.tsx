@@ -114,16 +114,18 @@ export function ProviderListings() {
   const activeListings = myListings.filter(l => l.status !== 'leased');
   const archivedListings = myListings.filter(l => l.status === 'leased');
 
+  const isAdmin = user?.email === 'admin@example.com';
+
   return (
     <>
       <div className="mt-8">
         <div className="mb-8 flex justify-between items-center flex-wrap gap-4">
           <div>
             <h2 className="text-3xl font-bold font-headline tracking-tight flex items-center gap-2">
-                <Building /> My Property Listings
+                <Building /> {isAdmin ? "All Platform Listings" : "My Property Listings"}
             </h2>
             <p className="text-muted-foreground mt-2">
-                Create new listings, manage active properties, and view your archived deals.
+                {isAdmin ? "Manage and review all listings on the platform." : "Create new listings, manage active properties, and view your archived deals."}
             </p>
           </div>
           <Button onClick={handleCreateNew}>
