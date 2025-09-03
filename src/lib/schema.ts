@@ -315,8 +315,6 @@ const negotiableTermSchema = z.object({
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
     agreedTerms: z.string().optional(),
-    isCostFactor: z.boolean().default(false).optional(),
-    cost: z.coerce.number().optional(),
 }).optional();
 
 const customTermSchema = z.object({
@@ -371,6 +369,7 @@ export const commercialTermsSchema = z.object({
     leaseTerms: z.object({
         leaseTenure: negotiableTermSchema,
         leaseLockIn: negotiableTermSchema,
+        rentEscalation: negotiableTermSchema,
         fitoutHandoverDate: negotiableTermSchema,
         fullHandoverDate: negotiableTermSchema,
         rentFreePeriod: negotiableTermSchema,
@@ -387,7 +386,6 @@ export const commercialTermsSchema = z.object({
         netTotalRental: negotiableTermSchema,
         camCharges: negotiableTermSchema,
         ifrsd: negotiableTermSchema,
-        rentEscalation: negotiableTermSchema,
         commitmentPhase2: negotiableTermSchema,
         additionalCharges: negotiableTermSchema,
         capexItems: z.array(customTermSchema).optional(),
