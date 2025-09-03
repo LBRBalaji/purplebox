@@ -1,3 +1,4 @@
+
 // src/app/dashboard/analytics/predictive/page.tsx
 'use client';
 
@@ -9,8 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Sparkles, TrendingUp, MapPin, ListChecks, FileText } from 'lucide-react';
-import { predictDemandTrends, type PredictDemandTrendsOutput } from '@/ai/flows/predict-demand-trends';
+import { predictDemandTrends } from '@/ai/flows/predict-demand-trends';
 import { useToast } from '@/hooks/use-toast';
+import type { PredictDemandTrendsOutput } from '@/lib/schema';
+import { Badge } from '@/components/ui/badge';
 
 export default function PredictiveAnalyticsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();

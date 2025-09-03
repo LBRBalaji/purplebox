@@ -125,96 +125,6 @@ export const GenerateListingDescriptionInputSchema = z.object({
 });
 export type GenerateListingDescriptionInput = z.infer<typeof GenerateListingDescriptionInputSchema>;
 
-
-// Function to dynamically create the property schema based on demand
-export const createPropertySchema = (demand?: DemandSchema) => {
-    let schema = z.object({
-        propertyId: z.string(),
-        isLocationConfirmed: z.boolean().refine(val => val === true, { message: "You must confirm the location match." }),
-        size: z.coerce.number().positive(),
-        floor: z.enum(['Ground', 'First Floor', 'Multi-Floor']),
-        readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
-        serviceModel: z.enum(['Standard', '3PL', 'Both']),
-        buildingType: z.enum(['PEB', 'RCC']).optional(),
-        safety: z.string().min(1),
-        ceilingHeight: z.coerce.number().optional(),
-        ceilingHeightUnit: z.enum(['ft', 'm']),
-        docks: z.coerce.number().optional(),
-        rentPerSft: z.coerce.number().positive(),
-        rentalSecurityDeposit: z.coerce.number().positive(),
-        userType: z.enum(['Developer', 'Owner']),
-        userName: z.string(),
-        userCompanyName: z.string(),
-        userPhoneNumber: z.string(),
-        userEmail: z.string().email(),
-        o2oDealDemandId: z.string().optional(),
-        approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']),
-        approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']).optional(),
-        availablePower: z.coerce.number().optional(),
-        genSetBackup: z.enum(['Available', 'Can be provided']),
-        fireHydrant: z.enum(['Installed', 'Can be provided']),
-        fireNoc: z.enum(['Obtained', 'Applied For', 'To Apply']),
-        canopy: z.enum(['Installed', 'Can be provided']),
-        additionalInformation: z.string().optional(),
-        optionals: z.object({
-          crane: optionalCraneSchema,
-          officeSpaceMin: z.coerce.number().optional(),
-          officeSpaceMax: z.coerce.number().optional(),
-          cafeteriaOrCanteen: z.enum(['Cafeteria', 'Canteen']).optional(),
-          seatingCapacity: z.coerce.number().optional(),
-          additionalToiletsMen: z.coerce.number().optional(),
-          additionalToiletsWomen: z.coerce.number().optional(),
-          truckParkingYardMin: z.coerce.number().optional(),
-          truckParkingYardMax: z.coerce.number().optional(),
-          openStorageYardMin: z.coerce.number().optional(),
-          openStorageYardMax: z.coerce.number().optional(),
-          tenantSpecificImprovements: z.string().optional(),
-          processWaterRequirement: z.coerce.number().optional(),
-          hvacArea: z.string().optional(),
-          sprinklerRequirement: z.string().optional(),
-          lightingRequirement: z.string().optional(),
-        }).optional(),
-        operations: z.object({
-          mpcbEcCategory: z.enum(['Acceptable', 'May Be', 'No']).optional(),
-          etpDetails: z.enum(['Acceptable', 'May Be', 'No']).optional(),
-          effluentCharacteristics: z.enum(['Acceptable', 'May Be', 'No']).optional(),
-        }).optional(),
-    });
-
-    if (demand?.preferences?.nonCompromisable?.includes('crane')) {
-        schema = schema.extend({
-            optionals: schema.shape.optionals.extend({
-                crane: optionalCraneSchema.refine(data => data?.required === true, {
-                    message: "Crane is a priority and must be provided.",
-                    path: ['required']
-                })
-            })
-        });
-    }
-
-    if (demand?.operationType === 'Manufacturing') {
-         schema = schema.extend({
-            operations: schema.shape.operations.refine(data => {
-                if (demand.operations?.mpcbEcCategory) return data?.mpcbEcCategory !== undefined;
-                return true;
-            }, { message: "MPCB/EC category compliance must be specified.", path: ['mpcbEcCategory']})
-            .refine(data => {
-                if (demand.operations?.etpDetails) return data?.etpDetails !== undefined;
-                return true;
-            }, { message: "ETP details compliance must be specified.", path: ['etpDetails']})
-             .refine(data => {
-                if (demand.operations?.effluentCharacteristics) return data?.effluentCharacteristics !== undefined;
-                return true;
-            }, { message: "Effluent characteristics compliance must be specified.", path: ['effluentCharacteristics']})
-        });
-    }
-
-    return schema;
-};
-
-export type PropertySchema = z.infer<ReturnType<typeof createPropertySchema>>;
-
-
 export const demandSchema = z.object({
   demandId: z.string(),
   companyName: z.string().min(1, 'Company name is required.'),
@@ -309,3 +219,117 @@ export const demandSchema = z.object({
 });
 
 export type DemandSchema = z.infer<typeof demandSchema>;
+
+// Function to dynamically create the property schema based on demand
+export const createPropertySchema = (demand?: DemandSchema) => {
+    let schema = z.object({
+        propertyId: z.string(),
+        isLocationConfirmed: z.boolean().refine(val => val === true, { message: "You must confirm the location match." }),
+        size: z.coerce.number().positive(),
+        floor: z.enum(['Ground', 'First Floor', 'Multi-Floor']),
+        readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
+        serviceModel: z.enum(['Standard', '3PL', 'Both']),
+        buildingType: z.enum(['PEB', 'RCC']).optional(),
+        safety: z.string().min(1),
+        ceilingHeight: z.coerce.number().optional(),
+        ceilingHeightUnit: z.enum(['ft', 'm']),
+        docks: z.coerce.number().optional(),
+        rentPerSft: z.coerce.number().positive(),
+        rentalSecurityDeposit: z.coerce.number().positive(),
+        userType: z.enum(['Developer', 'Owner']),
+        userName: z.string(),
+        userCompanyName: z.string(),
+        userPhoneNumber: z.string(),
+        userEmail: z.string().email(),
+        o2oDealDemandId: z.string().optional(),
+        approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']),
+        approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']).optional(),
+        availablePower: z.coerce.number().optional(),
+        genSetBackup: z.enum(['Available', 'Can be provided']),
+        fireHydrant: z.enum(['Installed', 'Can be provided']),
+        fireNoc: z.enum(['Obtained', 'Applied For', 'To Apply']),
+        canopy: z.enum(['Installed', 'Can be provided']),
+        additionalInformation: z.string().optional(),
+        optionals: z.object({
+          crane: optionalCraneSchema,
+          officeSpaceMin: z.coerce.number().optional(),
+          officeSpaceMax: z.coerce.number().optional(),
+          cafeteriaOrCanteen: z.enum(['Cafeteria', 'Canteen']).optional(),
+          seatingCapacity: z.coerce.number().optional(),
+          additionalToiletsMen: z.coerce.number().optional(),
+          additionalToiletsWomen: z.coerce.number().optional(),
+          truckParkingYardMin: z.coerce.number().optional(),
+          truckParkingYardMax: z.coerce.number().optional(),
+          openStorageYardMin: z.coerce.number().optional(),
+          openStorageYardMax: z.coerce.number().optional(),
+          tenantSpecificImprovements: z.string().optional(),
+          processWaterRequirement: z.coerce.number().optional(),
+          hvacArea: z.string().optional(),
+          sprinklerRequirement: z.string().optional(),
+          lightingRequirement: z.string().optional(),
+        }).optional(),
+        operations: z.object({
+          mpcbEcCategory: z.enum(['Acceptable', 'May Be', 'No']).optional(),
+          etpDetails: z.enum(['Acceptable', 'May Be', 'No']).optional(),
+          effluentCharacteristics: z.enum(['Acceptable', 'May Be', 'No']).optional(),
+        }).optional(),
+    });
+
+    if (demand?.preferences?.nonCompromisable?.includes('crane')) {
+        schema = schema.extend({
+            optionals: schema.shape.optionals.extend({
+                crane: optionalCraneSchema.refine(data => data?.required === true, {
+                    message: "Crane is a priority and must be provided.",
+                    path: ['required']
+                })
+            })
+        });
+    }
+
+    if (demand?.operationType === 'Manufacturing') {
+         schema = schema.extend({
+            operations: schema.shape.operations.refine(data => {
+                if (demand.operations?.mpcbEcCategory) return data?.mpcbEcCategory !== undefined;
+                return true;
+            }, { message: "MPCB/EC category compliance must be specified.", path: ['mpcbEcCategory']})
+            .refine(data => {
+                if (demand.operations?.etpDetails) return data?.etpDetails !== undefined;
+                return true;
+            }, { message: "ETP details compliance must be specified.", path: ['etpDetails']})
+             .refine(data => {
+                if (demand.operations?.effluentCharacteristics) return data?.effluentCharacteristics !== undefined;
+                return true;
+            }, { message: "Effluent characteristics compliance must be specified.", path: ['effluentCharacteristics']})
+        });
+    }
+
+    return schema;
+};
+
+export type PropertySchema = z.infer<ReturnType<typeof createPropertySchema>>;
+
+
+// Schemas for Predictive Analytics Flow
+export const PredictDemandTrendsInputSchema = z.object({
+  timeHorizon: z.enum(['next quarter', 'next 6 months']).default('next quarter')
+    .describe('The time period for which to predict demand trends.'),
+});
+export type PredictDemandTrendsInput = z.infer<typeof PredictDemandTrendsInputSchema>;
+
+const PredictedHotspotSchema = z.object({
+  location: z.string().describe('The predicted high-demand location (e.g., "Oragadam, Chennai").'),
+  reasoning: z.string().describe('The justification for why this location is predicted to be a hotspot.'),
+  growthPercentage: z.number().optional().describe('The estimated percentage growth in demand for this location.'),
+});
+
+const TrendingSpecSchema = z.object({
+  specification: z.string().describe('The specification that is trending (e.g., "Ceiling Height > 45ft", "Size > 200,000 sq.ft.", "3PL Service Model").'),
+  reasoning: z.string().describe('The reason behind this trend.'),
+});
+
+export const PredictDemandTrendsOutputSchema = z.object({
+  marketOutlook: z.string().describe('A summary of the predicted market outlook for the upcoming period, including key trends and shifts.'),
+  predictedHotspots: z.array(PredictedHotspotSchema).describe('A list of geographic locations where demand is expected to increase.'),
+  trendingSpecifications: z.array(TrendingSpecSchema).describe('A list of warehouse specifications that are predicted to be in high demand.'),
+});
+export type PredictDemandTrendsOutput = z.infer<typeof PredictDemandTrendsOutputSchema>;

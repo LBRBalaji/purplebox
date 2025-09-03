@@ -1,3 +1,4 @@
+
 // src/ai/flows/predict-demand-trends.ts
 'use server';
 
@@ -5,8 +6,6 @@
  * @fileOverview An AI agent that analyzes historical data to predict future warehouse demand trends.
  * 
  * - predictDemandTrends - A function that generates predictive analytics.
- * - PredictDemandTrendsInput - The input type for the predictDemandTrends function.
- * - PredictDemandTrendsOutput - The return type for the predictDemandTrends function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -15,32 +14,15 @@ import allDemands from '@/data/demands.json';
 import allListings from '@/data/listings.json';
 import allSubmissions from '@/data/submissions.json';
 import allAnalytics from '@/data/listing-analytics.json';
-import { demandSchema, listingSchema } from '@/lib/schema';
-import { type ListingAnalytics, type Submission } from '@/contexts/data-context';
+import { 
+    demandSchema, 
+    listingSchema, 
+    PredictDemandTrendsInputSchema, 
+    PredictDemandTrendsOutputSchema,
+    type PredictDemandTrendsInput,
+    type PredictDemandTrendsOutput,
+} from '@/lib/schema';
 
-export const PredictDemandTrendsInputSchema = z.object({
-  timeHorizon: z.enum(['next quarter', 'next 6 months']).default('next quarter')
-    .describe('The time period for which to predict demand trends.'),
-});
-export type PredictDemandTrendsInput = z.infer<typeof PredictDemandTrendsInputSchema>;
-
-const PredictedHotspotSchema = z.object({
-  location: z.string().describe('The predicted high-demand location (e.g., "Oragadam, Chennai").'),
-  reasoning: z.string().describe('The justification for why this location is predicted to be a hotspot.'),
-  growthPercentage: z.number().optional().describe('The estimated percentage growth in demand for this location.'),
-});
-
-const TrendingSpecSchema = z.object({
-  specification: z.string().describe('The specification that is trending (e.g., "Ceiling Height > 45ft", "Size > 200,000 sq.ft.", "3PL Service Model").'),
-  reasoning: z.string().describe('The reason behind this trend.'),
-});
-
-export const PredictDemandTrendsOutputSchema = z.object({
-  marketOutlook: z.string().describe('A summary of the predicted market outlook for the upcoming period, including key trends and shifts.'),
-  predictedHotspots: z.array(PredictedHotspotSchema).describe('A list of geographic locations where demand is expected to increase.'),
-  trendingSpecifications: z.array(TrendingSpecSchema).describe('A list of warehouse specifications that are predicted to be in high demand.'),
-});
-export type PredictDemandTrendsOutput = z.infer<typeof PredictDemandTrendsOutputSchema>;
 
 export async function predictDemandTrends(input: PredictDemandTrendsInput): Promise<PredictDemandTrendsOutput> {
   return predictDemandTrendsFlow(input);
