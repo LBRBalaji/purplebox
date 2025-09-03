@@ -1,3 +1,4 @@
+
 // src/app/dashboard/analytics/predictive/page.tsx
 'use client';
 
@@ -8,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Sparkles, TrendingUp, MapPin, ListChecks, FileText, Settings2, PlusCircle, X } from 'lucide-react';
+import { Sparkles, TrendingUp, MapPin, ListChecks, FileText, Settings2, PlusCircle, ChevronsUp, Waves } from 'lucide-react';
 import { predictDemandTrends } from '@/ai/flows/predict-demand-trends';
 import { useToast } from '@/hooks/use-toast';
 import type { PredictDemandTrendsInput, PredictDemandTrendsOutput } from '@/lib/schema';
@@ -27,8 +28,10 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from '@/lib/utils';
 import { Check } from '@/components/ui/check';
 import { Switch } from '@/components/ui/switch';
+import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
 
-type FilterKey = 'buildingType' | 'serviceModel' | 'availability' | 'craneAvailable' | 'roofType' | 'fireNOC';
+type FilterKey = 'buildingType' | 'serviceModel' | 'availability' | 'craneAvailable' | 'roofType' | 'fireNOC' | 'eveHeightMin' | 'docksMin' | 'roofInsulation' | 'ventilation';
 
 const availableFilters: { value: FilterKey; label: string }[] = [
     { value: 'buildingType', label: 'Building Type' },
@@ -37,6 +40,10 @@ const availableFilters: { value: FilterKey; label: string }[] = [
     { value: 'craneAvailable', label: 'Crane Available' },
     { value: 'roofType', label: 'Roof Type' },
     { value: 'fireNOC', label: 'Fire NOC Status' },
+    { value: 'eveHeightMin', label: 'Min Eve Height (m)' },
+    { value: 'docksMin', label: 'Min Docks' },
+    { value: 'roofInsulation', label: 'Roof Insulation' },
+    { value: 'ventilation', label: 'Ventilation Type' },
 ];
 
 export default function PredictiveAnalyticsPage() {
@@ -47,12 +54,15 @@ export default function PredictiveAnalyticsPage() {
     const [analysis, setAnalysis] = React.useState<PredictDemandTrendsOutput | null>(null);
 
     // State for filters
-    const [timeHorizon, setTimeHorizon] = React.useState<PredictDemandTrendsInput['timeHorizon']>('next quarter');
-    const [location, setLocation] = React.useState('');
-    const [filters, setFilters] = React.useState<PredictDemandTrendsInput>({});
     const [activeFilters, setActiveFilters] = React.useState<FilterKey[]>([]);
-     const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(false);
 
+    const form = useForm<PredictDemandTrendsInput>({
+        defaultValues: {
+            timeHorizon: 'next quarter',
+            location: '',
+        }
+    });
 
     React.useEffect(() => {
         if (!isAuthLoading && user?.email !== 'admin@example.com' && user?.role !== 'O2O') {
@@ -60,15 +70,11 @@ export default function PredictiveAnalyticsPage() {
         }
     }, [user, isAuthLoading, router]);
 
-    const handleGenerateAnalysis = async () => {
+    const handleGenerateAnalysis = async (data: PredictDemandTrendsInput) => {
         setIsLoading(true);
         setAnalysis(null);
         try {
-            const result = await predictDemandTrends({ 
-                timeHorizon,
-                location: location || undefined,
-                ...filters,
-             });
+            const result = await predictDemandTrends(data);
             setAnalysis(result);
         } catch (error) {
             console.error("Failed to generate predictive analysis:", error);
@@ -83,26 +89,16 @@ export default function PredictiveAnalyticsPage() {
         }
     };
     
-    const handleFilterChange = (key: FilterKey, value: string | boolean) => {
-        setFilters(prev => ({...prev, [key]: value === 'Any' ? undefined : value }));
-    }
-
     const toggleFilter = (filterKey: FilterKey) => {
-        setActiveFilters(prev => {
-            const newActive = prev.includes(filterKey) 
-                ? prev.filter(f => f !== filterKey)
-                : [...prev, filterKey];
+        const newActive = activeFilters.includes(filterKey) 
+            ? activeFilters.filter(f => f !== filterKey)
+            : [...activeFilters, filterKey];
 
-            // Clean up filter value when removing
-            if (!newActive.includes(filterKey)) {
-                setFilters(currentFilters => {
-                    const newFilters = {...currentFilters};
-                    delete newFilters[filterKey];
-                    return newFilters;
-                });
-            }
-            return newActive;
-        });
+        // Clean up filter value when removing
+        if (!newActive.includes(filterKey)) {
+            form.setValue(filterKey, undefined as any);
+        }
+        setActiveFilters(newActive);
     }
     
     if (isAuthLoading || (user && user.email !== 'admin@example.com' && user.role !== 'O2O')) {
@@ -111,7 +107,8 @@ export default function PredictiveAnalyticsPage() {
 
     return (
         <main className="container mx-auto p-4 md:p-8">
-            <div className="max-w-7xl mx-auto space-y-8">
+             <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleGenerateAnalysis)} className="max-w-7xl mx-auto space-y-8">
                 <div>
                     <h2 className="text-3xl font-bold font-headline tracking-tight">Predictive Demand Analytics</h2>
                     <p className="text-muted-foreground mt-2 max-w-3xl">
@@ -126,20 +123,20 @@ export default function PredictiveAnalyticsPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                             <div className="space-y-2">
-                                <Label htmlFor="time-horizon">Time Horizon</Label>
-                                <Select onValueChange={(value) => setTimeHorizon(value as any)} defaultValue={timeHorizon}>
-                                    <SelectTrigger id="time-horizon"><SelectValue /></SelectTrigger>
+                             <FormField control={form.control} name="timeHorizon" render={({ field }) => (
+                                <FormItem><FormLabel>Time Horizon</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                     <SelectContent>
                                         <SelectItem value="next quarter">Next Quarter</SelectItem>
                                         <SelectItem value="next 6 months">Next 6 Months</SelectItem>
                                     </SelectContent>
                                 </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="location">Focus Location (Optional)</Label>
-                                <Input id="location" placeholder="e.g. Chennai, Oragadam" value={location} onChange={(e) => setLocation(e.target.value)} />
-                            </div>
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="location" render={({ field }) => (
+                                <FormItem><FormLabel>Focus Location (Optional)</FormLabel><FormControl><Input placeholder="e.g. Chennai, Oragadam" {...field} /></FormControl></FormItem>
+                            )}/>
                              <div className="space-y-2">
                                 <Label>Add Data Filters</Label>
                                  <Popover open={open} onOpenChange={setOpen}>
@@ -184,107 +181,84 @@ export default function PredictiveAnalyticsPage() {
                         {activeFilters.length > 0 && (
                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 border-t border-dashed">
                                {activeFilters.includes('buildingType') && (
-                                     <div className="space-y-2">
-                                        <Label htmlFor="building-type">Building Type</Label>
-                                        <Select onValueChange={(value) => handleFilterChange('buildingType', value)} defaultValue="Any">
-                                            <SelectTrigger id="building-type"><SelectValue /></SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Any">Any</SelectItem>
-                                                <SelectItem value="PEB">PEB</SelectItem>
-                                                <SelectItem value="RCC">RCC</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                                     <FormField control={form.control} name="buildingType" render={({ field }) => (
+                                        <FormItem><FormLabel>Building Type</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                            <SelectItem value="PEB">PEB</SelectItem><SelectItem value="RCC">RCC</SelectItem>
+                                        </SelectContent></Select></FormItem>
+                                    )} />
                                )}
                                {activeFilters.includes('serviceModel') && (
-                                    <div className="space-y-2">
-                                        <Label htmlFor="service-model">Service Model</Label>
-                                        <Select onValueChange={(value) => handleFilterChange('serviceModel', value)} defaultValue="Any">
-                                            <SelectTrigger id="service-model"><SelectValue /></SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Any">Any</SelectItem>
-                                                <SelectItem value="Standard">Standard</SelectItem>
-                                                <SelectItem value="3PL">3PL</SelectItem>
-                                                <SelectItem value="Both">Both</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                                     <FormField control={form.control} name="serviceModel" render={({ field }) => (
+                                        <FormItem><FormLabel>Service Model</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                            <SelectItem value="Standard">Standard</SelectItem><SelectItem value="3PL">3PL</SelectItem><SelectItem value="Both">Both</SelectItem>
+                                        </SelectContent></Select></FormItem>
+                                    )} />
                                )}
                                {activeFilters.includes('availability') && (
-                                    <div className="space-y-2">
-                                        <Label htmlFor="availability">Availability</Label>
-                                        <Select onValueChange={(value) => handleFilterChange('availability', value)} defaultValue="Any">
-                                            <SelectTrigger id="availability"><SelectValue /></SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Any">Any</SelectItem>
-                                                <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
-                                                <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
-                                                <SelectItem value="Under Construction">Under Construction</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                                     <FormField control={form.control} name="availability" render={({ field }) => (
+                                        <FormItem><FormLabel>Availability</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                            <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem><SelectItem value="Available in 3 months">Available in 3 months</SelectItem><SelectItem value="Under Construction">Under Construction</SelectItem>
+                                        </SelectContent></Select></FormItem>
+                                    )} />
                                )}
                                {activeFilters.includes('roofType') && (
-                                    <div className="space-y-2">
-                                        <Label htmlFor="roof-type">Roof Type</Label>
-                                        <Select onValueChange={(value) => handleFilterChange('roofType', value)} defaultValue="Any">
-                                            <SelectTrigger id="roof-type"><SelectValue /></SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Any">Any</SelectItem>
-                                                <SelectItem value="Galvalume">Galvalume</SelectItem>
-                                                <SelectItem value="RCC">RCC</SelectItem>
-                                                <SelectItem value="ACC">ACC</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                                     <FormField control={form.control} name="roofType" render={({ field }) => (
+                                        <FormItem><FormLabel>Roof Type</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                            <SelectItem value="Galvalume">Galvalume</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="ACC">ACC</SelectItem>
+                                        </SelectContent></Select></FormItem>
+                                    )} />
+                               )}
+                               {activeFilters.includes('eveHeightMin') && (
+                                    <FormField control={form.control} name="eveHeightMin" render={({ field }) => (
+                                       <FormItem><FormLabel>Min Eve Height (m)</FormLabel><FormControl><Input type="number" {...field} /></FormControl></FormItem>
+                                   )} />
+                               )}
+                               {activeFilters.includes('docksMin') && (
+                                    <FormField control={form.control} name="docksMin" render={({ field }) => (
+                                       <FormItem><FormLabel>Min Docks</FormLabel><FormControl><Input type="number" {...field} /></FormControl></FormItem>
+                                   )} />
+                               )}
+                               {activeFilters.includes('roofInsulation') && (
+                                     <FormField control={form.control} name="roofInsulation" render={({ field }) => (
+                                        <FormItem><FormLabel>Roof Insulation</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                            <SelectItem value="Insulated">Insulated</SelectItem><SelectItem value="Non-Insulated">Non-Insulated</SelectItem>
+                                        </SelectContent></Select></FormItem>
+                                    )} />
+                               )}
+                               {activeFilters.includes('ventilation') && (
+                                     <FormField control={form.control} name="ventilation" render={({ field }) => (
+                                        <FormItem><FormLabel>Ventilation</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                            <SelectItem value="Turbo">Turbo</SelectItem><SelectItem value="Ridge">Ridge</SelectItem>
+                                        </SelectContent></Select></FormItem>
+                                    )} />
                                )}
                                {activeFilters.includes('craneAvailable') && (
-                                    <div className="space-y-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="craneAvailable"
-                                            render={() => (
-                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border bg-background p-3">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel>Crane Available</FormLabel>
-                                                    </div>
-                                                    <FormControl>
-                                                        <Switch
-                                                            checked={filters.craneAvailable}
-                                                            onCheckedChange={(checked) => handleFilterChange('craneAvailable', checked)}
-                                                        />
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
+                                    <FormField control={form.control} name="craneAvailable" render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border bg-background p-3">
+                                            <FormLabel>Crane Available</FormLabel>
+                                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                        </FormItem>
+                                    )} />
                                )}
                                {activeFilters.includes('fireNOC') && (
-                                    <div className="space-y-2">
-                                         <FormField
-                                            control={form.control}
-                                            name="fireNOC"
-                                            render={() => (
-                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border bg-background p-3">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel>Fire NOC Obtained</FormLabel>
-                                                    </div>
-                                                    <FormControl>
-                                                        <Switch
-                                                            checked={filters.fireNOC}
-                                                            onCheckedChange={(checked) => handleFilterChange('fireNOC', checked)}
-                                                        />
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
+                                    <FormField control={form.control} name="fireNOC" render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border bg-background p-3">
+                                            <FormLabel>Fire NOC Obtained</FormLabel>
+                                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                        </FormItem>
+                                    )} />
                                )}
                             </div>
                         )}
 
                         <div className="flex justify-end pt-4">
-                            <Button onClick={handleGenerateAnalysis} disabled={isLoading} size="lg">
+                            <Button type="submit" disabled={isLoading} size="lg">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 {isLoading ? 'Generating...' : 'Generate Analysis'}
                             </Button>
@@ -382,7 +356,8 @@ export default function PredictiveAnalyticsPage() {
                         </Alert>
                     )
                 )}
-            </div>
+            </form>
+             </Form>
         </main>
     );
 }

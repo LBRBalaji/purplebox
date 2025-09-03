@@ -41,6 +41,10 @@ const prompt = ai.definePrompt({
     craneAvailable: z.boolean().optional(),
     roofType: z.string().optional(),
     fireNOC: z.boolean().optional(),
+    eveHeightMin: z.number().optional(),
+    docksMin: z.number().optional(),
+    roofInsulation: z.string().optional(),
+    ventilation: z.string().optional(),
     demands: z.array(demandSchema),
     listings: z.array(listingSchema),
     submissions: z.array(z.any()), // Using any to avoid complexity with nested schemas in prompt
@@ -51,27 +55,17 @@ const prompt = ai.definePrompt({
   Your task is to predict future demand trends for the {{{timeHorizon}}}.
   
   Your analysis should be based on the provided historical data, filtered by the following user-defined criteria:
-  {{#if location}}
-  - **Location Focus**: The analysis should specifically focus on the **{{{location}}}** area.
-  {{/if}}
-  {{#if buildingType}}
-  - **Building Type**: Filter for **{{{buildingType}}}** building types.
-  {{/if}}
-  {{#if serviceModel}}
-  - **Service Model**: Filter for **{{{serviceModel}}}** service models.
-  {{/if}}
-  {{#if availability}}
-  - **Availability**: Filter for properties with status **{{{availability}}}**.
-  {{/if}}
-  {{#if craneAvailable}}
-  - **Crane**: Filter for properties where a crane is available.
-  {{/if}}
-  {{#if roofType}}
-  - **Roof Type**: Filter for properties with a **{{{roofType}}}** roof.
-  {{/if}}
-  {{#if fireNOC}}
-  - **Fire NOC**: Filter for properties where Fire NOC is obtained.
-  {{/if}}
+  {{#if location}}- **Location Focus**: The analysis should specifically focus on the **{{{location}}}** area.{{/if}}
+  {{#if buildingType}}- **Building Type**: Filter for **{{{buildingType}}}** building types.{{/if}}
+  {{#if serviceModel}}- **Service Model**: Filter for **{{{serviceModel}}}** service models.{{/if}}
+  {{#if availability}}- **Availability**: Filter for properties with status **{{{availability}}}**.{{/if}}
+  {{#if craneAvailable}}- **Crane**: Filter for properties where a crane is available.{{/if}}
+  {{#if roofType}}- **Roof Type**: Filter for properties with a **{{{roofType}}}** roof.{{/if}}
+  {{#if fireNOC}}- **Fire NOC**: Filter for properties where Fire NOC is obtained.{{/if}}
+  {{#if eveHeightMin}}- **Eve Height**: Filter for properties with eve height >= **{{{eveHeightMin}}}** meters.{{/if}}
+  {{#if docksMin}}- **Docks**: Filter for properties with >= **{{{docksMin}}}** docks.{{/if}}
+  {{#if roofInsulation}}- **Roof Insulation**: Filter for properties with **{{{roofInsulation}}}** roof insulation.{{/if}}
+  {{#if ventilation}}- **Ventilation**: Filter for properties with **{{{ventilation}}}** type.{{/if}}
 
   Analyze the following data sets:
   1.  **Demand Data**: Records of what customers have explicitly requested. Pay attention to locations, sizes, readiness timelines, and specific priorities.
@@ -101,27 +95,19 @@ const predictDemandTrendsFlow = ai.defineFlow(
     outputSchema: PredictDemandTrendsOutputSchema,
   },
   async (input) => {
-    // In a real application, you might fetch this data from a live database
-    // For this prototype, we're reading from the local JSON files.
-    // We can filter the data based on the input before sending it to the model.
-    let filteredDemands = allDemands;
     let filteredListings = allListings as ListingSchema[];
 
     if (input.location) {
         const loc = input.location.toLowerCase();
-        filteredDemands = filteredDemands.filter(d => d.locationName?.toLowerCase().includes(loc));
         filteredListings = filteredListings.filter(l => l.location.toLowerCase().includes(loc));
     }
     
     if (input.buildingType) {
-        const bt = input.buildingType.toLowerCase();
-        filteredDemands = filteredDemands.filter(d => d.buildingType?.toLowerCase() === bt);
-        filteredListings = filteredListings.filter(l => l.buildingSpecifications.buildingType?.toLowerCase().includes(bt));
+        filteredListings = filteredListings.filter(l => l.buildingSpecifications.buildingType?.toLowerCase() === input.buildingType?.toLowerCase());
     }
 
     if (input.serviceModel) {
-        const sm = input.serviceModel.toLowerCase();
-         filteredListings = filteredListings.filter(l => l.serviceModel?.toLowerCase() === sm);
+        filteredListings = filteredListings.filter(l => l.serviceModel?.toLowerCase() === input.serviceModel?.toLowerCase());
     }
     
     if (input.availability) {
@@ -140,10 +126,26 @@ const predictDemandTrendsFlow = ai.defineFlow(
         filteredListings = filteredListings.filter(l => l.certificatesAndApprovals.fireNOC === input.fireNOC);
     }
 
+    if (input.eveHeightMin !== undefined) {
+        filteredListings = filteredListings.filter(l => l.buildingSpecifications.eveHeightMeters !== undefined && l.buildingSpecifications.eveHeightMeters >= input.eveHeightMin!);
+    }
+
+    if (input.docksMin !== undefined) {
+        filteredListings = filteredListings.filter(l => l.buildingSpecifications.numberOfDocksAndShutters !== undefined && l.buildingSpecifications.numberOfDocksAndShutters >= input.docksMin!);
+    }
+
+    if (input.roofInsulation) {
+        filteredListings = filteredListings.filter(l => l.buildingSpecifications.roofInsulation === input.roofInsulation);
+    }
+
+    if (input.ventilation) {
+        filteredListings = filteredListings.filter(l => l.buildingSpecifications.ventilation === input.ventilation);
+    }
+
 
     const historicalData = {
         ...input,
-        demands: filteredDemands,
+        demands: allDemands,
         listings: filteredListings,
         submissions: allSubmissions,
         analytics: allAnalytics,

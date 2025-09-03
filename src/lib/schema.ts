@@ -320,6 +320,10 @@ export const PredictDemandTrendsInputSchema = z.object({
   craneAvailable: z.boolean().optional().describe('Filter by whether a crane is available.'),
   roofType: z.string().optional().describe('Filter by the type of roof.'),
   fireNOC: z.boolean().optional().describe('Filter by whether Fire NOC is obtained.'),
+  eveHeightMin: z.number().optional().describe('Filter by minimum eve height in meters.'),
+  docksMin: z.number().optional().describe('Filter by minimum number of docks.'),
+  roofInsulation: z.string().optional().describe('Filter by roof insulation status.'),
+  ventilation: z.string().optional().describe('Filter by ventilation type.'),
 });
 export type PredictDemandTrendsInput = z.infer<typeof PredictDemandTrendsInputSchema>;
 
