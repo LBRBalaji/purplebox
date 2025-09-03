@@ -299,7 +299,6 @@ export const createPropertySchema = (demand?: DemandSchema) => {
             }, { message: "ETP details compliance must be specified.", path: ['etpDetails']})
              .refine(data => {
                 if (demand.operations?.effluentCharacteristics) return data?.effluentCharacteristics !== undefined;
-                return true;
             }, { message: "Effluent characteristics compliance must be specified.", path: ['effluentCharacteristics']})
         });
     }
@@ -347,114 +346,46 @@ const actionableItemSchema = z.object({
     remarks: z.string().optional().default(''),
 });
 
+const createNegotiableTermSchema = () => z.object({
+    agreedTerms: z.string().optional().default(''),
+    proposedBy: z.enum(['Customer', 'Provider']).optional(),
+    status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
+});
+
 export const commercialTermsSchema = z.object({
     sessions: z.array(negotiationSessionSchema).optional().default([]),
     siteInfo: z.object({
-        postalAddress: negotiableTermSchema,
-        buildingNumber: negotiableTermSchema,
-        googleCoordinates: negotiableTermSchema,
-        buildingStatus: negotiableTermSchema,
+        postalAddress: createNegotiableTermSchema(),
+        buildingNumber: createNegotiableTermSchema(),
+        googleCoordinates: createNegotiableTermSchema(),
+        buildingStatus: createNegotiableTermSchema(),
     }).optional().default({}),
     area: z.object({
-        plinthArea: negotiableTermSchema,
-        mezzanineArea1: negotiableTermSchema,
-        mezzanineArea2: negotiableTermSchema,
-        canopyArea: negotiableTermSchema,
-        driversRestRoom: negotiableTermSchema,
-        totalChargeableArea: negotiableTermSchema,
+        plinthArea: createNegotiableTermSchema(),
+        mezzanineArea1: createNegotiableTermSchema(),
+        mezzanineArea2: createNegotiableTermSchema(),
+        canopyArea: createNegotiableTermSchema(),
+        driversRestRoom: createNegotiableTermSchema(),
+        totalChargeableArea: createNegotiableTermSchema(),
     }).optional().default({}),
-    tenantImprovements: z.object({
-        electricityPower: negotiableTermSchema,
-        internalCabling: negotiableTermSchema,
-        hvac: negotiableTermSchema,
-        mechanisedAccess: negotiableTermSchema,
-        washroomsOnMezzanine: negotiableTermSchema,
-        ramp: negotiableTermSchema,
-        customItems: z.array(customTermSchema).optional().default([]),
-    }),
     leaseTerms: z.object({
-        leaseTenure: negotiableTermSchema,
-        leaseLockIn: negotiableTermSchema,
-        rentEscalation: negotiableTermSchema,
-        fitoutHandoverDate: negotiableTermSchema,
-        fullHandoverDate: negotiableTermSchema,
-        rentFreePeriod: negotiableTermSchema,
-        chargeableArea: negotiableTermSchema,
-        leaseCommencementDate: negotiableTermSchema,
-        rentCommencementDate: negotiableTermSchema,
-        scopeAndCostOfRegistration: negotiableTermSchema,
-        customItems: z.array(customTermSchema).optional().default([]),
+        leaseTenure: createNegotiableTermSchema(),
+        leaseLockIn: createNegotiableTermSchema(),
+        rentEscalation: createNegotiableTermSchema(),
     }),
     commercialTerms: z.object({
-        chargeableArea: negotiableTermSchema,
-        buildingRentPerSft: negotiableTermSchema,
-        totalRentPerMonth: negotiableTermSchema,
-        netTotalRental: negotiableTermSchema,
-        camCharges: negotiableTermSchema,
-        ifrsd: negotiableTermSchema,
-        commitmentPhase2: negotiableTermSchema,
-        additionalCharges: negotiableTermSchema,
+        chargeableArea: createNegotiableTermSchema(),
+        buildingRentPerSft: createNegotiableTermSchema(),
+        totalRentPerMonth: createNegotiableTermSchema(),
+        camCharges: createNegotiableTermSchema(),
+        ifrsd: createNegotiableTermSchema(),
         capexItems: z.array(customTermSchema).optional().default([]),
         netCostPerMonth: z.number().optional().default(0),
     }),
-    electricalInfrastructure: z.object({
-        installedCapacity: negotiableTermSchema,
-        powerRequirementP1: negotiableTermSchema,
-        powerRequirementP2: negotiableTermSchema,
-        scopeOfProvidingPower: negotiableTermSchema,
-        timelineToProvidePower: negotiableTermSchema,
-        budgetP1: negotiableTermSchema,
-        budgetP2: negotiableTermSchema,
-        enhancementOfPower: negotiableTermSchema,
-        mainCableCapacity: negotiableTermSchema,
-        mainTappingPoint: negotiableTermSchema,
-        internalCabling: negotiableTermSchema,
-        internalSwitches: negotiableTermSchema,
-        streetLightToWarehouse: negotiableTermSchema,
-        streetLightInCompound: negotiableTermSchema,
-        gensetRequirement: negotiableTermSchema,
-        gensetCapacity: negotiableTermSchema,
-        provisionForGenset: negotiableTermSchema,
-        hvacRequirement: negotiableTermSchema,
-        hvacCapacity: negotiableTermSchema,
-        provisionForHvac: negotiableTermSchema,
-        falseCeiling: negotiableTermSchema,
-    }).optional().default({}),
-    building: z.object({
-        buildingType: negotiableTermSchema,
-        shopFloorDimension: negotiableTermSchema,
-        mezzanineDimension: negotiableTermSchema,
-        docksAndShutters: negotiableTermSchema,
-        canopyDimension: negotiableTermSchema,
-        naturalLightingVentilation: negotiableTermSchema,
-        roofInsulation: negotiableTermSchema,
-        internalLighting: negotiableTermSchema,
-    }).optional().default({}),
-    waterToiletSewerage: z.object({
-        workersToilet: negotiableTermSchema,
-        executiveToilet: negotiableTermSchema,
-        waterForWash: negotiableTermSchema,
-        waterSource: negotiableTermSchema,
-        overheadTank: negotiableTermSchema,
-        waterSump: negotiableTermSchema,
-        septicTank: negotiableTermSchema,
-        stpProvided: negotiableTermSchema,
-        solidWasteDisposal: negotiableTermSchema,
-    }).optional().default({}),
-    safetyAndSecurity: z.object({
-        fireExitDoor: negotiableTermSchema,
-        fireHydrantOutside: negotiableTermSchema,
-        fireHydrantInside: negotiableTermSchema,
-        fireSprinklers: negotiableTermSchema,
-        dedicatedWaterSump: negotiableTermSchema,
-        isFullyCompounded: negotiableTermSchema,
-        isSecurityProvided: negotiableTermSchema,
-        isCctvInstalled: negotiableTermSchema,
-        isSecurityDeskProvided: negotiableTermSchema,
-    }).optional().default({}),
     actionableItems: z.array(actionableItemSchema).optional().default([]),
     overallRemarks: z.string().optional().default(''),
 });
+
 export type CommercialTermsSchema = z.infer<typeof commercialTermsSchema>;
 
 // Tenant Improvements Schemas
@@ -531,3 +462,5 @@ export const layoutRequestSchema = z.object({
   }),
 });
 export type LayoutRequestData = z.infer<typeof layoutRequestSchema>;
+
+    

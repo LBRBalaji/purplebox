@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -20,98 +19,48 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from './ui/checkbox';
 import { Separator } from './ui/separator';
 
-const SectionHeader = ({ icon, title }: { icon: React.ElementType; title: string }) => {
+const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; title: string, description?: string }) => {
     const Icon = icon;
     return (
-        <TableHead colSpan={6} className="bg-primary/5 text-primary font-semibold">
-            <div className="flex items-center gap-2">
-                <Icon className="h-5 w-5" />
-                {title}
+        <div className="pt-6 first:pt-0">
+            <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Icon className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                    <h3 className="text-lg font-semibold">{title}</h3>
+                    {description && <p className="text-sm text-muted-foreground">{description}</p>}
+                </div>
             </div>
-        </TableHead>
+            <Separator />
+        </div>
     );
 };
 
-const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch, form }: { name: any; label: string; control: any; isTextarea?: boolean; isCostFactor?: boolean; watch: any, form: any }) => {
-    const showCostInput = watch(`${name}.isCostFactor`);
+const FormRow = ({ name, label, control, form, isTextarea }: { name: any; label: string; control: any; form: any, isTextarea?: boolean }) => {
     const InputComponent = isTextarea ? Textarea : Input;
 
     return (
-    <TableRow>
-        <TableCell className="font-medium w-[20%]">{label}</TableCell>
-        <TableCell className="w-[30%]">
-            <FormField control={control} name={`${name}.details`} render={({ field }) => (
-                <FormItem><FormControl><InputComponent placeholder="Specific details..." {...field} value={field.value ?? ''} className="min-h-0 h-10 p-2" /></FormControl><FormMessage /></FormItem>
-            )} />
-        </TableCell>
-        <TableCell className="w-[15%]">
-             <FormField control={control} name={`${name}.proposedBy`} render={({ field }) => (
-                <FormItem><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-            )} />
-        </TableCell>
-        <TableCell className="w-[15%]">
-             <FormField control={control} name={`${name}.status`} render={({ field }) => (
-                 <FormItem><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-            )} />
-        </TableCell>
-        <TableCell className="w-[20%]">
-            <FormField control={control} name={`${name}.agreedTerms`} render={({ field }) => (
-                <FormItem className="flex-grow"><FormControl><Input placeholder="Final terms..." {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-            )} />
-        </TableCell>
-        <TableCell className="w-[20%]">
-            <div className="flex items-center gap-2">
-                 {isCostFactor && (
-                    <FormField control={control} name={`${name}.isCostFactor`} render={({ field }) => ( <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl> )} />
-                 )}
-                 <FormField control={control} name={`${name}.cost`} render={({ field }) => (
-                     <FormItem className="flex-grow">
-                         <FormControl>
-                             <Input 
-                                type="number" 
-                                placeholder="Cost" 
-                                {...field} 
-                                value={field.value ?? ''}
-                                onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} 
-                                className={showCostInput ? "w-24" : "hidden"}
-                             />
-                         </FormControl>
-                         <FormMessage />
-                     </FormItem>
-                 )} />
+         <div className="grid grid-cols-12 gap-x-6 gap-y-2 py-4 border-b">
+            <div className="col-span-12 md:col-span-3"><FormLabel>{label}</FormLabel></div>
+            <div className="col-span-12 md:col-span-4">
+                <FormField control={control} name={`${name}.agreedTerms`} render={({ field }) => (
+                    <FormItem><FormControl><InputComponent placeholder="Agreed terms..." {...field} value={field.value ?? ''} className="h-10 p-2" /></FormControl><FormMessage /></FormItem>
+                )} />
             </div>
-        </TableCell>
-    </TableRow>
-)};
-
-const CustomFormRow = ({ control, index, remove, isCostFactor, watch, arrayName }: { control: any, index: number, remove: (index: number) => void, isCostFactor?: boolean, watch: any, arrayName: string }) => {
-    const showCostInput = watch(`${arrayName}.${index}.isCostFactor`);
-    const InputComponent = Textarea;
-    return (
-    <TableRow>
-        <TableCell><FormField control={control} name={`${arrayName}.${index}.particulars`} render={({ field }) => <Input placeholder={`Custom Item ${index+1}`} {...field} value={field.value ?? ''} />} /></TableCell>
-        <TableCell><FormField control={control} name={`${arrayName}.${index}.details`} render={({ field }) => <InputComponent placeholder="Details..." {...field} value={field.value ?? ''} className="h-10 p-2"/>} /></TableCell>
-        <TableCell><FormField control={control} name={`${arrayName}.${index}.proposedBy`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select> )} /></TableCell>
-        <TableCell><FormField control={control} name={`${arrayName}.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select> )} /></TableCell>
-        <TableCell>
-            <FormField control={control} name={`${arrayName}.${index}.agreedTerms`} render={({ field }) => (
-                <FormItem className="flex-grow"><FormControl><Input placeholder="Final terms..." {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-            )} />
-        </TableCell>
-        <TableCell>
-            <div className="flex items-center gap-2">
-                {isCostFactor && (
-                   <FormField control={control} name={`${arrayName}.${index}.isCostFactor`} render={({ field }) => ( <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl> )} />
-                )}
-                <FormField control={control} name={`${arrayName}.${index}.cost`} render={({ field }) => (
-                   <FormItem><FormControl><Input type="number" placeholder="Cost" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} className={showCostInput ? "w-24" : "hidden"}/></FormControl><FormMessage /></FormItem>
-                )}/>
-                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+            <div className="col-span-6 md:col-span-2">
+                 <FormField control={control} name={`${name}.proposedBy`} render={({ field }) => (
+                    <FormItem><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                )} />
             </div>
-        </TableCell>
-    </TableRow>
-)};
-
+            <div className="col-span-6 md:col-span-3">
+                 <FormField control={control} name={`${name}.status`} render={({ field }) => (
+                    <FormItem><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                )} />
+            </div>
+        </div>
+    )
+};
 
 export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
     const { listings, submissions } = useData();
@@ -228,16 +177,16 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
             form.reset({
                 ...form.getValues(),
                 siteInfo: {
-                    postalAddress: { details: primaryListing.location },
-                    buildingStatus: { details: primaryListing.availabilityDate },
-                    googleCoordinates: { details: primaryListing.latLng },
+                    postalAddress: { agreedTerms: primaryListing.location },
+                    buildingStatus: { agreedTerms: primaryListing.availabilityDate },
+                    googleCoordinates: { agreedTerms: primaryListing.latLng },
                 },
                 area: {
-                    totalChargeableArea: { details: String(primaryListing.sizeSqFt) },
+                    totalChargeableArea: { agreedTerms: String(primaryListing.sizeSqFt) },
                 },
                 building: {
-                    buildingType: { details: primaryListing.buildingSpecifications.buildingType },
-                    docksAndShutters: { details: String(primaryListing.buildingSpecifications.numberOfDocksAndShutters) },
+                    buildingType: { agreedTerms: primaryListing.buildingSpecifications.buildingType },
+                    docksAndShutters: { agreedTerms: String(primaryListing.buildingSpecifications.numberOfDocksAndShutters) },
                 },
                 commercialTerms: {
                     ...form.getValues().commercialTerms,
@@ -331,7 +280,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-8">
                         {sessionFields.map((field, index) => {
                             const { fields: customerFields, append: appendCustomer, remove: removeCustomer } = customerAttendees(index);
                             const { fields: providerFields, append: appendProvider, remove: removeProvider } = providerAttendees(index);
@@ -383,69 +332,36 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                 </div>
                             )
                         })}
-                        <div className="border rounded-lg overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[20%]">Particulars</TableHead>
-                                    <TableHead className="w-[30%]">Specific Details</TableHead>
-                                    <TableHead className="w-[15%]">Proposed By</TableHead>
-                                    <TableHead className="w-[15%]">Status</TableHead>
-                                    <TableHead className="w-[15%]">Agreed Terms</TableHead>
-                                    <TableHead className="w-[5%]">Cost</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow><SectionHeader icon={MapPin} title="Site Information" /></TableRow>
-                                <FormRow form={form} name="siteInfo.postalAddress" label="Postal Address" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="siteInfo.buildingNumber" label="Building Number" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="siteInfo.googleCoordinates" label="Google Coordinates" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="siteInfo.buildingStatus" label="Building Status" control={form.control} watch={form.watch}/>
-                                
-                                <TableRow><SectionHeader icon={Home} title="Area (in SFT)" /></TableRow>
-                                <FormRow form={form} name="area.plinthArea" label="Plinth Area (Shop Floor)" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="area.mezzanineArea1" label="Mezzanine Area 1" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="area.mezzanineArea2" label="Mezzanine Area 2" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="area.canopyArea" label="Canopy Area" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="area.driversRestRoom" label="Driver's Rest Room" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="area.totalChargeableArea" label="Total Chargeable Area" control={form.control} watch={form.watch}/>
 
-                                <TableRow><SectionHeader icon={HardHat} title="Tenant Improvement Items" /></TableRow>
-                                <FormRow form={form} name="tenantImprovements.electricityPower" label="Electricity Power" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="tenantImprovements.internalCabling" label="Internal Cabling & Power Gear" control={form.control} watch={form.watch}/>
-                                {tenantImprovementFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeTenantImprovement} watch={form.watch} arrayName="tenantImprovements.customItems" /> ))}
-                                <TableRow><TableCell colSpan={6}><Button type="button" variant="outline" size="sm" onClick={() => appendTenantImprovement({ particulars: '' })}><PlusCircle className="mr-2 h-4 w-4"/> Add Improvement Item</Button></TableCell></TableRow>
+                        <div className="space-y-6">
+                            <SectionHeader icon={MapPin} title="Site Information" />
+                            <FormRow form={form} name="siteInfo.postalAddress" label="Postal Address" control={form.control} />
+                            <FormRow form={form} name="siteInfo.buildingNumber" label="Building Number" control={form.control} />
+                            <FormRow form={form} name="siteInfo.googleCoordinates" label="Google Coordinates" control={form.control} />
+                            <FormRow form={form} name="siteInfo.buildingStatus" label="Building Status" control={form.control} />
 
-                                <TableRow><SectionHeader icon={ListChecks} title="Lease Terms" /></TableRow>
-                                <FormRow form={form} name="leaseTerms.leaseTenure" label="Lease Tenure" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="leaseTerms.leaseLockIn" label="Lease Lock-In Period" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="leaseTerms.rentEscalation" label="Rent Escalation (% and Freq.)" control={form.control} watch={form.watch}/>
-                                {leaseTermFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeLeaseTerm} watch={form.watch} arrayName="leaseTerms.customItems" /> ))}
-                                <TableRow><TableCell colSpan={6}><Button type="button" variant="outline" size="sm" onClick={() => appendLeaseTerm({ particulars: '' })}><PlusCircle className="mr-2 h-4 w-4"/> Add Lease Term</Button></TableCell></TableRow>
+                            <SectionHeader icon={Home} title="Area (in SFT)" />
+                            <FormRow form={form} name="area.plinthArea" label="Plinth Area (Shop Floor)" control={form.control} />
+                            <FormRow form={form} name="area.mezzanineArea1" label="Mezzanine Area 1" control={form.control} />
+                            <FormRow form={form} name="area.mezzanineArea2" label="Mezzanine Area 2" control={form.control} />
+                            <FormRow form={form} name="area.canopyArea" label="Canopy Area" control={form.control} />
+                            <FormRow form={form} name="area.driversRestRoom" label="Driver's Rest Room" control={form.control} />
+                            <FormRow form={form} name="area.totalChargeableArea" label="Total Chargeable Area" control={form.control} />
+                            
+                            <SectionHeader icon={ListChecks} title="Lease Terms" />
+                            <FormRow form={form} name="leaseTerms.leaseTenure" label="Lease Tenure" control={form.control} />
+                            <FormRow form={form} name="leaseTerms.leaseLockIn" label="Lease Lock-In Period" control={form.control} />
+                            <FormRow form={form} name="leaseTerms.rentEscalation" label="Rent Escalation (% and Freq.)" control={form.control} />
+                            
+                            <SectionHeader icon={HandCoins} title="Commercial Terms" />
+                             <FormRow form={form} name="commercialTerms.chargeableArea" label="Chargeable Area (SFT)" control={form.control} />
+                            <FormRow form={form} name="commercialTerms.buildingRentPerSft" label="Building Rent per SFT (INR)" control={form.control} />
+                            <FormRow form={form} name="commercialTerms.totalRentPerMonth" label="Total Rent per Month (INR)" control={form.control} />
+                            <FormRow form={form} name="commercialTerms.camCharges" label="CAM Charges per SFT" control={form.control}/>
+                            <FormRow form={form} name="commercialTerms.ifrsd" label="IFRSD (Security Deposit)" control={form.control} />
 
-                                <TableRow><SectionHeader icon={HandCoins} title="Commercial Terms" /></TableRow>
-                                <FormRow form={form} name="commercialTerms.chargeableArea" label="Chargeable Area (SFT)" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="commercialTerms.buildingRentPerSft" label="Building Rent per SFT (INR)" control={form.control} watch={form.watch}/>
-                                <FormRow form={form} name="commercialTerms.totalRentPerMonth" label="Total Rent per Month (INR)" control={form.control} watch={form.watch} />
-                                {capexFields.map((field, index) => ( <CustomFormRow key={field.id} control={form.control} index={index} remove={removeCapex} isCostFactor watch={form.watch} arrayName="commercialTerms.capexItems" /> ))}
-                                <TableRow><TableCell colSpan={6}><Button type="button" variant="outline" size="sm" onClick={() => appendCapex({ particulars: '', isCostFactor: true })}><PlusCircle className="mr-2 h-4 w-4"/> Add CAPEX Item</Button></TableCell></TableRow>
-                                <FormRow form={form} name="commercialTerms.camCharges" label="CAM Charges per SFT" control={form.control} isCostFactor watch={form.watch}/>
-                                <FormRow form={form} name="commercialTerms.ifrsd" label="IFRSD (Security Deposit)" control={form.control} watch={form.watch}/>
-                                
-                                <TableRow><SectionHeader icon={Power} title="Electrical Infrastructure" /></TableRow>
-                                <FormRow form={form} name="electricalInfrastructure.installedCapacity" label="Installed Capacity of Sub-Station" control={form.control} watch={form.watch} />
-
-                                <TableRow><SectionHeader icon={Building} title="The Building" /></TableRow>
-                                <FormRow form={form} name="building.buildingType" label="Building Type" control={form.control} watch={form.watch} />
-                               
-                                <TableRow><SectionHeader icon={Droplets} title="Water-Toilet-Sewerage" /></TableRow>
-                                <FormRow form={form} name="waterToiletSewerage.workersToilet" label="Workers' Toilet" control={form.control} watch={form.watch} />
-
-                                <TableRow><SectionHeader icon={ShieldCheck} title="Safety & Security" /></TableRow>
-                                <FormRow form={form} name="safetyAndSecurity.fireExitDoor" label="Provision of Fire Exit Door" control={form.control} watch={form.watch} />
-                            </TableBody>
-                        </Table>
                         </div>
+
                     </CardContent>
                      <CardFooter className="flex-col items-stretch space-y-4 pt-6">
                         <Card className="w-full">
@@ -482,7 +398,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                             </CardContent>
                         </Card>
 
-                         <div className="w-full space-y-2">
+                         <div className="w-full space-y-2 pt-4">
                              <FormLabel>Overall Remarks</FormLabel>
                              <FormField
                                 control={form.control}
@@ -535,7 +451,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                 )}
                             />
                         </div>
-                         <div className="flex items-center gap-2 justify-end">
+                         <div className="flex items-center gap-2 justify-end pt-4">
                              <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
                              <Button type="submit" variant="secondary"><Save className="mr-2 h-4 w-4" /> Save Draft</Button>
                              <Button type="button" onClick={handleFinalizeMoM}><Share className="mr-2 h-4 w-4" /> Finalize as MoM</Button>
@@ -546,3 +462,5 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
         </Form>
     );
 }
+
+    
