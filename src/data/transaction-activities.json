@@ -2,44 +2,34 @@
 [
     {
         "activityId": "ACT-1718300000001",
-        "leadId": "LDR-DEMO12345",
+        "leadId": "LDR-ACME456",
         "activityType": "Site Visit Request",
         "details": {
-            "visitDateTime": "2023-11-05T14:00:00Z",
+            "visitDateTime": "2023-11-15T14:00:00Z",
             "message": "Customer has requested a site visit for next week. Please confirm availability."
         },
-        "createdAt": "2023-10-28T09:30:00Z",
+        "createdAt": "2023-11-10T14:30:00Z",
         "createdBy": "o2o@example.com"
     },
     {
         "activityId": "ACT-1718300000002",
-        "leadId": "LDR-DEMO12345",
+        "leadId": "LDR-ACME456",
         "activityType": "Site Visit Update",
         "details": {
             "status": "Visited",
-            "notes": "Site visit completed successfully on Nov 5th. Customer was impressed with the facility."
+            "notes": "Site visit completed successfully on Nov 15th. Customer was impressed with the facility's high ceilings."
         },
-        "createdAt": "2023-11-06T10:00:00Z",
+        "createdAt": "2023-11-16T10:00:00Z",
         "createdBy": "o2o@example.com"
     },
     {
         "activityId": "ACT-1718300000003",
-        "leadId": "LDR-DEMO12345",
+        "leadId": "LDR-ACME456",
         "activityType": "Customer Feedback",
         "details": {
-            "feedbackText": "The customer found the location ideal but has concerns about the office space. They would like to discuss potential fit-out options."
+            "feedbackText": "The customer requires clarification on the load-bearing capacity of the floor to support heavy machinery."
         },
-        "createdAt": "2023-11-07T15:00:00Z",
-        "createdBy": "o2o@example.com"
-    },
-    {
-        "activityId": "ACT-1718300000004",
-        "leadId": "LDR-DEMO12345",
-        "activityType": "Tenant Improvements",
-        "details": {
-            "improvementsText": "Customer requires an additional 2,000 sq.ft. of office space and 3 extra power outlets in the main warehouse area. Awaiting quote for these improvements."
-        },
-        "createdAt": "2023-11-08T11:00:00Z",
+        "createdAt": "2023-11-17T11:00:00Z",
         "createdBy": "o2o@example.com"
     }
 ]
