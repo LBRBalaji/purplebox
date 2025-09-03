@@ -27,6 +27,10 @@ export function ProviderLeads() {
 
   const myLeads = React.useMemo(() => {
     if (!user) return [];
+    const isO2O = user.role === 'O2O' || user.email === 'admin@example.com';
+    if (isO2O) {
+        return registeredLeads; // O2O and Admin see all leads
+    }
     return registeredLeads.filter(lead => 
       lead.providers.some(p => p.providerEmail === user.email)
     );
@@ -73,9 +77,9 @@ export function ProviderLeads() {
                     <TableBody>
                         {myLeads.map(lead => {
                             const providerInfo = lead.providers.find(p => p.providerEmail === user?.email);
-                            if (!providerInfo) return null;
-                            
-                            const status = statusConfig[providerInfo.status];
+                            // For O2O/Admin, we just need a status to display. We can show a summary or the status of the first provider.
+                            // Here, we'll just determine the status for the logged-in user if they are a provider.
+                            const status = providerInfo ? statusConfig[providerInfo.status] : null;
 
                             return (
                                 <TableRow key={lead.id}>
@@ -89,10 +93,14 @@ export function ProviderLeads() {
                                     <TableCell className="max-w-xs truncate">{lead.requirementsSummary}</TableCell>
                                     <TableCell>{lead.registeredBy}</TableCell>
                                     <TableCell className="text-center">
-                                        <Badge className={cn("text-xs", status.color)}>{status.text}</Badge>
+                                        {status ? (
+                                            <Badge className={cn("text-xs", status.color)}>{status.text}</Badge>
+                                        ) : (
+                                            <Badge variant="outline">View Status</Badge>
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        {providerInfo.status === 'Pending' ? (
+                                        {providerInfo && providerInfo.status === 'Pending' ? (
                                             <div className="flex gap-2 justify-end">
                                                 <Button size="sm" variant="outline" onClick={() => handleStatusUpdate(lead.id, user!.email, 'Rejected')}>
                                                     <X className="mr-2 h-4 w-4" /> Reject
