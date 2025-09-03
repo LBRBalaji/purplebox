@@ -5,7 +5,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -446,14 +446,25 @@ export function ListingsPage() {
     <>
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
+             <div className="text-center py-8 md:py-12">
+                <div className="flex items-center justify-center gap-4 text-muted-foreground mb-4">
+                    <Search className="w-6 h-6"/>
+                    <div className="w-8 h-px bg-border"/>
+                    <CheckSquare className="w-6 h-6"/>
+                    <div className="w-8 h-px bg-border"/>
+                    <Download className="w-6 h-6"/>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight">Search-Select-Download</h1>
+                <p className="mt-4 text-lg text-muted-foreground">All the data you need, in a single CSV.</p>
+            </div>
              <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <div className="md:col-span-8">
                     <AlertTitle className="font-bold text-primary/90 text-xl flex items-center gap-3">
-                        <Download className="h-6 w-6 text-primary/80" />
+                        <Info className="h-6 w-6 text-primary/80" />
                         Download up to 5 listings at once!
                     </AlertTitle>
                     <AlertDescription className="text-primary/80 mt-2 space-y-3">
-                        <p>Select your favorite listings to instantly download their key details. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
+                        <p>Select your favorite listings to instantly <strong className="text-primary">download</strong> their key details. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
                         <Button onClick={handleLogDemandClick}>
                             <ClipboardPlus className="mr-2 h-4 w-4" /> Log Your Demand
                         </Button>
@@ -479,7 +490,7 @@ export function ListingsPage() {
             </Alert>
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
                 <div className="w-full">
-                    <h1 className="text-2xl font-bold font-headline tracking-tight">Search Listings</h1>
+                    <h2 className="text-2xl font-bold font-headline tracking-tight">Filter Listings</h2>
                     <p className="text-muted-foreground mt-1">
                         Use our advanced filters to find the perfect Warehouse, 3PL Operated Warehouse and Industrial Buildings for your needs.
                     </p>
