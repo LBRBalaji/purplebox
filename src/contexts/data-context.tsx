@@ -133,7 +133,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export type AgentLead = {
   id: string;
-  agentType: 'Individual' | 'Company';
+  agentType: 'Individual' | 'Company' | 'Developer';
   name: string;
   companyName: string;
   email: string;
