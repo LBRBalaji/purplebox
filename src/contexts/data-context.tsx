@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
-export type ListingStatus = 'pending' | 'approved' | 'rejected';
+export type ListingStatus = 'pending' | 'approved' | 'rejected' | 'leased';
 export type RegisteredLeadStatus = 'Pending' | 'Acknowledged' | 'Rejected';
 
 
@@ -52,10 +52,11 @@ export type DownloadRecord = {
 }
 
 type DataEvent = {
-  type: 'new_demand' | 'new_submission' | 'new_listing' | 'download_limit_exceeded';
+  type: 'new_demand' | 'new_submission' | 'new_listing' | 'download_limit_exceeded' | 'listing_status_changed';
   id: string; // The ID of the demand, submission, or user email
   timestamp: string;
   triggeredBy: string | undefined; // The email of the user who triggered the event
+  message?: string; // Optional message for the event
 };
 
 export type RegisteredLeadProvider = {
@@ -81,7 +82,7 @@ type DataContextType = {
   listings: ListingSchema[];
   addListing: (listing: ListingSchema, userEmail?: string) => void;
   updateListing: (listing: ListingSchema) => void;
-  updateListingStatus: (listingId: string, status: ListingStatus) => void;
+  updateListingStatus: (listingId: string, status: ListingStatus, userEmail?: string) => void;
   listingAnalytics: ListingAnalytics[];
   logListingView: (user: User, listingId: string) => void;
 
@@ -222,8 +223,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setListings(prev => prev.map(l => l.listingId === updatedListing.listingId ? updatedListing : l));
   }
 
-  const updateListingStatus = (listingId: string, status: ListingStatus) => {
-    setListings(prev => prev.map(l => l.listingId === listingId ? { ...l, status } : l));
+  const updateListingStatus = (listingId: string, status: ListingStatus, userEmail?: string) => {
+    setListings(prev => prev.map(l => {
+      if (l.listingId === listingId) {
+        setLastEvent({
+            type: 'listing_status_changed',
+            id: listingId,
+            timestamp: new Date().toISOString(),
+            triggeredBy: userEmail,
+            message: `Listing "${l.name}" status updated to ${status}.`
+        });
+        return { ...l, status };
+      }
+      return l;
+    }));
   }
 
 

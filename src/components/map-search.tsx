@@ -262,8 +262,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   // Filter listings to only show approved ones
   React.useEffect(() => {
-    const approvedListings = listings.filter(l => l.status === 'approved');
-    setWarehouses(approvedListings);
+    const activeListings = listings.filter(l => l.status === 'approved' || l.status === 'pending');
+    setWarehouses(activeListings);
   }, [listings]);
 
   // Init marker clusterer

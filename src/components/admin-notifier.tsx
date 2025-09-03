@@ -5,7 +5,7 @@ import * as React from 'react';
 import { useData } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
-import { AlertCircle, CheckCircle, ShieldAlert } from 'lucide-react';
+import { AlertCircle, CheckCircle, ShieldAlert, BadgeInfo } from 'lucide-react';
 
 export function AdminNotifier() {
   const { lastEvent } = useData();
@@ -54,6 +54,16 @@ export function AdminNotifier() {
                 </div>
             ),
             description: `User ${lastEvent.id} has reached their daily download limit.`,
+        });
+    } else if (lastEvent.type === 'listing_status_changed') {
+        toast({
+            title: (
+                <div className="flex items-center gap-2">
+                    <BadgeInfo className="h-5 w-5 text-primary" />
+                    <span>Listing Status Changed</span>
+                </div>
+            ),
+            description: lastEvent.message,
         });
     }
 

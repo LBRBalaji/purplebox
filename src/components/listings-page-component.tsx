@@ -348,9 +348,9 @@ export function ListingsPage() {
   }
 
   const maxSliderSize = useMemo(() => {
-    const max = Math.max(...approvedListings.map(w => w.sizeSqFt), 0);
+    const max = Math.max(...allListings.map(w => w.sizeSqFt), 0);
     return max > 0 ? Math.ceil(max / 100000) * 100000 : 1000000;
-  }, [approvedListings]);
+  }, [allListings]);
   
   const handleLogDemandClick = () => {
       if (!user) {
@@ -543,4 +543,3 @@ export function ListingsPage() {
     </>
   );
 }
-

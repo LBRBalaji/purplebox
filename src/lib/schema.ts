@@ -17,7 +17,7 @@ export const listingSchema = z.object({
   // System Metadata
   listingId: z.string(),
   developerId: z.string(), // references userId
-  status: z.enum(['pending', 'approved', 'rejected']),
+  status: z.enum(['pending', 'approved', 'rejected', 'leased']),
   
   // General Information
   warehouseBoxId: z.string(),
