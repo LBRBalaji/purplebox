@@ -41,7 +41,7 @@ const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch, form }
         <TableCell className="font-medium w-[20%]">{label}</TableCell>
         <TableCell className="w-[30%]">
             <FormField control={control} name={`${name}.details`} render={({ field }) => (
-                <FormItem><FormControl><InputComponent placeholder="Specific details..." {...field} className="min-h-0 h-10 p-2" /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormControl><InputComponent placeholder="Specific details..." {...field} value={field.value ?? ''} className="min-h-0 h-10 p-2" /></FormControl><FormMessage /></FormItem>
             )} />
         </TableCell>
         <TableCell className="w-[15%]">
@@ -56,7 +56,7 @@ const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch, form }
         </TableCell>
         <TableCell className="w-[20%]">
             <FormField control={control} name={`${name}.agreedTerms`} render={({ field }) => (
-                <FormItem className="flex-grow"><FormControl><Input placeholder="Final terms..." {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem className="flex-grow"><FormControl><Input placeholder="Final terms..." {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
             )} />
         </TableCell>
         <TableCell className="w-[20%]">
@@ -71,6 +71,7 @@ const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch, form }
                                 type="number" 
                                 placeholder="Cost" 
                                 {...field} 
+                                value={field.value ?? ''}
                                 onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} 
                                 className={showCostInput ? "w-24" : "hidden"}
                              />
@@ -88,13 +89,13 @@ const CustomFormRow = ({ control, index, remove, isCostFactor, watch, arrayName 
     const InputComponent = Textarea;
     return (
     <TableRow>
-        <TableCell><FormField control={control} name={`${arrayName}.${index}.particulars`} render={({ field }) => <Input placeholder={`Custom Item ${index+1}`} {...field} />} /></TableCell>
-        <TableCell><FormField control={control} name={`${arrayName}.${index}.details`} render={({ field }) => <InputComponent placeholder="Details..." {...field} className="h-10 p-2"/>} /></TableCell>
+        <TableCell><FormField control={control} name={`${arrayName}.${index}.particulars`} render={({ field }) => <Input placeholder={`Custom Item ${index+1}`} {...field} value={field.value ?? ''} />} /></TableCell>
+        <TableCell><FormField control={control} name={`${arrayName}.${index}.details`} render={({ field }) => <InputComponent placeholder="Details..." {...field} value={field.value ?? ''} className="h-10 p-2"/>} /></TableCell>
         <TableCell><FormField control={control} name={`${arrayName}.${index}.proposedBy`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select> )} /></TableCell>
         <TableCell><FormField control={control} name={`${arrayName}.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select> )} /></TableCell>
         <TableCell>
             <FormField control={control} name={`${arrayName}.${index}.agreedTerms`} render={({ field }) => (
-                <FormItem className="flex-grow"><FormControl><Input placeholder="Final terms..." {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem className="flex-grow"><FormControl><Input placeholder="Final terms..." {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
             )} />
         </TableCell>
         <TableCell>
@@ -103,7 +104,7 @@ const CustomFormRow = ({ control, index, remove, isCostFactor, watch, arrayName 
                    <FormField control={control} name={`${arrayName}.${index}.isCostFactor`} render={({ field }) => ( <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl> )} />
                 )}
                 <FormField control={control} name={`${arrayName}.${index}.cost`} render={({ field }) => (
-                   <FormItem><FormControl><Input type="number" placeholder="Cost" {...field} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} className={showCostInput ? "w-24" : "hidden"}/></FormControl><FormMessage /></FormItem>
+                   <FormItem><FormControl><Input type="number" placeholder="Cost" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} className={showCostInput ? "w-24" : "hidden"}/></FormControl><FormMessage /></FormItem>
                 )}/>
                 <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
             </div>
@@ -225,6 +226,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
     React.useEffect(() => {
         if (primaryListing) {
             form.reset({
+                ...form.getValues(),
                 siteInfo: {
                     postalAddress: { details: primaryListing.location },
                     buildingStatus: { details: primaryListing.availabilityDate },
@@ -238,21 +240,16 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                     docksAndShutters: { details: String(primaryListing.buildingSpecifications.numberOfDocksAndShutters) },
                 },
                 commercialTerms: {
+                    ...form.getValues().commercialTerms,
                     chargeableArea: { agreedTerms: String(primaryListing.sizeSqFt) },
                     buildingRentPerSft: { agreedTerms: String(primaryListing.rentPerSqFt) },
                     ifrsd: { agreedTerms: `INR ${((primaryListing.rentPerSqFt || 0) * primaryListing.sizeSqFt * (primaryListing.rentalSecurityDeposit || 0)).toLocaleString()}` },
-                    capexItems: [],
-                    netCostPerMonth: 0,
                 },
                 leaseTerms: {
+                    ...form.getValues().leaseTerms,
                     leaseTenure: { agreedTerms: '5 years'},
                     rentEscalation: { agreedTerms: '15% every 3 years'},
-                    customItems: [] 
                 },
-                tenantImprovements: { customItems: [] },
-                sessions: [],
-                actionableItems: [],
-                overallRemarks: ""
             });
         }
     }, [primaryListing, form]);
@@ -346,14 +343,14 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                             <Button type="button" variant="ghost" size="icon" onClick={() => removeSession(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                     </div>
                                         <Separator />
-                                        <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} /></FormControl></FormItem> )} />
+                                        <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} /></FormControl></FormItem> )} />
                                     
                                     <div className="space-y-2">
                                         <FormLabel>Customer Represented By</FormLabel>
                                         {customerFields.map((item, cIndex) => (
                                             <div key={item.id} className="flex items-center gap-2">
-                                                <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
-                                                <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''}/>} />
                                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                             </div>
                                         ))}
@@ -364,8 +361,8 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                         <FormLabel>Provider Represented By</FormLabel>
                                         {providerFields.map((item, pIndex) => (
                                             <div key={item.id} className="flex items-center gap-2">
-                                                <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
-                                                <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''}/>} />
                                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                             </div>
                                         ))}
@@ -376,8 +373,8 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                         <FormLabel>Transaction Facilitated By</FormLabel>
                                         {facilitatorFields.map((item, fIndex) => (
                                             <div key={item.id} className="flex items-center gap-2">
-                                                <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
-                                                <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''}/>} />
                                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                             </div>
                                         ))}
@@ -471,11 +468,11 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                     <TableBody>
                                         {actionableItemFields.map((field, index) => (
                                             <TableRow key={field.id}>
-                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.item`} render={({ field }) => <Textarea {...field} placeholder="Action item description"/>} /></TableCell>
+                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.item`} render={({ field }) => <Textarea {...field} value={field.value ?? ''} placeholder="Action item description"/>} /></TableCell>
                                                 <TableCell><FormField control={form.control} name={`actionableItems.${index}.responsibility`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem><SelectItem value="O2O">O2O</SelectItem></SelectContent></Select> )} /></TableCell>
-                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.schedule`} render={({ field }) => <Input {...field} placeholder="e.g., Within 7 days"/>} /></TableCell>
+                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.schedule`} render={({ field }) => <Input {...field} value={field.value ?? ''} placeholder="e.g., Within 7 days"/>} /></TableCell>
                                                 <TableCell><FormField control={form.control} name={`actionableItems.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Pending">Pending</SelectItem><SelectItem value="In Progress">In Progress</SelectItem><SelectItem value="Completed">Completed</SelectItem></SelectContent></Select> )} /></TableCell>
-                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.remarks`} render={({ field }) => <Input {...field} placeholder="Add remarks"/>} /></TableCell>
+                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.remarks`} render={({ field }) => <Input {...field} value={field.value ?? ''} placeholder="Add remarks"/>} /></TableCell>
                                                 <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => removeActionableItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
                                             </TableRow>
                                         ))}
@@ -493,7 +490,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                 render={({ field }) => (
                                     <FormItem>
                                     <FormControl>
-                                        <Textarea placeholder="Add any final notes, summaries, or next steps for this negotiation round..." {...field} />
+                                        <Textarea placeholder="Add any final notes, summaries, or next steps for this negotiation round..." {...field} value={field.value ?? ''} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -532,7 +529,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                     <FormItem className="w-full max-w-xs">
                                     <FormLabel className="flex items-center gap-2"><DollarSign className="h-4 w-4"/> Net Cost-Per Month (Excl. Tax)</FormLabel>
                                     <FormControl>
-                                        <Input type="number" {...field} readOnly className="text-lg font-bold text-primary bg-primary/10 border-primary/20"/>
+                                        <Input type="number" {...field} value={field.value ?? 0} readOnly className="text-lg font-bold text-primary bg-primary/10 border-primary/20"/>
                                     </FormControl>
                                     </FormItem>
                                 )}

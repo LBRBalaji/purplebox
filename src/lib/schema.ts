@@ -1,4 +1,5 @@
 
+
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -310,51 +311,51 @@ export const createPropertySchema = (demand?: DemandSchema) => {
 export type PropertySchema = z.infer<ReturnType<typeof createPropertySchema>>;
 
 const negotiableTermSchema = z.object({
-    details: z.string().optional(),
+    details: z.string().optional().default(''),
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
-    agreedTerms: z.string().optional(),
+    agreedTerms: z.string().optional().default(''),
 }).optional();
 
 const customTermSchema = z.object({
-    particulars: z.string(),
-    details: z.string().optional(),
+    particulars: z.string().default(''),
+    details: z.string().optional().default(''),
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
-    agreedTerms: z.string().optional(),
+    agreedTerms: z.string().optional().default(''),
     isCostFactor: z.boolean().default(false).optional(),
-    cost: z.coerce.number().optional(),
+    cost: asOptionalField(z.coerce.number()),
 });
 
 const attendeeSchema = z.object({
-    name: z.string().optional(),
-    title: z.string().optional(),
+    name: z.string().optional().default(''),
+    title: z.string().optional().default(''),
 });
 
 const negotiationSessionSchema = z.object({
-    date: z.string().datetime(),
-    venue: z.string().optional(),
-    customerAttendees: z.array(attendeeSchema).optional(),
-    providerAttendees: z.array(attendeeSchema).optional(),
-    facilitatorAttendees: z.array(attendeeSchema).optional(),
+    date: z.string().datetime().default(new Date().toISOString()),
+    venue: z.string().optional().default(''),
+    customerAttendees: z.array(attendeeSchema).optional().default([]),
+    providerAttendees: z.array(attendeeSchema).optional().default([]),
+    facilitatorAttendees: z.array(attendeeSchema).optional().default([]),
 });
 
 const actionableItemSchema = z.object({
-    item: z.string().optional(),
+    item: z.string().optional().default(''),
     responsibility: z.enum(['Customer', 'Provider', 'O2O']).optional(),
-    schedule: z.string().optional(),
+    schedule: z.string().optional().default(''),
     status: z.enum(['Pending', 'In Progress', 'Completed']).optional(),
-    remarks: z.string().optional(),
+    remarks: z.string().optional().default(''),
 });
 
 export const commercialTermsSchema = z.object({
-    sessions: z.array(negotiationSessionSchema).optional(),
+    sessions: z.array(negotiationSessionSchema).optional().default([]),
     siteInfo: z.object({
         postalAddress: negotiableTermSchema,
         buildingNumber: negotiableTermSchema,
         googleCoordinates: negotiableTermSchema,
         buildingStatus: negotiableTermSchema,
-    }).optional(),
+    }).optional().default({}),
     area: z.object({
         plinthArea: negotiableTermSchema,
         mezzanineArea1: negotiableTermSchema,
@@ -362,7 +363,7 @@ export const commercialTermsSchema = z.object({
         canopyArea: negotiableTermSchema,
         driversRestRoom: negotiableTermSchema,
         totalChargeableArea: negotiableTermSchema,
-    }).optional(),
+    }).optional().default({}),
     tenantImprovements: z.object({
         electricityPower: negotiableTermSchema,
         internalCabling: negotiableTermSchema,
@@ -370,7 +371,7 @@ export const commercialTermsSchema = z.object({
         mechanisedAccess: negotiableTermSchema,
         washroomsOnMezzanine: negotiableTermSchema,
         ramp: negotiableTermSchema,
-        customItems: z.array(customTermSchema).optional(),
+        customItems: z.array(customTermSchema).optional().default([]),
     }),
     leaseTerms: z.object({
         leaseTenure: negotiableTermSchema,
@@ -383,7 +384,7 @@ export const commercialTermsSchema = z.object({
         leaseCommencementDate: negotiableTermSchema,
         rentCommencementDate: negotiableTermSchema,
         scopeAndCostOfRegistration: negotiableTermSchema,
-        customItems: z.array(customTermSchema).optional(),
+        customItems: z.array(customTermSchema).optional().default([]),
     }),
     commercialTerms: z.object({
         chargeableArea: negotiableTermSchema,
@@ -394,8 +395,8 @@ export const commercialTermsSchema = z.object({
         ifrsd: negotiableTermSchema,
         commitmentPhase2: negotiableTermSchema,
         additionalCharges: negotiableTermSchema,
-        capexItems: z.array(customTermSchema).optional(),
-        netCostPerMonth: z.number().optional(),
+        capexItems: z.array(customTermSchema).optional().default([]),
+        netCostPerMonth: z.number().optional().default(0),
     }),
     electricalInfrastructure: z.object({
         installedCapacity: negotiableTermSchema,
@@ -419,7 +420,7 @@ export const commercialTermsSchema = z.object({
         hvacCapacity: negotiableTermSchema,
         provisionForHvac: negotiableTermSchema,
         falseCeiling: negotiableTermSchema,
-    }).optional(),
+    }).optional().default({}),
     building: z.object({
         buildingType: negotiableTermSchema,
         shopFloorDimension: negotiableTermSchema,
@@ -429,7 +430,7 @@ export const commercialTermsSchema = z.object({
         naturalLightingVentilation: negotiableTermSchema,
         roofInsulation: negotiableTermSchema,
         internalLighting: negotiableTermSchema,
-    }).optional(),
+    }).optional().default({}),
     waterToiletSewerage: z.object({
         workersToilet: negotiableTermSchema,
         executiveToilet: negotiableTermSchema,
@@ -440,7 +441,7 @@ export const commercialTermsSchema = z.object({
         septicTank: negotiableTermSchema,
         stpProvided: negotiableTermSchema,
         solidWasteDisposal: negotiableTermSchema,
-    }).optional(),
+    }).optional().default({}),
     safetyAndSecurity: z.object({
         fireExitDoor: negotiableTermSchema,
         fireHydrantOutside: negotiableTermSchema,
@@ -451,9 +452,9 @@ export const commercialTermsSchema = z.object({
         isSecurityProvided: negotiableTermSchema,
         isCctvInstalled: negotiableTermSchema,
         isSecurityDeskProvided: negotiableTermSchema,
-    }).optional(),
-    actionableItems: z.array(actionableItemSchema).optional(),
-    overallRemarks: z.string().optional(),
+    }).optional().default({}),
+    actionableItems: z.array(actionableItemSchema).optional().default([]),
+    overallRemarks: z.string().optional().default(''),
 });
 export type CommercialTermsSchema = z.infer<typeof commercialTermsSchema>;
 
