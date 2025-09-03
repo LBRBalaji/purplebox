@@ -94,7 +94,8 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                     aria-label={`Select warehouse ${listing.listingId}`}
                 />
                 <Label htmlFor={`select-${listing.listingId}`} className="text-sm font-medium flex items-center gap-1 cursor-pointer">
-                    Select <Smile className="h-4 w-4 text-amber-500" />
+                    Select
+                    {isSelected && <Smile className="h-4 w-4 text-amber-500 animate-in fade-in zoom-in-90 duration-500" />}
                 </Label>
             </div>
         </div>
@@ -176,7 +177,7 @@ function DownloadBar() {
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             
             const footer = [
-                [],
+                [], // Empty row for spacing
                 ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
@@ -561,3 +562,5 @@ export function ListingsPage() {
     </>
   );
 }
+
+    
