@@ -87,7 +87,7 @@ export default function LeadDetailPage() {
   }
 
   const customer = users[lead.customerId];
-  const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+  const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
   const isCustomer = user?.email === lead.customerId;
   
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : '/dashboard/register-lead';
@@ -116,7 +116,7 @@ export default function LeadDetailPage() {
             <TabsContent value="activity" className="mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                     <div className="md:col-span-2 space-y-6">
-                        {isAdminOrO2O && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                        {isO2O && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>
@@ -141,7 +141,7 @@ export default function LeadDetailPage() {
                                                         {activity.details.feedbackText && <p className="text-sm"><b>Feedback:</b> {activity.details.feedbackText}</p>}
                                                         {activity.details.improvementsText && <p className="text-sm"><b>Requirements:</b> {activity.details.improvementsText}</p>}
                                                         <TimelineDescription>
-                                                            Logged by {activity.createdBy} on {new Date(activity.createdAt).toLocaleDateString()}
+                                                            Logged by {activity.createdBy.replace('o2o@', 'O2O@')} on {new Date(activity.createdAt).toLocaleDateString()}
                                                         </TimelineDescription>
                                                     </TimelineBody>
                                                 </TimelineItem>
