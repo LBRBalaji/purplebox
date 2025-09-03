@@ -1,3 +1,4 @@
+
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -56,6 +57,7 @@ export const listingSchema = z.object({
     internalLighting: z.string().optional(),
     craneSupportStructureAvailable: z.boolean().optional(),
     craneAvailable: z.boolean().optional(),
+    warehouseLayoutAvailable: z.boolean().optional(),
     // New Roof Section
     roofType: z.enum(['Galvalume', 'RCC', 'ACC']).optional(),
     eveHeightMeters: asOptionalField(z.coerce.number()),
@@ -345,3 +347,16 @@ export const PredictDemandTrendsOutputSchema = z.object({
   trendingSpecifications: z.array(TrendingSpecSchema).describe('A list of warehouse specifications that are predicted to be in high demand.'),
 });
 export type PredictDemandTrendsOutput = z.infer<typeof PredictDemandTrendsOutputSchema>;
+
+export const layoutRequestSchema = z.object({
+  listingId: z.string(),
+  listingName: z.string(),
+  userName: z.string().min(1, 'Your name is required.'),
+  department: z.string().min(1, 'Department is required.'),
+  title: z.string().min(1, 'Your title is required.'),
+  mobile: z.string().min(10, 'A valid mobile number is required.'),
+  agreement: z.literal(true, {
+    errorMap: () => ({ message: 'You must agree to the terms.' }),
+  }),
+});
+export type LayoutRequestData = z.infer<typeof layoutRequestSchema>;

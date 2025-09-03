@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import * as XLSX from 'xlsx';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { LayoutRequestDialog } from '@/components/layout-request-dialog';
 
 
 const InfoPill = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) => (
@@ -87,6 +88,7 @@ export default function ListingDetailPage() {
     const { listings, logDownload, logListingView } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
+    const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
     const [navigationList, setNavigationList] = React.useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = React.useState(-1);
 
@@ -226,6 +228,14 @@ export default function ListingDetailPage() {
     
     const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
 
+    const handleLayoutRequest = () => {
+        if (!user) {
+            setIsLoginDialogOpen(true);
+            return;
+        }
+        setIsLayoutRequestOpen(true);
+    };
+
     return (
         <>
             <main className="container mx-auto p-4 md:p-8">
@@ -325,6 +335,7 @@ export default function ListingDetailPage() {
                                             {user && <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />}
                                             <DetailRow label="Crane Support Structure" value={listing.buildingSpecifications.craneSupportStructureAvailable} />
                                             <DetailRow label="Crane Available" value={listing.buildingSpecifications.craneAvailable} />
+                                            <DetailRow label="Warehouse Layout Available" value={listing.buildingSpecifications.warehouseLayoutAvailable} />
                                         </div>
                                          <div>
                                             <h4 className="font-semibold mb-2">Site</h4>
@@ -357,6 +368,14 @@ export default function ListingDetailPage() {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
+                                     {listing.buildingSpecifications.warehouseLayoutAvailable && (
+                                        <div className="mb-6">
+                                            <Button className="w-full" onClick={handleLayoutRequest}>
+                                                <Layout className="mr-2 h-4 w-4" />
+                                                Request a copy of the layout
+                                            </Button>
+                                        </div>
+                                    )}
                                     {listing.documents && listing.documents.length > 0 ? (
                                         <Table>
                                             <TableHeader>
@@ -441,8 +460,7 @@ export default function ListingDetailPage() {
                 </div>
             </main>
             <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => setIsLoginDialogOpen(false)} />
+            {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name}/>}
         </>
     );
 }
-
-    
