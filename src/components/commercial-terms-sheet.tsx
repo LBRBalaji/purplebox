@@ -274,14 +274,20 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
     };
 
     const handlePrint = () => {
+        const originalTitle = document.title;
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+        document.title = `MoM_${lead.id}_Lakshmi_Balaji_O2O_${timestamp}`;
         window.print();
+        document.title = originalTitle;
     };
 
     return (
         <Form {...form}>
+            <div className="hidden print-header">Commercial Terms Sheet</div>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 printable-content">
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="no-print">
                         <div className="flex justify-between items-start">
                             <div>
                                 <CardTitle>Commercial Terms Sheet</CardTitle>
@@ -316,11 +322,11 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                             const { fields: facilitatorFields, append: appendFacilitator, remove: removeFacilitator } = facilitatorAttendees(index);
                             return (
                                 <div key={field.id} className="p-4 border rounded-lg bg-secondary/50 space-y-4 mb-6">
-                                    <div className="flex justify-between items-center">
+                                    <div className="flex justify-between items-center no-print">
                                         <p className="font-semibold text-sm">Negotiation Session {index + 1}: {new Date(form.watch(`sessions.${index}.date`)).toLocaleString()}</p>
                                             <Button type="button" variant="ghost" size="icon" onClick={() => removeSession(index)} disabled={isCustomer}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                     </div>
-                                        <Separator />
+                                        <Separator className="no-print" />
                                         <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={isCustomer} /></FormControl></FormItem> )} />
                                     
                                     <div className="space-y-2">
@@ -329,10 +335,10 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                             <div key={item.id} className="flex items-center gap-2">
                                                 <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
                                                 <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)} disabled={isCustomer}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)} disabled={isCustomer} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                             </div>
                                         ))}
-                                        <Button type="button" size="sm" variant="outline" onClick={() => appendCustomer({name: '', title: ''})} disabled={isCustomer}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                        <Button type="button" size="sm" variant="outline" onClick={() => appendCustomer({name: '', title: ''})} disabled={isCustomer} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
                                     </div>
                                     
                                     <div className="space-y-2">
@@ -341,10 +347,10 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                             <div key={item.id} className="flex items-center gap-2">
                                                 <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
                                                 <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)} disabled={isCustomer}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)} disabled={isCustomer} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                             </div>
                                         ))}
-                                        <Button type="button" size="sm" variant="outline" onClick={() => appendProvider({name: '', title: ''})} disabled={isCustomer}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                        <Button type="button" size="sm" variant="outline" onClick={() => appendProvider({name: '', title: ''})} disabled={isCustomer} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
                                     </div>
 
                                     <div className="space-y-2">
@@ -353,10 +359,10 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                             <div key={item.id} className="flex items-center gap-2">
                                                 <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
                                                 <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)} disabled={isCustomer}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)} disabled={isCustomer} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                             </div>
                                         ))}
-                                        <Button type="button" size="sm" variant="outline" onClick={() => appendFacilitator({name: '', title: ''})} disabled={isCustomer}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                        <Button type="button" size="sm" variant="outline" onClick={() => appendFacilitator({name: '', title: ''})} disabled={isCustomer} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
                                     </div>
                                 </div>
                             )
@@ -407,7 +413,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                             <TableHead>Schedule</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead>Remarks</TableHead>
-                                            <TableHead></TableHead>
+                                            <TableHead className="no-print"></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -418,12 +424,12 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                                 <TableCell><FormField control={form.control} name={`actionableItems.${index}.schedule`} render={({ field }) => <Input {...field} value={field.value ?? ''} placeholder="e.g., Within 7 days" disabled={isCustomer}/>} /></TableCell>
                                                 <TableCell><FormField control={form.control} name={`actionableItems.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value} disabled={isCustomer}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Pending">Pending</SelectItem><SelectItem value="In Progress">In Progress</SelectItem><SelectItem value="Completed">Completed</SelectItem></SelectContent></Select> )} /></TableCell>
                                                 <TableCell><FormField control={form.control} name={`actionableItems.${index}.remarks`} render={({ field }) => <Input {...field} value={field.value ?? ''} placeholder="Add remarks" disabled={isCustomer}/>} /></TableCell>
-                                                <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => removeActionableItem(index)} disabled={isCustomer}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
+                                                <TableCell className="no-print"><Button type="button" variant="ghost" size="icon" onClick={() => removeActionableItem(index)} disabled={isCustomer}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
                                 </Table>
-                                <Button type="button" variant="outline" size="sm" onClick={() => appendActionableItem({})} className="mt-4" disabled={isCustomer}><PlusCircle className="mr-2 h-4 w-4"/> Add Action Item</Button>
+                                <Button type="button" variant="outline" size="sm" onClick={() => appendActionableItem({})} className="mt-4 no-print" disabled={isCustomer}><PlusCircle className="mr-2 h-4 w-4"/> Add Action Item</Button>
                             </CardContent>
                         </Card>
 
@@ -476,7 +482,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                 <p className="text-2xl font-bold text-primary">₹{commercialTermsWatched?.netCostPerMonth?.toLocaleString('en-IN') || 0}</p>
                             </div>
                         </div>
-                         <div className="flex items-center gap-2 justify-end pt-4">
+                         <div className="flex items-center gap-2 justify-end pt-4 no-print">
                              <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
                              {!isCustomer && (
                                 <>
@@ -488,6 +494,10 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                     </CardFooter>
                 </Card>
             </form>
+            <div className="hidden print-footer">
+                <span>Transaction ID: {lead.id}</span>
+                <span>Transaction Facilitator: <a href="https://www.lakshmibalajio2o.com" target="_blank" rel="noopener noreferrer">Lakshmi Balaji O2O</a></span>
+            </div>
         </Form>
     );
 }

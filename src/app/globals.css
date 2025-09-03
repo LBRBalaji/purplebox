@@ -87,3 +87,60 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body {
+    background: white;
+  }
+  
+  header, footer, .no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .printable-content {
+    box-shadow: none;
+    border: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+
+  .print-header {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .print-footer {
+    display: flex;
+    justify-content: space-between;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+    font-size: 0.8rem;
+    color: #555;
+  }
+}
