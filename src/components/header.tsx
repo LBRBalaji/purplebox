@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator, UserCheck, FileText } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator, UserCheck, FileText, Search as SearchIcon } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -167,6 +167,7 @@ export function Header() {
                         )}
                         {isAdmin && (
                             <>
+                                <NavLink href="/dashboard/search-console"><SearchIcon className="h-4 w-4" /> Search Console</NavLink>
                                 <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
                                 <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
                                 <AnalyticsDropdown />

@@ -35,6 +35,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (pathname.startsWith('/dashboard/manage-users')) {
             router.push('/dashboard');
         }
+        
+        // Redirect non-admins away from search console (only main admin has access)
+        if (pathname.startsWith('/dashboard/search-console')) {
+            router.push('/dashboard');
+        }
 
         // Redirect non-admins/O2O away from listing management
         if (pathname.startsWith('/dashboard/manage-listings') && !isO2OManager) {
