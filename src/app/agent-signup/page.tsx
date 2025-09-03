@@ -90,7 +90,7 @@ export default function AgentSignupPage() {
               </div>
               <h1 className="text-3xl font-bold font-headline text-primary">Agent Registration</h1>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Join the WareHouse Network</p>
+            <p className="text-xs text-muted-foreground mt-1">Join the Lakshmi Balaji O2O Network</p>
           </div>
           <CardTitle className="text-2xl">Become an Agent Partner</CardTitle>
           <Alert className="mt-4 text-left bg-primary/5 border-primary/20">

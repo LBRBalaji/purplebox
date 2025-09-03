@@ -7,7 +7,7 @@ import { DataProvider } from '@/contexts/data-context';
 import { Header } from '@/components/header';
 
 export const metadata: Metadata = {
-  title: 'WareHouse: Sourcing & Leasing Simplified',
+  title: 'Lakshmi Balaji O2O: Sourcing & Leasing Simplified',
   description: 'Sourcing & Leasing Simplified',
 };
 
