@@ -198,8 +198,8 @@ export function AdminListings() {
   const [sizeRange, setSizeRange] = React.useState([0, 1000000]);
 
   const allDevelopers = React.useMemo(() => {
-    const developerIds = new Set(listings.map(l => l.developerId));
-    return Object.values(users).filter(u => developerIds.has(u.email));
+    const developerEmails = new Set(listings.map(l => l.developerId));
+    return Object.values(users).filter(u => developerEmails.has(u.email));
   }, [listings, users]);
 
   const maxSliderSize = React.useMemo(() => {
@@ -325,3 +325,5 @@ export function AdminListings() {
       </div>
   );
 }
+
+    
