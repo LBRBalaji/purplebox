@@ -67,7 +67,7 @@ const AnalyticsDropdown = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
                 <DropdownMenuItem asChild>
-                    <Link href="/dashboard/analytics/listings">Listing Analytics</Link>
+                    <Link href="/dashboard/analytics/listings-performance">Listing Performance</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                     <Link href="/dashboard/analytics/demands">Demand Analytics</Link>
@@ -169,18 +169,13 @@ export function Header() {
                             <>
                                 <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
                                 <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
-                                <NavLink href="/dashboard/manage-listings"><FileCheck className="h-4 w-4" /> Manage Listings</NavLink>
                                 <AnalyticsDropdown />
                             </>
                         )}
                          {(isO2O && !isAdmin) && (
                             <>
                                 <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
-                                <NavLink href="/dashboard/manage-listings"><FileCheck className="h-4 w-4" /> Manage Listings</NavLink>
                             </>
-                         )}
-                         {isProvider && !isAdmin && (
-                            <NavLink href="/dashboard/manage-warehouses"><Warehouse className="h-4 w-4" /> Manage Warehouses</NavLink>
                          )}
                     </>
                 )}
