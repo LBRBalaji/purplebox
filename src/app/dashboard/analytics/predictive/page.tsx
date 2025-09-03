@@ -1,3 +1,4 @@
+
 // src/app/dashboard/analytics/predictive/page.tsx
 'use client';
 
@@ -35,6 +36,8 @@ export default function PredictiveAnalyticsPage() {
     const [timeHorizon, setTimeHorizon] = React.useState<PredictDemandTrendsInput['timeHorizon']>('next quarter');
     const [location, setLocation] = React.useState('');
     const [buildingType, setBuildingType] = React.useState<PredictDemandTrendsInput['buildingType']>('Any');
+    const [serviceModel, setServiceModel] = React.useState<PredictDemandTrendsInput['serviceModel']>('Any');
+
 
     React.useEffect(() => {
         if (!isAuthLoading && user?.email !== 'admin@example.com' && user?.role !== 'O2O') {
@@ -48,8 +51,9 @@ export default function PredictiveAnalyticsPage() {
         try {
             const result = await predictDemandTrends({ 
                 timeHorizon,
-                location: location || undefined, // Send undefined if empty
-                buildingType: buildingType === 'Any' ? undefined : buildingType
+                location: location || undefined,
+                buildingType: buildingType === 'Any' ? undefined : buildingType,
+                serviceModel: serviceModel === 'Any' ? undefined : serviceModel,
              });
             setAnalysis(result);
         } catch (error) {
@@ -84,7 +88,7 @@ export default function PredictiveAnalyticsPage() {
                         <CardTitle className="flex items-center gap-2"><Settings2 className="h-5 w-5"/>Analysis Parameters</CardTitle>
                         <CardDescription>Set the parameters for the analysis and click "Generate" to see the insights.</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+                    <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
                          <div className="space-y-2">
                             <Label htmlFor="time-horizon">Time Horizon</Label>
                             <Select onValueChange={(value) => setTimeHorizon(value as any)} defaultValue={timeHorizon}>
@@ -100,7 +104,7 @@ export default function PredictiveAnalyticsPage() {
                             <Input id="location" placeholder="e.g. Chennai, Oragadam" value={location} onChange={(e) => setLocation(e.target.value)} />
                         </div>
                         <div className="space-y-2">
-                             <Label htmlFor="building-type">Building Type (Optional)</Label>
+                             <Label htmlFor="building-type">Building Type</Label>
                             <Select onValueChange={(value) => setBuildingType(value as any)} defaultValue={buildingType}>
                                 <SelectTrigger id="building-type"><SelectValue /></SelectTrigger>
                                 <SelectContent>
@@ -110,9 +114,21 @@ export default function PredictiveAnalyticsPage() {
                                 </SelectContent>
                             </Select>
                         </div>
+                         <div className="space-y-2">
+                             <Label htmlFor="service-model">Service Model</Label>
+                            <Select onValueChange={(value) => setServiceModel(value as any)} defaultValue={serviceModel}>
+                                <SelectTrigger id="service-model"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Any">Any</SelectItem>
+                                    <SelectItem value="Standard">Standard</SelectItem>
+                                    <SelectItem value="3PL">3PL</SelectItem>
+                                    <SelectItem value="Both">Both</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <Button onClick={handleGenerateAnalysis} disabled={isLoading} className="w-full">
                             <Sparkles className="mr-2 h-4 w-4" />
-                            {isLoading ? 'Generating Insights...' : 'Generate Analysis'}
+                            {isLoading ? 'Generating...' : 'Generate'}
                         </Button>
                     </CardContent>
                 </Card>

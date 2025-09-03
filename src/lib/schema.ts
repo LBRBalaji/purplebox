@@ -1,3 +1,4 @@
+
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -314,6 +315,7 @@ export const PredictDemandTrendsInputSchema = z.object({
     .describe('The time period for which to predict demand trends.'),
   location: z.string().optional().describe('An optional location (e.g., city or industrial park) to focus the analysis on.'),
   buildingType: z.enum(['Any', 'PEB', 'RCC']).optional().describe('An optional building type to filter the analysis.'),
+  serviceModel: z.enum(['Any', 'Standard', '3PL', 'Both']).optional().describe('An optional service model to filter the analysis.'),
 });
 export type PredictDemandTrendsInput = z.infer<typeof PredictDemandTrendsInputSchema>;
 

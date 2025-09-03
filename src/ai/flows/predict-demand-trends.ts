@@ -1,3 +1,4 @@
+
 // src/ai/flows/predict-demand-trends.ts
 'use server';
 
@@ -35,6 +36,7 @@ const prompt = ai.definePrompt({
     timeHorizon: z.string(),
     location: z.string().optional(),
     buildingType: z.string().optional(),
+    serviceModel: z.string().optional(),
     demands: z.array(demandSchema),
     listings: z.array(listingSchema),
     submissions: z.array(z.any()), // Using any to avoid complexity with nested schemas in prompt
@@ -45,6 +47,7 @@ const prompt = ai.definePrompt({
   Your task is to predict future demand trends for the {{{timeHorizon}}}.
   {{#if location}}The analysis should specifically focus on the **{{{location}}}** area.{{/if}}
   {{#if buildingType}}The analysis should be filtered for **{{{buildingType}}}** building types.{{/if}}
+  {{#if serviceModel}}The analysis should be filtered for **{{{serviceModel}}}** service models.{{/if}}
 
   Analyze the following data sets:
   1.  **Demand Data**: Records of what customers have explicitly requested. Pay attention to locations, sizes, readiness timelines, and specific priorities.
@@ -78,7 +81,7 @@ const predictDemandTrendsFlow = ai.defineFlow(
     // For this prototype, we're reading from the local JSON files.
     // We can filter the data based on the input before sending it to the model.
     let filteredDemands = allDemands;
-    let filteredListings = allListings;
+    let filteredListings = allListings as ListingSchema[];
 
     if (input.location) {
         const loc = input.location.toLowerCase();
@@ -92,11 +95,17 @@ const predictDemandTrendsFlow = ai.defineFlow(
         filteredListings = filteredListings.filter(l => l.buildingSpecifications.buildingType?.toLowerCase().includes(bt));
     }
 
+    if (input.serviceModel && input.serviceModel !== 'Any') {
+        const sm = input.serviceModel.toLowerCase();
+         filteredListings = filteredListings.filter(l => l.serviceModel?.toLowerCase() === sm);
+    }
+
 
     const historicalData = {
         timeHorizon: input.timeHorizon,
         location: input.location,
         buildingType: input.buildingType,
+        serviceModel: input.serviceModel,
         demands: filteredDemands,
         listings: filteredListings,
         submissions: allSubmissions,
