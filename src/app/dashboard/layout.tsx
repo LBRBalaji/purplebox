@@ -40,8 +40,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
-        // Allow O2O Managers to access the leads detail pages
-        if (pathname.startsWith('/dashboard/leads') && !(isMainAdmin || isO2OManager || user.role === 'SuperAdmin')) {
+        // Allow Admins and O2O Managers to access the leads detail pages
+        if (pathname.startsWith('/dashboard/leads') && !(isMainAdmin || isO2OManager)) {
             router.push('/dashboard');
         }
     }
