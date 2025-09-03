@@ -23,6 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (isMainAdmin) return;
         
         const isO2OManager = user.role === 'O2O';
+        const isCustomer = user.role === 'User';
         
         // Analytics is only for the main admin and O2O
         if (pathname.startsWith('/dashboard/analytics') && !isO2OManager) {
@@ -43,8 +44,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
-        // Allow Admins and O2O Managers to access the leads detail pages
-        if (pathname.startsWith('/dashboard/leads') && !isO2OManager) {
+        // Allow Admins, O2O Managers, AND Customers to access the leads detail pages
+        if (pathname.startsWith('/dashboard/leads') && !isO2OManager && !isCustomer) {
             router.push('/dashboard');
         }
     }
