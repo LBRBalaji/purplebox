@@ -12,7 +12,7 @@ import {
 import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -32,6 +32,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Slider } from './ui/slider';
+
 
 function AdminListingCard({ listing, analytics, providerName }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string }) {
   const { updateListingStatus } = useData();
@@ -186,23 +190,127 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
 export function AdminListings() {
   const { listings, listingAnalytics } = useData();
   const { users } = useAuth();
+  
+  const [filteredListings, setFilteredListings] = React.useState<ListingSchema[]>([]);
+  const [locationFilter, setLocationFilter] = React.useState('');
+  const [developerFilter, setDeveloperFilter] = React.useState('all');
+  const [availabilityFilter, setAvailabilityFilter] = React.useState('all');
+  const [sizeRange, setSizeRange] = React.useState([0, 1000000]);
+
+  const allDevelopers = React.useMemo(() => {
+    const developerIds = new Set(listings.map(l => l.developerId));
+    return Object.values(users).filter(u => developerIds.has(u.email));
+  }, [listings, users]);
+
+  const maxSliderSize = React.useMemo(() => {
+    const max = Math.max(...listings.map(w => w.sizeSqFt), 0);
+    return max > 0 ? Math.ceil(max / 100000) * 100000 : 1000000;
+  }, [listings]);
+
+  React.useEffect(() => {
+     let results = [...listings];
+
+     if (locationFilter) {
+       results = results.filter(l => l.location.toLowerCase().includes(locationFilter.toLowerCase()));
+     }
+
+     if (developerFilter !== 'all') {
+       results = results.filter(l => l.developerId === developerFilter);
+     }
+     
+     if (availabilityFilter !== 'all') {
+       results = results.filter(l => l.availabilityDate === availabilityFilter);
+     }
+
+     results = results.filter(l => l.sizeSqFt >= sizeRange[0] && l.sizeSqFt <= sizeRange[1]);
+
+     setFilteredListings(results);
+
+  }, [listings, locationFilter, developerFilter, availabilityFilter, sizeRange]);
 
   const getProviderName = (developerId: string) => {
     const provider = Object.values(users).find(u => u.email === developerId);
     return provider?.companyName || 'Unknown Provider';
   };
+  
+  const resetFilters = () => {
+    setLocationFilter('');
+    setDeveloperFilter('all');
+    setAvailabilityFilter('all');
+    setSizeRange([0, maxSliderSize]);
+  }
 
   return (
       <div className="mt-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold font-headline tracking-tight">All Listings &amp; Performance</h2>
           <p className="text-muted-foreground mt-2">
-            An overview of all listings on the platform. Use the actions menu on each card to approve or reject them.
+            Filter and analyze all listings on the platform. Use the actions menu on each card to approve or reject them.
           </p>
         </div>
-        {listings.length > 0 ? (
+        
+         <Card className="mb-8 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+                 <div className="space-y-2">
+                    <label className="text-sm font-medium">Location</label>
+                    <Input 
+                        placeholder="Search by city or area..."
+                        value={locationFilter}
+                        onChange={e => setLocationFilter(e.target.value)}
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <label className="text-sm font-medium">Developer</label>
+                    <Select value={developerFilter} onValueChange={setDeveloperFilter}>
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Developers</SelectItem>
+                            {allDevelopers.map(dev => (
+                                <SelectItem key={dev.email} value={dev.email}>
+                                    {dev.companyName}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div className="space-y-2">
+                    <label className="text-sm font-medium">Availability</label>
+                    <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
+                            <SelectItem value="Under Construction">Under Construction</SelectItem>
+                            <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div className="lg:col-span-2 space-y-2">
+                    <label className="text-sm font-medium">Size (sq. ft.) - {sizeRange[0].toLocaleString()} to {sizeRange[1].toLocaleString()}</label>
+                    <Slider
+                        min={0}
+                        max={maxSliderSize}
+                        step={10000}
+                        value={sizeRange}
+                        onValueChange={newRange => setSizeRange(newRange as [number, number])}
+                    />
+                </div>
+                <div className="lg:col-span-2 flex justify-end">
+                    <Button onClick={resetFilters} variant="ghost" className="w-full lg:w-auto">
+                        <X className="mr-2 h-4 w-4" /> Reset Filters
+                    </Button>
+                </div>
+            </div>
+        </Card>
+
+
+        {filteredListings.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map(listing => {
+            {filteredListings.map(listing => {
               const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
               const providerName = getProviderName(listing.developerId);
               return <AdminListingCard key={listing.listingId} listing={listing} analytics={analytics} providerName={providerName} />;
@@ -210,8 +318,8 @@ export function AdminListings() {
           </div>
         ) : (
           <Card className="text-center p-12">
-              <CardTitle>No Listings Found</CardTitle>
-              <CardDescription className="mt-2">When providers create listings, they will appear here.</CardDescription>
+              <CardTitle>No Listings Match Your Filters</CardTitle>
+              <CardDescription className="mt-2">Try adjusting or resetting your search criteria.</CardDescription>
           </Card>
         )}
       </div>
