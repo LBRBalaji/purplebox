@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { type DemandSchema, type ListingSchema } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet } from '@/lib/schema';
 import { type User } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 
@@ -127,6 +127,8 @@ type DataContextType = {
   updateRegisteredLeadStatus: (leadId: string, providerEmail: string, status: RegisteredLeadStatus) => void;
   transactionActivities: TransactionActivity[];
   addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
+  getTenantImprovements: (leadId: string) => TenantImprovementsSheet | null;
+  updateTenantImprovements: (leadId: string, sheet: TenantImprovementsSheet) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -154,6 +156,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
   const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>([]);
   const [transactionActivities, setTransactionActivities] = useState<TransactionActivity[]>([]);
+  const [tenantImprovements, setTenantImprovements] = useState<TenantImprovementsSheet[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
@@ -170,6 +173,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 analyticsRes,
                 registeredLeadsRes,
                 activitiesRes,
+                tenantImprovementsRes,
             ] = await Promise.all([
                 fetch('/api/listings'),
                 fetch('/api/demands'),
@@ -178,9 +182,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 fetch('/api/listing-analytics'),
                 fetch('/api/registered-leads'),
                 fetch('/api/transaction-activities'),
+                fetch('/api/tenant-improvements'),
             ]);
             
-            if (!listingsRes.ok || !demandsRes.ok || !submissionsRes.ok || !agentLeadsRes.ok || !analyticsRes.ok || !registeredLeadsRes.ok || !activitiesRes.ok) {
+            if (!listingsRes.ok || !demandsRes.ok || !submissionsRes.ok || !agentLeadsRes.ok || !analyticsRes.ok || !registeredLeadsRes.ok || !activitiesRes.ok || !tenantImprovementsRes.ok) {
                 throw new Error('Failed to fetch initial data from one or more endpoints.');
             }
 
@@ -191,6 +196,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const analyticsData = await analyticsRes.json();
             const registeredLeadsData = await registeredLeadsRes.json();
             const activitiesData = await activitiesRes.json();
+            const tenantImprovementsData = await tenantImprovementsRes.json();
 
 
             setListings(listingsData);
@@ -200,10 +206,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
             setListingAnalytics(analyticsData);
             setRegisteredLeads(registeredLeadsData);
             setTransactionActivities(activitiesData);
+            setTenantImprovements(tenantImprovementsData);
             
             localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(agentLeadsData));
             localStorage.setItem('warehouseorigin_registered_leads', JSON.stringify(registeredLeadsData));
             localStorage.setItem('warehouseorigin_transaction_activities', JSON.stringify(activitiesData));
+            localStorage.setItem('warehouseorigin_tenant_improvements', JSON.stringify(tenantImprovementsData));
+
 
         } catch (error) {
             console.error("Failed to fetch initial data:", error);
@@ -228,6 +237,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
          const storedActivities = localStorage.getItem('warehouseorigin_transaction_activities');
         if (storedActivities) setTransactionActivities(JSON.parse(storedActivities));
+
+        const storedImprovements = localStorage.getItem('warehouseorigin_tenant_improvements');
+        if (storedImprovements) setTenantImprovements(JSON.parse(storedImprovements));
 
         const storedDownloads = localStorage.getItem('warehouseorigin_downloads');
         if(storedDownloads) setDownloadHistory(JSON.parse(storedDownloads));
@@ -512,6 +524,32 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const updatedActivities = [newActivity, ...transactionActivities];
       persistActivities(updatedActivities);
   };
+  
+  const persistTenantImprovements = (updatedSheets: TenantImprovementsSheet[]) => {
+    setTenantImprovements(updatedSheets);
+    localStorage.setItem('warehouseorigin_tenant_improvements', JSON.stringify(updatedSheets));
+  }
+  
+  const getTenantImprovements = (leadId: string): TenantImprovementsSheet | null => {
+    return tenantImprovements.find(sheet => sheet.leadId === leadId) || null;
+  }
+  
+  const updateTenantImprovements = (leadId: string, sheetData: TenantImprovementsSheet) => {
+    const existingSheet = getTenantImprovements(leadId);
+    let updatedSheets: TenantImprovementsSheet[];
+
+    if (existingSheet) {
+      updatedSheets = tenantImprovements.map(sheet => sheet.leadId === leadId ? sheetData : sheet);
+    } else {
+      updatedSheets = [...tenantImprovements, sheetData];
+    }
+    
+    persistTenantImprovements(updatedSheets);
+    toast({
+        title: "Improvements Sheet Saved",
+        description: "Your changes have been saved successfully.",
+    });
+  }
 
 
   return (
@@ -527,6 +565,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         updateRegisteredLeadStatus,
         transactionActivities,
         addTransactionActivity,
+        getTenantImprovements,
+        updateTenantImprovements
         }}>
       {children}
     </DataContext.Provider>
