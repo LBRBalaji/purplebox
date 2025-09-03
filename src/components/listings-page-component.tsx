@@ -172,13 +172,24 @@ function DownloadBar() {
                 'Size (Sq. Ft.)': l.sizeSqFt,
                 'Availability': l.availabilityDate,
                 'Rent (per Sq. Ft.)': l.rentPerSqFt || 'Contact for details',
+                 // Approvals
+                'Park Approval': l.certificatesAndApprovals.parkApproval ? 'Yes' : 'No',
+                'Building Approval': l.certificatesAndApprovals.buildingApproval ? 'Yes' : 'No',
+                'Fire License': l.certificatesAndApprovals.fireLicense ? 'Yes' : 'No',
+                'Fire NOC': l.certificatesAndApprovals.fireNOC ? 'Yes' : 'No',
+                'Building Insurance': l.certificatesAndApprovals.buildingInsurance ? 'Yes' : 'No',
+                'Property Tax Paid': l.certificatesAndApprovals.propertyTax ? 'Yes' : 'No',
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             
             const footer = [
                 [], // Empty row for spacing
-                ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
+                ["Zero Brokerage Charges"],
+                ["For Startups on their first transaction."],
+                ["For Logistics Companies on all transactions."],
+                [],
+                ["Powered by Lakshmi Balaji O2O | Warehouse-Technical-Commercials, in a single CSV"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 
@@ -562,4 +573,3 @@ export function ListingsPage() {
     </>
   );
 }
-

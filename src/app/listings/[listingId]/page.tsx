@@ -235,6 +235,13 @@ export default function ListingDetailPage() {
                 'Roof Insulation': listing.buildingSpecifications.roofInsulation,
                 'Ventilation': listing.buildingSpecifications.ventilation,
                 'Louvers': listing.buildingSpecifications.louvers ? 'Yes' : 'No',
+                // Approvals
+                'Park Approval': listing.certificatesAndApprovals.parkApproval ? 'Yes' : 'No',
+                'Building Approval': listing.certificatesAndApprovals.buildingApproval ? 'Yes' : 'No',
+                'Fire License': listing.certificatesAndApprovals.fireLicense ? 'Yes' : 'No',
+                'Fire NOC': listing.certificatesAndApprovals.fireNOC ? 'Yes' : 'No',
+                'Building Insurance': listing.certificatesAndApprovals.buildingInsurance ? 'Yes' : 'No',
+                'Property Tax Paid': listing.certificatesAndApprovals.propertyTax ? 'Yes' : 'No',
             }];
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -247,7 +254,11 @@ export default function ListingDetailPage() {
                 ["Email: balaji@lakshmibalajio2o.com"],
                 ["Mobile: +91 98410 98170"],
                 [],
-                ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
+                ["Zero Brokerage Charges"],
+                ["For Startups on their first transaction."],
+                ["For Logistics Companies on all transactions."],
+                [],
+                ["Powered by Lakshmi Balaji O2O | Warehouse-Technical-Commercials, in a single CSV"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 
@@ -455,7 +466,7 @@ export default function ListingDetailPage() {
                         </div>
                         
                         {/* Sticky Sidebar */}
-                        <div className="lg:col-span-1">
+                        <div className="lg:col-span-1 space-y-6">
                             <div className="sticky top-8 space-y-6">
                                 <Card>
                                     <CardHeader>
@@ -514,7 +525,7 @@ export default function ListingDetailPage() {
                                     </CardContent>
                                 </Card>
 
-                                <Card>
+                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Need Something Different?</CardTitle>
                                     </CardHeader>
@@ -539,5 +550,3 @@ export default function ListingDetailPage() {
         </>
     );
 }
-
-    
