@@ -11,13 +11,15 @@ export default function ManageUsersPage() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
 
+    const hasAccess = user?.role === 'SuperAdmin';
+
     React.useEffect(() => {
-        if (!isLoading && user?.email !== 'admin@example.com') {
+        if (!isLoading && !hasAccess) {
             router.push('/dashboard');
         }
-    }, [user, isLoading, router]);
+    }, [user, isLoading, router, hasAccess]);
     
-    if (isLoading || user?.email !== 'admin@example.com') {
+    if (isLoading || !hasAccess) {
         return null;
     }
 
