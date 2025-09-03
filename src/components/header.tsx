@@ -206,9 +206,17 @@ export function Header() {
                   </Button>
                 </div>
               ) : (
-                 <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
-                    <LogIn className="mr-2 h-4 w-4" /> Login
-                </Button>
+                <div className="flex items-center gap-2">
+                    <a href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
+                        <Button>
+                            <WhatsAppIcon className="mr-2 h-5 w-5" />
+                            WhatsApp O2O
+                        </Button>
+                    </a>
+                    <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
+                        <LogIn className="mr-2 h-4 w-4" /> Login
+                    </Button>
+                </div>
               )}
             </div>
         </div>
