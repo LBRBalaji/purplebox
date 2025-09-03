@@ -8,7 +8,7 @@ import { commercialTermsSchema, type CommercialTermsSchema } from '@/lib/schema'
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook } from 'lucide-react';
@@ -74,17 +74,43 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
     const form = useForm<CommercialTermsSchema>({
         resolver: zodResolver(commercialTermsSchema),
         defaultValues: {
-            leaseTerms: { customItems: [] },
-            commercialTerms: { capexItems: [], netCostPerMonth: 0 },
-            tenantImprovements: { customItems: [] },
-            sessions: [],
-            actionableItems: [],
-            overallRemarks: "",
+            sessions: [
+                {
+                    date: new Date().toISOString(),
+                    venue: 'LBR Office, Chennai',
+                    customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
+                    providerAttendees: [{ name: 'Test Provider', title: 'Director' }],
+                    facilitatorAttendees: [{ name: 'O2O Manager', title: 'O2O Manager' }],
+                }
+            ],
+            siteInfo: {
+                postalAddress: { agreedTerms: '123 Industrial Way, Oragadam, Chennai', status: 'Agreed' },
+                googleCoordinates: { agreedTerms: '12.83, 79.95', status: 'Agreed' },
+                buildingStatus: { agreedTerms: 'Ready for Occupancy', status: 'Agreed' },
+            },
+            area: {
+                totalChargeableArea: { agreedTerms: '150000', status: 'Agreed' }
+            },
+            leaseTerms: {
+                leaseTenure: { agreedTerms: '5 years', status: 'Agreed' },
+                leaseLockIn: { agreedTerms: '3 years', status: 'Agreed' },
+                rentEscalation: { agreedTerms: '15% every 3 years', status: 'Reserved For Discussion' },
+            },
+            commercialTerms: {
+                chargeableArea: { agreedTerms: '150000', status: 'Agreed' },
+                buildingRentPerSft: { agreedTerms: '25', status: 'Agreed' },
+                totalRentPerMonth: { agreedTerms: '3750000', status: 'Agreed' },
+                ifrsd: { agreedTerms: '22500000', status: 'Agreed' },
+                capexItems: [],
+                netCostPerMonth: 0,
+            },
+            actionableItems: [
+                { item: 'Finalize rent escalation clause', responsibility: 'O2O', schedule: 'Next Meeting', status: 'Pending' }
+            ],
+            overallRemarks: "Initial meeting was positive. Key discussion point for the next session is the rent escalation percentage. Customer is firm on 10%, provider wants 15%.",
         }
     });
 
-     const { fields: tenantImprovementFields, append: appendTenantImprovement, remove: removeTenantImprovement } = useFieldArray({ name: "tenantImprovements.customItems", control: form.control });
-     const { fields: leaseTermFields, append: appendLeaseTerm, remove: removeLeaseTerm } = useFieldArray({ name: "leaseTerms.customItems", control: form.control });
      const { fields: capexFields, append: appendCapex, remove: removeCapex } = useFieldArray({ name: "commercialTerms.capexItems", control: form.control });
      const { fields: sessionFields, append: appendSession, remove: removeSession } = useFieldArray({ name: "sessions", control: form.control });
      const { fields: actionableItemFields, append: appendActionableItem, remove: removeActionableItem } = useFieldArray({ name: "actionableItems", control: form.control });
@@ -177,27 +203,20 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
             form.reset({
                 ...form.getValues(),
                 siteInfo: {
-                    postalAddress: { agreedTerms: primaryListing.location },
-                    buildingStatus: { agreedTerms: primaryListing.availabilityDate },
-                    googleCoordinates: { agreedTerms: primaryListing.latLng },
+                    ...form.getValues().siteInfo,
+                    postalAddress: { agreedTerms: primaryListing.location, status: 'Agreed' },
+                    buildingStatus: { agreedTerms: primaryListing.availabilityDate, status: 'Agreed' },
+                    googleCoordinates: { agreedTerms: primaryListing.latLng, status: 'Agreed' },
                 },
                 area: {
-                    totalChargeableArea: { agreedTerms: String(primaryListing.sizeSqFt) },
-                },
-                building: {
-                    buildingType: { agreedTerms: primaryListing.buildingSpecifications.buildingType },
-                    docksAndShutters: { agreedTerms: String(primaryListing.buildingSpecifications.numberOfDocksAndShutters) },
+                    ...form.getValues().area,
+                    totalChargeableArea: { agreedTerms: String(primaryListing.sizeSqFt), status: 'Agreed' },
                 },
                 commercialTerms: {
                     ...form.getValues().commercialTerms,
-                    chargeableArea: { agreedTerms: String(primaryListing.sizeSqFt) },
-                    buildingRentPerSft: { agreedTerms: String(primaryListing.rentPerSqFt) },
-                    ifrsd: { agreedTerms: `INR ${((primaryListing.rentPerSqFt || 0) * primaryListing.sizeSqFt * (primaryListing.rentalSecurityDeposit || 0)).toLocaleString()}` },
-                },
-                leaseTerms: {
-                    ...form.getValues().leaseTerms,
-                    leaseTenure: { agreedTerms: '5 years'},
-                    rentEscalation: { agreedTerms: '15% every 3 years'},
+                    chargeableArea: { agreedTerms: String(primaryListing.sizeSqFt), status: 'Agreed' },
+                    buildingRentPerSft: { agreedTerms: String(primaryListing.rentPerSqFt), status: 'Agreed' },
+                    ifrsd: { agreedTerms: `INR ${((primaryListing.rentPerSqFt || 0) * primaryListing.sizeSqFt * (primaryListing.rentalSecurityDeposit || 0)).toLocaleString()}`, status: 'Agreed' },
                 },
             });
         }
@@ -229,13 +248,8 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
             ...currentData,
             siteInfo: reservedItems(currentData.siteInfo),
             area: reservedItems(currentData.area),
-            tenantImprovements: reservedItems(currentData.tenantImprovements),
             leaseTerms: reservedItems(currentData.leaseTerms),
             commercialTerms: reservedItems(currentData.commercialTerms),
-            electricalInfrastructure: reservedItems(currentData.electricalInfrastructure),
-            building: reservedItems(currentData.building),
-            waterToiletSewerage: reservedItems(currentData.waterToiletSewerage),
-            safetyAndSecurity: reservedItems(currentData.safetyAndSecurity),
             actionableItems: currentData.actionableItems?.filter(item => item.status !== 'Completed'),
         };
 
@@ -438,18 +452,14 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                             </Card>
                         )}
                         <div className="flex items-center gap-4 p-4 border rounded-lg bg-secondary/50 w-full justify-end">
-                            <FormField
-                                control={form.control}
-                                name="commercialTerms.netCostPerMonth"
-                                render={({ field }) => (
-                                    <FormItem className="w-full max-w-xs">
-                                    <FormLabel className="flex items-center gap-2"><DollarSign className="h-4 w-4"/> Net Cost-Per Month (Excl. Tax)</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" {...field} value={field.value ?? 0} readOnly className="text-lg font-bold text-primary bg-primary/10 border-primary/20"/>
-                                    </FormControl>
-                                    </FormItem>
-                                )}
-                            />
+                             <div className="text-right">
+                                <FormLabel className="text-sm font-normal">Total Rent per Month</FormLabel>
+                                <p className="text-2xl font-bold text-primary">₹{(commercialTermsWatched?.totalRentPerMonth?.agreedTerms ? parseFloat(commercialTermsWatched.totalRentPerMonth.agreedTerms).toLocaleString('en-IN') : 0)}</p>
+                            </div>
+                            <div className="text-right">
+                                <FormLabel className="text-sm font-normal">Net Cost per Month (incl. CAPEX)</FormLabel>
+                                <p className="text-2xl font-bold text-primary">₹{commercialTermsWatched?.netCostPerMonth?.toLocaleString('en-IN') || 0}</p>
+                            </div>
                         </div>
                          <div className="flex items-center gap-2 justify-end pt-4">
                              <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
@@ -462,5 +472,3 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
         </Form>
     );
 }
-
-    
