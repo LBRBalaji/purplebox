@@ -31,9 +31,10 @@
         "providers": [
             {
                 "providerEmail": "provider@example.com",
-                "status": "Acknowledged",
-                "acknowledgedAt": "2023-10-27T11:00:00Z"
+                "status": "Pending"
             }
         ]
     }
 ]
+
+    
