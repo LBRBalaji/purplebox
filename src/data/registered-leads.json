@@ -1,2 +1,21 @@
 
-[]
+[
+    {
+        "id": "LDR-DEMO12345",
+        "customerId": "user@example.com",
+        "leadName": "Test Customer Co.",
+        "leadContact": "Test Customer",
+        "leadEmail": "user@example.com",
+        "leadPhone": "555-123-4567",
+        "requirementsSummary": "Looking for a 100,000 sq.ft. warehouse in the Oragadam area with high ceilings and at least 10 docks. Immediate occupancy required.",
+        "registeredBy": "o2o@example.com",
+        "registeredAt": "2023-10-27T10:00:00Z",
+        "providers": [
+            {
+                "providerEmail": "provider@example.com",
+                "status": "Acknowledged",
+                "acknowledgedAt": "2023-10-27T11:00:00Z"
+            }
+        ]
+    }
+]
