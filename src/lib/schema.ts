@@ -1,4 +1,5 @@
 
+
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -314,7 +315,6 @@ const negotiableTermSchema = z.object({
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
     agreedTerms: z.string().optional(),
-    remarks: z.string().optional(),
     isCostFactor: z.boolean().default(false).optional(),
     cost: z.coerce.number().optional(),
 }).optional();
@@ -325,7 +325,6 @@ const customTermSchema = z.object({
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
     agreedTerms: z.string().optional(),
-    remarks: z.string().optional(),
     isCostFactor: z.boolean().default(false).optional(),
     cost: z.coerce.number().optional(),
 });
@@ -449,6 +448,7 @@ export const commercialTermsSchema = z.object({
         isCctvInstalled: negotiableTermSchema,
         isSecurityDeskProvided: negotiableTermSchema,
     }).optional(),
+    overallRemarks: z.string().optional(),
 });
 export type CommercialTermsSchema = z.infer<typeof commercialTermsSchema>;
 

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -11,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from './ui/table';
 import { Textarea } from './ui/textarea';
@@ -22,7 +23,7 @@ import { Separator } from './ui/separator';
 const SectionHeader = ({ icon, title }: { icon: React.ElementType; title: string }) => {
     const Icon = icon;
     return (
-        <TableHead colSpan={6} className="bg-primary/5 text-primary font-semibold">
+        <TableHead colSpan={5} className="bg-primary/5 text-primary font-semibold">
             <div className="flex items-center gap-2">
                 <Icon className="h-5 w-5" />
                 {title}
@@ -37,13 +38,13 @@ const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch }: { na
 
     return (
     <TableRow>
-        <TableCell className="font-medium w-[15%]">{label}</TableCell>
-        <TableCell className="w-[25%]">
+        <TableCell className="font-medium w-[20%]">{label}</TableCell>
+        <TableCell className="w-[30%]">
             <FormField control={control} name={`${name}.details`} render={({ field }) => (
                 <FormItem><FormControl><InputComponent placeholder="Specific details..." {...field} className="min-h-0 h-10 p-2" /></FormControl><FormMessage /></FormItem>
             )} />
         </TableCell>
-        <TableCell className="w-[12%]">
+        <TableCell className="w-[15%]">
              <FormField control={control} name={`${name}.proposedBy`} render={({ field }) => (
                 <FormItem><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
             )} />
@@ -53,7 +54,7 @@ const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch }: { na
                  <FormItem><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
             )} />
         </TableCell>
-        <TableCell className="w-[18%]">
+        <TableCell className="w-[20%]">
             <div className="flex items-center gap-2">
                  {isCostFactor && (
                     <FormField control={control} name={`${name}.isCostFactor`} render={({ field }) => ( <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl> )} />
@@ -67,11 +68,6 @@ const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch }: { na
                     )}/>
                  )}
             </div>
-        </TableCell>
-         <TableCell className="w-[15%]">
-            <FormField control={control} name={`${name}.remarks`} render={({ field }) => (
-                <FormItem><FormControl><Textarea placeholder="Remarks..." {...field} className="min-h-0 h-10 p-2" /></FormControl><FormMessage /></FormItem>
-            )} />
         </TableCell>
     </TableRow>
 )};
@@ -99,7 +95,7 @@ const CustomFormRow = ({ control, index, remove, isCostFactor, watch, arrayName 
                 )}
             </div>
         </TableCell>
-        <TableCell className="flex items-center gap-2"><FormField control={control} name={`${arrayName}.${index}.remarks`} render={({ field }) => <Textarea placeholder="Remarks..." {...field} className="h-10 p-2 flex-grow"/>} /><Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
+        <TableCell className="w-[5%]"><Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
     </TableRow>
 )};
 
@@ -116,7 +112,8 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
             leaseTerms: { customItems: [] },
             commercialTerms: { capexItems: [], netCostPerMonth: 0 },
             tenantImprovements: { customItems: [] },
-            sessions: []
+            sessions: [],
+            overallRemarks: "",
         }
     });
 
@@ -153,7 +150,8 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                 },
                 leaseTerms: { customItems: [] },
                 tenantImprovements: { customItems: [] },
-                sessions: []
+                sessions: [],
+                overallRemarks: ""
             });
         }
     }, [primaryListing, form]);
@@ -162,8 +160,12 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
     React.useEffect(() => {
         const calculateTotalCost = () => {
             let total = 0;
-            if (commercialTermsWatched?.buildingRentPerSft?.cost) total += commercialTermsWatched.buildingRentPerSft.cost;
-            if (commercialTermsWatched?.camCharges?.cost) total += commercialTermsWatched.camCharges.cost;
+            if (commercialTermsWatched?.buildingRentPerSft?.isCostFactor && commercialTermsWatched.buildingRentPerSft.cost) {
+                total += commercialTermsWatched.buildingRentPerSft.cost;
+            }
+            if (commercialTermsWatched?.camCharges?.isCostFactor && commercialTermsWatched.camCharges.cost) {
+                total += commercialTermsWatched.camCharges.cost;
+            }
             
             commercialTermsWatched?.capexItems?.forEach(item => {
                 if (item.isCostFactor && item.cost) {
@@ -218,6 +220,12 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
         const momData = form.getValues();
         console.log("Finalized Minutes of Meeting:", momData);
         alert("Minutes of Meeting finalized. Check the console for the data object that would be shared/stored.");
+    };
+    
+    const handleDraftMoU = () => {
+        const agreedTerms = form.getValues();
+        console.log("Drafting MoU based on these agreed terms:", agreedTerms);
+        alert("MoU draft initiated. Check the console for the data that would be used to generate the document.");
     };
 
     return (
@@ -303,12 +311,11 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[15%]">Particulars</TableHead>
-                                    <TableHead className="w-[25%]">Specific Details</TableHead>
-                                    <TableHead className="w-[12%]">Proposed By</TableHead>
+                                    <TableHead className="w-[20%]">Particulars</TableHead>
+                                    <TableHead className="w-[30%]">Specific Details</TableHead>
+                                    <TableHead className="w-[15%]">Proposed By</TableHead>
                                     <TableHead className="w-[15%]">Status</TableHead>
-                                    <TableHead className="w-[18%]">Agreed Terms</TableHead>
-                                    <TableHead className="w-[15%]">Remarks</TableHead>
+                                    <TableHead className="w-[20%]">Agreed Terms</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -365,6 +372,21 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                         </div>
                     </CardContent>
                      <CardFooter className="flex-col items-end space-y-4 pt-6">
+                         <div className="w-full space-y-2">
+                             <FormLabel>Overall Remarks</FormLabel>
+                             <FormField
+                                control={form.control}
+                                name="overallRemarks"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormControl>
+                                        <Textarea placeholder="Add any final notes, summaries, or next steps for this negotiation round..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                         </div>
                         <div className="flex items-center gap-4 p-4 border rounded-lg bg-secondary/50 w-full max-w-sm">
                             <FormField
                                 control={form.control}
@@ -380,6 +402,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                             />
                         </div>
                          <div className="flex items-center gap-2">
+                             <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
                              <Button type="submit" variant="secondary"><Save className="mr-2 h-4 w-4" /> Save Draft</Button>
                              <Button type="button" onClick={handleFinalizeMoM}><Share className="mr-2 h-4 w-4" /> Finalize as MoM</Button>
                          </div>
