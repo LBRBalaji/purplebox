@@ -1,4 +1,3 @@
-
 // src/app/dashboard/analytics/predictive/page.tsx
 'use client';
 
@@ -9,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Sparkles, TrendingUp, MapPin, ListChecks, FileText, Settings2 } from 'lucide-react';
+import { Sparkles, TrendingUp, MapPin, ListChecks, FileText, Settings2, PlusCircle, X } from 'lucide-react';
 import { predictDemandTrends } from '@/ai/flows/predict-demand-trends';
 import { useToast } from '@/hooks/use-toast';
 import type { PredictDemandTrendsInput, PredictDemandTrendsOutput } from '@/lib/schema';
@@ -23,7 +22,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
+import { Check } from '@/components/ui/check';
 
+type FilterKey = 'buildingType' | 'serviceModel';
+
+const availableFilters: { value: FilterKey; label: string }[] = [
+    { value: 'buildingType', label: 'Building Type' },
+    { value: 'serviceModel', label: 'Service Model' },
+];
 
 export default function PredictiveAnalyticsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
@@ -35,8 +44,9 @@ export default function PredictiveAnalyticsPage() {
     // State for filters
     const [timeHorizon, setTimeHorizon] = React.useState<PredictDemandTrendsInput['timeHorizon']>('next quarter');
     const [location, setLocation] = React.useState('');
-    const [buildingType, setBuildingType] = React.useState<PredictDemandTrendsInput['buildingType']>('Any');
-    const [serviceModel, setServiceModel] = React.useState<PredictDemandTrendsInput['serviceModel']>('Any');
+    const [filters, setFilters] = React.useState<PredictDemandTrendsInput>({});
+    const [activeFilters, setActiveFilters] = React.useState<FilterKey[]>([]);
+     const [open, setOpen] = React.useState(false);
 
 
     React.useEffect(() => {
@@ -52,8 +62,7 @@ export default function PredictiveAnalyticsPage() {
             const result = await predictDemandTrends({ 
                 timeHorizon,
                 location: location || undefined,
-                buildingType: buildingType === 'Any' ? undefined : buildingType,
-                serviceModel: serviceModel === 'Any' ? undefined : serviceModel,
+                ...filters,
              });
             setAnalysis(result);
         } catch (error) {
@@ -69,6 +78,28 @@ export default function PredictiveAnalyticsPage() {
         }
     };
     
+    const handleFilterChange = (key: FilterKey, value: string) => {
+        setFilters(prev => ({...prev, [key]: value === 'Any' ? undefined : value }));
+    }
+
+    const toggleFilter = (filterKey: FilterKey) => {
+        setActiveFilters(prev => {
+            const newActive = prev.includes(filterKey) 
+                ? prev.filter(f => f !== filterKey)
+                : [...prev, filterKey];
+
+            // Clean up filter value when removing
+            if (!newActive.includes(filterKey)) {
+                setFilters(currentFilters => {
+                    const newFilters = {...currentFilters};
+                    delete newFilters[filterKey];
+                    return newFilters;
+                });
+            }
+            return newActive;
+        });
+    }
+    
     if (isAuthLoading || (user && user.email !== 'admin@example.com' && user.role !== 'O2O')) {
         return null;
     }
@@ -79,7 +110,7 @@ export default function PredictiveAnalyticsPage() {
                 <div>
                     <h2 className="text-3xl font-bold font-headline tracking-tight">Predictive Demand Analytics</h2>
                     <p className="text-muted-foreground mt-2 max-w-3xl">
-                        Leverage AI to forecast market trends based on your platform's historical data.
+                        Leverage AI to forecast market trends based on your platform's historical data. Add filters to refine your analysis.
                     </p>
                 </div>
                 
@@ -88,48 +119,101 @@ export default function PredictiveAnalyticsPage() {
                         <CardTitle className="flex items-center gap-2"><Settings2 className="h-5 w-5"/>Analysis Parameters</CardTitle>
                         <CardDescription>Set the parameters for the analysis and click "Generate" to see the insights.</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
-                         <div className="space-y-2">
-                            <Label htmlFor="time-horizon">Time Horizon</Label>
-                            <Select onValueChange={(value) => setTimeHorizon(value as any)} defaultValue={timeHorizon}>
-                                <SelectTrigger id="time-horizon"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="next quarter">Next Quarter</SelectItem>
-                                    <SelectItem value="next 6 months">Next 6 Months</SelectItem>
-                                </SelectContent>
-                            </Select>
+                    <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                             <div className="space-y-2">
+                                <Label htmlFor="time-horizon">Time Horizon</Label>
+                                <Select onValueChange={(value) => setTimeHorizon(value as any)} defaultValue={timeHorizon}>
+                                    <SelectTrigger id="time-horizon"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="next quarter">Next Quarter</SelectItem>
+                                        <SelectItem value="next 6 months">Next 6 Months</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="location">Focus Location (Optional)</Label>
+                                <Input id="location" placeholder="e.g. Chennai, Oragadam" value={location} onChange={(e) => setLocation(e.target.value)} />
+                            </div>
+                             <div className="space-y-2">
+                                <Label>Add Data Filters</Label>
+                                 <Popover open={open} onOpenChange={setOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            aria-expanded={open}
+                                            className="w-full justify-start"
+                                        >
+                                           <PlusCircle className="mr-2 h-4 w-4" />
+                                           Select filters...
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                        <Command>
+                                            <CommandInput placeholder="Search filters..." />
+                                            <CommandList>
+                                                <CommandEmpty>No filters found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {availableFilters.map((filter) => (
+                                                        <CommandItem
+                                                            key={filter.value}
+                                                            value={filter.label}
+                                                            onSelect={() => {
+                                                                toggleFilter(filter.value);
+                                                                setOpen(true);
+                                                            }}
+                                                        >
+                                                            <Check className={cn("mr-2 h-4 w-4", activeFilters.includes(filter.value) ? "opacity-100" : "opacity-0")} />
+                                                            <span>{filter.label}</span>
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                             <Label htmlFor="location">Focus Location (Optional)</Label>
-                            <Input id="location" placeholder="e.g. Chennai, Oragadam" value={location} onChange={(e) => setLocation(e.target.value)} />
+
+                        {activeFilters.length > 0 && (
+                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 border-t border-dashed">
+                               {activeFilters.includes('buildingType') && (
+                                     <div className="space-y-2">
+                                        <Label htmlFor="building-type">Building Type</Label>
+                                        <Select onValueChange={(value) => handleFilterChange('buildingType', value)} defaultValue="Any">
+                                            <SelectTrigger id="building-type"><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Any">Any</SelectItem>
+                                                <SelectItem value="PEB">PEB</SelectItem>
+                                                <SelectItem value="RCC">RCC</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                               )}
+                               {activeFilters.includes('serviceModel') && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="service-model">Service Model</Label>
+                                        <Select onValueChange={(value) => handleFilterChange('serviceModel', value)} defaultValue="Any">
+                                            <SelectTrigger id="service-model"><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Any">Any</SelectItem>
+                                                <SelectItem value="Standard">Standard</SelectItem>
+                                                <SelectItem value="3PL">3PL</SelectItem>
+                                                <SelectItem value="Both">Both</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                               )}
+                            </div>
+                        )}
+
+                        <div className="flex justify-end pt-4">
+                            <Button onClick={handleGenerateAnalysis} disabled={isLoading} size="lg">
+                                <Sparkles className="mr-2 h-4 w-4" />
+                                {isLoading ? 'Generating...' : 'Generate Analysis'}
+                            </Button>
                         </div>
-                        <div className="space-y-2">
-                             <Label htmlFor="building-type">Building Type</Label>
-                            <Select onValueChange={(value) => setBuildingType(value as any)} defaultValue={buildingType}>
-                                <SelectTrigger id="building-type"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Any">Any</SelectItem>
-                                    <SelectItem value="PEB">PEB</SelectItem>
-                                    <SelectItem value="RCC">RCC</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                         <div className="space-y-2">
-                             <Label htmlFor="service-model">Service Model</Label>
-                            <Select onValueChange={(value) => setServiceModel(value as any)} defaultValue={serviceModel}>
-                                <SelectTrigger id="service-model"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Any">Any</SelectItem>
-                                    <SelectItem value="Standard">Standard</SelectItem>
-                                    <SelectItem value="3PL">3PL</SelectItem>
-                                    <SelectItem value="Both">Both</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <Button onClick={handleGenerateAnalysis} disabled={isLoading} className="w-full">
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            {isLoading ? 'Generating...' : 'Generate'}
-                        </Button>
                     </CardContent>
                 </Card>
                 
@@ -218,7 +302,7 @@ export default function PredictiveAnalyticsPage() {
                             <Sparkles className="h-6 w-6 mx-auto mb-2" />
                             <AlertTitle className="text-lg font-semibold">Ready to See the Future?</AlertTitle>
                             <AlertDescription className="mt-2">
-                                Adjust the parameters above and click "Generate Analysis" to reveal predictive insights.
+                                Add filters and click "Generate Analysis" to reveal predictive insights.
                             </AlertDescription>
                         </Alert>
                     )
