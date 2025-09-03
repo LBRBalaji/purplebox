@@ -58,11 +58,13 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
     updateTenantImprovements(leadId, data);
   };
   
-  const isDeveloper = user?.role === 'SuperAdmin';
+  const isProvider = user?.role === 'SuperAdmin';
   const isCustomer = user?.role === 'User';
   const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
   
   const canEdit = isO2O || isCustomer;
+  const canUpdateStatusOnly = isProvider;
+
 
   const statusConfig: { [key: string]: { className: string } } = {
     Pending: { className: 'bg-amber-100 text-amber-800' },
@@ -114,11 +116,15 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                                     <FormField control={form.control} name={`items.${index}.status`} render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <Select onValueChange={(value) => {
-                                                    field.onChange(value);
-                                                    form.setValue(`items.${index}.lastUpdatedAt`, new Date().toISOString());
-                                                    if(user?.email) form.setValue(`items.${index}.updatedBy`, user.email);
-                                                }} value={field.value}>
+                                                <Select 
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        form.setValue(`items.${index}.lastUpdatedAt`, new Date().toISOString());
+                                                        if(user?.email) form.setValue(`items.${index}.updatedBy`, user.email);
+                                                    }} 
+                                                    value={field.value}
+                                                    disabled={!canEdit && !canUpdateStatusOnly}
+                                                >
                                                     <SelectTrigger className={cn("w-[150px] font-semibold", statusStyle.className)}>
                                                         <SelectValue/>
                                                     </SelectTrigger>
@@ -190,7 +196,7 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                     </FormControl>
                 )} />
               </div>
-              {canEdit && (
+              {(canEdit || canUpdateStatusOnly) && (
                 <div className="flex justify-end">
                   <Button type="submit">
                     <Save className="mr-2 h-4 w-4" /> Save Changes

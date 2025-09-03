@@ -74,6 +74,8 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
     const [totalOutflow, setTotalOutflow] = React.useState(0);
     
     const isCustomer = user?.role === 'User';
+    const isProvider = user?.role === 'SuperAdmin';
+    const canEdit = !isCustomer && !isProvider;
 
     const form = useForm<CommercialTermsSchema>({
         resolver: zodResolver(commercialTermsSchema),
@@ -283,9 +285,9 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
     };
 
     return (
-        <Form {...form}>
-            <div className="printable-container">
-                <div className="print-header hidden">Commercial Terms Sheet</div>
+        <div className="printable-container">
+            <div className="print-header hidden">Commercial Terms Sheet</div>
+            <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 printable-content">
                     <Card>
                         <CardHeader className="no-print">
@@ -297,23 +299,25 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                         {primaryListing && <span className="block mt-1 text-xs">Pre-filled with data from listing: <Link href={`/listings/${primaryListing.listingId}`} target="_blank" className="text-primary underline">{primaryListing.name}</Link></span>}
                                     </CardDescription>
                                 </div>
-                            {!isCustomer && (
-                                    <div className="flex items-center gap-2">
-                                        <Button type="button" variant="outline" onClick={handleGenerateFollowUp}>
-                                            <FileSymlink className="mr-2 h-4 w-4" />
-                                            Generate Follow-up
+                                <div className="flex items-center gap-2">
+                                     {(isCustomer || isProvider) && (
+                                        <Button type="button" variant="outline" onClick={handlePrint}>
+                                            <Download className="mr-2 h-4 w-4" /> Download as PDF
                                         </Button>
-                                        <Button type="button" onClick={() => appendSession({ date: new Date().toISOString(), venue: '', customerAttendees: [], providerAttendees: [], facilitatorAttendees: [] })}>
-                                            <Calendar className="mr-2 h-4 w-4"/>
-                                            Add Session
-                                        </Button>
-                                    </div>
-                            )}
-                            {isCustomer && (
-                                <Button type="button" variant="outline" onClick={handlePrint}>
-                                    <Download className="mr-2 h-4 w-4" /> Download as PDF
-                                </Button>
-                            )}
+                                    )}
+                                    {canEdit && (
+                                        <>
+                                            <Button type="button" variant="outline" onClick={handleGenerateFollowUp}>
+                                                <FileSymlink className="mr-2 h-4 w-4" />
+                                                Generate Follow-up
+                                            </Button>
+                                            <Button type="button" onClick={() => appendSession({ date: new Date().toISOString(), venue: '', customerAttendees: [], providerAttendees: [], facilitatorAttendees: [] })}>
+                                                <Calendar className="mr-2 h-4 w-4"/>
+                                                Add Session
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-8">
@@ -325,45 +329,45 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                     <div key={field.id} className="p-4 border rounded-lg bg-secondary/50 space-y-4 mb-6">
                                         <div className="flex justify-between items-center no-print">
                                             <p className="font-semibold text-sm">Negotiation Session {index + 1}: {new Date(form.watch(`sessions.${index}.date`)).toLocaleString()}</p>
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeSession(index)} disabled={isCustomer}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeSession(index)} disabled={!canEdit}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                         </div>
                                             <Separator className="no-print" />
-                                            <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={isCustomer} /></FormControl></FormItem> )} />
+                                            <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={!canEdit} /></FormControl></FormItem> )} />
                                         
                                         <div className="space-y-2">
                                             <FormLabel>Customer Represented By</FormLabel>
                                             {customerFields.map((item, cIndex) => (
                                                 <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)} disabled={isCustomer} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
+                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)} disabled={!canEdit} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                                 </div>
                                             ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendCustomer({name: '', title: ''})} disabled={isCustomer} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                            <Button type="button" size="sm" variant="outline" onClick={() => appendCustomer({name: '', title: ''})} disabled={!canEdit} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
                                         </div>
                                         
                                         <div className="space-y-2">
                                             <FormLabel>Provider Represented By</FormLabel>
                                             {providerFields.map((item, pIndex) => (
                                                 <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)} disabled={isCustomer} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
+                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)} disabled={!canEdit} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                                 </div>
                                             ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendProvider({name: '', title: ''})} disabled={isCustomer} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                            <Button type="button" size="sm" variant="outline" onClick={() => appendProvider({name: '', title: ''})} disabled={!canEdit} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
                                         </div>
 
                                         <div className="space-y-2">
                                             <FormLabel>Transaction Facilitated By</FormLabel>
                                             {facilitatorFields.map((item, fIndex) => (
                                                 <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={isCustomer}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)} disabled={isCustomer} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
+                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)} disabled={!canEdit} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
                                                 </div>
                                             ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendFacilitator({name: '', title: ''})} disabled={isCustomer} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                            <Button type="button" size="sm" variant="outline" onClick={() => appendFacilitator({name: '', title: ''})} disabled={!canEdit} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
                                         </div>
                                     </div>
                                 )
@@ -371,30 +375,30 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
 
                             <div className="space-y-6">
                                 <SectionHeader icon={MapPin} title="Site Information" />
-                                <FormRow form={form} name="siteInfo.postalAddress" label="Postal Address" control={form.control} disabled={isCustomer} />
-                                <FormRow form={form} name="siteInfo.buildingNumber" label="Building Number" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="siteInfo.googleCoordinates" label="Google Coordinates" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="siteInfo.buildingStatus" label="Building Status" control={form.control} disabled={isCustomer}/>
+                                <FormRow form={form} name="siteInfo.postalAddress" label="Postal Address" control={form.control} disabled={!canEdit} />
+                                <FormRow form={form} name="siteInfo.buildingNumber" label="Building Number" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="siteInfo.googleCoordinates" label="Google Coordinates" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="siteInfo.buildingStatus" label="Building Status" control={form.control} disabled={!canEdit}/>
 
                                 <SectionHeader icon={Home} title="Area (in SFT)" />
-                                <FormRow form={form} name="area.plinthArea" label="Plinth Area (Shop Floor)" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="area.mezzanineArea1" label="Mezzanine Area 1" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="area.mezzanineArea2" label="Mezzanine Area 2" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="area.canopyArea" label="Canopy Area" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="area.driversRestRoom" label="Driver's Rest Room" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="area.totalChargeableArea" label="Total Chargeable Area" control={form.control} disabled={isCustomer}/>
+                                <FormRow form={form} name="area.plinthArea" label="Plinth Area (Shop Floor)" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="area.mezzanineArea1" label="Mezzanine Area 1" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="area.mezzanineArea2" label="Mezzanine Area 2" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="area.canopyArea" label="Canopy Area" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="area.driversRestRoom" label="Driver's Rest Room" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="area.totalChargeableArea" label="Total Chargeable Area" control={form.control} disabled={!canEdit}/>
                                 
                                 <SectionHeader icon={ListChecks} title="Lease Terms" />
-                                <FormRow form={form} name="leaseTerms.leaseTenure" label="Lease Tenure" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="leaseTerms.leaseLockIn" label="Lease Lock-In Period" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="leaseTerms.rentEscalation" label="Rent Escalation (% and Freq.)" control={form.control} disabled={isCustomer}/>
+                                <FormRow form={form} name="leaseTerms.leaseTenure" label="Lease Tenure" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="leaseTerms.leaseLockIn" label="Lease Lock-In Period" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="leaseTerms.rentEscalation" label="Rent Escalation (% and Freq.)" control={form.control} disabled={!canEdit}/>
                                 
                                 <SectionHeader icon={HandCoins} title="Commercial Terms" />
-                                <FormRow form={form} name="commercialTerms.chargeableArea" label="Chargeable Area (SFT)" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="commercialTerms.buildingRentPerSft" label="Building Rent per SFT (INR)" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="commercialTerms.totalRentPerMonth" label="Total Rent per Month (INR)" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="commercialTerms.camCharges" label="CAM Charges per SFT" control={form.control} disabled={isCustomer}/>
-                                <FormRow form={form} name="commercialTerms.ifrsd" label="IFRSD (Security Deposit)" control={form.control} disabled={isCustomer}/>
+                                <FormRow form={form} name="commercialTerms.chargeableArea" label="Chargeable Area (SFT)" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="commercialTerms.buildingRentPerSft" label="Building Rent per SFT (INR)" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="commercialTerms.totalRentPerMonth" label="Total Rent per Month (INR)" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="commercialTerms.camCharges" label="CAM Charges per SFT" control={form.control} disabled={!canEdit}/>
+                                <FormRow form={form} name="commercialTerms.ifrsd" label="IFRSD (Security Deposit)" control={form.control} disabled={!canEdit}/>
 
                             </div>
 
@@ -420,17 +424,17 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                         <TableBody>
                                             {actionableItemFields.map((field, index) => (
                                                 <TableRow key={field.id}>
-                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.item`} render={({ field }) => <Textarea {...field} value={field.value ?? ''} placeholder="Action item description" disabled={isCustomer}/>} /></TableCell>
-                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.responsibility`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value} disabled={isCustomer}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem><SelectItem value="O2O">O2O</SelectItem></SelectContent></Select> )} /></TableCell>
-                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.schedule`} render={({ field }) => <Input {...field} value={field.value ?? ''} placeholder="e.g., Within 7 days" disabled={isCustomer}/>} /></TableCell>
-                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value} disabled={isCustomer}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Pending">Pending</SelectItem><SelectItem value="In Progress">In Progress</SelectItem><SelectItem value="Completed">Completed</SelectItem></SelectContent></Select> )} /></TableCell>
-                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.remarks`} render={({ field }) => <Input {...field} value={field.value ?? ''} placeholder="Add remarks" disabled={isCustomer}/>} /></TableCell>
-                                                    <TableCell className="no-print"><Button type="button" variant="ghost" size="icon" onClick={() => removeActionableItem(index)} disabled={isCustomer}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
+                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.item`} render={({ field }) => <Textarea {...field} value={field.value ?? ''} placeholder="Action item description" disabled={!canEdit}/>} /></TableCell>
+                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.responsibility`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value} disabled={!canEdit}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem><SelectItem value="O2O">O2O</SelectItem></SelectContent></Select> )} /></TableCell>
+                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.schedule`} render={({ field }) => <Input {...field} value={field.value ?? ''} placeholder="e.g., Within 7 days" disabled={!canEdit}/>} /></TableCell>
+                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value} disabled={!canEdit}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Pending">Pending</SelectItem><SelectItem value="In Progress">In Progress</SelectItem><SelectItem value="Completed">Completed</SelectItem></SelectContent></Select> )} /></TableCell>
+                                                    <TableCell><FormField control={form.control} name={`actionableItems.${index}.remarks`} render={({ field }) => <Input {...field} value={field.value ?? ''} placeholder="Add remarks" disabled={!canEdit}/>} /></TableCell>
+                                                    <TableCell className="no-print"><Button type="button" variant="ghost" size="icon" onClick={() => removeActionableItem(index)} disabled={!canEdit}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
                                     </Table>
-                                    <Button type="button" variant="outline" size="sm" onClick={() => appendActionableItem({})} className="mt-4 no-print" disabled={isCustomer}><PlusCircle className="mr-2 h-4 w-4"/> Add Action Item</Button>
+                                    <Button type="button" variant="outline" size="sm" onClick={() => appendActionableItem({})} className="mt-4 no-print" disabled={!canEdit}><PlusCircle className="mr-2 h-4 w-4"/> Add Action Item</Button>
                                 </CardContent>
                             </Card>
 
@@ -442,7 +446,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                     render={({ field }) => (
                                         <FormItem>
                                         <FormControl>
-                                            <Textarea placeholder="Add any final notes, summaries, or next steps for this negotiation round..." {...field} value={field.value ?? ''} disabled={isCustomer} />
+                                            <Textarea placeholder="Add any final notes, summaries, or next steps for this negotiation round..." {...field} value={field.value ?? ''} disabled={!canEdit} />
                                         </FormControl>
                                         <FormMessage />
                                         </FormItem>
@@ -485,7 +489,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                             </div>
                             <div className="flex items-center gap-2 justify-end pt-4 no-print">
                                 <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
-                                {!isCustomer && (
+                                {canEdit && (
                                     <>
                                         <Button type="submit" variant="secondary"><Save className="mr-2 h-4 w-4" /> Save Draft</Button>
                                         <Button type="button" onClick={handleFinalizeMoM}><Share className="mr-2 h-4 w-4" /> Finalize as MoM</Button>
@@ -495,11 +499,11 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                         </CardFooter>
                     </Card>
                 </form>
-                <div className="print-footer hidden">
-                    <span>Transaction ID: {lead.id}</span>
-                    <span>Transaction Facilitator: <a href="https://www.lakshmibalajio2o.com" target="_blank" rel="noopener noreferrer">Lakshmi Balaji O2O</a></span>
-                </div>
+            </Form>
+            <div className="print-footer hidden">
+                <span>Transaction ID: {lead.id}</span>
+                <span>Transaction Facilitator: <a href="https://www.lakshmibalajio2o.com" target="_blank" rel="noopener noreferrer">Lakshmi Balaji O2O</a></span>
             </div>
-        </Form>
+        </div>
     );
 }
