@@ -26,12 +26,17 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { Check } from '@/components/ui/check';
+import { Switch } from '@/components/ui/switch';
 
-type FilterKey = 'buildingType' | 'serviceModel';
+type FilterKey = 'buildingType' | 'serviceModel' | 'availability' | 'craneAvailable' | 'roofType' | 'fireNOC';
 
 const availableFilters: { value: FilterKey; label: string }[] = [
     { value: 'buildingType', label: 'Building Type' },
     { value: 'serviceModel', label: 'Service Model' },
+    { value: 'availability', label: 'Availability' },
+    { value: 'craneAvailable', label: 'Crane Available' },
+    { value: 'roofType', label: 'Roof Type' },
+    { value: 'fireNOC', label: 'Fire NOC Status' },
 ];
 
 export default function PredictiveAnalyticsPage() {
@@ -78,7 +83,7 @@ export default function PredictiveAnalyticsPage() {
         }
     };
     
-    const handleFilterChange = (key: FilterKey, value: string) => {
+    const handleFilterChange = (key: FilterKey, value: string | boolean) => {
         setFilters(prev => ({...prev, [key]: value === 'Any' ? undefined : value }));
     }
 
@@ -203,6 +208,76 @@ export default function PredictiveAnalyticsPage() {
                                                 <SelectItem value="Both">Both</SelectItem>
                                             </SelectContent>
                                         </Select>
+                                    </div>
+                               )}
+                               {activeFilters.includes('availability') && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="availability">Availability</Label>
+                                        <Select onValueChange={(value) => handleFilterChange('availability', value)} defaultValue="Any">
+                                            <SelectTrigger id="availability"><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Any">Any</SelectItem>
+                                                <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
+                                                <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
+                                                <SelectItem value="Under Construction">Under Construction</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                               )}
+                               {activeFilters.includes('roofType') && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="roof-type">Roof Type</Label>
+                                        <Select onValueChange={(value) => handleFilterChange('roofType', value)} defaultValue="Any">
+                                            <SelectTrigger id="roof-type"><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Any">Any</SelectItem>
+                                                <SelectItem value="Galvalume">Galvalume</SelectItem>
+                                                <SelectItem value="RCC">RCC</SelectItem>
+                                                <SelectItem value="ACC">ACC</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                               )}
+                               {activeFilters.includes('craneAvailable') && (
+                                    <div className="space-y-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="craneAvailable"
+                                            render={() => (
+                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border bg-background p-3">
+                                                    <div className="space-y-0.5">
+                                                        <FormLabel>Crane Available</FormLabel>
+                                                    </div>
+                                                    <FormControl>
+                                                        <Switch
+                                                            checked={filters.craneAvailable}
+                                                            onCheckedChange={(checked) => handleFilterChange('craneAvailable', checked)}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                               )}
+                               {activeFilters.includes('fireNOC') && (
+                                    <div className="space-y-2">
+                                         <FormField
+                                            control={form.control}
+                                            name="fireNOC"
+                                            render={() => (
+                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border bg-background p-3">
+                                                    <div className="space-y-0.5">
+                                                        <FormLabel>Fire NOC Obtained</FormLabel>
+                                                    </div>
+                                                    <FormControl>
+                                                        <Switch
+                                                            checked={filters.fireNOC}
+                                                            onCheckedChange={(checked) => handleFilterChange('fireNOC', checked)}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
                                )}
                             </div>

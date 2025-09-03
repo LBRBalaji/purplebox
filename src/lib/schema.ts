@@ -314,8 +314,12 @@ export const PredictDemandTrendsInputSchema = z.object({
   timeHorizon: z.enum(['next quarter', 'next 6 months']).default('next quarter')
     .describe('The time period for which to predict demand trends.'),
   location: z.string().optional().describe('An optional location (e.g., city or industrial park) to focus the analysis on.'),
-  buildingType: z.enum(['Any', 'PEB', 'RCC']).optional().describe('An optional building type to filter the analysis.'),
-  serviceModel: z.enum(['Any', 'Standard', '3PL', 'Both']).optional().describe('An optional service model to filter the analysis.'),
+  buildingType: z.string().optional().describe('An optional building type to filter the analysis.'),
+  serviceModel: z.string().optional().describe('An optional service model to filter the analysis.'),
+  availability: z.string().optional().describe('Filter by property availability status.'),
+  craneAvailable: z.boolean().optional().describe('Filter by whether a crane is available.'),
+  roofType: z.string().optional().describe('Filter by the type of roof.'),
+  fireNOC: z.boolean().optional().describe('Filter by whether Fire NOC is obtained.'),
 });
 export type PredictDemandTrendsInput = z.infer<typeof PredictDemandTrendsInputSchema>;
 

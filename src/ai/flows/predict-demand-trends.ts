@@ -37,6 +37,10 @@ const prompt = ai.definePrompt({
     location: z.string().optional(),
     buildingType: z.string().optional(),
     serviceModel: z.string().optional(),
+    availability: z.string().optional(),
+    craneAvailable: z.boolean().optional(),
+    roofType: z.string().optional(),
+    fireNOC: z.boolean().optional(),
     demands: z.array(demandSchema),
     listings: z.array(listingSchema),
     submissions: z.array(z.any()), // Using any to avoid complexity with nested schemas in prompt
@@ -45,9 +49,29 @@ const prompt = ai.definePrompt({
   output: {schema: PredictDemandTrendsOutputSchema},
   prompt: `You are a highly experienced real estate market analyst specializing in the Indian warehousing and industrial sector.
   Your task is to predict future demand trends for the {{{timeHorizon}}}.
-  {{#if location}}The analysis should specifically focus on the **{{{location}}}** area.{{/if}}
-  {{#if buildingType}}The analysis should be filtered for **{{{buildingType}}}** building types.{{/if}}
-  {{#if serviceModel}}The analysis should be filtered for **{{{serviceModel}}}** service models.{{/if}}
+  
+  Your analysis should be based on the provided historical data, filtered by the following user-defined criteria:
+  {{#if location}}
+  - **Location Focus**: The analysis should specifically focus on the **{{{location}}}** area.
+  {{/if}}
+  {{#if buildingType}}
+  - **Building Type**: Filter for **{{{buildingType}}}** building types.
+  {{/if}}
+  {{#if serviceModel}}
+  - **Service Model**: Filter for **{{{serviceModel}}}** service models.
+  {{/if}}
+  {{#if availability}}
+  - **Availability**: Filter for properties with status **{{{availability}}}**.
+  {{/if}}
+  {{#if craneAvailable}}
+  - **Crane**: Filter for properties where a crane is available.
+  {{/if}}
+  {{#if roofType}}
+  - **Roof Type**: Filter for properties with a **{{{roofType}}}** roof.
+  {{/if}}
+  {{#if fireNOC}}
+  - **Fire NOC**: Filter for properties where Fire NOC is obtained.
+  {{/if}}
 
   Analyze the following data sets:
   1.  **Demand Data**: Records of what customers have explicitly requested. Pay attention to locations, sizes, readiness timelines, and specific priorities.
@@ -89,23 +113,36 @@ const predictDemandTrendsFlow = ai.defineFlow(
         filteredListings = filteredListings.filter(l => l.location.toLowerCase().includes(loc));
     }
     
-    if (input.buildingType && input.buildingType !== 'Any') {
+    if (input.buildingType) {
         const bt = input.buildingType.toLowerCase();
         filteredDemands = filteredDemands.filter(d => d.buildingType?.toLowerCase() === bt);
         filteredListings = filteredListings.filter(l => l.buildingSpecifications.buildingType?.toLowerCase().includes(bt));
     }
 
-    if (input.serviceModel && input.serviceModel !== 'Any') {
+    if (input.serviceModel) {
         const sm = input.serviceModel.toLowerCase();
          filteredListings = filteredListings.filter(l => l.serviceModel?.toLowerCase() === sm);
+    }
+    
+    if (input.availability) {
+        filteredListings = filteredListings.filter(l => l.availabilityDate === input.availability);
+    }
+
+    if (input.craneAvailable !== undefined) {
+        filteredListings = filteredListings.filter(l => l.buildingSpecifications.craneAvailable === input.craneAvailable);
+    }
+
+    if (input.roofType) {
+        filteredListings = filteredListings.filter(l => l.buildingSpecifications.roofType === input.roofType);
+    }
+
+    if (input.fireNOC !== undefined) {
+        filteredListings = filteredListings.filter(l => l.certificatesAndApprovals.fireNOC === input.fireNOC);
     }
 
 
     const historicalData = {
-        timeHorizon: input.timeHorizon,
-        location: input.location,
-        buildingType: input.buildingType,
-        serviceModel: input.serviceModel,
+        ...input,
         demands: filteredDemands,
         listings: filteredListings,
         submissions: allSubmissions,
