@@ -181,7 +181,7 @@ export default function LeadDetailPage() {
                          {primaryListing && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Property</CardTitle>
+                                    <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Property Details</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3 text-sm">
                                     <Link href={`/listings/${primaryListing.listingId}`} target="_blank" className="font-semibold text-primary hover:underline block">{primaryListing.name}</Link>
