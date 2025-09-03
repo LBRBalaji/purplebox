@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -32,6 +33,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         // Redirect non-admins away from listing management
         if (pathname.startsWith('/dashboard/manage-listings') && !(isMainAdmin || isO2OManager)) {
+            router.push('/dashboard');
+        }
+
+        if (pathname.startsWith('/dashboard/register-lead') && !(isMainAdmin || isO2OManager)) {
             router.push('/dashboard');
         }
     }

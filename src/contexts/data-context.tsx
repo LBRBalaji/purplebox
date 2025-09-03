@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
 export type ListingStatus = 'pending' | 'approved' | 'rejected';
+export type RegisteredLeadStatus = 'Pending' | 'Acknowledged' | 'Rejected';
 
 
 export type Submission = {
@@ -57,6 +58,25 @@ type DataEvent = {
   triggeredBy: string | undefined; // The email of the user who triggered the event
 };
 
+export type RegisteredLeadProvider = {
+  providerEmail: string;
+  status: RegisteredLeadStatus;
+  acknowledgedAt?: string;
+  rejectionReason?: string;
+}
+
+export type RegisteredLead = {
+  id: string;
+  leadName: string;
+  leadContact: string;
+  leadEmail: string;
+  leadPhone: string;
+  requirementsSummary: string;
+  registeredBy: string; // email of LBO2O user
+  registeredAt: string;
+  providers: RegisteredLeadProvider[];
+}
+
 type DataContextType = {
   listings: ListingSchema[];
   addListing: (listing: ListingSchema, userEmail?: string) => void;
@@ -83,6 +103,9 @@ type DataContextType = {
   selectedForDownload: ListingSchema[];
   toggleSelectedForDownload: (listing: ListingSchema) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
+  registeredLeads: RegisteredLead[];
+  addRegisteredLead: (lead: Omit<RegisteredLead, 'id' | 'registeredAt'>) => void;
+  updateRegisteredLeadStatus: (leadId: string, providerEmail: string, status: RegisteredLeadStatus) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -108,6 +131,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
   const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
+  const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
@@ -121,16 +145,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 demandsRes,
                 submissionsRes,
                 agentLeadsRes,
-                analyticsRes
+                analyticsRes,
+                registeredLeadsRes,
             ] = await Promise.all([
                 fetch('/api/listings'),
                 fetch('/api/demands'),
                 fetch('/api/submissions'),
                 fetch('/api/agent-leads'),
-                fetch('/api/listing-analytics')
+                fetch('/api/listing-analytics'),
+                fetch('/api/registered-leads'),
             ]);
             
-            if (!listingsRes.ok || !demandsRes.ok || !submissionsRes.ok || !agentLeadsRes.ok || !analyticsRes.ok) {
+            if (!listingsRes.ok || !demandsRes.ok || !submissionsRes.ok || !agentLeadsRes.ok || !analyticsRes.ok || !registeredLeadsRes.ok) {
                 throw new Error('Failed to fetch initial data from one or more endpoints.');
             }
 
@@ -139,6 +165,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const submissionsData = await submissionsRes.json();
             const agentLeadsData = await agentLeadsRes.json();
             const analyticsData = await analyticsRes.json();
+            const registeredLeadsData = await registeredLeadsRes.json();
 
 
             setListings(listingsData);
@@ -146,8 +173,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
             setSubmissions(submissionsData);
             setAgentLeads(agentLeadsData);
             setListingAnalytics(analyticsData);
+            setRegisteredLeads(registeredLeadsData);
             
             localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(agentLeadsData));
+            localStorage.setItem('warehouseorigin_registered_leads', JSON.stringify(registeredLeadsData));
 
         } catch (error) {
             console.error("Failed to fetch initial data:", error);
@@ -166,6 +195,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
         const storedLeads = localStorage.getItem('warehouseorigin_agent_leads');
         if (storedLeads) setAgentLeads(JSON.parse(storedLeads));
+
+        const storedRegisteredLeads = localStorage.getItem('warehouseorigin_registered_leads');
+        if (storedRegisteredLeads) setRegisteredLeads(JSON.parse(storedRegisteredLeads));
+
         const storedDownloads = localStorage.getItem('warehouseorigin_downloads');
         if(storedDownloads) setDownloadHistory(JSON.parse(storedDownloads));
 
@@ -386,6 +419,39 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setSelectedForDownload([]);
   };
 
+  const persistRegisteredLeads = (updatedLeads: RegisteredLead[]) => {
+      setRegisteredLeads(updatedLeads);
+      localStorage.setItem('warehouseorigin_registered_leads', JSON.stringify(updatedLeads));
+  };
+
+  const addRegisteredLead = (leadData: Omit<RegisteredLead, 'id' | 'registeredAt'>) => {
+    const newLead: RegisteredLead = {
+      ...leadData,
+      id: `LDR-${Date.now()}`,
+      registeredAt: new Date().toISOString(),
+    };
+    const updatedLeads = [newLead, ...registeredLeads];
+    persistRegisteredLeads(updatedLeads);
+  };
+
+  const updateRegisteredLeadStatus = (leadId: string, providerEmail: string, status: RegisteredLeadStatus) => {
+    const updatedLeads = registeredLeads.map(lead => {
+      if (lead.id === leadId) {
+        return {
+          ...lead,
+          providers: lead.providers.map(provider => 
+            provider.providerEmail === providerEmail 
+              ? { ...provider, status, acknowledgedAt: new Date().toISOString() } 
+              : provider
+          )
+        };
+      }
+      return lead;
+    });
+    persistRegisteredLeads(updatedLeads);
+  };
+
+
   return (
     <DataContext.Provider value={{ 
         listings, addListing, updateListing, updateListingStatus, listingAnalytics, logListingView,
@@ -394,6 +460,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         selectedForDownload,
         toggleSelectedForDownload,
         clearSelectedForDownload,
+        registeredLeads,
+        addRegisteredLead,
+        updateRegisteredLeadStatus,
         }}>
       {children}
     </DataContext.Provider>

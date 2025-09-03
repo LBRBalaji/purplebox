@@ -16,6 +16,7 @@ import { AdminNotifier } from '@/components/admin-notifier';
 import { ApprovalQueue } from '@/components/approval-queue';
 import { useData } from '@/contexts/data-context';
 import { ProviderListings } from '@/components/provider-listings';
+import { ProviderLeads } from '@/components/provider-leads';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -54,15 +55,17 @@ const MainDashboard = () => {
 
     const renderProviderContent = () => (
       <Tabs value={providerTab} onValueChange={setProviderTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
           <TabsTrigger value="my-submissions">My Submissions</TabsTrigger>
-           <TabsTrigger value="my-listings">My Listings</TabsTrigger>
+          <TabsTrigger value="my-listings">My Listings</TabsTrigger>
+          <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
           <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
         <TabsContent value="active-demands"><DemandList /></TabsContent>
         <TabsContent value="my-submissions"><MySubmissions /></TabsContent>
         <TabsContent value="my-listings"><ProviderListings /></TabsContent>
+        <TabsContent value="registered-leads"><ProviderLeads /></TabsContent>
         <TabsContent value="submit-match"><PropertyForm /></TabsContent>
       </Tabs>
     );
