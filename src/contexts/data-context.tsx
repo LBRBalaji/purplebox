@@ -10,7 +10,7 @@ export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
 export type ListingStatus = 'pending' | 'approved' | 'rejected' | 'leased';
 export type RegisteredLeadStatus = 'Pending' | 'Acknowledged' | 'Rejected';
-
+export type SiteVisitStatus = 'Planned' | 'Visited' | 'Re-Scheduled' | 'Cancelled';
 
 export type Submission = {
     submissionId: string;
@@ -79,6 +79,23 @@ export type RegisteredLead = {
   providers: RegisteredLeadProvider[];
 }
 
+export type TransactionActivity = {
+    activityId: string;
+    leadId: string; // RegisteredLead ID
+    activityType: 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements';
+    details: {
+        visitDateTime?: string;
+        message?: string;
+        status?: SiteVisitStatus;
+        notes?: string;
+        feedbackText?: string;
+        improvementsText?: string;
+    };
+    createdAt: string;
+    createdBy: string; // O2O/Admin user email
+}
+
+
 type DataContextType = {
   listings: ListingSchema[];
   addListing: (listing: ListingSchema, userEmail?: string) => void;
@@ -108,6 +125,8 @@ type DataContextType = {
   registeredLeads: RegisteredLead[];
   addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>) => void;
   updateRegisteredLeadStatus: (leadId: string, providerEmail: string, status: RegisteredLeadStatus) => void;
+  transactionActivities: TransactionActivity[];
+  addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -134,6 +153,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
   const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
   const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>([]);
+  const [transactionActivities, setTransactionActivities] = useState<TransactionActivity[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
@@ -149,6 +169,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 agentLeadsRes,
                 analyticsRes,
                 registeredLeadsRes,
+                activitiesRes,
             ] = await Promise.all([
                 fetch('/api/listings'),
                 fetch('/api/demands'),
@@ -156,9 +177,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 fetch('/api/agent-leads'),
                 fetch('/api/listing-analytics'),
                 fetch('/api/registered-leads'),
+                fetch('/api/transaction-activities'),
             ]);
             
-            if (!listingsRes.ok || !demandsRes.ok || !submissionsRes.ok || !agentLeadsRes.ok || !analyticsRes.ok || !registeredLeadsRes.ok) {
+            if (!listingsRes.ok || !demandsRes.ok || !submissionsRes.ok || !agentLeadsRes.ok || !analyticsRes.ok || !registeredLeadsRes.ok || !activitiesRes.ok) {
                 throw new Error('Failed to fetch initial data from one or more endpoints.');
             }
 
@@ -168,6 +190,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const agentLeadsData = await agentLeadsRes.json();
             const analyticsData = await analyticsRes.json();
             const registeredLeadsData = await registeredLeadsRes.json();
+            const activitiesData = await activitiesRes.json();
 
 
             setListings(listingsData);
@@ -176,9 +199,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
             setAgentLeads(agentLeadsData);
             setListingAnalytics(analyticsData);
             setRegisteredLeads(registeredLeadsData);
+            setTransactionActivities(activitiesData);
             
             localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(agentLeadsData));
             localStorage.setItem('warehouseorigin_registered_leads', JSON.stringify(registeredLeadsData));
+            localStorage.setItem('warehouseorigin_transaction_activities', JSON.stringify(activitiesData));
 
         } catch (error) {
             console.error("Failed to fetch initial data:", error);
@@ -200,6 +225,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         const storedRegisteredLeads = localStorage.getItem('warehouseorigin_registered_leads');
         if (storedRegisteredLeads) setRegisteredLeads(JSON.parse(storedRegisteredLeads));
+
+         const storedActivities = localStorage.getItem('warehouseorigin_transaction_activities');
+        if (storedActivities) setTransactionActivities(JSON.parse(storedActivities));
 
         const storedDownloads = localStorage.getItem('warehouseorigin_downloads');
         if(storedDownloads) setDownloadHistory(JSON.parse(storedDownloads));
@@ -463,6 +491,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
     persistRegisteredLeads(updatedLeads);
   };
+  
+  const persistActivities = (updatedActivities: TransactionActivity[]) => {
+      setTransactionActivities(updatedActivities);
+      localStorage.setItem('warehouseorigin_transaction_activities', JSON.stringify(updatedActivities));
+  }
+
+  const addTransactionActivity = (activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
+      const newActivity: TransactionActivity = {
+          ...activityData,
+          activityId: `ACT-${Date.now()}`,
+          createdAt: new Date().toISOString(),
+      };
+      const updatedActivities = [newActivity, ...transactionActivities];
+      persistActivities(updatedActivities);
+  };
 
 
   return (
@@ -476,6 +519,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         registeredLeads,
         addRegisteredLead,
         updateRegisteredLeadStatus,
+        transactionActivities,
+        addTransactionActivity,
         }}>
       {children}
     </DataContext.Provider>

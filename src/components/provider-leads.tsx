@@ -2,16 +2,17 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Check, Mail, Phone, ThumbsUp, X } from 'lucide-react';
+import { Check, Mail, Phone, ThumbsUp, X, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: string } } = {
   Pending: { text: 'Pending Your Acknowledgment', color: 'bg-amber-100 text-amber-800' },
@@ -101,9 +102,11 @@ export function ProviderLeads() {
                                                 </Button>
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-muted-foreground italic">
-                                                Responded on {providerInfo.acknowledgedAt ? new Date(providerInfo.acknowledgedAt).toLocaleDateString() : ''}
-                                            </span>
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={`/dashboard/leads/${lead.id}`}>
+                                                    View Activities <ArrowRight className="ml-2 h-4 w-4" />
+                                                </Link>
+                                            </Button>
                                         )}
                                     </TableCell>
                                 </TableRow>
