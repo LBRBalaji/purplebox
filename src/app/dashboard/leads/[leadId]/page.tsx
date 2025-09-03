@@ -97,7 +97,7 @@ export default function LeadDetailPage() {
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Transactions
                 </Link>
             </Button>
-            <h2 className="text-3xl font-bold font-headline tracking-tight">Lead Transaction Details</h2>
+            <h2 className="text-3xl font-bold font-headline tracking-tight">Transaction Details</h2>
             <p className="text-muted-foreground mt-2">
                 Tracking all activities for Transaction ID: <span className="font-mono text-primary">{lead.id}</span>
             </p>
