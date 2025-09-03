@@ -42,11 +42,13 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, UserPlus, X } from 'lucide-react';
+import { Check, ChevronsUpDown, UserPlus, X, Building } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import type { RegisteredLead, RegisteredLeadProvider } from '@/contexts/data-context';
+import type { RegisteredLead, RegisteredLeadProvider, User } from '@/contexts/data-context';
 
 const leadRegistrationSchema = z.object({
+  id: z.string(),
+  customerId: z.string().min(1, 'A customer must be selected.'),
   leadName: z.string().min(1, 'Lead/Company name is required.'),
   leadContact: z.string().min(1, 'Contact person name is required.'),
   leadEmail: z.string().email('Invalid email address.'),
@@ -62,11 +64,14 @@ export default function RegisterLeadPage() {
   const { addRegisteredLead } = useData();
   const router = useRouter();
   const { toast } = useToast();
-  const [open, setOpen] = React.useState(false);
+  const [providerPopoverOpen, setProviderPopoverOpen] = React.useState(false);
+  const [customerPopoverOpen, setCustomerPopoverOpen] = React.useState(false);
 
   const form = useForm<LeadRegistrationFormValues>({
     resolver: zodResolver(leadRegistrationSchema),
     defaultValues: {
+      id: '',
+      customerId: '',
       leadName: '',
       leadContact: '',
       leadEmail: '',
@@ -76,11 +81,32 @@ export default function RegisterLeadPage() {
     },
   });
 
+  React.useEffect(() => {
+    // Auto-generate transaction ID on component mount for a new form
+    if (!form.getValues('id')) {
+      form.setValue('id', `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`);
+    }
+  }, [form]);
+
   const providers = React.useMemo(() => 
     Object.values(users).filter(u => u.role === 'SuperAdmin' && u.email !== 'admin@example.com'),
     [users]
   );
   
+  const customers = React.useMemo(() =>
+    Object.values(users).filter(u => u.role === 'User'),
+    [users]
+  );
+
+  const handleCustomerSelect = (customer: User) => {
+    form.setValue('customerId', customer.email);
+    form.setValue('leadName', customer.companyName);
+    form.setValue('leadContact', customer.userName);
+    form.setValue('leadEmail', customer.email);
+    form.setValue('leadPhone', customer.phone);
+    setCustomerPopoverOpen(false);
+  };
+
   const onSubmit = (data: LeadRegistrationFormValues) => {
     if (!user) return;
     
@@ -89,7 +115,9 @@ export default function RegisterLeadPage() {
       status: 'Pending',
     }));
 
-    const newLead: Omit<RegisteredLead, 'id' | 'registeredAt'> = {
+    const newLead: Omit<RegisteredLead, 'registeredAt'> = {
+      id: data.id,
+      customerId: data.customerId,
       leadName: data.leadName,
       leadContact: data.leadContact,
       leadEmail: data.leadEmail,
@@ -106,7 +134,16 @@ export default function RegisterLeadPage() {
       description: `${data.leadName} has been registered with ${data.providerEmails.length} provider(s).`,
     });
 
-    form.reset();
+    form.reset({
+      id: `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+      customerId: '',
+      leadName: '',
+      leadContact: '',
+      leadEmail: '',
+      leadPhone: '',
+      requirementsSummary: '',
+      providerEmails: [],
+    });
   };
 
   if (isAuthLoading) {
@@ -126,19 +163,77 @@ export default function RegisterLeadPage() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                  control={form.control}
-                  name="leadName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Lead / Company Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., ACME Logistics" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <FormField
+                        control={form.control}
+                        name="id"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Transaction ID</FormLabel>
+                            <FormControl>
+                                <Input {...field} disabled />
+                            </FormControl>
+                            </FormItem>
+                        )}
+                        />
+                    <FormField
+                      control={form.control}
+                      name="customerId"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Lead / Company Name</FormLabel>
+                           <Popover open={customerPopoverOpen} onOpenChange={setCustomerPopoverOpen}>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value
+                                    ? customers.find(c => c.email === field.value)?.companyName
+                                    : "Select a customer"}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                              <Command>
+                                <CommandInput placeholder="Search customers..." />
+                                <CommandList>
+                                    <CommandEmpty>No customers found.</CommandEmpty>
+                                    <CommandGroup>
+                                    {customers.map((customer) => (
+                                        <CommandItem
+                                            value={`${customer.companyName} ${customer.userName} ${customer.email}`}
+                                            key={customer.email}
+                                            onSelect={() => handleCustomerSelect(customer)}
+                                        >
+                                            <Check
+                                                className={cn(
+                                                "mr-2 h-4 w-4",
+                                                field.value === customer.email ? "opacity-100" : "opacity-0"
+                                                )}
+                                            />
+                                            <div>
+                                                <p>{customer.companyName}</p>
+                                                <p className="text-xs text-muted-foreground">{customer.userName}</p>
+                                            </div>
+                                        </CommandItem>
+                                    ))}
+                                    </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <FormField
                     control={form.control}
@@ -147,7 +242,7 @@ export default function RegisterLeadPage() {
                         <FormItem>
                         <FormLabel>Contact Person</FormLabel>
                         <FormControl>
-                            <Input placeholder="e.g., John Doe" {...field} />
+                            <Input placeholder="Auto-filled from selection" {...field} disabled />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -160,7 +255,7 @@ export default function RegisterLeadPage() {
                         <FormItem>
                         <FormLabel>Contact Phone</FormLabel>
                         <FormControl>
-                            <Input placeholder="+91..." {...field} />
+                            <Input placeholder="Auto-filled from selection" {...field} disabled />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -174,7 +269,7 @@ export default function RegisterLeadPage() {
                         <FormItem>
                         <FormLabel>Contact Email</FormLabel>
                         <FormControl>
-                            <Input type="email" placeholder="contact@company.com" {...field} />
+                            <Input type="email" placeholder="Auto-filled from selection" {...field} disabled />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -203,7 +298,7 @@ export default function RegisterLeadPage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Select Property Providers</FormLabel>
-                      <Popover open={open} onOpenChange={setOpen}>
+                      <Popover open={providerPopoverOpen} onOpenChange={setProviderPopoverOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
@@ -245,6 +340,7 @@ export default function RegisterLeadPage() {
                                             : "opacity-0"
                                         )}
                                     />
+                                     <Building className="mr-2 h-4 w-4 text-muted-foreground" />
                                     {provider.companyName} ({provider.userName})
                                     </CommandItem>
                                 ))}

@@ -67,7 +67,8 @@ export type RegisteredLeadProvider = {
 }
 
 export type RegisteredLead = {
-  id: string;
+  id: string; // Unique transaction ID
+  customerId: string; // The User's email (ID)
   leadName: string;
   leadContact: string;
   leadEmail: string;
@@ -105,7 +106,7 @@ type DataContextType = {
   toggleSelectedForDownload: (listing: ListingSchema) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
   registeredLeads: RegisteredLead[];
-  addRegisteredLead: (lead: Omit<RegisteredLead, 'id' | 'registeredAt'>) => void;
+  addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>) => void;
   updateRegisteredLeadStatus: (leadId: string, providerEmail: string, status: RegisteredLeadStatus) => void;
 };
 
@@ -437,10 +438,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('warehouseorigin_registered_leads', JSON.stringify(updatedLeads));
   };
 
-  const addRegisteredLead = (leadData: Omit<RegisteredLead, 'id' | 'registeredAt'>) => {
+  const addRegisteredLead = (leadData: Omit<RegisteredLead, 'registeredAt'>) => {
     const newLead: RegisteredLead = {
       ...leadData,
-      id: `LDR-${Date.now()}`,
       registeredAt: new Date().toISOString(),
     };
     const updatedLeads = [newLead, ...registeredLeads];
