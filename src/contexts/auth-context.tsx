@@ -35,7 +35,7 @@ const defaultUsers: { [email: string]: User } = {
   'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test Customer', phone: '555-123-4567' },
   'logistics.pro@example.com': { email: 'logistics.pro@example.com', role: 'User', companyName: 'ProLogistics Solutions', userName: 'Sunil Patel', phone: '555-987-6543' },
   'provider@example.com': { email: 'provider@example.com', role: 'SuperAdmin', companyName: 'Prime Properties', userName: 'Test Provider', phone: '555-111-2222' },
-  'o2o@example.com': { email: 'o2o@example.com', role: 'O2O', companyName: 'Warehouse Origin', userName: 'O2O Manager', phone: '555-020-0202' },
+  'o2o@example.com': { email: 'o2o@example.com', role: 'O2O', companyName: 'Lakshmi Balaji O2O', userName: 'O2O Manager', phone: '555-020-0202' },
 };
 
 const personalEmailDomains = [
