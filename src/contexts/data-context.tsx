@@ -329,33 +329,39 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const logListingView = React.useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {
-      const newAnalytics = prevAnalytics.map(analytic => {
-        if (analytic.listingId === listingId) {
-          const newViewer: ViewedByRecord = {
-            name: user.userName,
-            company: user.companyName,
-            timestamp: Date.now(),
-          };
+      const newAnalytics = [...prevAnalytics];
+      let analytic = newAnalytics.find(a => a.listingId === listingId);
 
-          const existingViewers = analytic.viewedBy || [];
-          const viewerIndex = existingViewers.findIndex(v => v.name === newViewer.name && v.company === newViewer.company);
-          
-          let updatedViewers;
-          if (viewerIndex > -1) {
-            updatedViewers = [...existingViewers];
-            updatedViewers[viewerIndex] = newViewer;
-          } else {
-             updatedViewers = [...existingViewers, newViewer];
-          }
+      if (analytic) {
+        const newViewer: ViewedByRecord = {
+          name: user.userName,
+          company: user.companyName,
+          timestamp: Date.now(),
+        };
 
-          return {
-            ...analytic,
-            views: (analytic.views || 0) + 1,
-            viewedBy: updatedViewers,
-          };
+        const existingViewers = analytic.viewedBy || [];
+        // Don't add a new view record if the same user viewed it very recently
+        const lastView = existingViewers.find(v => v.name === newViewer.name && v.company === newViewer.company);
+        const fiveMinutes = 5 * 60 * 1000;
+        if (lastView && (Date.now() - lastView.timestamp < fiveMinutes)) {
+            return prevAnalytics; // No change
         }
-        return analytic;
-      });
+
+        analytic.views = (analytic.views || 0) + 1;
+        analytic.viewedBy = [...existingViewers, newViewer];
+
+      } else {
+        // If no analytics record exists for this listing, create one
+        analytic = {
+          listingId,
+          views: 1,
+          downloads: 0,
+          customerIndustries: {},
+          viewedBy: [{ name: user.userName, company: user.companyName, timestamp: Date.now() }],
+          downloadedBy: [],
+        };
+        newAnalytics.push(analytic);
+      }
       return newAnalytics;
     });
   }, []);
