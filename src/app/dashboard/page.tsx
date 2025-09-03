@@ -27,9 +27,9 @@ const MainDashboard = () => {
     const propertyMatchDemandId = searchParams.get('demandId');
 
     const isMainAdmin = user?.email === 'admin@example.com';
-    const isProvider = user?.role === 'SuperAdmin' && user.email !== 'admin@example.com';
+    const isProvider = user?.role === 'SuperAdmin';
     const isTenant = user?.role === 'User';
-    const isO2O = user?.role === 'O2O';
+    const isO2O = user?.role === 'O2O' && user.email !== 'admin@example.com';
 
     const [providerTab, setProviderTab] = React.useState('active-demands');
     const [tenantTab, setTenantTab] = React.useState('my-demands');

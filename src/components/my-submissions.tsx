@@ -66,8 +66,8 @@ export function MySubmissions() {
   return (
     <div className="mt-8">
         <div className="mb-8">
-            <h2 className="text-3xl font-bold font-headline tracking-tight flex items-center gap-3"><Briefcase /> My Submissions</h2>
-            <p className="text-muted-foreground mt-2">Track the status of properties you've submitted against demands.</p>
+            <h2 className="text-3xl font-bold font-headline tracking-tight flex items-center gap-3"><Briefcase /> Submissions</h2>
+            <p className="text-muted-foreground mt-2">Track the status of properties submitted against demands.</p>
         </div>
          <Card>
             <CardContent className="p-0">
