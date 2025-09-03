@@ -1,4 +1,3 @@
-
 // src/ai/flows/predict-demand-trends.ts
 'use server';
 
@@ -9,6 +8,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
 import allDemands from '@/data/demands.json';
 import allListings from '@/data/listings.json';
@@ -30,6 +30,7 @@ export async function predictDemandTrends(input: PredictDemandTrendsInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'predictDemandTrendsPrompt',
+  model: googleAI.model('gemini-1.5-flash-latest'),
   input: {schema: z.object({
     timeHorizon: z.string(),
     demands: z.array(demandSchema),
