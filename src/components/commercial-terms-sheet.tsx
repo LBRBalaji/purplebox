@@ -34,6 +34,7 @@ const SectionHeader = ({ icon, title }: { icon: React.ElementType; title: string
 
 const FormRow = ({ name, label, control, isTextarea, isCostFactor, watch, form }: { name: any; label: string; control: any; isTextarea?: boolean; isCostFactor?: boolean; watch: any, form: any }) => {
     const showCostInput = watch(`${name}.isCostFactor`);
+    const InputComponent = isTextarea ? Textarea : Input;
 
     return (
     <TableRow>
@@ -136,9 +137,20 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
      const { fields: capexFields, append: appendCapex, remove: removeCapex } = useFieldArray({ name: "commercialTerms.capexItems", control: form.control });
      const { fields: sessionFields, append: appendSession, remove: removeSession } = useFieldArray({ name: "sessions", control: form.control });
 
-     const { fields: customerFields, append: appendCustomer, remove: removeCustomer } = useFieldArray({ name: `sessions.${sessionFields.length - 1}.customerAttendees`, control: form.control });
-     const { fields: providerFields, append: appendProvider, remove: removeProvider } = useFieldArray({ name: `sessions.${sessionFields.length - 1}.providerAttendees`, control: form.control });
-     const { fields: facilitatorFields, append: appendFacilitator, remove: removeFacilitator } = useFieldArray({ name: `sessions.${sessionFields.length - 1}.facilitatorAttendees`, control: form.control });
+     const customerAttendees = (index: number) => {
+        const { fields, append, remove } = useFieldArray({ name: `sessions.${index}.customerAttendees`, control: form.control });
+        return { fields, append, remove };
+    };
+
+    const providerAttendees = (index: number) => {
+        const { fields, append, remove } = useFieldArray({ name: `sessions.${index}.providerAttendees`, control: form.control });
+        return { fields, append, remove };
+    };
+
+    const facilitatorAttendees = (index: number) => {
+        const { fields, append, remove } = useFieldArray({ name: `sessions.${index}.facilitatorAttendees`, control: form.control });
+        return { fields, append, remove };
+    };
 
     const commercialTermsWatched = form.watch('commercialTerms');
     const leaseTermsWatched = form.watch('leaseTerms');
@@ -314,56 +326,57 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        {sessionFields.length > 0 && (
-                            <div className="space-y-4 mb-6">
-                                {sessionFields.map((field, index) => (
-                                    <div key={field.id} className="p-4 border rounded-lg bg-secondary/50 space-y-4">
-                                        <div className="flex justify-between items-center">
-                                            <p className="font-semibold text-sm">Negotiation Session {index + 1}: {new Date(form.watch(`sessions.${index}.date`)).toLocaleString()}</p>
-                                             <Button type="button" variant="ghost" size="icon" onClick={() => removeSession(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                                        </div>
-                                         <Separator />
-                                         <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} /></FormControl></FormItem> )} />
-                                        
-                                        <div className="space-y-2">
-                                            <FormLabel>Customer Represented By</FormLabel>
-                                            {customerFields.map((item, cIndex) => (
-                                                <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
-                                                </div>
-                                            ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendCustomer({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
-                                        </div>
-                                        
-                                        <div className="space-y-2">
-                                            <FormLabel>Provider Represented By</FormLabel>
-                                            {providerFields.map((item, pIndex) => (
-                                                <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
-                                                </div>
-                                            ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendProvider({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <FormLabel>Transaction Facilitated By</FormLabel>
-                                            {facilitatorFields.map((item, fIndex) => (
-                                                <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
-                                                </div>
-                                            ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendFacilitator({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
-                                        </div>
+                        {sessionFields.map((field, index) => {
+                            const { fields: customerFields, append: appendCustomer, remove: removeCustomer } = customerAttendees(index);
+                            const { fields: providerFields, append: appendProvider, remove: removeProvider } = providerAttendees(index);
+                            const { fields: facilitatorFields, append: appendFacilitator, remove: removeFacilitator } = facilitatorAttendees(index);
+                            return (
+                                <div key={field.id} className="p-4 border rounded-lg bg-secondary/50 space-y-4 mb-6">
+                                    <div className="flex justify-between items-center">
+                                        <p className="font-semibold text-sm">Negotiation Session {index + 1}: {new Date(form.watch(`sessions.${index}.date`)).toLocaleString()}</p>
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeSession(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                        <Separator />
+                                        <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} /></FormControl></FormItem> )} />
+                                    
+                                    <div className="space-y-2">
+                                        <FormLabel>Customer Represented By</FormLabel>
+                                        {customerFields.map((item, cIndex) => (
+                                            <div key={item.id} className="flex items-center gap-2">
+                                                <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                            </div>
+                                        ))}
+                                        <Button type="button" size="sm" variant="outline" onClick={() => appendCustomer({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <FormLabel>Provider Represented By</FormLabel>
+                                        {providerFields.map((item, pIndex) => (
+                                            <div key={item.id} className="flex items-center gap-2">
+                                                <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                            </div>
+                                        ))}
+                                        <Button type="button" size="sm" variant="outline" onClick={() => appendProvider({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <FormLabel>Transaction Facilitated By</FormLabel>
+                                        {facilitatorFields.map((item, fIndex) => (
+                                            <div key={item.id} className="flex items-center gap-2">
+                                                <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field}/>} />
+                                                <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field}/>} />
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                            </div>
+                                        ))}
+                                        <Button type="button" size="sm" variant="outline" onClick={() => appendFacilitator({name: '', title: ''})}><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+                                    </div>
+                                </div>
+                            )
+                        })}
                         <div className="border rounded-lg overflow-x-auto">
                         <Table>
                             <TableHeader>
