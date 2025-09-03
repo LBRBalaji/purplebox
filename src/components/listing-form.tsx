@@ -353,9 +353,16 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                  <FormLabel className="text-lg font-semibold">Documents & Media</FormLabel>
                  <div className="space-y-4 p-4 border rounded-md">
                     {fields.map((field, index) => (
-                        <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-4 items-end">
+                        <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                             <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
                                 <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} placeholder="e.g. Floor Plan" /></FormControl><FormMessage /></FormItem>
+                            )} />
+                             <FormField control={form.control} name={`documents.${index}.type`} render={({ field }) => (
+                                <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                    <SelectItem value="image">Image</SelectItem>
+                                    <SelectItem value="video">Video</SelectItem>
+                                    <SelectItem value="layout">Layout</SelectItem>
+                                </SelectContent></Select><FormMessage /></FormItem>
                             )} />
                             <FormField control={form.control} name={`documents.${index}.url`} render={({ field }) => (
                                 <FormItem><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://" /></FormControl><FormMessage /></FormItem>
