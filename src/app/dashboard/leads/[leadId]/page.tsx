@@ -8,7 +8,7 @@ import { useData, type TransactionActivity, type RegisteredLead } from '@/contex
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -65,8 +65,9 @@ export default function LeadDetailPage() {
 
     const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
     const isProviderForThisLead = foundLead.providers.some(p => p.providerEmail === user?.email);
+    const isCustomerOfThisLead = foundLead.customerId === user?.email;
 
-    if (isAdminOrO2O || isProviderForThisLead) {
+    if (isAdminOrO2O || isProviderForThisLead || isCustomerOfThisLead) {
         setLead(foundLead);
         const leadActivities = transactionActivities
             .filter(a => a.leadId === leadId)
@@ -87,6 +88,9 @@ export default function LeadDetailPage() {
 
   const customer = users[lead.customerId];
   const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+  const isCustomer = user?.email === lead.customerId;
+  
+  const backLink = isCustomer ? '/dashboard?tab=my-transactions' : '/dashboard/register-lead';
 
 
   return (
@@ -94,7 +98,7 @@ export default function LeadDetailPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
              <Button variant="ghost" asChild className="mb-4">
-                <Link href="/dashboard/register-lead">
+                <Link href={backLink}>
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Transactions
                 </Link>
             </Button>
@@ -106,7 +110,7 @@ export default function LeadDetailPage() {
         <Tabs defaultValue="activity" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
-                <TabsTrigger value="commercials"><FileSpreadsheet className="mr-2 h-4 w-4"/> Commercials</TabsTrigger>
+                <TabsTrigger value="commercials"><HandCoins className="mr-2 h-4 w-4"/> Commercials</TabsTrigger>
                 <TabsTrigger value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
             </TabsList>
             <TabsContent value="activity" className="mt-6">
@@ -155,7 +159,7 @@ export default function LeadDetailPage() {
                     <div className="space-y-6 sticky top-24">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><User className="h-5 w-5"/> Lead Info</CardTitle>
+                                <CardTitle className="flex items-center gap-2"><User className="h-5 w-5"/> Customer Info</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3 text-sm">
                                 <div className="font-semibold">{customer?.companyName || lead.leadName}</div>

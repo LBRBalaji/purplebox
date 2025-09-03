@@ -17,6 +17,7 @@ import { ApprovalQueue } from '@/components/approval-queue';
 import { useData } from '@/contexts/data-context';
 import { ProviderListings } from '@/components/provider-listings';
 import { ProviderLeads } from '@/components/provider-leads';
+import { CustomerTransactions } from '@/components/customer-transactions';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -72,9 +73,10 @@ const MainDashboard = () => {
 
     const renderTenantContent = () => (
       <Tabs value={tenantTab} onValueChange={setTenantTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="my-demands">My Demands & Matches</TabsTrigger>
           <TabsTrigger value="log-demand">Log New Demand</TabsTrigger>
+          <TabsTrigger value="my-transactions">My Transactions</TabsTrigger>
           <TabsTrigger value="shortlisted">Shortlisted</TabsTrigger>
         </TabsList>
         <TabsContent value="my-demands">
@@ -82,6 +84,9 @@ const MainDashboard = () => {
         </TabsContent>
         <TabsContent value="log-demand">
           <DemandForm onDemandLogged={handleSwitchToMyDemands} />
+        </TabsContent>
+        <TabsContent value="my-transactions">
+            <CustomerTransactions />
         </TabsContent>
         <TabsContent value="shortlisted">
             <ShortlistedProperties />
