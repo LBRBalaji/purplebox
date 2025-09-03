@@ -92,14 +92,13 @@ const MainDashboard = () => {
     // O2O Manager now has a more focused view
     const renderO2OContent = () => (
       <Tabs value={adminTab} onValueChange={setAdminTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="approval-queue">
                 Approval Queue 
                 {hasPendingSubmissions && <span className="ml-2 h-2 w-2 rounded-full bg-destructive animate-ping"></span>}
             </TabsTrigger>
             <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
             <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
-            <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
         <TabsContent value="approval-queue">
             <ApprovalQueue />
@@ -109,9 +108,6 @@ const MainDashboard = () => {
         </TabsContent>
          <TabsContent value="registered-leads">
             <ProviderLeads />
-        </TabsContent>
-        <TabsContent value="submit-match">
-            <PropertyForm />
         </TabsContent>
       </Tabs>
     );

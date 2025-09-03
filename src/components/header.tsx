@@ -163,14 +163,17 @@ export function Header() {
                             </NavLink>
                         )}
                         {isAdmin && (
-                            <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
+                            <>
+                                <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
+                                <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
+                                <NavLink href="/dashboard/manage-listings"><FileCheck className="h-4 w-4" /> Manage Listings</NavLink>
+                                <AnalyticsDropdown />
+                            </>
                         )}
-                         {(isAdmin || isO2O) && (
+                         {(isO2O && !isAdmin) && (
                             <>
                                 <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
                                 <NavLink href="/dashboard/manage-listings"><FileCheck className="h-4 w-4" /> Manage Listings</NavLink>
-                                <NavLink href="/dashboard/approval"><CheckCircle className="h-4 w-4" /> Approval Queue</NavLink>
-                                <AnalyticsDropdown />
                             </>
                          )}
                          {isProvider && !isAdmin && (
