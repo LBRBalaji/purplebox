@@ -85,7 +85,15 @@ export function AddActivityForm({ leadId, onAddActivity }: AddActivityFormProps)
       createdBy: user.email,
     };
     onAddActivity(activityData);
-    form.reset({ activityType: 'Site Visit Request' });
+    form.reset({
+      activityType: 'Site Visit Request',
+      visitDateTime: undefined,
+      message: '',
+      status: undefined,
+      notes: '',
+      feedbackText: '',
+      improvementsText: '',
+    });
   };
 
   const renderFormFields = () => {
