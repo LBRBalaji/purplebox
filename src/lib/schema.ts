@@ -1,4 +1,3 @@
-
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -324,6 +323,8 @@ export const PredictDemandTrendsInputSchema = z.object({
   docksMin: z.number().optional().describe('Filter by minimum number of docks.'),
   roofInsulation: z.string().optional().describe('Filter by roof insulation status.'),
   ventilation: z.string().optional().describe('Filter by ventilation type.'),
+  sizeMin: z.number().optional().describe('Filter by minimum property size in sq. ft.'),
+  sizeMax: z.number().optional().describe('Filter by maximum property size in sq. ft.'),
 });
 export type PredictDemandTrendsInput = z.infer<typeof PredictDemandTrendsInputSchema>;
 

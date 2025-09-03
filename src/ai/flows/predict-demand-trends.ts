@@ -1,4 +1,3 @@
-
 // src/ai/flows/predict-demand-trends.ts
 'use server';
 
@@ -45,6 +44,8 @@ const prompt = ai.definePrompt({
     docksMin: z.number().optional(),
     roofInsulation: z.string().optional(),
     ventilation: z.string().optional(),
+    sizeMin: z.number().optional(),
+    sizeMax: z.number().optional(),
     demands: z.array(demandSchema),
     listings: z.array(listingSchema),
     submissions: z.array(z.any()), // Using any to avoid complexity with nested schemas in prompt
@@ -66,6 +67,7 @@ const prompt = ai.definePrompt({
   {{#if docksMin}}- **Docks**: Filter for properties with >= **{{{docksMin}}}** docks.{{/if}}
   {{#if roofInsulation}}- **Roof Insulation**: Filter for properties with **{{{roofInsulation}}}** roof insulation.{{/if}}
   {{#if ventilation}}- **Ventilation**: Filter for properties with **{{{ventilation}}}** type.{{/if}}
+  {{#if sizeMin}}- **Size**: Filter for properties with size between **{{{sizeMin}}}** and **{{{sizeMax}}}** sq. ft.{{/if}}
 
   Analyze the following data sets:
   1.  **Demand Data**: Records of what customers have explicitly requested. Pay attention to locations, sizes, readiness timelines, and specific priorities.
@@ -140,6 +142,10 @@ const predictDemandTrendsFlow = ai.defineFlow(
 
     if (input.ventilation) {
         filteredListings = filteredListings.filter(l => l.buildingSpecifications.ventilation === input.ventilation);
+    }
+    
+    if (input.sizeMin !== undefined && input.sizeMax !== undefined) {
+      filteredListings = filteredListings.filter(l => l.sizeSqFt >= input.sizeMin! && l.sizeSqFt <= input.sizeMax!);
     }
 
 

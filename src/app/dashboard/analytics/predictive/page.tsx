@@ -1,4 +1,3 @@
-
 // src/app/dashboard/analytics/predictive/page.tsx
 'use client';
 
@@ -9,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Sparkles, TrendingUp, MapPin, ListChecks, FileText, Settings2, PlusCircle, ChevronsUp, Waves } from 'lucide-react';
+import { Sparkles, TrendingUp, MapPin, ListChecks, FileText, Settings2, PlusCircle, ChevronsUp, Waves, Scaling } from 'lucide-react';
 import { predictDemandTrends } from '@/ai/flows/predict-demand-trends';
 import { useToast } from '@/hooks/use-toast';
 import type { PredictDemandTrendsInput, PredictDemandTrendsOutput } from '@/lib/schema';
@@ -30,10 +29,13 @@ import { Check } from '@/components/ui/check';
 import { Switch } from '@/components/ui/switch';
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
+import { Slider } from '@/components/ui/slider';
+import { useData } from '@/contexts/data-context';
 
-type FilterKey = 'buildingType' | 'serviceModel' | 'availability' | 'craneAvailable' | 'roofType' | 'fireNOC' | 'eveHeightMin' | 'docksMin' | 'roofInsulation' | 'ventilation';
+type FilterKey = 'buildingType' | 'serviceModel' | 'availability' | 'craneAvailable' | 'roofType' | 'fireNOC' | 'eveHeightMin' | 'docksMin' | 'roofInsulation' | 'ventilation' | 'sizeRange';
 
 const availableFilters: { value: FilterKey; label: string }[] = [
+    { value: 'sizeRange', label: 'Size Range' },
     { value: 'buildingType', label: 'Building Type' },
     { value: 'serviceModel', label: 'Service Model' },
     { value: 'availability', label: 'Availability' },
@@ -48,6 +50,7 @@ const availableFilters: { value: FilterKey; label: string }[] = [
 
 export default function PredictiveAnalyticsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
+    const { listings } = useData();
     const router = useRouter();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = React.useState(false);
@@ -57,12 +60,27 @@ export default function PredictiveAnalyticsPage() {
     const [activeFilters, setActiveFilters] = React.useState<FilterKey[]>([]);
     const [open, setOpen] = React.useState(false);
 
+    const maxSliderSize = React.useMemo(() => {
+        const max = Math.max(...listings.map(w => w.sizeSqFt), 0);
+        return max > 0 ? Math.ceil(max / 100000) * 100000 : 1000000;
+    }, [listings]);
+
     const form = useForm<PredictDemandTrendsInput>({
         defaultValues: {
             timeHorizon: 'next quarter',
             location: '',
+            sizeMin: 0,
+            sizeMax: maxSliderSize
         }
     });
+
+    React.useEffect(() => {
+      form.reset({
+        ...form.formState.defaultValues,
+        sizeMin: 0,
+        sizeMax: maxSliderSize,
+      })
+    }, [maxSliderSize, form])
 
     React.useEffect(() => {
         if (!isAuthLoading && user?.email !== 'admin@example.com' && user?.role !== 'O2O') {
@@ -96,7 +114,12 @@ export default function PredictiveAnalyticsPage() {
 
         // Clean up filter value when removing
         if (!newActive.includes(filterKey)) {
-            form.setValue(filterKey, undefined as any);
+             if (filterKey === 'sizeRange') {
+                form.setValue('sizeMin', 0);
+                form.setValue('sizeMax', maxSliderSize);
+            } else {
+                form.setValue(filterKey as any, undefined);
+            }
         }
         setActiveFilters(newActive);
     }
@@ -180,6 +203,29 @@ export default function PredictiveAnalyticsPage() {
 
                         {activeFilters.length > 0 && (
                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 border-t border-dashed">
+                               {activeFilters.includes('sizeRange') && (
+                                   <FormField control={form.control} name="sizeMin" render={() => (
+                                        <FormItem className="md:col-span-2">
+                                            <FormLabel>Size Range (Sq. Ft.)</FormLabel>
+                                             <FormControl>
+                                                <Slider
+                                                    min={0}
+                                                    max={maxSliderSize}
+                                                    step={10000}
+                                                    value={[form.watch('sizeMin') || 0, form.watch('sizeMax') || maxSliderSize]}
+                                                    onValueChange={(value) => {
+                                                        form.setValue('sizeMin', value[0]);
+                                                        form.setValue('sizeMax', value[1]);
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <div className="flex justify-between text-xs text-muted-foreground">
+                                                <span>{(form.watch('sizeMin') || 0).toLocaleString()}</span>
+                                                <span>{(form.watch('sizeMax') || maxSliderSize).toLocaleString()}</span>
+                                            </div>
+                                        </FormItem>
+                                    )} />
+                                )}
                                {activeFilters.includes('buildingType') && (
                                      <FormField control={form.control} name="buildingType" render={({ field }) => (
                                         <FormItem><FormLabel>Building Type</FormLabel>
@@ -214,12 +260,12 @@ export default function PredictiveAnalyticsPage() {
                                )}
                                {activeFilters.includes('eveHeightMin') && (
                                     <FormField control={form.control} name="eveHeightMin" render={({ field }) => (
-                                       <FormItem><FormLabel>Min Eve Height (m)</FormLabel><FormControl><Input type="number" {...field} /></FormControl></FormItem>
+                                       <FormItem><FormLabel>Min Eve Height (m)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl></FormItem>
                                    )} />
                                )}
                                {activeFilters.includes('docksMin') && (
                                     <FormField control={form.control} name="docksMin" render={({ field }) => (
-                                       <FormItem><FormLabel>Min Docks</FormLabel><FormControl><Input type="number" {...field} /></FormControl></FormItem>
+                                       <FormItem><FormLabel>Min Docks</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl></FormItem>
                                    )} />
                                )}
                                {activeFilters.includes('roofInsulation') && (
