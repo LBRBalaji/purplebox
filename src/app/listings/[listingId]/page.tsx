@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -285,6 +285,14 @@ export default function ListingDetailPage() {
         setIsLayoutRequestOpen(true);
     };
 
+    const handleLogDemandClick = () => {
+      if (!user) {
+        setIsLoginDialogOpen(true);
+        return;
+      }
+      router.push('/dashboard?logNew=true');
+    }
+
     return (
         <>
             <main className="container mx-auto p-4 md:p-8">
@@ -313,7 +321,7 @@ export default function ListingDetailPage() {
                     </div>
                     
                     {/* Main Content */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                         <div className="lg:col-span-2 space-y-8">
                             {/* Image and High-level stats */}
                             <Card>
@@ -447,63 +455,81 @@ export default function ListingDetailPage() {
                         </div>
                         
                         {/* Sticky Sidebar */}
-                        <div className="lg:col-span-1 space-y-6">
-                            <Card className="sticky top-8">
-                                <CardHeader>
-                                    <CardTitle>Commercials</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {user ? (
-                                        <div className="space-y-4">
-                                            <div className="flex items-baseline justify-center text-center">
-                                                <span className="text-4xl font-bold">₹{listing.rentPerSqFt || '??'}</span>
-                                                <span className="text-sm text-muted-foreground">/sq.ft./month</span>
+                        <div className="lg:col-span-1">
+                            <div className="sticky top-8 space-y-6">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Commercials</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {user ? (
+                                            <div className="space-y-4">
+                                                <div className="flex items-baseline justify-center text-center">
+                                                    <span className="text-4xl font-bold">₹{listing.rentPerSqFt || '??'}</span>
+                                                    <span className="text-sm text-muted-foreground">/sq.ft./month</span>
+                                                </div>
+                                                <Separator/>
+                                                <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
+                                                <DetailRow label="Construction Progress" value={listing.constructionProgress} />
                                             </div>
-                                            <Separator/>
-                                            <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
-                                            <DetailRow label="Construction Progress" value={listing.constructionProgress} />
-                                        </div>
-                                    ) : (
-                                        <Alert>
-                                            <Lock className="h-4 w-4" />
-                                            <AlertTitle>Login Required</AlertTitle>
-                                            <AlertDescription>
-                                                Please log in or sign up to view detailed commercial terms and other sensitive data.
-                                            </AlertDescription>
-                                            <Button className="w-full mt-4" onClick={() => setIsLoginDialogOpen(true)}>Login</Button>
-                                        </Alert>
+                                        ) : (
+                                            <Alert>
+                                                <Lock className="h-4 w-4" />
+                                                <AlertTitle>Login Required</AlertTitle>
+                                                <AlertDescription>
+                                                    Please log in or sign up to view detailed commercial terms and other sensitive data.
+                                                </AlertDescription>
+                                                <Button className="w-full mt-4" onClick={() => setIsLoginDialogOpen(true)}>Login</Button>
+                                            </Alert>
+                                        )}
+                                    </CardContent>
+                                    {user && user.role === 'User' && (
+                                        <CardFooter>
+                                            <Button className="w-full" onClick={handleDownloadRequest}>
+                                                <Download className="mr-2 h-4 w-4" /> Download Details as CSV
+                                            </Button>
+                                        </CardFooter>
                                     )}
-                                </CardContent>
-                                {user && user.role === 'User' && (
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Certificates & Approvals</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {user ? (
+                                            <div className="space-y-1">
+                                                <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
+                                                <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
+                                                <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
+                                                <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
+                                                <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
+                                                <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground text-center p-4">
+                                                Login to view compliance details.
+                                            </p>
+                                        )}
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Need Something Different?</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-muted-foreground">
+                                            For more tailored options, our demand specific warehouse sourcing service is always available.
+                                        </p>
+                                    </CardContent>
                                     <CardFooter>
-                                        <Button className="w-full" onClick={handleDownloadRequest}>
-                                            <Download className="mr-2 h-4 w-4" /> Download Details as CSV
+                                        <Button className="w-full" onClick={handleLogDemandClick}>
+                                            <ClipboardPlus className="mr-2 h-4 w-4" /> Log Demand
                                         </Button>
                                     </CardFooter>
-                                )}
-                            </Card>
-
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Certificates & Approvals</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                     {user ? (
-                                        <div className="space-y-1">
-                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
-                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
-                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
-                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
-                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
-                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
-                                        </div>
-                                     ) : (
-                                         <p className="text-sm text-muted-foreground text-center p-4">
-                                            Login to view compliance details.
-                                         </p>
-                                     )}
-                                </CardContent>
-                            </Card>
+                                </Card>
+                            </div>
                         </div>
                     </div>
                 </div>
