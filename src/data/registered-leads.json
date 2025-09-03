@@ -75,8 +75,29 @@
                 "rejectionReason": "BTS requirement does not fit current portfolio."
             }
         ]
+    },
+    {
+        "id": "LDR-HEAVYLIFT",
+        "customerId": "user@example.com",
+        "leadName": "Heavy-Lift Manufacturing",
+        "leadContact": "Vikram Singh",
+        "leadEmail": "vikram.s@h-lift.com",
+        "leadPhone": "555-111-9999",
+        "requirementsSummary": "Requirement for a heavy engineering manufacturing unit with EOT crane specs. High ceiling is mandatory.",
+        "registeredBy": "o2o@example.com",
+        "registeredAt": "2024-01-10T11:00:00Z",
+        "providers": [
+            {
+                "providerEmail": "provider@example.com",
+                "status": "Acknowledged",
+                "acknowledgedAt": "2024-01-11T12:00:00Z",
+                "acknowledgedBy": {
+                    "name": "Test Provider",
+                    "title": "Director",
+                    "mobile": "555-111-2222",
+                    "email": "provider@example.com"
+                }
+            }
+        ]
     }
 ]
-
-    
-

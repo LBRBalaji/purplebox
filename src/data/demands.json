@@ -16,7 +16,10 @@
     "docks": 12,
     "description": "Urgent requirement for a large warehouse with high ceilings and 10+ docks near the port.",
     "preferences": {
-      "nonCompromisable": ["size", "docks"]
+      "nonCompromisable": ["size", "docks"],
+      "approvals": "Must to have",
+      "fireNoc": "Good to have",
+      "fireSafety": "Must to have"
     }
   },
   {
@@ -35,7 +38,10 @@
     "docks": 4,
     "description": "Need an industrial building for a light assembly line. Good connectivity is a must.",
     "preferences": {
-      "nonCompromisable": ["location"]
+      "nonCompromisable": ["location"],
+      "approvals": "Must to have",
+      "fireNoc": "Must to have",
+      "fireSafety": "Must to have"
     }
   },
   {
@@ -54,7 +60,10 @@
     "docks": 2,
     "description": "Looking for a warehouse for e-commerce fulfillment in the city center. Must be ready for immediate occupation.",
     "preferences": {
-      "nonCompromisable": ["location", "readiness"]
+      "nonCompromisable": ["location", "readiness"],
+      "approvals": "Must to have",
+      "fireNoc": "Good to have",
+      "fireSafety": "Good to have"
     }
   },
   {
@@ -73,7 +82,10 @@
     "docks": 20,
     "description": "Industrial facility for manufacturing, requiring heavy power load and effluent treatment plant.",
     "preferences": {
-      "nonCompromisable": ["size", "power", "fireSafety"]
+      "nonCompromisable": ["size", "power", "fireSafety"],
+      "approvals": "Must to have",
+      "fireNoc": "Must to have",
+      "fireSafety": "Must to have"
     }
   },
   {
@@ -92,7 +104,10 @@
     "docks": 15,
     "description": "Tier-1 logistics firm requires a Grade A PEB warehouse. Facility must be compliant with all modern fire safety norms (NOC obtained), have high ceiling clearance for vertical storage, and ample docking stations for high-volume turnover. Non-compromisable on fire safety, ceiling height, and readiness.",
     "preferences": {
-      "nonCompromisable": ["fireNoc", "ceilingHeight", "readiness"]
+      "nonCompromisable": ["fireNoc", "ceilingHeight", "readiness"],
+      "approvals": "Must to have",
+      "fireNoc": "Must to have",
+      "fireSafety": "Must to have"
     }
   },
   {
@@ -111,7 +126,10 @@
       "docks": 6,
       "description": "Need a temperature-controlled warehouse for pharmaceutical storage. Must have all statutory approvals (CMDA/BDA) and an obtained Fire NOC. Consistent power with full generator backup is non-negotiable due to the sensitive nature of the products. The lease must be budget-friendly.",
       "preferences": {
-          "nonCompromisable": ["approvals", "fireNoc", "power"]
+          "nonCompromisable": ["approvals", "fireNoc", "power"],
+          "approvals": "Must to have",
+          "fireNoc": "Must to have",
+          "fireSafety": "Must to have"
       }
   },
   {
@@ -130,7 +148,10 @@
       "docks": 18,
       "description": "Automotive components supplier looking for a high-throughput facility. A minimum of 45 ft ceiling height is required for our automated racking systems. The number of docks is critical for our logistics. The property must be part of an industrial park with excellent road access. Fire safety compliance is a must.",
       "preferences": {
-          "nonCompromisable": ["ceilingHeight", "docks", "fireSafety"]
+          "nonCompromisable": ["ceilingHeight", "docks", "fireSafety"],
+          "approvals": "Must to have",
+          "fireNoc": "Must to have",
+          "fireSafety": "Must to have"
       }
   },
   {
@@ -149,7 +170,10 @@
       "docks": 10,
       "description": "Cold storage solutions provider looking for a Build-To-Suit (BTS) opportunity. We require a standalone facility with space for our refrigeration units. A high installed power capacity is essential. All approvals for a cold storage facility must be obtainable (To Apply).",
       "preferences": {
-          "nonCompromisable": ["readiness", "power", "approvals"]
+          "nonCompromisable": ["readiness", "power", "approvals"],
+          "approvals": "Must to have",
+          "fireNoc": "Must to have",
+          "fireSafety": "Must to have"
       }
   },
   {
@@ -240,7 +264,10 @@
       "docks": 25,
       "description": "Second major requirement for a large-scale distribution hub in the southern corridor. Similar to our previous demand, but for a different client. High-grade specs are essential.",
       "preferences": {
-          "nonCompromisable": ["size", "readiness"]
+          "nonCompromisable": ["size", "readiness"],
+          "approvals": "Must to have",
+          "fireNoc": "Must to have",
+          "fireSafety": "Must to have"
       }
   },
   {
@@ -259,7 +286,10 @@
       "docks": 8,
       "description": "Expansion requirement for our pharmaceutical distribution network in the Pune region.",
       "preferences": {
-          "nonCompromisable": ["location", "approvals"]
+          "nonCompromisable": ["location", "approvals"],
+          "approvals": "Must to have",
+          "fireNoc": "Must to have",
+          "fireSafety": "Must to have"
       }
   }
 ]

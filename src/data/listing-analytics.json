@@ -60,33 +60,33 @@
     },
     {
       "listingId": "LST-P9O7I5U3",
-      "views": 0,
-      "downloads": 0,
+      "views": 22,
+      "downloads": 4,
       "customerIndustries": {},
       "downloadedBy": [],
       "viewedBy": []
     },
     {
       "listingId": "LST-A1S2D3F4",
-      "views": 0,
-      "downloads": 0,
+      "views": 12,
+      "downloads": 1,
       "customerIndustries": {},
       "downloadedBy": [],
       "viewedBy": []
     },
     {
       "listingId": "LST-G5H6J7K8",
-      "views": 75,
-      "downloads": 12,
-      "customerIndustries": { "Automotive": 5, "FMCG": 7 },
+      "views": 175,
+      "downloads": 32,
+      "customerIndustries": { "Automotive": 15, "FMCG": 17 },
       "downloadedBy": [],
       "viewedBy": []
     },
     {
       "listingId": "LST-L9K1J2H3",
-      "views": 120,
-      "downloads": 22,
-      "customerIndustries": { "Electronics": 15, "Logistics": 7 },
+      "views": 220,
+      "downloads": 42,
+      "customerIndustries": { "Electronics": 25, "Logistics": 17 },
       "downloadedBy": [],
       "viewedBy": []
     },

@@ -31,5 +31,26 @@
         },
         "createdAt": "2023-11-17T11:00:00Z",
         "createdBy": "o2o@example.com"
+    },
+    {
+        "activityId": "ACT-1740000000009",
+        "leadId": "LDR-HEAVYLIFT",
+        "activityType": "Site Visit Request",
+        "details": {
+            "visitDateTime": "2024-01-20T10:00:00Z",
+            "message": "Please arrange a site visit for the Heavy-Lift Manufacturing team. They are keen to see the crane support structure."
+        },
+        "createdAt": "2024-01-12T15:00:00Z",
+        "createdBy": "o2o@example.com"
+    },
+    {
+        "activityId": "ACT-1740000000010",
+        "leadId": "LDR-HEAVYLIFT",
+        "activityType": "Tenant Improvements",
+        "details": {
+            "improvementsText": "Customer has indicated they will require an additional 10-ton EOT crane to be installed. They may also need a small office extension."
+        },
+        "createdAt": "2024-01-22T16:00:00Z",
+        "createdBy": "o2o@example.com"
     }
 ]

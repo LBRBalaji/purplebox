@@ -25,5 +25,31 @@
             }
         ],
         "overallRemarks": "Crane installation is the highest priority. Office construction can begin concurrently. All timelines are subject to material availability."
+    },
+    {
+        "leadId": "LDR-HEAVYLIFT",
+        "items": [
+            {
+                "id": "TI-HL-001",
+                "item": "Reinforce foundation in Bay 3 for heavy machinery installation.",
+                "category": "Civil",
+                "estimatedSchedule": "60 days",
+                "agreedSchedule": "",
+                "status": "Pending",
+                "lastUpdatedAt": "2024-01-22T16:05:00Z",
+                "updatedBy": "o2o@example.com"
+            },
+            {
+                "id": "TI-HL-002",
+                "item": "Upgrade main electrical panel to support an additional 500 kVA load.",
+                "category": "Electrical",
+                "estimatedSchedule": "30 days",
+                "agreedSchedule": "",
+                "status": "Pending",
+                "lastUpdatedAt": "2024-01-22T16:05:00Z",
+                "updatedBy": "o2o@example.com"
+            }
+        ],
+        "overallRemarks": "Initial list of improvements requested by Heavy-Lift Manufacturing. Awaiting provider estimates on schedule and cost."
     }
 ]

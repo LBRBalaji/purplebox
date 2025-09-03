@@ -53,5 +53,23 @@
     "status": "Pending",
     "isNew": true,
     "demandUserEmail": "user@example.com"
+  },
+  {
+    "submissionId": "SUB-1740000000009",
+    "demandId": "DMD-1740000000009",
+    "listingId": "LST-L9K1J2H3",
+    "providerEmail": "provider@example.com",
+    "status": "Approved",
+    "isNew": true,
+    "demandUserEmail": "user@example.com"
+  },
+  {
+    "submissionId": "SUB-1750000000010",
+    "demandId": "DMD-1750000000010",
+    "listingId": "LST-Z4A5S6D7",
+    "providerEmail": "provider@example.com",
+    "status": "Pending",
+    "isNew": false,
+    "demandUserEmail": "logistics.pro@example.com"
   }
 ]
