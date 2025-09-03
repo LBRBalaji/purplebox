@@ -15,6 +15,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CommercialTermsSheet } from '@/components/commercial-terms-sheet';
+import { TenantImprovementsSheet } from '@/components/tenant-improvements-sheet';
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
   'Site Visit Request': CalendarIcon,
@@ -102,10 +103,11 @@ export default function LeadDetailPage() {
                 Tracking all activities for Transaction ID: <span className="font-mono text-primary">{lead.id}</span>
             </p>
         </div>
-        <Tabs defaultValue="activity">
-            <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="activity" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
                 <TabsTrigger value="commercials"><FileSpreadsheet className="mr-2 h-4 w-4"/> Commercials</TabsTrigger>
+                <TabsTrigger value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
             </TabsList>
             <TabsContent value="activity" className="mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
@@ -183,6 +185,9 @@ export default function LeadDetailPage() {
             </TabsContent>
             <TabsContent value="commercials" className="mt-6">
                 <CommercialTermsSheet lead={lead} />
+            </TabsContent>
+             <TabsContent value="improvements" className="mt-6">
+                <TenantImprovementsSheet leadId={lead.id} />
             </TabsContent>
         </Tabs>
       </div>

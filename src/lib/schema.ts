@@ -1,5 +1,4 @@
 
-
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -315,7 +314,7 @@ const negotiableTermSchema = z.object({
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
     agreedTerms: z.string().optional().default(''),
-}).optional();
+});
 
 const customTermSchema = z.object({
     particulars: z.string().default(''),
@@ -457,6 +456,30 @@ export const commercialTermsSchema = z.object({
     overallRemarks: z.string().optional().default(''),
 });
 export type CommercialTermsSchema = z.infer<typeof commercialTermsSchema>;
+
+// Tenant Improvements Schemas
+export const tenantImprovementItemSchema = z.object({
+  id: z.string(),
+  item: z.string().min(1, "Item description is required."),
+  category: z.enum([
+    "Civil", "Roof", "Door", "Electrical", "Fire", "Road", "Docks", "HVAC", 
+    "Safety & Security", "Compliances Certificate", "Mechanical", 
+    "Administrative", "Workforce", "3PL"
+  ]),
+  estimatedSchedule: z.string().optional(),
+  agreedSchedule: z.string().optional(),
+  status: z.enum(["Pending", "In Progress", "Completed", "On Hold"]).default("Pending"),
+  lastUpdatedAt: z.string().datetime(),
+  updatedBy: z.string(), // user email
+});
+export type TenantImprovementItem = z.infer<typeof tenantImprovementItemSchema>;
+
+export const tenantImprovementsSheetSchema = z.object({
+    leadId: z.string(),
+    items: z.array(tenantImprovementItemSchema),
+    overallRemarks: z.string().optional(),
+});
+export type TenantImprovementsSheet = z.infer<typeof tenantImprovementsSheetSchema>;
 
 // Schemas for Predictive Analytics Flow
 export const PredictDemandTrendsInputSchema = z.object({

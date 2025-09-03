@@ -1,0 +1,29 @@
+
+[
+    {
+        "leadId": "LDR-ACME456",
+        "items": [
+            {
+                "id": "TI-001",
+                "item": "Install additional 5-ton capacity EOT crane.",
+                "category": "Mechanical",
+                "estimatedSchedule": "45 days from lease signing",
+                "agreedSchedule": "40 days from lease signing",
+                "status": "In Progress",
+                "lastUpdatedAt": "2023-11-20T09:00:00Z",
+                "updatedBy": "provider@example.com"
+            },
+            {
+                "id": "TI-002",
+                "item": "Construct a 1,500 sq.ft. office space on the mezzanine floor.",
+                "category": "Civil",
+                "estimatedSchedule": "30 days",
+                "agreedSchedule": "30 days",
+                "status": "Pending",
+                "lastUpdatedAt": "2023-11-10T11:00:00Z",
+                "updatedBy": "o2o@example.com"
+            }
+        ],
+        "overallRemarks": "Crane installation is the highest priority. Office construction can begin concurrently. All timelines are subject to material availability."
+    }
+]
