@@ -38,7 +38,7 @@ function ResultCard({ title, icon: Icon, children, count }: { title: string, ico
 }
 
 export default function SearchConsolePage() {
-    const { listings, demands } = useData();
+    const { listings, demands, submissions } = useData();
     const { users: allUsers } = useAuth();
     const [searchTerm, setSearchTerm] = React.useState('');
     const [results, setResults] = React.useState<SearchResult | null>(null);
@@ -54,35 +54,73 @@ export default function SearchConsolePage() {
 
         const lowerCaseSearch = searchTerm.toLowerCase();
         
-        let foundListings: ListingSchema[] = [];
-        let foundDemands: DemandSchema[] = [];
-        let foundUsers: User[] = [];
+        let foundUsers = new Set<User>();
+        let foundListings = new Set<ListingSchema>();
+        let foundDemands = new Set<DemandSchema>();
 
-        // Search Users by name or email
-        foundUsers = Object.values(allUsers).filter(u => 
-            u.userName.toLowerCase().includes(lowerCaseSearch) || 
-            u.companyName.toLowerCase().includes(lowerCaseSearch) ||
-            u.email.toLowerCase().includes(lowerCaseSearch)
-        );
-        const foundUserEmails = new Set(foundUsers.map(u => u.email));
+        // Step 1: Direct Search
+        Object.values(allUsers).forEach(u => {
+            if (u.userName.toLowerCase().includes(lowerCaseSearch) || 
+                u.companyName.toLowerCase().includes(lowerCaseSearch) ||
+                u.email.toLowerCase().includes(lowerCaseSearch)) {
+                foundUsers.add(u);
+            }
+        });
 
-        // Search Listings by ID or Name
-        foundListings = listings.filter(l => 
-            l.listingId.toLowerCase().includes(lowerCaseSearch) || 
-            l.name.toLowerCase().includes(lowerCaseSearch) ||
-            foundUserEmails.has(l.developerId)
-        );
+        listings.forEach(l => {
+            if (l.listingId.toLowerCase().includes(lowerCaseSearch) || 
+                l.name.toLowerCase().includes(lowerCaseSearch) ||
+                l.location.toLowerCase().includes(lowerCaseSearch)) {
+                foundListings.add(l);
+            }
+        });
+
+        demands.forEach(d => {
+            if (d.demandId.toLowerCase().includes(lowerCaseSearch) ||
+                d.locationName?.toLowerCase().includes(lowerCaseSearch) ||
+                d.companyName.toLowerCase().includes(lowerCaseSearch) ||
+                d.userName.toLowerCase().includes(lowerCaseSearch)) {
+                foundDemands.add(d);
+            }
+        });
         
-        // Search Demands by ID or user association
-        foundDemands = demands.filter(d => 
-            d.demandId.toLowerCase().includes(lowerCaseSearch) ||
-            foundUserEmails.has(d.userEmail)
-        );
+        // Step 2: Cross-Reference Search
+        const userEmails = new Set(Array.from(foundUsers).map(u => u.email));
+
+        // Find demands by found users
+        demands.forEach(d => {
+            if (userEmails.has(d.userEmail)) {
+                foundDemands.add(d);
+            }
+        });
+
+        // Find listings by found users (providers)
+        listings.forEach(l => {
+            if (userEmails.has(l.developerId)) {
+                foundListings.add(l);
+            }
+        });
+        
+        const demandIds = new Set(Array.from(foundDemands).map(d => d.demandId));
+        const listingIds = new Set(Array.from(foundListings).map(l => l.listingId));
+
+        // Find related submissions
+        submissions.forEach(sub => {
+            if (demandIds.has(sub.demandId)) {
+                const listing = listings.find(l => l.listingId === sub.listingId);
+                if(listing) foundListings.add(listing);
+            }
+            if (listingIds.has(sub.listingId)) {
+                const demand = demands.find(d => d.demandId === sub.demandId);
+                if (demand) foundDemands.add(demand);
+            }
+        });
+
 
         setResults({
-            listings: foundListings,
-            demands: foundDemands,
-            users: foundUsers
+            listings: Array.from(foundListings),
+            demands: Array.from(foundDemands),
+            users: Array.from(foundUsers)
         });
         setSearched(true);
     }
@@ -99,7 +137,7 @@ export default function SearchConsolePage() {
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold font-headline tracking-tight">Admin Search Console</h1>
                     <p className="text-muted-foreground mt-2">
-                        Enter a Listing ID, Customer Name/Email, or Provider Name to track all related data.
+                        Enter a Listing ID, Demand ID, Customer/Provider Name or Email to track all related data.
                     </p>
                 </div>
                 
