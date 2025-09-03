@@ -14,7 +14,6 @@ import { Textarea } from './ui/textarea';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { PlusCircle, Save, Trash2, HardHat, Clock } from 'lucide-react';
-import { Badge } from './ui/badge';
 import { cn } from '@/lib/utils';
 
 
@@ -62,6 +61,8 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
   const isDeveloper = user?.role === 'SuperAdmin';
   const isCustomer = user?.role === 'User';
   const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+  
+  const canEdit = isO2O || isCustomer;
 
   const statusConfig: { [key: string]: { className: string } } = {
     Pending: { className: 'bg-amber-100 text-amber-800' },
@@ -94,7 +95,7 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                                         <FormItem>
                                             <FormLabel className="sr-only">Improvement Item</FormLabel>
                                             <FormControl>
-                                                <Textarea placeholder="Describe the improvement item..." {...field} disabled={!isO2O} className="text-base font-semibold bg-background"/>
+                                                <Textarea placeholder="Describe the improvement item..." {...field} disabled={!canEdit} className="text-base font-semibold bg-background"/>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -105,7 +106,7 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2 items-end ml-4">
-                                     {isO2O && (
+                                     {canEdit && (
                                         <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
                                             <Trash2 className="h-4 w-4 text-destructive" />
                                         </Button>
@@ -117,7 +118,7 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                                                     field.onChange(value);
                                                     form.setValue(`items.${index}.lastUpdatedAt`, new Date().toISOString());
                                                     if(user?.email) form.setValue(`items.${index}.updatedBy`, user.email);
-                                                }} value={field.value} disabled={!isDeveloper && !isO2O}>
+                                                }} value={field.value}>
                                                     <SelectTrigger className={cn("w-[150px] font-semibold", statusStyle.className)}>
                                                         <SelectValue/>
                                                     </SelectTrigger>
@@ -136,7 +137,7 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <FormField control={form.control} name={`items.${index}.category`} render={({ field }) => (
                                     <FormItem><FormLabel>Category</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value} disabled={!isO2O}>
+                                        <Select onValueChange={field.onChange} value={field.value} disabled={!canEdit}>
                                             <FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl>
                                             <SelectContent>
                                                 {improvementCategories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
@@ -146,10 +147,10 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                                     </FormItem>
                                 )} />
                                 <FormField control={form.control} name={`items.${index}.estimatedSchedule`} render={({ field }) => (
-                                    <FormItem><FormLabel>Estimated Schedule</FormLabel><FormControl><Input placeholder="e.g. 45 days" {...field} disabled={!isO2O} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem><FormLabel>Estimated Schedule</FormLabel><FormControl><Input placeholder="e.g. 45 days" {...field} disabled={!canEdit} /></FormControl><FormMessage /></FormItem>
                                 )} />
                                 <FormField control={form.control} name={`items.${index}.agreedSchedule`} render={({ field }) => (
-                                    <FormItem><FormLabel>Agreed Schedule</FormLabel><FormControl><Input placeholder="e.g. 40 days" {...field} disabled={!isO2O} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem><FormLabel>Agreed Schedule</FormLabel><FormControl><Input placeholder="e.g. 40 days" {...field} disabled={!canEdit} /></FormControl><FormMessage /></FormItem>
                                 )} />
                             </CardContent>
                         </Card>
@@ -161,7 +162,7 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                     <p>No improvement items have been added for this transaction yet.</p>
                 </div>
             )}
-             {isO2O && (
+             {canEdit && (
                 <Button 
                     type="button" 
                     variant="outline" 
@@ -185,11 +186,11 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                 <FormLabel>Overall Remarks</FormLabel>
                 <FormField control={form.control} name="overallRemarks" render={({ field }) => (
                     <FormControl>
-                        <Textarea {...field} placeholder="Add any summary notes here..." disabled={!isO2O} />
+                        <Textarea {...field} placeholder="Add any summary notes here..." disabled={!canEdit} />
                     </FormControl>
                 )} />
               </div>
-              {!isCustomer && (
+              {canEdit && (
                 <div className="flex justify-end">
                   <Button type="submit">
                     <Save className="mr-2 h-4 w-4" /> Save Changes
