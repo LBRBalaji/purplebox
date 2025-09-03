@@ -13,7 +13,7 @@ import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Archive, BarChart2, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Repeat, Truck, Unarchive } from 'lucide-react';
+import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { ListingForm } from './listing-form';
@@ -52,7 +52,7 @@ function ProviderListingCard({ listing, onStatusChange }: { listing: ListingSche
        <CardFooter className="flex-col items-stretch gap-2">
             {listing.status === 'leased' ? (
                 <Button onClick={() => onStatusChange('pending')}>
-                    <Unarchive className="mr-2 h-4 w-4" /> Re-list Property
+                    <ArchiveRestore className="mr-2 h-4 w-4" /> Re-list Property
                 </Button>
             ) : (
                  <Button onClick={() => onStatusChange('leased')}>
