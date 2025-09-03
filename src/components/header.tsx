@@ -120,10 +120,8 @@ const ToolsDropdown = () => {
 export function Header() {
   const { user, logout, isLoading } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
-  const isAdmin = user?.email === 'admin@example.com';
+  const isSuperAdmin = user?.role === 'SuperAdmin';
   const isO2O = user?.role === 'O2O';
-  const isProvider = user?.role === 'SuperAdmin';
-  const isCustomer = user?.role === 'User';
 
   return (
     <>
@@ -165,15 +163,17 @@ export function Header() {
                                 <UserPlus className="h-4 w-4" /> Agent Signup
                             </NavLink>
                         )}
-                        {isAdmin && (
+                         {(isSuperAdmin || isO2O) && (
+                            <AnalyticsDropdown />
+                         )}
+                        {isSuperAdmin && (
                             <>
                                 <NavLink href="/dashboard/search-console"><SearchIcon className="h-4 w-4" /> Search Console</NavLink>
                                 <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
                                 <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
-                                <AnalyticsDropdown />
                             </>
                         )}
-                         {(isO2O && !isAdmin) && (
+                         {isO2O && !isSuperAdmin && (
                             <>
                                 <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
                             </>
@@ -183,7 +183,7 @@ export function Header() {
           </nav>
 
            <div className="flex items-center gap-4 flex-shrink-0">
-              {user && user.email !== 'admin@example.com' && user?.role !== 'O2O' && (
+              {user && !(isSuperAdmin || isO2O) && (
                 <Link href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline">
                       <WhatsAppIcon className="mr-2 h-5 w-5" />
@@ -198,7 +198,7 @@ export function Header() {
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">{user.userName}</p>
                     <p className="text-xs text-muted-foreground">
-                        {user.role === 'SuperAdmin' ? 'Property Provider' : user.role === 'User' ? 'Customer' : user.role}
+                        {user.role === 'Warehouse Developer' ? 'Property Provider' : user.role === 'User' ? 'Customer' : user.role}
                     </p>
                   </div>
                   <Button variant="outline" size="sm" onClick={logout}>
