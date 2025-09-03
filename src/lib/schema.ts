@@ -1,5 +1,4 @@
 
-
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -340,6 +339,13 @@ const negotiationSessionSchema = z.object({
     facilitatorAttendees: z.array(attendeeSchema).optional(),
 });
 
+const actionableItemSchema = z.object({
+    item: z.string().optional(),
+    responsibility: z.enum(['Customer', 'Provider', 'O2O']).optional(),
+    schedule: z.string().optional(),
+    status: z.enum(['Pending', 'In Progress', 'Completed']).optional(),
+    remarks: z.string().optional(),
+});
 
 export const commercialTermsSchema = z.object({
     sessions: z.array(negotiationSessionSchema).optional(),
@@ -446,6 +452,7 @@ export const commercialTermsSchema = z.object({
         isCctvInstalled: negotiableTermSchema,
         isSecurityDeskProvided: negotiableTermSchema,
     }).optional(),
+    actionableItems: z.array(actionableItemSchema).optional(),
     overallRemarks: z.string().optional(),
 });
 export type CommercialTermsSchema = z.infer<typeof commercialTermsSchema>;

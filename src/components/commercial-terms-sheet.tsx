@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, TableFooter } from './ui/table';
 import { Textarea } from './ui/textarea';
@@ -128,6 +128,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
             commercialTerms: { capexItems: [], netCostPerMonth: 0 },
             tenantImprovements: { customItems: [] },
             sessions: [],
+            actionableItems: [],
             overallRemarks: "",
         }
     });
@@ -136,6 +137,8 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
      const { fields: leaseTermFields, append: appendLeaseTerm, remove: removeLeaseTerm } = useFieldArray({ name: "leaseTerms.customItems", control: form.control });
      const { fields: capexFields, append: appendCapex, remove: removeCapex } = useFieldArray({ name: "commercialTerms.capexItems", control: form.control });
      const { fields: sessionFields, append: appendSession, remove: removeSession } = useFieldArray({ name: "sessions", control: form.control });
+     const { fields: actionableItemFields, append: appendActionableItem, remove: removeActionableItem } = useFieldArray({ name: "actionableItems", control: form.control });
+
 
      const customerAttendees = (index: number) => {
         const { fields, append, remove } = useFieldArray({ name: `sessions.${index}.customerAttendees`, control: form.control });
@@ -244,6 +247,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                 leaseTerms: { customItems: [] },
                 tenantImprovements: { customItems: [] },
                 sessions: [],
+                actionableItems: [],
                 overallRemarks: ""
             });
         }
@@ -282,6 +286,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
             building: reservedItems(currentData.building),
             waterToiletSewerage: reservedItems(currentData.waterToiletSewerage),
             safetyAndSecurity: reservedItems(currentData.safetyAndSecurity),
+            actionableItems: currentData.actionableItems?.filter(item => item.status !== 'Completed'),
         };
 
         console.log("Generated Follow-up Sheet Data:", newSheetData);
@@ -441,7 +446,41 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                         </Table>
                         </div>
                     </CardContent>
-                     <CardFooter className="flex-col items-end space-y-4 pt-6">
+                     <CardFooter className="flex-col items-stretch space-y-4 pt-6">
+                        <Card className="w-full">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><Notebook className="h-5 w-5 text-primary" /> Actionable Items</CardTitle>
+                                <CardDescription>Track tasks and responsibilities agreed upon during negotiations.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[30%]">Item</TableHead>
+                                            <TableHead>Responsibility</TableHead>
+                                            <TableHead>Schedule</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Remarks</TableHead>
+                                            <TableHead></TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {actionableItemFields.map((field, index) => (
+                                            <TableRow key={field.id}>
+                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.item`} render={({ field }) => <Textarea {...field} placeholder="Action item description"/>} /></TableCell>
+                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.responsibility`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem><SelectItem value="O2O">O2O</SelectItem></SelectContent></Select> )} /></TableCell>
+                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.schedule`} render={({ field }) => <Input {...field} placeholder="e.g., Within 7 days"/>} /></TableCell>
+                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.status`} render={({ field }) => ( <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="Pending">Pending</SelectItem><SelectItem value="In Progress">In Progress</SelectItem><SelectItem value="Completed">Completed</SelectItem></SelectContent></Select> )} /></TableCell>
+                                                <TableCell><FormField control={form.control} name={`actionableItems.${index}.remarks`} render={({ field }) => <Input {...field} placeholder="Add remarks"/>} /></TableCell>
+                                                <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => removeActionableItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <Button type="button" variant="outline" size="sm" onClick={() => appendActionableItem({})} className="mt-4"><PlusCircle className="mr-2 h-4 w-4"/> Add Action Item</Button>
+                            </CardContent>
+                        </Card>
+
                          <div className="w-full space-y-2">
                              <FormLabel>Overall Remarks</FormLabel>
                              <FormField
@@ -481,12 +520,12 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                 </CardContent>
                             </Card>
                         )}
-                        <div className="flex items-center gap-4 p-4 border rounded-lg bg-secondary/50 w-full max-w-sm">
+                        <div className="flex items-center gap-4 p-4 border rounded-lg bg-secondary/50 w-full justify-end">
                             <FormField
                                 control={form.control}
                                 name="commercialTerms.netCostPerMonth"
                                 render={({ field }) => (
-                                    <FormItem className="flex-grow">
+                                    <FormItem className="w-full max-w-xs">
                                     <FormLabel className="flex items-center gap-2"><DollarSign className="h-4 w-4"/> Net Cost-Per Month (Excl. Tax)</FormLabel>
                                     <FormControl>
                                         <Input type="number" {...field} readOnly className="text-lg font-bold text-primary bg-primary/10 border-primary/20"/>
@@ -495,7 +534,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                 )}
                             />
                         </div>
-                         <div className="flex items-center gap-2">
+                         <div className="flex items-center gap-2 justify-end">
                              <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
                              <Button type="submit" variant="secondary"><Save className="mr-2 h-4 w-4" /> Save Draft</Button>
                              <Button type="button" onClick={handleFinalizeMoM}><Share className="mr-2 h-4 w-4" /> Finalize as MoM</Button>
