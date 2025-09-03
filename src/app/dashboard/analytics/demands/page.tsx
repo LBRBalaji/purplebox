@@ -49,11 +49,13 @@ export default function DemandAnalyticsPage() {
         to: new Date(),
     });
     
+    const hasAccess = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+    
     React.useEffect(() => {
-        if (!isAuthLoading && user?.email !== 'admin@example.com') {
+        if (!isAuthLoading && !hasAccess) {
             router.push('/dashboard');
         }
-    }, [user, isAuthLoading, router]);
+    }, [user, isAuthLoading, router, hasAccess]);
 
     const filteredDemands = React.useMemo(() => {
         return demands.filter(d => {
@@ -172,7 +174,7 @@ export default function DemandAnalyticsPage() {
     };
 
 
-    if (isAuthLoading || user?.email !== 'admin@example.com') {
+    if (isAuthLoading || !hasAccess) {
         return null;
     }
 

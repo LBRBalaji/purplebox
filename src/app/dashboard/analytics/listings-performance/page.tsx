@@ -9,7 +9,7 @@ export default function ManageListingsPage() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
 
-    const hasAccess = user?.email === 'admin@example.com' || user?.role === 'O2O';
+    const hasAccess = user?.role === 'SuperAdmin' || user?.role === 'O2O';
 
     React.useEffect(() => {
         if (!isLoading && !hasAccess) {

@@ -1,3 +1,4 @@
+
 // src/app/dashboard/analytics/predictive/page.tsx
 'use client';
 
@@ -82,11 +83,13 @@ export default function PredictiveAnalyticsPage() {
       })
     }, [maxSliderSize, form])
 
+    const hasAccess = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+
     React.useEffect(() => {
-        if (!isAuthLoading && user?.email !== 'admin@example.com' && user?.role !== 'O2O') {
+        if (!isAuthLoading && !hasAccess) {
             router.push('/dashboard');
         }
-    }, [user, isAuthLoading, router]);
+    }, [user, isAuthLoading, router, hasAccess]);
 
     const handleGenerateAnalysis = async (data: PredictDemandTrendsInput) => {
         setIsLoading(true);
@@ -124,7 +127,7 @@ export default function PredictiveAnalyticsPage() {
         setActiveFilters(newActive);
     }
     
-    if (isAuthLoading || (user && user.email !== 'admin@example.com' && user.role !== 'O2O')) {
+    if (isAuthLoading || !hasAccess) {
         return null;
     }
 
