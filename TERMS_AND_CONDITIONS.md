@@ -3,13 +3,13 @@
 
 **Last Updated:** [Date]
 
-Welcome to WareHouse, a platform operated by LAKSHMI BALAJI O2O ("Company", "we", "us", or "our"). These Terms and Conditions ("Terms") govern your access to and use of our website, services, and platform (collectively, the "Service").
+Welcome to WareHouse-Lakshmi Balaji O2O, a platform operated by Lakshmi Balaj Realty Private Limited ("Company", "we", "us", or "our"). These Terms and Conditions ("Terms") govern your access to and use of our website, services, and platform (collectively, the "Service").
 
 By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the Service.
 
 ### 1. Description of Service
 
-Lakshmi Balaji Realty is a real estate brokerage firm and Lakshmi Balaji O2O is an Online to Offline Platform to simplify real estate transactions. This online platform, WareHouse, is used to manage the marketing of warehouses and other properties, enabling customers to list their demands and source properties, and allowing developers to list their properties to connect with customers.
+Lakshmi Balaji Realty is a real estate brokerage firm and Warehouse-Lakshmi Balaji O2O is an Online to Offline Platform to simplify real estate transactions. This online platform, WareHouse, is used to manage the marketing of warehouses and other properties, enabling customers to list their demands and source properties, and allowing developers to list their properties to connect with customers.
 
 In addition to this platform, our services include, but are not limited to:
 - Facilitating site visits for customers.

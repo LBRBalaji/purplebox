@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, List, ArrowRight } from 'lucide-react';
+import { BarChart, List, ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AnalyticsHubPage() {
@@ -14,7 +14,7 @@ export default function AnalyticsHubPage() {
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold font-headline tracking-tight">Analytics Hub</h2>
                     <p className="text-muted-foreground mt-2">
-                        Select a dashboard to view performance metrics for listings and demands.
+                        Select a dashboard to view historical performance metrics or generate AI-powered predictive insights.
                     </p>
                 </div>
                 
@@ -45,6 +45,24 @@ export default function AnalyticsHubPage() {
                                     </CardTitle>
                                     <CardDescription className="mt-2">
                                         Analyze demand trends, success rates, and customer activity.
+                                    </CardDescription>
+                                </div>
+                                 <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                </div>
+                 <div className="pt-6">
+                     <Link href="/dashboard/analytics/predictive" className="group">
+                        <Card className="h-full hover:border-primary transition-colors bg-primary/5">
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Sparkles className="text-primary" />
+                                        Predictive Demand Analytics (AI)
+                                    </CardTitle>
+                                    <CardDescription className="mt-2">
+                                        Leverage AI to analyze historical data and forecast future market trends, demand hotspots, and specification requirements.
                                     </CardDescription>
                                 </div>
                                  <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>

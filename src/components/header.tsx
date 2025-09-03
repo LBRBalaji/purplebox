@@ -15,6 +15,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 
 
@@ -70,6 +71,13 @@ const AnalyticsDropdown = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                     <Link href="/dashboard/analytics/demands">Demand Analytics</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                    <Link href="/dashboard/analytics/predictive">
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Predictive Analytics
+                    </Link>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
