@@ -189,6 +189,8 @@ function DownloadBar() {
                 ["For Startups on their first transaction."],
                 ["For Logistics Companies on all transactions."],
                 [],
+                ["Your growth is our growth. Come back tomorrow and download another set of O2O warehouse listings to serve your next customer", "www.LakshmiBalajiO2O.com"],
+                [],
                 ["Powered by Lakshmi Balaji O2O | Warehouse-Technical-Commercials, in a single CSV"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
