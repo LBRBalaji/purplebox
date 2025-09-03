@@ -21,14 +21,14 @@ import { CustomerTransactions } from '@/components/customer-transactions';
 
 const MainDashboard = () => {
     const { user } = useAuth();
-    const { submissions } = useData();
+    const { submissions, listings } = useData();
     const searchParams = useSearchParams();
     const logNewDemand = searchParams.get('logNew') === 'true';
     const editDemandId = searchParams.get('editDemandId');
     const propertyMatchDemandId = searchParams.get('demandId');
 
     const isMainAdmin = user?.email === 'admin@example.com';
-    const isProvider = user?.role === 'SuperAdmin';
+    const isProvider = listings.some(l => l.developerId === user?.email);
     const isTenant = user?.role === 'User';
     const isO2O = user?.role === 'O2O' && user.email !== 'admin@example.com';
 

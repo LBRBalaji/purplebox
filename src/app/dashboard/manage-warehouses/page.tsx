@@ -10,22 +10,18 @@ export default function ManageWarehousesPage() {
     const router = useRouter();
 
     React.useEffect(() => {
-        if (!isLoading && user?.role !== 'SuperAdmin') {
-            router.push('/dashboard');
-        }
-    }, [user, isLoading, router]);
+        // Redirect logic can be simplified or removed, as this page is now informational.
+        // Or redirect all users away immediately.
+        router.push('/dashboard');
+    }, [router]);
     
-    if (isLoading || user?.role !== 'SuperAdmin') {
-        return null;
-    }
-
     return (
         <main className="container mx-auto p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
                  <Card className="text-center p-12">
-                    <CardTitle>Feature Deprecated</CardTitle>
+                    <CardTitle>Feature Moved</CardTitle>
                     <CardDescription className="mt-2">
-                        Warehouse management is now handled via the "My Listings" tab on the main dashboard for providers.
+                        Warehouse management is now handled via the "My Listings" tab on the main dashboard for providers. You are being redirected.
                     </CardDescription>
                 </Card>
             </div>
