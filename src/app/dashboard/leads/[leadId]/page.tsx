@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
-import { useData, type TransactionActivity } from '@/contexts/data-context';
+import { useData, type TransactionActivity, type RegisteredLead } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
@@ -47,30 +47,32 @@ export default function LeadDetailPage() {
   const { user, users, isLoading: isAuthLoading } = useAuth();
   const { registeredLeads, transactionActivities, addTransactionActivity, isLoading: isDataLoading } = useData();
 
-  const [lead, setLead] = React.useState<any>(null);
+  const [lead, setLead] = React.useState<RegisteredLead | null>(null);
   const [activities, setActivities] = React.useState<TransactionActivity[]>([]);
 
   React.useEffect(() => {
-    if (isDataLoading) return;
+    if (isDataLoading || isAuthLoading) return;
+    
     const foundLead = registeredLeads.find(l => l.id === leadId);
 
-    if (foundLead) {
-        const isProviderForThisLead = foundLead.providers.some(p => p.providerEmail === user?.email);
-        const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
-        
-        if (isProviderForThisLead || isAdminOrO2O) {
-            setLead(foundLead);
-            const leadActivities = transactionActivities
-                .filter(a => a.leadId === leadId)
-                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            setActivities(leadActivities);
-        } else {
-            router.push('/dashboard');
-        }
-    } else if (!isDataLoading) {
+    if (!foundLead) {
+        if (!isDataLoading) router.push('/dashboard');
+        return;
+    }
+
+    const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+    const isProviderForThisLead = foundLead.providers.some(p => p.providerEmail === user?.email);
+
+    if (isAdminOrO2O || isProviderForThisLead) {
+        setLead(foundLead);
+        const leadActivities = transactionActivities
+            .filter(a => a.leadId === leadId)
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setActivities(leadActivities);
+    } else {
         router.push('/dashboard');
     }
-  }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading]);
+  }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading, isAuthLoading]);
 
   const handleAddActivity = (data: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
     addTransactionActivity(data);
@@ -108,7 +110,7 @@ export default function LeadDetailPage() {
                     <CardContent>
                        {activities.length > 0 ? (
                             <Timeline>
-                                {activities.map((activity, index) => {
+                                {activities.map((activity) => {
                                     const Icon = activityIcons[activity.activityType] || Mic;
                                     return(
                                         <TimelineItem key={activity.activityId}>
