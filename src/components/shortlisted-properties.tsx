@@ -31,7 +31,7 @@ export function ShortlistedProperties() {
         'Availability': listing.availabilityDate,
         'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
         'Shop Floor Dimension': listing.buildingSpecifications.shopFloorLevelDimension,
-        'Roof Insulation': listing.buildingSpecifications.roofInsulationStatus,
+        'Roof Insulation': listing.buildingSpecifications.roofInsulation,
         'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
         'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
         'Outside Flooring': listing.siteSpecifications.typeOfFlooringOutside,
