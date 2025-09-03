@@ -463,4 +463,11 @@ export const layoutRequestSchema = z.object({
 });
 export type LayoutRequestData = z.infer<typeof layoutRequestSchema>;
 
-    
+
+export const acknowledgmentSchema = z.object({
+  name: z.string().min(1, "Name is required."),
+  title: z.string().min(1, "Title/Designation is required."),
+  mobile: z.string().min(1, "Mobile number is required."),
+  email: z.string().email(),
+});
+export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;

@@ -14,7 +14,13 @@
             {
                 "providerEmail": "provider@example.com",
                 "status": "Acknowledged",
-                "acknowledgedAt": "2023-11-10T12:00:00Z"
+                "acknowledgedAt": "2023-11-10T12:00:00Z",
+                "acknowledgedBy": {
+                    "name": "Test Provider",
+                    "title": "Director",
+                    "mobile": "555-111-2222",
+                    "email": "provider@example.com"
+                }
             }
         ]
     },

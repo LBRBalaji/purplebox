@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type AcknowledgmentDetails } from '@/lib/schema';
 import { type User } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 
@@ -64,6 +64,7 @@ export type RegisteredLeadProvider = {
   status: RegisteredLeadStatus;
   acknowledgedAt?: string;
   rejectionReason?: string;
+  acknowledgedBy?: AcknowledgmentDetails;
 }
 
 export type RegisteredLead = {
@@ -124,7 +125,7 @@ type DataContextType = {
   clearSelectedForDownload: () => void;
   registeredLeads: RegisteredLead[];
   addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>) => void;
-  updateRegisteredLeadStatus: (leadId: string, providerEmail: string, status: RegisteredLeadStatus) => void;
+  updateRegisteredLeadStatus: (leadId: string, providerEmail: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => void;
   transactionActivities: TransactionActivity[];
   addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
   getTenantImprovements: (leadId: string) => TenantImprovementsSheet | null;
@@ -493,14 +494,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
     persistRegisteredLeads(updatedLeads);
   };
 
-  const updateRegisteredLeadStatus = (leadId: string, providerEmail: string, status: RegisteredLeadStatus) => {
+  const updateRegisteredLeadStatus = (leadId: string, providerEmail: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => {
     const updatedLeads = registeredLeads.map(lead => {
       if (lead.id === leadId) {
         return {
           ...lead,
           providers: lead.providers.map(provider => 
             provider.providerEmail === providerEmail 
-              ? { ...provider, status, acknowledgedAt: new Date().toISOString() } 
+              ? { 
+                  ...provider, 
+                  status: newStatus, 
+                  acknowledgedAt: newStatus === 'Acknowledged' ? new Date().toISOString() : undefined,
+                  acknowledgedBy: newStatus === 'Acknowledged' ? details : undefined,
+                } 
               : provider
           )
         };
