@@ -32,7 +32,7 @@ import { useForm } from 'react-hook-form';
 import { Slider } from '@/components/ui/slider';
 import { useData } from '@/contexts/data-context';
 
-type FilterKey = 'buildingType' | 'serviceModel' | 'availability' | 'craneAvailable' | 'roofType' | 'fireNOC' | 'eveHeightMin' | 'docksMin' | 'roofInsulation' | 'ventilation' | 'sizeRange';
+type FilterKey = 'sizeRange' | 'buildingType' | 'serviceModel' | 'availability' | 'craneAvailable' | 'roofType' | 'fireNOC' | 'eveHeightMin' | 'docksMin' | 'roofInsulation' | 'ventilation';
 
 const availableFilters: { value: FilterKey; label: string }[] = [
     { value: 'sizeRange', label: 'Size Range' },
