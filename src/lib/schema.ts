@@ -313,6 +313,8 @@ export type PropertySchema = z.infer<ReturnType<typeof createPropertySchema>>;
 export const PredictDemandTrendsInputSchema = z.object({
   timeHorizon: z.enum(['next quarter', 'next 6 months']).default('next quarter')
     .describe('The time period for which to predict demand trends.'),
+  location: z.string().optional().describe('An optional location (e.g., city or industrial park) to focus the analysis on.'),
+  buildingType: z.enum(['Any', 'PEB', 'RCC']).optional().describe('An optional building type to filter the analysis.'),
 });
 export type PredictDemandTrendsInput = z.infer<typeof PredictDemandTrendsInputSchema>;
 

@@ -33,6 +33,8 @@ const prompt = ai.definePrompt({
   model: googleAI.model('gemini-1.5-flash-latest'),
   input: {schema: z.object({
     timeHorizon: z.string(),
+    location: z.string().optional(),
+    buildingType: z.string().optional(),
     demands: z.array(demandSchema),
     listings: z.array(listingSchema),
     submissions: z.array(z.any()), // Using any to avoid complexity with nested schemas in prompt
@@ -40,7 +42,9 @@ const prompt = ai.definePrompt({
   })},
   output: {schema: PredictDemandTrendsOutputSchema},
   prompt: `You are a highly experienced real estate market analyst specializing in the Indian warehousing and industrial sector.
-  Your task is to predict future demand trends for the {{{timeHorizon}}} based on the historical data provided.
+  Your task is to predict future demand trends for the {{{timeHorizon}}}.
+  {{#if location}}The analysis should specifically focus on the **{{{location}}}** area.{{/if}}
+  {{#if buildingType}}The analysis should be filtered for **{{{buildingType}}}** building types.{{/if}}
 
   Analyze the following data sets:
   1.  **Demand Data**: Records of what customers have explicitly requested. Pay attention to locations, sizes, readiness timelines, and specific priorities.
@@ -72,10 +76,29 @@ const predictDemandTrendsFlow = ai.defineFlow(
   async (input) => {
     // In a real application, you might fetch this data from a live database
     // For this prototype, we're reading from the local JSON files.
+    // We can filter the data based on the input before sending it to the model.
+    let filteredDemands = allDemands;
+    let filteredListings = allListings;
+
+    if (input.location) {
+        const loc = input.location.toLowerCase();
+        filteredDemands = filteredDemands.filter(d => d.locationName?.toLowerCase().includes(loc));
+        filteredListings = filteredListings.filter(l => l.location.toLowerCase().includes(loc));
+    }
+    
+    if (input.buildingType && input.buildingType !== 'Any') {
+        const bt = input.buildingType.toLowerCase();
+        filteredDemands = filteredDemands.filter(d => d.buildingType?.toLowerCase() === bt);
+        filteredListings = filteredListings.filter(l => l.buildingSpecifications.buildingType?.toLowerCase().includes(bt));
+    }
+
+
     const historicalData = {
         timeHorizon: input.timeHorizon,
-        demands: allDemands,
-        listings: allListings,
+        location: input.location,
+        buildingType: input.buildingType,
+        demands: filteredDemands,
+        listings: filteredListings,
         submissions: allSubmissions,
         analytics: allAnalytics,
     };
