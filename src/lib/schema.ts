@@ -310,17 +310,20 @@ export const createPropertySchema = (demand?: DemandSchema) => {
 export type PropertySchema = z.infer<ReturnType<typeof createPropertySchema>>;
 
 const negotiableTermSchema = z.object({
-    customerValue: z.string().optional(),
-    providerValue: z.string().optional(),
-    agreedValue: z.string().optional(),
+    details: z.string().optional(),
+    proposedBy: z.enum(['Customer', 'Provider']).optional(),
+    status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
+    remarks: z.string().optional(),
 }).optional();
 
 const customTermSchema = z.object({
-    label: z.string(),
-    customerValue: z.string().optional(),
-    providerValue: z.string().optional(),
-    agreedValue: z.string().optional(),
-})
+    particulars: z.string(),
+    details: z.string().optional(),
+    proposedBy: z.enum(['Customer', 'Provider']).optional(),
+    status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
+    remarks: z.string().optional(),
+});
+
 
 export const commercialTermsSchema = z.object({
     siteInfo: z.object({
@@ -344,7 +347,8 @@ export const commercialTermsSchema = z.object({
         mechanisedAccess: negotiableTermSchema,
         washroomsOnMezzanine: negotiableTermSchema,
         ramp: negotiableTermSchema,
-    }).optional(),
+        customItems: z.array(customTermSchema).optional(),
+    }),
     leaseTerms: z.object({
         leaseTenure: negotiableTermSchema,
         leaseLockIn: negotiableTermSchema,
@@ -361,17 +365,68 @@ export const commercialTermsSchema = z.object({
         chargeableArea: negotiableTermSchema,
         buildingRentPerSft: negotiableTermSchema,
         totalRentPerMonth: negotiableTermSchema,
-        capexItems: z.array(customTermSchema).optional(),
         netTotalRental: negotiableTermSchema,
         camCharges: negotiableTermSchema,
         ifrsd: negotiableTermSchema,
         rentEscalation: negotiableTermSchema,
         commitmentPhase2: negotiableTermSchema,
         additionalCharges: negotiableTermSchema,
+        capexItems: z.array(customTermSchema).optional(),
     }),
+    electricalInfrastructure: z.object({
+        installedCapacity: negotiableTermSchema,
+        powerRequirementP1: negotiableTermSchema,
+        powerRequirementP2: negotiableTermSchema,
+        scopeOfProvidingPower: negotiableTermSchema,
+        timelineToProvidePower: negotiableTermSchema,
+        budgetP1: negotiableTermSchema,
+        budgetP2: negotiableTermSchema,
+        enhancementOfPower: negotiableTermSchema,
+        mainCableCapacity: negotiableTermSchema,
+        mainTappingPoint: negotiableTermSchema,
+        internalCabling: negotiableTermSchema,
+        internalSwitches: negotiableTermSchema,
+        streetLightToWarehouse: negotiableTermSchema,
+        streetLightInCompound: negotiableTermSchema,
+        gensetRequirement: negotiableTermSchema,
+        gensetCapacity: negotiableTermSchema,
+        provisionForGenset: negotiableTermSchema,
+        hvacRequirement: negotiableTermSchema,
+        hvacCapacity: negotiableTermSchema,
+        provisionForHvac: negotiableTermSchema,
+        falseCeiling: negotiableTermSchema,
+    }).optional(),
     building: z.object({
         buildingType: negotiableTermSchema,
+        shopFloorDimension: negotiableTermSchema,
+        mezzanineDimension: negotiableTermSchema,
         docksAndShutters: negotiableTermSchema,
+        canopyDimension: negotiableTermSchema,
+        naturalLightingVentilation: negotiableTermSchema,
+        roofInsulation: negotiableTermSchema,
+        internalLighting: negotiableTermSchema,
+    }).optional(),
+    waterToiletSewerage: z.object({
+        workersToilet: negotiableTermSchema,
+        executiveToilet: negotiableTermSchema,
+        waterForWash: negotiableTermSchema,
+        waterSource: negotiableTermSchema,
+        overheadTank: negotiableTermSchema,
+        waterSump: negotiableTermSchema,
+        septicTank: negotiableTermSchema,
+        stpProvided: negotiableTermSchema,
+        solidWasteDisposal: negotiableTermSchema,
+    }).optional(),
+    safetyAndSecurity: z.object({
+        fireExitDoor: negotiableTermSchema,
+        fireHydrantOutside: negotiableTermSchema,
+        fireHydrantInside: negotiableTermSchema,
+        fireSprinklers: negotiableTermSchema,
+        dedicatedWaterSump: negotiableTermSchema,
+        isFullyCompounded: negotiableTermSchema,
+        isSecurityProvided: negotiableTermSchema,
+        isCctvInstalled: negotiableTermSchema,
+        isSecurityDeskProvided: negotiableTermSchema,
     }).optional(),
 });
 export type CommercialTermsSchema = z.infer<typeof commercialTermsSchema>;
