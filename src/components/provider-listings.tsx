@@ -21,7 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 
 
-function ProviderListingCard({ listing, onStatusChange }: { listing: ListingSchema, onStatusChange: (status: ListingStatus) => void }) {
+function ProviderListingCard({ listing, onStatusChange, onEdit }: { listing: ListingSchema, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema) => void }) {
   const statusConfig: Record<ListingStatus, { text: string; className: string, icon: React.ElementType }> = {
     approved: { text: "Approved", className: "bg-green-100 text-green-800", icon: CircleCheck },
     pending: { text: "Pending", className: "bg-amber-100 text-amber-800", icon: History },
@@ -59,7 +59,7 @@ function ProviderListingCard({ listing, onStatusChange }: { listing: ListingSche
                     <Archive className="mr-2 h-4 w-4" /> Mark as Leased
                 </Button>
             )}
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => onEdit(listing)}>
                 <Edit className="mr-2 h-4 w-4" /> Edit Listing
             </Button>
        </CardFooter>
@@ -69,14 +69,16 @@ function ProviderListingCard({ listing, onStatusChange }: { listing: ListingSche
 
 export function ProviderListings() {
   const { user } = useAuth();
-  const { listings, listingAnalytics, addListing, updateListingStatus } = useData();
+  const { listings, addListing, updateListing, updateListingStatus } = useData();
   const [myListings, setMyListings] = React.useState<ListingSchema[]>([]);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {
     if (user?.email) {
-      setMyListings(listings.filter(l => l.developerId === user.email));
+      const isAdmin = user.email === 'admin@example.com';
+      setMyListings(isAdmin ? listings : listings.filter(l => l.developerId === user.email));
     }
   }, [listings, user]);
   
@@ -88,9 +90,24 @@ export function ProviderListings() {
     });
   };
 
+  const handleEdit = (listing: ListingSchema) => {
+    setSelectedListing(listing);
+    setIsFormOpen(true);
+  }
+
+  const handleCreateNew = () => {
+    setSelectedListing(null);
+    setIsFormOpen(true);
+  }
+
   const handleFormSubmit = (data: ListingSchema) => {
-    addListing(data, user?.email);
+    if (selectedListing) {
+      updateListing(data);
+    } else {
+      addListing(data, user?.email);
+    }
     setIsFormOpen(false);
+    setSelectedListing(null);
   }
 
   const activeListings = myListings.filter(l => l.status !== 'leased');
@@ -108,7 +125,7 @@ export function ProviderListings() {
                 Create new listings, manage active properties, and view your archived deals.
             </p>
           </div>
-          <Button onClick={() => setIsFormOpen(true)}>
+          <Button onClick={handleCreateNew}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Create New Listing
           </Button>
@@ -132,6 +149,7 @@ export function ProviderListings() {
                             key={listing.listingId} 
                             listing={listing} 
                             onStatusChange={(newStatus) => handleStatusChange(listing.listingId, newStatus)}
+                            onEdit={handleEdit}
                         />
                         ))}
                     </div>
@@ -150,6 +168,7 @@ export function ProviderListings() {
                             key={listing.listingId} 
                             listing={listing} 
                             onStatusChange={(newStatus) => handleStatusChange(listing.listingId, newStatus)}
+                             onEdit={handleEdit}
                         />
                         ))}
                     </div>
@@ -165,6 +184,7 @@ export function ProviderListings() {
       <ListingForm 
         isOpen={isFormOpen}
         onOpenChange={setIsFormOpen}
+        listing={selectedListing}
         onSubmit={handleFormSubmit}
       />
     </>

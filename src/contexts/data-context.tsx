@@ -249,7 +249,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   const updateListing = (updatedListing: ListingSchema) => {
-    setListings(prev => prev.map(l => l.listingId === updatedListing.listingId ? updatedListing : l));
+    setListings(prev => prev.map(l => l.listingId === updatedListing.listingId ? { ...updatedListing, status: 'pending' as const } : l));
+     setLastEvent({
+      type: 'new_listing',
+      id: updatedListing.listingId,
+      timestamp: new Date().toISOString(),
+      triggeredBy: updatedListing.developerId,
+    });
   }
 
   const updateListingStatus = (listingId: string, status: ListingStatus, userEmail?: string) => {

@@ -19,29 +19,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     if (!isLoading && user) {
         const isMainAdmin = user.email === 'admin@example.com';
+        // If the user is the main admin, no need to check other rules.
+        if (isMainAdmin) return;
+        
         const isO2OManager = user.role === 'O2O';
         
         // Analytics is only for the main admin and O2O
-        if (pathname.startsWith('/dashboard/analytics') && !(isMainAdmin || isO2OManager)) {
+        if (pathname.startsWith('/dashboard/analytics') && !isO2OManager) {
             router.push('/dashboard');
         }
         
-        // Redirect non-admins away from user management
-        if (pathname.startsWith('/dashboard/manage-users') && !isMainAdmin) {
+        // Redirect non-admins away from user management (only main admin has access)
+        if (pathname.startsWith('/dashboard/manage-users')) {
             router.push('/dashboard');
         }
 
-        // Redirect non-admins away from listing management
-        if (pathname.startsWith('/dashboard/manage-listings') && !(isMainAdmin || isO2OManager)) {
+        // Redirect non-admins/O2O away from listing management
+        if (pathname.startsWith('/dashboard/manage-listings') && !isO2OManager) {
             router.push('/dashboard');
         }
 
-        if (pathname.startsWith('/dashboard/register-lead') && !(isMainAdmin || isO2OManager)) {
+        if (pathname.startsWith('/dashboard/register-lead') && !isO2OManager) {
             router.push('/dashboard');
         }
 
         // Allow Admins and O2O Managers to access the leads detail pages
-        if (pathname.startsWith('/dashboard/leads') && !(isMainAdmin || isO2OManager)) {
+        if (pathname.startsWith('/dashboard/leads') && !isO2OManager) {
             router.push('/dashboard');
         }
     }

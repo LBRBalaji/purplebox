@@ -27,8 +27,8 @@ export function ProviderLeads() {
 
   const myLeads = React.useMemo(() => {
     if (!user) return [];
-    const isO2O = user.role === 'O2O' || user.email === 'admin@example.com';
-    if (isO2O) {
+    const isAdminOrO2O = user.role === 'O2O' || user.email === 'admin@example.com';
+    if (isAdminOrO2O) {
         return registeredLeads; // O2O and Admin see all leads
     }
     return registeredLeads.filter(lead => 

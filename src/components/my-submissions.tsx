@@ -48,9 +48,9 @@ export function MySubmissions() {
 
     React.useEffect(() => {
         if (user?.email) {
-            const isO2O = user.role === 'O2O' || user.email === 'admin@example.com';
+            const isAdmin = user.email === 'admin@example.com';
             
-            const relevantSubmissions = isO2O 
+            const relevantSubmissions = isAdmin
                 ? submissions
                 : submissions.filter(sub => sub.providerEmail === user.email);
             
@@ -96,7 +96,7 @@ export function MySubmissions() {
                                 </TableCell>
                                 <TableCell>{listing.location}</TableCell>
                                 <TableCell>
-                                    {user?.role === 'O2O' || user?.email === 'admin@example.com' 
+                                    {user?.email === 'admin@example.com' 
                                         ? listing.developerName || submission.providerEmail 
                                         : 'Me'}
                                 </TableCell>

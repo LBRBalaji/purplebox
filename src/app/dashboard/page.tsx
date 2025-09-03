@@ -26,9 +26,10 @@ const MainDashboard = () => {
     const editDemandId = searchParams.get('editDemandId');
     const propertyMatchDemandId = searchParams.get('demandId');
 
+    const isMainAdmin = user?.email === 'admin@example.com';
     const isProvider = user?.role === 'SuperAdmin' && user.email !== 'admin@example.com';
     const isTenant = user?.role === 'User';
-    const isAdminOrO2O = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+    const isO2O = user?.role === 'O2O';
 
     const [providerTab, setProviderTab] = React.useState('active-demands');
     const [tenantTab, setTenantTab] = React.useState('my-demands');
@@ -51,7 +52,6 @@ const MainDashboard = () => {
         setAdminTab('submit-match');
       }
     }, [logNewDemand, editDemandId, propertyMatchDemandId]);
-
 
     const renderProviderContent = () => (
       <Tabs value={providerTab} onValueChange={setProviderTab}>
@@ -89,9 +89,8 @@ const MainDashboard = () => {
       </Tabs>
     );
     
-    // Main Admin and O2O Manager now see a more focused dashboard.
-    // Urgent tasks (approvals) are shown first.
-    const renderAdminAndO2OContent = () => (
+    // O2O Manager now has a more focused view
+    const renderO2OContent = () => (
       <Tabs value={adminTab} onValueChange={setAdminTab}>
         <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="approval-queue">
@@ -116,15 +115,39 @@ const MainDashboard = () => {
         </TabsContent>
       </Tabs>
     );
+
+    // Main Admin gets a super-view with all possible tabs
+    const renderMainAdminContent = () => (
+       <Tabs defaultValue="approval-queue" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="approval-queue">
+                Approval Queue 
+                {hasPendingSubmissions && <span className="ml-2 h-2 w-2 rounded-full bg-destructive animate-ping"></span>}
+            </TabsTrigger>
+            <TabsTrigger value="all-demands">All Demands</TabsTrigger>
+            <TabsTrigger value="all-submissions">All Submissions</TabsTrigger>
+            <TabsTrigger value="all-listings">All Listings</TabsTrigger>
+            <TabsTrigger value="all-leads">All Leads</TabsTrigger>
+        </TabsList>
+        <TabsContent value="approval-queue"><ApprovalQueue /></TabsContent>
+        <TabsContent value="all-demands"><DemandList /></TabsContent>
+        <TabsContent value="all-submissions"><MySubmissions /></TabsContent>
+        <TabsContent value="all-listings"><ProviderListings /></TabsContent>
+        <TabsContent value="all-leads"><ProviderLeads /></TabsContent>
+      </Tabs>
+    );
     
+    if (isMainAdmin) {
+        return renderMainAdminContent();
+    }
     if (isProvider) {
         return renderProviderContent();
     }
     if (isTenant) {
         return renderTenantContent();
     }
-    if (isAdminOrO2O) {
-        return renderAdminAndO2OContent();
+    if (isO2O) {
+        return renderO2OContent();
     }
 
     return (
