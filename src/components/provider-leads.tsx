@@ -151,10 +151,12 @@ export function ProviderLeads() {
                                                             </div>
                                                         </TooltipTrigger>
                                                         <TooltipContent>
-                                                            <p className="font-semibold">Acknowledged by:</p>
-                                                            <p>{providerInfo.acknowledgedBy.name}, {providerInfo.acknowledgedBy.title}</p>
-                                                            <p>{providerInfo.acknowledgedBy.email}</p>
-                                                            <p>{providerInfo.acknowledgedBy.mobile}</p>
+                                                            <div className="p-1">
+                                                              <p className="font-semibold">Acknowledged by:</p>
+                                                              <p>{providerInfo.acknowledgedBy.name}, {providerInfo.acknowledgedBy.title}</p>
+                                                              <p>{providerInfo.acknowledgedBy.email}</p>
+                                                              <p>{providerInfo.acknowledgedBy.mobile}</p>
+                                                            </div>
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
@@ -176,13 +178,15 @@ export function ProviderLeads() {
                                                                     <Handshake className="h-5 w-5 text-primary"/>
                                                                     Confirm Lead Acknowledgment
                                                                 </AlertDialogTitle>
-                                                                <AlertDialogDescription className="text-left pt-2 space-y-3">
-                                                                    <p>
-                                                                        By proceeding, you are formally acknowledging this lead registration. This step confirms your agreement to collaborate with Lakshmi Balaji O2O on this transaction.
-                                                                    </p>
-                                                                    <p className="font-semibold text-foreground">
-                                                                        Please be aware that this action signifies the start of our professional engagement for this specific lead and is non-revocable.
-                                                                    </p>
+                                                                <AlertDialogDescription asChild>
+                                                                    <div className="text-left pt-2 space-y-3 text-sm text-muted-foreground">
+                                                                        <p>
+                                                                            By proceeding, you are formally acknowledging this lead registration. This step confirms your agreement to collaborate with Lakshmi Balaji O2O on this transaction.
+                                                                        </p>
+                                                                        <p className="font-semibold text-foreground">
+                                                                            Please be aware that this action signifies the start of our professional engagement for this specific lead and is non-revocable.
+                                                                        </p>
+                                                                    </div>
                                                                 </AlertDialogDescription>
                                                             </AlertDialogHeader>
                                                             <AlertDialogFooter>
