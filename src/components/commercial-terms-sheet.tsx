@@ -4,14 +4,14 @@
 import * as React from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { commercialTermsSchema, type CommercialTermsSchema } from '@/lib/schema';
+import { commercialTermsSchema, type CommercialTermsSchema, type ListingSchema } from '@/lib/schema';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, TableFooter } from './ui/table';
 import { Textarea } from './ui/textarea';
@@ -63,19 +63,16 @@ const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: a
     )
 };
 
-export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
+export function CommercialTermsSheet({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
     const { user } = useAuth();
-    const { listings, submissions } = useData();
     
-    const primarySubmission = submissions.find(s => s.demandId === lead.id && s.status === 'Approved');
-    const primaryListing = listings.find(l => l.listingId === primarySubmission?.listingId);
-
     const [rentalOutflow, setRentalOutflow] = React.useState<{ year: number, annualRent: number }[]>([]);
     const [totalOutflow, setTotalOutflow] = React.useState(0);
     
     const isCustomer = user?.role === 'User';
     const isProvider = user?.role === 'SuperAdmin';
-    const canEdit = !isCustomer && !isProvider;
+    const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+    const canEdit = isO2O;
 
     const form = useForm<CommercialTermsSchema>({
         resolver: zodResolver(commercialTermsSchema),
@@ -90,6 +87,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                 }
             ],
             siteInfo: {
+                listingId: { agreedTerms: '', status: 'Agreed' },
                 postalAddress: { agreedTerms: '123 Industrial Way, Oragadam, Chennai', status: 'Agreed' },
                 googleCoordinates: { agreedTerms: '12.83, 79.95', status: 'Agreed' },
                 buildingStatus: { agreedTerms: 'Ready for Occupancy', status: 'Agreed' },
@@ -210,6 +208,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                 ...form.getValues(),
                 siteInfo: {
                     ...form.getValues().siteInfo,
+                    listingId: { agreedTerms: primaryListing.listingId, status: 'Agreed' },
                     postalAddress: { agreedTerms: primaryListing.location, status: 'Agreed' },
                     buildingStatus: { agreedTerms: primaryListing.availabilityDate, status: 'Agreed' },
                     googleCoordinates: { agreedTerms: primaryListing.latLng, status: 'Agreed' },
@@ -296,7 +295,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                     <CardTitle>Commercial Terms Sheet</CardTitle>
                                     <CardDescription>
                                         Manage negotiation points for Transaction ID: {lead.id}.
-                                        {primaryListing && <span className="block mt-1 text-xs">Pre-filled with data from listing: <Link href={`/listings/${primaryListing.listingId}`} target="_blank" className="text-primary underline">{primaryListing.name}</Link></span>}
+                                        {primaryListing && <span className="block mt-1 text-xs">For Listing: <Link href={`/listings/${primaryListing.listingId}`} target="_blank" className="text-primary underline">{primaryListing.name}</Link></span>}
                                     </CardDescription>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -375,6 +374,7 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
 
                             <div className="space-y-6">
                                 <SectionHeader icon={MapPin} title="Site Information" />
+                                <FormRow form={form} name="siteInfo.listingId" label="Listing ID" control={form.control} disabled={true} />
                                 <FormRow form={form} name="siteInfo.postalAddress" label="Postal Address" control={form.control} disabled={!canEdit} />
                                 <FormRow form={form} name="siteInfo.buildingNumber" label="Building Number" control={form.control} disabled={!canEdit}/>
                                 <FormRow form={form} name="siteInfo.googleCoordinates" label="Google Coordinates" control={form.control} disabled={!canEdit}/>
@@ -487,12 +487,16 @@ export function CommercialTermsSheet({ lead }: { lead: RegisteredLead }) {
                                     <p className="text-2xl font-bold text-primary">₹{commercialTermsWatched?.netCostPerMonth?.toLocaleString('en-IN') || 0}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2 justify-end pt-4 no-print">
-                                <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
-                                {canEdit && (
+                             <div className="flex items-center gap-2 justify-end pt-4 no-print">
+                                {(isCustomer || isProvider) && (
+                                    <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
+                                )}
+                                {isO2O && (
                                     <>
+                                        <Button type="button" variant="outline" onClick={handleFinalizeMoM}>
+                                            <Share className="mr-2 h-4 w-4" /> Finalize as MoM
+                                        </Button>
                                         <Button type="submit" variant="secondary"><Save className="mr-2 h-4 w-4" /> Save Draft</Button>
-                                        <Button type="button" onClick={handleFinalizeMoM}><Share className="mr-2 h-4 w-4" /> Finalize as MoM</Button>
                                     </>
                                 )}
                             </div>

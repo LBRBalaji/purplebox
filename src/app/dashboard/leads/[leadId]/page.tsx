@@ -5,10 +5,11 @@ import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { useData, type TransactionActivity, type RegisteredLead } from '@/contexts/data-context';
+import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -48,10 +49,11 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, addTransactionActivity, isLoading: isDataLoading } = useData();
+  const { registeredLeads, transactionActivities, addTransactionActivity, submissions, listings, isLoading: isDataLoading } = useData();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
   const [activities, setActivities] = React.useState<TransactionActivity[]>([]);
+  const [primaryListing, setPrimaryListing] = React.useState<ListingSchema | null>(null);
 
   React.useEffect(() => {
     if (isDataLoading || isAuthLoading) return;
@@ -73,10 +75,17 @@ export default function LeadDetailPage() {
             .filter(a => a.leadId === leadId)
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setActivities(leadActivities);
+
+        // Find the primary listing for this transaction
+        const approvedSubmission = submissions.find(s => s.demandId === foundLead.id && s.status === 'Approved');
+        if (approvedSubmission) {
+            const listingDetails = listings.find(l => l.listingId === approvedSubmission.listingId);
+            if(listingDetails) setPrimaryListing(listingDetails);
+        }
     } else {
         router.push('/dashboard');
     }
-  }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading, isAuthLoading]);
+  }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading, isAuthLoading, submissions, listings]);
 
   const handleAddActivity = (data: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
     addTransactionActivity(data);
@@ -89,6 +98,7 @@ export default function LeadDetailPage() {
   const customer = users[lead.customerId];
   const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
   const isCustomer = user?.email === lead.customerId;
+  const isProvider = user?.role === 'SuperAdmin';
   
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : '/dashboard/register-lead';
 
@@ -168,6 +178,19 @@ export default function LeadDetailPage() {
                                 <a href={`tel:${customer?.phone || lead.leadPhone}`} className="text-primary hover:underline block">{customer?.phone || lead.leadPhone}</a>
                             </CardContent>
                         </Card>
+                         {primaryListing && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Property</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3 text-sm">
+                                    <Link href={`/listings/${primaryListing.listingId}`} target="_blank" className="font-semibold text-primary hover:underline block">{primaryListing.name}</Link>
+                                    <div><MapPin className="inline-block h-4 w-4 mr-2 text-muted-foreground" />{primaryListing.location}</div>
+                                    <div><Scaling className="inline-block h-4 w-4 mr-2 text-muted-foreground" />{primaryListing.sizeSqFt.toLocaleString()} sq. ft.</div>
+                                    <p className="text-xs text-muted-foreground pt-1">ID: {primaryListing.listingId}</p>
+                                </CardContent>
+                            </Card>
+                        )}
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5"/> Involved Providers</CardTitle>
@@ -188,7 +211,7 @@ export default function LeadDetailPage() {
                 </div>
             </TabsContent>
             <TabsContent value="commercials" className="mt-6">
-                <CommercialTermsSheet lead={lead} />
+                <CommercialTermsSheet lead={lead} primaryListing={primaryListing} />
             </TabsContent>
              <TabsContent value="improvements" className="mt-6">
                 <TenantImprovementsSheet leadId={lead.id} />

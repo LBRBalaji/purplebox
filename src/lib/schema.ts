@@ -355,6 +355,7 @@ const createNegotiableTermSchema = () => z.object({
 export const commercialTermsSchema = z.object({
     sessions: z.array(negotiationSessionSchema).optional().default([]),
     siteInfo: z.object({
+        listingId: createNegotiableTermSchema(),
         postalAddress: createNegotiableTermSchema(),
         buildingNumber: createNegotiableTermSchema(),
         googleCoordinates: createNegotiableTermSchema(),
