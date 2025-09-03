@@ -38,7 +38,8 @@ function ResultCard({ title, icon: Icon, children, count }: { title: string, ico
 }
 
 export default function SearchConsolePage() {
-    const { listings, demands, users: allUsers } = useData();
+    const { listings, demands } = useData();
+    const { users: allUsers } = useAuth();
     const [searchTerm, setSearchTerm] = React.useState('');
     const [results, setResults] = React.useState<SearchResult | null>(null);
     const [searched, setSearched] = React.useState(false);

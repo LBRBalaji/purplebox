@@ -187,7 +187,7 @@ export function Header() {
                 <Link href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline">
                       <WhatsAppIcon className="mr-2 h-5 w-5" />
-                      WhatsApp O2O
+                      WhatsApp O2O Team
                   </Button>
                 </Link>
               )}
@@ -211,7 +211,7 @@ export function Header() {
                     <a href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
                         <Button>
                             <WhatsAppIcon className="mr-2 h-5 w-5" />
-                            WhatsApp O2O
+                            WhatsApp O2O Team
                         </Button>
                     </a>
                     <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
