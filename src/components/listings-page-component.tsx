@@ -18,7 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { LoginDialog } from './login-dialog';
 import { LimitExceededDialog } from './limit-exceeded-dialog';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from './ui/badge';
 import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DownloadTermsDialog } from './download-terms-dialog';
@@ -422,6 +422,14 @@ export function ListingsPage() {
     }
   };
 
+  const handleLoginSuccess = () => {
+    setIsLoginOpen(false);
+    toast({
+        title: "Logged In Successfully",
+        description: "You can now select properties to download."
+    });
+  }
+
   const renderContent = () => {
     if (isDataLoading) {
       return (
@@ -597,7 +605,7 @@ export function ListingsPage() {
         </div>
     </main>
      <DownloadBar />
-     <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
+     <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess} />
      <LimitExceededDialog 
         isOpen={isLimitExceededDialogOpen} 
         onOpenChange={setIsLimitExceededDialogOpen}
@@ -606,3 +614,5 @@ export function ListingsPage() {
     </>
   );
 }
+
+    

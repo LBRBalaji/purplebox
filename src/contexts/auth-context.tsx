@@ -31,10 +31,10 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const defaultUsers: { [email: string]: User } = {
-  'superadmin@example.com': { email: 'superadmin@example.com', role: 'SuperAdmin', companyName: 'Origin Depot', userName: 'Platform Super Admin', phone: 'N/A' },
+  'superadmin@example.com': { email: 'superadmin@example.com', role: 'SuperAdmin', companyName: 'Origin Depot', userName: 'O2O Super Admin', phone: 'N/A' },
   'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test Customer', phone: '555-123-4567' },
   'logistics.pro@example.com': { email: 'logistics.pro@example.com', role: 'User', companyName: 'ProLogistics Solutions', userName: 'Sunil Patel', phone: '555-987-6543' },
-  'provider@example.com': { email: 'provider@example.com', role: 'Warehouse Developer', companyName: 'Prime Properties', userName: 'Test Provider', phone: '555-111-2222' },
+  'provider@example.com': { email: 'provider@example.com', role: 'Warehouse Developer', companyName: 'Prime Properties', userName: 'Anil Kumar', phone: '555-111-2222' },
   'o2o@example.com': { email: 'o2o@example.com', role: 'O2O', companyName: 'Lakshmi Balaji O2O', userName: 'O2O Manager', phone: '555-020-0202' },
 };
 
@@ -216,3 +216,5 @@ export function useAuth() {
   }
   return context;
 }
+
+    
