@@ -59,9 +59,9 @@ const LogDemandButton = ({ center, onLogDemand, variant = "default" }: { center:
                     <span>Get Detailed and <strong className="font-semibold text-foreground">Downloadable</strong> Warehouse Proposals in 72 Hours (excluding holidays) on your Dashboard.</span>
                 </div>
                  <div className='text-center pt-2'>
-                    <p className="mb-2">Prefer to browse now?</p>
+                    <p className="mb-2">Download Listings Instantly</p>
                     <Button asChild variant="outline" size="sm" className="w-full">
-                        <Link href="/">Explore all listings <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                        <Link href="/">Search-Select-Download <ArrowRight className="ml-2 h-4 w-4" /></Link>
                     </Button>
                  </div>
             </div>
