@@ -105,12 +105,6 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                         Sign Up
                     </Link>
                 </div>
-                 <div>
-                    Are you an Agent Partner?{' '}
-                    <Link href="/agent-signup" className="underline text-primary">
-                        Register Here
-                    </Link>
-                </div>
             </div>
         </div>
       </DialogContent>

@@ -3,12 +3,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardContent } from './ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from './ui/card';
 import { Switch } from './ui/switch';
 import { Label } from './ui/label';
-import { Cookie } from 'lucide-react';
+import { Cookie, X } from 'lucide-react';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
+import { cn } from '@/lib/utils';
 
 type Consent = {
     necessary: boolean;
@@ -66,7 +67,16 @@ export function CookieBanner() {
     return (
         <>
             <div className="fixed bottom-0 inset-x-0 z-50 p-4 animate-in slide-in-from-bottom-5">
-                 <Card className="max-w-4xl mx-auto shadow-2xl">
+                 <Card className="max-w-4xl mx-auto shadow-2xl relative">
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 h-6 w-6"
+                        onClick={handleRejectAll}
+                    >
+                        <X className="h-4 w-4" />
+                        <span className="sr-only">Close</span>
+                    </Button>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                            <Cookie className="h-5 w-5 text-primary"/> We use cookies
@@ -78,7 +88,6 @@ export function CookieBanner() {
                     <CardFooter className="flex-col sm:flex-row gap-2">
                         <Button className="w-full sm:w-auto" onClick={handleAcceptAll}>Accept All</Button>
                         <Button className="w-full sm:w-auto" variant="outline" onClick={() => setIsDialogOpen(true)}>Manage Cookies</Button>
-                        <Button className="w-full sm:w-auto" variant="outline" onClick={handleRejectAll}>Reject All</Button>
                     </CardFooter>
                 </Card>
             </div>
