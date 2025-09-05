@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft, Star, Ruler, ZoomIn, ZoomOut, MapPin } from 'lucide-react';
+import { Search, X, Building2, Scaling, CalendarCheck, CheckCircle, Info, ClipboardPlus, LogIn, ArrowLeft, Star, Ruler, ZoomIn, ZoomOut, MapPin, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginDialog } from './login-dialog';
 import type { ListingSchema } from '@/lib/schema';
@@ -53,16 +53,17 @@ const LogDemandButton = ({ center, onLogDemand, variant = "default" }: { center:
                     </>
                 )}
             </Button>
-            <div className="text-xs text-muted-foreground space-y-2">
+            <div className="text-xs text-muted-foreground space-y-3">
                 <div className="flex items-start gap-2">
                     <Info className="h-4 w-4 shrink-0 mt-0.5" />
                     <span>Get Detailed and <strong className="font-semibold text-foreground">Downloadable</strong> Warehouse Proposals in 72 Hours (excluding holidays) on your Dashboard.</span>
                 </div>
-                 <p>
-                    Prefer to browse now?{' '}
-                    <Link href="/" className="text-primary underline hover:text-primary/80">Explore all listings</Link>
-                    {' '}and instantly download details for your top picks.
-                </p>
+                 <div className='text-center pt-2'>
+                    <p className="mb-2">Prefer to browse now?</p>
+                    <Button asChild variant="outline" size="sm" className="w-full">
+                        <Link href="/">Explore all listings <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                    </Button>
+                 </div>
             </div>
         </div>
     );
