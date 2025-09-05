@@ -93,15 +93,9 @@ const AnalyticsDropdown = () => {
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-                <DropdownMenuItem asChild>
-                    <Link href="/dashboard/analytics/listings-performance">Listing Performance</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href="/dashboard/analytics/demands">Demand Analytics</Link>
-                </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                    <Link href="/dashboard/analytics/traffic">Platform Traffic</Link>
-                </DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/analytics/listings-performance">Listing Performance</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/analytics/demands">Demand Analytics</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/analytics/traffic">Platform Traffic</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link href="/dashboard/analytics/predictive">
@@ -149,7 +143,7 @@ const ManageDropdown = ({ isSuperAdmin, isO2O }: { isSuperAdmin: boolean, isO2O:
 const ToolsDropdown = () => {
     const { user } = useAuth();
     const pathname = usePathname();
-    const isActive = pathname.startsWith('/commercial-calculator') || pathname.startsWith('/listing-comparison') || pathname.startsWith('/registration-calculator');
+    const isActive = pathname.startsWith('/commercial-calculator') || pathname.startsWith('/listing-comparison') || pathname.startsWith('/registration-calculator') || pathname.startsWith('/roi-calculator');
 
     return (
         <DropdownMenu>
@@ -162,6 +156,9 @@ const ToolsDropdown = () => {
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
+                 <DropdownMenuItem asChild>
+                    <Link href="/roi-calculator">Investment ROI Calculator</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                     <Link href="/commercial-calculator">Area & Commercials Calculator</Link>
                 </DropdownMenuItem>
