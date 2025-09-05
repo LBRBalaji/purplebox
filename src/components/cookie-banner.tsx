@@ -19,12 +19,14 @@ type Consent = {
 export function CookieBanner() {
     const [consent, setConsent] = useState<Consent | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const [localPreferences, setLocalPreferences] = useState<Consent>({
         necessary: true,
         preferences: true,
     });
 
     useEffect(() => {
+        setMounted(true);
         try {
             const storedConsent = localStorage.getItem('cookie_consent');
             if (storedConsent) {
@@ -60,8 +62,8 @@ export function CookieBanner() {
     }, [consent]);
 
 
-    if (consent) {
-        return null; // Don't show banner if consent is already given/denied
+    if (!mounted || consent) {
+        return null; // Don't show banner if not mounted or consent is already given/denied
     }
 
     return (
@@ -88,6 +90,7 @@ export function CookieBanner() {
                     <CardFooter className="flex-col sm:flex-row gap-2">
                         <Button className="w-full sm:w-auto" onClick={handleAcceptAll}>Accept All</Button>
                         <Button className="w-full sm:w-auto" variant="outline" onClick={() => setIsDialogOpen(true)}>Manage Cookies</Button>
+                        <Button className="w-full sm:w-auto" variant="secondary" onClick={handleRejectAll}>Reject All</Button>
                     </CardFooter>
                 </Card>
             </div>
