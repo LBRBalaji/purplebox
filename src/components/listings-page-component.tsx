@@ -5,7 +5,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare, Smile } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare, Smile, Share, Mail, Linkedin, Twitter, Facebook } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -27,7 +27,81 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Skeleton } from './ui/skeleton';
 import { Label } from './ui/label';
 import { Separator } from './ui/separator';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
+const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.919 6.066l-1.285 4.685 4.758-1.241z"
+      />
+    </svg>
+);
+
+
+function ShareDropdown({ listing }: { listing: ListingSchema }) {
+    const [currentUrl, setCurrentUrl] = React.useState('');
+
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setCurrentUrl(`${window.location.origin}/listings/${listing.listingId}`);
+        }
+    }, [listing.listingId]);
+
+    if (!currentUrl) return null;
+
+    const text = encodeURIComponent(`Check out this property: ${listing.name}`);
+    const emailSubject = encodeURIComponent(`Property Listing: ${listing.name}`);
+    const emailBody = encodeURIComponent(`I thought you might be interested in this property listing:\n\n${listing.name}\n${listing.location}\n\nView more details here: ${currentUrl}`);
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full">
+                    <Share className="mr-2 h-4 w-4" /> Share
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                 <DropdownMenuItem asChild>
+                    <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} target="_blank" rel="noopener noreferrer">
+                        <Mail className="mr-2 h-4 w-4" /> Email
+                    </a>
+                 </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                    <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${text}`} target="_blank" rel="noopener noreferrer">
+                        <Linkedin className="mr-2 h-4 w-4" /> LinkedIn
+                    </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${text}`} target="_blank" rel="noopener noreferrer">
+                        <Twitter className="mr-2 h-4 w-4" /> X / Twitter
+                    </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer">
+                        <Facebook className="mr-2 h-4 w-4" /> Facebook
+                    </a>
+                </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                    <a href={`https://api.whatsapp.com/send?text=${text}%20${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer">
+                        <WhatsAppIcon className="mr-2 h-4 w-4" /> WhatsApp
+                    </a>
+                 </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
   const previewImage = listing.documents?.find(d => d.type === 'image')?.url || 'https://placehold.co/600x400/210D42/FFFFFF?text=Image+Not+Available';
@@ -123,6 +197,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
         </div>
       </CardContent>
       <CardFooter className="p-6 pt-0 grid grid-cols-2 gap-2">
+        <ShareDropdown listing={listing} />
         <Button asChild className="w-full" variant="outline">
             <Link href={`/commercial-calculator?compare=${listing.listingId}`}>
                 <Calculator className="mr-2 h-4 w-4" /> Calculate
@@ -614,5 +689,3 @@ export function ListingsPage() {
     </>
   );
 }
-
-    
