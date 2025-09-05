@@ -101,13 +101,13 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
             <div className="text-sm text-center text-muted-foreground pt-2 space-y-2">
                 <div>
                     Don&apos;t have an account?{' '}
-                    <Link href="/signup" className="underline text-primary">
+                    <Link href="/signup" className="underline text-primary" onClick={() => onOpenChange(false)}>
                         Sign Up
                     </Link>
                 </div>
                  <div>
                     Are you an agent?{' '}
-                    <Link href="/agent-signup" className="underline text-primary">
+                    <Link href="/agent-signup" className="underline text-primary" onClick={() => onOpenChange(false)}>
                         Register Here
                     </Link>
                 </div>
