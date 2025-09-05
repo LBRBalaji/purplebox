@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Skeleton } from './ui/skeleton';
 import { Label } from './ui/label';
+import { Separator } from './ui/separator';
 
 
 function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
@@ -294,6 +295,23 @@ export function ListingsPage() {
   
   const approvedListings = useMemo(() => allListings.filter(l => l.status === 'approved'), [allListings]);
 
+  const inventoryCount = approvedListings.length;
+  const totalInventorySize = useMemo(() =>
+      approvedListings.reduce((sum, listing) => sum + listing.sizeSqFt, 0),
+    [approvedListings]
+  );
+  
+  // Function to format large numbers into a more readable format (e.g., 1.5M)
+  const formatSize = (size: number) => {
+    if (size >= 1000000) {
+      return `${(size / 1000000).toFixed(1)}M`;
+    }
+    if (size >= 1000) {
+      return `${(size / 1000).toFixed(0)}K`;
+    }
+    return size.toString();
+  };
+
   const selectedIds = useMemo(() => new Set(selectedForDownload.map(l => l.listingId)), [selectedForDownload]);
 
   useEffect(() => {
@@ -477,6 +495,19 @@ export function ListingsPage() {
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight">Search-Select-Download</h1>
                 <p className="mt-4 text-lg text-muted-foreground">Warehouse-Technical-Commercials, in a single CSV</p>
+                
+                 <div className="mt-8 flex items-center justify-center gap-4 md:gap-8 text-center animate-in fade-in-0 duration-1000">
+                    <div className="text-center">
+                        <p className="text-2xl md:text-3xl font-bold text-primary">{inventoryCount}</p>
+                        <p className="text-xs text-muted-foreground tracking-wider">WAREHOUSES</p>
+                    </div>
+                    <Separator orientation="vertical" className="h-10" />
+                    <div className="text-center">
+                         <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>
+                        <p className="text-xs text-muted-foreground tracking-wider">SQ. FT. LISTED</p>
+                    </div>
+                </div>
+
             </div>
              <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <div className="md:col-span-8">
