@@ -2,6 +2,7 @@
 [
   {
     "demandId": "DMD-1700000000001",
+    "createdAt": "2023-11-14T20:53:20Z",
     "userEmail": "user@example.com",
     "companyName": "ACME Corp",
     "userName": "John Doe",
@@ -24,6 +25,7 @@
   },
   {
     "demandId": "DMD-1700000000002",
+    "createdAt": "2023-11-15T20:53:20Z",
     "userEmail": "user@example.com",
     "companyName": "TechCorp",
     "userName": "Jane Smith",
@@ -46,6 +48,7 @@
   },
   {
     "demandId": "DMD-1700000000003",
+    "createdAt": "2023-11-16T20:53:20Z",
     "userEmail": "user@example.com",
     "companyName": "RetailCo",
     "userName": "Peter Jones",
@@ -68,6 +71,7 @@
   },
   {
     "demandId": "DMD-1700000000004",
+    "createdAt": "2023-11-17T20:53:20Z",
     "userEmail": "user@example.com",
     "companyName": "Global Industries",
     "userName": "Mary Williams",
@@ -90,6 +94,7 @@
   },
   {
     "demandId": "DMD-1700000000005",
+    "createdAt": "2023-11-18T20:53:20Z",
     "userEmail": "logistics.pro@example.com",
     "companyName": "ProLogistics Solutions",
     "userName": "Sunil Patel",
@@ -112,6 +117,7 @@
   },
   {
       "demandId": "DMD-1710000000006",
+      "createdAt": "2024-03-09T17:20:00Z",
       "userEmail": "user@example.com",
       "companyName": "PharmaSafe Inc.",
       "userName": "Dr. Evelyn Reed",
@@ -134,6 +140,7 @@
   },
   {
       "demandId": "DMD-1720000000007",
+      "createdAt": "2024-07-03T16:53:20Z",
       "userEmail": "user@example.com",
       "companyName": "AutoParts Express",
       "userName": "Rajesh Singh",
@@ -156,6 +163,7 @@
   },
   {
       "demandId": "DMD-1730000000008",
+      "createdAt": "2024-10-26T16:53:20Z",
       "userEmail": "user@example.com",
       "companyName": "FrostyFoods Logistics",
       "userName": "Mei Lin",
@@ -178,6 +186,7 @@
   },
   {
     "demandId": "DMD-1740000000009",
+    "createdAt": "2025-02-18T16:53:20Z",
     "userEmail": "user@example.com",
     "companyName": "Heavy-Lift Manufacturing",
     "userName": "Vikram Singh",
@@ -219,6 +228,7 @@
   },
   {
       "demandId": "DMD-1750000000010",
+      "createdAt": "2025-06-13T16:53:20Z",
       "userEmail": "logistics.pro@example.com",
       "companyName": "ProLogistics Solutions",
       "userName": "Priya Sharma",
@@ -250,6 +260,7 @@
   },
   {
       "demandId": "DMD-1750000000011",
+      "createdAt": "2025-06-14T16:53:20Z",
       "userEmail": "logistics.pro@example.com",
       "companyName": "ProLogistics Solutions",
       "userName": "Sunil Patel",
@@ -272,6 +283,7 @@
   },
   {
       "demandId": "DMD-1750000000012",
+      "createdAt": "2025-06-15T16:53:20Z",
       "userEmail": "user@example.com",
       "companyName": "PharmaSafe Inc.",
       "userName": "Dr. Evelyn Reed",

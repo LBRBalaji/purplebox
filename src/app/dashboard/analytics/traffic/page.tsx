@@ -90,7 +90,7 @@ export default function TrafficAnalyticsPage() {
     }, [users]);
     
     const demandActivityData = React.useMemo(() => {
-        return groupDataByDay(demands, (item) => new Date(parseInt(item.demandId.split('-')[1])));
+        return groupDataByDay(demands.filter(d => d.createdAt), (item) => new Date(item.createdAt!));
     }, [demands]);
 
     const userRoleData = React.useMemo(() => {
@@ -114,8 +114,8 @@ export default function TrafficAnalyticsPage() {
     }, [users]);
     
     const recentActivity = React.useMemo(() => {
-        const userEvents = Object.values(users).map(u => ({ type: 'New User', subject: u.userName, timestamp: new Date(u.createdAt) }));
-        const demandEvents = demands.map(d => ({ type: 'New Demand', subject: d.demandId, timestamp: new Date(parseInt(d.demandId.split('-')[1])) }));
+        const userEvents = Object.values(users).filter(u => u.createdAt).map(u => ({ type: 'New User', subject: u.userName, timestamp: new Date(u.createdAt) }));
+        const demandEvents = demands.filter(d => d.createdAt).map(d => ({ type: 'New Demand', subject: d.demandId, timestamp: new Date(d.createdAt!) }));
         const listingEvents = listings.filter(l => l.createdAt).map(l => ({ type: 'New Listing', subject: l.name, timestamp: new Date(l.createdAt!) }));
 
         return [...userEvents, ...demandEvents, ...listingEvents]

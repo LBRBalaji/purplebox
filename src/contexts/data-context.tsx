@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
@@ -106,7 +107,7 @@ type DataContextType = {
   logListingView: (user: User, listingId: string) => void;
 
   demands: DemandSchema[];
-  addDemand: (demand: DemandSchema, userEmail?: string) => void;
+  addDemand: (demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => void;
   updateDemand: (demand: DemandSchema) => void;
   submissions: Submission[];
   addSubmission: (submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => void;
@@ -308,8 +309,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     persistAgentLeads(updatedLeads);
   };
 
-  const addDemand = (demand: DemandSchema, userEmail?: string) => {
-    setDemands((prev) => [demand, ...prev]);
+  const addDemand = (demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => {
+    const newDemand = { ...demand, createdAt: new Date().toISOString() };
+    setDemands((prev) => [newDemand, ...prev]);
     setLastEvent({
       type: 'new_demand',
       id: demand.demandId,
@@ -586,3 +588,4 @@ export function useData() {
   }
   return context;
 }
+

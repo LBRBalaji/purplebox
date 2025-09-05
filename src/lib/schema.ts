@@ -1,4 +1,5 @@
 
+
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -129,6 +130,7 @@ export type GenerateListingDescriptionInput = z.infer<typeof GenerateListingDesc
 
 export const demandSchema = z.object({
   demandId: z.string(),
+  createdAt: z.string().datetime().optional(),
   companyName: z.string().min(1, 'Company name is required.'),
   userName: z.string().min(1, 'User name is required.'),
   userEmail: z.string().email('Invalid email address.'),
@@ -473,3 +475,4 @@ export const acknowledgmentSchema = z.object({
   email: z.string().email(),
 });
 export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;
+
