@@ -20,6 +20,7 @@ export function CookieBanner() {
     const [consent, setConsent] = useState<Consent | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
     const [localPreferences, setLocalPreferences] = useState<Consent>({
         necessary: true,
         preferences: true,
@@ -31,9 +32,12 @@ export function CookieBanner() {
             const storedConsent = localStorage.getItem('cookie_consent');
             if (storedConsent) {
                 setConsent(JSON.parse(storedConsent));
+            } else {
+                setIsVisible(true);
             }
         } catch (e) {
             console.error("Could not parse cookie consent from localStorage", e);
+            setIsVisible(true);
         }
     }, []);
 
@@ -41,18 +45,21 @@ export function CookieBanner() {
         setConsent(localPreferences);
         localStorage.setItem('cookie_consent', JSON.stringify(localPreferences));
         setIsDialogOpen(false);
+        setIsVisible(false);
     };
 
     const handleAcceptAll = () => {
         const allAccepted = { necessary: true, preferences: true };
         setConsent(allAccepted);
         localStorage.setItem('cookie_consent', JSON.stringify(allAccepted));
+        setIsVisible(false);
     };
 
     const handleRejectAll = () => {
         const onlyNecessary = { necessary: true, preferences: false };
         setConsent(onlyNecessary);
         localStorage.setItem('cookie_consent', JSON.stringify(onlyNecessary));
+        setIsVisible(false);
     };
     
     useEffect(() => {
@@ -62,8 +69,8 @@ export function CookieBanner() {
     }, [consent]);
 
 
-    if (!mounted || consent) {
-        return null; // Don't show banner if not mounted or consent is already given/denied
+    if (!mounted || !isVisible) {
+        return null;
     }
 
     return (
