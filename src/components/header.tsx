@@ -53,7 +53,7 @@ const NavLink = ({ href, children, exact = false }: { href: string, children: Re
 
 const ListingsDropdown = () => {
     const pathname = usePathname();
-    const isActive = pathname === '/' || pathname.startsWith('/map-search');
+    const isActive = pathname === '/' || pathname.startsWith('/map-search') || pathname.startsWith('/listings');
 
     return (
         <DropdownMenu>
@@ -212,15 +212,10 @@ export function Header() {
                         )}
                         <ListingsDropdown />
                         <ToolsDropdown />
-                         {!user && (
-                            <NavLink href="/agent-signup">
-                                <UserPlus className="h-4 w-4" /> Agent Signup
-                            </NavLink>
-                        )}
                          {(isSuperAdmin || isO2O) && (
                             <>
                                 <AnalyticsDropdown />
-                                <ManageDropdown isSuperAdmin={isSuperAdmin} isO2O={isO2O} />
+                                <ManageDropdown isSuperAdmin={isSuperAdmin || false} isO2O={isO2O || false} />
                             </>
                          )}
                     </>
