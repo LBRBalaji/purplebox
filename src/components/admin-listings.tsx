@@ -106,7 +106,7 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
             </div>
         </div>
         {analytics?.viewedBy && analytics.viewedBy.length > 0 && (
-          <Collapsible>
+          <Collapsible defaultOpen={true}>
             <CollapsibleTrigger className="w-full flex items-center justify-between text-sm font-medium text-primary py-2 px-3 bg-primary/5 rounded-md hover:bg-primary/10">
               <span className="flex items-center gap-2"><Eye className="h-4 w-4" /> Viewed By ({analytics.viewedBy.length})</span>
               <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
@@ -132,7 +132,7 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
           </Collapsible>
         )}
         {analytics?.downloadedBy && analytics.downloadedBy.length > 0 && (
-          <Collapsible>
+          <Collapsible defaultOpen={true}>
             <CollapsibleTrigger className="w-full flex items-center justify-between text-sm font-medium text-primary py-2 px-3 bg-primary/5 rounded-md hover:bg-primary/10">
               <span className="flex items-center gap-2"><Users className="h-4 w-4" /> Downloaded By ({analytics.downloadedBy.length})</span>
               <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
