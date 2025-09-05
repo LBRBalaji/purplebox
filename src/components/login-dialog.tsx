@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Briefcase, UserPlus } from 'lucide-react';
+import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Briefcase, UserPlus, Handshake } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -103,6 +103,12 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                     Don&apos;t have an account?{' '}
                     <Link href="/signup" className="underline text-primary">
                         Sign Up
+                    </Link>
+                </div>
+                 <div>
+                    Are you an agent?{' '}
+                    <Link href="/agent-signup" className="underline text-primary">
+                        Register Here
                     </Link>
                 </div>
             </div>

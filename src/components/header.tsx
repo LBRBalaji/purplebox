@@ -248,11 +248,6 @@ export function Header() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                    <Button asChild>
-                        <Link href="/agent-signup">
-                            Register as Agent
-                        </Link>
-                    </Button>
                     <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
                         <LogIn className="mr-2 h-4 w-4" /> Login
                     </Button>
