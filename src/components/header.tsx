@@ -51,6 +51,33 @@ const NavLink = ({ href, children, exact = false }: { href: string, children: Re
     )
 }
 
+const ListingsDropdown = () => {
+    const pathname = usePathname();
+    const isActive = pathname === '/' || pathname.startsWith('/map-search');
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button className={cn(
+                    "text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2",
+                     isActive && "text-primary"
+                )}>
+                    <Warehouse className="h-4 w-4" /> Listings <ChevronDown className="h-4 w-4" />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
+                    <Link href="/"><List className="mr-2 h-4 w-4" /> Browse Listings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/map-search"><Map className="mr-2 h-4 w-4" /> Map Search</Link>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
+
 const AnalyticsDropdown = () => {
     const pathname = usePathname();
     const isActive = pathname.startsWith('/dashboard/analytics');
@@ -184,13 +211,8 @@ export function Header() {
                                 <LayoutDashboard className="h-4 w-4" /> Dashboard
                             </NavLink>
                         )}
-                        <NavLink href="/" exact={true}>
-                            <List className="h-4 w-4" /> Browse Listings
-                        </NavLink>
-                        <NavLink href="/map-search">
-                            <Map className="h-4 w-4" /> Map Search
-                        </NavLink>
-                         <ToolsDropdown />
+                        <ListingsDropdown />
+                        <ToolsDropdown />
                          {!user && (
                             <NavLink href="/agent-signup">
                                 <UserPlus className="h-4 w-4" /> Agent Signup
