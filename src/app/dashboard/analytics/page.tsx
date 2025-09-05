@@ -67,8 +67,6 @@ export default function AnalyticsHubPage() {
                             </CardHeader>
                         </Card>
                     </Link>
-                </div>
-                 <div className="pt-6">
                      <Link href="/dashboard/analytics/predictive" className="group">
                         <Card className="h-full hover:border-primary transition-colors bg-primary/5">
                             <CardHeader className="flex flex-row items-center justify-between">

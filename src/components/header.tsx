@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator, UserCheck, FileText, Search as SearchIcon } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator, UserCheck, FileText, Search as SearchIcon, Settings } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -72,6 +72,9 @@ const AnalyticsDropdown = () => {
                 <DropdownMenuItem asChild>
                     <Link href="/dashboard/analytics/demands">Demand Analytics</Link>
                 </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                    <Link href="/dashboard/analytics/traffic">Platform Traffic</Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link href="/dashboard/analytics/predictive">
@@ -79,6 +82,36 @@ const AnalyticsDropdown = () => {
                         Predictive Analytics
                     </Link>
                 </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
+const ManageDropdown = ({ isSuperAdmin, isO2O }: { isSuperAdmin: boolean, isO2O: boolean }) => {
+    const pathname = usePathname();
+    const isActive = pathname.startsWith('/dashboard/manage') || pathname.startsWith('/dashboard/register') || pathname.startsWith('/dashboard/search-console');
+    
+    if (!isSuperAdmin && !isO2O) return null;
+
+    return (
+         <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button className={cn(
+                    "text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2",
+                     isActive && "text-primary"
+                )}>
+                    <Settings className="h-4 w-4" /> Manage <ChevronDown className="h-4 w-4" />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+                 {isSuperAdmin && (
+                    <>
+                        <DropdownMenuItem asChild><Link href="/dashboard/search-console"><SearchIcon className="mr-2 h-4 w-4" /> Search Console</Link></DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link href="/dashboard/manage-users"><Users className="mr-2 h-4 w-4" /> Manage Users</Link></DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                    </>
+                 )}
+                 <DropdownMenuItem asChild><Link href="/dashboard/register-lead"><UserCheck className="mr-2 h-4 w-4" /> Register a Lead</Link></DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
@@ -164,18 +197,9 @@ export function Header() {
                             </NavLink>
                         )}
                          {(isSuperAdmin || isO2O) && (
-                            <AnalyticsDropdown />
-                         )}
-                        {isSuperAdmin && (
                             <>
-                                <NavLink href="/dashboard/search-console"><SearchIcon className="h-4 w-4" /> Search Console</NavLink>
-                                <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
-                                <NavLink href="/dashboard/manage-users"><Users className="h-4 w-4" /> Manage Users</NavLink>
-                            </>
-                        )}
-                         {isO2O && !isSuperAdmin && (
-                            <>
-                                <NavLink href="/dashboard/register-lead"><UserCheck className="h-4 w-4" /> Register a Lead</NavLink>
+                                <AnalyticsDropdown />
+                                <ManageDropdown isSuperAdmin={isSuperAdmin} isO2O={isO2O} />
                             </>
                          )}
                     </>
