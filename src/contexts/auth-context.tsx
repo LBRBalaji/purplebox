@@ -11,10 +11,11 @@ export type User = {
   companyName: string;
   userName: string;
   phone: string;
+  createdAt: string; // Added createdAt
 };
 
 // NewUser now includes the role, as the signup form will determine it.
-export type NewUser = User;
+export type NewUser = Omit<User, 'createdAt'>;
 
 type AuthContextType = {
   user: User | null;
@@ -31,11 +32,11 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const defaultUsers: { [email: string]: User } = {
-  'superadmin@example.com': { email: 'superadmin@example.com', role: 'SuperAdmin', companyName: 'Origin Depot', userName: 'O2O Super Admin', phone: 'N/A' },
-  'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test Customer', phone: '555-123-4567' },
-  'logistics.pro@example.com': { email: 'logistics.pro@example.com', role: 'User', companyName: 'ProLogistics Solutions', userName: 'Sunil Patel', phone: '555-987-6543' },
-  'provider@example.com': { email: 'provider@example.com', role: 'Warehouse Developer', companyName: 'Prime Properties', userName: 'Anil Kumar', phone: '555-111-2222' },
-  'o2o@example.com': { email: 'o2o@example.com', role: 'O2O', companyName: 'Lakshmi Balaji O2O', userName: 'O2O Manager', phone: '555-020-0202' },
+  'superadmin@example.com': { email: 'superadmin@example.com', role: 'SuperAdmin', companyName: 'Origin Depot', userName: 'O2O Super Admin', phone: 'N/A', createdAt: '2023-01-01T10:00:00Z' },
+  'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test Customer', phone: '555-123-4567', createdAt: '2023-10-15T11:00:00Z' },
+  'logistics.pro@example.com': { email: 'logistics.pro@example.com', role: 'User', companyName: 'ProLogistics Solutions', userName: 'Sunil Patel', phone: '555-987-6543', createdAt: '2023-10-20T12:00:00Z' },
+  'provider@example.com': { email: 'provider@example.com', role: 'Warehouse Developer', companyName: 'Prime Properties', userName: 'Anil Kumar', phone: '555-111-2222', createdAt: '2023-09-05T14:00:00Z' },
+  'o2o@example.com': { email: 'o2o@example.com', role: 'O2O', companyName: 'Lakshmi Balaji O2O', userName: 'O2O Manager', phone: '555-020-0202', createdAt: '2023-01-01T10:05:00Z' },
 };
 
 const personalEmailDomains = [
@@ -138,11 +139,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // 3. Add user if validation passes
-    addUser(details);
+    const newUserWithTimestamp: User = { ...details, createdAt: new Date().toISOString() };
+    addUser(newUserWithTimestamp);
 
     // Log the new user in
-    setUser(details);
-    sessionStorage.setItem('user', JSON.stringify(details));
+    setUser(newUserWithTimestamp);
+    sessionStorage.setItem('user', JSON.stringify(newUserWithTimestamp));
     router.push('/dashboard');
   }
 
@@ -161,12 +163,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       return;
     }
-    const newUsers = { ...users, [details.email.toLowerCase()]: details };
+    const newUserWithTimestamp: User = { ...details, createdAt: new Date().toISOString() };
+    const newUsers = { ...users, [details.email.toLowerCase()]: newUserWithTimestamp };
     persistUsers(newUsers);
   };
   
   const updateUser = (details: NewUser) => {
-    if (!users[details.email.toLowerCase()]) {
+    const existingUser = users[details.email.toLowerCase()];
+    if (!existingUser) {
       toast({
         variant: "destructive",
         title: "Update Failed",
@@ -174,13 +178,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       return;
     }
-    const newUsers = { ...users, [details.email.toLowerCase()]: details };
+    const updatedUser: User = { ...existingUser, ...details };
+    const newUsers = { ...users, [details.email.toLowerCase()]: updatedUser };
     persistUsers(newUsers);
 
     // If the updated user is the currently logged-in user, update session storage as well
     if (user?.email === details.email) {
-      setUser(details);
-      sessionStorage.setItem('user', JSON.stringify(details));
+      setUser(updatedUser);
+      sessionStorage.setItem('user', JSON.stringify(updatedUser));
     }
   };
 
@@ -216,5 +221,3 @@ export function useAuth() {
   }
   return context;
 }
-
-    

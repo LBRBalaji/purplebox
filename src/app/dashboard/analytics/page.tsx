@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, List, ArrowRight, Sparkles, TrendingUp } from 'lucide-react';
+import { BarChart, List, ArrowRight, Sparkles, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AnalyticsHubPage() {
@@ -45,6 +45,22 @@ export default function AnalyticsHubPage() {
                                     </CardTitle>
                                     <CardDescription className="mt-2">
                                         Analyze demand trends, success rates, and customer activity.
+                                    </CardDescription>
+                                </div>
+                                 <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                     <Link href="/dashboard/analytics/traffic" className="group">
+                        <Card className="h-full hover:border-primary transition-colors">
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Users className="text-primary" />
+                                        Platform Traffic
+                                    </CardTitle>
+                                    <CardDescription className="mt-2">
+                                        Monitor user growth and overall platform activity trends.
                                     </CardDescription>
                                 </div>
                                  <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
