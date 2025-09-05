@@ -6,6 +6,7 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { DataProvider } from '@/contexts/data-context';
 import { Header } from '@/components/header';
 import Link from 'next/link';
+import { CookieBanner } from '@/components/cookie-banner';
 
 export const metadata: Metadata = {
   title: 'Lakshmi Balaji O2O: Sourcing & Leasing Simplified',
@@ -19,9 +20,13 @@ function Footer() {
         <p>
           <span className="font-bold text-primary">Lakshmi Balaji O2O</span> | Simplifying Real Estate Transactions. All rights reserved.
         </p>
-         <div className="mt-2">
+         <div className="mt-2 space-x-4">
             <Link href="/terms-and-conditions" className="hover:underline">
               Terms & Conditions
+            </Link>
+            <span>|</span>
+            <Link href="/cookie-policy" className="hover:underline">
+              Cookie Policy
             </Link>
           </div>
       </div>
@@ -52,6 +57,7 @@ export default function RootLayout({
           </DataProvider>
         </AuthProvider>
         <Toaster />
+        <CookieBanner />
       </body>
     </html>
   );
