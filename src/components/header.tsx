@@ -116,7 +116,7 @@ const AnalyticsDropdown = () => {
 
 const ManageDropdown = ({ isSuperAdmin, isO2O }: { isSuperAdmin: boolean, isO2O: boolean }) => {
     const pathname = usePathname();
-    const isActive = pathname.startsWith('/dashboard/manage') || pathname.startsWith('/dashboard/register') || pathname.startsWith('/dashboard/search-console');
+    const isActive = pathname.startsWith('/dashboard');
     
     if (!isSuperAdmin && !isO2O) return null;
 
@@ -133,6 +133,8 @@ const ManageDropdown = ({ isSuperAdmin, isO2O }: { isSuperAdmin: boolean, isO2O:
             <DropdownMenuContent align="start">
                  {isSuperAdmin && (
                     <>
+                        <DropdownMenuItem asChild><Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" /> Main Dashboard</Link></DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem asChild><Link href="/dashboard/search-console"><SearchIcon className="mr-2 h-4 w-4" /> Search Console</Link></DropdownMenuItem>
                         <DropdownMenuItem asChild><Link href="/dashboard/manage-users"><Users className="mr-2 h-4 w-4" /> Manage Users</Link></DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -206,7 +208,7 @@ export function Header() {
                     </div>
                 ) : (
                     <>
-                        {user && (
+                        {user && !isSuperAdmin && (
                             <NavLink href="/dashboard">
                                 <LayoutDashboard className="h-4 w-4" /> Dashboard
                             </NavLink>
