@@ -97,6 +97,7 @@ export default function TrafficAnalyticsPage() {
         const roleCounts = Object.values(users).reduce((acc, user) => {
             let role = user.role;
             if (role === 'Warehouse Developer') role = 'Provider';
+            if (role === 'SuperAdmin') role = 'Provider';
             acc[role] = (acc[role] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
