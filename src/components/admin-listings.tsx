@@ -325,5 +325,3 @@ export function AdminListings() {
       </div>
   );
 }
-
-    
