@@ -196,67 +196,45 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const persistListings = (updatedListings: ListingSchema[]) => {
-    setListings(updatedListings);
-    persistData('listings', updatedListings, 'listings');
-  };
-  
-  const persistDemands = (updatedDemands: DemandSchema[]) => {
-    setDemands(updatedDemands);
-    persistData('demands', updatedDemands, 'demands');
-  };
-
-  const persistSubmissions = (updatedSubmissions: Submission[]) => {
-    setSubmissions(updatedSubmissions);
-    persistData('submissions', updatedSubmissions, 'submissions');
-  };
-
-  const persistAgentLeads = (updatedLeads: AgentLead[]) => {
-      setAgentLeads(updatedLeads);
-      persistData('agent-leads', updatedLeads, 'agent leads');
-  }
-
-  const persistRegisteredLeads = (updatedLeads: RegisteredLead[]) => {
-      setRegisteredLeads(updatedLeads);
-      persistData('registered-leads', updatedLeads, 'registered leads');
-  };
-  
-  const persistActivities = (updatedActivities: TransactionActivity[]) => {
-      setTransactionActivities(updatedActivities);
-      persistData('transaction-activities', updatedActivities, 'transaction activities');
-  }
-  
-  const persistTenantImprovements = (updatedSheets: TenantImprovementsSheet[]) => {
-    setTenantImprovements(updatedSheets);
-    persistData('tenant-improvements', updatedSheets, 'tenant improvements');
-  }
+  const persistListings = (updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings');
+  const persistDemands = (updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands');
+  const persistSubmissions = (updatedSubmissions: Submission[]) => persistData('submissions', updatedSubmissions, 'submissions');
+  const persistAgentLeads = (updatedLeads: AgentLead[]) => persistData('agent-leads', updatedLeads, 'agent leads');
+  const persistRegisteredLeads = (updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads');
+  const persistActivities = (updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities');
+  const persistTenantImprovements = (updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements');
 
   const addListing = (listing: ListingSchema, userEmail?: string) => {
-    const newListings = [{ ...listing, status: 'pending' as const }, ...listings];
-    persistListings(newListings);
-    setLastEvent({
-      type: 'new_listing',
-      id: listing.listingId,
-      timestamp: new Date().toISOString(),
-      triggeredBy: userEmail,
+    setListings(prevListings => {
+        const newListings = [{ ...listing, status: 'pending' as const }, ...prevListings];
+        persistListings(newListings);
+        setLastEvent({
+          type: 'new_listing',
+          id: listing.listingId,
+          timestamp: new Date().toISOString(),
+          triggeredBy: userEmail,
+        });
+        return newListings;
     });
   }
 
   const updateListing = (updatedListing: ListingSchema) => {
-    const newListings = listings.map(l => l.listingId === updatedListing.listingId ? { ...updatedListing, status: 'pending' as const } : l);
-    persistListings(newListings);
-     setLastEvent({
-      type: 'new_listing',
-      id: updatedListing.listingId,
-      timestamp: new Date().toISOString(),
-      triggeredBy: updatedListing.developerId,
+    setListings(prevListings => {
+        const newListings = prevListings.map(l => l.listingId === updatedListing.listingId ? { ...updatedListing, status: 'pending' as const } : l);
+        persistListings(newListings);
+        setLastEvent({
+          type: 'new_listing',
+          id: updatedListing.listingId,
+          timestamp: new Date().toISOString(),
+          triggeredBy: updatedListing.developerId,
+        });
+        return newListings;
     });
   }
 
   const updateListingStatus = (listingId: string, status: ListingStatus, userEmail?: string) => {
-    let updatedListings: ListingSchema[] = [];
     setListings(prev => {
-        updatedListings = prev.map(l => {
+        const updatedListings = prev.map(l => {
             if (l.listingId === listingId) {
                 setLastEvent({
                     type: 'listing_status_changed',
@@ -275,66 +253,84 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   const addAgentLead = (lead: Omit<AgentLead, 'id' | 'status'>) => {
-      const newLead: AgentLead = { 
-        ...lead, 
-        id: `AGENT-${Date.now()}`, 
-        status: 'Pending' 
-      };
-      const updatedLeads = [newLead, ...agentLeads];
-      persistAgentLeads(updatedLeads);
+    setAgentLeads(prevLeads => {
+        const newLead: AgentLead = { 
+          ...lead, 
+          id: `AGENT-${Date.now()}`, 
+          status: 'Pending' 
+        };
+        const updatedLeads = [newLead, ...prevLeads];
+        persistAgentLeads(updatedLeads);
+        return updatedLeads;
+    });
   }
 
   const updateAgentLeadStatus = (leadId: string, status: AgentStatus) => {
-    const updatedLeads = agentLeads.map(lead => lead.id === leadId ? { ...lead, status } : lead);
-    persistAgentLeads(updatedLeads);
+    setAgentLeads(prevLeads => {
+        const updatedLeads = prevLeads.map(lead => lead.id === leadId ? { ...lead, status } : lead);
+        persistAgentLeads(updatedLeads);
+        return updatedLeads;
+    });
   };
 
   const addDemand = (demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => {
-    const newDemand = { ...demand, createdAt: new Date().toISOString() };
-    const newDemands = [newDemand, ...demands];
-    persistDemands(newDemands);
-    setLastEvent({
-      type: 'new_demand',
-      id: demand.demandId,
-      timestamp: new Date().toISOString(),
-      triggeredBy: userEmail,
+    setDemands(prevDemands => {
+        const newDemand = { ...demand, createdAt: new Date().toISOString() };
+        const newDemands = [newDemand, ...prevDemands];
+        persistDemands(newDemands);
+        setLastEvent({
+          type: 'new_demand',
+          id: demand.demandId,
+          timestamp: new Date().toISOString(),
+          triggeredBy: userEmail,
+        });
+        return newDemands;
     });
   };
 
   const updateDemand = (updatedDemand: DemandSchema) => {
-    const newDemands = demands.map((demand) =>
-        demand.demandId === updatedDemand.demandId ? updatedDemand : demand
-    );
-    persistDemands(newDemands);
+    setDemands(prevDemands => {
+        const newDemands = prevDemands.map((demand) =>
+            demand.demandId === updatedDemand.demandId ? updatedDemand : demand
+        );
+        persistDemands(newDemands);
+        return newDemands;
+    });
   };
 
   const addSubmission = (submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => {
-    const demand = demands.find(d => d.demandId === submission.demandId);
-    const submissionWithDefaults: Submission = {
-        ...submission,
-        submissionId: `SUB-${Date.now()}`,
-        isNew: true,
-        demandUserEmail: demand?.userEmail,
-        status: 'Pending', 
-    };
-    const newSubmissions = [submissionWithDefaults, ...submissions];
-    persistSubmissions(newSubmissions);
-    setLastEvent({
-        type: 'new_submission',
-        id: submission.demandId,
-        timestamp: new Date().toISOString(),
-        triggeredBy: userEmail,
+    setSubmissions(prevSubmissions => {
+        const demand = demands.find(d => d.demandId === submission.demandId);
+        const submissionWithDefaults: Submission = {
+            ...submission,
+            submissionId: `SUB-${Date.now()}`,
+            isNew: true,
+            demandUserEmail: demand?.userEmail,
+            status: 'Pending', 
+        };
+        const newSubmissions = [submissionWithDefaults, ...prevSubmissions];
+        persistSubmissions(newSubmissions);
+        setLastEvent({
+            type: 'new_submission',
+            id: submission.demandId,
+            timestamp: new Date().toISOString(),
+            triggeredBy: userEmail,
+        });
+        return newSubmissions;
     });
   };
 
   const updateSubmissionStatus = (submissionId: string, status: SubmissionStatus) => {
-    const newSubmissions = submissions.map(sub =>
-        sub.submissionId === submissionId ? { ...sub, status, isNew: status === 'Approved' ? true : sub.isNew } : sub
-    );
-    persistSubmissions(newSubmissions);
-    if (status === 'Rejected') {
-      setShortlistedItems(prev => prev.filter(item => item.submissionId !== submissionId));
-    }
+    setSubmissions(prevSubmissions => {
+        const newSubmissions = prevSubmissions.map(sub =>
+            sub.submissionId === submissionId ? { ...sub, status, isNew: status === 'Approved' ? true : sub.isNew } : sub
+        );
+        persistSubmissions(newSubmissions);
+        if (status === 'Rejected') {
+          setShortlistedItems(prev => prev.filter(item => item.submissionId !== submissionId));
+        }
+        return newSubmissions;
+    });
   };
 
   const toggleShortlist = (submissionToToggle: Submission) => {
@@ -355,11 +351,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const clearNewSubmissions = (submissionIds: string[]) => {
-    const idsToClear = new Set(submissionIds);
-    const newSubmissions = submissions.map(sub => 
-            idsToClear.has(sub.submissionId) ? { ...sub, isNew: false } : sub
-    );
-    persistSubmissions(newSubmissions);
+    setSubmissions(prevSubmissions => {
+        const idsToClear = new Set(submissionIds);
+        const newSubmissions = prevSubmissions.map(sub => 
+                idsToClear.has(sub.submissionId) ? { ...sub, isNew: false } : sub
+        );
+        persistSubmissions(newSubmissions);
+        return newSubmissions;
+    });
   };
   
   const getTodaysTotalDownloads = (userId: string): number => {
@@ -462,44 +461,53 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const addRegisteredLead = (leadData: Omit<RegisteredLead, 'registeredAt'>) => {
-    const newLead: RegisteredLead = {
-      ...leadData,
-      registeredAt: new Date().toISOString(),
-    };
-    const updatedLeads = [newLead, ...registeredLeads];
-    persistRegisteredLeads(updatedLeads);
+    setRegisteredLeads(prevLeads => {
+        const newLead: RegisteredLead = {
+          ...leadData,
+          registeredAt: new Date().toISOString(),
+        };
+        const updatedLeads = [newLead, ...prevLeads];
+        persistRegisteredLeads(updatedLeads);
+        return updatedLeads;
+    });
   };
 
   const updateRegisteredLeadStatus = (leadId: string, providerEmail: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => {
-    const updatedLeads = registeredLeads.map(lead => {
-      if (lead.id === leadId) {
-        return {
-          ...lead,
-          providers: lead.providers.map(provider => 
-            provider.providerEmail === providerEmail 
-              ? { 
-                  ...provider, 
-                  status: newStatus, 
-                  acknowledgedAt: newStatus === 'Acknowledged' ? new Date().toISOString() : undefined,
-                  acknowledgedBy: newStatus === 'Acknowledged' ? details : undefined,
-                } 
-              : provider
-          )
-        };
-      }
-      return lead;
+    setRegisteredLeads(prevLeads => {
+        const updatedLeads = prevLeads.map(lead => {
+          if (lead.id === leadId) {
+            return {
+              ...lead,
+              providers: lead.providers.map(provider => 
+                provider.providerEmail === providerEmail 
+                  ? { 
+                      ...provider, 
+                      status: newStatus, 
+                      acknowledgedAt: newStatus === 'Acknowledged' ? new Date().toISOString() : undefined,
+                      acknowledgedBy: newStatus === 'Acknowledged' ? details : undefined,
+                    } 
+                  : provider
+              )
+            };
+          }
+          return lead;
+        });
+        persistRegisteredLeads(updatedLeads);
+        return updatedLeads;
     });
-    persistRegisteredLeads(updatedLeads);
   };
   
   const addTransactionActivity = (activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
-      const newActivity: TransactionActivity = {
-          ...activityData,
-          activityId: `ACT-${Date.now()}`,
-          createdAt: new Date().toISOString(),
-      };
-      const updatedActivities = [newActivity, ...transactionActivities];
-      persistActivities(updatedActivities);
+      setTransactionActivities(prevActivities => {
+          const newActivity: TransactionActivity = {
+              ...activityData,
+              activityId: `ACT-${Date.now()}`,
+              createdAt: new Date().toISOString(),
+          };
+          const updatedActivities = [newActivity, ...prevActivities];
+          persistActivities(updatedActivities);
+          return updatedActivities;
+      });
   };
   
   const getTenantImprovements = (leadId: string): TenantImprovementsSheet | null => {
@@ -507,19 +515,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
   
   const updateTenantImprovements = (leadId: string, sheetData: TenantImprovementsSheet) => {
-    const existingSheet = getTenantImprovements(leadId);
-    let updatedSheets: TenantImprovementsSheet[];
+    setTenantImprovements(prevSheets => {
+        const existingSheet = prevSheets.find(sheet => sheet.leadId === leadId);
+        let updatedSheets: TenantImprovementsSheet[];
 
-    if (existingSheet) {
-      updatedSheets = tenantImprovements.map(sheet => sheet.leadId === leadId ? sheetData : sheet);
-    } else {
-      updatedSheets = [...tenantImprovements, sheetData];
-    }
-    
-    persistTenantImprovements(updatedSheets);
-    toast({
-        title: "Improvements Sheet Saved",
-        description: "Your changes have been saved successfully.",
+        if (existingSheet) {
+          updatedSheets = prevSheets.map(sheet => sheet.leadId === leadId ? sheetData : sheet);
+        } else {
+          updatedSheets = [...prevSheets, sheetData];
+        }
+        
+        persistTenantImprovements(updatedSheets);
+        toast({
+            title: "Improvements Sheet Saved",
+            description: "Your changes have been saved successfully.",
+        });
+        return updatedSheets;
     });
   }
 
