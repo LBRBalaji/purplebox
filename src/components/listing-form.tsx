@@ -355,7 +355,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                     {fields.map((field, index) => (
                         <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                             <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
-                                <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} placeholder="e.g. Floor Plan" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name={`documents.${index}.type`} render={({ field }) => (
                                 <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
