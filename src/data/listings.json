@@ -1,2 +1,70 @@
 
-[]
+[
+  {
+    "listingId": "LST-ZNHZYG",
+    "developerId": "wd1@o2o.com",
+    "status": "approved",
+    "warehouseBoxId": "WBX-PRIM-SM9L",
+    "name": "LBR 1",
+    "location": "MWC",
+    "sizeSqFt": 200000,
+    "description": "",
+    "rentPerSqFt": 45,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "90%",
+    "serviceModel": "Standard",
+    "area": {
+      "plinthArea": 185000,
+      "mezzanineArea1": 5000,
+      "canopyArea": 4000,
+      "driversRestRoomArea": 2000,
+      "totalChargeableArea": 214000
+    },
+    "buildingSpecifications": {
+      "buildingType": "PEB",
+      "numberOfDocksAndShutters": 24,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
+      "craneAvailable": true,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Turbo",
+      "louvers": true
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfFlooringOutside": "RCC ",
+      "typeOfRoad": "Tar Road"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "layout",
+        "name": "Test Document",
+        "url": "https://drive.google.com/uc?export=view&id=1mfGDvv5h5IIvJuL_9tR29SkI7Eb9L318"
+      },
+      {
+        "type": "image",
+        "name": "image 1",
+        "url": "https://drive.google.com/uc?export=view&id=1D7UEbbjdQtA6d4Y_jxpiKvtPXoZB2l1w"
+      },
+      {
+        "type": "image",
+        "name": "image 2",
+        "url": "https://drive.google.com/uc?export=view&id=1pbN9wZa2oOqDTqQfO2UxQntyRLPkzSxu"
+      }
+    ]
+  }
+]
