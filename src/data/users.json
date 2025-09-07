@@ -1,2 +1,74 @@
-
-[]
+{
+  "admin@example.com": {
+    "email": "admin@example.com",
+    "role": "SuperAdmin",
+    "companyName": "Admin Corp",
+    "userName": "Default Admin",
+    "phone": "N/A",
+    "createdAt": "2025-09-07T10:25:51.680Z"
+  },
+  "superadmin@o2o.com": {
+    "email": "superadmin@o2o.com",
+    "role": "SuperAdmin",
+    "companyName": "O2O Platform",
+    "userName": "O2O Super Admin",
+    "phone": "1234567890",
+    "createdAt": "2025-09-08T10:00:00.000Z"
+  },
+  "manager@o2o.com": {
+    "email": "manager@o2o.com",
+    "role": "O2O",
+    "companyName": "O2O Platform",
+    "userName": "O2O Manager",
+    "phone": "1234567890",
+    "createdAt": "2025-09-08T10:01:00.000Z"
+  },
+  "customer1@o2o.com": {
+    "email": "customer1@o2o.com",
+    "role": "User",
+    "companyName": "Alpha Logistics",
+    "userName": "Alex Ray",
+    "phone": "2345678901",
+    "createdAt": "2025-09-08T10:02:00.000Z"
+  },
+  "customer2@o2o.com": {
+    "email": "customer2@o2o.com",
+    "role": "User",
+    "companyName": "Beta Retail",
+    "userName": "Ben Carter",
+    "phone": "3456789012",
+    "createdAt": "2025-09-08T10:03:00.000Z"
+  },
+  "customer3@o2o.com": {
+    "email": "customer3@o2o.com",
+    "role": "User",
+    "companyName": "Gamma Goods",
+    "userName": "Casey Dune",
+    "phone": "4567890123",
+    "createdAt": "2025-09-08T10:04:00.000Z"
+  },
+  "wd1@o2o.com": {
+    "email": "wd1@o2o.com",
+    "role": "Warehouse Developer",
+    "companyName": "Prime Warehousing",
+    "userName": "Developer One",
+    "phone": "5678901234",
+    "createdAt": "2025-09-08T10:05:00.000Z"
+  },
+  "wd2@o2o.com": {
+    "email": "wd2@o2o.com",
+    "role": "Warehouse Developer",
+    "companyName": "Apex Logistics Parks",
+    "userName": "Developer Two",
+    "phone": "6789012345",
+    "createdAt": "2025-09-08T10:06:00.000Z"
+  },
+  "wd3@o2o.com": {
+    "email": "wd3@o2o.com",
+    "role": "Warehouse Developer",
+    "companyName": "Zenith Properties",
+    "userName": "Developer Three",
+    "phone": "7890123456",
+    "createdAt": "2025-09-08T10:07:00.000Z"
+  }
+}
