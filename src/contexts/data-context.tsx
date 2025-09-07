@@ -176,9 +176,30 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // This can be used if we need to load from local storage in the future
   }, [toast]);
 
+  const persistListings = async (updatedListings: ListingSchema[]) => {
+    try {
+        const response = await fetch('/api/listings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedListings)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to save listings to the server.');
+        }
+        setListings(updatedListings);
+    } catch (error) {
+        console.error("Error persisting listings:", error);
+        toast({
+            variant: "destructive",
+            title: "Data Sync Error",
+            description: "Could not save listing changes to the server."
+        });
+    }
+  };
+
   const addListing = (listing: ListingSchema, userEmail?: string) => {
     const newListings = [{ ...listing, status: 'pending' as const }, ...listings];
-    setListings(newListings);
+    persistListings(newListings);
     setLastEvent({
       type: 'new_listing',
       id: listing.listingId,
@@ -188,7 +209,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   const updateListing = (updatedListing: ListingSchema) => {
-    setListings(prev => prev.map(l => l.listingId === updatedListing.listingId ? { ...updatedListing, status: 'pending' as const } : l));
+    const newListings = listings.map(l => l.listingId === updatedListing.listingId ? { ...updatedListing, status: 'pending' as const } : l);
+    persistListings(newListings);
      setLastEvent({
       type: 'new_listing',
       id: updatedListing.listingId,
@@ -198,19 +220,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   const updateListingStatus = (listingId: string, status: ListingStatus, userEmail?: string) => {
-    setListings(prev => prev.map(l => {
-      if (l.listingId === listingId) {
-        setLastEvent({
-            type: 'listing_status_changed',
-            id: listingId,
-            timestamp: new Date().toISOString(),
-            triggeredBy: userEmail,
-            message: `Listing "${l.name}" status updated to ${status}.`
+    let updatedListings: ListingSchema[] = [];
+    setListings(prev => {
+        updatedListings = prev.map(l => {
+            if (l.listingId === listingId) {
+                setLastEvent({
+                    type: 'listing_status_changed',
+                    id: listingId,
+                    timestamp: new Date().toISOString(),
+                    triggeredBy: userEmail,
+                    message: `Listing "${l.name}" status updated to ${status}.`
+                });
+                return { ...l, status };
+            }
+            return l;
         });
-        return { ...l, status };
-      }
-      return l;
-    }));
+        persistListings(updatedListings);
+        return updatedListings;
+    });
   }
 
 
