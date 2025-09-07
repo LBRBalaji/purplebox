@@ -31,14 +31,6 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const defaultUsers: { [email: string]: User } = {
-  'superadmin@example.com': { email: 'superadmin@example.com', role: 'SuperAdmin', companyName: 'Origin Depot', userName: 'O2O Super Admin', phone: 'N/A', createdAt: '2023-01-01T10:00:00Z' },
-  'user@example.com': { email: 'user@example.com', role: 'User', companyName: 'Test Customer Co.', userName: 'Test Customer', phone: '555-123-4567', createdAt: '2023-10-15T11:00:00Z' },
-  'logistics.pro@example.com': { email: 'logistics.pro@example.com', role: 'User', companyName: 'ProLogistics Solutions', userName: 'Sunil Patel', phone: '555-987-6543', createdAt: '2023-10-20T12:00:00Z' },
-  'provider@example.com': { email: 'provider@example.com', role: 'Warehouse Developer', companyName: 'Prime Properties', userName: 'Anil Kumar', phone: '555-111-2222', createdAt: '2023-09-05T14:00:00Z' },
-  'o2o@example.com': { email: 'o2o@example.com', role: 'O2O', companyName: 'Lakshmi Balaji O2O', userName: 'O2O Manager', phone: '555-020-0202', createdAt: '2023-01-01T10:05:00Z' },
-};
-
 const personalEmailDomains = [
     'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'live.com', 'msn.com', 'protonmail.com'
 ];
@@ -60,17 +52,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Use localStorage to persist user accounts across sessions
       const usersFromStorage = localStorage.getItem('warehouseorigin_users');
       storedUsers = usersFromStorage ? JSON.parse(usersFromStorage) : {};
+
+       // If no users exist, create a default admin user
+      if (Object.keys(storedUsers).length === 0) {
+          const defaultAdmin: User = {
+              email: 'admin@example.com',
+              role: 'SuperAdmin',
+              companyName: 'Admin Corp',
+              userName: 'Default Admin',
+              phone: 'N/A',
+              createdAt: new Date().toISOString()
+          };
+          storedUsers = { [defaultAdmin.email]: defaultAdmin };
+          localStorage.setItem('warehouseorigin_users', JSON.stringify(storedUsers));
+          console.log("No users found. Created default admin account.");
+      }
+
     } catch (e) {
       console.error("Could not parse users from localStorage", e);
       storedUsers = {};
     }
 
-    // Merge default users with stored users to ensure defaults are always available
-    const mergedUsers = { ...defaultUsers, ...storedUsers };
-    setUsers(mergedUsers);
-    localStorage.setItem('warehouseorigin_users', JSON.stringify(mergedUsers));
-
-
+    setUsers(storedUsers);
+    
     // Check for a logged-in user in session storage on initial load
     try {
       const storedUser = sessionStorage.getItem('user');
@@ -190,11 +194,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteUser = (email: string) => {
-    if (email === 'superadmin@example.com') {
+    if (email === 'admin@example.com') {
         toast({
             variant: "destructive",
             title: "Action Forbidden",
-            description: "The super admin account cannot be deleted.",
+            description: "The admin account cannot be deleted.",
         });
         return;
     }

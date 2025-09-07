@@ -6,6 +6,14 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type AcknowledgmentDetails } from '@/lib/schema';
 import { type User } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
+import initialListings from '@/data/listings.json';
+import initialDemands from '@/data/demands.json';
+import initialSubmissions from '@/data/submissions.json';
+import initialAgentLeads from '@/data/agent-leads.json';
+import initialListingAnalytics from '@/data/listing-analytics.json';
+import initialRegisteredLeads from '@/data/registered-leads.json';
+import initialTransactionActivities from '@/data/transaction-activities.json';
+import initialTenantImprovements from '@/data/tenant-improvements.json';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -150,105 +158,22 @@ export type AgentLead = {
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const [listings, setListings] = useState<ListingSchema[]>([]);
-  const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>([]);
-  const [demands, setDemands] = useState<DemandSchema[]>([]);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [listings, setListings] = useState<ListingSchema[]>(initialListings as ListingSchema[]);
+  const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>(initialListingAnalytics as ListingAnalytics[]);
+  const [demands, setDemands] = useState<DemandSchema[]>(initialDemands as DemandSchema[]);
+  const [submissions, setSubmissions] = useState<Submission[]>(initialSubmissions as Submission[]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
-  const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
-  const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>([]);
-  const [transactionActivities, setTransactionActivities] = useState<TransactionActivity[]>([]);
-  const [tenantImprovements, setTenantImprovements] = useState<TenantImprovementsSheet[]>([]);
+  const [agentLeads, setAgentLeads] = useState<AgentLead[]>(initialAgentLeads as AgentLead[]);
+  const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>(initialRegisteredLeads as RegisteredLead[]);
+  const [transactionActivities, setTransactionActivities] = useState<TransactionActivity[]>(initialTransactionActivities as TransactionActivity[]);
+  const [tenantImprovements, setTenantImprovements] = useState<TenantImprovementsSheet[]>(initialTenantImprovements as TenantImprovementsSheet[]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
-        try {
-            const [
-                listingsRes,
-                demandsRes,
-                submissionsRes,
-                agentLeadsRes,
-                analyticsRes,
-                registeredLeadsRes,
-                activitiesRes,
-                tenantImprovementsRes,
-            ] = await Promise.all([
-                fetch('/api/listings'),
-                fetch('/api/demands'),
-                fetch('/api/submissions'),
-                fetch('/api/agent-leads'),
-                fetch('/api/listing-analytics'),
-                fetch('/api/registered-leads'),
-                fetch('/api/transaction-activities'),
-                fetch('/api/tenant-improvements'),
-            ]);
-            
-            if (!listingsRes.ok || !demandsRes.ok || !submissionsRes.ok || !agentLeadsRes.ok || !analyticsRes.ok || !registeredLeadsRes.ok || !activitiesRes.ok || !tenantImprovementsRes.ok) {
-                throw new Error('Failed to fetch initial data from one or more endpoints.');
-            }
-
-            const listingsData = await listingsRes.json();
-            const demandsData = await demandsRes.json();
-            const submissionsData = await submissionsRes.json();
-            const agentLeadsData = await agentLeadsRes.json();
-            const analyticsData = await analyticsRes.json();
-            const registeredLeadsData = await registeredLeadsRes.json();
-            const activitiesData = await activitiesRes.json();
-            const tenantImprovementsData = await tenantImprovementsRes.json();
-
-
-            setListings(listingsData);
-            setDemands(demandsData);
-            setSubmissions(submissionsData);
-            setAgentLeads(agentLeadsData);
-            setListingAnalytics(analyticsData);
-            setRegisteredLeads(registeredLeadsData);
-            setTransactionActivities(activitiesData);
-            setTenantImprovements(tenantImprovementsData);
-            
-            localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(agentLeadsData));
-            localStorage.setItem('warehouseorigin_registered_leads', JSON.stringify(registeredLeadsData));
-            localStorage.setItem('warehouseorigin_transaction_activities', JSON.stringify(activitiesData));
-            localStorage.setItem('warehouseorigin_tenant_improvements', JSON.stringify(tenantImprovementsData));
-
-
-        } catch (error) {
-            console.error("Failed to fetch initial data:", error);
-             toast({
-                variant: 'destructive',
-                title: "Error Loading Data",
-                description: "Could not load initial platform data. Some features may be unavailable.",
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    fetchData();
-    
-    try {
-        const storedLeads = localStorage.getItem('warehouseorigin_agent_leads');
-        if (storedLeads) setAgentLeads(JSON.parse(storedLeads));
-
-        const storedRegisteredLeads = localStorage.getItem('warehouseorigin_registered_leads');
-        if (storedRegisteredLeads) setRegisteredLeads(JSON.parse(storedRegisteredLeads));
-
-         const storedActivities = localStorage.getItem('warehouseorigin_transaction_activities');
-        if (storedActivities) setTransactionActivities(JSON.parse(storedActivities));
-
-        const storedImprovements = localStorage.getItem('warehouseorigin_tenant_improvements');
-        if (storedImprovements) setTenantImprovements(JSON.parse(storedImprovements));
-
-        const storedDownloads = localStorage.getItem('warehouseorigin_downloads');
-        if(storedDownloads) setDownloadHistory(JSON.parse(storedDownloads));
-
-    } catch (e) {
-        console.error("Failed to parse data from local storage", e);
-    }
+    // This can be used if we need to load from local storage in the future
   }, [toast]);
 
   const addListing = (listing: ListingSchema, userEmail?: string) => {
@@ -291,7 +216,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const persistAgentLeads = (updatedLeads: AgentLead[]) => {
       setAgentLeads(updatedLeads);
-      localStorage.setItem('warehouseorigin_agent_leads', JSON.stringify(updatedLeads));
+      // In a real app, this would be an API call. For now, we update state.
   }
 
   const addAgentLead = (lead: Omit<AgentLead, 'id' | 'status'>) => {
@@ -484,7 +409,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const persistRegisteredLeads = (updatedLeads: RegisteredLead[]) => {
       setRegisteredLeads(updatedLeads);
-      localStorage.setItem('warehouseorigin_registered_leads', JSON.stringify(updatedLeads));
+      // In a real app, this would be an API call
   };
 
   const addRegisteredLead = (leadData: Omit<RegisteredLead, 'registeredAt'>) => {
@@ -520,7 +445,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   
   const persistActivities = (updatedActivities: TransactionActivity[]) => {
       setTransactionActivities(updatedActivities);
-      localStorage.setItem('warehouseorigin_transaction_activities', JSON.stringify(updatedActivities));
+      // In a real app, this would be an API call
   }
 
   const addTransactionActivity = (activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
@@ -535,7 +460,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   
   const persistTenantImprovements = (updatedSheets: TenantImprovementsSheet[]) => {
     setTenantImprovements(updatedSheets);
-    localStorage.setItem('warehouseorigin_tenant_improvements', JSON.stringify(updatedSheets));
+    // In a real app, this would be an API call
   }
   
   const getTenantImprovements = (leadId: string): TenantImprovementsSheet | null => {

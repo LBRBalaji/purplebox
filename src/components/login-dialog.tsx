@@ -74,28 +74,9 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-background px-2 text-muted-foreground">
-                    Or use a test account
+                    Or
                     </span>
                 </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-                <Button type="button" variant="outline" onClick={() => handleTestUserLogin('o2o@example.com')}>
-                    <Briefcase className="mr-2 h-4 w-4" />
-                    O2O Manager
-                </Button>
-                 <Button type="button" variant="outline" onClick={() => handleTestUserLogin('superadmin@example.com')}>
-                    <UserCog className="mr-2 h-4 w-4" />
-                    O2O Super Admin
-                </Button>
-                 <Button type="button" variant="outline" onClick={() => handleTestUserLogin('provider@example.com')}>
-                    <Building className="mr-2 h-4 w-4" />
-                    Warehouse Developer
-                </Button>
-                 <Button type="button" variant="outline" onClick={() => handleTestUserLogin('user@example.com')}>
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    Customer (Tenant)
-                </Button>
             </div>
 
             <div className="text-sm text-center text-muted-foreground pt-2 space-y-2">
