@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 
@@ -46,36 +46,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    let storedUsers;
+  const fetchUsers = useCallback(async () => {
     try {
-      // Use localStorage to persist user accounts across sessions
-      const usersFromStorage = localStorage.getItem('warehouseorigin_users');
-      storedUsers = usersFromStorage ? JSON.parse(usersFromStorage) : {};
-
-       // If no users exist, create a default admin user
-      if (Object.keys(storedUsers).length === 0) {
-          const defaultAdmin: User = {
-              email: 'admin@example.com',
-              role: 'SuperAdmin',
-              companyName: 'Admin Corp',
-              userName: 'Default Admin',
-              phone: 'N/A',
-              createdAt: new Date().toISOString()
-          };
-          storedUsers = { [defaultAdmin.email]: defaultAdmin };
-          localStorage.setItem('warehouseorigin_users', JSON.stringify(storedUsers));
-          console.log("No users found. Created default admin account.");
+      const response = await fetch('/api/users');
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
       }
-
-    } catch (e) {
-      console.error("Could not parse users from localStorage", e);
-      storedUsers = {};
+      const data = await response.json();
+      if (Object.keys(data).length === 0) {
+        const defaultAdmin: User = {
+            email: 'admin@example.com',
+            role: 'SuperAdmin',
+            companyName: 'Admin Corp',
+            userName: 'Default Admin',
+            phone: 'N/A',
+            createdAt: new Date().toISOString()
+        };
+        const initialUsers = { [defaultAdmin.email]: defaultAdmin };
+        await persistUsers(initialUsers);
+        setUsers(initialUsers);
+      } else {
+        setUsers(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users, starting with default admin if empty:", error);
+    } finally {
+      setIsLoading(false);
     }
+  }, []);
 
-    setUsers(storedUsers);
-    
-    // Check for a logged-in user in session storage on initial load
+  useEffect(() => {
+    fetchUsers();
     try {
       const storedUser = sessionStorage.getItem('user');
       if (storedUser) {
@@ -84,14 +85,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Could not parse user from session storage", error);
       sessionStorage.removeItem('user');
-    } finally {
-      setIsLoading(false);
     }
-  }, []);
+  }, [fetchUsers]);
 
-  const persistUsers = (updatedUsers: { [email: string]: User }) => {
-    setUsers(updatedUsers);
-    localStorage.setItem('warehouseorigin_users', JSON.stringify(updatedUsers));
+  const persistUsers = async (updatedUsers: { [email: string]: User }) => {
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUsers),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to persist users');
+      }
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error('Error saving users:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Save Failed',
+        description: 'Could not save user data to the server.',
+      });
+    }
   }
 
   const login = (email: string, onLoginSuccess?: () => void) => {
@@ -118,7 +133,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const companyName = details.companyName.toLowerCase();
     const emailDomain = email.split('@')[1];
 
-    // 1. Check for personal email domains
     if (personalEmailDomains.includes(emailDomain)) {
         toast({
             variant: "destructive",
@@ -128,7 +142,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
     }
 
-    // 2. Check for competitor keywords
     const searchString = `${email} ${companyName}`;
     const foundKeyword = competitorKeywords.find(keyword => searchString.includes(keyword));
     if (foundKeyword) {
@@ -142,11 +155,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
     }
 
-    // 3. Add user if validation passes
     const newUserWithTimestamp: User = { ...details, createdAt: new Date().toISOString() };
     addUser(newUserWithTimestamp);
 
-    // Log the new user in
     setUser(newUserWithTimestamp);
     sessionStorage.setItem('user', JSON.stringify(newUserWithTimestamp));
     router.push('/dashboard');
@@ -158,7 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/');
   };
 
-  const addUser = (details: NewUser) => {
+  const addUser = async (details: NewUser) => {
     if (users[details.email.toLowerCase()]) {
       toast({
         variant: "destructive",
@@ -169,10 +180,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const newUserWithTimestamp: User = { ...details, createdAt: new Date().toISOString() };
     const newUsers = { ...users, [details.email.toLowerCase()]: newUserWithTimestamp };
-    persistUsers(newUsers);
+    await persistUsers(newUsers);
   };
   
-  const updateUser = (details: NewUser) => {
+  const updateUser = async (details: NewUser) => {
     const existingUser = users[details.email.toLowerCase()];
     if (!existingUser) {
       toast({
@@ -184,16 +195,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const updatedUser: User = { ...existingUser, ...details };
     const newUsers = { ...users, [details.email.toLowerCase()]: updatedUser };
-    persistUsers(newUsers);
+    await persistUsers(newUsers);
 
-    // If the updated user is the currently logged-in user, update session storage as well
     if (user?.email === details.email) {
       setUser(updatedUser);
       sessionStorage.setItem('user', JSON.stringify(updatedUser));
     }
   };
 
-  const deleteUser = (email: string) => {
+  const deleteUser = async (email: string) => {
     if (email === 'admin@example.com') {
         toast({
             variant: "destructive",
@@ -204,7 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const newUsers = { ...users };
     delete newUsers[email.toLowerCase()];
-    persistUsers(newUsers);
+    await persistUsers(newUsers);
 
     if (user?.email === email) {
       logout();
