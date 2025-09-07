@@ -1,2 +1,71 @@
-
-[]
+[
+  {
+    "demandId": "DMD-1757245914521",
+    "createdAt": "2025-09-07T11:52:16.190Z",
+    "companyName": "Alpha Logistics",
+    "userName": "Alex Ray",
+    "userEmail": "customer1@o2o.com",
+    "userPhone": "2345678901",
+    "operationType": "Warehousing",
+    "location": "12.736902, 80.014366",
+    "locationName": "Mahindra World City",
+    "radius": 6,
+    "size": 250000,
+    "sizeMin": 200000,
+    "sizeMax": 2650000,
+    "sizeVariationPercentage": 10,
+    "ceilingHeight": 11,
+    "ceilingHeightUnit": "m",
+    "docks": 10,
+    "powerMin": 200,
+    "powerMax": 300,
+    "readiness": "Immediate",
+    "description": "test meeting",
+    "buildingType": "PEB",
+    "preferences": {
+      "nonCompromisable": [
+        "size",
+        "buildingType",
+        "ceilingHeight",
+        "docks",
+        "power",
+        "approvals",
+        "fireNoc",
+        "fireSafety"
+      ],
+      "approvals": "Must to have",
+      "fireNoc": "Must to have",
+      "fireSafety": "Must to have"
+    },
+    "optionals": {
+      "officeSpaceMin": 3000,
+      "officeSpaceMax": 5000,
+      "cafeteriaOrCanteen": "Cafeteria",
+      "seatingCapacity": 40,
+      "additionalToiletsMen": 5,
+      "additionalToiletsWomen": 5,
+      "truckParkingYardMin": 15000,
+      "truckParkingYardMax": 25000,
+      "openStorageYardMin": 20000,
+      "openStorageYardMax": 30000,
+      "tenantSpecificImprovements": "test tenant",
+      "processWaterRequirement": 100,
+      "hvacArea": "130000",
+      "sprinklerRequirement": "Yes",
+      "crane": {
+        "required": true,
+        "type": "EOT",
+        "count": 2,
+        "transverseLength": 120,
+        "span": 30,
+        "underhookHeight": 7,
+        "capacity": 10
+      },
+      "lightingRequirement": "200 lux"
+    },
+    "operations": {
+      "etpDetails": "",
+      "effluentCharacteristics": ""
+    }
+  }
+]

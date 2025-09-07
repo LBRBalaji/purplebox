@@ -271,7 +271,7 @@ function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | und
 }
 
 
-export function PropertyForm() {
+export function PropertyForm({ demandId }: { demandId: string | null }) {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -286,12 +286,9 @@ export function PropertyForm() {
   const [isCommercialsOpen, setIsCommercialsOpen] = React.useState(true);
   const [isAdditionalInfoOpen, setIsAdditionalInfoOpen] = React.useState(false);
   
-  const demandIdFromUrl = searchParams.get('demandId');
-  const isMatchingMode = !!demandIdFromUrl;
-
   const demandToMatch = React.useMemo(() => 
-    demands.find(d => d.demandId === demandIdFromUrl),
-    [demands, demandIdFromUrl]
+    demands.find(d => d.demandId === demandId),
+    [demands, demandId]
   );
   
   const propertySchema = React.useMemo(() => createPropertySchema(demandToMatch), [demandToMatch]);
@@ -405,13 +402,13 @@ export function PropertyForm() {
   }, [form, user]);
 
   React.useEffect(() => {
-    if (demandIdFromUrl) {
-      form.setValue('o2oDealDemandId', demandIdFromUrl, { shouldValidate: true });
+    if (demandId) {
+      form.setValue('o2oDealDemandId', demandId, { shouldValidate: true });
     }
     if (demandToMatch) {
        form.setValue('ceilingHeightUnit', demandToMatch.ceilingHeightUnit || 'ft');
     }
-  }, [searchParams, form, demandIdFromUrl, demandToMatch]);
+  }, [searchParams, form, demandId, demandToMatch]);
   
   const onFinalSubmit = (data: PropertySchema) => {
       try {
@@ -482,7 +479,7 @@ export function PropertyForm() {
   }
   
 
-  if (!isMatchingMode || !demandToMatch) {
+  if (!demandId || !demandToMatch) {
     return (
         <Card>
             <CardHeader>

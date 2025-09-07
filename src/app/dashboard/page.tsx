@@ -67,7 +67,9 @@ const MainDashboard = () => {
         <TabsContent value="active-demands"><DemandList /></TabsContent>
         <TabsContent value="my-listings"><ProviderListings /></TabsContent>
         <TabsContent value="registered-leads"><ProviderLeads /></TabsContent>
-        <TabsContent value="submit-match"><PropertyForm /></TabsContent>
+        <TabsContent value="submit-match">
+          <PropertyForm demandId={propertyMatchDemandId} />
+        </TabsContent>
       </Tabs>
     );
 
