@@ -384,7 +384,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                     <FormField control={form.control} name="description" render={({ field }) => (
                         <FormItem>
                             <FormControl>
-                                <Textarea {...field} placeholder="Describe the key features of your property, or generate one with AI." className="min-h-32"/>
+                                <Textarea {...field} value={field.value ?? ''} placeholder="Describe the key features of your property, or generate one with AI." className="min-h-32"/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
