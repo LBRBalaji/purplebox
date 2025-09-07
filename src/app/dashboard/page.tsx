@@ -36,7 +36,7 @@ const MainDashboard = () => {
     const [providerTab, setProviderTab] = React.useState('active-demands');
     const [customerTab, setCustomerTab] = React.useState('my-demands');
     const [adminTab, setAdminTab] = React.useState('approval-queue');
-    const [superAdminTab, setSuperAdminTab] = React.useState('approval-queue');
+    const [superAdminTab, setSuperAdminTab] = React.useState('all-listings');
 
     const hasPendingSubmissions = React.useMemo(() => {
         return submissions.some(s => s.status === 'Pending');
@@ -120,27 +120,20 @@ const MainDashboard = () => {
     // Super Admin gets a super-view with all possible tabs
     const renderMainAdminContent = () => (
        <Tabs value={superAdminTab} onValueChange={setSuperAdminTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="approval-queue">
-                Approval Queue 
-                {hasPendingSubmissions && <span className="ml-2 h-2 w-2 rounded-full bg-destructive animate-ping"></span>}
-            </TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="all-listings">All Listings</TabsTrigger>
             <TabsTrigger value="all-demands">All Demands</TabsTrigger>
             <TabsTrigger value="all-submissions">All Submissions</TabsTrigger>
-            <TabsTrigger value="all-listings">All Listings</TabsTrigger>
             <TabsTrigger value="all-leads">All Leads</TabsTrigger>
         </TabsList>
-        <TabsContent value="approval-queue">
-            {superAdminTab === 'approval-queue' && <ApprovalQueue />}
+        <TabsContent value="all-listings">
+            {superAdminTab === 'all-listings' && <AdminListings />}
         </TabsContent>
         <TabsContent value="all-demands">
             {superAdminTab === 'all-demands' && <DemandList />}
         </TabsContent>
         <TabsContent value="all-submissions">
             {superAdminTab === 'all-submissions' && <MySubmissions />}
-        </TabsContent>
-        <TabsContent value="all-listings">
-            {superAdminTab === 'all-listings' && <AdminListings />}
         </TabsContent>
         <TabsContent value="all-leads">
             {superAdminTab === 'all-leads' && <ProviderLeads />}
