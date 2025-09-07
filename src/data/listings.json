@@ -1,5 +1,54 @@
-
 [
+  {
+    "listingId": "LST-ELTUE2",
+    "developerId": "wd1@o2o.com",
+    "status": "approved",
+    "warehouseBoxId": "WBX-PRIM-11EQ",
+    "name": "LBR 2",
+    "location": "Mappedu",
+    "sizeSqFt": 150000,
+    "description": "",
+    "rentPerSqFt": 38,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "40",
+    "serviceModel": "Standard",
+    "area": {
+      "plinthArea": 139000,
+      "mezzanineArea1": 4000,
+      "canopyArea": 5000,
+      "driversRestRoomArea": 1000,
+      "totalChargeableArea": 165000
+    },
+    "buildingSpecifications": {
+      "buildingType": "PEB",
+      "numberOfDocksAndShutters": 15,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
+      "craneAvailable": true,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar Road"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": []
+  },
   {
     "listingId": "LST-ZNHZYG",
     "developerId": "wd1@o2o.com",

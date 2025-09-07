@@ -10,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
 import { GenerateListingDescriptionInputSchema } from '@/lib/schema';
 import type { GenerateListingDescriptionInput } from '@/lib/schema';
@@ -26,6 +27,7 @@ export async function generateListingDescription(input: GenerateListingDescripti
 
 const prompt = ai.definePrompt({
   name: 'generateListingDescriptionPrompt',
+  model: googleAI.model('gemini-1.5-flash-latest'),
   input: {schema: GenerateListingDescriptionInputSchema},
   output: {schema: GenerateListingDescriptionOutputSchema},
   prompt: `You are an expert real estate copywriter specializing in industrial and warehouse properties.
