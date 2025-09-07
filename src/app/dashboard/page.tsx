@@ -166,11 +166,18 @@ const MainDashboard = () => {
 
 
 export default function DashboardPage() {
+  const searchParams = useSearchParams();
+  const propertyMatchDemandId = searchParams.get('demandId');
+
+  // This key ensures the component re-mounts when the demandId changes,
+  // which is crucial for the PropertyForm to get the correct initial state.
+  const componentKey = propertyMatchDemandId || 'main-dashboard';
+
   return (
     <main className="container mx-auto p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <React.Suspense fallback={<div>Loading...</div>}>
-            <MainDashboard />
+            <MainDashboard key={componentKey} />
         </React.Suspense>
         <AdminNotifier />
       </div>

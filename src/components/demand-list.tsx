@@ -66,7 +66,7 @@ function DemandCard({ demand }: { demand: DemandSchema }) {
   const [potentialMatches, setPotentialMatches] = React.useState<ListingSchema[]>([]);
 
   React.useEffect(() => {
-      if (user?.role === 'SuperAdmin' && user.email && demand.location) {
+      if (user?.role === 'Warehouse Developer' && user.email && demand.location) {
           const providerListings = listings.filter(l => l.developerId === user.email && l.status === 'approved');
           const [demandLat, demandLng] = demand.location.split(',').map(Number);
           
