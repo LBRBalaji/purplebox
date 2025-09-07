@@ -18,6 +18,7 @@ import { useData } from '@/contexts/data-context';
 import { ProviderListings } from '@/components/provider-listings';
 import { ProviderLeads } from '@/components/provider-leads';
 import { CustomerTransactions } from '@/components/customer-transactions';
+import { AdminListings } from '@/components/admin-listings';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -139,7 +140,7 @@ const MainDashboard = () => {
             {superAdminTab === 'all-submissions' && <MySubmissions />}
         </TabsContent>
         <TabsContent value="all-listings">
-            {superAdminTab === 'all-listings' && <ProviderListings />}
+            {superAdminTab === 'all-listings' && <AdminListings />}
         </TabsContent>
         <TabsContent value="all-leads">
             {superAdminTab === 'all-leads' && <ProviderLeads />}

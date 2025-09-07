@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import * as React from 'react';
 
-export default function ManageListingsPage() {
+export default function ListingsPerformancePage() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
 
