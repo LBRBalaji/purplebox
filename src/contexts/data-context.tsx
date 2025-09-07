@@ -176,26 +176,60 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // This can be used if we need to load from local storage in the future
   }, [toast]);
 
-  const persistListings = async (updatedListings: ListingSchema[]) => {
+  const persistData = async (endpoint: string, data: any, entityName: string) => {
     try {
-        const response = await fetch('/api/listings', {
+        const response = await fetch(`/api/${endpoint}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedListings)
+            body: JSON.stringify(data)
         });
         if (!response.ok) {
-            throw new Error('Failed to save listings to the server.');
+            throw new Error(`Failed to save ${entityName} to the server.`);
         }
-        setListings(updatedListings);
     } catch (error) {
-        console.error("Error persisting listings:", error);
+        console.error(`Error persisting ${entityName}:`, error);
         toast({
             variant: "destructive",
             title: "Data Sync Error",
-            description: "Could not save listing changes to the server."
+            description: `Could not save ${entityName} changes to the server.`
         });
     }
+  }
+
+  const persistListings = (updatedListings: ListingSchema[]) => {
+    setListings(updatedListings);
+    persistData('listings', updatedListings, 'listings');
   };
+  
+  const persistDemands = (updatedDemands: DemandSchema[]) => {
+    setDemands(updatedDemands);
+    persistData('demands', updatedDemands, 'demands');
+  };
+
+  const persistSubmissions = (updatedSubmissions: Submission[]) => {
+    setSubmissions(updatedSubmissions);
+    persistData('submissions', updatedSubmissions, 'submissions');
+  };
+
+  const persistAgentLeads = (updatedLeads: AgentLead[]) => {
+      setAgentLeads(updatedLeads);
+      persistData('agent-leads', updatedLeads, 'agent leads');
+  }
+
+  const persistRegisteredLeads = (updatedLeads: RegisteredLead[]) => {
+      setRegisteredLeads(updatedLeads);
+      persistData('registered-leads', updatedLeads, 'registered leads');
+  };
+  
+  const persistActivities = (updatedActivities: TransactionActivity[]) => {
+      setTransactionActivities(updatedActivities);
+      persistData('transaction-activities', updatedActivities, 'transaction activities');
+  }
+  
+  const persistTenantImprovements = (updatedSheets: TenantImprovementsSheet[]) => {
+    setTenantImprovements(updatedSheets);
+    persistData('tenant-improvements', updatedSheets, 'tenant improvements');
+  }
 
   const addListing = (listing: ListingSchema, userEmail?: string) => {
     const newListings = [{ ...listing, status: 'pending' as const }, ...listings];
@@ -240,12 +274,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }
 
-
-  const persistAgentLeads = (updatedLeads: AgentLead[]) => {
-      setAgentLeads(updatedLeads);
-      // In a real app, this would be an API call. For now, we update state.
-  }
-
   const addAgentLead = (lead: Omit<AgentLead, 'id' | 'status'>) => {
       const newLead: AgentLead = { 
         ...lead, 
@@ -263,7 +291,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addDemand = (demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => {
     const newDemand = { ...demand, createdAt: new Date().toISOString() };
-    setDemands((prev) => [newDemand, ...prev]);
+    const newDemands = [newDemand, ...demands];
+    persistDemands(newDemands);
     setLastEvent({
       type: 'new_demand',
       id: demand.demandId,
@@ -273,11 +302,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const updateDemand = (updatedDemand: DemandSchema) => {
-    setDemands((prev) =>
-      prev.map((demand) =>
+    const newDemands = demands.map((demand) =>
         demand.demandId === updatedDemand.demandId ? updatedDemand : demand
-      )
     );
+    persistDemands(newDemands);
   };
 
   const addSubmission = (submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => {
@@ -289,7 +317,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         demandUserEmail: demand?.userEmail,
         status: 'Pending', 
     };
-    setSubmissions((prev) => [submissionWithDefaults, ...prev]);
+    const newSubmissions = [submissionWithDefaults, ...submissions];
+    persistSubmissions(newSubmissions);
     setLastEvent({
         type: 'new_submission',
         id: submission.demandId,
@@ -299,11 +328,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const updateSubmissionStatus = (submissionId: string, status: SubmissionStatus) => {
-    setSubmissions(prev =>
-      prev.map(sub =>
+    const newSubmissions = submissions.map(sub =>
         sub.submissionId === submissionId ? { ...sub, status, isNew: status === 'Approved' ? true : sub.isNew } : sub
-      )
     );
+    persistSubmissions(newSubmissions);
     if (status === 'Rejected') {
       setShortlistedItems(prev => prev.filter(item => item.submissionId !== submissionId));
     }
@@ -328,11 +356,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const clearNewSubmissions = (submissionIds: string[]) => {
     const idsToClear = new Set(submissionIds);
-    setSubmissions(prev => 
-        prev.map(sub => 
+    const newSubmissions = submissions.map(sub => 
             idsToClear.has(sub.submissionId) ? { ...sub, isNew: false } : sub
-        )
     );
+    persistSubmissions(newSubmissions);
   };
   
   const getTodaysTotalDownloads = (userId: string): number => {
@@ -434,11 +461,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setSelectedForDownload([]);
   };
 
-  const persistRegisteredLeads = (updatedLeads: RegisteredLead[]) => {
-      setRegisteredLeads(updatedLeads);
-      // In a real app, this would be an API call
-  };
-
   const addRegisteredLead = (leadData: Omit<RegisteredLead, 'registeredAt'>) => {
     const newLead: RegisteredLead = {
       ...leadData,
@@ -470,11 +492,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     persistRegisteredLeads(updatedLeads);
   };
   
-  const persistActivities = (updatedActivities: TransactionActivity[]) => {
-      setTransactionActivities(updatedActivities);
-      // In a real app, this would be an API call
-  }
-
   const addTransactionActivity = (activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
       const newActivity: TransactionActivity = {
           ...activityData,
@@ -484,11 +501,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const updatedActivities = [newActivity, ...transactionActivities];
       persistActivities(updatedActivities);
   };
-  
-  const persistTenantImprovements = (updatedSheets: TenantImprovementsSheet[]) => {
-    setTenantImprovements(updatedSheets);
-    // In a real app, this would be an API call
-  }
   
   const getTenantImprovements = (leadId: string): TenantImprovementsSheet | null => {
     return tenantImprovements.find(sheet => sheet.leadId === leadId) || null;
