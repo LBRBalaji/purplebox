@@ -50,7 +50,7 @@ export const listingSchema = z.object({
 
   // Building Specifications
   buildingSpecifications: z.object({
-    buildingType: z.string().optional(),
+    buildingType: z.array(z.string()).optional(),
     shopFloorLevelDimension: z.string().optional(),
     mezzanineFloorLevelHeightAndDimension: z.string().optional(),
     numberOfDocksAndShutters: asOptionalField(z.coerce.number()),
@@ -72,9 +72,9 @@ export const listingSchema = z.object({
 
   // Site Specifications
   siteSpecifications: z.object({
-    typeOfFlooringInside: z.string().optional(),
+    typeOfFlooringInside: z.enum(['FM2', 'VDF-RCC', 'RCC', 'PCC']).optional(),
     typeOfFlooringOutside: z.string().optional(),
-    typeOfRoad: z.string().optional(),
+    typeOfRoad: z.enum(['Tar', 'RCC', 'PCC', 'Gravel']).optional(),
   }),
   
   // Certificates & Approvals
@@ -122,7 +122,7 @@ export const GenerateListingDescriptionInputSchema = z.object({
   availabilityDate: z.string().describe('The readiness of the property for occupancy (e.g., "Ready for Occupancy").'),
   serviceModel: z.enum(['Standard', '3PL', 'Both']).optional().describe('The service model (Standard warehouse, 3PL, or both).'),
   rentPerSqFt: z.number().optional().describe('The rent per square foot.'),
-  buildingType: z.string().optional().describe('The type of building (e.g., "PEB").'),
+  buildingType: z.array(z.string()).optional().describe('The type of building (e.g., ["PEB", "RCC"]).'),
   roofType: z.string().optional().describe("The material and type of the roof."),
   eveHeightMeters: z.number().optional().describe("The eve height in meters."),
 });
@@ -450,7 +450,7 @@ const TrendingSpecSchema = z.object({
 export const PredictDemandTrendsOutputSchema = z.object({
   marketOutlook: z.string().describe('A summary of the predicted market outlook for the upcoming period, including key trends and shifts.'),
   predictedHotspots: z.array(PredictedHotspotSchema).describe('A list of geographic locations where demand is expected to increase.'),
-  trendingSpecifications: z.array(TrendingSpecSchema).describe('A list of warehouse specifications that are predicted to be in high demand.'),
+  trendingSpecifications: z.array(TrendingSpecSchema).describe('A list of specifications that are predicted to be in high demand.'),
 });
 export type PredictDemandTrendsOutput = z.infer<typeof PredictDemandTrendsOutputSchema>;
 
@@ -475,4 +475,5 @@ export const acknowledgmentSchema = z.object({
   email: z.string().email(),
 });
 export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;
+
 

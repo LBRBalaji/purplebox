@@ -50,6 +50,11 @@ type ListingFormProps = {
   onSubmit: (data: ListingSchema) => void;
 };
 
+const buildingTypes = [
+    { id: 'PEB', label: 'PEB' },
+    { id: 'RCC', label: 'RCC' },
+];
+
 export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: ListingFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -80,6 +85,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
         totalChargeableArea: undefined,
       },
       buildingSpecifications: {
+        buildingType: [],
         craneSupportStructureAvailable: false,
         craneAvailable: false,
         warehouseLayoutAvailable: false,
@@ -117,15 +123,27 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 warehouseBoxId: `WBX-${user?.companyName?.substring(0,4).toUpperCase() || 'NEW'}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
                 name: '',
                 location: '',
+                sizeSqFt: undefined,
                 description: '',
+                rentPerSqFt: undefined,
+                rentalSecurityDeposit: undefined,
                 availabilityDate: 'Ready for Occupancy',
                 constructionProgress: '',
                 serviceModel: 'Standard',
-                area: {},
+                area: {
+                  plinthArea: undefined,
+                  mezzanineArea1: undefined,
+                  mezzanineArea2: undefined,
+                  canopyArea: undefined,
+                  driversRestRoomArea: undefined,
+                  totalChargeableArea: undefined,
+                },
                 buildingSpecifications: {
-                    craneSupportStructureAvailable: false,
-                    craneAvailable: false,
-                    warehouseLayoutAvailable: false,
+                  buildingType: [],
+                  craneSupportStructureAvailable: false,
+                  craneAvailable: false,
+                  warehouseLayoutAvailable: false,
+                  louvers: false,
                 },
                 siteSpecifications: {},
                 certificatesAndApprovals: {
@@ -211,10 +229,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 <FormLabel className="text-lg font-semibold">General Information</FormLabel>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md">
                     <FormField control={form.control} name="name" render={({ field }) => (
-                        <FormItem><FormLabel>Warehouse Name</FormLabel><FormControl><Input {...field} placeholder="e.g. Prime Logistics Park - Unit A" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Warehouse Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Prime Logistics Park - Unit A" /></FormControl><FormMessage /></FormItem>
                     )} />
                      <FormField control={form.control} name="location" render={({ field }) => (
-                        <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
                     )} />
                      <FormField control={form.control} name="sizeSqFt" render={({ field }) => (
                         <FormItem><FormLabel>Total Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
@@ -275,8 +293,46 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                      <div className="space-y-4">
                         <FormLabel className="text-lg font-semibold">Building Specifications</FormLabel>
                         <div className="space-y-4 p-4 border rounded-md">
-                             <FormField control={form.control} name="buildingSpecifications.buildingType" render={({ field }) => (
-                                <FormItem><FormLabel>Building Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., PEB" /></FormControl><FormMessage /></FormItem>
+                             <FormField control={form.control} name="buildingSpecifications.buildingType" render={() => (
+                                <FormItem>
+                                    <FormLabel>Building Type</FormLabel>
+                                    <div className="flex flex-wrap gap-4 pt-2">
+                                    {buildingTypes.map((item) => (
+                                        <FormField
+                                        key={item.id}
+                                        control={form.control}
+                                        name="buildingSpecifications.buildingType"
+                                        render={({ field }) => {
+                                            return (
+                                            <FormItem
+                                                key={item.id}
+                                                className="flex flex-row items-start space-x-3 space-y-0"
+                                            >
+                                                <FormControl>
+                                                <Checkbox
+                                                    checked={field.value?.includes(item.id)}
+                                                    onCheckedChange={(checked) => {
+                                                    return checked
+                                                        ? field.onChange([...(field.value || []), item.id])
+                                                        : field.onChange(
+                                                            field.value?.filter(
+                                                            (value) => value !== item.id
+                                                            )
+                                                        )
+                                                    }}
+                                                />
+                                                </FormControl>
+                                                <FormLabel className="font-normal">
+                                                {item.label}
+                                                </FormLabel>
+                                            </FormItem>
+                                            )
+                                        }}
+                                        />
+                                    ))}
+                                    </div>
+                                    <FormMessage />
+                                </FormItem>
                             )} />
                             <FormField control={form.control} name="buildingSpecifications.numberOfDocksAndShutters" render={({ field }) => (
                                 <FormItem><FormLabel>Number of Docks/Shutters</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
@@ -323,13 +379,13 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         <FormLabel className="text-lg font-semibold">Site &amp; Roof</FormLabel>
                         <div className="space-y-4 p-4 border rounded-md">
                              <FormField control={form.control} name="siteSpecifications.typeOfFlooringInside" render={({ field }) => (
-                                <FormItem><FormLabel>Inside Flooring Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., FM2 Grade, 8-ton point load" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Inside Flooring Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="FM2">FM2</SelectItem><SelectItem value="VDF-RCC">VDF-RCC</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="PCC">PCC</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name="siteSpecifications.typeOfFlooringOutside" render={({ field }) => (
                                 <FormItem><FormLabel>Outside Flooring Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., VDF Concrete" /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name="siteSpecifications.typeOfRoad" render={({ field }) => (
-                                <FormItem><FormLabel>Access Road Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., Tar road, 4-lane access" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Access Road Flooring</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Tar">Tar</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="PCC">PCC</SelectItem><SelectItem value="Gravel">Gravel</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                             )} />
                              <Separator />
                             <FormField control={form.control} name="buildingSpecifications.roofType" render={({ field }) => (<FormItem><FormLabel>Roof Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Galvalume">Galvalume</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="ACC">ACC</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
@@ -363,7 +419,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                     {fields.map((field, index) => (
                         <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                             <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
-                                <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name={`documents.${index}.type`} render={({ field }) => (
                                 <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
@@ -373,7 +429,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                 </SelectContent></Select><FormMessage /></FormItem>
                             )} />
                             <FormField control={form.control} name={`documents.${index}.url`} render={({ field }) => (
-                                <FormItem><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://" /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>URL</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="https://" /></FormControl><FormMessage /></FormItem>
                             )} />
                             <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
                                 <Trash2 className="h-4 w-4" />
