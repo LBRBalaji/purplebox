@@ -292,7 +292,7 @@ export default function ListingDetailPage() {
                 'Name': listing.name,
                 'Location': listing.location,
                 'Total Area (Sq. Ft.)': listing.sizeSqFt,
-                'Building Type': listing.buildingSpecifications.buildingType,
+                'Building Type': Array.isArray(listing.buildingSpecifications.buildingType) ? listing.buildingSpecifications.buildingType.join(', ') : listing.buildingSpecifications.buildingType,
                 'Availability': listing.availabilityDate,
                 'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
                 'Shop Floor Dimension': listing.buildingSpecifications.shopFloorLevelDimension,
@@ -447,7 +447,7 @@ export default function ListingDetailPage() {
                                     </Carousel>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                                         <InfoPill icon={Scaling} label="Total Area" value={`${listing.sizeSqFt.toLocaleString()} sft`} />
-                                        <InfoPill icon={Building2} label="Building Type" value={listing.buildingSpecifications.buildingType} />
+                                        <InfoPill icon={Building2} label="Building Type" value={Array.isArray(listing.buildingSpecifications.buildingType) ? listing.buildingSpecifications.buildingType.join(' / ') : 'N/A'} />
                                         <InfoPill icon={Calendar} label="Availability" value={listing.availabilityDate} />
                                         <InfoPill icon={HardHat} label="Docks" value={listing.buildingSpecifications.numberOfDocksAndShutters} />
                                     </div>

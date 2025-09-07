@@ -46,7 +46,7 @@ function ProviderListingCard({ listing, onStatusChange, onEdit }: { listing: Lis
                   {listing.name}
                 </Link>
               </CardTitle>
-              <CardDescription>{listing.location} - {listing.sizeSqFt.toLocaleString()} sq. ft.</CardDescription>
+              <CardDescription>{listing.listingId}</CardDescription>
             </div>
              <Badge className={status.className}><StatusIcon className="mr-1.5 h-3 w-3" /> {status.text}</Badge>
         </div>

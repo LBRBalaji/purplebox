@@ -158,6 +158,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                     </Badge>
                 )}
                 <CardTitle className="leading-tight">{listing.name}</CardTitle>
+                <CardDescription>ID: {listing.listingId}</CardDescription>
                 <CardDescription className="flex items-center gap-1.5 pt-1">
                     <MapPin className="h-4 w-4" /> {listing.location}
                 </CardDescription>
