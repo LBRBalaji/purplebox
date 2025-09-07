@@ -369,7 +369,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return uniqueTimestamps.size;
   };
 
-  const logDownload = (userId: string): { success: boolean; limitReached: boolean } => {
+  const logDownload = (userId: string) => {
     const todaysTotalDownloads = getTodaysTotalDownloads(userId);
 
     if (todaysTotalDownloads >= 2) {
