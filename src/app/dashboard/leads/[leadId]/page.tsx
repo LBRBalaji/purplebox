@@ -58,7 +58,7 @@ function DeveloperSelection({ lead, onSelect }: { lead: RegisteredLead, onSelect
             <CardContent className="space-y-4">
                 {lead.providers.map(provider => {
                     const devUser = users[provider.providerEmail];
-                    const devListings = provider.listingIds.map(id => listings.find(l => l.listingId === id)).filter((l): l is ListingSchema => !!l);
+                    const devListings = (provider.listingIds || []).map(id => listings.find(l => l.listingId === id)).filter((l): l is ListingSchema => !!l);
                     return (
                         <button key={provider.providerEmail} onClick={() => onSelect(provider, devListings)} className="w-full text-left p-4 border rounded-lg hover:bg-accent transition-colors flex justify-between items-center">
                             <div>
@@ -99,13 +99,14 @@ export default function LeadDetailPage() {
         return;
     }
     
-    const isAdminOrO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
+    const isSuperAdmin = user?.role === 'SuperAdmin';
+    const isO2O = user?.role === 'O2O';
     const isProviderForThisLead = foundLead.providers.some(p => p.providerEmail === user?.email);
     const isCustomerOfThisLead = foundLead.customerId === user?.email;
     const isAgentOfThisLead = foundLead.registeredBy === user?.email;
+    const isPremiumAgent = isAgentOfThisLead && user?.plan === 'Paid_Premium';
 
-
-    if (isAdminOrO2O || isProviderForThisLead || isCustomerOfThisLead || isAgentOfThisLead) {
+    if (isSuperAdmin || isO2O || isProviderForThisLead || isCustomerOfThisLead || isAgentOfThisLead) {
         setLead(foundLead);
         const leadActivities = transactionActivities
             .filter(a => a.leadId === leadId)
@@ -115,7 +116,7 @@ export default function LeadDetailPage() {
         // If there's only one provider, automatically select them
         if (foundLead.providers.length === 1) {
             const provider = foundLead.providers[0];
-            const devListings = provider.listingIds.map(id => listings.find(l => l.listingId === id)).filter((l): l is ListingSchema => !!l);
+            const devListings = (provider.listingIds || []).map(id => listings.find(l => l.listingId === id)).filter((l): l is ListingSchema => !!l);
             setSelectedProvider(provider);
             setSelectedProviderListings(devListings);
         }
@@ -155,7 +156,7 @@ export default function LeadDetailPage() {
     <main className="container mx-auto p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-            {selectedProvider ? (
+            {lead.providers.length > 1 && selectedProvider ? (
                 <Button variant="ghost" onClick={() => setSelectedProvider(null)} className="mb-4">
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Developer Selection
                 </Button>
