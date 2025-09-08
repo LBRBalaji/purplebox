@@ -186,7 +186,7 @@ export default function LeadDetailPage() {
   const isProvider = user?.role === 'Warehouse Developer';
 
   const providerDetailsForUser = lead.providers.find(p => p.providerEmail === user?.email);
-  const isAnyPropertyPending = isProvider && providerDetailsForUser?.properties.some(p => p.status === 'Pending');
+  const isAnyPropertyPending = isProvider && providerDetailsForUser?.properties?.some(p => p.status === 'Pending');
   
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=registered-leads' : '/dashboard/transactions';
 
