@@ -31,7 +31,7 @@
       },
       "postalAddress": {
         "agreedTerms": "123 Industrial Way, Oragadam, Chennai",
-        "proposedBy": "Provider",
+        "proposedBy": "Customer",
         "status": "Agreed"
       },
       "buildingNumber": {
@@ -41,7 +41,7 @@
       },
       "googleCoordinates": {
         "agreedTerms": "12.83, 79.95",
-        "proposedBy": "Provider",
+        "proposedBy": "Customer",
         "status": "Agreed"
       },
       "buildingStatus": {
@@ -53,8 +53,8 @@
     "area": {
       "plinthArea": {
         "agreedTerms": "450000",
-        "proposedBy": "Provider",
-        "status": "Reserved For Discussion"
+        "proposedBy": "Customer",
+        "status": "Agreed"
       },
       "mezzanineArea1": {
         "agreedTerms": "6000",
@@ -64,19 +64,21 @@
       "mezzanineArea2": {
         "agreedTerms": "0",
         "proposedBy": "Provider",
-        "status": "Not Applicable"
+        "status": "Reserved For Discussion"
       },
       "canopyArea": {
         "agreedTerms": "7000",
+        "proposedBy": "Customer",
         "status": "Agreed"
       },
       "driversRestRoom": {
         "agreedTerms": "2000",
-        "status": "Agreed"
+        "proposedBy": "Customer",
+        "status": "Reserved For Discussion"
       },
       "totalChargeableArea": {
         "agreedTerms": "450000",
-        "proposedBy": "Provider",
+        "proposedBy": "Customer",
         "status": "Reserved For Discussion"
       }
     },
@@ -88,12 +90,12 @@
       },
       "leaseLockIn": {
         "agreedTerms": "1 years",
-        "proposedBy": "Customer",
+        "proposedBy": "Provider",
         "status": "Agreed"
       },
       "rentEscalation": {
         "agreedTerms": "15% every 3 years",
-        "proposedBy": "Customer",
+        "proposedBy": "Provider",
         "status": "Reserved For Discussion"
       }
     },
@@ -110,7 +112,7 @@
       },
       "totalRentPerMonth": {
         "agreedTerms": "11250000",
-        "proposedBy": "Provider",
+        "proposedBy": "Customer",
         "status": "Agreed"
       },
       "camCharges": {
@@ -124,7 +126,7 @@
         "status": "Agreed"
       },
       "capexItems": [],
-      "netCostPerMonth": 3750000
+      "netCostPerMonth": 11250000
     },
     "actionableItems": [
       {

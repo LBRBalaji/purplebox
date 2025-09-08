@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from './ui/checkbox';
 import { Separator } from './ui/separator';
 import { useAuth } from '@/contexts/auth-context';
+import { cn } from '@/lib/utils';
 
 const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; title: string, description?: string }) => {
     const Icon = icon;
@@ -41,9 +42,10 @@ const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; 
 
 const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: any; label: string; control: any; form: any, isTextarea?: boolean, disabled?: boolean }) => {
     const InputComponent = isTextarea ? Textarea : Input;
+    const status = form.watch(`${name}.status`);
 
     return (
-         <div className="grid grid-cols-12 gap-x-6 gap-y-2 py-4 border-b">
+         <div className={cn("grid grid-cols-12 gap-x-6 gap-y-2 py-4 border-b", status === 'Reserved For Discussion' && 'bg-amber-100/50 rounded-md p-4')}>
             <div className="col-span-12 md:col-span-3"><FormLabel>{label}</FormLabel></div>
             <div className="col-span-12 md:col-span-4">
                 <FormField control={control} name={`${name}.agreedTerms`} render={({ field }) => (
@@ -506,3 +508,5 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
         </div>
     );
 }
+
+    
