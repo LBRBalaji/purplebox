@@ -97,8 +97,38 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 
 
 const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any }) => {
-    const { control, watch } = useFormContext<CommercialTermsSchema>();
+    const { control, watch, setValue } = useFormContext<CommercialTermsSchema>();
     
+    const watchedAreaFields = watch([
+        `sessions.${sessionIndex}.area.plinthArea.agreedTerms`,
+        `sessions.${sessionIndex}.area.mezzanineArea1.agreedTerms`,
+        `sessions.${sessionIndex}.area.mezzanineArea2.agreedTerms`,
+        `sessions.${sessionIndex}.area.canopyArea.agreedTerms`,
+        `sessions.${sessionIndex}.area.driversRestRoom.agreedTerms`,
+    ]);
+
+    React.useEffect(() => {
+        const [plinth, mezz1, mezz2, canopy, driversRoom] = watchedAreaFields.map(v => parseFloat(v || '0'));
+        const totalArea = [plinth, mezz1, mezz2, canopy, driversRoom]
+            .filter(v => !isNaN(v))
+            .reduce((acc, v) => acc + v, 0);
+        setValue(`sessions.${sessionIndex}.area.totalChargeableArea.agreedTerms`, String(totalArea));
+    }, [watchedAreaFields, setValue, sessionIndex]);
+    
+    const watchedCommercialFields = watch([
+         `sessions.${sessionIndex}.commercialTerms.buildingRentPerSft.agreedTerms`,
+         `sessions.${sessionIndex}.commercialTerms.chargeableArea.agreedTerms`,
+    ]);
+
+    React.useEffect(() => {
+        const [rentPerSft, chargeableArea] = watchedCommercialFields.map(v => parseFloat(v || '0'));
+         if (!isNaN(rentPerSft) && !isNaN(chargeableArea)) {
+            const totalRent = rentPerSft * chargeableArea;
+            setValue(`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth.agreedTerms`, String(totalRent));
+        }
+    }, [watchedCommercialFields, setValue, sessionIndex]);
+
+
     return (
         <Card className="bg-secondary/30">
             <Collapsible defaultOpen={sessionIndex === watch('sessions').length - 1}>
@@ -193,7 +223,7 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                 date: new Date().toISOString(),
                 venue: 'LBR Office, Chennai',
                 customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
-                providerAttendees: [{ name: 'Test Provider', title: 'Director' }],
+                providerAttendees: [{ name: '', title: '' }],
                 facilitatorAttendees: [{ name: 'O2O Manager', title: 'O2O Manager' }],
                 siteInfo: {
                     listingId: { agreedTerms: primaryListing?.listingId || '', status: 'Agreed' },
@@ -217,34 +247,6 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
             });
         }
     }, [lead.id, primaryListing, getCommercialTerms, form, lead.leadContact]);
-
-    const watchedSessions = form.watch('sessions');
-
-    React.useEffect(() => {
-      watchedSessions.forEach((session, index) => {
-        // Calculate Total Rent
-        const rentPerSft = parseFloat(session.commercialTerms?.buildingRentPerSft?.agreedTerms || '0');
-        const chargeableArea = parseFloat(session.commercialTerms?.chargeableArea?.agreedTerms || '0');
-        if (!isNaN(rentPerSft) && !isNaN(chargeableArea)) {
-            const totalRent = rentPerSft * chargeableArea;
-            form.setValue(`sessions.${index}.commercialTerms.totalRentPerMonth.agreedTerms`, String(totalRent));
-        }
-
-        // Calculate Total Chargeable Area
-        const plinth = parseFloat(session.area?.plinthArea?.agreedTerms || '0');
-        const mezz1 = parseFloat(session.area?.mezzanineArea1?.agreedTerms || '0');
-        const mezz2 = parseFloat(session.area?.mezzanineArea2?.agreedTerms || '0');
-        const canopy = parseFloat(session.area?.canopyArea?.agreedTerms || '0');
-        const driversRoom = parseFloat(session.area?.driversRestRoom?.agreedTerms || '0');
-        
-        const totalArea = [plinth, mezz1, mezz2, canopy, driversRoom]
-            .filter(v => !isNaN(v))
-            .reduce((acc, v) => acc + v, 0);
-
-        form.setValue(`sessions.${index}.area.totalChargeableArea.agreedTerms`, String(totalArea));
-      })
-    }, [watchedSessions, form])
-
 
     const onSubmit = (data: CommercialTermsSchema) => {
         updateCommercialTerms(lead.id, data);
