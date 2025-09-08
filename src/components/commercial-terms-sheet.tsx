@@ -9,10 +9,10 @@ import { commercialTermsSchema, type CommercialTermsSchema, type ListingSchema }
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from './ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, TableFooter } from './ui/table';
 import { Textarea } from './ui/textarea';
@@ -21,6 +21,7 @@ import { Checkbox } from './ui/checkbox';
 import { Separator } from './ui/separator';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 
 const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; title: string, description?: string }) => {
     const Icon = icon;
@@ -94,31 +95,72 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 };
 
 
-const NegotiationSession = ({ sessionIndex, onRemove, canEdit }: { sessionIndex: number, onRemove: () => void, canEdit: boolean }) => {
+const NegotiationSession = ({ sessionIndex, onRemove, canEdit, lead, primaryListing }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; lead: RegisteredLead; primaryListing: ListingSchema | null; }) => {
     const { control, watch } = useFormContext<CommercialTermsSchema>();
     
     return (
-        <div className="p-4 border rounded-lg bg-secondary/50 space-y-4 mb-6">
-            <div className="flex justify-between items-center no-print">
-                <p className="font-semibold text-sm">Negotiation Session {sessionIndex + 1}: {new Date(watch(`sessions.${sessionIndex}.date`)).toLocaleString()}</p>
-                    <Button type="button" variant="ghost" size="icon" onClick={onRemove} disabled={!canEdit}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-            </div>
-            <Separator className="no-print" />
-            <FormField control={control} name={`sessions.${sessionIndex}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={!canEdit} /></FormControl></FormItem> )} />
-            
-            <AttendeeSection sessionIndex={sessionIndex} type="customer" disabled={!canEdit} />
-            <AttendeeSection sessionIndex={sessionIndex} type="provider" disabled={!canEdit} />
-            <AttendeeSection sessionIndex={sessionIndex} type="facilitator" disabled={!canEdit} />
-        </div>
+        <Card className="bg-secondary/30">
+            <Collapsible defaultOpen={sessionIndex === watch('sessions').length - 1}>
+                <CollapsibleTrigger asChild>
+                    <div className="flex justify-between items-center p-4 cursor-pointer hover:bg-secondary/50 rounded-t-lg">
+                        <h3 className="text-lg font-semibold text-primary">
+                            Negotiation Session {sessionIndex + 1}: {new Date(watch(`sessions.${sessionIndex}.date`)).toLocaleString()}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                            {canEdit && <Button type="button" variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onRemove(); }}><Trash2 className="h-4 w-4 text-destructive"/></Button>}
+                            <ChevronsUpDown className="h-4 w-4" />
+                        </div>
+                    </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="p-6 space-y-6">
+                        <div className="p-4 border rounded-lg bg-background space-y-4">
+                            <FormField control={control} name={`sessions.${sessionIndex}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={!canEdit} /></FormControl></FormItem> )} />
+                            
+                            <AttendeeSection sessionIndex={sessionIndex} type="customer" disabled={!canEdit} />
+                            <AttendeeSection sessionIndex={sessionIndex} type="provider" disabled={!canEdit} />
+                            <AttendeeSection sessionIndex={sessionIndex} type="facilitator" disabled={!canEdit} />
+                        </div>
+
+                         <div className="space-y-6">
+                            <SectionHeader icon={MapPin} title="Site Information" />
+                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.listingId`} label="Listing ID" control={control} disabled={true} />
+                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.postalAddress`} label="Postal Address" control={control} disabled={!canEdit} />
+                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.buildingNumber`} label="Building Number" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.googleCoordinates`} label="Google Coordinates" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.buildingStatus`} label="Building Status" control={control} disabled={!canEdit}/>
+
+                            <SectionHeader icon={Home} title="Area (in SFT)" />
+                            <FormRow form={control} name={`sessions.${sessionIndex}.area.plinthArea`} label="Plinth Area (Shop Floor)" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.area.mezzanineArea1`} label="Mezzanine Area 1" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.area.mezzanineArea2`} label="Mezzanine Area 2" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.area.canopyArea`} label="Canopy Area" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.area.driversRestRoom`} label="Driver's Rest Room" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.area.totalChargeableArea`} label="Total Chargeable Area" control={control} disabled={!canEdit}/>
+                            
+                            <SectionHeader icon={ListChecks} title="Lease Terms" />
+                            <FormRow form={control} name={`sessions.${sessionIndex}.leaseTerms.leaseTenure`} label="Lease Tenure" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.leaseTerms.leaseLockIn`} label="Lease Lock-In Period" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.leaseTerms.rentEscalation`} label="Rent Escalation (% and Freq.)" control={control} disabled={!canEdit}/>
+                            
+                            <SectionHeader icon={HandCoins} title="Commercial Terms" />
+                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.chargeableArea`} label="Chargeable Area (SFT)" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.buildingRentPerSft`} label="Building Rent per SFT (INR)" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth`} label="Total Rent per Month (INR)" control={control} disabled={true}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.camCharges`} label="CAM Charges per SFT" control={control} disabled={!canEdit}/>
+                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.ifrsd`} label="IFRSD (Security Deposit)" control={control} disabled={!canEdit}/>
+
+                        </div>
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
+        </Card>
     );
 }
 
 export function CommercialTermsSheet({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
     const { user } = useAuth();
     const { getCommercialTerms, updateCommercialTerms } = useData();
-    
-    const [rentalOutflow, setRentalOutflow] = React.useState<{ year: number, annualRent: number }[]>([]);
-    const [totalOutflow, setTotalOutflow] = React.useState(0);
     
     const isCustomer = user?.role === 'User';
     const isProvider = user?.role === 'SuperAdmin';
@@ -130,176 +172,75 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
     const form = useForm<CommercialTermsSchema>({
         resolver: zodResolver(commercialTermsSchema),
         defaultValues: {
-            sessions: [
-                {
-                    date: new Date().toISOString(),
-                    venue: 'LBR Office, Chennai',
-                    customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
-                    providerAttendees: [{ name: 'Test Provider', title: 'Director' }],
-                    facilitatorAttendees: [{ name: 'O2O Manager', title: 'O2O Manager' }],
-                }
-            ],
-            siteInfo: {
-                listingId: { agreedTerms: '', status: 'Agreed' },
-                postalAddress: { agreedTerms: '123 Industrial Way, Oragadam, Chennai', status: 'Agreed' },
-                googleCoordinates: { agreedTerms: '12.83, 79.95', status: 'Agreed' },
-                buildingStatus: { agreedTerms: 'Ready for Occupancy', status: 'Agreed' },
-            },
-            area: {
-                totalChargeableArea: { agreedTerms: '150000', status: 'Agreed' }
-            },
-            leaseTerms: {
-                leaseTenure: { agreedTerms: '5 years', status: 'Agreed' },
-                leaseLockIn: { agreedTerms: '3 years', status: 'Agreed' },
-                rentEscalation: { agreedTerms: '15% every 3 years', status: 'Reserved For Discussion' },
-            },
-            commercialTerms: {
-                chargeableArea: { agreedTerms: '150000', status: 'Agreed' },
-                buildingRentPerSft: { agreedTerms: '25', status: 'Agreed' },
-                totalRentPerMonth: { agreedTerms: '3750000', status: 'Agreed' },
-                ifrsd: { agreedTerms: '22500000', status: 'Agreed' },
-                capexItems: [],
-                netCostPerMonth: 0,
-            },
-            actionableItems: [
-                { item: 'Finalize rent escalation clause', responsibility: 'O2O', schedule: 'Next Meeting', status: 'Pending' }
-            ],
-            overallRemarks: "Initial meeting was positive. Key discussion point for the next session is the rent escalation percentage. Customer is firm on 10%, provider wants 15%.",
+            sessions: [],
+            actionableItems: [],
+            overallRemarks: "",
         }
     });
 
-     const { fields: capexFields, append: appendCapex, remove: removeCapex } = useFieldArray({ name: "commercialTerms.capexItems", control: form.control });
      const { fields: sessionFields, append: appendSession, remove: removeSession } = useFieldArray({ name: "sessions", control: form.control });
      const { fields: actionableItemFields, append: appendActionableItem, remove: removeActionableItem } = useFieldArray({ name: "actionableItems", control: form.control });
 
-    const commercialTermsWatched = form.watch('commercialTerms');
-    const leaseTermsWatched = form.watch('leaseTerms');
-
-    // Auto-calculate Total Rent per Month
-    React.useEffect(() => {
-        const rentPerSft = parseFloat(commercialTermsWatched?.buildingRentPerSft?.agreedTerms || '0');
-        const chargeableArea = parseFloat(commercialTermsWatched?.chargeableArea?.agreedTerms || '0');
-        if (!isNaN(rentPerSft) && !isNaN(chargeableArea)) {
-            const totalRent = rentPerSft * chargeableArea;
-            form.setValue('commercialTerms.totalRentPerMonth.agreedTerms', String(totalRent));
-        }
-    }, [commercialTermsWatched?.buildingRentPerSft?.agreedTerms, commercialTermsWatched?.chargeableArea?.agreedTerms, form]);
-    
-    // Auto-calculate Net Cost per Month
-    React.useEffect(() => {
-        let total = 0;
-        const totalRent = parseFloat(commercialTermsWatched?.totalRentPerMonth?.agreedTerms || '0');
-        if (!isNaN(totalRent)) {
-            total += totalRent;
-        }
-
-        commercialTermsWatched?.capexItems?.forEach(item => {
-            if (item.cost) {
-                total += item.cost;
-            }
-        });
-        form.setValue('commercialTerms.netCostPerMonth', total);
-
-    }, [commercialTermsWatched?.totalRentPerMonth, commercialTermsWatched?.capexItems, form]);
-
-    // Calculate yearly rent outflow
-    React.useEffect(() => {
-        const tenureString = leaseTermsWatched?.leaseTenure?.agreedTerms?.match(/\d+/)?.[0];
-        const tenure = tenureString ? parseInt(tenureString, 10) : 0;
-        
-        const rentString = commercialTermsWatched?.totalRentPerMonth?.agreedTerms;
-        const initialMonthlyRent = rentString ? parseFloat(rentString) : 0;
-
-        const escalationString = leaseTermsWatched?.rentEscalation?.agreedTerms;
-        const escalationPercentMatch = escalationString?.match(/(\d+)%/);
-        const escalationFreqMatch = escalationString?.match(/every (\d+)/i);
-
-        const escalationPercent = escalationPercentMatch ? parseInt(escalationPercentMatch[1], 10) / 100 : 0;
-        const escalationFreq = escalationFreqMatch ? parseInt(escalationFreqMatch[1], 10) : 0;
-
-        if (tenure > 0 && initialMonthlyRent > 0 && escalationFreq > 0) {
-            let yearlyBreakdown = [];
-            let total = 0;
-            let currentMonthlyRent = initialMonthlyRent;
-
-            for (let year = 1; year <= tenure; year++) {
-                if (year > 1 && (year - 1) % escalationFreq === 0) {
-                    currentMonthlyRent *= (1 + escalationPercent);
-                }
-                const annualRent = currentMonthlyRent * 12;
-                total += annualRent;
-                yearlyBreakdown.push({ year, annualRent });
-            }
-            setRentalOutflow(yearlyBreakdown);
-            setTotalOutflow(total);
-        } else {
-            setRentalOutflow([]);
-            setTotalOutflow(0);
-        }
-
-    }, [leaseTermsWatched?.leaseTenure?.agreedTerms, leaseTermsWatched?.rentEscalation?.agreedTerms, commercialTermsWatched?.totalRentPerMonth?.agreedTerms]);
     
     // Load existing data
     React.useEffect(() => {
         const existingData = getCommercialTerms(lead.id);
-        if (existingData) {
+        if (existingData && existingData.sessions.length > 0) {
             form.reset(existingData);
         } else if (primaryListing) {
-             form.reset({
-                ...form.getValues(),
+             const defaultSession = {
+                date: new Date().toISOString(),
+                venue: 'LBR Office, Chennai',
+                customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
+                providerAttendees: [{ name: 'Test Provider', title: 'Director' }],
+                facilitatorAttendees: [{ name: 'O2O Manager', title: 'O2O Manager' }],
                 siteInfo: {
-                    ...form.getValues().siteInfo,
                     listingId: { agreedTerms: primaryListing.listingId, status: 'Agreed' },
                     postalAddress: { agreedTerms: primaryListing.location, status: 'Agreed' },
                     buildingStatus: { agreedTerms: primaryListing.availabilityDate, status: 'Agreed' },
                     googleCoordinates: { agreedTerms: primaryListing.latLng, status: 'Agreed' },
                 },
                 area: {
-                    ...form.getValues().area,
                     totalChargeableArea: { agreedTerms: String(primaryListing.sizeSqFt), status: 'Agreed' },
                 },
                 commercialTerms: {
-                    ...form.getValues().commercialTerms,
                     chargeableArea: { agreedTerms: String(primaryListing.sizeSqFt), status: 'Agreed' },
                     buildingRentPerSft: { agreedTerms: String(primaryListing.rentPerSqFt), status: 'Agreed' },
                     ifrsd: { agreedTerms: `INR ${((primaryListing.rentPerSqFt || 0) * primaryListing.sizeSqFt * (primaryListing.rentalSecurityDeposit || 0)).toLocaleString()}`, status: 'Agreed' },
                 },
+                leaseTerms: {}
+             };
+             form.reset({
+                ...form.getValues(),
+                sessions: [defaultSession]
             });
         }
-    }, [lead.id, primaryListing, getCommercialTerms, form]);
+    }, [lead.id, primaryListing, getCommercialTerms, form, lead.leadContact]);
+
+    const watchedSessions = form.watch('sessions');
+
+    React.useEffect(() => {
+      watchedSessions.forEach((session, index) => {
+        const rentPerSft = parseFloat(session.commercialTerms?.buildingRentPerSft?.agreedTerms || '0');
+        const chargeableArea = parseFloat(session.commercialTerms?.chargeableArea?.agreedTerms || '0');
+        if (!isNaN(rentPerSft) && !isNaN(chargeableArea)) {
+            const totalRent = rentPerSft * chargeableArea;
+            form.setValue(`sessions.${index}.commercialTerms.totalRentPerMonth.agreedTerms`, String(totalRent));
+        }
+      })
+    }, [watchedSessions, form])
+
 
     const onSubmit = (data: CommercialTermsSchema) => {
         updateCommercialTerms(lead.id, data);
     };
     
     const handleGenerateFollowUp = () => {
-        const currentData = form.getValues();
-        const reservedItems = <T extends Record<string, any>>(section: T) => {
-            if (!section) return {};
-            return Object.entries(section).reduce((acc, [key, value]) => {
-                if (key === 'customItems' || key === 'capexItems') {
-                    const filteredItems = value.filter((item: any) => item.status === 'Reserved For Discussion');
-                    if (filteredItems.length > 0) {
-                        (acc as any)[key] = filteredItems;
-                    }
-                } else if (value && typeof value === 'object' && 'status' in value && value.status === 'Reserved For Discussion') {
-                    (acc as any)[key] = value;
-                }
-                return acc;
-            }, {} as Partial<T>);
-        };
-        
-        const newSheetData = {
-            ...currentData,
-            siteInfo: reservedItems(currentData.siteInfo),
-            area: reservedItems(currentData.area),
-            leaseTerms: reservedItems(currentData.leaseTerms),
-            commercialTerms: reservedItems(currentData.commercialTerms),
-            actionableItems: currentData.actionableItems?.filter(item => item.status !== 'Completed'),
-        };
-
-        console.log("Generated Follow-up Sheet Data:", newSheetData);
-        alert("Check the console for the generated follow-up sheet data. In a real app, this would create a new version.");
+        // This function would ideally create a new session pre-filled with reserved items from the last one.
+        // For now, we'll just log to console.
+        const lastSession = form.getValues().sessions[form.getValues().sessions.length - 1];
+        console.log("Generating follow-up based on last session:", lastSession);
+        alert("Check console for follow-up data. This would be a new session in a real implementation.");
     }
     
     const handleFinalizeMoM = () => {
@@ -350,7 +291,7 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                                                 <FileSymlink className="mr-2 h-4 w-4" />
                                                 Generate Follow-up
                                             </Button>
-                                            <Button type="button" onClick={() => appendSession({ date: new Date().toISOString(), venue: '', customerAttendees: [], providerAttendees: [], facilitatorAttendees: [] })}>
+                                            <Button type="button" onClick={() => appendSession({ date: new Date().toISOString() })}>
                                                 <Calendar className="mr-2 h-4 w-4"/>
                                                 Add Session
                                             </Button>
@@ -360,45 +301,16 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-8">
-                            {sessionFields.map((field, index) => (
+                             {sessionFields.map((field, index) => (
                                 <NegotiationSession
                                     key={field.id}
                                     sessionIndex={index}
                                     onRemove={() => removeSession(index)}
                                     canEdit={canEdit}
+                                    lead={lead}
+                                    primaryListing={primaryListing}
                                 />
                             ))}
-
-                            <div className="space-y-6">
-                                <SectionHeader icon={MapPin} title="Site Information" />
-                                <FormRow form={form} name="siteInfo.listingId" label="Listing ID" control={form.control} disabled={true} />
-                                <FormRow form={form} name="siteInfo.postalAddress" label="Postal Address" control={form.control} disabled={!canEdit} />
-                                <FormRow form={form} name="siteInfo.buildingNumber" label="Building Number" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="siteInfo.googleCoordinates" label="Google Coordinates" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="siteInfo.buildingStatus" label="Building Status" control={form.control} disabled={!canEdit}/>
-
-                                <SectionHeader icon={Home} title="Area (in SFT)" />
-                                <FormRow form={form} name="area.plinthArea" label="Plinth Area (Shop Floor)" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="area.mezzanineArea1" label="Mezzanine Area 1" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="area.mezzanineArea2" label="Mezzanine Area 2" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="area.canopyArea" label="Canopy Area" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="area.driversRestRoom" label="Driver's Rest Room" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="area.totalChargeableArea" label="Total Chargeable Area" control={form.control} disabled={!canEdit}/>
-                                
-                                <SectionHeader icon={ListChecks} title="Lease Terms" />
-                                <FormRow form={form} name="leaseTerms.leaseTenure" label="Lease Tenure" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="leaseTerms.leaseLockIn" label="Lease Lock-In Period" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="leaseTerms.rentEscalation" label="Rent Escalation (% and Freq.)" control={form.control} disabled={!canEdit}/>
-                                
-                                <SectionHeader icon={HandCoins} title="Commercial Terms" />
-                                <FormRow form={form} name="commercialTerms.chargeableArea" label="Chargeable Area (SFT)" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="commercialTerms.buildingRentPerSft" label="Building Rent per SFT (INR)" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="commercialTerms.totalRentPerMonth" label="Total Rent per Month (INR)" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="commercialTerms.camCharges" label="CAM Charges per SFT" control={form.control} disabled={!canEdit}/>
-                                <FormRow form={form} name="commercialTerms.ifrsd" label="IFRSD (Security Deposit)" control={form.control} disabled={!canEdit}/>
-
-                            </div>
-
                         </CardContent>
                         <CardFooter className="flex-col items-stretch space-y-4 pt-6">
                             <Card className="w-full">
@@ -450,40 +362,6 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                                     )}
                                 />
                             </div>
-                            {rentalOutflow.length > 0 && (
-                                <Card className="w-full">
-                                    <CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary"/> Statement of Rent Outflow</CardTitle></CardHeader>
-                                    <CardContent>
-                                        <Table>
-                                            <TableHeader><TableRow><TableHead>Year</TableHead><TableHead className="text-right">Annual Rental Outflow</TableHead></TableRow></TableHeader>
-                                            <TableBody>
-                                                {rentalOutflow.map(item => (
-                                                    <TableRow key={item.year}>
-                                                        <TableCell>Year {item.year}</TableCell>
-                                                        <TableCell className="text-right">₹{item.annualRent.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                            <TableFooter>
-                                                <TableRow>
-                                                    <TableCell className="font-bold">Total Outflow (Lease Period)</TableCell>
-                                                    <TableCell className="text-right font-bold">₹{totalOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</TableCell>
-                                                </TableRow>
-                                            </TableFooter>
-                                        </Table>
-                                    </CardContent>
-                                </Card>
-                            )}
-                            <div className="flex items-center gap-4 p-4 border rounded-lg bg-secondary/50 w-full justify-end">
-                                <div className="text-right">
-                                    <FormLabel className="text-sm font-normal">Total Rent per Month</FormLabel>
-                                    <p className="text-2xl font-bold text-primary">₹{(commercialTermsWatched?.totalRentPerMonth?.agreedTerms ? parseFloat(commercialTermsWatched.totalRentPerMonth.agreedTerms).toLocaleString('en-IN') : 0)}</p>
-                                </div>
-                                <div className="text-right">
-                                    <FormLabel className="text-sm font-normal">Net Cost per Month (incl. CAPEX)</FormLabel>
-                                    <p className="text-2xl font-bold text-primary">₹{commercialTermsWatched?.netCostPerMonth?.toLocaleString('en-IN') || 0}</p>
-                                </div>
-                            </div>
                              <div className="flex items-center gap-2 justify-end pt-4 no-print">
                                 {(isCustomer || isProvider) && (
                                     <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
@@ -508,5 +386,3 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
         </div>
     );
 }
-
-    
