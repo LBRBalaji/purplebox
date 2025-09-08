@@ -54,12 +54,12 @@ const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: a
                 )} />
             </div>
             <div className="col-span-6 md:col-span-2">
-                 <FormField control={form.control} name={`${name}.proposedBy`} render={({ field }) => (
+                 <FormField control={control} name={`${name}.proposedBy`} render={({ field }) => (
                     <FormItem><Select onValueChange={field.onChange} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
             <div className="col-span-6 md:col-span-3">
-                 <FormField control={form.control} name={`${name}.status`} render={({ field }) => (
+                 <FormField control={control} name={`${name}.status`} render={({ field }) => (
                     <FormItem><Select onValueChange={field.onChange} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
@@ -95,7 +95,7 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 };
 
 
-const NegotiationSession = ({ sessionIndex, onRemove, canEdit, lead, primaryListing }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; lead: RegisteredLead; primaryListing: ListingSchema | null; }) => {
+const NegotiationSession = ({ sessionIndex, onRemove, canEdit, lead, primaryListing, form }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; lead: RegisteredLead; primaryListing: ListingSchema | null; form: any }) => {
     const { control, watch } = useFormContext<CommercialTermsSchema>();
     
     return (
@@ -124,31 +124,31 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, lead, primaryList
 
                          <div className="space-y-6">
                             <SectionHeader icon={MapPin} title="Site Information" />
-                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.listingId`} label="Listing ID" control={control} disabled={true} />
-                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.postalAddress`} label="Postal Address" control={control} disabled={!canEdit} />
-                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.buildingNumber`} label="Building Number" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.googleCoordinates`} label="Google Coordinates" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.siteInfo.buildingStatus`} label="Building Status" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.listingId`} label="Listing ID" control={control} disabled={true} />
+                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.postalAddress`} label="Postal Address" control={control} disabled={!canEdit} />
+                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.buildingNumber`} label="Building Number" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.googleCoordinates`} label="Google Coordinates" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.buildingStatus`} label="Building Status" control={control} disabled={!canEdit}/>
 
                             <SectionHeader icon={Home} title="Area (in SFT)" />
-                            <FormRow form={control} name={`sessions.${sessionIndex}.area.plinthArea`} label="Plinth Area (Shop Floor)" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.area.mezzanineArea1`} label="Mezzanine Area 1" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.area.mezzanineArea2`} label="Mezzanine Area 2" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.area.canopyArea`} label="Canopy Area" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.area.driversRestRoom`} label="Driver's Rest Room" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.area.totalChargeableArea`} label="Total Chargeable Area" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.area.plinthArea`} label="Plinth Area (Shop Floor)" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.area.mezzanineArea1`} label="Mezzanine Area 1" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.area.mezzanineArea2`} label="Mezzanine Area 2" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.area.canopyArea`} label="Canopy Area" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.area.driversRestRoom`} label="Driver's Rest Room" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.area.totalChargeableArea`} label="Total Chargeable Area" control={control} disabled={!canEdit}/>
                             
                             <SectionHeader icon={ListChecks} title="Lease Terms" />
-                            <FormRow form={control} name={`sessions.${sessionIndex}.leaseTerms.leaseTenure`} label="Lease Tenure" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.leaseTerms.leaseLockIn`} label="Lease Lock-In Period" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.leaseTerms.rentEscalation`} label="Rent Escalation (% and Freq.)" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.leaseTerms.leaseTenure`} label="Lease Tenure" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.leaseTerms.leaseLockIn`} label="Lease Lock-In Period" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.leaseTerms.rentEscalation`} label="Rent Escalation (% and Freq.)" control={control} disabled={!canEdit}/>
                             
                             <SectionHeader icon={HandCoins} title="Commercial Terms" />
-                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.chargeableArea`} label="Chargeable Area (SFT)" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.buildingRentPerSft`} label="Building Rent per SFT (INR)" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth`} label="Total Rent per Month (INR)" control={control} disabled={true}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.camCharges`} label="CAM Charges per SFT" control={control} disabled={!canEdit}/>
-                            <FormRow form={control} name={`sessions.${sessionIndex}.commercialTerms.ifrsd`} label="IFRSD (Security Deposit)" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.chargeableArea`} label="Chargeable Area (SFT)" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.buildingRentPerSft`} label="Building Rent per SFT (INR)" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth`} label="Total Rent per Month (INR)" control={control} disabled={true}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.camCharges`} label="CAM Charges per SFT" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.ifrsd`} label="IFRSD (Security Deposit)" control={control} disabled={!canEdit}/>
 
                         </div>
                     </div>
@@ -163,7 +163,7 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
     const { getCommercialTerms, updateCommercialTerms } = useData();
     
     const isCustomer = user?.role === 'User';
-    const isProvider = user?.role === 'SuperAdmin';
+    const isProvider = user?.role === 'Warehouse Developer';
     const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
     const isAgent = user?.role === 'Agent';
     const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
@@ -309,6 +309,7 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                                     canEdit={canEdit}
                                     lead={lead}
                                     primaryListing={primaryListing}
+                                    form={form}
                                 />
                             ))}
                         </CardContent>
