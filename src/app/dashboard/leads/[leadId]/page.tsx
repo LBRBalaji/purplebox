@@ -117,7 +117,6 @@ export default function LeadDetailPage() {
     const isProviderForThisLead = foundLead.providers.some(p => p.providerEmail === user?.email);
     const isCustomerOfThisLead = foundLead.customerId === user?.email;
     const isAgentOfThisLead = foundLead.registeredBy === user?.email;
-    const isPremiumAgent = isAgentOfThisLead && user?.plan === 'Paid_Premium';
 
     if (isSuperAdmin || isO2O || isProviderForThisLead || isCustomerOfThisLead || isAgentOfThisLead) {
         setLead(foundLead);
