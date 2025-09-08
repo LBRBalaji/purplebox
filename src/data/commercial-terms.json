@@ -139,5 +139,151 @@
     ],
     "overallRemarks": "Initial meeting was positive. Key discussion point for the next session is the rent escalation percentage. Customer is firm on 10%, provider wants 15%.",
     "leadId": "LDR-MFB1MSNQ8BPB4"
+  },
+  {
+    "sessions": [
+      {
+        "date": "2025-09-08T12:55:25.055Z",
+        "venue": "LBR Office, Chennai",
+        "customerAttendees": [
+          {
+            "name": "Balaji",
+            "title": "Lead"
+          }
+        ],
+        "providerAttendees": [
+          {
+            "name": "Test Provider",
+            "title": "Director"
+          }
+        ],
+        "facilitatorAttendees": [
+          {
+            "name": "O2O Manager",
+            "title": "O2O Manager"
+          }
+        ]
+      },
+      {
+        "date": "2025-09-08T12:58:01.332Z",
+        "venue": "",
+        "customerAttendees": [],
+        "providerAttendees": [],
+        "facilitatorAttendees": []
+      }
+    ],
+    "siteInfo": {
+      "listingId": {
+        "agreedTerms": "",
+        "status": "Agreed"
+      },
+      "postalAddress": {
+        "agreedTerms": "123 Industrial Way, Oragadam, Chennai",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "buildingNumber": {
+        "agreedTerms": "20C",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "googleCoordinates": {
+        "agreedTerms": "12.83, 79.95",
+        "status": "Agreed"
+      },
+      "buildingStatus": {
+        "agreedTerms": "Ready for Occupancy",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      }
+    },
+    "area": {
+      "plinthArea": {
+        "agreedTerms": "450000",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      },
+      "mezzanineArea1": {
+        "agreedTerms": "6000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "mezzanineArea2": {
+        "agreedTerms": "0",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "canopyArea": {
+        "agreedTerms": "7000",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      },
+      "driversRestRoom": {
+        "agreedTerms": "2000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "totalChargeableArea": {
+        "agreedTerms": "150000",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      }
+    },
+    "leaseTerms": {
+      "leaseTenure": {
+        "agreedTerms": "5 years",
+        "proposedBy": "Customer",
+        "status": "Reserved For Discussion"
+      },
+      "leaseLockIn": {
+        "agreedTerms": "3 years",
+        "proposedBy": "Customer",
+        "status": "Agreed"
+      },
+      "rentEscalation": {
+        "agreedTerms": "15% every 3 years",
+        "status": "Agreed"
+      }
+    },
+    "commercialTerms": {
+      "chargeableArea": {
+        "agreedTerms": "150000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "buildingRentPerSft": {
+        "agreedTerms": "25",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "totalRentPerMonth": {
+        "agreedTerms": "3750000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "camCharges": {
+        "agreedTerms": "2",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "ifrsd": {
+        "agreedTerms": "22500000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "capexItems": [],
+      "netCostPerMonth": 3750000
+    },
+    "actionableItems": [
+      {
+        "item": "Finalize rent escalation clause",
+        "responsibility": "O2O",
+        "schedule": "Next Meeting",
+        "status": "Pending",
+        "remarks": ""
+      }
+    ],
+    "overallRemarks": "Initial meeting was positive. Key discussion point for the next session is the rent escalation percentage. Customer is firm on 10%, provider wants 15%.",
+    "leadId": "LDR-MFB0VLBGE69QO"
   }
 ]

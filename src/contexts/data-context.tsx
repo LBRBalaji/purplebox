@@ -181,10 +181,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const [toastMessage, setToastMessage] = useState<{ variant?: "default" | "destructive" | null, title: string, description: string} | null>(null);
 
   useEffect(() => {
-    // This can be used if we need to load from local storage in the future
-  }, [toast]);
+    if (toastMessage) {
+        toast(toastMessage);
+        setToastMessage(null);
+    }
+  }, [toastMessage, toast]);
+
 
   const persistData = async (endpoint: string, data: any, entityName: string) => {
     try {
@@ -198,7 +204,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     } catch (error) {
         console.error(`Error persisting ${entityName}:`, error);
-        toast({
+        setToastMessage({
             variant: "destructive",
             title: "Data Sync Error",
             description: `Could not save ${entityName} changes to the server.`
@@ -391,7 +397,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             timestamp: new Date().toISOString(),
             triggeredBy: userId,
         });
-        toast({
+        setToastMessage({
             variant: "destructive",
             title: "Daily Download Limit Reached",
             description: "You have already downloaded twice today. Please try again tomorrow.",
@@ -559,7 +565,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         
         persistTenantImprovements(updatedSheets);
-        toast({
+        setToastMessage({
             title: "Improvements Sheet Saved",
             description: "Your changes have been saved successfully.",
         });
@@ -586,7 +592,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         
         persistCommercialTerms(updatedSheets);
-        toast({
+        setToastMessage({
             title: "Commercial Terms Saved",
             description: "Your changes have been saved successfully.",
         });
