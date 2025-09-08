@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { type NewUser, type User } from "@/contexts/auth-context";
 import { z } from "zod";
+import { useAuth } from "@/contexts/auth-context";
 
 const userFormSchema = z.object({
     email: z.string().email('Invalid email address.'),
@@ -53,6 +54,12 @@ type UserFormProps = {
 
 export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps) {
   const isEditMode = !!user;
+  const { users } = useAuth();
+
+  const companies = React.useMemo(() => {
+    const companyNames = new Set(Object.values(users).map(u => u.companyName));
+    return Array.from(companyNames);
+  }, [users]);
 
   const form = useForm<UserFormSchema>({
     resolver: zodResolver(userFormSchema),
@@ -113,6 +120,18 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                       <FormMessage />
                   </FormItem>
               )} />
+               <FormField control={form.control} name="companyName" render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Company Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter or select company" list="company-suggestions" />
+                      </FormControl>
+                      <datalist id="company-suggestions">
+                        {companies.map(c => <option key={c} value={c} />)}
+                      </datalist>
+                      <FormMessage />
+                  </FormItem>
+              )} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="userName" render={({ field }) => (
                     <FormItem>
@@ -121,21 +140,14 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                         <FormMessage />
                     </FormItem>
                 )} />
-                <FormField control={form.control} name="companyName" render={({ field }) => (
+                <FormField control={form.control} name="phone" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Company Name</FormLabel>
-                        <FormControl><Input {...field} placeholder="Acme Inc." /></FormControl>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl><Input {...field} placeholder="+1 234 567 890" /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
               </div>
-              <FormField control={form.control} name="phone" render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl><Input {...field} placeholder="+1 234 567 890" /></FormControl>
-                      <FormMessage />
-                  </FormItem>
-              )} />
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="role" render={({ field }) => (
                     <FormItem>
