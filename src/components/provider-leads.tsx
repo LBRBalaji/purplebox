@@ -192,94 +192,12 @@ export function ProviderLeads() {
                                         )}
 
                                         <TableCell className="text-right">
-                                            {providerInfo?.acknowledgedBy ? (
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <div className="flex items-center justify-end">
-                                                                <Badge variant="secondary" className="flex items-center gap-1.5 cursor-help">
-                                                                    <UserCheck className="h-3 w-3"/>
-                                                                    {providerInfo.acknowledgedBy.name}
-                                                                </Badge>
-                                                            </div>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <div className="p-1">
-                                                              <p className="font-semibold">Acknowledged by:</p>
-                                                              <p>{providerInfo.acknowledgedBy.name}, {providerInfo.acknowledgedBy.title}</p>
-                                                              <p>{providerInfo.acknowledgedBy.email}</p>
-                                                              <p>{providerInfo.acknowledgedBy.mobile}</p>
-                                                            </div>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-
-                                            ) : providerInfo && providerInfo.status === 'Pending' ? (
-                                                <div className="flex gap-2 justify-end">
-                                                    <AlertDialog>
-                                                        <AlertDialogTrigger asChild>
-                                                          <Button size="sm" variant="outline">
-                                                              <X className="mr-2 h-4 w-4" /> Reject
-                                                          </Button>
-                                                        </AlertDialogTrigger>
-                                                         <AlertDialogContent>
-                                                            <AlertDialogHeader><AlertDialogTitle>Confirm Rejection</AlertDialogTitle><AlertDialogDescription>Are you sure you want to reject this lead registration?</AlertDialogDescription></AlertDialogHeader>
-                                                            <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(lead.id, user!.email)}>Confirm Reject</AlertDialogAction></AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
-                                                    <AlertDialog>
-                                                        <AlertDialogTrigger asChild>
-                                                            <Button size="sm">
-                                                                <Check className="mr-2 h-4 w-4" /> Acknowledge
-                                                            </Button>
-                                                        </AlertDialogTrigger>
-                                                        <AlertDialogContent className="sm:max-w-lg">
-                                                            <AlertDialogHeader>
-                                                                <AlertDialogTitle className="flex items-center gap-2">
-                                                                    <Handshake className="h-5 w-5 text-primary"/>
-                                                                    Review Lead Registration Details
-                                                                </AlertDialogTitle>
-                                                                <AlertDialogDescription asChild>
-                                                                     <div className="text-left pt-2 space-y-4 text-sm text-muted-foreground">
-                                                                        <div className="space-y-1">
-                                                                            <p className="font-semibold text-foreground">Requirements Summary:</p>
-                                                                            <p className="text-sm p-3 bg-secondary/50 rounded-md">{lead.requirementsSummary}</p>
-                                                                        </div>
-                                                                        <div className="space-y-2">
-                                                                             <p className="font-semibold text-foreground">Linked Properties:</p>
-                                                                             <div className="space-y-2">
-                                                                                 {providerInfo.listingIds.map(id => {
-                                                                                    const listing = listings.find(l => l.listingId === id);
-                                                                                    return (
-                                                                                        <div key={id} className="flex items-center gap-2 p-2 rounded-md border text-xs">
-                                                                                            <Building className="h-4 w-4 text-muted-foreground shrink-0"/>
-                                                                                            <div className="flex-grow">
-                                                                                                <p className="font-medium text-foreground">{listing?.name || id}</p>
-                                                                                                <p>{listing?.location}</p>
-                                                                                            </div>
-                                                                                            <Button variant="ghost" size="icon" className="h-6 w-6" asChild>
-                                                                                                <Link href={`/listings/${id}`} target="_blank"><Link2 className="h-3 w-3"/></Link>
-                                                                                            </Button>
-                                                                                        </div>
-                                                                                    )
-                                                                                 })}
-                                                                             </div>
-                                                                        </div>
-                                                                        <p className="font-semibold text-foreground pt-2">
-                                                                            By proceeding, you confirm your agreement to collaborate with Lakshmi Balaji O2O on this transaction.
-                                                                        </p>
-                                                                    </div>
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter>
-                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction onClick={() => handleAcknowledgeClick(lead)}>
-                                                                    I Understand, Proceed
-                                                                </AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
-                                                </div>
+                                            {providerInfo && providerInfo.status === 'Pending' ? (
+                                                <Button asChild variant="default" size="sm">
+                                                    <Link href={`/dashboard/leads/${lead.id}`}>
+                                                        Review & Action <ArrowRight className="ml-2 h-4 w-4" />
+                                                    </Link>
+                                                </Button>
                                             ) : (
                                                 <Button asChild variant="outline" size="sm">
                                                     <Link href={`/dashboard/leads/${lead.id}`}>
