@@ -26,6 +26,9 @@ const MainDashboard = () => {
     const { user } = useAuth();
     const { submissions, listings } = useData();
     const searchParams = useSearchParams();
+    
+    // Read URL params to control active tabs
+    const defaultTabParam = searchParams.get('tab');
     const logNewDemand = searchParams.get('logNew') === 'true';
     const editDemandId = searchParams.get('editDemandId');
     const propertyMatchDemandId = searchParams.get('demandId');
@@ -36,10 +39,10 @@ const MainDashboard = () => {
     const isCustomer = user?.role === 'User';
     const isAgent = user?.role === 'Agent';
 
-    const [providerTab, setProviderTab] = React.useState('my-listings');
-    const [customerTab, setCustomerTab] = React.useState('my-demands');
-    const [adminTab, setAdminTab] = React.useState('approval-queue');
-    const [superAdminTab, setSuperAdminTab] = React.useState('all-listings');
+    const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'my-listings');
+    const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-demands');
+    const [adminTab, setAdminTab] = React.useState(defaultTabParam || 'approval-queue');
+    const [superAdminTab, setSuperAdminTab] = React.useState(defaultTabParam || 'all-listings');
 
     const hasPendingSubmissions = React.useMemo(() => {
         return submissions.some(s => s.status === 'Pending');
@@ -49,15 +52,21 @@ const MainDashboard = () => {
         setCustomerTab('my-demands');
     }, []);
 
-    // Effect to switch tab based on URL params
+    // Effect to switch tab based on URL params for specific actions
     React.useEffect(() => {
       if (logNewDemand || editDemandId) {
         setCustomerTab('log-demand');
       } else if (propertyMatchDemandId) {
         setProviderTab('submit-match');
-        setAdminTab('submit-match');
+        setAdminTab('submit-match'); // For O2O manager if they use it
+      } else if (defaultTabParam) {
+        // Handle general tab switching from notifications
+        if (isProvider) setProviderTab(defaultTabParam);
+        if (isCustomer) setCustomerTab(defaultTabParam);
+        if (isO2OManager) setAdminTab(defaultTabParam);
+        if (isSuperAdmin) setSuperAdminTab(defaultTabParam);
       }
-    }, [logNewDemand, editDemandId, propertyMatchDemandId]);
+    }, [logNewDemand, editDemandId, propertyMatchDemandId, defaultTabParam, isProvider, isCustomer, isO2OManager, isSuperAdmin]);
 
     const renderProviderContent = () => (
       <Tabs value={providerTab} onValueChange={setProviderTab}>

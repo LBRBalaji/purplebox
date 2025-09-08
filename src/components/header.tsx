@@ -180,7 +180,7 @@ const ToolsDropdown = () => {
 
 const Notifications = () => {
     const { user } = useAuth();
-    const { submissions, agentLeads, registeredLeads, demands } = useData();
+    const { submissions, agentLeads, registeredLeads } = useData();
 
     const notifications = React.useMemo(() => {
         if (!user) return [];
@@ -196,7 +196,7 @@ const Notifications = () => {
         if (isO2O || isSuperAdmin) {
             const pendingSubmissions = submissions.filter(s => s.status === 'Pending').length;
             if (pendingSubmissions > 0) {
-                items.push({ text: `${pendingSubmissions} new property submission(s) for approval`, href: '/dashboard/approval', icon: MailCheck });
+                items.push({ text: `${pendingSubmissions} new property submission(s) for approval`, href: '/dashboard?tab=approval-queue', icon: MailCheck });
             }
             const pendingAgents = agentLeads.filter(a => a.status === 'Pending').length;
             if (pendingAgents > 0) {
@@ -207,28 +207,27 @@ const Notifications = () => {
         if (isProvider) {
             const pendingLeads = registeredLeads.filter(l => l.providers.some(p => p.providerEmail === user.email && p.status === 'Pending')).length;
             if (pendingLeads > 0) {
-                items.push({ text: `${pendingLeads} new lead(s) require your acknowledgment`, href: '/dashboard', icon: UserCheck });
+                items.push({ text: `${pendingLeads} new lead(s) require your acknowledgment`, href: '/dashboard?tab=registered-leads', icon: UserCheck });
             }
         }
 
         if (isCustomer) {
-            const newMatches = submissions.filter(s => s.demandUserEmail === user.email && s.isNew).length;
-            if (newMatches > 0) {
-                const demandIds = new Set(submissions.filter(s => s.demandUserEmail === user.email && s.isNew).map(s => s.demandId));
-                items.push({ text: `You have ${newMatches} new approved match(es) for ${demandIds.size > 1 ? `${demandIds.size} demands` : `demand ${Array.from(demandIds)[0]}`}`, href: '/dashboard', icon: FileCheck });
+            const newSubmissionCount = submissions.filter(s => s.demandUserEmail === user.email && s.isNew).length;
+            if (newSubmissionCount > 0) {
+                items.push({ text: `You have ${newSubmissionCount} new approved match(es)`, href: '/dashboard?tab=my-demands', icon: FileCheck });
             }
         }
         
         if (isAgent) {
              const pendingAcks = registeredLeads.filter(l => l.registeredBy === user.email && l.providers.some(p => p.status === 'Pending')).length;
              if (pendingAcks > 0) {
-                 items.push({ text: `${pendingAcks} provider acknowledgment(s) are pending for your leads`, href: '/dashboard/transactions', icon: HardHat });
+                 items.push({ text: `${pendingAcks} provider acknowledgment(s) are pending`, href: '/dashboard/transactions', icon: HardHat });
              }
         }
         
         return items;
 
-    }, [user, submissions, agentLeads, registeredLeads, demands]);
+    }, [user, submissions, agentLeads, registeredLeads]);
 
     if (!user || notifications.length === 0) {
         return null;
