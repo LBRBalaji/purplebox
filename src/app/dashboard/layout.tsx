@@ -27,7 +27,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const isAdmin = isSuperAdmin || isO2OManager;
         
         // Analytics is only for the main admin and O2O.
-        // This rule now correctly allows access to the hub at /dashboard/analytics and any sub-page.
         if (pathname.startsWith('/dashboard/analytics') && !isAdmin) {
             router.push('/dashboard');
         }

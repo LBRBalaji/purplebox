@@ -20,6 +20,7 @@ import { ProviderLeads } from '@/components/provider-leads';
 import { CustomerTransactions } from '@/components/customer-transactions';
 import { AdminListings } from '@/components/admin-listings';
 import Link from 'next/link';
+import { TransactionsPage } from '@/components/transactions-page';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -39,7 +40,6 @@ const MainDashboard = () => {
     const [customerTab, setCustomerTab] = React.useState('my-demands');
     const [adminTab, setAdminTab] = React.useState('approval-queue');
     const [superAdminTab, setSuperAdminTab] = React.useState('all-listings');
-    const [agentTab, setAgentTab] = React.useState('manage-transactions');
 
     const hasPendingSubmissions = React.useMemo(() => {
         return submissions.some(s => s.status === 'Pending');
@@ -122,16 +122,7 @@ const MainDashboard = () => {
 
     // Agent gets a focused view for lead generation
     const renderAgentContent = () => {
-        return (
-            <Tabs value={agentTab} onValueChange={setAgentTab}>
-                <TabsList className="grid w-full grid-cols-1">
-                  <TabsTrigger value="manage-transactions">My Registered Leads</TabsTrigger>
-                </TabsList>
-                <TabsContent value="manage-transactions">
-                  <ProviderLeads />
-                </TabsContent>
-            </Tabs>
-        );
+        return <TransactionsPage />;
     };
 
     // Super Admin gets a super-view with all possible tabs
