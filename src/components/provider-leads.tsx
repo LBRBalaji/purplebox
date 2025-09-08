@@ -6,10 +6,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake } from 'lucide-react';
+import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
-import type { RegisteredLead, RegisteredLeadStatus } from '@/contexts/data-context';
+import type { RegisteredLead, RegisteredLeadStatus, ListingSchema } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
@@ -41,7 +41,7 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
 
 export function ProviderLeads() {
   const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, updateRegisteredLeadStatus } = useData();
+  const { registeredLeads, updateRegisteredLeadStatus, listings } = useData();
   const { toast } = useToast();
   const [selectedLead, setSelectedLead] = React.useState<RegisteredLead | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -180,7 +180,7 @@ export function ProviderLeads() {
                                           </>
                                         ) : (
                                           <>
-                                            <TableCell>{lead.registeredBy}</TableCell>
+                                            <TableCell>{allUsers[lead.registeredBy]?.companyName || lead.registeredBy}</TableCell>
                                             <TableCell className="text-center">
                                                 {status ? (
                                                     <Badge className={cn("text-xs", status.color)}>{status.text}</Badge>
@@ -233,19 +233,40 @@ export function ProviderLeads() {
                                                                 <Check className="mr-2 h-4 w-4" /> Acknowledge
                                                             </Button>
                                                         </AlertDialogTrigger>
-                                                        <AlertDialogContent>
+                                                        <AlertDialogContent className="sm:max-w-lg">
                                                             <AlertDialogHeader>
                                                                 <AlertDialogTitle className="flex items-center gap-2">
                                                                     <Handshake className="h-5 w-5 text-primary"/>
-                                                                    Confirm Lead Acknowledgment
+                                                                    Review Lead Registration Details
                                                                 </AlertDialogTitle>
                                                                 <AlertDialogDescription asChild>
-                                                                    <div className="text-left pt-2 space-y-3 text-sm text-muted-foreground">
-                                                                        <p>
-                                                                            By proceeding, you are formally acknowledging this lead registration. This step confirms your agreement to collaborate with Lakshmi Balaji O2O on this transaction.
-                                                                        </p>
-                                                                        <p className="font-semibold text-foreground">
-                                                                            Please be aware that this action signifies the start of our professional engagement for this specific lead and is non-revocable.
+                                                                     <div className="text-left pt-2 space-y-4 text-sm text-muted-foreground">
+                                                                        <div className="space-y-1">
+                                                                            <p className="font-semibold text-foreground">Requirements Summary:</p>
+                                                                            <p className="text-sm p-3 bg-secondary/50 rounded-md">{lead.requirementsSummary}</p>
+                                                                        </div>
+                                                                        <div className="space-y-2">
+                                                                             <p className="font-semibold text-foreground">Linked Properties:</p>
+                                                                             <div className="space-y-2">
+                                                                                 {providerInfo.listingIds.map(id => {
+                                                                                    const listing = listings.find(l => l.listingId === id);
+                                                                                    return (
+                                                                                        <div key={id} className="flex items-center gap-2 p-2 rounded-md border text-xs">
+                                                                                            <Building className="h-4 w-4 text-muted-foreground shrink-0"/>
+                                                                                            <div className="flex-grow">
+                                                                                                <p className="font-medium text-foreground">{listing?.name || id}</p>
+                                                                                                <p>{listing?.location}</p>
+                                                                                            </div>
+                                                                                            <Button variant="ghost" size="icon" className="h-6 w-6" asChild>
+                                                                                                <Link href={`/listings/${id}`} target="_blank"><Link2 className="h-3 w-3"/></Link>
+                                                                                            </Button>
+                                                                                        </div>
+                                                                                    )
+                                                                                 })}
+                                                                             </div>
+                                                                        </div>
+                                                                        <p className="font-semibold text-foreground pt-2">
+                                                                            By proceeding, you confirm your agreement to collaborate with Lakshmi Balaji O2O on this transaction.
                                                                         </p>
                                                                     </div>
                                                                 </AlertDialogDescription>
