@@ -40,8 +40,8 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
 };
 
 export function ProviderLeads() {
-  const { user } = useAuth();
-  const { registeredLeads, updateRegisteredLeadStatus, users: allUsers } = useData();
+  const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
+  const { registeredLeads, updateRegisteredLeadStatus } = useData();
   const { toast } = useToast();
   const [selectedLead, setSelectedLead] = React.useState<RegisteredLead | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -88,6 +88,10 @@ export function ProviderLeads() {
     });
     setIsDialogOpen(false);
     setSelectedLead(null);
+  }
+
+  if (isAuthLoading) {
+    return null; // Don't render until auth data is loaded
   }
 
   if (myLeads.length === 0) {
