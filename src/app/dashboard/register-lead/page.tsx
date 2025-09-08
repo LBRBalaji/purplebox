@@ -90,7 +90,7 @@ function RegisterLeadForm() {
   }, [form]);
 
   const providers = React.useMemo(() => 
-    Object.values(users).filter(u => u.role === 'SuperAdmin' && u.email !== 'admin@example.com'),
+    Object.values(users).filter(u => u.role === 'Warehouse Developer'),
     [users]
   );
   
@@ -412,5 +412,3 @@ export default function TransactionsPage() {
     </main>
   );
 }
-
-    

@@ -71,5 +71,14 @@
     "userName": "Developer Three",
     "phone": "7890123456",
     "createdAt": "2025-09-08T10:07:00.000Z"
+  },
+  "mlakshmibalaji@gmail.com": {
+    "email": "mlakshmibalaji@gmail.com",
+    "companyName": "Lakshmi Balaji Realty Private Limited",
+    "userName": "Subbulakshmi",
+    "phone": "9363598170",
+    "role": "Agent",
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-08T08:14:26.605Z"
   }
 }
