@@ -53,7 +53,7 @@ import Link from 'next/link';
 
 const providerSelectionSchema = z.object({
   providerEmail: z.string().email(),
-  listingIds: z.array(z.string()).min(1, 'At least one property must be selected for this provider.'),
+  listingIds: z.array(z.string()).min(1, 'At least one property must be selected for this provider.').max(3, 'You can select a maximum of 3 properties.'),
 });
 
 const leadRegistrationSchema = z.object({
@@ -64,6 +64,9 @@ const leadRegistrationSchema = z.object({
   leadEmail: z.string().email('Invalid email address.'),
   leadPhone: z.string().min(1, 'Phone number is required.'),
   requirementsSummary: z.string().min(10, 'Please provide a brief summary of requirements.'),
+  location: z.string().optional(),
+  size: z.coerce.number().optional(),
+  possession: z.string().optional(),
   providers: z.array(providerSelectionSchema).min(1, 'At least one provider must be selected.'),
 });
 
@@ -86,6 +89,9 @@ function RegisterLeadForm() {
       leadEmail: '',
       leadPhone: '',
       requirementsSummary: '',
+      location: '',
+      size: undefined,
+      possession: 'Immediate',
       providers: [],
     },
   });
@@ -94,6 +100,8 @@ function RegisterLeadForm() {
     control: form.control,
     name: "providers"
   });
+  
+  const locationValue = form.watch('location');
 
   React.useEffect(() => {
     if (!form.getValues('id')) {
@@ -130,8 +138,7 @@ function RegisterLeadForm() {
 
     const leadProviders: RegisteredLeadProvider[] = data.providers.map(p => ({
       providerEmail: p.providerEmail,
-      listingIds: p.listingIds,
-      status: 'Pending',
+      properties: p.listingIds.map(id => ({ listingId: id, status: 'Pending' }))
     }));
 
     const newLead: Omit<RegisteredLead, 'registeredAt'> = {
@@ -144,6 +151,7 @@ function RegisterLeadForm() {
       requirementsSummary: data.requirementsSummary,
       registeredBy: user.email,
       providers: leadProviders,
+      isO2OCollaborator: false,
     };
 
     addRegisteredLead(newLead, user?.email);
@@ -161,6 +169,9 @@ function RegisterLeadForm() {
       leadEmail: '',
       leadPhone: '',
       requirementsSummary: '',
+      location: '',
+      size: undefined,
+      possession: 'Immediate',
       providers: [],
     });
   };
@@ -208,17 +219,41 @@ function RegisterLeadForm() {
              </div>
              <FormField control={form.control} name="leadEmail" render={({ field }) => (<FormItem><FormLabel>Contact Email</FormLabel><FormControl><Input type="email" placeholder={isAgent ? "Enter email" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId')} /></FormControl><FormMessage /></FormItem> )} />
             <FormField control={form.control} name="requirementsSummary" render={({ field }) => ( <FormItem><FormLabel>Requirements Summary</FormLabel><FormControl><Textarea placeholder="Briefly describe the lead's requirements..." {...field} /></FormControl><FormMessage /></FormItem>)} />
+            
+            {isAgent && (
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                     <FormField control={form.control} name="location" render={({ field }) => ( <FormItem><FormLabel>Location</FormLabel><FormControl><Input placeholder="e.g. Oragadam, Chennai" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="size" render={({ field }) => ( <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="possession" render={({ field }) => (<FormItem><FormLabel>Possession</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                        <SelectItem value="Immediate">Immediate</SelectItem>
+                        <SelectItem value="within 45 days">Within 45 days</SelectItem>
+                        <SelectItem value="3 months">3 months</SelectItem>
+                        <SelectItem value="BTS">BTS</SelectItem>
+                     </SelectContent></Select><FormMessage /></FormItem>)} />
+                 </div>
+            )}
 
             <div className="space-y-4">
                 <FormLabel>Providers and their Properties</FormLabel>
                  {fields.map((field, index) => {
-                    const providerListings = approvedListings.filter(l => l.developerId === form.watch(`providers.${index}.providerEmail`));
+                    const providerEmail = form.watch(`providers.${index}.providerEmail`);
+                    const selectedListings = form.watch(`providers.${index}.listingIds`) || [];
+                    const filteredProviderListings = approvedListings.filter(l => 
+                      l.developerId === providerEmail &&
+                      (!locationValue || l.location.toLowerCase().includes(locationValue.toLowerCase()))
+                    );
+                    const canSelectMore = selectedListings.length < 3;
+
                     return (
                         <div key={field.id} className="p-4 border rounded-lg space-y-4">
                             <div className="flex items-end gap-4">
                                 <FormField control={form.control} name={`providers.${index}.providerEmail`} render={({ field }) => (
                                     <FormItem className="flex-grow"><FormLabel>Provider</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger>
+                                    <Select onValueChange={(value) => {
+                                        field.onChange(value);
+                                        // Reset selected listings when provider changes
+                                        form.setValue(`providers.${index}.listingIds`, []);
+                                    }} value={field.value}><FormControl><SelectTrigger>
                                         <SelectValue placeholder="Select a provider" />
                                     </SelectTrigger></FormControl><SelectContent>
                                         {allProviders.map(p => <SelectItem key={p.email} value={p.email}>{p.companyName}</SelectItem>)}
@@ -229,23 +264,30 @@ function RegisterLeadForm() {
                             </div>
                             <FormField control={form.control} name={`providers.${index}.listingIds`} render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Select Properties for this Provider</FormLabel>
+                                    <FormLabel>Select Properties for this Provider (Max 3)</FormLabel>
                                     <FormControl>
                                         <div className="p-3 border rounded-md max-h-48">
                                             <ScrollArea className="h-full">
-                                                {providerListings.length > 0 ? providerListings.map(listing => (
+                                                {providerEmail ? (
+                                                    filteredProviderListings.length > 0 ? filteredProviderListings.map(listing => (
                                                     <div key={listing.listingId} className="flex items-center justify-between space-x-2 p-2">
                                                         <div className="flex items-center space-x-2">
                                                             <Checkbox
                                                                 id={`${field.name}-${listing.listingId}`}
                                                                 checked={field.value?.includes(listing.listingId)}
                                                                 onCheckedChange={(checked) => {
-                                                                    return checked
-                                                                        ? field.onChange([...(field.value || []), listing.listingId])
-                                                                        : field.onChange(field.value?.filter((id) => id !== listing.listingId))
+                                                                    const currentValue = field.value || [];
+                                                                    if (checked) {
+                                                                        if (canSelectMore) {
+                                                                            return field.onChange([...currentValue, listing.listingId]);
+                                                                        }
+                                                                    } else {
+                                                                        return field.onChange(currentValue.filter((id) => id !== listing.listingId));
+                                                                    }
                                                                 }}
+                                                                disabled={!canSelectMore && !field.value?.includes(listing.listingId)}
                                                             />
-                                                            <label htmlFor={`${field.name}-${listing.listingId}`} className="text-sm font-medium leading-none cursor-pointer">
+                                                            <label htmlFor={`${field.name}-${listing.listingId}`} className={cn("text-sm font-medium leading-none cursor-pointer", !canSelectMore && !field.value?.includes(listing.listingId) && "text-muted-foreground")}>
                                                                 {listing.name} <span className="text-muted-foreground">({listing.location})</span>
                                                             </label>
                                                         </div>
@@ -256,7 +298,8 @@ function RegisterLeadForm() {
                                                             </Link>
                                                         </Button>
                                                     </div>
-                                                )) : <p className="text-sm text-muted-foreground p-2">No listings found for this provider. Add properties in 'My Listings'.</p>}
+                                                )) : <p className="text-sm text-muted-foreground p-2">No listings match the specified location. Try changing the location or clearing it to see all listings.</p>
+                                                ) : <p className="text-sm text-muted-foreground p-2">Please select a provider first.</p>}
                                             </ScrollArea>
                                         </div>
                                     </FormControl>
@@ -279,6 +322,7 @@ function RegisterLeadForm() {
 export function TransactionsPage() {
   const { user } = useAuth();
   const isAgent = user?.role === 'Agent';
+  const isO2O = user?.role === 'O2O';
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -294,7 +338,7 @@ export function TransactionsPage() {
         <Tabs defaultValue="activity">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="activity">
-                    {isAgent ? 'My Registered Leads' : 'Transaction Activity'}
+                    {isAgent ? 'My Registered Leads' : isO2O ? 'All O2O Leads' : 'My Acknowledged Leads'}
                 </TabsTrigger>
                 <TabsTrigger value="register">Register New Lead</TabsTrigger>
             </TabsList>
@@ -308,3 +352,4 @@ export function TransactionsPage() {
       </div>
   );
 }
+
