@@ -50,7 +50,8 @@ import { ProviderLeads } from '@/components/provider-leads';
 
 const leadRegistrationSchema = z.object({
   id: z.string(),
-  customerId: z.string().min(1, 'A customer must be selected.'),
+  // customerId is optional for agent-created leads where the customer might not be in the system yet.
+  customerId: z.string().optional(), 
   leadName: z.string().min(1, 'Lead/Company name is required.'),
   leadContact: z.string().min(1, 'Contact person name is required.'),
   leadEmail: z.string().email('Invalid email address.'),
@@ -118,7 +119,8 @@ function RegisterLeadForm() {
 
     const newLead: Omit<RegisteredLead, 'registeredAt'> = {
       id: data.id,
-      customerId: data.customerId,
+      // For agent-created leads, customerId might be the email they entered if it's a new customer
+      customerId: data.customerId || data.leadEmail,
       leadName: data.leadName,
       leadContact: data.leadContact,
       leadEmail: data.leadEmail,
@@ -146,6 +148,8 @@ function RegisterLeadForm() {
       providerEmails: [],
     });
   };
+  
+  const isAgent = user?.role === 'Agent';
 
   if (isAuthLoading) {
     return null;
@@ -175,63 +179,79 @@ function RegisterLeadForm() {
                         </FormItem>
                     )}
                     />
-                <FormField
-                  control={form.control}
-                  name="customerId"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Lead / Company Name</FormLabel>
-                       <Popover open={customerPopoverOpen} onOpenChange={setCustomerPopoverOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? customers.find(c => c.email === field.value)?.companyName
-                                : "Select a customer"}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                          <Command>
-                            <CommandInput placeholder="Search customers..." />
-                            <CommandList>
-                                <CommandEmpty>No customers found.</CommandEmpty>
-                                <CommandGroup>
-                                {customers.map((customer) => (
-                                    <CommandItem
-                                        value={`${customer.companyName} ${customer.userName} ${customer.email}`}
-                                        key={customer.email}
-                                        onSelect={() => handleCustomerSelect(customer)}
-                                    >
-                                        <Check
-                                            className={cn(
-                                            "mr-2 h-4 w-4",
-                                            field.value === customer.email ? "opacity-100" : "opacity-0"
-                                            )}
-                                        />
-                                        <div>
-                                            <p>{customer.companyName}</p>
-                                            <p className="text-xs text-muted-foreground">{customer.userName}</p>
-                                        </div>
-                                    </CommandItem>
-                                ))}
-                                </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {isAgent ? (
+                     <FormField
+                        control={form.control}
+                        name="leadName"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Lead / Company Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter company name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                ) : (
+                    <FormField
+                    control={form.control}
+                    name="customerId"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                        <FormLabel>Lead / Company Name</FormLabel>
+                        <Popover open={customerPopoverOpen} onOpenChange={setCustomerPopoverOpen}>
+                            <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground"
+                                )}
+                                >
+                                {field.value
+                                    ? customers.find(c => c.email === field.value)?.companyName
+                                    : "Select a customer"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                                <CommandInput placeholder="Search customers..." />
+                                <CommandList>
+                                    <CommandEmpty>No customers found.</CommandEmpty>
+                                    <CommandGroup>
+                                    {customers.map((customer) => (
+                                        <CommandItem
+                                            value={`${customer.companyName} ${customer.userName} ${customer.email}`}
+                                            key={customer.email}
+                                            onSelect={() => handleCustomerSelect(customer)}
+                                        >
+                                            <Check
+                                                className={cn(
+                                                "mr-2 h-4 w-4",
+                                                field.value === customer.email ? "opacity-100" : "opacity-0"
+                                                )}
+                                            />
+                                            <div>
+                                                <p>{customer.companyName}</p>
+                                                <p className="text-xs text-muted-foreground">{customer.userName}</p>
+                                            </div>
+                                        </CommandItem>
+                                    ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                            </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                )}
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField
@@ -241,7 +261,7 @@ function RegisterLeadForm() {
                     <FormItem>
                     <FormLabel>Contact Person</FormLabel>
                     <FormControl>
-                        <Input placeholder="Auto-filled from selection" {...field} disabled />
+                        <Input placeholder={isAgent ? "Enter contact name" : "Auto-filled from selection"} {...field} disabled={!isAgent && !!form.watch('customerId')} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -254,7 +274,7 @@ function RegisterLeadForm() {
                     <FormItem>
                     <FormLabel>Contact Phone</FormLabel>
                     <FormControl>
-                        <Input placeholder="Auto-filled from selection" {...field} disabled />
+                        <Input placeholder={isAgent ? "Enter phone number" : "Auto-filled from selection"} {...field} disabled={!isAgent && !!form.watch('customerId')} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -268,7 +288,7 @@ function RegisterLeadForm() {
                     <FormItem>
                     <FormLabel>Contact Email</FormLabel>
                     <FormControl>
-                        <Input type="email" placeholder="Auto-filled from selection" {...field} disabled />
+                        <Input type="email" placeholder={isAgent ? "Enter email address" : "Auto-filled from selection"} {...field} disabled={!isAgent && !!form.watch('customerId')} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
