@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -109,7 +108,7 @@ export function ProviderLeads() {
                         <TableBody>
                             {myLeads.map(lead => {
                                 const providerInfo = lead.providers.find(p => p.providerEmail === user?.email);
-                                const statusSummary = providerInfo 
+                                const statusSummary = providerInfo && providerInfo.properties
                                     ? {
                                         pending: providerInfo.properties.filter(p => p.status === 'Pending').length,
                                         acknowledged: providerInfo.properties.filter(p => p.status === 'Acknowledged').length,
@@ -195,7 +194,7 @@ export function ProviderLeads() {
                                         <TableCell className="text-right">
                                             <Button asChild variant={statusSummary.pending > 0 ? "default" : "outline"} size="sm">
                                                 <Link href={`/dashboard/leads/${lead.id}`}>
-                                                    {isProvider && statusSummary.pending > 0 ? "Review & Action" : "View Activities"}
+                                                    {user?.role === 'Warehouse Developer' && statusSummary.pending > 0 ? "Review & Action" : "View Activities"}
                                                     <ArrowRight className="ml-2 h-4 w-4" />
                                                 </Link>
                                             </Button>
