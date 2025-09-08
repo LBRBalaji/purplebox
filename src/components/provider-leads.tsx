@@ -141,9 +141,10 @@ export function ProviderLeads() {
                                                <TooltipProvider>
                                                 <div className="flex flex-col gap-2">
                                                     {lead.providers.map(p => {
-                                                        const total = p.properties.length;
-                                                        const acknowledged = p.properties.filter(prop => prop.status === 'Acknowledged').length;
-                                                        const rejected = p.properties.filter(prop => prop.status === 'Rejected').length;
+                                                        const properties = p.properties || [];
+                                                        const total = properties.length;
+                                                        const acknowledged = properties.filter(prop => prop.status === 'Acknowledged').length;
+                                                        const rejected = properties.filter(prop => prop.status === 'Rejected').length;
                                                         const pending = total - acknowledged - rejected;
                                                         return (
                                                             <Tooltip key={p.providerEmail}>
