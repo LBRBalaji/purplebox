@@ -42,9 +42,9 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, UserPlus, X, Building } from 'lucide-react';
+import { Check, ChevronsUpDown, UserPlus, X, Building, Warehouse } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import type { RegisteredLead, RegisteredLeadProvider, User } from '@/contexts/data-context';
+import type { RegisteredLead, RegisteredLeadProvider, User, ListingSchema } from '@/contexts/data-context';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProviderLeads } from '@/components/provider-leads';
 
@@ -52,6 +52,7 @@ const leadRegistrationSchema = z.object({
   id: z.string(),
   // customerId is optional for agent-created leads where the customer might not be in the system yet.
   customerId: z.string().optional(), 
+  listingId: z.string().min(1, 'A property must be selected for the transaction.'),
   leadName: z.string().min(1, 'Lead/Company name is required.'),
   leadContact: z.string().min(1, 'Contact person name is required.'),
   leadEmail: z.string().email('Invalid email address.'),
@@ -64,16 +65,18 @@ type LeadRegistrationFormValues = z.infer<typeof leadRegistrationSchema>;
 
 function RegisterLeadForm() {
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { addRegisteredLead } = useData();
+  const { addRegisteredLead, listings } = useData();
   const { toast } = useToast();
   const [providerPopoverOpen, setProviderPopoverOpen] = React.useState(false);
   const [customerPopoverOpen, setCustomerPopoverOpen] = React.useState(false);
+  const [listingPopoverOpen, setListingPopoverOpen] = React.useState(false);
 
   const form = useForm<LeadRegistrationFormValues>({
     resolver: zodResolver(leadRegistrationSchema),
     defaultValues: {
       id: '',
       customerId: '',
+      listingId: '',
       leadName: '',
       leadContact: '',
       leadEmail: '',
@@ -99,6 +102,11 @@ function RegisterLeadForm() {
     Object.values(users).filter(u => u.role === 'User'),
     [users]
   );
+  
+  const approvedListings = React.useMemo(() => 
+    listings.filter(l => l.status === 'approved'),
+    [listings]
+  );
 
   const handleCustomerSelect = (customer: User) => {
     form.setValue('customerId', customer.email);
@@ -108,6 +116,15 @@ function RegisterLeadForm() {
     form.setValue('leadPhone', customer.phone);
     setCustomerPopoverOpen(false);
   };
+  
+  const handleListingSelect = (listing: ListingSchema) => {
+    form.setValue('listingId', listing.listingId);
+    if(listing.developerId && !form.getValues('providerEmails').includes(listing.developerId)) {
+        form.setValue('providerEmails', [listing.developerId]);
+    }
+    setListingPopoverOpen(false);
+  };
+
 
   const onSubmit = (data: LeadRegistrationFormValues) => {
     if (!user) return;
@@ -119,6 +136,7 @@ function RegisterLeadForm() {
 
     const newLead: Omit<RegisteredLead, 'registeredAt'> = {
       id: data.id,
+      listingId: data.listingId,
       // For agent-created leads, customerId might be the email they entered if it's a new customer
       customerId: data.customerId || data.leadEmail,
       leadName: data.leadName,
@@ -140,6 +158,7 @@ function RegisterLeadForm() {
     form.reset({
       id: `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
       customerId: '',
+      listingId: '',
       leadName: '',
       leadContact: '',
       leadEmail: '',
@@ -294,6 +313,63 @@ function RegisterLeadForm() {
                     </FormItem>
                 )}
                 />
+             <FormField
+                control={form.control}
+                name="listingId"
+                render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                    <FormLabel>Subject Property</FormLabel>
+                     <Popover open={listingPopoverOpen} onOpenChange={setListingPopoverOpen}>
+                        <PopoverTrigger asChild>
+                        <FormControl>
+                            <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                            )}
+                            >
+                            {field.value
+                                ? approvedListings.find(l => l.listingId === field.value)?.name
+                                : "Select a property"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                            <CommandInput placeholder="Search listings..." />
+                            <CommandList>
+                                <CommandEmpty>No properties found.</CommandEmpty>
+                                <CommandGroup>
+                                {approvedListings.map((listing) => (
+                                    <CommandItem
+                                        value={`${listing.name} ${listing.location} ${listing.listingId}`}
+                                        key={listing.listingId}
+                                        onSelect={() => handleListingSelect(listing)}
+                                    >
+                                        <Check
+                                            className={cn(
+                                            "mr-2 h-4 w-4",
+                                            field.value === listing.listingId ? "opacity-100" : "opacity-0"
+                                            )}
+                                        />
+                                        <div>
+                                            <p>{listing.name}</p>
+                                            <p className="text-xs text-muted-foreground">{listing.location}</p>
+                                        </div>
+                                    </CommandItem>
+                                ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                        </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
             <FormField
               control={form.control}
               name="requirementsSummary"
@@ -369,7 +445,7 @@ function RegisterLeadForm() {
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    The lead will be registered with these providers.
+                    The lead will be registered with these providers. The property owner will be added automatically.
                   </FormDescription>
                    <div className="pt-2 flex flex-wrap gap-2">
                     {field.value?.map((email) => {

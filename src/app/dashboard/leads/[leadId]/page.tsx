@@ -49,7 +49,7 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, addTransactionActivity, submissions, listings, isLoading: isDataLoading } = useData();
+  const { registeredLeads, transactionActivities, listings, isLoading: isDataLoading } = useData();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
   const [activities, setActivities] = React.useState<TransactionActivity[]>([]);
@@ -64,11 +64,12 @@ export default function LeadDetailPage() {
         if (!isDataLoading) router.push('/dashboard');
         return;
     }
-
-    const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+    
+    const isAdminOrO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
     const isProviderForThisLead = foundLead.providers.some(p => p.providerEmail === user?.email);
     const isCustomerOfThisLead = foundLead.customerId === user?.email;
     const isAgentOfThisLead = foundLead.registeredBy === user?.email;
+
 
     if (isAdminOrO2O || isProviderForThisLead || isCustomerOfThisLead || isAgentOfThisLead) {
         setLead(foundLead);
@@ -76,26 +77,22 @@ export default function LeadDetailPage() {
             .filter(a => a.leadId === leadId)
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setActivities(leadActivities);
-
-        // Corrected Logic: Find the submission that matches the transaction's participants
-        const approvedSubmission = submissions.find(s => 
-            s.status === 'Approved' &&
-            s.demandUserEmail === foundLead.customerId && 
-            foundLead.providers.some(p => p.providerEmail === s.providerEmail)
-        );
-
-        if (approvedSubmission) {
-            const listingDetails = listings.find(l => l.listingId === approvedSubmission.listingId);
+        
+        // New logic to find the primary listing directly from the lead
+        if (foundLead.listingId) {
+            const listingDetails = listings.find(l => l.listingId === foundLead.listingId);
             if(listingDetails) setPrimaryListing(listingDetails);
         }
+
     } else {
         router.push('/dashboard');
     }
-  }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading, isAuthLoading, submissions, listings]);
+  }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading, isAuthLoading, listings]);
 
 
   const handleAddActivity = (data: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
-    addTransactionActivity(data);
+    // In a real app, this would be an API call. Here we simulate it.
+    console.log("Activity to add:", data);
   };
   
   if (isAuthLoading || isDataLoading || !lead) {
@@ -103,7 +100,7 @@ export default function LeadDetailPage() {
   }
 
   const customer = users[lead.customerId];
-  const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+  const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
   const isCustomer = user?.email === lead.customerId;
   const isAgent = user?.role === 'Agent';
   const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
@@ -134,7 +131,7 @@ export default function LeadDetailPage() {
             <TabsContent value="activity" className="mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                     <div className="md:col-span-2 space-y-6">
-                        {(isO2O || (isCustomer && user?.plan === 'Paid_Premium') || isPremiumAgent) && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                        {(isO2O || isPremiumAgent) && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>
