@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -38,8 +39,12 @@ export function ProviderLeads() {
   const myLeads = React.useMemo(() => {
     if (!user) return [];
     
+    // O2O and Admin see leads that are either flagged for collaboration or originated from a non-agent
     if (isAdminOrO2O) {
-        return registeredLeads; // O2O and Admin see all leads
+        return registeredLeads.filter(lead => {
+            const registeringUser = allUsers[lead.registeredBy];
+            return lead.isO2OCollaborator || registeringUser?.role !== 'Agent';
+        });
     }
 
     if (isAgent) {
@@ -50,7 +55,7 @@ export function ProviderLeads() {
     return registeredLeads.filter(lead => 
       lead.providers.some(p => p.providerEmail === user.email)
     );
-  }, [registeredLeads, user, isAgent, isAdminOrO2O]);
+  }, [registeredLeads, user, isAgent, isAdminOrO2O, allUsers]);
 
 
   if (isAuthLoading) {

@@ -92,6 +92,7 @@ export type RegisteredLead = {
   registeredBy: string; // email of LBO2O user
   registeredAt: string;
   providers: RegisteredLeadProvider[];
+  isO2OCollaborator?: boolean;
 }
 
 export type TransactionActivity = {

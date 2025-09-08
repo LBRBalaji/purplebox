@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, UserPlus, X, Building, Warehouse, PlusCircle, Trash2, Eye } from 'lucide-react';
+import { Check, ChevronsUpDown, UserPlus, X, Building, Warehouse, PlusCircle, Trash2, Eye, Handshake, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { RegisteredLead, RegisteredLeadProvider, User, ListingSchema, RegisteredLeadProperty } from '@/contexts/data-context';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -51,6 +51,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData } from '@/contexts/data-context';
 import Link from 'next/link';
+import { Switch } from '@/components/ui/switch';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const providerSelectionSchema = z.object({
   providerEmail: z.string().email("Please select a provider."),
@@ -69,6 +71,7 @@ const leadRegistrationSchema = z.object({
   location: z.string().optional(),
   size: z.coerce.number().optional(),
   possession: z.enum(['Immediate', 'within 45 days', '3 months', 'BTS']).optional(),
+  isO2OCollaborator: z.boolean().default(false),
 });
 
 type LeadRegistrationFormValues = z.infer<typeof leadRegistrationSchema>;
@@ -91,6 +94,7 @@ function RegisterLeadForm() {
       leadPhone: '',
       requirementsSummary: '',
       providers: [],
+      isO2OCollaborator: false,
     },
   });
 
@@ -149,6 +153,7 @@ function RegisterLeadForm() {
       requirementsSummary: data.requirementsSummary,
       registeredBy: user.email,
       providers: leadProviders,
+      isO2OCollaborator: data.isO2OCollaborator,
     };
 
     addRegisteredLead(newLead, user.email);
@@ -167,6 +172,7 @@ function RegisterLeadForm() {
       leadPhone: '',
       requirementsSummary: '',
       providers: [],
+      isO2OCollaborator: false,
     });
   };
 
@@ -310,6 +316,31 @@ function RegisterLeadForm() {
                 })}
                 <Button type="button" variant="outline" size="sm" onClick={() => append({ providerEmail: '', listingIds: [] })}><PlusCircle className="mr-2 h-4 w-4" /> Add Provider</Button>
             </div>
+             {isAgent && (
+                <FormField
+                    control={form.control}
+                    name="isO2OCollaborator"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <FormLabel className="text-base flex items-center gap-2">
+                                    <Handshake className="h-5 w-5 text-primary" />
+                                    Request O2O Team Collaboration
+                                </FormLabel>
+                                <FormDescription>
+                                    Enable this if you need assistance from the O2O team to manage this transaction.
+                                </FormDescription>
+                            </div>
+                            <FormControl>
+                                <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+            )}
             <div className="flex justify-end pt-4"><Button type="submit"><UserPlus className="mr-2 h-4 w-4"/>Register Lead</Button></div>
           </form>
         </Form>
