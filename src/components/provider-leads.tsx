@@ -34,29 +34,37 @@ import {
 } from "@/components/ui/alert-dialog"
 
 const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: string } } = {
-  Pending: { text: 'Pending Your Acknowledgment', color: 'bg-amber-100 text-amber-800' },
+  Pending: { text: 'Pending Acknowledgment', color: 'bg-amber-100 text-amber-800' },
   Acknowledged: { text: 'Acknowledged', color: 'bg-green-100 text-green-800' },
   Rejected: { text: 'Rejected', color: 'bg-red-100 text-red-800' },
 };
 
 export function ProviderLeads() {
   const { user } = useAuth();
-  const { registeredLeads, updateRegisteredLeadStatus } = useData();
+  const { registeredLeads, updateRegisteredLeadStatus, users: allUsers } = useData();
   const { toast } = useToast();
   const [selectedLead, setSelectedLead] = React.useState<RegisteredLead | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-
+  
+  const isAgent = user?.role === 'Agent';
 
   const myLeads = React.useMemo(() => {
     if (!user) return [];
     const isAdminOrO2O = user.role === 'O2O' || user.email === 'admin@example.com';
+    
     if (isAdminOrO2O) {
         return registeredLeads; // O2O and Admin see all leads
     }
+
+    if (isAgent) {
+        return registeredLeads.filter(lead => lead.registeredBy === user.email);
+    }
+    
+    // Default to provider view
     return registeredLeads.filter(lead => 
       lead.providers.some(p => p.providerEmail === user.email)
     );
-  }, [registeredLeads, user]);
+  }, [registeredLeads, user, isAgent]);
 
   const handleReject = (leadId: string, providerEmail: string) => {
     updateRegisteredLeadStatus(leadId, providerEmail, 'Rejected');
@@ -86,8 +94,12 @@ export function ProviderLeads() {
     return (
       <div className="mt-8">
         <Card className="text-center p-12">
-            <CardTitle>No Leads Registered With You</CardTitle>
-            <CardDescription className="mt-2">When the Lakshmi Balaji O2O team registers a new lead with you, it will appear here for your acknowledgment.</CardDescription>
+            <CardTitle>
+                {isAgent ? 'You Have Not Registered Any Leads' : 'No Leads Registered With You'}
+            </CardTitle>
+            <CardDescription className="mt-2">
+                 {isAgent ? 'Use the "Register New Lead" tab to get started.' : 'When the Lakshmi Balaji O2O team registers a new lead with you, it will appear here for your acknowledgment.'}
+            </CardDescription>
         </Card>
       </div>
     );
@@ -97,8 +109,12 @@ export function ProviderLeads() {
     <>
         <div className="mt-8">
             <div className="mb-8">
-                <h2 className="text-3xl font-bold font-headline tracking-tight">Registered Leads</h2>
-                <p className="text-muted-foreground mt-2">Acknowledge or reject leads registered with you by the Lakshmi Balaji O2O team.</p>
+                <h2 className="text-3xl font-bold font-headline tracking-tight">
+                    {isAgent ? 'My Registered Leads' : 'Registered Leads'}
+                </h2>
+                <p className="text-muted-foreground mt-2">
+                    {isAgent ? 'Track the status and activity of the leads you have registered.' : 'Acknowledge or reject leads registered with you by the Lakshmi Balaji O2O team.'}
+                </p>
             </div>
             <Card>
                 <CardContent className="p-0">
@@ -108,7 +124,7 @@ export function ProviderLeads() {
                                 <TableHead>Lead Name</TableHead>
                                 <TableHead>Contact</TableHead>
                                 <TableHead>Requirements Summary</TableHead>
-                                <TableHead>Registered By</TableHead>
+                                {isAgent ? <TableHead>Registered With (Providers)</TableHead> : <TableHead>Registered By</TableHead>}
                                 <TableHead className="text-center">Your Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -116,8 +132,6 @@ export function ProviderLeads() {
                         <TableBody>
                             {myLeads.map(lead => {
                                 const providerInfo = lead.providers.find(p => p.providerEmail === user?.email);
-                                // For O2O/Admin, we just need a status to display. We can show a summary or the status of the first provider.
-                                // Here, we'll just determine the status for the logged-in user if they are a provider.
                                 const status = providerInfo ? statusConfig[providerInfo.status] : null;
 
                                 return (
@@ -130,7 +144,26 @@ export function ProviderLeads() {
                                             </div>
                                         </TableCell>
                                         <TableCell className="max-w-xs truncate">{lead.requirementsSummary}</TableCell>
-                                        <TableCell>{lead.registeredBy}</TableCell>
+                                        
+                                        {isAgent ? (
+                                            <TableCell>
+                                                <div className="flex flex-col gap-2">
+                                                    {lead.providers.map(p => {
+                                                        const providerDetails = allUsers[p.providerEmail];
+                                                        const providerStatus = statusConfig[p.status];
+                                                        return (
+                                                            <div key={p.providerEmail} className="flex items-center gap-2 text-xs">
+                                                                <Badge variant="outline" className={cn(providerStatus?.color, "w-32 justify-center")}>{providerStatus?.text || p.status}</Badge>
+                                                                <span>{providerDetails?.companyName || p.providerEmail}</span>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </TableCell>
+                                        ) : (
+                                             <TableCell>{lead.registeredBy}</TableCell>
+                                        )}
+
                                         <TableCell className="text-center">
                                             {status ? (
                                                 <Badge className={cn("text-xs", status.color)}>{status.text}</Badge>
@@ -163,9 +196,17 @@ export function ProviderLeads() {
 
                                             ) : providerInfo && providerInfo.status === 'Pending' ? (
                                                 <div className="flex gap-2 justify-end">
-                                                    <Button size="sm" variant="outline" onClick={() => handleReject(lead.id, user!.email)}>
-                                                        <X className="mr-2 h-4 w-4" /> Reject
-                                                    </Button>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                          <Button size="sm" variant="outline">
+                                                              <X className="mr-2 h-4 w-4" /> Reject
+                                                          </Button>
+                                                        </AlertDialogTrigger>
+                                                         <AlertDialogContent>
+                                                            <AlertDialogHeader><AlertDialogTitle>Confirm Rejection</AlertDialogTitle><AlertDialogDescription>Are you sure you want to reject this lead registration?</AlertDialogDescription></AlertDialogHeader>
+                                                            <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(lead.id, user!.email)}>Confirm Reject</AlertDialogAction></AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
                                                     <AlertDialog>
                                                         <AlertDialogTrigger asChild>
                                                             <Button size="sm">

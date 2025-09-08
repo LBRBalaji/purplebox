@@ -1,5 +1,37 @@
 [
   {
+    "id": "LDR-MFAW2NJDDGSSV",
+    "customerId": "y@reliance.com",
+    "leadName": "Reliance Industries",
+    "leadContact": "Balaji",
+    "leadEmail": "y@reliance.com",
+    "leadPhone": "234567891",
+    "requirementsSummary": "hey do you want to get into discussion with me to find out where the 'property details' card ",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T08:59:56.644Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "Director",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
+      },
+      {
+        "providerEmail": "wd2@o2o.com",
+        "status": "Pending"
+      },
+      {
+        "providerEmail": "wd3@o2o.com",
+        "status": "Pending"
+      }
+    ],
+    "registeredAt": "2025-09-08T08:59:03.317Z"
+  },
+  {
     "id": "LDR-MFAUQJKZCJ67K",
     "customerId": "customer2@o2o.com",
     "leadName": "Beta Retail",
