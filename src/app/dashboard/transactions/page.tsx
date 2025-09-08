@@ -53,11 +53,8 @@ import { useData } from '@/contexts/data-context';
 import Link from 'next/link';
 
 const providerSelectionSchema = z.object({
-  providerEmail: z.string().email(),
-  properties: z.array(z.object({
-    listingId: z.string(),
-    status: z.enum(['Pending', 'Acknowledged', 'Rejected']),
-  })).min(1, 'At least one property must be selected for this provider.'),
+  providerEmail: z.string().email("Please select a provider."),
+  listingIds: z.array(z.string()).min(1, "At least one property must be selected.").max(3, "You can select a maximum of 3 properties."),
 });
 
 const leadRegistrationSchema = z.object({
@@ -68,10 +65,7 @@ const leadRegistrationSchema = z.object({
   leadEmail: z.string().email('Invalid email address.'),
   leadPhone: z.string().min(1, 'Phone number is required.'),
   requirementsSummary: z.string().min(10, 'Please provide a brief summary of requirements.'),
-  providers: z.array(z.object({
-      providerEmail: z.string().email("Please select a provider."),
-      listingIds: z.array(z.string()).min(1, "At least one property must be selected.").max(3, "You can select a maximum of 3 properties."),
-  })).min(1, 'At least one provider must be selected.'),
+  providers: z.array(providerSelectionSchema).min(1, 'At least one provider must be selected.'),
   location: z.string().optional(),
   size: z.coerce.number().optional(),
   possession: z.enum(['Immediate', 'within 45 days', '3 months', 'BTS']).optional(),
@@ -356,3 +350,4 @@ export function TransactionsPage() {
       </div>
   );
 }
+
