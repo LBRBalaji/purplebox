@@ -70,6 +70,7 @@ type DataEvent = {
 
 export type RegisteredLeadProvider = {
   providerEmail: string;
+  listingIds: string[]; // Can now hold multiple listings
   status: RegisteredLeadStatus;
   acknowledgedAt?: string;
   rejectionReason?: string;
@@ -79,7 +80,6 @@ export type RegisteredLeadProvider = {
 export type RegisteredLead = {
   id: string; // Unique transaction ID
   customerId: string; // The User's email (ID)
-  listingId: string; // The property this transaction is about
   leadName: string;
   leadContact: string;
   leadEmail: string;
