@@ -75,6 +75,7 @@ function RegisterLeadForm() {
   const { addRegisteredLead, listings } = useData();
   const { toast } = useToast();
   const [customerPopoverOpen, setCustomerPopoverOpen] = React.useState(false);
+  const isAgent = user?.role === 'Agent';
 
   const form = useForm<LeadRegistrationFormValues>({
     resolver: zodResolver(leadRegistrationSchema),
@@ -164,8 +165,6 @@ function RegisterLeadForm() {
       providers: [],
     });
   };
-  
-  const isAgent = user?.role === 'Agent';
 
   if (isAuthLoading) return null;
   
