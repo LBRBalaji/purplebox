@@ -88,7 +88,7 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, listings, updateRegisteredLeadStatus, isLoading: isDataLoading } = useData();
+  const { registeredLeads, transactionActivities, listings, updateRegisteredLeadStatus, addTransactionActivity, isLoading: isDataLoading } = useData();
   const { toast } = useToast();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
@@ -140,8 +140,11 @@ export default function LeadDetailPage() {
 
 
   const handleAddActivity = (data: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
-    // In a real app, this would be an API call. Here we simulate it.
-    console.log("Activity to add:", data);
+    addTransactionActivity(data);
+    toast({
+        title: "Activity Logged",
+        description: "The new activity has been successfully saved.",
+    });
   };
 
   const handleAcknowledgeClick = (property: RegisteredLeadProperty) => {
