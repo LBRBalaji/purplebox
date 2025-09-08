@@ -1,5 +1,32 @@
 [
   {
+    "id": "LDR-MFB00CG21XBSI",
+    "customerId": "balaji@kpn.com",
+    "leadName": "Kovai Pazhamudhir Solai",
+    "leadContact": "Balaji",
+    "leadEmail": "balaji@kpn.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Correct the Dashboard View (src/app/dashboard/page.tsx): I will add a specific view for O2O Managers that defaults to showing the \"Registered Leads\" tab. Crucially, I will also ensure that Agents are shown the correct view, giving them access to the \"My Registered Leads\" and the \"Register New Lead\" tabs. This was the missing piece.",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "listingIds": [
+          "LST-ZNHZYG"
+        ],
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T10:53:51.883Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "Director",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
+      }
+    ],
+    "registeredAt": "2025-09-08T10:48:56.160Z"
+  },
+  {
     "id": "LDR-MFAW2NJDDGSSV",
     "customerId": "y@reliance.com",
     "leadName": "Reliance Industries",

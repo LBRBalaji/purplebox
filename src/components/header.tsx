@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator, UserCheck, FileText, Search as SearchIcon, Settings } from 'lucide-react';
+import { Building, LogOut, Sparkles, Map, LogIn, LayoutDashboard, Warehouse, BarChart, ShieldCheck, Users, Briefcase, List, ChevronDown, ClipboardCheck, UserPlus, CheckCircle, FileCheck, Calculator, UserCheck, FileText, Search as SearchIcon, Settings, Bell, HardHat, MailCheck } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -16,7 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
+import { useData } from '@/contexts/data-context';
+import { Badge } from './ui/badge';
 
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -175,6 +178,88 @@ const ToolsDropdown = () => {
     );
 }
 
+const Notifications = () => {
+    const { user } = useAuth();
+    const { submissions, agentLeads, registeredLeads, demands } = useData();
+
+    const notifications = React.useMemo(() => {
+        if (!user) return [];
+
+        const isSuperAdmin = user.role === 'SuperAdmin';
+        const isO2O = user.role === 'O2O';
+        const isProvider = user.role === 'Warehouse Developer';
+        const isCustomer = user.role === 'User';
+        const isAgent = user.role === 'Agent';
+        
+        let items: { text: string; href: string; icon: React.ElementType }[] = [];
+
+        if (isO2O || isSuperAdmin) {
+            const pendingSubmissions = submissions.filter(s => s.status === 'Pending').length;
+            if (pendingSubmissions > 0) {
+                items.push({ text: `${pendingSubmissions} new property submission(s) for approval`, href: '/dashboard/approval', icon: MailCheck });
+            }
+            const pendingAgents = agentLeads.filter(a => a.status === 'Pending').length;
+            if (pendingAgents > 0) {
+                items.push({ text: `${pendingAgents} new agent application(s)`, href: '/dashboard/manage-users', icon: UserPlus });
+            }
+        }
+        
+        if (isProvider) {
+            const pendingLeads = registeredLeads.filter(l => l.providers.some(p => p.providerEmail === user.email && p.status === 'Pending')).length;
+            if (pendingLeads > 0) {
+                items.push({ text: `${pendingLeads} new lead(s) require your acknowledgment`, href: '/dashboard', icon: UserCheck });
+            }
+        }
+
+        if (isCustomer) {
+            const newMatches = submissions.filter(s => s.demandUserEmail === user.email && s.isNew).length;
+            if (newMatches > 0) {
+                const demandIds = new Set(submissions.filter(s => s.demandUserEmail === user.email && s.isNew).map(s => s.demandId));
+                items.push({ text: `You have ${newMatches} new approved match(es) for ${demandIds.size > 1 ? `${demandIds.size} demands` : `demand ${Array.from(demandIds)[0]}`}`, href: '/dashboard', icon: FileCheck });
+            }
+        }
+        
+        if (isAgent) {
+             const pendingAcks = registeredLeads.filter(l => l.registeredBy === user.email && l.providers.some(p => p.status === 'Pending')).length;
+             if (pendingAcks > 0) {
+                 items.push({ text: `${pendingAcks} provider acknowledgment(s) are pending for your leads`, href: '/dashboard/transactions', icon: HardHat });
+             }
+        }
+        
+        return items;
+
+    }, [user, submissions, agentLeads, registeredLeads, demands]);
+
+    if (!user || notifications.length === 0) {
+        return null;
+    }
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 justify-center rounded-full p-0 text-xs">
+                        {notifications.length}
+                    </Badge>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuLabel>Pending Tasks</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {notifications.map((item, index) => (
+                    <DropdownMenuItem key={index} asChild>
+                        <Link href={item.href} className="flex items-start gap-3">
+                             <item.icon className="h-4 w-4 mt-1 text-muted-foreground" />
+                             <span className="whitespace-normal">{item.text}</span>
+                        </Link>
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
 
 export function Header() {
   const { user, logout, isLoading } = useAuth();
@@ -234,7 +319,8 @@ export function Header() {
               {isLoading ? (
                 <Skeleton className="h-9 w-24" />
               ) : user ? (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                   <Notifications />
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">{user.userName}</p>
                     <p className="text-xs text-muted-foreground">
