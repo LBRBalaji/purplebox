@@ -3,7 +3,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type AcknowledgmentDetails } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type CommercialTermsSchema, type AcknowledgmentDetails } from '@/lib/schema';
 import { type User } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 import initialListings from '@/data/listings.json';
@@ -14,6 +14,7 @@ import initialListingAnalytics from '@/data/listing-analytics.json';
 import initialRegisteredLeads from '@/data/registered-leads.json';
 import initialTransactionActivities from '@/data/transaction-activities.json';
 import initialTenantImprovements from '@/data/tenant-improvements.json';
+import initialCommercialTerms from '@/data/commercial-terms.json';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -145,6 +146,8 @@ type DataContextType = {
   addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
   getTenantImprovements: (leadId: string) => TenantImprovementsSheet | null;
   updateTenantImprovements: (leadId: string, sheet: TenantImprovementsSheet) => void;
+  getCommercialTerms: (leadId: string) => CommercialTermsSchema | null;
+  updateCommercialTerms: (leadId: string, sheet: CommercialTermsSchema) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -173,6 +176,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>(initialRegisteredLeads as RegisteredLead[]);
   const [transactionActivities, setTransactionActivities] = useState<TransactionActivity[]>(initialTransactionActivities as TransactionActivity[]);
   const [tenantImprovements, setTenantImprovements] = useState<TenantImprovementsSheet[]>(initialTenantImprovements as TenantImprovementsSheet[]);
+  const [commercialTerms, setCommercialTerms] = useState<CommercialTermsSchema[]>(initialCommercialTerms as any[]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
@@ -209,6 +213,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistRegisteredLeads = (updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads');
   const persistActivities = (updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities');
   const persistTenantImprovements = (updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements');
+  const persistCommercialTerms = (updatedSheets: CommercialTermsSchema[]) => persistData('commercial-terms', updatedSheets, 'commercial terms');
+
 
   const addListing = (listing: ListingSchema, userEmail?: string) => {
     setListings(prevListings => {
@@ -561,6 +567,33 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }
 
+  const getCommercialTerms = (leadId: string): CommercialTermsSchema | null => {
+    const result = commercialTerms.find((sheet: any) => sheet.leadId === leadId);
+    return result || null;
+  }
+
+  const updateCommercialTerms = (leadId: string, sheetData: CommercialTermsSchema) => {
+      setCommercialTerms(prevSheets => {
+        const sheetWithId = { ...sheetData, leadId: leadId };
+        const existingSheetIndex = prevSheets.findIndex((sheet: any) => sheet.leadId === leadId);
+        let updatedSheets: CommercialTermsSchema[];
+
+        if (existingSheetIndex > -1) {
+            updatedSheets = [...prevSheets];
+            updatedSheets[existingSheetIndex] = sheetWithId as any;
+        } else {
+            updatedSheets = [...prevSheets, sheetWithId as any];
+        }
+        
+        persistCommercialTerms(updatedSheets);
+        toast({
+            title: "Commercial Terms Saved",
+            description: "Your changes have been saved successfully.",
+        });
+        return updatedSheets;
+    });
+  }
+
 
   return (
     <DataContext.Provider value={{ 
@@ -576,7 +609,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         transactionActivities,
         addTransactionActivity,
         getTenantImprovements,
-        updateTenantImprovements
+        updateTenantImprovements,
+        getCommercialTerms,
+        updateCommercialTerms
         }}>
       {children}
     </DataContext.Provider>

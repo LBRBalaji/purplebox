@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -50,12 +51,12 @@ const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: a
                 )} />
             </div>
             <div className="col-span-6 md:col-span-2">
-                 <FormField control={control} name={`${name}.proposedBy`} render={({ field }) => (
+                 <FormField control={form.control} name={`${name}.proposedBy`} render={({ field }) => (
                     <FormItem><Select onValueChange={field.onChange} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
             <div className="col-span-6 md:col-span-3">
-                 <FormField control={control} name={`${name}.status`} render={({ field }) => (
+                 <FormField control={form.control} name={`${name}.status`} render={({ field }) => (
                     <FormItem><Select onValueChange={field.onChange} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
@@ -65,6 +66,7 @@ const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: a
 
 export function CommercialTermsSheet({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
     const { user } = useAuth();
+    const { getCommercialTerms, updateCommercialTerms } = useData();
     
     const [rentalOutflow, setRentalOutflow] = React.useState<{ year: number, annualRent: number }[]>([]);
     const [totalOutflow, setTotalOutflow] = React.useState(0);
@@ -203,10 +205,14 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
         }
 
     }, [leaseTermsWatched?.leaseTenure?.agreedTerms, leaseTermsWatched?.rentEscalation?.agreedTerms, commercialTermsWatched?.totalRentPerMonth?.agreedTerms]);
-
+    
+    // Load existing data
     React.useEffect(() => {
-        if (primaryListing) {
-            form.reset({
+        const existingData = getCommercialTerms(lead.id);
+        if (existingData) {
+            form.reset(existingData);
+        } else if (primaryListing) {
+             form.reset({
                 ...form.getValues(),
                 siteInfo: {
                     ...form.getValues().siteInfo,
@@ -227,11 +233,10 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                 },
             });
         }
-    }, [primaryListing, form]);
+    }, [lead.id, primaryListing, getCommercialTerms, form]);
 
     const onSubmit = (data: CommercialTermsSchema) => {
-        console.log("Commercial Terms Submitted: ", data);
-        alert("Commercial terms saved! Check console for data.");
+        updateCommercialTerms(lead.id, data);
     };
     
     const handleGenerateFollowUp = () => {
