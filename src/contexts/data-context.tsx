@@ -61,7 +61,7 @@ export type DownloadRecord = {
 }
 
 type DataEvent = {
-  type: 'new_demand' | 'new_submission' | 'new_listing' | 'download_limit_exceeded' | 'listing_status_changed';
+  type: 'new_demand' | 'new_submission' | 'new_listing' | 'download_limit_exceeded' | 'listing_status_changed' | 'new_lead_for_provider';
   id: string; // The ID of the demand, submission, or user email
   timestamp: string;
   triggeredBy: string | undefined; // The email of the user who triggered the event
@@ -134,7 +134,7 @@ type DataContextType = {
   toggleSelectedForDownload: (listing: ListingSchema) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
   registeredLeads: RegisteredLead[];
-  addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>) => void;
+  addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => void;
   updateRegisteredLeadStatus: (leadId: string, providerEmail: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => void;
   transactionActivities: TransactionActivity[];
   addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
@@ -461,7 +461,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setSelectedForDownload([]);
   };
 
-  const addRegisteredLead = (leadData: Omit<RegisteredLead, 'registeredAt'>) => {
+  const addRegisteredLead = (leadData: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => {
     setRegisteredLeads(prevLeads => {
         const newLead: RegisteredLead = {
           ...leadData,
@@ -469,6 +469,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
         };
         const updatedLeads = [newLead, ...prevLeads];
         persistRegisteredLeads(updatedLeads);
+
+        // Create a notification for each property in the lead
+        newLead.providers.forEach(provider => {
+            provider.listingIds.forEach(listingId => {
+                setLastEvent({
+                    type: 'new_lead_for_provider',
+                    id: `${provider.providerEmail}|${newLead.id}|${listingId}`,
+                    timestamp: new Date().toISOString(),
+                    triggeredBy: userEmail,
+                    message: `New lead for listing ${listingId}`
+                });
+            });
+        });
+
         return updatedLeads;
     });
   };

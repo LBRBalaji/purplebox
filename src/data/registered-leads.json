@@ -15,7 +15,14 @@
           "LST-ELTUE2",
           "LST-ZNHZYG"
         ],
-        "status": "Pending"
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T11:22:27.789Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "director",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
       }
     ],
     "registeredAt": "2025-09-08T11:13:11.428Z"
