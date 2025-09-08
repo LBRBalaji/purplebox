@@ -9,7 +9,7 @@ import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -100,7 +100,7 @@ export default function LeadDetailPage() {
   const isCustomer = user?.email === lead.customerId;
   const isProvider = user?.role === 'SuperAdmin';
   
-  const backLink = isCustomer ? '/dashboard?tab=my-transactions' : '/dashboard/register-lead';
+  const backLink = isCustomer ? '/dashboard?tab=my-transactions' : '/dashboard/transactions';
 
 
   return (
@@ -167,17 +167,32 @@ export default function LeadDetailPage() {
                         </Card>
                     </div>
                     <div className="space-y-6 sticky top-24">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><User className="h-5 w-5"/> Customer Info</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3 text-sm">
-                                <div className="font-semibold">{customer?.companyName || lead.leadName}</div>
-                                <div>{customer?.userName || lead.leadContact}</div>
-                                <a href={`mailto:${customer?.email || lead.leadEmail}`} className="text-primary hover:underline block">{customer?.email || lead.leadEmail}</a>
-                                <a href={`tel:${customer?.phone || lead.leadPhone}`} className="text-primary hover:underline block">{customer?.phone || lead.leadPhone}</a>
-                            </CardContent>
-                        </Card>
+                        {!isCustomer && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2"><User className="h-5 w-5"/> Customer Info</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3 text-sm">
+                                    <div className="font-semibold">{customer?.companyName || lead.leadName}</div>
+                                    <div>{customer?.userName || lead.leadContact}</div>
+                                    <a href={`mailto:${customer?.email || lead.leadEmail}`} className="text-primary hover:underline block">{customer?.email || lead.leadEmail}</a>
+                                    <a href={`tel:${customer?.phone || lead.leadPhone}`} className="text-primary hover:underline block">{customer?.phone || lead.leadPhone}</a>
+                                </CardContent>
+                            </Card>
+                        )}
+                        {isCustomer && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2"><UserCheck className="h-5 w-5"/> Agent Info</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3 text-sm">
+                                    <div className="font-semibold">Lakshmi Balaji Realty</div>
+                                    <div>O2O Manager</div>
+                                    <a href={`mailto:balaji@lakshmibalajio2o.com`} className="text-primary hover:underline block">balaji@lakshmibalajio2o.com</a>
+                                    <a href={`tel:919841098170`} className="text-primary hover:underline block">+91 98410 98170</a>
+                                </CardContent>
+                            </Card>
+                        )}
                          {primaryListing && (
                             <Card>
                                 <CardHeader>
