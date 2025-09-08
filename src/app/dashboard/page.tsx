@@ -125,30 +125,37 @@ const MainDashboard = () => {
     // Agent gets a focused view for lead generation
     const renderAgentContent = () => {
         const isPremium = user?.plan === 'Paid_Premium';
-        const gridCols = isPremium ? 'grid-cols-3' : 'grid-cols-2';
+        const gridCols = isPremium ? 'grid-cols-2' : 'grid-cols-1';
 
+        // Premium agents get access to the full transaction management page
+        if (isPremium) {
+             return (
+                 <Tabs defaultValue="manage-transactions">
+                     <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
+                        <TabsTrigger value="manage-transactions" asChild>
+                            <Link href="/dashboard/transactions">Manage Transactions</Link>
+                        </TabsTrigger>
+                     </TabsList>
+                      <TabsContent value="active-demands">
+                        <DemandList />
+                      </TabsContent>
+                      <TabsContent value="manage-transactions">
+                        {/* This content is now handled by the /dashboard/transactions page, which includes the ProviderLeads component */}
+                      </TabsContent>
+                 </Tabs>
+             );
+        }
+
+        // Standard agents have a simpler view
         return (
             <Tabs value={agentTab} onValueChange={setAgentTab}>
                 <TabsList className={`grid w-full ${gridCols}`}>
                     <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
-                    <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
-                    {isPremium && (
-                        <Link href="/dashboard/transactions">
-                           <TabsTrigger value="manage-transactions" className="w-full">
-                                Manage Transactions
-                           </TabsTrigger>
-                        </Link>
-                    )}
                 </TabsList>
                 <TabsContent value="active-demands">
                     <DemandList />
                 </TabsContent>
-                <TabsContent value="registered-leads">
-                    <ProviderLeads />
-                </TabsContent>
-                 <TabsContent value="manage-transactions">
-                    {/* Content will be on the transactions page */}
-                 </TabsContent>
             </Tabs>
         );
     };

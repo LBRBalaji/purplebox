@@ -407,18 +407,26 @@ function RegisterLeadForm() {
 
 
 export default function TransactionsPage() {
+  const { user } = useAuth();
+  const isAgent = user?.role === 'Agent';
+
   return (
     <main className="container mx-auto p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
             <h2 className="text-3xl font-bold font-headline tracking-tight">Transactions</h2>
             <p className="text-muted-foreground mt-2">
-              Register new business leads or manage the activity for existing ones.
+              {isAgent 
+                ? 'Register new business leads or manage the activity for existing ones.'
+                : 'Manage ongoing transactions and register new business leads.'
+              }
             </p>
         </div>
         <Tabs defaultValue="activity">
             <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="activity">Transaction Activity</TabsTrigger>
+                <TabsTrigger value="activity">
+                    {isAgent ? 'My Registered Leads' : 'Transaction Activity'}
+                </TabsTrigger>
                 <TabsTrigger value="register">Register New Lead</TabsTrigger>
             </TabsList>
             <TabsContent value="activity" className="mt-6">
