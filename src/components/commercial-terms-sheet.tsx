@@ -43,7 +43,8 @@ const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; 
 
 const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: any; label: string; control: any; form: any, isTextarea?: boolean, disabled?: boolean }) => {
     const InputComponent = isTextarea ? Textarea : Input;
-    const status = form.watch(`${name}.status`);
+    const { watch } = form;
+    const status = watch(`${name}.status`);
 
     return (
          <div className={cn("grid grid-cols-12 gap-x-6 gap-y-2 py-4 border-b", status === 'Reserved For Discussion' && 'bg-amber-100/50 rounded-md p-4')}>
@@ -187,7 +188,7 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
         const existingData = getCommercialTerms(lead.id);
         if (existingData && existingData.sessions.length > 0) {
             form.reset(existingData);
-        } else if (primaryListing) {
+        } else {
              const defaultSession = {
                 date: new Date().toISOString(),
                 venue: 'LBR Office, Chennai',
@@ -195,18 +196,18 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                 providerAttendees: [{ name: 'Test Provider', title: 'Director' }],
                 facilitatorAttendees: [{ name: 'O2O Manager', title: 'O2O Manager' }],
                 siteInfo: {
-                    listingId: { agreedTerms: primaryListing.listingId, status: 'Agreed' },
-                    postalAddress: { agreedTerms: primaryListing.location, status: 'Agreed' },
-                    buildingStatus: { agreedTerms: primaryListing.availabilityDate, status: 'Agreed' },
-                    googleCoordinates: { agreedTerms: primaryListing.latLng, status: 'Agreed' },
+                    listingId: { agreedTerms: primaryListing?.listingId || '', status: 'Agreed' },
+                    postalAddress: { agreedTerms: primaryListing?.location || '', status: 'Agreed' },
+                    buildingStatus: { agreedTerms: primaryListing?.availabilityDate || '', status: 'Agreed' },
+                    googleCoordinates: { agreedTerms: primaryListing?.latLng || '', status: 'Agreed' },
                 },
                 area: {
-                    totalChargeableArea: { agreedTerms: String(primaryListing.sizeSqFt), status: 'Agreed' },
+                    totalChargeableArea: { agreedTerms: String(primaryListing?.sizeSqFt || ''), status: 'Agreed' },
                 },
                 commercialTerms: {
-                    chargeableArea: { agreedTerms: String(primaryListing.sizeSqFt), status: 'Agreed' },
-                    buildingRentPerSft: { agreedTerms: String(primaryListing.rentPerSqFt), status: 'Agreed' },
-                    ifrsd: { agreedTerms: `INR ${((primaryListing.rentPerSqFt || 0) * primaryListing.sizeSqFt * (primaryListing.rentalSecurityDeposit || 0)).toLocaleString()}`, status: 'Agreed' },
+                    chargeableArea: { agreedTerms: String(primaryListing?.sizeSqFt || ''), status: 'Agreed' },
+                    buildingRentPerSft: { agreedTerms: String(primaryListing?.rentPerSqFt || ''), status: 'Agreed' },
+                    ifrsd: { agreedTerms: `INR ${((primaryListing?.rentPerSqFt || 0) * (primaryListing?.sizeSqFt || 0) * (primaryListing?.rentalSecurityDeposit || 0)).toLocaleString()}`, status: 'Agreed' },
                 },
                 leaseTerms: {}
              };
