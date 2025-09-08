@@ -99,7 +99,8 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any }) => {
     const { control, watch, setValue } = useFormContext<CommercialTermsSchema>();
     
-    const watchedAreaFields = watch([
+    // Auto-calculation for Total Chargeable Area
+    const areaFields = watch([
         `sessions.${sessionIndex}.area.plinthArea.agreedTerms`,
         `sessions.${sessionIndex}.area.mezzanineArea1.agreedTerms`,
         `sessions.${sessionIndex}.area.mezzanineArea2.agreedTerms`,
@@ -108,25 +109,33 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
     ]);
 
     React.useEffect(() => {
-        const [plinth, mezz1, mezz2, canopy, driversRoom] = watchedAreaFields.map(v => parseFloat(v || '0'));
+        const [plinth, mezz1, mezz2, canopy, driversRoom] = areaFields.map(v => parseFloat(v || '0'));
         const totalArea = [plinth, mezz1, mezz2, canopy, driversRoom]
             .filter(v => !isNaN(v))
             .reduce((acc, v) => acc + v, 0);
-        setValue(`sessions.${sessionIndex}.area.totalChargeableArea.agreedTerms`, String(totalArea));
-    }, [watchedAreaFields, setValue, sessionIndex]);
+
+        const currentTotal = parseFloat(watch(`sessions.${sessionIndex}.area.totalChargeableArea.agreedTerms`) || '0');
+        if (totalArea !== currentTotal) {
+            setValue(`sessions.${sessionIndex}.area.totalChargeableArea.agreedTerms`, String(totalArea));
+        }
+    }, [areaFields, setValue, sessionIndex, watch]);
     
-    const watchedCommercialFields = watch([
+     // Auto-calculation for Total Rent
+    const commercialFields = watch([
          `sessions.${sessionIndex}.commercialTerms.buildingRentPerSft.agreedTerms`,
-         `sessions.${sessionIndex}.commercialTerms.chargeableArea.agreedTerms`,
+         `sessions.${sessionIndex}.area.totalChargeableArea.agreedTerms`, // Use the calculated total area
     ]);
 
     React.useEffect(() => {
-        const [rentPerSft, chargeableArea] = watchedCommercialFields.map(v => parseFloat(v || '0'));
+        const [rentPerSft, chargeableArea] = commercialFields.map(v => parseFloat(v || '0'));
          if (!isNaN(rentPerSft) && !isNaN(chargeableArea)) {
             const totalRent = rentPerSft * chargeableArea;
-            setValue(`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth.agreedTerms`, String(totalRent));
+             const currentTotal = parseFloat(watch(`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth.agreedTerms`) || '0');
+             if(totalRent !== currentTotal) {
+                setValue(`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth.agreedTerms`, String(totalRent));
+             }
         }
-    }, [watchedCommercialFields, setValue, sessionIndex]);
+    }, [commercialFields, setValue, sessionIndex, watch]);
 
 
     return (
@@ -194,7 +203,7 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
     const { getCommercialTerms, updateCommercialTerms } = useData();
     
     const isCustomer = user?.role === 'User';
-    const isProvider = user?.role === 'Warehouse Developer';
+    const isProvider = user?.role === 'SuperAdmin';
     const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
     const isAgent = user?.role === 'Agent';
     const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
