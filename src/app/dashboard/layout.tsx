@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
-        if (pathname.startsWith('/dashboard/register-lead') && !isAdmin) {
+        if (pathname.startsWith('/dashboard/transactions') && !isAdmin) {
             router.push('/dashboard');
         }
 

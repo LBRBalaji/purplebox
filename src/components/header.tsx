@@ -134,7 +134,7 @@ const ManageDropdown = ({ isSuperAdmin, isO2O }: { isSuperAdmin: boolean, isO2O:
                         <DropdownMenuSeparator />
                     </>
                  )}
-                 <DropdownMenuItem asChild><Link href="/dashboard/register-lead"><UserCheck className="mr-2 h-4 w-4" /> Register a Lead</Link></DropdownMenuItem>
+                 <DropdownMenuItem asChild><Link href="/dashboard/transactions"><UserCheck className="mr-2 h-4 w-4" /> Manage Transactions</Link></DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
