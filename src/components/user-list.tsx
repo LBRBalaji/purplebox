@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import type { User, NewUser } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from './ui/button';
-import { Pencil, PlusCircle, Trash2 } from 'lucide-react';
+import { Pencil, PlusCircle, Trash2, Shield } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/contexts/auth-context';
 import { UserForm } from './user-form';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 
 export function UserList() {
@@ -93,7 +94,21 @@ export function UserList() {
             <TableBody>
               {allUsers.map(user => (
                 <TableRow key={user.email}>
-                  <TableCell className="font-medium">{user.userName}</TableCell>
+                  <TableCell className="font-medium flex items-center gap-2">
+                    {user.userName}
+                    {user.isCompanyAdmin && (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Shield className="h-4 w-4 text-primary" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Company Admin</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
+                  </TableCell>
                   <TableCell>{user.companyName}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>

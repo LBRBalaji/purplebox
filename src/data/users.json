@@ -80,5 +80,14 @@
     "role": "Agent",
     "plan": "Paid_Premium",
     "createdAt": "2025-09-08T08:14:26.605Z"
+  },
+  "betacustomer2@o2o.com": {
+    "email": "betacustomer2@o2o.com",
+    "companyName": "Beta Retail",
+    "userName": "Murugan",
+    "phone": "9841098170",
+    "role": "User",
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-08T14:53:54.579Z"
   }
 }

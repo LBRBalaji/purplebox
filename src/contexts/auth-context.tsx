@@ -8,6 +8,7 @@ import { toast } from '@/hooks/use-toast';
 export type User = {
   email: string;
   role: 'SuperAdmin' | 'User' | 'O2O' | 'Warehouse Developer' | 'Agent';
+  isCompanyAdmin?: boolean;
   plan: 'Free' | 'Paid_Basic' | 'Paid_Premium';
   companyName: string;
   userName: string;
@@ -57,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const defaultAdmin: User = {
             email: 'admin@example.com',
             role: 'SuperAdmin',
+            isCompanyAdmin: true,
             plan: 'Paid_Premium',
             companyName: 'Admin Corp',
             userName: 'Default Admin',
@@ -156,8 +158,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
     }
     
-    // New users default to the 'Free' plan
-    const newUserWithDefaults: NewUser = { ...details, plan: 'Free' };
+    // New users default to the 'Free' plan and are not company admins
+    const newUserWithDefaults: NewUser = { ...details, plan: 'Free', isCompanyAdmin: false };
 
     const newUserWithTimestamp: User = { ...newUserWithDefaults, createdAt: new Date().toISOString() };
     addUser(newUserWithTimestamp);

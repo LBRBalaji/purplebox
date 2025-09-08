@@ -33,6 +33,7 @@ import {
 import { type NewUser, type User } from "@/contexts/auth-context";
 import { z } from "zod";
 import { useAuth } from "@/contexts/auth-context";
+import { Switch } from "./ui/switch";
 
 const userFormSchema = z.object({
     email: z.string().email('Invalid email address.'),
@@ -40,6 +41,7 @@ const userFormSchema = z.object({
     userName: z.string().min(1, 'User name is required.'),
     phone: z.string().min(1, 'Phone number is required.'),
     role: z.enum(['User', 'SuperAdmin', 'O2O', 'Warehouse Developer', 'Agent']),
+    isCompanyAdmin: z.boolean().optional(),
     plan: z.enum(['Free', 'Paid_Basic', 'Paid_Premium']),
 });
 
@@ -69,6 +71,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
       userName: '',
       phone: '',
       role: 'User',
+      isCompanyAdmin: false,
       plan: 'Free',
     },
   });
@@ -82,6 +85,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                 userName: user.userName,
                 phone: user.phone,
                 role: user.role,
+                isCompanyAdmin: user.isCompanyAdmin || false,
                 plan: user.plan || 'Free',
             });
         } else {
@@ -91,6 +95,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
               userName: '',
               phone: '',
               role: 'User',
+              isCompanyAdmin: false,
               plan: 'Free',
             });
         }
@@ -182,6 +187,26 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                   )}
                 />
               </div>
+              <FormField
+                control={form.control}
+                name="isCompanyAdmin"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Company Admin</FormLabel>
+                      <FormDescription>
+                        This user can manage other users in their company.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             <DialogFooter className="pt-4">
                 <DialogClose asChild>
                     <Button type="button" variant="outline">Cancel</Button>

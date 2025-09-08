@@ -32,6 +32,7 @@ This table stores information for every individual who registers on the platform
 *   `companyId` (Foreign Key, links to the `Companies` table)
 *   `email` (Unique Identifier, searchable)
 *   `role` (String: "User", "SuperAdmin", "O2O", "Warehouse Developer", "Agent") - *Crucial for access control.*
+*   `isCompanyAdmin` (Boolean) - *If true, this user can manage other users within their own company.*
 *   `plan` (String: "Free", "Paid_Basic", "Paid_Premium") - *Determines feature access, especially for "User" role.*
 *   `companyName` (String) - *Denormalized for easy display.*
 *   `userName` (String)
@@ -42,7 +43,7 @@ This table stores information for every individual who registers on the platform
 
 1.  **Registration:** When a user signs up on the **Signup Page**, a new record is created. A Super Admin then assigns them to a company.
 2.  **Login:** During login, the system fetches the user's record to retrieve their role, plan, and company information.
-3.  **User Management:** The Super Admin uses the **Manage Users** page to view, edit, and assign users to companies.
+3.  **User Management:** The Super Admin uses the **Manage Users** page to view, edit, and assign users to companies. They can also designate a user as a `Company Admin`.
 
 ---
 
