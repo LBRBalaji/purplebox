@@ -126,7 +126,7 @@ export default function LeadDetailPage() {
             <TabsContent value="activity" className="mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                     <div className="md:col-span-2 space-y-6">
-                        {isO2O && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                        {(isO2O || (isCustomer && user?.plan === 'Paid_Premium')) && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>

@@ -19,7 +19,14 @@
       },
       {
         "providerEmail": "wd1@o2o.com",
-        "status": "Pending"
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T08:23:57.098Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "VP",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
       }
     ],
     "registeredAt": "2025-09-08T08:21:07.944Z"
