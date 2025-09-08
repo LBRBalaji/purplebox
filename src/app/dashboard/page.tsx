@@ -19,6 +19,7 @@ import { ProviderListings } from '@/components/provider-listings';
 import { ProviderLeads } from '@/components/provider-leads';
 import { CustomerTransactions } from '@/components/customer-transactions';
 import { AdminListings } from '@/components/admin-listings';
+import Link from 'next/link';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -122,20 +123,35 @@ const MainDashboard = () => {
     );
 
     // Agent gets a focused view for lead generation
-    const renderAgentContent = () => (
-        <Tabs value={agentTab} onValueChange={setAgentTab}>
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
-                <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
-            </TabsList>
-            <TabsContent value="active-demands">
-                <DemandList />
-            </TabsContent>
-            <TabsContent value="registered-leads">
-                <ProviderLeads />
-            </TabsContent>
-        </Tabs>
-    );
+    const renderAgentContent = () => {
+        const isPremium = user?.plan === 'Paid_Premium';
+        const gridCols = isPremium ? 'grid-cols-3' : 'grid-cols-2';
+
+        return (
+            <Tabs value={agentTab} onValueChange={setAgentTab}>
+                <TabsList className={`grid w-full ${gridCols}`}>
+                    <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
+                    <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
+                    {isPremium && (
+                        <Link href="/dashboard/transactions">
+                           <TabsTrigger value="manage-transactions" className="w-full">
+                                Manage Transactions
+                           </TabsTrigger>
+                        </Link>
+                    )}
+                </TabsList>
+                <TabsContent value="active-demands">
+                    <DemandList />
+                </TabsContent>
+                <TabsContent value="registered-leads">
+                    <ProviderLeads />
+                </TabsContent>
+                 <TabsContent value="manage-transactions">
+                    {/* Content will be on the transactions page */}
+                 </TabsContent>
+            </Tabs>
+        );
+    };
 
     // Super Admin gets a super-view with all possible tabs
     const renderMainAdminContent = () => (

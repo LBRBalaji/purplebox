@@ -22,6 +22,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const isO2OManager = user.role === 'O2O';
         const isCustomer = user.role === 'User';
         const isProvider = user.role === 'Warehouse Developer';
+        const isPremiumAgent = user.role === 'Agent' && user.plan === 'Paid_Premium';
 
         const isAdmin = isSuperAdmin || isO2OManager;
         
@@ -46,7 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
-        if (pathname.startsWith('/dashboard/transactions') && !isAdmin) {
+        if (pathname.startsWith('/dashboard/transactions') && !isAdmin && !isPremiumAgent) {
             router.push('/dashboard');
         }
 
