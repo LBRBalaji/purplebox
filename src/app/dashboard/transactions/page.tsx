@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, UserPlus, X, Building, Warehouse, PlusCircle, Trash2 } from 'lucide-react';
+import { Check, ChevronsUpDown, UserPlus, X, Building, Warehouse, PlusCircle, Trash2, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { RegisteredLead, RegisteredLeadProvider, User, ListingSchema } from '@/contexts/data-context';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -49,6 +49,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData } from '@/contexts/data-context';
+import Link from 'next/link';
 
 const providerSelectionSchema = z.object({
   providerEmail: z.string().email(),
@@ -233,19 +234,27 @@ function RegisterLeadForm() {
                                         <div className="p-3 border rounded-md max-h-48">
                                             <ScrollArea className="h-full">
                                                 {providerListings.length > 0 ? providerListings.map(listing => (
-                                                    <div key={listing.listingId} className="flex items-center space-x-2 p-2">
-                                                        <Checkbox
-                                                            id={`${field.name}-${listing.listingId}`}
-                                                            checked={field.value?.includes(listing.listingId)}
-                                                            onCheckedChange={(checked) => {
-                                                                return checked
-                                                                    ? field.onChange([...(field.value || []), listing.listingId])
-                                                                    : field.onChange(field.value?.filter((id) => id !== listing.listingId))
-                                                            }}
-                                                        />
-                                                        <label htmlFor={`${field.name}-${listing.listingId}`} className="text-sm font-medium leading-none">
-                                                            {listing.name} <span className="text-muted-foreground">({listing.location})</span>
-                                                        </label>
+                                                    <div key={listing.listingId} className="flex items-center justify-between space-x-2 p-2">
+                                                        <div className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id={`${field.name}-${listing.listingId}`}
+                                                                checked={field.value?.includes(listing.listingId)}
+                                                                onCheckedChange={(checked) => {
+                                                                    return checked
+                                                                        ? field.onChange([...(field.value || []), listing.listingId])
+                                                                        : field.onChange(field.value?.filter((id) => id !== listing.listingId))
+                                                                }}
+                                                            />
+                                                            <label htmlFor={`${field.name}-${listing.listingId}`} className="text-sm font-medium leading-none cursor-pointer">
+                                                                {listing.name} <span className="text-muted-foreground">({listing.location})</span>
+                                                            </label>
+                                                        </div>
+                                                        <Button asChild variant="ghost" size="icon">
+                                                            <Link href={`/listings/${listing.listingId}`} target="_blank">
+                                                                <Eye className="h-4 w-4"/>
+                                                                <span className="sr-only">View Listing</span>
+                                                            </Link>
+                                                        </Button>
                                                     </div>
                                                 )) : <p className="text-sm text-muted-foreground p-2">No listings found for this provider. Add properties in 'My Listings'.</p>}
                                             </ScrollArea>
