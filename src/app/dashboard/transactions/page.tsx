@@ -66,6 +66,9 @@ const leadRegistrationSchema = z.object({
   leadPhone: z.string().min(1, 'Phone number is required.'),
   requirementsSummary: z.string().min(10, 'Please provide a brief summary of requirements.'),
   providers: z.array(providerSelectionSchema).min(1, 'At least one provider must be selected.'),
+  location: z.string().optional(),
+  size: z.coerce.number().optional(),
+  possession: z.enum(['Immediate', 'within 45 days', '3 months', 'BTS']).optional(),
 });
 
 type LeadRegistrationFormValues = z.infer<typeof leadRegistrationSchema>;
@@ -95,6 +98,8 @@ function RegisterLeadForm() {
     control: form.control,
     name: "providers"
   });
+
+  const watchLocation = form.watch('location');
 
   React.useEffect(() => {
     if (!form.getValues('id')) {
@@ -207,12 +212,40 @@ function RegisterLeadForm() {
                 <FormField control={form.control} name="leadPhone" render={({ field }) => ( <FormItem><FormLabel>Contact Phone</FormLabel><FormControl><Input placeholder={isAgent ? "Enter phone number" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId')} /></FormControl><FormMessage /></FormItem>)} />
              </div>
              <FormField control={form.control} name="leadEmail" render={({ field }) => (<FormItem><FormLabel>Contact Email</FormLabel><FormControl><Input type="email" placeholder={isAgent ? "Enter email" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId')} /></FormControl><FormMessage /></FormItem> )} />
+            
+             {isAgent && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t pt-8">
+                    <FormField control={form.control} name="location" render={({ field }) => (<FormItem><FormLabel>Location</FormLabel><FormControl><Input placeholder="e.g. Chennai" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="size" render={({ field }) => (<FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="possession" render={({ field }) => (
+                      <FormItem><FormLabel>Possession</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger></FormControl>
+                          <SelectContent>
+                              <SelectItem value="Immediate">Immediate</SelectItem>
+                              <SelectItem value="within 45 days">Within 45 days</SelectItem>
+                              <SelectItem value="3 months">3 months</SelectItem>
+                              <SelectItem value="BTS">BTS</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                </div>
+             )}
+
             <FormField control={form.control} name="requirementsSummary" render={({ field }) => ( <FormItem><FormLabel>Requirements Summary</FormLabel><FormControl><Textarea placeholder="Briefly describe the lead's requirements..." {...field} /></FormControl><FormMessage /></FormItem>)} />
 
             <div className="space-y-4">
                 <FormLabel>Providers and their Properties</FormLabel>
                  {fields.map((field, index) => {
-                    const providerListings = approvedListings.filter(l => l.developerId === form.watch(`providers.${index}.providerEmail`));
+                    const selectedProviderEmail = form.watch(`providers.${index}.providerEmail`);
+                    const providerListings = approvedListings.filter(l => 
+                        l.developerId === selectedProviderEmail &&
+                        (!watchLocation || l.location.toLowerCase().includes(watchLocation.toLowerCase()))
+                    );
+                    const selectedCount = form.watch(`providers.${index}.listingIds`)?.length || 0;
+
                     return (
                         <div key={field.id} className="p-4 border rounded-lg space-y-4">
                             <div className="flex items-end gap-4">
@@ -229,7 +262,7 @@ function RegisterLeadForm() {
                             </div>
                             <FormField control={form.control} name={`providers.${index}.listingIds`} render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Select Properties for this Provider</FormLabel>
+                                    <FormLabel>Select Properties for this Provider ({selectedCount}/3)</FormLabel>
                                     <FormControl>
                                         <div className="p-3 border rounded-md max-h-48">
                                             <ScrollArea className="h-full">
@@ -240,6 +273,15 @@ function RegisterLeadForm() {
                                                                 id={`${field.name}-${listing.listingId}`}
                                                                 checked={field.value?.includes(listing.listingId)}
                                                                 onCheckedChange={(checked) => {
+                                                                    const isSelected = field.value?.includes(listing.listingId);
+                                                                    if (!isSelected && selectedCount >= 3) {
+                                                                        toast({
+                                                                            variant: "destructive",
+                                                                            title: "Selection Limit Reached",
+                                                                            description: "You can only select up to 3 properties per provider.",
+                                                                        });
+                                                                        return;
+                                                                    }
                                                                     return checked
                                                                         ? field.onChange([...(field.value || []), listing.listingId])
                                                                         : field.onChange(field.value?.filter((id) => id !== listing.listingId))
@@ -256,7 +298,7 @@ function RegisterLeadForm() {
                                                             </Link>
                                                         </Button>
                                                     </div>
-                                                )) : <p className="text-sm text-muted-foreground p-2">No listings found for this provider. Add properties in 'My Listings'.</p>}
+                                                )) : <p className="text-sm text-muted-foreground p-2">No listings found for this provider {watchLocation ? `in "${watchLocation}"` : ''}. Add properties in 'My Listings' or clear the location filter.</p>}
                                             </ScrollArea>
                                         </div>
                                     </FormControl>
@@ -308,3 +350,4 @@ export function TransactionsPage() {
       </div>
   );
 }
+
