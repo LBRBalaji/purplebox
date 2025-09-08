@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -6,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2 } from 'lucide-react';
+import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2, Clock, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus, ListingSchema } from '@/contexts/data-context';
@@ -21,36 +22,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 
-const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: string } } = {
-  Pending: { text: 'Pending Acknowledgment', color: 'bg-amber-100 text-amber-800' },
-  Acknowledged: { text: 'Acknowledged', color: 'bg-green-100 text-green-800' },
-  Rejected: { text: 'Rejected', color: 'bg-red-100 text-red-800' },
+const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: string, icon: React.ElementType } } = {
+  Pending: { text: 'Pending', color: 'text-amber-600', icon: Clock },
+  Acknowledged: { text: 'Acknowledged', color: 'text-green-600', icon: Check },
+  Rejected: { text: 'Rejected', color: 'text-red-600', icon: X },
 };
 
 export function ProviderLeads() {
   const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, updateRegisteredLeadStatus, listings } = useData();
-  const { toast } = useToast();
-  const [selectedLead, setSelectedLead] = React.useState<RegisteredLead | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const { registeredLeads } = useData();
   
   const isAgent = user?.role === 'Agent';
+  const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
 
   const myLeads = React.useMemo(() => {
     if (!user) return [];
-    const isAdminOrO2O = user.role === 'O2O' || user.email === 'admin@example.com';
     
     if (isAdminOrO2O) {
         return registeredLeads; // O2O and Admin see all leads
@@ -64,31 +51,8 @@ export function ProviderLeads() {
     return registeredLeads.filter(lead => 
       lead.providers.some(p => p.providerEmail === user.email)
     );
-  }, [registeredLeads, user, isAgent]);
+  }, [registeredLeads, user, isAgent, isAdminOrO2O]);
 
-  const handleReject = (leadId: string, providerEmail: string) => {
-    updateRegisteredLeadStatus(leadId, providerEmail, 'Rejected');
-    toast({
-      title: 'Lead Rejected',
-      description: `You have rejected the lead registration.`,
-    });
-  }
-
-  const handleAcknowledgeClick = (lead: RegisteredLead) => {
-    setSelectedLead(lead);
-    setIsDialogOpen(true);
-  };
-  
-  const handleAcknowledgeSubmit = (details: AcknowledgmentDetails) => {
-    if (!selectedLead || !user?.email) return;
-    updateRegisteredLeadStatus(selectedLead.id, user.email, 'Acknowledged', details);
-    toast({
-        title: 'Lead Acknowledged!',
-        description: `Thank you for your confirmation. We look forward to a successful collaboration on this transaction.`,
-    });
-    setIsDialogOpen(false);
-    setSelectedLead(null);
-  }
 
   if (isAuthLoading) {
     return null; // Don't render until auth data is loaded
@@ -128,10 +92,10 @@ export function ProviderLeads() {
                                 <TableHead>Lead Name</TableHead>
                                 <TableHead>Contact</TableHead>
                                 <TableHead>Requirements Summary</TableHead>
-                                {isAgent ? (
+                                {isAgent || isAdminOrO2O ? (
                                   <>
                                     <TableHead>Developers</TableHead>
-                                    <TableHead>Developer Acknowledgement</TableHead>
+                                    <TableHead>Acknowledgment Status</TableHead>
                                   </>
                                 ) : (
                                   <>
@@ -145,8 +109,13 @@ export function ProviderLeads() {
                         <TableBody>
                             {myLeads.map(lead => {
                                 const providerInfo = lead.providers.find(p => p.providerEmail === user?.email);
-                                const status = providerInfo ? statusConfig[providerInfo.status] : null;
-
+                                const statusSummary = providerInfo 
+                                    ? {
+                                        pending: providerInfo.properties.filter(p => p.status === 'Pending').length,
+                                        acknowledged: providerInfo.properties.filter(p => p.status === 'Acknowledged').length,
+                                        rejected: providerInfo.properties.filter(p => p.status === 'Rejected').length,
+                                    } : { pending: 0, acknowledged: 0, rejected: 0};
+                                
                                 return (
                                     <TableRow key={lead.id}>
                                         <TableCell className="font-medium">{lead.leadName}</TableCell>
@@ -158,7 +127,7 @@ export function ProviderLeads() {
                                         </TableCell>
                                         <TableCell className="max-w-xs truncate">{lead.requirementsSummary}</TableCell>
                                         
-                                        {isAgent ? (
+                                        {isAgent || isAdminOrO2O ? (
                                           <>
                                             <TableCell>
                                               <div className="flex flex-col gap-2">
@@ -170,41 +139,66 @@ export function ProviderLeads() {
                                               </div>
                                             </TableCell>
                                             <TableCell>
-                                              <div className="flex flex-col gap-2">
-                                                {lead.providers.map(p => {
-                                                  const providerStatus = statusConfig[p.status];
-                                                  return <Badge key={p.providerEmail} variant="outline" className={cn(providerStatus?.color, "w-36 justify-center")}>{providerStatus?.text || p.status}</Badge>
-                                                })}
-                                              </div>
+                                               <TooltipProvider>
+                                                <div className="flex flex-col gap-2">
+                                                    {lead.providers.map(p => {
+                                                        const total = p.properties.length;
+                                                        const acknowledged = p.properties.filter(prop => prop.status === 'Acknowledged').length;
+                                                        const rejected = p.properties.filter(prop => prop.status === 'Rejected').length;
+                                                        const pending = total - acknowledged - rejected;
+                                                        return (
+                                                            <Tooltip key={p.providerEmail}>
+                                                                <TooltipTrigger asChild>
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <Badge variant={pending > 0 ? "secondary" : "default"} className={cn(pending > 0 ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800')}>{acknowledged}/{total} Ack.</Badge>
+                                                                        {pending > 0 && <HelpCircle className="h-4 w-4 text-muted-foreground" />}
+                                                                    </div>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    <p>Acknowledged: {acknowledged}</p>
+                                                                    <p>Pending: {pending}</p>
+                                                                    <p>Rejected: {rejected}</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        )
+                                                    })}
+                                                </div>
+                                               </TooltipProvider>
                                             </TableCell>
                                           </>
                                         ) : (
                                           <>
                                             <TableCell>{allUsers[lead.registeredBy]?.companyName || lead.registeredBy}</TableCell>
                                             <TableCell className="text-center">
-                                                {status ? (
-                                                    <Badge className={cn("text-xs", status.color)}>{status.text}</Badge>
-                                                ) : (
-                                                    <Badge variant="outline">View Status</Badge>
-                                                )}
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <div className="flex items-center justify-center gap-1.5 cursor-help">
+                                                                {statusSummary.pending > 0 ? (
+                                                                     <Badge variant="secondary" className="bg-amber-100 text-amber-800">{statusSummary.pending} Pending</Badge>
+                                                                ) : (
+                                                                     <Badge variant="default" className="bg-green-100 text-green-800">All Actioned</Badge>
+                                                                )}
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>Acknowledged: {statusSummary.acknowledged}</p>
+                                                            <p>Pending: {statusSummary.pending}</p>
+                                                            <p>Rejected: {statusSummary.rejected}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
                                             </TableCell>
                                           </>
                                         )}
 
                                         <TableCell className="text-right">
-                                            {providerInfo && providerInfo.status === 'Pending' ? (
-                                                <Button asChild variant="default" size="sm">
-                                                    <Link href={`/dashboard/leads/${lead.id}`}>
-                                                        Review & Action <ArrowRight className="ml-2 h-4 w-4" />
-                                                    </Link>
-                                                </Button>
-                                            ) : (
-                                                <Button asChild variant="outline" size="sm">
-                                                    <Link href={`/dashboard/leads/${lead.id}`}>
-                                                        View Activities <ArrowRight className="ml-2 h-4 w-4" />
-                                                    </Link>
-                                                </Button>
-                                            )}
+                                            <Button asChild variant={statusSummary.pending > 0 ? "default" : "outline"} size="sm">
+                                                <Link href={`/dashboard/leads/${lead.id}`}>
+                                                    {isProvider && statusSummary.pending > 0 ? "Review & Action" : "View Activities"}
+                                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                                </Link>
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -214,12 +208,6 @@ export function ProviderLeads() {
                 </CardContent>
             </Card>
         </div>
-        <AcknowledgeLeadDialog 
-            isOpen={isDialogOpen}
-            onOpenChange={setIsDialogOpen}
-            lead={selectedLead}
-            onSubmit={handleAcknowledgeSubmit}
-        />
     </>
   )
 }

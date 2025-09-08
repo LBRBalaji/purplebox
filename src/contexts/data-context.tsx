@@ -68,13 +68,17 @@ type DataEvent = {
   message?: string; // Optional message for the event
 };
 
-export type RegisteredLeadProvider = {
-  providerEmail: string;
-  listingIds: string[]; // Can now hold multiple listings
+export type RegisteredLeadProperty = {
+  listingId: string;
   status: RegisteredLeadStatus;
   acknowledgedAt?: string;
   rejectionReason?: string;
   acknowledgedBy?: AcknowledgmentDetails;
+}
+
+export type RegisteredLeadProvider = {
+  providerEmail: string;
+  properties: RegisteredLeadProperty[];
 }
 
 export type RegisteredLead = {
@@ -135,7 +139,7 @@ type DataContextType = {
   clearSelectedForDownload: () => void;
   registeredLeads: RegisteredLead[];
   addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => void;
-  updateRegisteredLeadStatus: (leadId: string, providerEmail: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => void;
+  updateRegisteredLeadStatus: (leadId: string, providerEmail: string, listingId: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => void;
   transactionActivities: TransactionActivity[];
   addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
   getTenantImprovements: (leadId: string) => TenantImprovementsSheet | null;
@@ -472,13 +476,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         // Create a notification for each property in the lead
         newLead.providers.forEach(provider => {
-            provider.listingIds.forEach(listingId => {
+            provider.properties.forEach(property => {
                 setLastEvent({
                     type: 'new_lead_for_provider',
-                    id: `${provider.providerEmail}|${newLead.id}|${listingId}`,
+                    id: `${provider.providerEmail}|${newLead.id}|${property.listingId}`,
                     timestamp: new Date().toISOString(),
                     triggeredBy: userEmail,
-                    message: `New lead for listing ${listingId}`
+                    message: `New lead for listing ${property.listingId}`
                 });
             });
         });
@@ -487,7 +491,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const updateRegisteredLeadStatus = (leadId: string, providerEmail: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => {
+  const updateRegisteredLeadStatus = (leadId: string, providerEmail: string, listingId: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => {
     setRegisteredLeads(prevLeads => {
         const updatedLeads = prevLeads.map(lead => {
           if (lead.id === leadId) {
@@ -497,9 +501,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 provider.providerEmail === providerEmail 
                   ? { 
                       ...provider, 
-                      status: newStatus, 
-                      acknowledgedAt: newStatus === 'Acknowledged' ? new Date().toISOString() : undefined,
-                      acknowledgedBy: newStatus === 'Acknowledged' ? details : undefined,
+                      properties: provider.properties.map(prop => 
+                        prop.listingId === listingId 
+                        ? {
+                            ...prop,
+                            status: newStatus,
+                            acknowledgedAt: newStatus === 'Acknowledged' ? new Date().toISOString() : undefined,
+                            acknowledgedBy: newStatus === 'Acknowledged' ? details : undefined,
+                        }
+                        : prop
+                      )
                     } 
                   : provider
               )

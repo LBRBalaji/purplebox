@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -42,7 +43,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, UserPlus, X, Building, Warehouse, PlusCircle, Trash2, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import type { RegisteredLead, RegisteredLeadProvider, User, ListingSchema } from '@/contexts/data-context';
+import type { RegisteredLead, RegisteredLeadProvider, User, ListingSchema, RegisteredLeadProperty } from '@/contexts/data-context';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProviderLeads } from '@/components/provider-leads';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -130,8 +131,7 @@ function RegisterLeadForm() {
 
     const leadProviders: RegisteredLeadProvider[] = data.providers.map(p => ({
       providerEmail: p.providerEmail,
-      listingIds: p.listingIds,
-      status: 'Pending',
+      properties: p.listingIds.map(id => ({ listingId: id, status: 'Pending' })),
     }));
 
     const newLead: Omit<RegisteredLead, 'registeredAt'> = {
@@ -279,7 +279,6 @@ function RegisterLeadForm() {
 export function TransactionsPage() {
   const { user } = useAuth();
   const isAgent = user?.role === 'Agent';
-  const isO2O = user?.role === 'O2O';
 
   return (
     <div className="max-w-7xl mx-auto">

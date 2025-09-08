@@ -1,15 +1,16 @@
 
+
 'use client';
 
 import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
-import { useData, type TransactionActivity, type RegisteredLead, type RegisteredLeadProvider } from '@/contexts/data-context';
+import { useData, type TransactionActivity, type RegisteredLead, type RegisteredLeadProvider, type RegisteredLeadProperty } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -22,6 +23,8 @@ import { useToast } from '@/hooks/use-toast';
 import { AcknowledgeLeadDialog } from '@/components/acknowledge-lead-dialog';
 import type { AcknowledgmentDetails } from '@/lib/schema';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
@@ -64,7 +67,7 @@ function DeveloperSelection({ lead, onSelect }: { lead: RegisteredLead, onSelect
             <CardContent className="space-y-4">
                 {lead.providers.map(provider => {
                     const devUser = users[provider.providerEmail];
-                    const devListings = (provider.listingIds || []).map(id => listings.find(l => l.listingId === id)).filter((l): l is ListingSchema => !!l);
+                    const devListings = (provider.properties || []).map(p => listings.find(l => l.listingId === p.listingId)).filter((l): l is ListingSchema => !!l);
                     return (
                         <button key={provider.providerEmail} onClick={() => onSelect(provider, devListings)} className="w-full text-left p-4 border rounded-lg hover:bg-accent transition-colors flex justify-between items-center">
                             <div>
@@ -95,6 +98,7 @@ export default function LeadDetailPage() {
   const [selectedProviderListings, setSelectedProviderListings] = React.useState<ListingSchema[]>([]);
   
   const [isAcknowledgeDialogOpen, setIsAcknowledgeDialogOpen] = React.useState(false);
+  const [propertyToAcknowledge, setPropertyToAcknowledge] = React.useState<RegisteredLeadProperty | null>(null);
 
 
   React.useEffect(() => {
@@ -124,7 +128,7 @@ export default function LeadDetailPage() {
         // If there's only one provider, automatically select them
         if (foundLead.providers.length === 1) {
             const provider = foundLead.providers[0];
-            const devListings = (provider.listingIds || []).map(id => listings.find(l => l.listingId === id)).filter((l): l is ListingSchema => !!l);
+            const devListings = (provider.properties || []).map(p => listings.find(l => l.listingId === p.listingId)).filter((l): l is ListingSchema => !!l);
             setSelectedProvider(provider);
             setSelectedProviderListings(devListings);
         }
@@ -140,24 +144,29 @@ export default function LeadDetailPage() {
     console.log("Activity to add:", data);
   };
 
+  const handleAcknowledgeClick = (property: RegisteredLeadProperty) => {
+      setPropertyToAcknowledge(property);
+      setIsAcknowledgeDialogOpen(true);
+  }
+
   const handleAcknowledgeSubmit = (details: AcknowledgmentDetails) => {
-    if (!lead || !user?.email) return;
-    updateRegisteredLeadStatus(lead.id, user.email, 'Acknowledged', details);
+    if (!lead || !user?.email || !propertyToAcknowledge) return;
+    updateRegisteredLeadStatus(lead.id, user.email, propertyToAcknowledge.listingId, 'Acknowledged', details);
     toast({
-        title: 'Lead Acknowledged!',
-        description: `Thank you for your confirmation. We look forward to a successful collaboration on this transaction.`,
+        title: 'Property Acknowledged!',
+        description: `Thank you for your confirmation.`,
     });
     setIsAcknowledgeDialogOpen(false);
+    setPropertyToAcknowledge(null);
   }
   
-  const handleReject = () => {
+  const handleReject = (listingId: string) => {
     if (!lead || !user?.email) return;
-    updateRegisteredLeadStatus(lead.id, user.email, 'Rejected');
+    updateRegisteredLeadStatus(lead.id, user.email, listingId, 'Rejected');
     toast({
-      title: 'Lead Rejected',
-      description: `You have rejected the lead registration.`,
+      title: 'Property Rejected',
+      description: `You have rejected the lead for this property.`,
     });
-    router.push('/dashboard'); // Go back to dashboard after rejecting
   }
 
   const handleProviderSelect = (provider: RegisteredLeadProvider, devListings: ListingSchema[]) => {
@@ -177,7 +186,7 @@ export default function LeadDetailPage() {
   const isProvider = user?.role === 'Warehouse Developer';
 
   const providerDetailsForUser = lead.providers.find(p => p.providerEmail === user?.email);
-  const isPendingAcknowledgement = isProvider && providerDetailsForUser?.status === 'Pending';
+  const isAnyPropertyPending = isProvider && providerDetailsForUser?.properties.some(p => p.status === 'Pending');
   
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=registered-leads' : '/dashboard/transactions';
 
@@ -204,41 +213,6 @@ export default function LeadDetailPage() {
                   Tracking all activities for Transaction ID: <span className="font-mono text-primary">{lead.id}</span>
               </p>
           </div>
-
-          {isPendingAcknowledgement && (
-             <Card className="mb-8 bg-amber-50 border-amber-200">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-amber-800">
-                       <AlertCircle className="h-5 w-5" /> Acknowledgment Required
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-amber-700">Please review the details of this lead registration below and either acknowledge it to begin the transaction process or reject it if it's not a fit.</p>
-                </CardContent>
-                <CardFooter className="flex justify-end gap-2">
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive">
-                                <ThumbsDown className="mr-2 h-4 w-4" /> Reject Lead
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure you want to reject this lead?</AlertDialogTitle>
-                                <AlertDialogDescription>This action cannot be undone. The O2O team will be notified of your decision.</AlertDialogDescription>
-                            </AlertDialogHeader>
-                             <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleReject}>Confirm Rejection</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                    <Button onClick={() => setIsAcknowledgeDialogOpen(true)}>
-                        <ThumbsUp className="mr-2 h-4 w-4" /> Acknowledge Lead
-                    </Button>
-                </CardFooter>
-            </Card>
-          )}
 
           {!selectedProvider ? (
               <DeveloperSelection lead={lead} onSelect={handleProviderSelect} />
@@ -323,34 +297,51 @@ export default function LeadDetailPage() {
                                   <Card>
                                       <CardHeader>
                                           <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Linked Properties</CardTitle>
+                                          <CardDescription>Manage acknowledgment status for each property below.</CardDescription>
                                       </CardHeader>
-                                      <CardContent className="space-y-4">
-                                          {selectedProviderListings.map(listing => (
-                                               <div key={listing.listingId} className="p-3 rounded-md border bg-secondary/50 flex justify-between items-center">
-                                                  <div>
-                                                      <p className="font-semibold text-primary block">{listing.name}</p>
-                                                      <div className="text-sm mt-1"><MapPin className="inline-block h-4 w-4 mr-2 text-muted-foreground" />{listing.location}</div>
-                                                      <div className="text-sm"><Scaling className="inline-block h-4 w-4 mr-2 text-muted-foreground" />{listing.sizeSqFt.toLocaleString()} sq. ft.</div>
-                                                  </div>
-                                                  <Button asChild variant="ghost" size="icon">
-                                                      <Link href={`/listings/${listing.listingId}`} target="_blank">
-                                                        <Link2 className="h-4 w-4" />
-                                                      </Link>
-                                                  </Button>
-                                              </div>
-                                          ))}
+                                      <CardContent className="p-0">
+                                            <Table>
+                                                <TableBody>
+                                                    {selectedProvider.properties.map(property => {
+                                                        const listing = listings.find(l => l.listingId === property.listingId);
+                                                        if (!listing) return null;
+                                                        
+                                                        const statusConfig = {
+                                                            Pending: { text: 'Pending', icon: Clock, color: 'text-amber-600' },
+                                                            Acknowledged: { text: 'Acknowledged', icon: Check, color: 'text-green-600' },
+                                                            Rejected: { text: 'Rejected', icon: X, color: 'text-red-600' },
+                                                        };
+                                                        const status = statusConfig[property.status] || statusConfig.Pending;
+                                                        const StatusIcon = status.icon;
+
+                                                        return (
+                                                            <TableRow key={property.listingId}>
+                                                                <TableCell>
+                                                                    <p className="font-semibold">{listing.name}</p>
+                                                                    <p className="text-xs text-muted-foreground">{listing.location}</p>
+                                                                    <p className="text-xs text-muted-foreground">{listing.sizeSqFt.toLocaleString()} sq. ft.</p>
+                                                                    <Badge variant="outline" className={status.color}>{property.status}</Badge>
+                                                                </TableCell>
+                                                                <TableCell className="text-right">
+                                                                {isProvider && property.status === 'Pending' ? (
+                                                                     <div className="flex gap-2 justify-end">
+                                                                        <AlertDialog><AlertDialogTrigger asChild><Button variant="destructive" size="icon"><ThumbsDown className="h-4 w-4" /></Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure you want to reject this lead?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(listing.listingId)}>Confirm Rejection</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+                                                                        <Button variant="default" size="icon" onClick={() => handleAcknowledgeClick(property)}><ThumbsUp className="h-4 w-4" /></Button>
+                                                                     </div>
+                                                                ) : (
+                                                                    <Button asChild variant="ghost" size="icon">
+                                                                        <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
+                                                                    </Button>
+                                                                )}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )
+                                                    })}
+                                                </TableBody>
+                                            </Table>
                                       </CardContent>
                                   </Card>
                               )}
-                              <Card>
-                                  <CardHeader>
-                                      <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5"/> Developer</CardTitle>
-                                  </CardHeader>
-                                  <CardContent className="space-y-4 text-sm">
-                                      <p className="font-semibold">{providerUser?.companyName}</p>
-                                      <p className="text-xs text-muted-foreground">{selectedProvider?.status}</p>
-                                  </CardContent>
-                              </Card>
                           </div>
                       </div>
                   </TabsContent>
@@ -373,5 +364,3 @@ export default function LeadDetailPage() {
     </>
   );
 }
-
-    
