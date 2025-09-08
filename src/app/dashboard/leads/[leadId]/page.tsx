@@ -25,6 +25,7 @@ import type { AcknowledgmentDetails } from '@/lib/schema';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
@@ -283,16 +284,16 @@ export default function LeadDetailPage() {
                                       </CardContent>
                                   </Card>
                               )}
-                              {isCustomer && (
+                              {providerUser && (
                                   <Card>
                                       <CardHeader>
-                                          <CardTitle className="flex items-center gap-2"><UserCheck className="h-5 w-5"/> Agent Info</CardTitle>
+                                          <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Developer Info</CardTitle>
                                       </CardHeader>
                                       <CardContent className="space-y-3 text-sm">
-                                          <div className="font-semibold">Lakshmi Balaji Realty</div>
-                                          <div>O2O Manager</div>
-                                          <a href={`mailto:balaji@lakshmibalajio2o.com`} className="text-primary hover:underline block">balaji@lakshmibalajio2o.com</a>
-                                          <a href={`tel:919841098170`} className="text-primary hover:underline block">+91 98410 98170</a>
+                                          <div className="font-semibold">{providerUser.companyName}</div>
+                                          <div>{providerUser.userName}</div>
+                                          <a href={`mailto:${providerUser.email}`} className="text-primary hover:underline block">{providerUser.email}</a>
+                                          <a href={`tel:${providerUser.phone}`} className="text-primary hover:underline block">{providerUser.phone}</a>
                                       </CardContent>
                                   </Card>
                               )}
@@ -302,46 +303,46 @@ export default function LeadDetailPage() {
                                           <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Linked Properties</CardTitle>
                                           <CardDescription>Manage acknowledgment status for each property below.</CardDescription>
                                       </CardHeader>
-                                      <CardContent className="p-0">
-                                            <Table>
-                                                <TableBody>
-                                                    {selectedProvider.properties.map(property => {
-                                                        const listing = listings.find(l => l.listingId === property.listingId);
-                                                        if (!listing) return null;
-                                                        
-                                                        const statusConfig = {
-                                                            Pending: { text: 'Pending', icon: Clock, color: 'text-amber-600' },
-                                                            Acknowledged: { text: 'Acknowledged', icon: Check, color: 'text-green-600' },
-                                                            Rejected: { text: 'Rejected', icon: X, color: 'text-red-600' },
-                                                        };
-                                                        const status = statusConfig[property.status] || statusConfig.Pending;
-                                                        const StatusIcon = status.icon;
+                                      <CardContent className="space-y-4">
+                                            {selectedProvider.properties.map((property, index) => {
+                                                const listing = listings.find(l => l.listingId === property.listingId);
+                                                if (!listing) return null;
+                                                
+                                                const statusConfig = {
+                                                    Pending: { text: 'Pending', icon: Clock, color: 'text-amber-600' },
+                                                    Acknowledged: { text: 'Acknowledged', icon: Check, color: 'text-green-600' },
+                                                    Rejected: { text: 'Rejected', icon: X, color: 'text-red-600' },
+                                                };
+                                                const status = statusConfig[property.status] || statusConfig.Pending;
 
-                                                        return (
-                                                            <TableRow key={property.listingId}>
-                                                                <TableCell>
-                                                                    <p className="font-semibold">{listing.name}</p>
-                                                                    <p className="text-xs text-muted-foreground">{listing.location}</p>
-                                                                    <p className="text-xs text-muted-foreground">{listing.sizeSqFt.toLocaleString()} sq. ft.</p>
-                                                                    <Badge variant="outline" className={status.color}>{property.status}</Badge>
-                                                                </TableCell>
-                                                                <TableCell className="text-right">
-                                                                {isProvider && property.status === 'Pending' ? (
-                                                                     <div className="flex gap-2 justify-end">
-                                                                        <AlertDialog><AlertDialogTrigger asChild><Button variant="destructive" size="icon"><ThumbsDown className="h-4 w-4" /></Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure you want to reject this lead?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(listing.listingId)}>Confirm Rejection</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
-                                                                        <Button variant="default" size="icon" onClick={() => handleAcknowledgeClick(property)}><ThumbsUp className="h-4 w-4" /></Button>
-                                                                     </div>
-                                                                ) : (
-                                                                    <Button asChild variant="ghost" size="icon">
-                                                                        <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
-                                                                    </Button>
-                                                                )}
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        )
-                                                    })}
-                                                </TableBody>
-                                            </Table>
+                                                return (
+                                                  <React.Fragment key={property.listingId}>
+                                                    {index > 0 && <Separator />}
+                                                    <div className="flex items-start justify-between gap-4">
+                                                        <div className="flex-grow space-y-1">
+                                                            <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-semibold hover:underline">{listing.name}</Link>
+                                                            <p className="text-xs text-muted-foreground">{listing.location} &bull; {listing.sizeSqFt.toLocaleString()} sq. ft.</p>
+                                                            <Badge variant="outline" className={status.color}>
+                                                                <status.icon className="mr-1.5 h-3 w-3" />
+                                                                {property.status}
+                                                            </Badge>
+                                                        </div>
+                                                        <div className="flex flex-col items-end gap-2 shrink-0">
+                                                          {isProvider && property.status === 'Pending' ? (
+                                                              <div className="flex gap-2">
+                                                                  <AlertDialog><AlertDialogTrigger asChild><Button variant="destructive" size="icon" className="h-8 w-8"><ThumbsDown className="h-4 w-4" /></Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(listing.listingId)}>Confirm Rejection</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+                                                                  <Button variant="default" size="icon" className="h-8 w-8" onClick={() => handleAcknowledgeClick(property)}><ThumbsUp className="h-4 w-4" /></Button>
+                                                              </div>
+                                                          ) : (
+                                                              <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                                                                  <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
+                                                              </Button>
+                                                          )}
+                                                        </div>
+                                                    </div>
+                                                  </React.Fragment>
+                                                )
+                                            })}
                                       </CardContent>
                                   </Card>
                               )}
