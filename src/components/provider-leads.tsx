@@ -128,8 +128,17 @@ export function ProviderLeads() {
                                 <TableHead>Lead Name</TableHead>
                                 <TableHead>Contact</TableHead>
                                 <TableHead>Requirements Summary</TableHead>
-                                {isAgent ? <TableHead>Registered With (Providers)</TableHead> : <TableHead>Registered By</TableHead>}
-                                <TableHead className="text-center">Your Status</TableHead>
+                                {isAgent ? (
+                                  <>
+                                    <TableHead>Developers</TableHead>
+                                    <TableHead>Developer Acknowledgement</TableHead>
+                                  </>
+                                ) : (
+                                  <>
+                                    <TableHead>Registered By</TableHead>
+                                    <TableHead className="text-center">Your Status</TableHead>
+                                  </>
+                                )}
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -150,31 +159,38 @@ export function ProviderLeads() {
                                         <TableCell className="max-w-xs truncate">{lead.requirementsSummary}</TableCell>
                                         
                                         {isAgent ? (
+                                          <>
                                             <TableCell>
-                                                <div className="flex flex-col gap-2">
-                                                    {lead.providers.map(p => {
-                                                        const providerDetails = allUsers[p.providerEmail];
-                                                        const providerStatus = statusConfig[p.status];
-                                                        return (
-                                                            <div key={p.providerEmail} className="flex items-center gap-2 text-xs">
-                                                                <Badge variant="outline" className={cn(providerStatus?.color, "w-32 justify-center")}>{providerStatus?.text || p.status}</Badge>
-                                                                <span>{providerDetails?.companyName || p.providerEmail}</span>
-                                                            </div>
-                                                        )
-                                                    })}
-                                                </div>
+                                              <div className="flex flex-col gap-2">
+                                                {lead.providers.map(p => {
+                                                  if (isAuthLoading) return null;
+                                                  const providerDetails = allUsers[p.providerEmail];
+                                                  return <div key={p.providerEmail} className="text-sm">{providerDetails?.companyName || p.providerEmail}</div>
+                                                })}
+                                              </div>
                                             </TableCell>
+                                            <TableCell>
+                                              <div className="flex flex-col gap-2">
+                                                {lead.providers.map(p => {
+                                                  const providerStatus = statusConfig[p.status];
+                                                  return <Badge key={p.providerEmail} variant="outline" className={cn(providerStatus?.color, "w-36 justify-center")}>{providerStatus?.text || p.status}</Badge>
+                                                })}
+                                              </div>
+                                            </TableCell>
+                                          </>
                                         ) : (
-                                             <TableCell>{lead.registeredBy}</TableCell>
+                                          <>
+                                            <TableCell>{lead.registeredBy}</TableCell>
+                                            <TableCell className="text-center">
+                                                {status ? (
+                                                    <Badge className={cn("text-xs", status.color)}>{status.text}</Badge>
+                                                ) : (
+                                                    <Badge variant="outline">View Status</Badge>
+                                                )}
+                                            </TableCell>
+                                          </>
                                         )}
 
-                                        <TableCell className="text-center">
-                                            {status ? (
-                                                <Badge className={cn("text-xs", status.color)}>{status.text}</Badge>
-                                            ) : (
-                                                <Badge variant="outline">View Status</Badge>
-                                            )}
-                                        </TableCell>
                                         <TableCell className="text-right">
                                             {providerInfo?.acknowledgedBy ? (
                                                 <TooltipProvider>
