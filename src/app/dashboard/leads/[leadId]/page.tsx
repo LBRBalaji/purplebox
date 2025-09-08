@@ -76,8 +76,13 @@ export default function LeadDetailPage() {
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setActivities(leadActivities);
 
-        // Find the primary listing for this transaction
-        const approvedSubmission = submissions.find(s => s.demandId === foundLead.id && s.status === 'Approved');
+        // Corrected Logic: Find the submission that matches the transaction's participants
+        const approvedSubmission = submissions.find(s => 
+            s.status === 'Approved' &&
+            s.demandUserEmail === foundLead.customerId && 
+            foundLead.providers.some(p => p.providerEmail === s.providerEmail)
+        );
+
         if (approvedSubmission) {
             const listingDetails = listings.find(l => l.listingId === approvedSubmission.listingId);
             if(listingDetails) setPrimaryListing(listingDetails);
@@ -86,6 +91,7 @@ export default function LeadDetailPage() {
         router.push('/dashboard');
     }
   }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading, isAuthLoading, submissions, listings]);
+
 
   const handleAddActivity = (data: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
     addTransactionActivity(data);
@@ -236,5 +242,3 @@ export default function LeadDetailPage() {
     </main>
   );
 }
-
-    
