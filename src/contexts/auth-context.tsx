@@ -8,13 +8,13 @@ import { toast } from '@/hooks/use-toast';
 export type User = {
   email: string;
   role: 'SuperAdmin' | 'User' | 'O2O' | 'Warehouse Developer';
+  plan: 'Free' | 'Paid_Basic' | 'Paid_Premium';
   companyName: string;
   userName: string;
   phone: string;
-  createdAt: string; // Added createdAt
+  createdAt: string; 
 };
 
-// NewUser now includes the role, as the signup form will determine it.
 export type NewUser = Omit<User, 'createdAt'>;
 
 type AuthContextType = {
@@ -57,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const defaultAdmin: User = {
             email: 'admin@example.com',
             role: 'SuperAdmin',
+            plan: 'Paid_Premium',
             companyName: 'Admin Corp',
             userName: 'Default Admin',
             phone: 'N/A',
@@ -154,8 +155,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push('/agent-signup');
         return;
     }
+    
+    // New users default to the 'Free' plan
+    const newUserWithDefaults: NewUser = { ...details, plan: 'Free' };
 
-    const newUserWithTimestamp: User = { ...details, createdAt: new Date().toISOString() };
+    const newUserWithTimestamp: User = { ...newUserWithDefaults, createdAt: new Date().toISOString() };
     addUser(newUserWithTimestamp);
 
     setUser(newUserWithTimestamp);

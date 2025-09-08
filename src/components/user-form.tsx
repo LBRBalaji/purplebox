@@ -39,6 +39,7 @@ const userFormSchema = z.object({
     userName: z.string().min(1, 'User name is required.'),
     phone: z.string().min(1, 'Phone number is required.'),
     role: z.enum(['User', 'SuperAdmin', 'O2O', 'Warehouse Developer']),
+    plan: z.enum(['Free', 'Paid_Basic', 'Paid_Premium']),
 });
 
 type UserFormSchema = z.infer<typeof userFormSchema>;
@@ -61,6 +62,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
       userName: '',
       phone: '',
       role: 'User',
+      plan: 'Free',
     },
   });
 
@@ -73,6 +75,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                 userName: user.userName,
                 phone: user.phone,
                 role: user.role,
+                plan: user.plan || 'Free',
             });
         } else {
             form.reset({
@@ -81,6 +84,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
               userName: '',
               phone: '',
               role: 'User',
+              plan: 'Free',
             });
         }
     }
@@ -132,22 +136,39 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                       <FormMessage />
                   </FormItem>
               )} />
-               <FormField control={form.control} name="role" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role</FormLabel>
-                     <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        <SelectItem value="User">Customer (Demand)</SelectItem>
-                        <SelectItem value="Warehouse Developer">Warehouse Developer</SelectItem>
-                        <SelectItem value="O2O">O2O Platform Manager</SelectItem>
-                        <SelectItem value="SuperAdmin">O2O Super Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField control={form.control} name="role" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="User">Customer (Demand)</SelectItem>
+                          <SelectItem value="Warehouse Developer">Warehouse Developer</SelectItem>
+                          <SelectItem value="O2O">O2O Platform Manager</SelectItem>
+                          <SelectItem value="SuperAdmin">O2O Super Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField control={form.control} name="plan" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>User Plan Model</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="Free">Free</SelectItem>
+                          <SelectItem value="Paid_Basic">Paid_Basic</SelectItem>
+                          <SelectItem value="Paid_Premium">Paid_Premium</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             <DialogFooter className="pt-4">
                 <DialogClose asChild>
                     <Button type="button" variant="outline">Cancel</Button>

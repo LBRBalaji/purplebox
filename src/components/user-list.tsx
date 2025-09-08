@@ -86,6 +86,7 @@ export function UserList() {
                 <TableHead>Company</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
+                <TableHead>Plan</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -98,6 +99,11 @@ export function UserList() {
                   <TableCell>
                      <Badge variant={user.role === 'SuperAdmin' ? "destructive" : user.role === 'O2O' ? 'default' : "outline"}>
                         {user.role === 'SuperAdmin' ? 'O2O Super Admin' : user.role === 'O2O' ? 'O2O Manager' : user.role === 'Warehouse Developer' ? 'Provider' : 'Customer'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                     <Badge variant={user.plan === 'Free' ? "secondary" : "default"}>
+                        {user.plan}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

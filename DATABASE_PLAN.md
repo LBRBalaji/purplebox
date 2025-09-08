@@ -1,3 +1,4 @@
+
 # Backend Database Configuration Plan
 
 Here is a clear breakdown of the database requirements and application flows for your platform. This information will serve as a blueprint for configuring your backend database, such as Firestore or any SQL-based system.
@@ -12,7 +13,8 @@ This table stores information for every individual who registers on the platform
 
 *   `userId` (Primary Key, e.g., UID from Firebase Auth)
 *   `email` (Unique Identifier, searchable)
-*   `role` (String: "User", "SuperAdmin", "O2O") - *Crucial for access control.*
+*   `role` (String: "User", "SuperAdmin", "O2O", "Warehouse Developer") - *Crucial for access control.*
+*   `plan` (String: "Free", "Paid_Basic", "Paid_Premium") - *Determines feature access, especially for "User" role.*
 *   `companyName` (String)
 *   `userName` (String)
 *   `phone` (String)
@@ -20,9 +22,9 @@ This table stores information for every individual who registers on the platform
 
 **Application Flow:**
 
-1.  **Registration:** When a user signs up on the **Signup Page**, a new record is created in the `Users` table. Their selected role determines their permissions across the platform.
-2.  **Login:** During login, the system fetches the user's record using their email to retrieve their role and profile information, which is then used to customize the dashboard and navigation.
-3.  **User Management:** The main admin uses the **Manage Users** page to view, edit, or delete records from this table.
+1.  **Registration:** When a user signs up on the **Signup Page**, a new record is created in the `Users` table. Their selected role and default plan ("Free" for customers) determine their permissions.
+2.  **Login:** During login, the system fetches the user's record using their email to retrieve their role, plan, and profile information, which is then used to customize the dashboard and enable/disable features.
+3.  **User Management:** The main admin uses the **Manage Users** page to view, edit (role and plan), or delete records from this table.
 
 ---
 
