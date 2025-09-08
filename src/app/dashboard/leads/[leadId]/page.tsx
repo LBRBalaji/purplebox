@@ -68,8 +68,9 @@ export default function LeadDetailPage() {
     const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
     const isProviderForThisLead = foundLead.providers.some(p => p.providerEmail === user?.email);
     const isCustomerOfThisLead = foundLead.customerId === user?.email;
+    const isAgentOfThisLead = foundLead.registeredBy === user?.email;
 
-    if (isAdminOrO2O || isProviderForThisLead || isCustomerOfThisLead) {
+    if (isAdminOrO2O || isProviderForThisLead || isCustomerOfThisLead || isAgentOfThisLead) {
         setLead(foundLead);
         const leadActivities = transactionActivities
             .filter(a => a.leadId === leadId)
@@ -104,7 +105,8 @@ export default function LeadDetailPage() {
   const customer = users[lead.customerId];
   const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
   const isCustomer = user?.email === lead.customerId;
-  const isProvider = user?.role === 'SuperAdmin';
+  const isAgent = user?.role === 'Agent';
+  const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
   
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : '/dashboard/transactions';
 
@@ -132,7 +134,7 @@ export default function LeadDetailPage() {
             <TabsContent value="activity" className="mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                     <div className="md:col-span-2 space-y-6">
-                        {(isO2O || (isCustomer && user?.plan === 'Paid_Premium')) && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                        {(isO2O || (isCustomer && user?.plan === 'Paid_Premium') || isPremiumAgent) && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>

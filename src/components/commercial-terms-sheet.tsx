@@ -72,7 +72,9 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
     const isCustomer = user?.role === 'User';
     const isProvider = user?.role === 'SuperAdmin';
     const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
-    const canEdit = isO2O;
+    const isAgent = user?.role === 'Agent';
+    const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
+    const canEdit = isO2O || isPremiumAgent;
 
     const form = useForm<CommercialTermsSchema>({
         resolver: zodResolver(commercialTermsSchema),
@@ -491,7 +493,7 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                                 {(isCustomer || isProvider) && (
                                     <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
                                 )}
-                                {isO2O && (
+                                {canEdit && (
                                     <>
                                         <Button type="button" variant="outline" onClick={handleFinalizeMoM}>
                                             <Share className="mr-2 h-4 w-4" /> Finalize as MoM
