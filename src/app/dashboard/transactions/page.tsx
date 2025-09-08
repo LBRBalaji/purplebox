@@ -273,6 +273,7 @@ function RegisterLeadForm() {
 export default function TransactionsPage() {
   const { user } = useAuth();
   const isAgent = user?.role === 'Agent';
+  const isO2O = user?.role === 'O2O';
 
   return (
     <main className="container mx-auto p-4 md:p-8">

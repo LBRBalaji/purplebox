@@ -23,7 +23,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const isCustomer = user.role === 'User';
         const isProvider = user.role === 'Warehouse Developer';
         const isAgent = user.role === 'Agent';
-        const isPremiumAgent = isAgent && user.plan === 'Paid_Premium';
 
         const isAdmin = isSuperAdmin || isO2OManager;
         
@@ -48,7 +47,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
-        if (pathname.startsWith('/dashboard/transactions') && !isAdmin && !isPremiumAgent) {
+        // Transactions page is for O2O Managers and all Agents
+        if (pathname.startsWith('/dashboard/transactions') && !isO2OManager && !isAgent) {
             router.push('/dashboard');
         }
 
