@@ -146,7 +146,7 @@ function RegisterLeadForm() {
       providers: leadProviders,
     };
 
-    addRegisteredLead(newLead);
+    addRegisteredLead(newLead, user.email);
 
     toast({
       title: 'Lead Registered Successfully!',
