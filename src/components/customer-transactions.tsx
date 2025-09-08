@@ -53,7 +53,7 @@ export function CustomerTransactions() {
               <TableRow>
                 <TableHead>Transaction ID</TableHead>
                 <TableHead>Requirements Summary</TableHead>
-                <TableHead>Involved Providers & Status</TableHead>
+                <TableHead>Developer(s)</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -67,16 +67,10 @@ export function CustomerTransactions() {
                       <div className="flex flex-col gap-2">
                         {lead.providers.map(p => {
                           const providerUser = users[p.providerEmail];
-                          const statusInfo = providerStatusConfig[p.status];
-                          const Icon = statusInfo.icon;
                           return (
                             <div key={p.providerEmail} className="flex items-center gap-2">
                                 <Building className="h-4 w-4 text-muted-foreground"/>
                                 <span className="text-sm font-medium flex-grow">{providerUser?.companyName || p.providerEmail}</span>
-                                <Badge variant="outline" className={cn("text-xs font-normal", statusInfo.color)}>
-                                    <Icon className="h-3 w-3 mr-1.5"/>
-                                    {statusInfo.text}
-                                </Badge>
                             </div>
                           )
                         })}
