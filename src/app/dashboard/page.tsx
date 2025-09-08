@@ -32,11 +32,13 @@ const MainDashboard = () => {
     const isO2OManager = user?.role === 'O2O';
     const isProvider = user?.role === 'Warehouse Developer';
     const isCustomer = user?.role === 'User';
+    const isAgent = user?.role === 'Agent';
 
     const [providerTab, setProviderTab] = React.useState('active-demands');
     const [customerTab, setCustomerTab] = React.useState('my-demands');
     const [adminTab, setAdminTab] = React.useState('approval-queue');
     const [superAdminTab, setSuperAdminTab] = React.useState('all-listings');
+    const [agentTab, setAgentTab] = React.useState('active-demands');
 
     const hasPendingSubmissions = React.useMemo(() => {
         return submissions.some(s => s.status === 'Pending');
@@ -119,6 +121,22 @@ const MainDashboard = () => {
       </Tabs>
     );
 
+    // Agent gets a focused view for lead generation
+    const renderAgentContent = () => (
+        <Tabs value={agentTab} onValueChange={setAgentTab}>
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
+                <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
+            </TabsList>
+            <TabsContent value="active-demands">
+                <DemandList />
+            </TabsContent>
+            <TabsContent value="registered-leads">
+                <ProviderLeads />
+            </TabsContent>
+        </Tabs>
+    );
+
     // Super Admin gets a super-view with all possible tabs
     const renderMainAdminContent = () => (
        <Tabs value={superAdminTab} onValueChange={setSuperAdminTab} className="w-full">
@@ -151,6 +169,8 @@ const MainDashboard = () => {
         return renderCustomerContent();
     } else if (isO2OManager) {
         return renderO2OContent();
+    } else if (isAgent) {
+        return renderAgentContent();
     }
 
 
