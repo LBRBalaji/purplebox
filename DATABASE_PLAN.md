@@ -26,6 +26,11 @@ This table stores information for every individual who registers on the platform
 2.  **Login:** During login, the system fetches the user's record using their email to retrieve their role, plan, and profile information, which is then used to customize the dashboard and enable/disable features.
 3.  **User Management:** The main admin uses the **Manage Users** page to view, edit (role and plan), or delete records from this table.
 
+**Privileges by Plan (for "User" role):**
+*   **Free:** Can log demands, view matches, and shortlist properties. Downloads are limited (e.g., 5 listings per day, max 2 downloads).
+*   **Paid_Basic:** All "Free" features, plus access to advanced features like digital negotiation sheets and tenant improvement tracking. Download limits may be increased.
+*   **Paid_Premium:** All "Paid_Basic" features with no download restrictions, plus access to exclusive market analytics or other high-value features.
+
 ---
 
 ### 2. Demands Database

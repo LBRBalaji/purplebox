@@ -13,7 +13,8 @@
     "companyName": "O2O Platform",
     "userName": "O2O Super Admin",
     "phone": "1234567890",
-    "createdAt": "2025-09-08T10:00:00.000Z"
+    "createdAt": "2025-09-08T10:00:00.000Z",
+    "plan": "Paid_Premium"
   },
   "manager@o2o.com": {
     "email": "manager@o2o.com",
