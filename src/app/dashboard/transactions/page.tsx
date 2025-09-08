@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, UserPlus, X, Building, Warehouse, PlusCircle } from 'lucide-react';
+import { Check, ChevronsUpDown, UserPlus, X, Building, Warehouse, PlusCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { RegisteredLead, RegisteredLeadProvider, User, ListingSchema } from '@/contexts/data-context';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
