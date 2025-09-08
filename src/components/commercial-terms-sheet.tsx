@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, useFieldArray, Controller, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { commercialTermsSchema, type CommercialTermsSchema, type ListingSchema } from '@/lib/schema';
 import { useData } from '@/contexts/data-context';
@@ -64,6 +64,53 @@ const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: a
     )
 };
 
+
+const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: number, type: 'customer' | 'provider' | 'facilitator', disabled: boolean }) => {
+    const { control } = useFormContext<CommercialTermsSchema>();
+    const name = `sessions.${sessionIndex}.${type}Attendees` as const;
+    const { fields, append, remove } = useFieldArray({ name, control });
+
+    const titleMap = {
+        customer: 'Customer Represented By',
+        provider: 'Provider Represented By',
+        facilitator: 'Transaction Facilitated By'
+    };
+
+    return (
+        <div className="space-y-2">
+            <FormLabel>{titleMap[type]}</FormLabel>
+            {fields.map((item, index) => (
+                <div key={item.id} className="flex items-center gap-2">
+                    <FormField control={control} name={`${name}.${index}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={disabled}/>} />
+                    <FormField control={control} name={`${name}.${index}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={disabled}/>} />
+                    <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} disabled={disabled} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                </div>
+            ))}
+            <Button type="button" size="sm" variant="outline" onClick={() => append({name: '', title: ''})} disabled={disabled} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
+        </div>
+    );
+};
+
+
+const NegotiationSession = ({ sessionIndex, onRemove, canEdit }: { sessionIndex: number, onRemove: () => void, canEdit: boolean }) => {
+    const { control, watch } = useFormContext<CommercialTermsSchema>();
+    
+    return (
+        <div className="p-4 border rounded-lg bg-secondary/50 space-y-4 mb-6">
+            <div className="flex justify-between items-center no-print">
+                <p className="font-semibold text-sm">Negotiation Session {sessionIndex + 1}: {new Date(watch(`sessions.${sessionIndex}.date`)).toLocaleString()}</p>
+                    <Button type="button" variant="ghost" size="icon" onClick={onRemove} disabled={!canEdit}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+            </div>
+            <Separator className="no-print" />
+            <FormField control={control} name={`sessions.${sessionIndex}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={!canEdit} /></FormControl></FormItem> )} />
+            
+            <AttendeeSection sessionIndex={sessionIndex} type="customer" disabled={!canEdit} />
+            <AttendeeSection sessionIndex={sessionIndex} type="provider" disabled={!canEdit} />
+            <AttendeeSection sessionIndex={sessionIndex} type="facilitator" disabled={!canEdit} />
+        </div>
+    );
+}
+
 export function CommercialTermsSheet({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
     const { user } = useAuth();
     const { getCommercialTerms, updateCommercialTerms } = useData();
@@ -123,22 +170,6 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
      const { fields: sessionFields, append: appendSession, remove: removeSession } = useFieldArray({ name: "sessions", control: form.control });
      const { fields: actionableItemFields, append: appendActionableItem, remove: removeActionableItem } = useFieldArray({ name: "actionableItems", control: form.control });
 
-
-     const customerAttendees = (index: number) => {
-        const { fields, append, remove } = useFieldArray({ name: `sessions.${index}.customerAttendees`, control: form.control });
-        return { fields, append, remove };
-    };
-
-    const providerAttendees = (index: number) => {
-        const { fields, append, remove } = useFieldArray({ name: `sessions.${index}.providerAttendees`, control: form.control });
-        return { fields, append, remove };
-    };
-
-    const facilitatorAttendees = (index: number) => {
-        const { fields, append, remove } = useFieldArray({ name: `sessions.${index}.facilitatorAttendees`, control: form.control });
-        return { fields, append, remove };
-    };
-
     const commercialTermsWatched = form.watch('commercialTerms');
     const leaseTermsWatched = form.watch('leaseTerms');
 
@@ -186,8 +217,8 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
 
         if (tenure > 0 && initialMonthlyRent > 0 && escalationFreq > 0) {
             let yearlyBreakdown = [];
-            let currentMonthlyRent = initialMonthlyRent;
             let total = 0;
+            let currentMonthlyRent = initialMonthlyRent;
 
             for (let year = 1; year <= tenure; year++) {
                 if (year > 1 && (year - 1) % escalationFreq === 0) {
@@ -327,57 +358,14 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-8">
-                            {sessionFields.map((field, index) => {
-                                const { fields: customerFields, append: appendCustomer, remove: removeCustomer } = customerAttendees(index);
-                                const { fields: providerFields, append: appendProvider, remove: removeProvider } = providerAttendees(index);
-                                const { fields: facilitatorFields, append: appendFacilitator, remove: removeFacilitator } = facilitatorAttendees(index);
-                                return (
-                                    <div key={field.id} className="p-4 border rounded-lg bg-secondary/50 space-y-4 mb-6">
-                                        <div className="flex justify-between items-center no-print">
-                                            <p className="font-semibold text-sm">Negotiation Session {index + 1}: {new Date(form.watch(`sessions.${index}.date`)).toLocaleString()}</p>
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeSession(index)} disabled={!canEdit}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                                        </div>
-                                            <Separator className="no-print" />
-                                            <FormField control={form.control} name={`sessions.${index}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={!canEdit} /></FormControl></FormItem> )} />
-                                        
-                                        <div className="space-y-2">
-                                            <FormLabel>Customer Represented By</FormLabel>
-                                            {customerFields.map((item, cIndex) => (
-                                                <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.customerAttendees.${cIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomer(cIndex)} disabled={!canEdit} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
-                                                </div>
-                                            ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendCustomer({name: '', title: ''})} disabled={!canEdit} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
-                                        </div>
-                                        
-                                        <div className="space-y-2">
-                                            <FormLabel>Provider Represented By</FormLabel>
-                                            {providerFields.map((item, pIndex) => (
-                                                <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.providerAttendees.${pIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeProvider(pIndex)} disabled={!canEdit} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
-                                                </div>
-                                            ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendProvider({name: '', title: ''})} disabled={!canEdit} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <FormLabel>Transaction Facilitated By</FormLabel>
-                                            {facilitatorFields.map((item, fIndex) => (
-                                                <div key={item.id} className="flex items-center gap-2">
-                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
-                                                    <FormField control={form.control} name={`sessions.${index}.facilitatorAttendees.${fIndex}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={!canEdit}/>} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFacilitator(fIndex)} disabled={!canEdit} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
-                                                </div>
-                                            ))}
-                                            <Button type="button" size="sm" variant="outline" onClick={() => appendFacilitator({name: '', title: ''})} disabled={!canEdit} className="no-print"><PlusCircle className="mr-2 w-4 h-4"/>Add</Button>
-                                        </div>
-                                    </div>
-                                )
-                            })}
+                            {sessionFields.map((field, index) => (
+                                <NegotiationSession
+                                    key={field.id}
+                                    sessionIndex={index}
+                                    onRemove={() => removeSession(index)}
+                                    canEdit={canEdit}
+                                />
+                            ))}
 
                             <div className="space-y-6">
                                 <SectionHeader icon={MapPin} title="Site Information" />
