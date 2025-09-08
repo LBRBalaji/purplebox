@@ -193,7 +193,7 @@ export default function LeadDetailPage() {
                         )}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5"/> Involved Providers</CardTitle>
+                                <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5"/> Developer</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {lead.providers.map((p: any) => {
