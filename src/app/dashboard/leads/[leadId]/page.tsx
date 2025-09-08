@@ -236,3 +236,5 @@ export default function LeadDetailPage() {
     </main>
   );
 }
+
+    
