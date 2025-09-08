@@ -95,7 +95,7 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 };
 
 
-const NegotiationSession = ({ sessionIndex, onRemove, canEdit, lead, primaryListing, form }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; lead: RegisteredLead; primaryListing: ListingSchema | null; form: any }) => {
+const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any }) => {
     const { control, watch } = useFormContext<CommercialTermsSchema>();
     
     return (
@@ -124,7 +124,7 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, lead, primaryList
 
                          <div className="space-y-6">
                             <SectionHeader icon={MapPin} title="Site Information" />
-                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.listingId`} label="Listing ID" control={control} disabled={true} />
+                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.listingId`} label="Listing ID" control={control} disabled={!canEdit} />
                             <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.postalAddress`} label="Postal Address" control={control} disabled={!canEdit} />
                             <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.buildingNumber`} label="Building Number" control={control} disabled={!canEdit}/>
                             <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.googleCoordinates`} label="Google Coordinates" control={control} disabled={!canEdit}/>
@@ -136,7 +136,7 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, lead, primaryList
                             <FormRow form={form} name={`sessions.${sessionIndex}.area.mezzanineArea2`} label="Mezzanine Area 2" control={control} disabled={!canEdit}/>
                             <FormRow form={form} name={`sessions.${sessionIndex}.area.canopyArea`} label="Canopy Area" control={control} disabled={!canEdit}/>
                             <FormRow form={form} name={`sessions.${sessionIndex}.area.driversRestRoom`} label="Driver's Rest Room" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.area.totalChargeableArea`} label="Total Chargeable Area" control={control} disabled={!canEdit}/>
+                            <FormRow form={form} name={`sessions.${sessionIndex}.area.totalChargeableArea`} label="Total Chargeable Area" control={control} disabled={true}/>
                             
                             <SectionHeader icon={ListChecks} title="Lease Terms" />
                             <FormRow form={form} name={`sessions.${sessionIndex}.leaseTerms.leaseTenure`} label="Lease Tenure" control={control} disabled={!canEdit}/>
@@ -221,12 +221,26 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
 
     React.useEffect(() => {
       watchedSessions.forEach((session, index) => {
+        // Calculate Total Rent
         const rentPerSft = parseFloat(session.commercialTerms?.buildingRentPerSft?.agreedTerms || '0');
         const chargeableArea = parseFloat(session.commercialTerms?.chargeableArea?.agreedTerms || '0');
         if (!isNaN(rentPerSft) && !isNaN(chargeableArea)) {
             const totalRent = rentPerSft * chargeableArea;
             form.setValue(`sessions.${index}.commercialTerms.totalRentPerMonth.agreedTerms`, String(totalRent));
         }
+
+        // Calculate Total Chargeable Area
+        const plinth = parseFloat(session.area?.plinthArea?.agreedTerms || '0');
+        const mezz1 = parseFloat(session.area?.mezzanineArea1?.agreedTerms || '0');
+        const mezz2 = parseFloat(session.area?.mezzanineArea2?.agreedTerms || '0');
+        const canopy = parseFloat(session.area?.canopyArea?.agreedTerms || '0');
+        const driversRoom = parseFloat(session.area?.driversRestRoom?.agreedTerms || '0');
+        
+        const totalArea = [plinth, mezz1, mezz2, canopy, driversRoom]
+            .filter(v => !isNaN(v))
+            .reduce((acc, v) => acc + v, 0);
+
+        form.setValue(`sessions.${index}.area.totalChargeableArea.agreedTerms`, String(totalArea));
       })
     }, [watchedSessions, form])
 
@@ -236,8 +250,6 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
     };
     
     const handleGenerateFollowUp = () => {
-        // This function would ideally create a new session pre-filled with reserved items from the last one.
-        // For now, we'll just log to console.
         const lastSession = form.getValues().sessions[form.getValues().sessions.length - 1];
         console.log("Generating follow-up based on last session:", lastSession);
         alert("Check console for follow-up data. This would be a new session in a real implementation.");
@@ -307,8 +319,6 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                                     sessionIndex={index}
                                     onRemove={() => removeSession(index)}
                                     canEdit={canEdit}
-                                    lead={lead}
-                                    primaryListing={primaryListing}
                                     form={form}
                                 />
                             ))}
