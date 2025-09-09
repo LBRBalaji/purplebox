@@ -443,6 +443,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         <AlertTitle>Important: Do Not Expose Identity</AlertTitle>
                         <AlertDescription>
                             Please do not upload front views, elevations, or any pictures that could reveal the property's or developer's identity. Use only inside views of the building. Any identifying images will be removed by the admin.
+                            We thank you in advance for your understanding and cooperation in respecting this platform policy.
                         </AlertDescription>
                     </Alert>
                     {fields.map((field, index) => (
