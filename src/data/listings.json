@@ -8,7 +8,7 @@
     "name": "Box two",
     "location": "Chengalpet",
     "sizeSqFt": 300000,
-    "description": "Box two, a ready-to-occupy 300,000 sq. ft. PEB warehouse in Chengalpet, offers an exceptional opportunity.  Boasting an 11-meter eave height, a Galvalume roof, and a standard service model, this expansive space is available at a competitive ₹27 per sq. ft. Ideal for large-scale operations, this property ensures efficient logistics and ample storage capacity.",
+    "description": "Box two, a ready-to-occupy 300,000 sq. ft. PEB warehouse in Chengalpet, offers an exceptional opportunity.  Boasting an 11-meter eave height, a Galvalume roof, and a standard service model, this expansive space is available at a competitive ₹27 per sq. ft. Ideal for large-scale operations, this ensures efficient logistics and ample storage capacity.",
     "rentPerSqFt": 27,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -55,7 +55,12 @@
       {
         "type": "image",
         "name": "Front View",
-        "url": "https://drive.google.com/file/d/1taX2HQh2tQdxMMEbhobhi7FyKrptY9Di/view?usp=drive_link"
+        "url": "https://picsum.photos/seed/box-two/800/600"
+      },
+      {
+        "type": "image",
+        "name": "Dock Area",
+        "url": "https://picsum.photos/seed/box-two-docks/800/600"
       }
     ]
   },
