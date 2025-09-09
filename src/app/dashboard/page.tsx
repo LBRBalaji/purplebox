@@ -44,6 +44,7 @@ const MainDashboard = () => {
     const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-demands');
     const [adminTab, setAdminTab] = React.useState(defaultTabParam || 'approval-queue');
     const [superAdminTab, setSuperAdminTab] = React.useState(defaultTabParam || 'all-listings');
+    const [agentTab, setAgentTab] = React.useState(defaultTabParam || 'transactions');
 
     const hasPendingSubmissions = React.useMemo(() => {
         return submissions.some(s => s.status === 'Pending');
@@ -66,8 +67,9 @@ const MainDashboard = () => {
         if (isCustomer) setCustomerTab(defaultTabParam);
         if (isO2OManager) setAdminTab(defaultTabParam);
         if (isSuperAdmin) setSuperAdminTab(defaultTabParam);
+        if (isAgent) setAgentTab(defaultTabParam);
       }
-    }, [logNewDemand, editDemandId, propertyMatchDemandId, defaultTabParam, isProvider, isCustomer, isO2OManager, isSuperAdmin]);
+    }, [logNewDemand, editDemandId, propertyMatchDemandId, defaultTabParam, isProvider, isCustomer, isO2OManager, isSuperAdmin, isAgent]);
 
     const renderProviderContent = () => (
       <Tabs value={providerTab} onValueChange={setProviderTab}>
@@ -110,13 +112,14 @@ const MainDashboard = () => {
     // O2O Manager now has a more focused view
     const renderO2OContent = () => (
       <Tabs value={adminTab} onValueChange={setAdminTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="approval-queue">
                 Approval Queue 
                 {hasPendingSubmissions && <span className="ml-2 h-2 w-2 rounded-full bg-destructive animate-ping"></span>}
             </TabsTrigger>
             <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
             <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
+            <TabsTrigger value="my-shortlist">My Shortlist</TabsTrigger>
         </TabsList>
         <TabsContent value="approval-queue">
             <ApprovalQueue />
@@ -127,13 +130,28 @@ const MainDashboard = () => {
          <TabsContent value="registered-leads">
             <ProviderLeads />
         </TabsContent>
+        <TabsContent value="my-shortlist">
+            <GeneralShortlist />
+        </TabsContent>
       </Tabs>
     );
 
     // Agent gets a focused view for lead generation
-    const renderAgentContent = () => {
-        return <TransactionsPage />;
-    };
+    const renderAgentContent = () => (
+        <Tabs value={agentTab} onValueChange={setAgentTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="transactions">Transactions</TabsTrigger>
+                <TabsTrigger value="my-shortlist">My Shortlist</TabsTrigger>
+            </TabsList>
+            <TabsContent value="transactions">
+                <TransactionsPage />
+            </TabsContent>
+            <TabsContent value="my-shortlist">
+                <GeneralShortlist />
+            </TabsContent>
+        </Tabs>
+    );
+
 
     // Super Admin gets a super-view with all possible tabs
     const renderMainAdminContent = () => (

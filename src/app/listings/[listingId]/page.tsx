@@ -381,11 +381,12 @@ export default function ListingDetailPage() {
             setIsLoginDialogOpen(true);
             return;
         }
-        if (user.role !== 'User') {
+        const canShortlist = user.role === 'User' || user.role === 'Agent' || user.role === 'O2O';
+        if (!canShortlist) {
             toast({
                 variant: 'destructive',
                 title: 'Action Not Available',
-                description: 'Only Customer accounts can shortlist properties.',
+                description: 'Shortlisting is available for Customers, Agents, and O2O Managers.',
             });
             return;
         }
@@ -582,7 +583,7 @@ export default function ListingDetailPage() {
                                             </Alert>
                                         )}
                                     </CardContent>
-                                    {user && user.role === 'User' && (
+                                    {user && (
                                         <CardFooter className="flex flex-col gap-2">
                                             <Button
                                                 variant={isShortlisted ? 'default' : 'outline'}
@@ -592,9 +593,11 @@ export default function ListingDetailPage() {
                                                 <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
                                                 {isShortlisted ? 'Shortlisted' : 'Shortlist'}
                                             </Button>
-                                            <Button className="w-full" onClick={handleDownloadRequest}>
-                                                <Download className="mr-2 h-4 w-4" /> Download Details as CSV
-                                            </Button>
+                                            {user.role === 'User' && (
+                                                <Button className="w-full" onClick={handleDownloadRequest}>
+                                                    <Download className="mr-2 h-4 w-4" /> Download Details as CSV
+                                                </Button>
+                                            )}
                                         </CardFooter>
                                     )}
                                 </Card>

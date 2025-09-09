@@ -84,7 +84,7 @@ function ShareDropdown({ listing }: { listing: ListingSchema }) {
                     <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${text}`} target="_blank" rel="noopener noreferrer">
                         <Linkedin className="mr-2 h-4 w-4" /> LinkedIn
                     </a>
-                </DropdownMenuItem>
+                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                     <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${text}`} target="_blank" rel="noopener noreferrer">
                         <Twitter className="mr-2 h-4 w-4" /> X / Twitter
@@ -475,12 +475,12 @@ export function ListingsPage() {
       setIsLoginOpen(true);
       return;
     }
-    if (user.role !== 'User') {
+    const canShortlist = user.role === 'User' || user.role === 'Agent' || user.role === 'O2O';
+    if (!canShortlist) {
       toast({
         variant: 'destructive',
         title: 'Action Not Available',
-        description:
-          'Only Customer accounts can shortlist properties.',
+        description: 'Shortlisting is available for Customers, Agents, and O2O Managers.',
       });
       return;
     }
