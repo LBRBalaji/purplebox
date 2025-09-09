@@ -158,7 +158,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                     </Badge>
                 )}
                 <div className="flex items-center gap-3">
-                   <Checkbox
+                    <Checkbox
                         checked={isSelected}
                         onCheckedChange={() => onSelectionChange(listing)}
                         aria-label={`Select warehouse ${listing.listingId}`}
@@ -727,3 +727,4 @@ export function ListingsPage() {
 }
 
     
+
