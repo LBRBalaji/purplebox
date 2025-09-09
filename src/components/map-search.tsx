@@ -384,11 +384,11 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       if (circle) circle.setMap(null);
       
       const newCircle = new google.maps.Circle({
-            strokeColor: 'hsl(210 60% 50%)',
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: 'hsl(210 60% 50%)',
-            fillOpacity: 0.15,
+            strokeColor: '#FFC107',
+            strokeOpacity: 0.9,
+            strokeWeight: 3,
+            fillColor: '#FFC107',
+            fillOpacity: 0.2,
             map,
             center: location,
             radius: searchRadius, 
