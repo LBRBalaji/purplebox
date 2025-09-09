@@ -196,7 +196,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
         <div className="col-span-2">
              <Button className="w-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20" variant="secondary" onClick={() => onSelectionChange(listing)}>
               <div className={cn("mr-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-primary/50", isSelected && "bg-primary border-primary")}>
-                  <Smile className={cn("h-4 w-4 text-primary transition-transform duration-300", isSelected ? 'scale-100 rotate-0 text-primary-foreground' : 'scale-0 -rotate-90')} />
+                  <Smile className={cn("h-4 w-4 text-primary transition-transform duration-300", isSelected ? 'scale-100 rotate-0 text-amber-400' : 'scale-0 -rotate-90')} />
               </div>
               <span className="font-semibold text-base">Select Me</span>
             </Button>
@@ -727,5 +727,6 @@ export function ListingsPage() {
 }
 
     
+
 
 
