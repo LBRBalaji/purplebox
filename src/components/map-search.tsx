@@ -162,7 +162,7 @@ function WarehouseDetailCard({ warehouse }: { warehouse: ListingSchema }) {
                     </div>
                      <div className="space-y-1">
                         <p className="text-muted-foreground flex items-center gap-1"><Building2 className="h-4 w-4"/> Building Type</p>
-                        <p className="font-semibold">{warehouse.buildingSpecifications.buildingType || 'N/A'}</p>
+                        <p className="font-semibold">{Array.isArray(warehouse.buildingSpecifications.buildingType) ? warehouse.buildingSpecifications.buildingType.join(' / ') : 'N/A'}</p>
                     </div>
                      <div className="space-y-1">
                         <p className="text-muted-foreground flex items-center gap-1"><CheckCircle className="h-4 w-4"/> Docks</p>
@@ -271,46 +271,44 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   React.useEffect(() => {
     if (!map || !markerLibrary || !geometry) return;
 
-    // Clear previous clusterer instance if it exists
     if (markerClustererRef.current) {
       markerClustererRef.current.clearMarkers();
     }
     
-    if (warehouses.length === 0) return;
+    if (warehouses.length > 0) {
+        const newMarkers = warehouses.map(warehouse => {
+            const latLngParts = warehouse.latLng?.split(',').map(s => parseFloat(s.trim()));
+            if (!latLngParts || latLngParts.length !== 2 || isNaN(latLngParts[0]) || isNaN(latLngParts[1])) {
+                return null;
+            }
+            
+            const fuzzFactor = 0.005; // Approx 500 meters
+            const position = { 
+                lat: latLngParts[0] + (Math.random() - 0.5) * fuzzFactor, 
+                lng: latLngParts[1] + (Math.random() - 0.5) * fuzzFactor 
+            };
+            
+            const marker = new google.maps.Marker({
+                position,
+                icon: {
+                  path: google.maps.SymbolPath.CIRCLE,
+                  scale: 10,
+                  fillColor: 'hsl(var(--primary))',
+                  fillOpacity: 0.5,
+                  strokeColor: 'hsl(var(--primary-foreground))',
+                  strokeWeight: 1,
+                },
+            });
+            marker.addListener('click', () => {
+                setSelectedWarehouse(warehouse);
+                setSummaryData(null);
+            });
+            return marker;
+        }).filter((m): m is google.maps.Marker => m !== null);
 
-    const newMarkers = warehouses.map(warehouse => {
-        const latLngParts = warehouse.latLng?.split(',').map(s => parseFloat(s.trim()));
-        if (!latLngParts || latLngParts.length !== 2 || isNaN(latLngParts[0]) || isNaN(latLngParts[1])) {
-            return null;
-        }
-        
-        // Fuzz the location slightly to protect privacy
-        const fuzzFactor = 0.005; // Approx 500 meters
-        const position = { 
-            lat: latLngParts[0] + (Math.random() - 0.5) * fuzzFactor, 
-            lng: latLngParts[1] + (Math.random() - 0.5) * fuzzFactor 
-        };
-        
-        const marker = new google.maps.Marker({
-            position,
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 10,
-              fillColor: 'hsl(var(--primary))',
-              fillOpacity: 0.5,
-              strokeColor: 'hsl(var(--primary-foreground))',
-              strokeWeight: 1,
-            },
-        });
-        marker.addListener('click', () => {
-            setSelectedWarehouse(warehouse);
-            setSummaryData(null);
-        });
-        return marker;
-    }).filter((m): m is google.maps.Marker => m !== null);
-
-    setMarkers(newMarkers);
-    markerClustererRef.current = new MarkerClusterer({ map, markers: newMarkers });
+        setMarkers(newMarkers);
+        markerClustererRef.current = new MarkerClusterer({ map, markers: newMarkers });
+    }
 
     return () => {
         if (markerClustererRef.current) {
@@ -362,12 +360,12 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
       if (nearbyWarehouses.length > 0) {
         const sizes = nearbyWarehouses.map(w => w.sizeSqFt);
-        const docks = nearbyWarehouses.map(w => w.buildingSpecifications.numberOfDocksAndShutters).filter(d => d !== undefined && d > 0);
+        const ceilingHeights = nearbyWarehouses.map(w => w.buildingSpecifications.eveHeightMeters).filter((h): h is number => h !== undefined && h > 0);
         
         const readinessCounts = nearbyWarehouses.reduce((acc, w) => {
             if (w.availabilityDate === 'Ready for Occupancy') acc.ready++;
             else if (w.availabilityDate === 'Available in 3 months') acc.soon++;
-            else if (w.availabilityDate === 'Under Construction' || w.availabilityDate.includes('2025')) acc.underConstruction++;
+            else if (w.availabilityDate === 'Under Construction' || (w.constructionProgress && parseInt(w.constructionProgress) < 100)) acc.underConstruction++;
             return acc;
         }, { ready: 0, soon: 0, underConstruction: 0 });
 
@@ -376,7 +374,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             totalListings: nearbyWarehouses.length,
             sizeRange: `${Math.min(...sizes).toLocaleString()} - ${Math.max(...sizes).toLocaleString()} sq. ft.`,
             readiness: readinessCounts,
-            avgCeilingHeight: docks.length > 0 ? Math.round(docks.reduce((a, b) => a + (b || 0), 0) / docks.length) : 0,
+            avgCeilingHeight: ceilingHeights.length > 0 ? Math.round(ceilingHeights.reduce((a, b) => a + (b || 0), 0) / ceilingHeights.length * 3.28084) : 0, // convert meters to feet for display
             center: center,
         };
         setSummaryData(newSummary);
