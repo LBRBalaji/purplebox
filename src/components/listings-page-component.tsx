@@ -146,16 +146,6 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                   </>
               )}
             </Carousel>
-             <div className="absolute top-3 right-3 z-10">
-                <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={() => onSelectionChange(listing)}
-                    aria-label={`Select warehouse ${listing.listingId}`}
-                    className="h-6 w-6 rounded-full bg-background/50 backdrop-blur-sm border-2 border-white/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                >
-                  <Smile className={cn("h-4 w-4 transition-transform duration-200", isSelected ? 'scale-100 rotate-0' : 'scale-0 -rotate-90')} />
-                </Checkbox>
-            </div>
         </div>
        </CardHeader>
        <CardContent className="flex-grow p-6 space-y-4">
@@ -167,11 +157,20 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                         3PL Operated
                     </Badge>
                 )}
-                <CardTitle className="leading-tight">{listing.name || listing.listingId}</CardTitle>
-                <CardDescription>ID: {listing.listingId}</CardDescription>
-                <CardDescription className="flex items-center gap-1.5 pt-1">
-                    <MapPin className="h-4 w-4" /> {listing.location}
-                </CardDescription>
+                <div className="flex items-center gap-3">
+                   <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => onSelectionChange(listing)}
+                        aria-label={`Select warehouse ${listing.listingId}`}
+                        className="h-6 w-6 rounded-full data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    >
+                      <Smile className={cn("h-4 w-4 transition-transform duration-200", isSelected ? 'scale-100 rotate-0' : 'scale-0 -rotate-90')} />
+                    </Checkbox>
+                    <div className="flex-grow">
+                        <CardTitle className="leading-tight">{listing.listingId}</CardTitle>
+                        <CardDescription>{listing.location}</CardDescription>
+                    </div>
+                </div>
             </div>
             <div className="flex items-center space-x-2 shrink-0 pt-1">
                 <Button variant="ghost" size="icon" onClick={() => onShortlist(listing.listingId)}>
