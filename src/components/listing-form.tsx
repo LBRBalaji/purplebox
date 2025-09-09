@@ -112,9 +112,13 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   });
 
   // Watch for changes in area fields to auto-calculate total
-  const areaValues = form.watch("area");
+  const plinthArea = form.watch("area.plinthArea");
+  const mezzanineArea1 = form.watch("area.mezzanineArea1");
+  const mezzanineArea2 = form.watch("area.mezzanineArea2");
+  const canopyArea = form.watch("area.canopyArea");
+  const driversRestRoomArea = form.watch("area.driversRestRoomArea");
+
   React.useEffect(() => {
-    const { plinthArea, mezzanineArea1, mezzanineArea2, canopyArea, driversRestRoomArea } = areaValues;
     const total =
       (Number(plinthArea) || 0) +
       (Number(mezzanineArea1) || 0) +
@@ -122,10 +126,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
       (Number(canopyArea) || 0) +
       (Number(driversRestRoomArea) || 0);
 
-    if (total !== (Number(areaValues.totalChargeableArea) || 0)) {
+    const currentTotal = Number(form.getValues("area.totalChargeableArea")) || 0;
+
+    if (total !== currentTotal) {
         form.setValue("area.totalChargeableArea", total, { shouldValidate: true });
     }
-  }, [areaValues, form]);
+  }, [plinthArea, mezzanineArea1, mezzanineArea2, canopyArea, driversRestRoomArea, form]);
 
 
   React.useEffect(() => {
@@ -300,7 +306,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         <FormItem><FormLabel>Driver's Rest Room Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="area.totalChargeableArea" render={({ field }) => (
-                        <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} readOnly className="bg-secondary" /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
               </div>
