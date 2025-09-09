@@ -239,7 +239,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const geometry = useMapsLibrary('geometry');
   const router = useRouter();
   const { user } = useAuth();
-  const { listings } = useData(); // Use live data from context
+  const { listings } = useData();
   
   const [warehouses, setWarehouses] = React.useState<ListingSchema[]>([]);
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
@@ -251,7 +251,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [pendingRedirectCenter, setPendingRedirectCenter] = React.useState<{ lat: number; lng: number } | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [markers, setMarkers] = React.useState<google.maps.Marker[]>([]);
-  const [markerClusterer, setMarkerClusterer] = React.useState<MarkerClusterer | null>(null);
+  const markerClustererRef = React.useRef<MarkerClusterer | null>(null);
   const [selectedWarehouse, setSelectedWarehouse] = React.useState<ListingSchema | null>(null);
   
   // States for Distance Calculator
@@ -261,20 +261,23 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [measureMarkers, setMeasureMarkers] = React.useState<google.maps.Marker[]>([]);
   const [totalDistance, setTotalDistance] = React.useState(0);
 
-  // Filter listings to only show approved ones
+  // Filter listings to only show approved ones and keep it up to date
   React.useEffect(() => {
-    const activeListings = listings.filter(l => l.status === 'approved' || l.status === 'pending');
+    const activeListings = listings.filter(l => l.status === 'approved');
     setWarehouses(activeListings);
   }, [listings]);
 
   // Init marker clusterer
   React.useEffect(() => {
-    if (!map || !markerLibrary || warehouses.length === 0 || !geometry) return;
+    if (!map || !markerLibrary || !geometry) return;
 
-    if (markerClusterer) {
-        markerClusterer.clearMarkers();
+    // Clear previous clusterer instance if it exists
+    if (markerClustererRef.current) {
+      markerClustererRef.current.clearMarkers();
     }
     
+    if (warehouses.length === 0) return;
+
     const newMarkers = warehouses.map(warehouse => {
         const latLngParts = warehouse.latLng?.split(',').map(s => parseFloat(s.trim()));
         if (!latLngParts || latLngParts.length !== 2 || isNaN(latLngParts[0]) || isNaN(latLngParts[1])) {
@@ -292,27 +295,26 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             position,
             icon: {
               path: google.maps.SymbolPath.CIRCLE,
-              scale: 10, // Increased size
+              scale: 10,
               fillColor: 'hsl(var(--primary))',
-              fillOpacity: 0.5, // 50% transparency
+              fillOpacity: 0.5,
               strokeColor: 'hsl(var(--primary-foreground))',
               strokeWeight: 1,
             },
         });
         marker.addListener('click', () => {
             setSelectedWarehouse(warehouse);
-            setSummaryData(null); // Clear regional summary when a specific warehouse is selected
+            setSummaryData(null);
         });
         return marker;
     }).filter((m): m is google.maps.Marker => m !== null);
 
     setMarkers(newMarkers);
-    const newClusterer = new MarkerClusterer({ map, markers: newMarkers });
-    setMarkerClusterer(newClusterer);
+    markerClustererRef.current = new MarkerClusterer({ map, markers: newMarkers });
 
     return () => {
-        if (newClusterer) {
-            newClusterer.clearMarkers();
+        if (markerClustererRef.current) {
+            markerClustererRef.current.clearMarkers();
         }
     };
   }, [map, markerLibrary, warehouses, geometry]);
@@ -346,8 +348,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       setLastSearchedCenter(center);
       setSelectedWarehouse(null);
       
-      // Dynamic summary calculation
-      const searchRadius = 25000; // 25km
+      const searchRadius = 25000;
       const searchCenterLatLng = new google.maps.LatLng(center.lat, center.lng);
 
       const nearbyWarehouses = warehouses.filter(w => {
@@ -457,85 +458,76 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     map?.setZoom(5);
   };
 
-  // --- Distance Calculator Logic ---
+  const toggleMeasurement = () => {
+      clearMeasurement();
+      setIsMeasuring(prev => !prev);
+  };
 
-    // Toggle measurement mode
-    const toggleMeasurement = () => {
-        clearMeasurement();
-        setIsMeasuring(prev => !prev);
-    };
+  const clearMeasurement = () => {
+      measurePolyline?.setMap(null);
+      measureMarkers.forEach(marker => marker.setMap(null));
+      setMeasurePoints([]);
+      setMeasurePolyline(null);
+      setMeasureMarkers([]);
+      setTotalDistance(0);
+  };
 
-    // Clear measurement data
-    const clearMeasurement = () => {
-        measurePolyline?.setMap(null);
-        measureMarkers.forEach(marker => marker.setMap(null));
-        setMeasurePoints([]);
-        setMeasurePolyline(null);
-        setMeasureMarkers([]);
-        setTotalDistance(0);
-    };
+  React.useEffect(() => {
+      if (!map || !isMeasuring) return;
 
-    // Effect to handle map clicks for measurement
-    React.useEffect(() => {
-        if (!map || !isMeasuring) return;
+      map.setOptions({ draggableCursor: 'crosshair' });
+      const clickListener = map.addListener('click', (e: google.maps.MapMouseEvent) => {
+          if (e.latLng) {
+              setMeasurePoints(prev => [...prev, e.latLng!]);
+          }
+      });
 
-        map.setOptions({ draggableCursor: 'crosshair' });
-        const clickListener = map.addListener('click', (e: google.maps.MapMouseEvent) => {
-            if (e.latLng) {
-                setMeasurePoints(prev => [...prev, e.latLng!]);
-            }
-        });
+      return () => {
+          map.setOptions({ draggableCursor: 'grab' });
+          google.maps.event.removeListener(clickListener);
+      };
+  }, [map, isMeasuring]);
 
-        return () => {
-            map.setOptions({ draggableCursor: 'grab' });
-            google.maps.event.removeListener(clickListener);
-        };
-    }, [map, isMeasuring]);
+  React.useEffect(() => {
+      if (!map || !geometry || !isMeasuring) return;
 
-    // Effect to update polyline and distance
-    React.useEffect(() => {
-        if (!map || !geometry || !isMeasuring) return;
+      measureMarkers.forEach(marker => marker.setMap(null));
+      const newMarkers = measurePoints.map(point => new google.maps.Marker({
+          position: point,
+          map: map,
+          icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 4,
+              fillColor: 'hsl(var(--primary))',
+              fillOpacity: 1,
+              strokeColor: 'white',
+              strokeWeight: 2,
+          },
+      }));
+      setMeasureMarkers(newMarkers);
 
-        // Draw markers
-        measureMarkers.forEach(marker => marker.setMap(null)); // Clear old markers
-        const newMarkers = measurePoints.map(point => new google.maps.Marker({
-            position: point,
-            map: map,
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 4,
-                fillColor: 'hsl(var(--primary))',
-                fillOpacity: 1,
-                strokeColor: 'white',
-                strokeWeight: 2,
-            },
-        }));
-        setMeasureMarkers(newMarkers);
+      if (!measurePolyline) {
+          const newPolyline = new google.maps.Polyline({
+              path: measurePoints,
+              geodesic: true,
+              strokeColor: 'hsl(var(--primary))',
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+              map: map,
+          });
+          setMeasurePolyline(newPolyline);
+      } else {
+          measurePolyline.setPath(measurePoints);
+      }
+      
+      if (measurePoints.length > 1) {
+          const distance = google.maps.geometry.spherical.computeLength(measurePoints);
+          setTotalDistance(distance / 1000);
+      } else {
+          setTotalDistance(0);
+      }
 
-        // Draw polyline
-        if (!measurePolyline) {
-            const newPolyline = new google.maps.Polyline({
-                path: measurePoints,
-                geodesic: true,
-                strokeColor: 'hsl(var(--primary))',
-                strokeOpacity: 1.0,
-                strokeWeight: 2,
-                map: map,
-            });
-            setMeasurePolyline(newPolyline);
-        } else {
-            measurePolyline.setPath(measurePoints);
-        }
-        
-        // Calculate distance
-        if (measurePoints.length > 1) {
-            const distance = google.maps.geometry.spherical.computeLength(measurePoints);
-            setTotalDistance(distance / 1000); // convert meters to kilometers
-        } else {
-            setTotalDistance(0);
-        }
-
-    }, [measurePoints, map, geometry, isMeasuring, measurePolyline]);
+  }, [measurePoints, map, geometry, isMeasuring, measurePolyline]);
 
 
   return (
