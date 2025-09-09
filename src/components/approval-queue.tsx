@@ -82,7 +82,7 @@ export function ApprovalQueue() {
                                 <TableHead>Location</TableHead>
                                 <TableHead>Size (Sq. Ft.)</TableHead>
                                 <TableHead>Provider</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="text-right w-[340px]">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -100,27 +100,12 @@ export function ApprovalQueue() {
                                             <Button variant="outline" size="sm" onClick={() => handleEdit(listing)}>
                                                 <Pencil className="mr-2 h-4 w-4" /> Edit
                                             </Button>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Change Status</DropdownMenuLabel>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onClick={() => handleStatusChange(listing.listingId, 'approved')}>
-                                                        <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Approve
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleStatusChange(listing.listingId, 'rejected')}>
-                                                        <XCircle className="mr-2 h-4 w-4 text-red-500" /> Reject
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleStatusChange(listing.listingId, 'pending')}>
-                                                        <PauseCircle className="mr-2 h-4 w-4 text-amber-500" /> Hold (Set to Pending)
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <Button variant="destructive" size="sm" onClick={() => handleStatusChange(listing.listingId, 'rejected')}>
+                                                <XCircle className="mr-2 h-4 w-4" /> Reject
+                                            </Button>
+                                            <Button variant="default" size="sm" onClick={() => handleStatusChange(listing.listingId, 'approved')}>
+                                                <CheckCircle className="mr-2 h-4 w-4" /> Approve
+                                            </Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -139,4 +124,3 @@ export function ApprovalQueue() {
       </>
     );
 }
-
