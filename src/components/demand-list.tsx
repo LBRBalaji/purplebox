@@ -29,7 +29,7 @@ import { Separator } from './ui/separator';
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
-  location: 'Location',
+  location: 'Location & Radius',
   ceilingHeight: 'Ceiling Height',
   docks: 'Docks',
   readiness: 'Readiness',
