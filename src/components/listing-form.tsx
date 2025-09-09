@@ -446,6 +446,9 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             We thank you in advance for your understanding and cooperation in respecting this platform policy.
                         </AlertDescription>
                     </Alert>
+                    <FormDescription className="text-xs">
+                        Use a Google Drive link. Right-click file {'->'} Share {'->'} Anyone with the link. Paste it here.
+                    </FormDescription>
                     {fields.map((field, index) => (
                         <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                             <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
@@ -473,9 +476,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                             }}
                                         />
                                     </FormControl>
-                                    <FormDescription className="text-xs">
-                                        Use a Google Drive link. Right-click file {'->'} Share {'->'} Anyone with the link. Paste it here.
-                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
