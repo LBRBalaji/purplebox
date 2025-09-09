@@ -61,6 +61,11 @@
         "type": "image",
         "name": "Dock Area",
         "url": "https://picsum.photos/seed/box-two-docks/800/600"
+      },
+      {
+        "type": "image",
+        "name": "Park View",
+        "url": "https://picsum.photos/seed/box-two-park/800/600"
       }
     ]
   },
@@ -200,7 +205,9 @@
     "constructionProgress": "100%",
     "serviceModel": "Standard",
     "buildingSpecifications": {
-      "buildingType": ["PEB"]
+      "buildingType": [
+        "PEB"
+      ]
     },
     "area": {},
     "siteSpecifications": {},
