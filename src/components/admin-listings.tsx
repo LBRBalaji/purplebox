@@ -12,7 +12,7 @@ import {
 import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -35,16 +35,18 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Slider } from './ui/slider';
+import { ListingForm } from './listing-form';
 
 
-function AdminListingCard({ listing, analytics, providerName }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string }) {
+function AdminListingCard({ listing, analytics, providerName, onEdit }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string, onEdit: (listing: ListingSchema) => void }) {
   const { updateListingStatus } = useData();
   const { toast } = useToast();
 
   const statusConfig = {
     approved: { text: "Approved", className: "bg-green-100 text-green-800" },
     pending: { text: "Pending Review", className: "bg-amber-100 text-amber-800" },
-    rejected: { text: "Rejected", className: "bg-red-100 text-red-800" }
+    rejected: { text: "Rejected", className: "bg-red-100 text-red-800" },
+    leased: { text: "Leased", className: "bg-blue-100 text-blue-800" }
   };
   const status = statusConfig[listing.status] || { text: 'Unknown', className: 'bg-gray-100 text-gray-800' };
 
@@ -76,8 +78,12 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Manage Status</DropdownMenuLabel>
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                 <DropdownMenuItem onClick={() => onEdit(listing)}>
+                  <Edit className="mr-2 h-4 w-4" /> Edit Listing
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuLabel>Manage Status</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => handleStatusChange('approved')}>
                   <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Approve
                 </DropdownMenuItem>
@@ -86,6 +92,9 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleStatusChange('pending')}>
                   <PauseCircle className="mr-2 h-4 w-4 text-amber-500" /> Set to Pending
+                </DropdownMenuItem>
+                 <DropdownMenuItem onClick={() => handleStatusChange('leased')}>
+                  <PauseCircle className="mr-2 h-4 w-4 text-blue-500" /> Mark as Leased
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -188,7 +197,7 @@ function AdminListingCard({ listing, analytics, providerName }: { listing: Listi
 }
 
 export function AdminListings() {
-  const { listings, listingAnalytics } = useData();
+  const { listings, listingAnalytics, updateListing } = useData();
   const { users } = useAuth();
   
   const [filteredListings, setFilteredListings] = React.useState<ListingSchema[]>([]);
@@ -196,6 +205,9 @@ export function AdminListings() {
   const [developerFilter, setDeveloperFilter] = React.useState('all');
   const [availabilityFilter, setAvailabilityFilter] = React.useState('all');
   const [sizeRange, setSizeRange] = React.useState([0, 1000000]);
+
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
 
   const allDevelopers = React.useMemo(() => {
     const developerEmails = new Set(listings.map(l => l.developerId));
@@ -240,7 +252,19 @@ export function AdminListings() {
     setSizeRange([0, maxSliderSize]);
   }
 
+  const handleEdit = (listing: ListingSchema) => {
+    setSelectedListing(listing);
+    setIsFormOpen(true);
+  };
+
+  const handleFormSubmit = (data: ListingSchema) => {
+    updateListing(data);
+    setIsFormOpen(false);
+    setSelectedListing(null);
+  };
+
   return (
+    <>
       <div className="mt-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold font-headline tracking-tight">All Listings &amp; Performance</h2>
@@ -313,7 +337,7 @@ export function AdminListings() {
             {filteredListings.map(listing => {
               const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
               const providerName = getProviderName(listing.developerId);
-              return <AdminListingCard key={listing.listingId} listing={listing} analytics={analytics} providerName={providerName} />;
+              return <AdminListingCard key={listing.listingId} listing={listing} analytics={analytics} providerName={providerName} onEdit={handleEdit} />;
             })}
           </div>
         ) : (
@@ -323,5 +347,12 @@ export function AdminListings() {
           </Card>
         )}
       </div>
+      <ListingForm
+        isOpen={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        listing={selectedListing}
+        onSubmit={handleFormSubmit}
+      />
+    </>
   );
 }
