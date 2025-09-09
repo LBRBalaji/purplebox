@@ -7,6 +7,7 @@ import { DataProvider } from '@/contexts/data-context';
 import { Header } from '@/components/header';
 import Link from 'next/link';
 import { CookieBanner } from '@/components/cookie-banner';
+import { GoogleAnalytics } from '@/components/google-analytics';
 
 export const metadata: Metadata = {
   title: 'Lakshmi Balaji O2O: Sourcing & Leasing Simplified',
@@ -49,6 +50,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased flex flex-col h-full bg-background">
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && <GoogleAnalytics />}
         <AuthProvider>
           <DataProvider>
             <Header />
