@@ -147,6 +147,8 @@ type DataContextType = {
   updateTenantImprovements: (leadId: string, sheet: TenantImprovementsSheet) => void;
   getCommercialTerms: (leadId: string) => CommercialTermsSchema | null;
   updateCommercialTerms: (leadId: string, sheet: CommercialTermsSchema) => void;
+  generalShortlist: string[]; // Array of listingIds
+  toggleGeneralShortlist: (listingId: string) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -180,6 +182,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
   
   const [toastMessage, setToastMessage] = useState<{ variant?: "default" | "destructive" | null, title: string, description: string} | null>(null);
 
@@ -189,6 +192,33 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setToastMessage(null);
     }
   }, [toastMessage, toast]);
+
+  useEffect(() => {
+    try {
+        const storedShortlist = localStorage.getItem('general_shortlist');
+        if (storedShortlist) {
+            setGeneralShortlist(JSON.parse(storedShortlist));
+        }
+    } catch (e) {
+        console.error("Could not parse general shortlist from localStorage", e);
+    }
+  }, []);
+
+  const toggleGeneralShortlist = (listingId: string) => {
+    setGeneralShortlist(prev => {
+        const isShortlisted = prev.includes(listingId);
+        let updatedList: string[];
+        if (isShortlisted) {
+            updatedList = prev.filter(id => id !== listingId);
+            toast({ title: "Removed from Shortlist" });
+        } else {
+            updatedList = [...prev, listingId];
+            toast({ title: "Added to Shortlist" });
+        }
+        localStorage.setItem('general_shortlist', JSON.stringify(updatedList));
+        return updatedList;
+    });
+  };
 
 
   const persistData = async (endpoint: string, data: any, entityName: string) => {
@@ -613,7 +643,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         getTenantImprovements,
         updateTenantImprovements,
         getCommercialTerms,
-        updateCommercialTerms
+        updateCommercialTerms,
+        generalShortlist,
+        toggleGeneralShortlist,
         }}>
       {children}
     </DataContext.Provider>

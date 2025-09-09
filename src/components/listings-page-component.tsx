@@ -105,7 +105,7 @@ function ShareDropdown({ listing }: { listing: ListingSchema }) {
     );
 }
 
-function ListingCard({ listing, isSelected, onSelectionChange }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void }) {
+function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isShortlisted }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void, onShortlist: (listingId: string) => void, isShortlisted: boolean }) {
   const previewImage = listing.documents?.find(d => d.type === 'image')?.url || 'https://placehold.co/600x400/210D42/FFFFFF?text=Image+Not+Available';
 
   return (
@@ -164,17 +164,10 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
                     <MapPin className="h-4 w-4" /> {listing.location}
                 </CardDescription>
             </div>
-             <div className="flex items-center space-x-2 shrink-0 pt-1">
-                <Checkbox
-                    id={`select-${listing.listingId}`}
-                    checked={isSelected}
-                    onCheckedChange={() => onSelectionChange(listing)}
-                    aria-label={`Select warehouse ${listing.listingId}`}
-                />
-                <Label htmlFor={`select-${listing.listingId}`} className="text-sm font-medium flex items-center gap-1 cursor-pointer">
-                    Select
-                    {isSelected && <Smile className="h-4 w-4 text-amber-500 animate-in fade-in zoom-in-90 duration-500" />}
-                </Label>
+            <div className="flex items-center space-x-2 shrink-0 pt-1">
+                <Button variant="ghost" size="icon" onClick={() => onShortlist(listing.listingId)}>
+                    <Star className={cn("h-5 w-5 text-muted-foreground", isShortlisted && "fill-amber-400 text-amber-500")} />
+                </Button>
             </div>
         </div>
 
@@ -185,7 +178,7 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
             </div>
             <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-primary" />
-                <span className="font-medium">{listing.buildingSpecifications.buildingType || 'N/A'}</span>
+                <span className="font-medium">{Array.isArray(listing.buildingSpecifications.buildingType) ? listing.buildingSpecifications.buildingType.join(' / ') : 'N/A'}</span>
             </div>
              <div className="flex items-center gap-2">
                 <ChevronsUp className="h-4 w-4 text-primary" />
@@ -359,7 +352,7 @@ const searchPlaceholders = [
 export function ListingsPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { listings: allListings, isLoading: isDataLoading, selectedForDownload, toggleSelectedForDownload } = useData();
+  const { listings: allListings, isLoading: isDataLoading, selectedForDownload, toggleSelectedForDownload, generalShortlist, toggleGeneralShortlist } = useData();
   const { toast } = useToast();
   const [filteredListings, setFilteredListings] = useState<ListingSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -410,7 +403,7 @@ export function ListingsPage() {
             const searchHaystack = [
                 listing.name,
                 listing.listingId,
-                listing.buildingSpecifications.buildingType,
+                Array.isArray(listing.buildingSpecifications.buildingType) ? listing.buildingSpecifications.buildingType.join(' ') : '',
                 listing.serviceModel,
                 listing.buildingSpecifications.eveHeightMeters ? `eve height ${listing.buildingSpecifications.eveHeightMeters}m` : '',
                 listing.buildingSpecifications.roofType,
@@ -477,7 +470,24 @@ export function ListingsPage() {
       router.push('/dashboard?logNew=true');
   }
 
-    const handleSelectionChange = (listing: ListingSchema) => {
+  const handleShortlistClick = (listingId: string) => {
+    if (!user) {
+      setIsLoginOpen(true);
+      return;
+    }
+    if (user.role !== 'User') {
+      toast({
+        variant: 'destructive',
+        title: 'Action Not Available',
+        description:
+          'Only Customer accounts can shortlist properties.',
+      });
+      return;
+    }
+    toggleGeneralShortlist(listingId);
+  };
+
+  const handleSelectionChange = (listing: ListingSchema) => {
     if (!user) {
       setIsLoginOpen(true);
       return;
@@ -543,6 +553,8 @@ export function ListingsPage() {
               listing={listing} 
               isSelected={selectedIds.has(listing.listingId)}
               onSelectionChange={handleSelectionChange}
+              onShortlist={handleShortlistClick}
+              isShortlisted={generalShortlist.includes(listing.listingId)}
             />
           ))}
         </div>

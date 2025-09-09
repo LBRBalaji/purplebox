@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus, Share, Linkedin, Twitter, Facebook, Mail } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus, Share, Linkedin, Twitter, Facebook, Mail, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -202,7 +202,7 @@ export default function ListingDetailPage() {
     const router = useRouter();
     const { user } = useAuth();
     const { toast } = useToast();
-    const { listings, logDownload, logListingView, isLoading } = useData();
+    const { listings, logDownload, logListingView, isLoading, generalShortlist, toggleGeneralShortlist } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
@@ -263,6 +263,8 @@ export default function ListingDetailPage() {
     if (isLoading || !listing) {
         return <DetailPageSkeleton />;
     }
+
+    const isShortlisted = generalShortlist.includes(listing.listingId);
     
     const handleDownloadRequest = () => {
         if (!user) {
@@ -373,6 +375,22 @@ export default function ListingDetailPage() {
       }
       router.push('/dashboard?logNew=true');
     }
+
+    const handleShortlistClick = () => {
+        if (!user) {
+            setIsLoginDialogOpen(true);
+            return;
+        }
+        if (user.role !== 'User') {
+            toast({
+                variant: 'destructive',
+                title: 'Action Not Available',
+                description: 'Only Customer accounts can shortlist properties.',
+            });
+            return;
+        }
+        toggleGeneralShortlist(listing.listingId);
+    };
 
     return (
         <>
@@ -565,7 +583,15 @@ export default function ListingDetailPage() {
                                         )}
                                     </CardContent>
                                     {user && user.role === 'User' && (
-                                        <CardFooter>
+                                        <CardFooter className="flex flex-col gap-2">
+                                            <Button
+                                                variant={isShortlisted ? 'default' : 'outline'}
+                                                className="w-full"
+                                                onClick={handleShortlistClick}
+                                            >
+                                                <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
+                                                {isShortlisted ? 'Shortlisted' : 'Shortlist'}
+                                            </Button>
                                             <Button className="w-full" onClick={handleDownloadRequest}>
                                                 <Download className="mr-2 h-4 w-4" /> Download Details as CSV
                                             </Button>

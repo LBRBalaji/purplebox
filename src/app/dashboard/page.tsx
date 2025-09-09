@@ -21,6 +21,7 @@ import { CustomerTransactions } from '@/components/customer-transactions';
 import { AdminListings } from '@/components/admin-listings';
 import Link from 'next/link';
 import { TransactionsPage } from '@/components/transactions-page';
+import { GeneralShortlist } from '@/components/general-shortlist';
 
 const MainDashboard = () => {
     const { user } = useAuth();
@@ -88,8 +89,8 @@ const MainDashboard = () => {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="my-demands">My Demands & Matches</TabsTrigger>
           <TabsTrigger value="log-demand">Log New Demand</TabsTrigger>
+          <TabsTrigger value="my-shortlist">My Shortlist</TabsTrigger>
           <TabsTrigger value="my-transactions">My Transactions</TabsTrigger>
-          <TabsTrigger value="shortlisted">Shortlisted</TabsTrigger>
         </TabsList>
         <TabsContent value="my-demands">
             <MyDemands onSwitchTab={setCustomerTab} />
@@ -97,11 +98,11 @@ const MainDashboard = () => {
         <TabsContent value="log-demand">
           <DemandForm onDemandLogged={handleSwitchToMyDemands} />
         </TabsContent>
+        <TabsContent value="my-shortlist">
+            <GeneralShortlist />
+        </TabsContent>
         <TabsContent value="my-transactions">
             <CustomerTransactions />
-        </TabsContent>
-        <TabsContent value="shortlisted">
-            <ShortlistedProperties />
         </TabsContent>
       </Tabs>
     );
