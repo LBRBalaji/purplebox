@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type CommercialTermsSchema, type AcknowledgmentDetails } from '@/lib/schema';
 import { type User } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -211,17 +211,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const persistListings = (updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings');
-  const persistDemands = (updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands');
-  const persistSubmissions = (updatedSubmissions: Submission[]) => persistData('submissions', updatedSubmissions, 'submissions');
-  const persistAgentLeads = (updatedLeads: AgentLead[]) => persistData('agent-leads', updatedLeads, 'agent leads');
-  const persistRegisteredLeads = (updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads');
-  const persistActivities = (updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities');
-  const persistTenantImprovements = (updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements');
-  const persistCommercialTerms = (updatedSheets: CommercialTermsSchema[]) => persistData('commercial-terms', updatedSheets, 'commercial terms');
+  const persistListings = useCallback((updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings'), []);
+  const persistDemands = useCallback((updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands'), []);
+  const persistSubmissions = useCallback((updatedSubmissions: Submission[]) => persistData('submissions', updatedSubmissions, 'submissions'), []);
+  const persistAgentLeads = useCallback((updatedLeads: AgentLead[]) => persistData('agent-leads', updatedLeads, 'agent leads'), []);
+  const persistRegisteredLeads = useCallback((updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads'), []);
+  const persistActivities = useCallback((updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities'), []);
+  const persistTenantImprovements = useCallback((updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements'), []);
+  const persistCommercialTerms = useCallback((updatedSheets: CommercialTermsSchema[]) => persistData('commercial-terms', updatedSheets, 'commercial terms'), []);
 
 
-  const addListing = (listing: ListingSchema, userEmail?: string) => {
+  const addListing = useCallback((listing: ListingSchema, userEmail?: string) => {
     setListings(prevListings => {
         const newListings = [{ ...listing, status: 'pending' as const }, ...prevListings];
         persistListings(newListings);
@@ -233,9 +233,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         });
         return newListings;
     });
-  }
+  }, [persistListings]);
 
-  const updateListing = (updatedListing: ListingSchema) => {
+  const updateListing = useCallback((updatedListing: ListingSchema) => {
     setListings(prevListings => {
         const newListings = prevListings.map(l => l.listingId === updatedListing.listingId ? { ...updatedListing, status: 'pending' as const } : l);
         persistListings(newListings);
@@ -247,9 +247,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         });
         return newListings;
     });
-  }
+  }, [persistListings]);
 
-  const updateListingStatus = (listingId: string, status: ListingStatus, userEmail?: string) => {
+  const updateListingStatus = useCallback((listingId: string, status: ListingStatus, userEmail?: string) => {
     setListings(prev => {
         const updatedListings = prev.map(l => {
             if (l.listingId === listingId) {
@@ -267,9 +267,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         persistListings(updatedListings);
         return updatedListings;
     });
-  }
+  }, [persistListings]);
 
-  const addAgentLead = (lead: Omit<AgentLead, 'id' | 'status'>) => {
+  const addAgentLead = useCallback((lead: Omit<AgentLead, 'id' | 'status'>) => {
     setAgentLeads(prevLeads => {
         const newLead: AgentLead = { 
           ...lead, 
@@ -280,17 +280,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
         persistAgentLeads(updatedLeads);
         return updatedLeads;
     });
-  }
+  }, [persistAgentLeads]);
 
-  const updateAgentLeadStatus = (leadId: string, status: AgentStatus) => {
+  const updateAgentLeadStatus = useCallback((leadId: string, status: AgentStatus) => {
     setAgentLeads(prevLeads => {
         const updatedLeads = prevLeads.map(lead => lead.id === leadId ? { ...lead, status } : lead);
         persistAgentLeads(updatedLeads);
         return updatedLeads;
     });
-  };
+  }, [persistAgentLeads]);
 
-  const addDemand = (demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => {
+  const addDemand = useCallback((demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => {
     setDemands(prevDemands => {
         const newDemand = { ...demand, createdAt: new Date().toISOString() };
         const newDemands = [newDemand, ...prevDemands];
@@ -303,9 +303,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         });
         return newDemands;
     });
-  };
+  }, [persistDemands]);
 
-  const updateDemand = (updatedDemand: DemandSchema) => {
+  const updateDemand = useCallback((updatedDemand: DemandSchema) => {
     setDemands(prevDemands => {
         const newDemands = prevDemands.map((demand) =>
             demand.demandId === updatedDemand.demandId ? updatedDemand : demand
@@ -313,9 +313,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         persistDemands(newDemands);
         return newDemands;
     });
-  };
+  }, [persistDemands]);
 
-  const addSubmission = (submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => {
+  const addSubmission = useCallback((submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => {
     setSubmissions(prevSubmissions => {
         const demand = demands.find(d => d.demandId === submission.demandId);
         const submissionWithDefaults: Submission = {
@@ -335,9 +335,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         });
         return newSubmissions;
     });
-  };
+  }, [demands, persistSubmissions]);
 
-  const updateSubmissionStatus = (submissionId: string, status: SubmissionStatus) => {
+  const updateSubmissionStatus = useCallback((submissionId: string, status: SubmissionStatus) => {
     setSubmissions(prevSubmissions => {
         const newSubmissions = prevSubmissions.map(sub =>
             sub.submissionId === submissionId ? { ...sub, status, isNew: status === 'Approved' ? true : sub.isNew } : sub
@@ -348,9 +348,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         return newSubmissions;
     });
-  };
+  }, [persistSubmissions]);
 
-  const toggleShortlist = (submissionToToggle: Submission) => {
+  const toggleShortlist = useCallback((submissionToToggle: Submission) => {
     if (submissionToToggle.status !== 'Approved') return;
 
     setShortlistedItems((prev) => {
@@ -365,9 +365,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return [...prev, submissionToToggle];
       }
     });
-  };
+  }, []);
 
-  const clearNewSubmissions = (submissionIds: string[]) => {
+  const clearNewSubmissions = useCallback((submissionIds: string[]) => {
     setSubmissions(prevSubmissions => {
         const idsToClear = new Set(submissionIds);
         const newSubmissions = prevSubmissions.map(sub => 
@@ -376,17 +376,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
         persistSubmissions(newSubmissions);
         return newSubmissions;
     });
-  };
+  }, [persistSubmissions]);
   
-  const getTodaysTotalDownloads = (userId: string): number => {
+  const getTodaysTotalDownloads = useCallback((userId: string): number => {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const downloadEntries = downloadHistory.filter(d => d.userId === userId && d.timestamp >= startOfDay);
     const uniqueTimestamps = new Set(downloadEntries.map(d => d.timestamp));
     return uniqueTimestamps.size;
-  };
+  }, [downloadHistory]);
 
-  const logDownload = (userId: string) => {
+  const logDownload = useCallback((userId: string) => {
     const todaysTotalDownloads = getTodaysTotalDownloads(userId);
 
     if (todaysTotalDownloads >= 2) {
@@ -416,9 +416,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
 
     return { success: true, limitReached: false };
-  }
+  }, [downloadHistory, getTodaysTotalDownloads]);
 
-  const logListingView = React.useCallback((user: User, listingId: string) => {
+  const logListingView = useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {
       const newAnalytics = [...prevAnalytics];
       let analytic = newAnalytics.find(a => a.listingId === listingId);
@@ -431,7 +431,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         };
 
         const existingViewers = analytic.viewedBy || [];
-        // Don't add a new view record if the same user viewed it very recently
         const lastView = existingViewers.find(v => v.name === newViewer.name && v.company === newViewer.company);
         const fiveMinutes = 5 * 60 * 1000;
         if (lastView && (Date.now() - lastView.timestamp < fiveMinutes)) {
@@ -442,7 +441,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         analytic.viewedBy = [...existingViewers, newViewer];
 
       } else {
-        // If no analytics record exists for this listing, create one
         analytic = {
           listingId,
           views: 1,
@@ -457,7 +455,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const toggleSelectedForDownload = (listing: ListingSchema): { limitReached: boolean } => {
+  const toggleSelectedForDownload = useCallback((listing: ListingSchema): { limitReached: boolean } => {
     const isSelected = selectedForDownload.some(item => item.listingId === listing.listingId);
 
     if (isSelected) {
@@ -470,14 +468,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setSelectedForDownload(prev => [...prev, listing]);
       return { limitReached: false };
     }
-  };
+  }, [selectedForDownload]);
 
 
-  const clearSelectedForDownload = () => {
+  const clearSelectedForDownload = useCallback(() => {
     setSelectedForDownload([]);
-  };
+  }, []);
 
-  const addRegisteredLead = (leadData: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => {
+  const addRegisteredLead = useCallback((leadData: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => {
     setRegisteredLeads(prevLeads => {
         const newLead: RegisteredLead = {
           ...leadData,
@@ -486,7 +484,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const updatedLeads = [newLead, ...prevLeads];
         persistRegisteredLeads(updatedLeads);
 
-        // Create a notification for each property in the lead
         newLead.providers.forEach(provider => {
             provider.properties.forEach(property => {
                 setLastEvent({
@@ -501,9 +498,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         return updatedLeads;
     });
-  };
+  }, [persistRegisteredLeads]);
 
-  const updateRegisteredLeadStatus = (leadId: string, providerEmail: string, listingId: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => {
+  const updateRegisteredLeadStatus = useCallback((leadId: string, providerEmail: string, listingId: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => {
     setRegisteredLeads(prevLeads => {
         const updatedLeads = prevLeads.map(lead => {
           if (lead.id === leadId) {
@@ -533,9 +530,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         persistRegisteredLeads(updatedLeads);
         return updatedLeads;
     });
-  };
+  }, [persistRegisteredLeads]);
   
-  const addTransactionActivity = (activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
+  const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
       setTransactionActivities(prevActivities => {
           const newActivity: TransactionActivity = {
               ...activityData,
@@ -546,13 +543,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
           persistActivities(updatedActivities);
           return updatedActivities;
       });
-  };
+  }, [persistActivities]);
   
-  const getTenantImprovements = (leadId: string): TenantImprovementsSheet | null => {
+  const getTenantImprovements = useCallback((leadId: string): TenantImprovementsSheet | null => {
     return tenantImprovements.find(sheet => sheet.leadId === leadId) || null;
-  }
+  }, [tenantImprovements]);
   
-  const updateTenantImprovements = (leadId: string, sheetData: TenantImprovementsSheet) => {
+  const updateTenantImprovements = useCallback((leadId: string, sheetData: TenantImprovementsSheet) => {
     setTenantImprovements(prevSheets => {
         const existingSheet = prevSheets.find(sheet => sheet.leadId === leadId);
         let updatedSheets: TenantImprovementsSheet[];
@@ -570,14 +567,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         });
         return updatedSheets;
     });
-  }
+  }, [persistTenantImprovements]);
 
-  const getCommercialTerms = (leadId: string): CommercialTermsSchema | null => {
+  const getCommercialTerms = useCallback((leadId: string): CommercialTermsSchema | null => {
     const result = commercialTerms.find((sheet: any) => sheet.leadId === leadId);
     return result || null;
-  }
+  }, [commercialTerms]);
 
-  const updateCommercialTerms = (leadId: string, sheetData: CommercialTermsSchema) => {
+  const updateCommercialTerms = useCallback((leadId: string, sheetData: CommercialTermsSchema) => {
       setCommercialTerms(prevSheets => {
         const sheetWithId = { ...sheetData, leadId: leadId };
         const existingSheetIndex = prevSheets.findIndex((sheet: any) => sheet.leadId === leadId);
@@ -597,7 +594,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         });
         return updatedSheets;
     });
-  }
+  }, [persistCommercialTerms]);
 
 
   return (

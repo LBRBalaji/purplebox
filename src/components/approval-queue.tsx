@@ -6,18 +6,10 @@ import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Check, CheckCircle, Edit, Eye, MoreHorizontal, PauseCircle, Pencil, ThumbsDown, ThumbsUp, XCircle } from 'lucide-react';
+import { Check, CheckCircle, Eye, Pencil, XCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import type { ListingSchema } from '@/lib/schema';
 import Link from 'next/link';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { ListingForm } from './listing-form';
 
 export function ApprovalQueue() {

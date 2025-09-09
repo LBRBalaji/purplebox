@@ -2,7 +2,7 @@
   {
     "listingId": "LST-RD962F",
     "developerId": "wd2@o2o.com",
-    "status": "pending",
+    "status": "approved",
     "warehouseBoxId": "WBX-APEX-E8YF",
     "name": "Box two",
     "location": "Chengalpet",
@@ -80,7 +80,9 @@
       "totalChargeableArea": 165000
     },
     "buildingSpecifications": {
-      "buildingType": ["PEB"],
+      "buildingType": [
+        "PEB"
+      ],
       "numberOfDocksAndShutters": 15,
       "internalLighting": "LED-HI Bay 300 lux",
       "craneSupportStructureAvailable": true,
@@ -130,7 +132,9 @@
       "totalChargeableArea": 214000
     },
     "buildingSpecifications": {
-      "buildingType": ["PEB"],
+      "buildingType": [
+        "PEB"
+      ],
       "numberOfDocksAndShutters": 24,
       "internalLighting": "LED-HI Bay 300 lux",
       "craneSupportStructureAvailable": true,
