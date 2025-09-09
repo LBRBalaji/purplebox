@@ -64,8 +64,13 @@
       },
       {
         "type": "image",
-        "name": "Park View",
-        "url": "https://picsum.photos/seed/box-two-park/800/600"
+        "name": "Front view",
+        "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
+      },
+      {
+        "type": "image",
+        "name": "front view-elevation",
+        "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
       }
     ]
   },
