@@ -214,50 +214,48 @@ export default function ListingDetailPage() {
         
         const listingId = params.listingId as string;
         
-        if (user && listingId) {
-            logListingView(user, listingId);
+        const foundListing = listings.find(l => l.listingId === listingId);
+
+        if (!foundListing) {
+            if (!isLoading) router.push('/listings');
+            return;
         }
 
-        if (listings.length > 0) {
-            const activeListings = listings.filter(l => l.status === 'approved');
-            const foundListing = activeListings.find(l => l.listingId === listingId);
+        const isSuperAdminOrO2O = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+        const isOwner = user?.email === foundListing.developerId;
+        const isApproved = foundListing.status === 'approved';
 
-            if (foundListing) {
-                setListing(foundListing);
+        if (isApproved || isSuperAdminOrO2O || isOwner) {
+            setListing(foundListing);
+            if (user && isApproved) {
+                 logListingView(user, listingId);
+            }
+        } else {
+             router.push('/listings');
+             return;
+        }
+        
+
+        // Logic for previous/next navigation
+        try {
+            const storedResultIds = sessionStorage.getItem('warehouse_search_results');
+            let listToNavigate: string[];
+
+            if (storedResultIds) {
+                listToNavigate = JSON.parse(storedResultIds);
             } else {
-                // If not found in approved, maybe it's a preview for an admin/provider
-                const foundAnyStatus = listings.find(l => l.listingId === listingId);
-                if (foundAnyStatus && (user?.email === foundAnyStatus.developerId || user?.role === 'SuperAdmin' || user?.email === 'admin@example.com')) {
-                    setListing(foundAnyStatus);
-                } else {
-                    router.push('/listings');
-                    return;
-                }
+                listToNavigate = listings.filter(l => l.status === 'approved').map(w => w.listingId).sort((a,b) => a.localeCompare(b));
             }
-
-            // Logic for previous/next navigation
-            try {
-                const storedResultIds = sessionStorage.getItem('warehouse_search_results');
-                let listToNavigate: string[];
-
-                if (storedResultIds) {
-                    listToNavigate = JSON.parse(storedResultIds);
-                } else {
-                    listToNavigate = activeListings.map(w => w.listingId).sort((a,b) => a.localeCompare(b));
-                }
-                
-                setNavigationList(listToNavigate);
-                const foundIndex = listToNavigate.findIndex(id => id === listingId);
-                setCurrentIndex(foundIndex);
-            } catch (e) {
-                console.error("Could not access sessionStorage for navigation", e);
-                 const listToNavigate = activeListings.map(w => w.listingId).sort((a,b) => a.localeCompare(b));
-                 setNavigationList(listToNavigate);
-                 const foundIndex = listToNavigate.findIndex(id => id === listingId);
-                 setCurrentIndex(foundIndex);
-            }
-        } else if (!isLoading) {
-            router.push('/listings');
+            
+            setNavigationList(listToNavigate);
+            const foundIndex = listToNavigate.findIndex(id => id === listingId);
+            setCurrentIndex(foundIndex);
+        } catch (e) {
+            console.error("Could not access sessionStorage for navigation", e);
+             const listToNavigate = listings.filter(l => l.status === 'approved').map(w => w.listingId).sort((a,b) => a.localeCompare(b));
+             setNavigationList(listToNavigate);
+             const foundIndex = listToNavigate.findIndex(id => id === listingId);
+             setCurrentIndex(foundIndex);
         }
 
     }, [params.listingId, router, user, logListingView, listings, isLoading]);
@@ -486,7 +484,6 @@ export default function ListingDetailPage() {
                                             <h4 className="font-semibold mb-2">Site</h4>
                                             <Separator />
                                             <DetailRow label="Inside Flooring" value={listing.siteSpecifications.typeOfFlooringInside} />
-                                            <DetailRow label="Outside Flooring" value={listing.siteSpecifications.typeOfFlooringOutside} />
                                             <DetailRow label="Access Road" value={listing.siteSpecifications.typeOfRoad} />
                                         </div>
                                         <div className="md:col-span-2 pt-4">
