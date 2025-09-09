@@ -116,14 +116,14 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   React.useEffect(() => {
     const { plinthArea, mezzanineArea1, mezzanineArea2, canopyArea, driversRestRoomArea } = areaValues;
     const total =
-      (plinthArea || 0) +
-      (mezzanineArea1 || 0) +
-      (mezzanineArea2 || 0) +
-      (canopyArea || 0) +
-      (driversRestRoomArea || 0);
+      (Number(plinthArea) || 0) +
+      (Number(mezzanineArea1) || 0) +
+      (Number(mezzanineArea2) || 0) +
+      (Number(canopyArea) || 0) +
+      (Number(driversRestRoomArea) || 0);
 
-    if (total > 0 && total !== areaValues.totalChargeableArea) {
-      form.setValue("area.totalChargeableArea", total, { shouldValidate: true });
+    if (total !== (Number(areaValues.totalChargeableArea) || 0)) {
+        form.setValue("area.totalChargeableArea", total, { shouldValidate: true });
     }
   }, [areaValues, form]);
 

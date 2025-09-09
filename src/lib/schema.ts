@@ -45,7 +45,7 @@ export const listingSchema = z.object({
     mezzanineArea2: asOptionalField(z.coerce.number()),
     canopyArea: asOptionalField(z.coerce.number()),
     driversRestRoomArea: asOptionalField(z.coerce.number()),
-    totalChargeableArea: asOptionalField(z.coerce.number().positive("Total area is required.")),
+    totalChargeableArea: asOptionalField(z.coerce.number()),
   }),
 
   // Building Specifications
