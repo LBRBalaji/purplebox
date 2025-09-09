@@ -291,11 +291,11 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 position,
                 icon: {
                   path: google.maps.SymbolPath.CIRCLE,
-                  scale: 10,
-                  fillColor: 'hsl(var(--primary))',
-                  fillOpacity: 0.5,
-                  strokeColor: 'hsl(var(--primary-foreground))',
-                  strokeWeight: 1,
+                  scale: 15,
+                  fillColor: '#FFC107',
+                  fillOpacity: 0.7,
+                  strokeColor: '#FFFFFF',
+                  strokeWeight: 2,
                 },
             });
             marker.addListener('click', () => {
