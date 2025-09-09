@@ -106,7 +106,6 @@ function ShareDropdown({ listing }: { listing: ListingSchema }) {
 }
 
 function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isShortlisted }: { listing: ListingSchema, isSelected: boolean, onSelectionChange: (listing: ListingSchema) => void, onShortlist: (listingId: string) => void, isShortlisted: boolean }) {
-  const previewImage = listing.documents?.find(d => d.type === 'image')?.url || 'https://placehold.co/600x400/210D42/FFFFFF?text=Image+Not+Available';
 
   return (
     <Card className={cn("flex flex-col transition-all overflow-hidden group", isSelected && "ring-2 ring-primary")}>
@@ -147,6 +146,16 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                   </>
               )}
             </Carousel>
+             <div className="absolute top-3 right-3 z-10">
+                <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={() => onSelectionChange(listing)}
+                    aria-label={`Select warehouse ${listing.listingId}`}
+                    className="h-6 w-6 rounded-full bg-background/50 backdrop-blur-sm border-2 border-white/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                >
+                  <Smile className={cn("h-4 w-4 transition-transform duration-200", isSelected ? 'scale-100 rotate-0' : 'scale-0 -rotate-90')} />
+                </Checkbox>
+            </div>
         </div>
        </CardHeader>
        <CardContent className="flex-grow p-6 space-y-4">
@@ -717,3 +726,5 @@ export function ListingsPage() {
     </>
   );
 }
+
+    
