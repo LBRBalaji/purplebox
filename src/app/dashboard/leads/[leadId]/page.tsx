@@ -9,7 +9,7 @@ import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -130,6 +130,14 @@ export default function LeadDetailPage() {
             const devListings = (provider.properties || []).map(p => listings.find(l => l.listingId === p.listingId)).filter((l): l is ListingSchema => !!l);
             setSelectedProvider(provider);
             setSelectedProviderListings(devListings);
+        } else if (user?.role === 'Warehouse Developer') {
+            // If user is a developer and there are multiple, auto-select their view
+            const provider = foundLead.providers.find(p => p.providerEmail === user.email);
+            if (provider) {
+                const devListings = (provider.properties || []).map(p => listings.find(l => l.listingId === p.listingId)).filter((l): l is ListingSchema => !!l);
+                setSelectedProvider(provider);
+                setSelectedProviderListings(devListings);
+            }
         }
 
     } else {
@@ -182,13 +190,14 @@ export default function LeadDetailPage() {
   }
 
   const customer = users[lead.customerId];
+  const leadSourceUser = users[lead.registeredBy];
   const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
   const isCustomer = user?.email === lead.customerId;
   const isAgent = user?.role === 'Agent';
   const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
   const isProvider = user?.role === 'Warehouse Developer';
 
-  const providerDetailsForUser = lead.providers.find(p => p.providerEmail === user?.email);
+  const providerDetailsForUser = isProvider ? lead.providers.find(p => p.providerEmail === user?.email) : null;
   
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=registered-leads' : '/dashboard/transactions';
 
@@ -199,7 +208,7 @@ export default function LeadDetailPage() {
       <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-              {lead.providers.length > 1 && selectedProvider ? (
+              {lead.providers.length > 1 && selectedProvider && !isProvider ? (
                   <Button variant="ghost" onClick={() => setSelectedProvider(null)} className="mb-4">
                       <ArrowLeft className="mr-2 h-4 w-4" /> Back to Developer Selection
                   </Button>
@@ -282,7 +291,7 @@ export default function LeadDetailPage() {
                                       </CardContent>
                                   </Card>
                               )}
-                              {providerUser && (
+                              {providerUser && !isProvider && (
                                   <Card>
                                       <CardHeader>
                                           <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Developer Info</CardTitle>
@@ -292,6 +301,19 @@ export default function LeadDetailPage() {
                                           <div>{providerUser.userName}</div>
                                           <a href={`mailto:${providerUser.email}`} className="text-primary hover:underline block">{providerUser.email}</a>
                                           <a href={`tel:${providerUser.phone}`} className="text-primary hover:underline block">{providerUser.phone}</a>
+                                      </CardContent>
+                                  </Card>
+                              )}
+                              {isProvider && leadSourceUser && (
+                                  <Card>
+                                      <CardHeader>
+                                          <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5"/> Lead Source</CardTitle>
+                                      </CardHeader>
+                                      <CardContent className="space-y-3 text-sm">
+                                          <p>This lead was registered by:</p>
+                                          <div className="font-semibold">{leadSourceUser.userName}</div>
+                                          <div>{leadSourceUser.companyName}</div>
+                                          <Badge variant={leadSourceUser.role === 'Agent' ? 'secondary' : 'default'}>{leadSourceUser.role}</Badge>
                                       </CardContent>
                                   </Card>
                               )}
