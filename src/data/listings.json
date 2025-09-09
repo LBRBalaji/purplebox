@@ -1,3 +1,4 @@
+
 [
   {
     "listingId": "LST-RD962F",
@@ -178,5 +179,27 @@
         "url": "https://drive.google.com/uc?export=view&id=1pbN9wZa2oOqDTqQfO2UxQntyRLPkzSxu"
       }
     ]
+  },
+  {
+    "listingId": "LST-TEST01",
+    "developerId": "wd3@o2o.com",
+    "status": "pending",
+    "warehouseBoxId": "WBX-ZENI-PEND",
+    "name": "Zenith Pending Warehouse",
+    "location": "Sriperumbudur",
+    "sizeSqFt": 120000,
+    "description": "A new facility in the industrial corridor of Sriperumbudur, awaiting final review and approval.",
+    "rentPerSqFt": 28,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "buildingSpecifications": {
+      "buildingType": ["PEB"]
+    },
+    "area": {},
+    "siteSpecifications": {},
+    "certificatesAndApprovals": {},
+    "documents": []
   }
 ]

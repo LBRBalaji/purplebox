@@ -11,9 +11,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import type { ListingSchema } from '@/lib/schema';
 import Link from 'next/link';
 import { ListingForm } from './listing-form';
+import { useAuth } from '@/contexts/auth-context';
 
 export function ApprovalQueue() {
     const { listings, updateListingStatus, updateListing } = useData();
+    const { users } = useAuth();
     const { toast } = useToast();
     const [pendingListings, setPendingListings] = React.useState<ListingSchema[]>([]);
     const [isFormOpen, setIsFormOpen] = React.useState(false);
@@ -78,12 +80,14 @@ export function ApprovalQueue() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {pendingListings.map(listing => (
+                            {pendingListings.map(listing => {
+                                const provider = users[listing.developerId];
+                                return (
                                 <TableRow key={listing.listingId}>
                                     <TableCell className="font-medium">{listing.name}</TableCell>
                                     <TableCell>{listing.location}</TableCell>
                                     <TableCell>{listing.sizeSqFt.toLocaleString()}</TableCell>
-                                    <TableCell>{listing.developerName || 'N/A'}</TableCell>
+                                    <TableCell>{provider?.companyName || 'N/A'}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             <Button asChild variant="outline" size="sm">
@@ -101,7 +105,7 @@ export function ApprovalQueue() {
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )})}
                         </TableBody>
                     </Table>
                 </CardContent>
