@@ -184,15 +184,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
   
-  const [toastMessage, setToastMessage] = useState<{ variant?: "default" | "destructive" | null, title: string, description: string} | null>(null);
-
-  useEffect(() => {
-    if (toastMessage) {
-        toast(toastMessage);
-        setToastMessage(null);
-    }
-  }, [toastMessage, toast]);
-
   useEffect(() => {
     try {
         const storedShortlist = localStorage.getItem('general_shortlist');
@@ -233,7 +224,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     } catch (error) {
         console.error(`Error persisting ${entityName}:`, error);
-        setToastMessage({
+        toast({
             variant: "destructive",
             title: "Data Sync Error",
             description: `Could not save ${entityName} changes to the server.`
@@ -426,7 +417,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             timestamp: new Date().toISOString(),
             triggeredBy: userId,
         });
-        setToastMessage({
+        toast({
             variant: "destructive",
             title: "Daily Download Limit Reached",
             description: "You have already downloaded twice today. Please try again tomorrow.",
@@ -446,7 +437,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
 
     return { success: true, limitReached: false };
-  }, [downloadHistory, getTodaysTotalDownloads]);
+  }, [downloadHistory, getTodaysTotalDownloads, toast]);
 
   const logListingView = useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {
@@ -591,13 +582,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         
         persistTenantImprovements(updatedSheets);
-        setToastMessage({
+        toast({
             title: "Improvements Sheet Saved",
             description: "Your changes have been saved successfully.",
         });
         return updatedSheets;
     });
-  }, [persistTenantImprovements]);
+  }, [persistTenantImprovements, toast]);
 
   const getCommercialTerms = useCallback((leadId: string): CommercialTermsSchema | null => {
     const result = commercialTerms.find((sheet: any) => sheet.leadId === leadId);
@@ -618,13 +609,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         
         persistCommercialTerms(updatedSheets);
-        setToastMessage({
+        toast({
             title: "Commercial Terms Saved",
             description: "Your changes have been saved successfully.",
         });
         return updatedSheets;
     });
-  }, [persistCommercialTerms]);
+  }, [persistCommercialTerms, toast]);
 
 
   return (
