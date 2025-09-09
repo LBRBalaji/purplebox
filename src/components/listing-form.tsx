@@ -111,6 +111,23 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     name: "documents"
   });
 
+  // Watch for changes in area fields to auto-calculate total
+  const areaValues = form.watch("area");
+  React.useEffect(() => {
+    const { plinthArea, mezzanineArea1, mezzanineArea2, canopyArea, driversRestRoomArea } = areaValues;
+    const total =
+      (plinthArea || 0) +
+      (mezzanineArea1 || 0) +
+      (mezzanineArea2 || 0) +
+      (canopyArea || 0) +
+      (driversRestRoomArea || 0);
+
+    if (total > 0 && total !== areaValues.totalChargeableArea) {
+      form.setValue("area.totalChargeableArea", total, { shouldValidate: true });
+    }
+  }, [areaValues, form]);
+
+
   React.useEffect(() => {
     if (isOpen) {
         if (isEditMode && listing) {
@@ -283,7 +300,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         <FormItem><FormLabel>Driver's Rest Room Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="area.totalChargeableArea" render={({ field }) => (
-                        <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} disabled /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
               </div>
@@ -380,9 +397,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         <div className="space-y-4 p-4 border rounded-md">
                              <FormField control={form.control} name="siteSpecifications.typeOfFlooringInside" render={({ field }) => (
                                 <FormItem><FormLabel>Inside Flooring Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="FM2">FM2</SelectItem><SelectItem value="VDF-RCC">VDF-RCC</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="PCC">PCC</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-                            )} />
-                             <FormField control={form.control} name="siteSpecifications.typeOfFlooringOutside" render={({ field }) => (
-                                <FormItem><FormLabel>Outside Flooring Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., VDF Concrete" /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name="siteSpecifications.typeOfRoad" render={({ field }) => (
                                 <FormItem><FormLabel>Access Road Flooring</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Tar">Tar</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="PCC">PCC</SelectItem><SelectItem value="Gravel">Gravel</SelectItem></SelectContent></Select><FormMessage /></FormItem>

@@ -73,7 +73,6 @@ export const listingSchema = z.object({
   // Site Specifications
   siteSpecifications: z.object({
     typeOfFlooringInside: z.enum(['FM2', 'VDF-RCC', 'RCC', 'PCC']).optional(),
-    typeOfFlooringOutside: z.string().optional(),
     typeOfRoad: z.enum(['Tar', 'RCC', 'PCC', 'Gravel']).optional(),
   }),
   
