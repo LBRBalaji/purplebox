@@ -17,7 +17,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Checkbox } from '@/components/ui/checkbox';
 import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { cn, convertGoogleDriveLink } from '@/lib/utils';
 import { LoginDialog } from './login-dialog';
 import { LimitExceededDialog } from './limit-exceeded-dialog';
 import { Badge } from './ui/badge';
@@ -118,7 +118,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                   <CarouselItem key={index}>
                     <div className="aspect-video relative">
                       <Image
-                        src={doc.url}
+                        src={convertGoogleDriveLink(doc.url)}
                         alt={doc.name || listing.name}
                         fill
                         className="object-cover"

@@ -41,6 +41,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { generateListingDescriptionAction } from "@/lib/actions";
 import { Sparkles } from "lucide-react";
+import { convertGoogleDriveLink } from "@/lib/utils";
 
 
 type ListingFormProps = {
@@ -449,7 +450,23 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                 </SelectContent></Select><FormMessage /></FormItem>
                             )} />
                             <FormField control={form.control} name={`documents.${index}.url`} render={({ field }) => (
-                                <FormItem><FormLabel>URL</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="https://" /></FormControl><FormMessage /></FormItem>
+                                <FormItem>
+                                    <FormLabel>URL</FormLabel>
+                                    <FormControl>
+                                        <Input 
+                                            {...field}
+                                            value={field.value ?? ''} 
+                                            placeholder="https://"
+                                            onBlur={(e) => {
+                                                const convertedUrl = convertGoogleDriveLink(e.target.value);
+                                                field.onChange(convertedUrl);
+                                                field.onBlur();
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <FormDescription className="text-xs">Paste the share link from Google Drive. It will be converted automatically.</FormDescription>
+                                    <FormMessage />
+                                </FormItem>
                             )} />
                             <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
                                 <Trash2 className="h-4 w-4" />

@@ -29,7 +29,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { cn } from '@/lib/utils';
+import { cn, convertGoogleDriveLink } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import * as XLSX from 'xlsx';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -433,7 +433,7 @@ export default function ListingDetailPage() {
                                                 <CarouselItem key={index}>
                                                     <div className="aspect-video relative">
                                                         <Image
-                                                            src={doc.url}
+                                                            src={convertGoogleDriveLink(doc.url)}
                                                             alt={doc.name || listing.name}
                                                             fill
                                                             className="object-cover"
