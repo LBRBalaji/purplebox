@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -42,12 +41,7 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
 
 export function ProviderLeads() {
   const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, updateRegisteredLeadStatus } = useData();
-  const { toast } = useToast();
-  
-  const [leadToAcknowledge, setLeadToAcknowledge] = React.useState<RegisteredLead | null>(null);
-  const [propertyToAcknowledge, setPropertyToAcknowledge] = React.useState<RegisteredLeadProperty | null>(null);
-  const [isAcknowledgeFormOpen, setIsAcknowledgeFormOpen] = React.useState(false);
+  const { registeredLeads } = useData();
   
   const isAgent = user?.role === 'Agent';
   const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
@@ -55,7 +49,6 @@ export function ProviderLeads() {
   const myLeads = React.useMemo(() => {
     if (!user) return [];
     
-    // O2O and Admin see leads that are either flagged for collaboration or originated from a non-agent
     if (isAdminOrO2O) {
         return registeredLeads.filter(lead => {
             const registeringUser = allUsers[lead.registeredBy];
@@ -73,32 +66,6 @@ export function ProviderLeads() {
     );
   }, [registeredLeads, user, isAgent, isAdminOrO2O, allUsers]);
 
-  const handleAcknowledgeClick = (lead: RegisteredLead, property: RegisteredLeadProperty) => {
-    setLeadToAcknowledge(lead);
-    setPropertyToAcknowledge(property);
-    setIsAcknowledgeFormOpen(true);
-  }
-
-  const handleAcknowledgeSubmit = (details: AcknowledgmentDetails) => {
-    if (!leadToAcknowledge || !user?.email || !propertyToAcknowledge) return;
-    updateRegisteredLeadStatus(leadToAcknowledge.id, user.email, propertyToAcknowledge.listingId, 'Acknowledged', details);
-    toast({
-        title: 'Property Acknowledged!',
-        description: `Thank you for your confirmation.`,
-    });
-    setIsAcknowledgeFormOpen(false);
-    setPropertyToAcknowledge(null);
-    setLeadToAcknowledge(null);
-  }
-  
-  const handleReject = (leadId: string, listingId: string) => {
-    if (!user?.email) return;
-    updateRegisteredLeadStatus(leadId, user.email, listingId, 'Rejected');
-    toast({
-      title: 'Property Rejected',
-      description: `You have rejected the lead for this property.`,
-    });
-  }
 
   if (isAuthLoading) {
     return null; // Don't render until auth data is loaded
@@ -127,7 +94,7 @@ export function ProviderLeads() {
                     {isAgent ? 'My Registered Leads' : 'Registered Leads'}
                 </h2>
                 <p className="text-muted-foreground mt-2">
-                    {isAgent ? 'Track the status and activity of the leads you have registered.' : 'Acknowledge or reject leads registered with you by the Lakshmi Balaji O2O team.'}
+                    {isAgent ? 'Track the status and activity of the leads you have registered.' : 'Review new leads and manage their activity. Click "View Activity" to acknowledge or reject.'}
                 </p>
             </div>
             <Card>
@@ -228,29 +195,6 @@ export function ProviderLeads() {
 
                                         <TableCell className="text-right">
                                             <div className="flex flex-col gap-2 items-end">
-                                            {(providerInfoForCurrentUser?.properties || []).filter(p => p.status === 'Pending').map(prop => (
-                                                <div key={prop.listingId} className="flex items-center gap-2">
-                                                    <span className="text-xs text-muted-foreground">{prop.listingId}</span>
-                                                    <AlertDialog>
-                                                        <AlertDialogTrigger asChild>
-                                                            <Button variant="destructive" size="sm" className="h-7"><ThumbsUp className="mr-2 h-4 w-4" />Acknowledge</Button>
-                                                        </AlertDialogTrigger>
-                                                        <AlertDialogContent>
-                                                            <AlertDialogHeader>
-                                                                <AlertDialogTitle>Formal Acknowledgment</AlertDialogTitle>
-                                                                <AlertDialogDescription>
-                                                                    By clicking "Confirm", you are formally acknowledging this lead from Lakshmi Balaji O2O. 
-                                                                    This is an important, non-revocable action that solidifies our collaboration for this specific transaction.
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter>
-                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction onClick={() => handleAcknowledgeClick(lead, prop)}>Confirm & Proceed</AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
-                                                </div>
-                                            ))}
                                              <Button asChild variant="outline" size="sm">
                                                 <Link href={`/dashboard/leads/${lead.id}`}>
                                                     View Activity <ArrowRight className="ml-2 h-4 w-4" />
@@ -266,12 +210,6 @@ export function ProviderLeads() {
                 </CardContent>
             </Card>
         </div>
-        <AcknowledgeLeadDialog 
-            isOpen={isAcknowledgeFormOpen}
-            onOpenChange={setIsAcknowledgeFormOpen}
-            lead={leadToAcknowledge}
-            onSubmit={handleAcknowledgeSubmit}
-        />
     </>
   )
 }
