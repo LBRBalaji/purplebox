@@ -23,7 +23,7 @@ export const listingSchema = z.object({
   
   // General Information
   warehouseBoxId: z.string(),
-  name: z.string().min(1, "Warehouse name is required."),
+  name: z.string().optional(),
   location: z.string().min(1, "Location is required."),
   latLng: z.string().optional(),
   sizeSqFt: z.coerce.number().positive("Size must be a positive number."),
@@ -115,7 +115,7 @@ const optionalCraneSchema = z.object({
 
 export const GenerateListingDescriptionInputSchema = z.object({
   propertyId: z.string().describe('The unique identifier for the property.'),
-  name: z.string().describe("The name of the warehouse or listing."),
+  name: z.string().optional().describe("The name of the warehouse or listing."),
   location: z.string().describe('The geographical location of the property.'),
   sizeSqFt: z.coerce.number().describe('The size of the property in square feet.'),
   availabilityDate: z.string().describe('The readiness of the property for occupancy (e.g., "Ready for Occupancy").'),

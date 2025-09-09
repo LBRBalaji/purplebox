@@ -45,10 +45,10 @@ function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { lis
             <div>
               <CardTitle>
                 <Link href={`/listings/${listing.listingId}`} className="hover:underline" target="_blank" rel="noopener noreferrer">
-                  {listing.name}
+                  {listing.listingId}
                 </Link>
               </CardTitle>
-              <CardDescription>{listing.listingId}</CardDescription>
+              <CardDescription>{listing.location}</CardDescription>
             </div>
              <DropdownMenu>
               <DropdownMenuTrigger asChild>

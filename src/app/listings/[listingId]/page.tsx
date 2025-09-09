@@ -155,9 +155,9 @@ function ShareDropdown({ listing }: { listing: ListingSchema }) {
 
     if (!currentUrl) return null;
 
-    const text = encodeURIComponent(`Check out this property: ${listing.name}`);
-    const emailSubject = encodeURIComponent(`Property Listing: ${listing.name}`);
-    const emailBody = encodeURIComponent(`I thought you might be interested in this property listing:\n\n${listing.name}\n${listing.location}\n\nView more details here: ${currentUrl}`);
+    const text = encodeURIComponent(`Check out this property: ${listing.listingId}`);
+    const emailSubject = encodeURIComponent(`Property Listing: ${listing.listingId}`);
+    const emailBody = encodeURIComponent(`I thought you might be interested in this property listing:\n\nListing ID: ${listing.listingId}\n${listing.location}\n\nView more details here: ${currentUrl}`);
 
     return (
         <DropdownMenu>
@@ -176,7 +176,7 @@ function ShareDropdown({ listing }: { listing: ListingSchema }) {
                     <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${text}`} target="_blank" rel="noopener noreferrer">
                         <Linkedin className="mr-2 h-4 w-4" /> LinkedIn
                     </a>
-                </DropdownMenuItem>
+                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                     <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${text}`} target="_blank" rel="noopener noreferrer">
                         <Twitter className="mr-2 h-4 w-4" /> X / Twitter
@@ -345,7 +345,7 @@ export default function ListingDetailPage() {
 
             toast({
                 title: "Download Started",
-                description: `Details for ${listing.name} are being downloaded.`,
+                description: `Details for listing ${listing.listingId} are being downloaded.`,
             });
         }
 
@@ -401,7 +401,7 @@ export default function ListingDetailPage() {
                     <div className="flex justify-between items-center flex-wrap gap-4">
                         <div>
                             <Badge variant="secondary">{listing.listingId}</Badge>
-                            <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.name}</h1>
+                            <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.name || `Warehouse in ${listing.location}`}</h1>
                             <p className="text-lg text-muted-foreground flex items-center gap-2 mt-2">
                                 <MapPin className="h-5 w-5" /> {listing.location}
                             </p>
@@ -434,7 +434,7 @@ export default function ListingDetailPage() {
                                                     <div className="aspect-video relative">
                                                         <Image
                                                             src={convertGoogleDriveLink(doc.url)}
-                                                            alt={doc.name || listing.name}
+                                                            alt={doc.name || listing.listingId}
                                                             fill
                                                             className="object-cover"
                                                             data-ai-hint="warehouse industrial building"
@@ -645,7 +645,7 @@ export default function ListingDetailPage() {
                 </div>
             </main>
             <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => setIsLoginDialogOpen(false)} />
-            {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name}/>}
+            {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name || `Warehouse in ${listing.location}`}/>}
         </>
     );
 }

@@ -35,7 +35,7 @@ const prompt = ai.definePrompt({
   Based on the following details, write a compelling, one-paragraph description for the property.
 
   **Property Details:**
-  - Listing Name: {{{name}}}
+  {{#if name}}- Listing Name: {{{name}}}{{/if}}
   - Location: {{{location}}}
   - Total Size: {{{sizeSqFt}}} sq. ft.
   - Availability: {{{availabilityDate}}}

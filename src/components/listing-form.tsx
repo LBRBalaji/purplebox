@@ -229,7 +229,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     onSubmit(data);
     toast({
         title: isEditMode ? "Listing Updated" : "Listing Submitted",
-        description: `Your listing for "${data.name}" has been saved and is pending admin approval.`
+        description: `Your listing for "${data.listingId}" has been saved and is pending admin approval.`
     })
   };
 
@@ -253,9 +253,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               <div className="space-y-4">
                 <FormLabel className="text-lg font-semibold">General Information</FormLabel>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md">
-                    <FormField control={form.control} name="name" render={({ field }) => (
-                        <FormItem><FormLabel>Warehouse Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Prime Logistics Park - Unit A" /></FormControl><FormMessage /></FormItem>
-                    )} />
                      <FormField control={form.control} name="location" render={({ field }) => (
                         <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
                     )} />
@@ -446,8 +443,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             We thank you in advance for your understanding and cooperation in respecting this platform policy.
                         </AlertDescription>
                     </Alert>
-                    <FormDescription className="text-xs">
-                        Use a Google Drive link. Right-click file {'->'} Share {'->'} Anyone with the link. Paste it here.
+                    <FormDescription>
+                        Use a Google Drive link. Right-click file {'->'} Share {'->'} Anyone with the link. Paste it here. The system will convert it automatically.
                     </FormDescription>
                     {fields.map((field, index) => (
                         <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">

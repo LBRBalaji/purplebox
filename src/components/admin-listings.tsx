@@ -54,7 +54,7 @@ function AdminListingCard({ listing, analytics, providerName, onEdit }: { listin
     updateListingStatus(listing.listingId, newStatus);
     toast({
       title: 'Listing Status Updated',
-      description: `Listing "${listing.name}" has been set to ${newStatus}.`,
+      description: `Listing "${listing.listingId}" has been set to ${newStatus}.`,
     });
   }
 
@@ -65,7 +65,7 @@ function AdminListingCard({ listing, analytics, providerName, onEdit }: { listin
             <div>
               <CardTitle>
                 <Link href={`/listings/${listing.listingId}`} className="hover:underline" target="_blank">
-                  {listing.name}
+                  {listing.listingId}
                 </Link>
               </CardTitle>
               <CardDescription>{listing.location} - {providerName}</CardDescription>

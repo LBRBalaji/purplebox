@@ -99,7 +99,7 @@ export function MySubmissions() {
                     <TableHeader>
                     <TableRow>
                         <TableHead>Demand ID</TableHead>
-                        <TableHead>Property Name</TableHead>
+                        <TableHead>Property ID</TableHead>
                         <TableHead>Location</TableHead>
                         <TableHead>Provider</TableHead>
                         <TableHead className="text-center">Status</TableHead>
@@ -114,9 +114,9 @@ export function MySubmissions() {
                                 <TableCell className="font-medium">{submission.demandId}</TableCell>
                                 <TableCell>
                                     <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-medium text-primary hover:underline">
-                                        {listing.name}
+                                        {listing.listingId}
                                     </Link>
-                                    <p className="text-xs text-muted-foreground">{listing.listingId}</p>
+                                    <p className="text-xs text-muted-foreground">{listing.name}</p>
                                 </TableCell>
                                 <TableCell>{listing.location}</TableCell>
                                 <TableCell>

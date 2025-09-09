@@ -63,9 +63,9 @@ function ShareDropdown({ listing }: { listing: ListingSchema }) {
 
     if (!currentUrl) return null;
 
-    const text = encodeURIComponent(`Check out this property: ${listing.name}`);
-    const emailSubject = encodeURIComponent(`Property Listing: ${listing.name}`);
-    const emailBody = encodeURIComponent(`I thought you might be interested in this property listing:\n\n${listing.name}\n${listing.location}\n\nView more details here: ${currentUrl}`);
+    const text = encodeURIComponent(`Check out this property: ${listing.listingId}`);
+    const emailSubject = encodeURIComponent(`Property Listing: ${listing.listingId}`);
+    const emailBody = encodeURIComponent(`I thought you might be interested in this property listing:\n\nListing ID: ${listing.listingId}\n${listing.location}\n\nView more details here: ${currentUrl}`);
 
     return (
         <DropdownMenu>
@@ -119,7 +119,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                     <div className="aspect-video relative">
                       <Image
                         src={convertGoogleDriveLink(doc.url)}
-                        alt={doc.name || listing.name}
+                        alt={doc.name || listing.listingId}
                         fill
                         className="object-cover"
                         data-ai-hint="warehouse industrial building"
@@ -158,7 +158,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                         3PL Operated
                     </Badge>
                 )}
-                <CardTitle className="leading-tight">{listing.name}</CardTitle>
+                <CardTitle className="leading-tight">{listing.name || listing.listingId}</CardTitle>
                 <CardDescription>ID: {listing.listingId}</CardDescription>
                 <CardDescription className="flex items-center gap-1.5 pt-1">
                     <MapPin className="h-4 w-4" /> {listing.location}
