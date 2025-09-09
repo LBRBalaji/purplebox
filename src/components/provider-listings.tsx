@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { AdminListings } from './admin-listings';
 
 
 function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { listing: ListingSchema, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema) => void, isAdmin: boolean }) {
@@ -194,11 +195,12 @@ export function ProviderListings() {
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
   const { toast } = useToast();
-
+  
+  const isAdmin = user?.role === 'SuperAdmin';
+  
   React.useEffect(() => {
     if (user?.email) {
-      const isAdmin = user.role === 'SuperAdmin';
-      setMyListings(isAdmin ? listings : listings.filter(l => l.developerId === user.email));
+      setMyListings(listings.filter(l => l.developerId === user.email));
     }
   }, [listings, user]);
   
@@ -229,11 +231,14 @@ export function ProviderListings() {
     setIsFormOpen(false);
     setSelectedListing(null);
   }
+  
+  if (isAdmin) {
+      return <AdminListings />;
+  }
 
   const activeListings = myListings.filter(l => l.status !== 'leased');
   const archivedListings = myListings.filter(l => l.status === 'leased');
 
-  const isAdmin = user?.role === 'SuperAdmin';
 
   return (
     <>
@@ -241,10 +246,10 @@ export function ProviderListings() {
         <div className="mb-8 flex justify-between items-center flex-wrap gap-4">
           <div>
             <h2 className="text-3xl font-bold font-headline tracking-tight flex items-center gap-2">
-                <Building /> {isAdmin ? "All Platform Listings" : "My Property Listings"}
+                <Building /> My Property Listings
             </h2>
             <p className="text-muted-foreground mt-2">
-                {isAdmin ? "Manage and review all listings on the platform." : "Create new listings, manage active properties, and view your archived deals."}
+                Create new listings, manage active properties, and view your archived deals.
             </p>
           </div>
           <Button onClick={handleCreateNew}>
