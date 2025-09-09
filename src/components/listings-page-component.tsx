@@ -158,21 +158,13 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                     </Badge>
                 )}
                 <div className="flex items-center gap-3">
-                    <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => onSelectionChange(listing)}
-                        aria-label={`Select warehouse ${listing.listingId}`}
-                        className="h-6 w-6 rounded-full data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                    >
-                      <Smile className={cn("h-4 w-4 transition-transform duration-200", isSelected ? 'scale-100 rotate-0' : 'scale-0 -rotate-90')} />
-                    </Checkbox>
                     <div className="flex-grow">
                         <CardTitle className="leading-tight">{listing.listingId}</CardTitle>
                         <CardDescription>{listing.location}</CardDescription>
                     </div>
                 </div>
             </div>
-            <div className="flex items-center space-x-2 shrink-0 pt-1">
+             <div className="flex items-center space-x-2 shrink-0 pt-1">
                 <Button variant="ghost" size="icon" onClick={() => onShortlist(listing.listingId)}>
                     <Star className={cn("h-5 w-5 text-muted-foreground", isShortlisted && "fill-amber-400 text-amber-500")} />
                 </Button>
@@ -201,6 +193,14 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
         </div>
       </CardContent>
       <CardFooter className="p-6 pt-0 grid grid-cols-2 gap-2">
+        <div className="col-span-2">
+             <Button className="w-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20" variant="secondary" onClick={() => onSelectionChange(listing)}>
+              <div className={cn("mr-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-primary/50", isSelected && "bg-primary border-primary")}>
+                  <Smile className={cn("h-4 w-4 text-primary transition-transform duration-300", isSelected ? 'scale-100 rotate-0 text-primary-foreground' : 'scale-0 -rotate-90')} />
+              </div>
+              <span className="font-semibold text-base">Select Me</span>
+            </Button>
+        </div>
         <ShareDropdown listing={listing} />
         <Button asChild className="w-full" variant="outline">
             <Link href={`/commercial-calculator?compare=${listing.listingId}`}>
@@ -727,4 +727,5 @@ export function ListingsPage() {
 }
 
     
+
 
