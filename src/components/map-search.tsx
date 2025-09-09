@@ -385,10 +385,10 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       
       const newCircle = new google.maps.Circle({
             strokeColor: '#FFC107',
-            strokeOpacity: 0.9,
-            strokeWeight: 3,
+            strokeOpacity: 1,
+            strokeWeight: 4,
             fillColor: '#FFC107',
-            fillOpacity: 0.2,
+            fillOpacity: 0.25,
             map,
             center: location,
             radius: searchRadius, 
