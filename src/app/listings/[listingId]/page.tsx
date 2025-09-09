@@ -202,7 +202,7 @@ export default function ListingDetailPage() {
     const router = useRouter();
     const { user } = useAuth();
     const { toast } = useToast();
-    const { listings, logDownload, logListingView, isLoading, generalShortlist, toggleGeneralShortlist } = useData();
+    const { listings, logDownload, logListingView, isLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
@@ -589,9 +589,10 @@ export default function ListingDetailPage() {
                                                 variant={isShortlisted ? 'default' : 'outline'}
                                                 className="w-full"
                                                 onClick={handleShortlistClick}
+                                                disabled={isShortlistLoading}
                                             >
                                                 <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
-                                                {isShortlisted ? 'Shortlisted' : 'Shortlist'}
+                                                {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist'}
                                             </Button>
                                             {user.role === 'User' && (
                                                 <Button className="w-full" onClick={handleDownloadRequest}>

@@ -149,6 +149,7 @@ type DataContextType = {
   updateCommercialTerms: (leadId: string, sheet: CommercialTermsSchema) => void;
   generalShortlist: string[]; // Array of listingIds
   toggleGeneralShortlist: (listingId: string) => void;
+  isShortlistLoading: boolean;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -183,15 +184,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
+  const [isShortlistLoading, setIsShortlistLoading] = useState(true);
   
   useEffect(() => {
     try {
+        setIsShortlistLoading(true);
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
             setGeneralShortlist(JSON.parse(storedShortlist));
         }
     } catch (e) {
         console.error("Could not parse general shortlist from localStorage", e);
+    } finally {
+        setIsShortlistLoading(false);
     }
   }, []);
 
@@ -637,6 +642,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         updateCommercialTerms,
         generalShortlist,
         toggleGeneralShortlist,
+        isShortlistLoading,
         }}>
       {children}
     </DataContext.Provider>
