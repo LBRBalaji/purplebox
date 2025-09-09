@@ -263,7 +263,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   // Filter listings to only show approved ones and keep it up to date
   React.useEffect(() => {
-    const activeListings = listings.filter(l => l.status === 'approved');
+    const activeListings = listings.filter(l => l.status === 'approved' && l.latLng);
     setWarehouses(activeListings);
   }, [listings]);
 
@@ -282,10 +282,9 @@ function MapSearchContent({ mapId }: { mapId: string }) {
                 return null;
             }
             
-            const fuzzFactor = 0.005; // Approx 500 meters
             const position = { 
-                lat: latLngParts[0] + (Math.random() - 0.5) * fuzzFactor, 
-                lng: latLngParts[1] + (Math.random() - 0.5) * fuzzFactor 
+                lat: latLngParts[0], 
+                lng: latLngParts[1]
             };
             
             const marker = new google.maps.Marker({
