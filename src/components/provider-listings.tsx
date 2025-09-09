@@ -14,7 +14,7 @@ import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock } from 'lucide-react';
+import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { ListingForm } from './listing-form';
@@ -22,9 +22,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 
-function ProviderListingCard({ listing, onStatusChange, onEdit }: { listing: ListingSchema, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema) => void }) {
+function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { listing: ListingSchema, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema) => void, isAdmin: boolean }) {
   const { listingAnalytics } = useData();
   const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
   const statusConfig: Record<ListingStatus, { text: string; className: string, icon: React.ElementType }> = {
@@ -48,7 +49,42 @@ function ProviderListingCard({ listing, onStatusChange, onEdit }: { listing: Lis
               </CardTitle>
               <CardDescription>{listing.listingId}</CardDescription>
             </div>
-             <Badge className={status.className}><StatusIcon className="mr-1.5 h-3 w-3" /> {status.text}</Badge>
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onEdit(listing)}>
+                  <Edit className="mr-2 h-4 w-4" /> Edit Listing
+                </DropdownMenuItem>
+                {isAdmin && (
+                    <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => onStatusChange('approved')}>
+                          <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Approve
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onStatusChange('rejected')}>
+                          <XCircle className="mr-2 h-4 w-4 text-red-500" /> Reject
+                        </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => onStatusChange('pending')}>
+                          <PauseCircle className="mr-2 h-4 w-4 text-amber-500" /> Set to Pending
+                        </DropdownMenuItem>
+                    </>
+                )}
+                 <DropdownMenuSeparator />
+                 <DropdownMenuItem onClick={() => onStatusChange('leased')}>
+                    <Archive className="mr-2 h-4 w-4" /> Mark as Leased
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+        <div className="mt-2">
+          <Badge className={status.className}><StatusIcon className="mr-1.5 h-3 w-3" /> {status.text}</Badge>
         </div>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
@@ -141,18 +177,11 @@ function ProviderListingCard({ listing, onStatusChange, onEdit }: { listing: Lis
         )}
       </CardContent>
        <CardFooter className="flex-col items-stretch gap-2">
-            {listing.status === 'leased' ? (
+            {listing.status === 'leased' && (
                 <Button onClick={() => onStatusChange('pending')}>
                     <ArchiveRestore className="mr-2 h-4 w-4" /> Re-list Property
                 </Button>
-            ) : (
-                 <Button onClick={() => onStatusChange('leased')}>
-                    <Archive className="mr-2 h-4 w-4" /> Mark as Leased
-                </Button>
             )}
-            <Button variant="outline" onClick={() => onEdit(listing)}>
-                <Edit className="mr-2 h-4 w-4" /> Edit Listing
-            </Button>
        </CardFooter>
     </Card>
   );
@@ -177,7 +206,7 @@ export function ProviderListings() {
     updateListingStatus(listingId, status, user?.email);
     toast({
         title: 'Listing Status Updated',
-        description: `The listing has been moved to ${status === 'leased' ? 'Archived' : 'Active'}.`,
+        description: `The listing status has been changed.`,
     });
   };
 
@@ -243,6 +272,7 @@ export function ProviderListings() {
                             listing={listing} 
                             onStatusChange={(newStatus) => handleStatusChange(listing.listingId, newStatus)}
                             onEdit={handleEdit}
+                            isAdmin={isAdmin || false}
                         />
                         ))}
                     </div>
@@ -262,6 +292,7 @@ export function ProviderListings() {
                             listing={listing} 
                             onStatusChange={(newStatus) => handleStatusChange(listing.listingId, newStatus)}
                              onEdit={handleEdit}
+                             isAdmin={isAdmin || false}
                         />
                         ))}
                     </div>

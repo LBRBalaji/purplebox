@@ -2,145 +2,141 @@
 'use client';
 
 import * as React from 'react';
-import { useData, type Submission } from '@/contexts/data-context';
+import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Check, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { Check, CheckCircle, Edit, Eye, MoreHorizontal, PauseCircle, Pencil, ThumbsDown, ThumbsUp, XCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import type { ListingSchema, DemandSchema } from '@/lib/schema';
+import type { ListingSchema } from '@/lib/schema';
 import Link from 'next/link';
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ListingForm } from './listing-form';
 
 export function ApprovalQueue() {
-    const { demands, submissions, listings, updateSubmissionStatus } = useData();
+    const { listings, updateListingStatus, updateListing } = useData();
     const { toast } = useToast();
-    const [pendingSubmissions, setPendingSubmissions] = React.useState<(Submission & { listing?: ListingSchema, demand?: DemandSchema })[]>([]);
+    const [pendingListings, setPendingListings] = React.useState<ListingSchema[]>([]);
+    const [isFormOpen, setIsFormOpen] = React.useState(false);
+    const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
 
     React.useEffect(() => {
-        const pending = submissions
-            .filter(s => s.status === 'Pending')
-            .map(s => ({
-                ...s,
-                listing: listings.find(l => l.listingId === s.listingId),
-                demand: demands.find(d => d.demandId === s.demandId)
-            }));
-        setPendingSubmissions(pending);
-    }, [submissions, listings, demands]);
+        const pending = listings.filter(l => l.status === 'pending');
+        setPendingListings(pending);
+    }, [listings]);
 
-    const handleApproval = (submissionId: string, isApproved: boolean) => {
-        const newStatus = isApproved ? 'Approved' : 'Rejected';
-        updateSubmissionStatus(submissionId, newStatus);
+    const handleStatusChange = (listingId: string, newStatus: ListingStatus) => {
+        updateListingStatus(listingId, newStatus);
         toast({
-            title: `Submission ${isApproved ? 'Approved' : 'Rejected'}`,
-            description: `The property match ${submissionId} has been updated.`,
+            title: `Listing ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`,
+            description: `The listing has been updated.`,
         });
     };
 
-    if (pendingSubmissions.length === 0) {
+     const handleEdit = (listing: ListingSchema) => {
+        setSelectedListing(listing);
+        setIsFormOpen(true);
+    };
+
+    const handleFormSubmit = (data: ListingSchema) => {
+        updateListing(data);
+        setIsFormOpen(false);
+        setSelectedListing(null);
+    };
+
+
+    if (pendingListings.length === 0) {
         return (
             <Card className="mt-8 text-center p-12">
                 <CardTitle className="flex items-center justify-center gap-2">
                     <Check className="h-6 w-6 text-green-500" />
                     Approval Queue is Empty
                 </CardTitle>
-                <CardDescription className="mt-2">There are no pending property submissions to review.</CardDescription>
+                <CardDescription className="mt-2">There are no pending listings to review.</CardDescription>
             </Card>
         );
     }
     
     return (
+      <>
         <div className="mt-8 space-y-6">
             <div className="mb-8">
-                <h2 className="text-3xl font-bold font-headline tracking-tight">Submissions for Approval</h2>
+                <h2 className="text-3xl font-bold font-headline tracking-tight">Listings for Approval</h2>
                 <p className="text-muted-foreground mt-2">
-                    Review property submissions from providers and approve or reject them.
+                    Review new listings from providers and approve or reject them.
                 </p>
             </div>
-            {pendingSubmissions.map(submission => {
-                if (!submission.demand || !submission.listing) return null;
-                const { demand, listing } = submission;
-
-                const scoreItems = [
-                    {
-                        criterion: "Location",
-                        demand: `${demand.locationName} (within ${demand.radius}km)`,
-                        property: listing.location,
-                    },
-                    {
-                        criterion: "Size (Sq. Ft.)",
-                        demand: `${demand.size.toLocaleString()}`,
-                        property: `${listing.sizeSqFt.toLocaleString()}`,
-                    },
-                    {
-                        criterion: "Building Type",
-                        demand: `${demand.buildingType || 'Any'}`,
-                        property: `${listing.buildingSpecifications.buildingType}`,
-                    },
-                    {
-                        criterion: "Ceiling Height",
-                        demand: `${demand.ceilingHeight || 'N/A'} ${demand.ceilingHeightUnit || 'ft'}`,
-                        property: `~${listing.buildingSpecifications.eveHeightMeters} m`,
-                    },
-                    {
-                        criterion: "Docks",
-                        demand: `${demand.docks || 'N/A'}`,
-                        property: `${listing.buildingSpecifications.numberOfDocksAndShutters}`,
-                    },
-                    {
-                        criterion: "Approvals",
-                        demand: demand.preferences.approvals || 'Good to have',
-                        property: listing.certificatesAndApprovals.buildingApproval ? 'Obtained' : 'Not Obtained',
-                    },
-                    {
-                        criterion: "Fire Safety (NOC)",
-                        demand: demand.preferences.fireNoc || 'Good to have',
-                        property: listing.certificatesAndApprovals.fireNOC ? 'Obtained' : 'Not Obtained',
-                    },
-                ];
-
-
-                return (
-                    <Card key={submission.submissionId}>
-                        <CardHeader>
-                             <CardTitle>Review Submission for Demand: <span className="text-primary">{submission.demandId}</span></CardTitle>
-                             <CardDescription>
-                                Submitted by: <span className="font-medium">{listing.developerName || submission.providerEmail}</span> for Listing: <Link href={`/listings/${listing.listingId}`} className="font-medium text-primary hover:underline" target='_blank'>{listing.name} ({listing.listingId})</Link>
-                             </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="p-4 border rounded-md bg-primary/5 space-y-4">
-                                <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-1/4">Criterion</TableHead>
-                                        <TableHead>Customer Requirement</TableHead>
-                                        <TableHead>Property Specification</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {scoreItems.map(item => (
-                                        <TableRow key={item.criterion}>
-                                            <TableCell className="font-semibold">{item.criterion}</TableCell>
-                                            <TableCell>{item.demand}</TableCell>
-                                            <TableCell>{item.property}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                                </Table>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-end gap-3">
-                            <Button variant="outline" onClick={() => handleApproval(submission.submissionId, false)}>
-                                <ThumbsDown className="mr-2 h-4 w-4" /> Reject
-                            </Button>
-                            <Button onClick={() => handleApproval(submission.submissionId, true)}>
-                                <ThumbsUp className="mr-2 h-4 w-4" /> Approve
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                )
-            })}
+             <Card>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Listing Name</TableHead>
+                                <TableHead>Location</TableHead>
+                                <TableHead>Size (Sq. Ft.)</TableHead>
+                                <TableHead>Provider</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {pendingListings.map(listing => (
+                                <TableRow key={listing.listingId}>
+                                    <TableCell className="font-medium">{listing.name}</TableCell>
+                                    <TableCell>{listing.location}</TableCell>
+                                    <TableCell>{listing.sizeSqFt.toLocaleString()}</TableCell>
+                                    <TableCell>{listing.developerName || 'N/A'}</TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={`/listings/${listing.listingId}`} target="_blank"><Eye className="mr-2 h-4 w-4"/> View</Link>
+                                            </Button>
+                                            <Button variant="outline" size="sm" onClick={() => handleEdit(listing)}>
+                                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                            </Button>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuLabel>Change Status</DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem onClick={() => handleStatusChange(listing.listingId, 'approved')}>
+                                                        <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Approve
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleStatusChange(listing.listingId, 'rejected')}>
+                                                        <XCircle className="mr-2 h-4 w-4 text-red-500" /> Reject
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleStatusChange(listing.listingId, 'pending')}>
+                                                        <PauseCircle className="mr-2 h-4 w-4 text-amber-500" /> Hold (Set to Pending)
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+             </Card>
         </div>
+        <ListingForm
+            isOpen={isFormOpen}
+            onOpenChange={setIsFormOpen}
+            listing={selectedListing}
+            onSubmit={handleFormSubmit}
+        />
+      </>
     );
 }
+

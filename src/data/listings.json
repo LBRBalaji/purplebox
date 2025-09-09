@@ -1,5 +1,64 @@
 [
   {
+    "listingId": "LST-RD962F",
+    "developerId": "wd2@o2o.com",
+    "status": "pending",
+    "warehouseBoxId": "WBX-APEX-E8YF",
+    "name": "Box two",
+    "location": "Chengalpet",
+    "sizeSqFt": 300000,
+    "description": "Box two, a ready-to-occupy 300,000 sq. ft. PEB warehouse in Chengalpet, offers an exceptional opportunity.  Boasting an 11-meter eave height, a Galvalume roof, and a standard service model, this expansive space is available at a competitive ₹27 per sq. ft. Ideal for large-scale operations, this property ensures efficient logistics and ample storage capacity.",
+    "rentPerSqFt": 27,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "70%",
+    "serviceModel": "Standard",
+    "area": {
+      "plinthArea": 280000,
+      "mezzanineArea1": 6000,
+      "mezzanineArea2": 4000,
+      "canopyArea": 5000,
+      "driversRestRoomArea": 2000,
+      "totalChargeableArea": 297000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 40,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
+      "craneAvailable": true,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Front View",
+        "url": "https://drive.google.com/file/d/1taX2HQh2tQdxMMEbhobhi7FyKrptY9Di/view?usp=drive_link"
+      }
+    ]
+  },
+  {
     "listingId": "LST-ELTUE2",
     "developerId": "wd1@o2o.com",
     "status": "approved",
