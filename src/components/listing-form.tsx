@@ -473,7 +473,9 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                             }}
                                         />
                                     </FormControl>
-                                    <FormDescription className="text-xs">Paste the share link from Google Drive. It will be converted automatically.</FormDescription>
+                                    <FormDescription className="text-xs">
+                                        Use a Google Drive link. Right-click file {'->'} Share {'->'} Anyone with the link. Paste it here.
+                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
