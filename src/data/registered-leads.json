@@ -14,7 +14,14 @@
         "properties": [
           {
             "listingId": "LST-ZNHZYG",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-09T06:31:55.031Z",
+            "acknowledgedBy": {
+              "name": "Developer One",
+              "title": "vp",
+              "mobile": "5678901234",
+              "email": "wd1@o2o.com"
+            }
           }
         ]
       }
