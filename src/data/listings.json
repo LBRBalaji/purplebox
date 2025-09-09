@@ -80,7 +80,7 @@
       "totalChargeableArea": 165000
     },
     "buildingSpecifications": {
-      "buildingType": "PEB",
+      "buildingType": ["PEB"],
       "numberOfDocksAndShutters": 15,
       "internalLighting": "LED-HI Bay 300 lux",
       "craneSupportStructureAvailable": true,
@@ -130,7 +130,7 @@
       "totalChargeableArea": 214000
     },
     "buildingSpecifications": {
-      "buildingType": "PEB",
+      "buildingType": ["PEB"],
       "numberOfDocksAndShutters": 24,
       "internalLighting": "LED-HI Bay 300 lux",
       "craneSupportStructureAvailable": true,
