@@ -10,7 +10,7 @@ import { Button } from './ui/button';
 import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2, Clock, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
-import type { RegisteredLead, RegisteredLeadStatus, ListingSchema } from '@/contexts/data-context';
+import type { RegisteredLead, RegisteredLeadStatus, ListingSchema, RegisteredLeadProperty } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
@@ -22,6 +22,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: string, icon: React.ElementType } } = {
   Pending: { text: 'Pending', color: 'text-amber-600', icon: Clock },
@@ -31,7 +42,12 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
 
 export function ProviderLeads() {
   const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads } = useData();
+  const { registeredLeads, updateRegisteredLeadStatus } = useData();
+  const { toast } = useToast();
+  
+  const [leadToAcknowledge, setLeadToAcknowledge] = React.useState<RegisteredLead | null>(null);
+  const [propertyToAcknowledge, setPropertyToAcknowledge] = React.useState<RegisteredLeadProperty | null>(null);
+  const [isAcknowledgeFormOpen, setIsAcknowledgeFormOpen] = React.useState(false);
   
   const isAgent = user?.role === 'Agent';
   const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
@@ -57,6 +73,32 @@ export function ProviderLeads() {
     );
   }, [registeredLeads, user, isAgent, isAdminOrO2O, allUsers]);
 
+  const handleAcknowledgeClick = (lead: RegisteredLead, property: RegisteredLeadProperty) => {
+    setLeadToAcknowledge(lead);
+    setPropertyToAcknowledge(property);
+    setIsAcknowledgeFormOpen(true);
+  }
+
+  const handleAcknowledgeSubmit = (details: AcknowledgmentDetails) => {
+    if (!leadToAcknowledge || !user?.email || !propertyToAcknowledge) return;
+    updateRegisteredLeadStatus(leadToAcknowledge.id, user.email, propertyToAcknowledge.listingId, 'Acknowledged', details);
+    toast({
+        title: 'Property Acknowledged!',
+        description: `Thank you for your confirmation.`,
+    });
+    setIsAcknowledgeFormOpen(false);
+    setPropertyToAcknowledge(null);
+    setLeadToAcknowledge(null);
+  }
+  
+  const handleReject = (leadId: string, listingId: string) => {
+    if (!user?.email) return;
+    updateRegisteredLeadStatus(leadId, user.email, listingId, 'Rejected');
+    toast({
+      title: 'Property Rejected',
+      description: `You have rejected the lead for this property.`,
+    });
+  }
 
   if (isAuthLoading) {
     return null; // Don't render until auth data is loaded
@@ -112,13 +154,7 @@ export function ProviderLeads() {
                         </TableHeader>
                         <TableBody>
                             {myLeads.map(lead => {
-                                const providerInfo = lead.providers.find(p => p.providerEmail === user?.email);
-                                const statusSummary = providerInfo && providerInfo.properties
-                                    ? {
-                                        pending: providerInfo.properties.filter(p => p.status === 'Pending').length,
-                                        acknowledged: providerInfo.properties.filter(p => p.status === 'Acknowledged').length,
-                                        rejected: providerInfo.properties.filter(p => p.status === 'Rejected').length,
-                                    } : { pending: 0, acknowledged: 0, rejected: 0};
+                                const providerInfoForCurrentUser = lead.providers.find(p => p.providerEmail === user?.email);
                                 
                                 return (
                                     <TableRow key={lead.id}>
@@ -175,35 +211,52 @@ export function ProviderLeads() {
                                           <>
                                             <TableCell>{allUsers[lead.registeredBy]?.companyName || lead.registeredBy}</TableCell>
                                             <TableCell className="text-center">
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <div className="flex items-center justify-center gap-1.5 cursor-help">
-                                                                {statusSummary.pending > 0 ? (
-                                                                     <Badge variant="secondary" className="bg-amber-100 text-amber-800">{statusSummary.pending} Pending</Badge>
-                                                                ) : (
-                                                                     <Badge variant="default" className="bg-green-100 text-green-800">All Actioned</Badge>
-                                                                )}
-                                                            </div>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p>Acknowledged: {statusSummary.acknowledged}</p>
-                                                            <p>Pending: {statusSummary.pending}</p>
-                                                            <p>Rejected: {statusSummary.rejected}</p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
+                                                <div className="flex flex-col gap-2 items-center">
+                                                {(providerInfoForCurrentUser?.properties || []).map(prop => {
+                                                    const statusInfo = statusConfig[prop.status];
+                                                    return (
+                                                         <Badge key={prop.listingId} variant="outline" className={cn("font-medium", statusInfo.color)}>
+                                                            <statusInfo.icon className="mr-1.5 h-3 w-3" />
+                                                            {statusInfo.text}
+                                                        </Badge>
+                                                    )
+                                                })}
+                                                </div>
                                             </TableCell>
                                           </>
                                         )}
 
                                         <TableCell className="text-right">
-                                            <Button asChild variant={statusSummary.pending > 0 ? "default" : "outline"} size="sm">
+                                            <div className="flex flex-col gap-2 items-end">
+                                            {(providerInfoForCurrentUser?.properties || []).filter(p => p.status === 'Pending').map(prop => (
+                                                <div key={prop.listingId} className="flex items-center gap-2">
+                                                    <span className="text-xs text-muted-foreground">{prop.listingId}</span>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button variant="destructive" size="sm" className="h-7"><ThumbsUp className="mr-2 h-4 w-4" />Acknowledge</Button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle>Formal Acknowledgment</AlertDialogTitle>
+                                                                <AlertDialogDescription>
+                                                                    By clicking "Confirm", you are formally acknowledging this lead from Lakshmi Balaji O2O. 
+                                                                    This is an important, non-revocable action that solidifies our collaboration for this specific transaction.
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleAcknowledgeClick(lead, prop)}>Confirm & Proceed</AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                </div>
+                                            ))}
+                                             <Button asChild variant="outline" size="sm">
                                                 <Link href={`/dashboard/leads/${lead.id}`}>
-                                                    {user?.role === 'Warehouse Developer' && statusSummary.pending > 0 ? "Review & Action" : "View Activities"}
-                                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                                    View Activity <ArrowRight className="ml-2 h-4 w-4" />
                                                 </Link>
                                             </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -213,6 +266,12 @@ export function ProviderLeads() {
                 </CardContent>
             </Card>
         </div>
+        <AcknowledgeLeadDialog 
+            isOpen={isAcknowledgeFormOpen}
+            onOpenChange={setIsAcknowledgeFormOpen}
+            lead={leadToAcknowledge}
+            onSubmit={handleAcknowledgeSubmit}
+        />
     </>
   )
 }

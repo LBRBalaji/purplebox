@@ -14,7 +14,8 @@
     "userName": "O2O Super Admin",
     "phone": "1234567890",
     "createdAt": "2025-09-08T10:00:00.000Z",
-    "plan": "Paid_Premium"
+    "plan": "Paid_Premium",
+    "isCompanyAdmin": true
   },
   "manager@o2o.com": {
     "email": "manager@o2o.com",
@@ -38,7 +39,9 @@
     "companyName": "Beta Retail",
     "userName": "Ben Carter",
     "phone": "3456789012",
-    "createdAt": "2025-09-08T10:03:00.000Z"
+    "createdAt": "2025-09-08T10:03:00.000Z",
+    "isCompanyAdmin": true,
+    "plan": "Free"
   },
   "customer3@o2o.com": {
     "email": "customer3@o2o.com",
