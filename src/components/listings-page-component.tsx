@@ -397,15 +397,27 @@ export function ListingsPage() {
  useEffect(() => {
     let results = approvedListings;
 
-    // Filter by general search term
     if (searchTerm) {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      
+      // Check for eve height search e.g. "11m"
+      const heightMatch = lowerCaseSearchTerm.match(/(\d+)\s*m/);
+
+      if (heightMatch && heightMatch[1]) {
+        const minHeight = parseInt(heightMatch[1], 10);
+        if (!isNaN(minHeight)) {
+          results = results.filter(listing => 
+            listing.buildingSpecifications.eveHeightMeters && listing.buildingSpecifications.eveHeightMeters >= minHeight
+          );
+        }
+      } else {
+        // General text search
         results = results.filter(listing => {
             const searchHaystack = [
                 listing.name,
                 listing.listingId,
                 Array.isArray(listing.buildingSpecifications.buildingType) ? listing.buildingSpecifications.buildingType.join(' ') : '',
                 listing.serviceModel,
-                listing.buildingSpecifications.eveHeightMeters ? `eve height ${listing.buildingSpecifications.eveHeightMeters}m` : '',
                 listing.buildingSpecifications.roofType,
                 listing.buildingSpecifications.ventilation,
                 listing.buildingSpecifications.roofInsulation,
@@ -414,8 +426,9 @@ export function ListingsPage() {
                 listing.certificatesAndApprovals.fireNOC ? "fire NOC approved" : "",
                 listing.certificatesAndApprovals.buildingApproval ? "building approval" : ""
             ].join(' ').toLowerCase();
-            return searchHaystack.includes(searchTerm.toLowerCase());
+            return searchHaystack.includes(lowerCaseSearchTerm);
         });
+      }
     }
 
     // Filter by location
