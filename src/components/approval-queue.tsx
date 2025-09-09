@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Check, CheckCircle, Edit, Eye, MoreHorizontal, PauseCircle, Pencil, ThumbsDown, ThumbsUp, XCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';

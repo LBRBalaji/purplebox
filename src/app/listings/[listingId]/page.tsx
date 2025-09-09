@@ -213,7 +213,6 @@ export default function ListingDetailPage() {
         if (isLoading) return;
         
         const listingId = params.listingId as string;
-        
         const foundListing = listings.find(l => l.listingId === listingId);
 
         if (!foundListing) {
@@ -235,8 +234,6 @@ export default function ListingDetailPage() {
              return;
         }
         
-
-        // Logic for previous/next navigation
         try {
             const storedResultIds = sessionStorage.getItem('warehouse_search_results');
             let listToNavigate: string[];
@@ -258,7 +255,7 @@ export default function ListingDetailPage() {
              setCurrentIndex(foundIndex);
         }
 
-    }, [params.listingId, router, user, logListingView, listings, isLoading]);
+    }, [params.listingId, listings, isLoading, user, router, logListingView]);
 
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
@@ -296,7 +293,6 @@ export default function ListingDetailPage() {
                 'Shop Floor Dimension': listing.buildingSpecifications.shopFloorLevelDimension,
                 'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
                 'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
-                'Outside Flooring': listing.siteSpecifications.typeOfFlooringOutside,
                 'Access Road': listing.siteSpecifications.typeOfRoad,
                 'Rent (per Sq. Ft.)': listing.rentPerSqFt || 'Contact for details',
                 'Security Deposit (Months)': listing.rentalSecurityDeposit || 'Contact for details',
