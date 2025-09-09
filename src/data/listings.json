@@ -1,4 +1,3 @@
-
 [
   {
     "listingId": "LST-RD962F",
@@ -198,7 +197,7 @@
   {
     "listingId": "LST-TEST01",
     "developerId": "wd1@o2o.com",
-    "status": "pending",
+    "status": "approved",
     "warehouseBoxId": "WBX-ZENI-PEND",
     "name": "Zenith Pending Warehouse",
     "location": "Sriperumbudur",
@@ -209,14 +208,34 @@
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
     "serviceModel": "Standard",
+    "area": {},
     "buildingSpecifications": {
       "buildingType": [
         "PEB"
       ]
     },
-    "area": {},
     "siteSpecifications": {},
-    "certificatesAndApprovals": {},
-    "documents": []
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": false,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": false
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Front View",
+        "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
+      },
+      {
+        "type": "image",
+        "name": "Inside Warehouse",
+        "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
+      }
+    ]
   }
 ]

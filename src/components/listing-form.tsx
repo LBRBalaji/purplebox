@@ -36,12 +36,13 @@ import { Textarea } from "./ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
-import { Trash2, Wand2 } from "lucide-react";
+import { AlertCircle, Trash2, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { generateListingDescriptionAction } from "@/lib/actions";
 import { Sparkles } from "lucide-react";
 import { convertGoogleDriveLink } from "@/lib/utils";
+import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 
 
 type ListingFormProps = {
@@ -437,6 +438,13 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               <div className="space-y-4">
                  <FormLabel className="text-lg font-semibold">Documents & Media</FormLabel>
                  <div className="space-y-4 p-4 border rounded-md">
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Important: Do Not Expose Identity</AlertTitle>
+                        <AlertDescription>
+                            Please do not upload front views, elevations, or any pictures that could reveal the property's or developer's identity. Use only inside views of the building. Any identifying images will be removed by the admin.
+                        </AlertDescription>
+                    </Alert>
                     {fields.map((field, index) => (
                         <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                             <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
