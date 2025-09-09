@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -10,7 +9,7 @@ import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -149,7 +148,8 @@ export default function LeadDetailPage() {
 
   const handleAcknowledgeClick = (property: RegisteredLeadProperty) => {
       setPropertyToAcknowledge(property);
-      setIsAcknowledgeDialogOpen(true);
+      // The button now opens the confirmation dialog first.
+      // The final form dialog is opened from the confirmation dialog's action.
   }
 
   const handleAcknowledgeSubmit = (details: AcknowledgmentDetails) => {
@@ -189,7 +189,6 @@ export default function LeadDetailPage() {
   const isProvider = user?.role === 'Warehouse Developer';
 
   const providerDetailsForUser = lead.providers.find(p => p.providerEmail === user?.email);
-  const isAnyPropertyPending = isProvider && providerDetailsForUser?.properties?.some(p => p.status === 'Pending');
   
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=registered-leads' : '/dashboard/transactions';
 
@@ -330,7 +329,31 @@ export default function LeadDetailPage() {
                                                           {isProvider && property.status === 'Pending' ? (
                                                               <div className="flex gap-2">
                                                                   <AlertDialog><AlertDialogTrigger asChild><Button variant="destructive" size="icon" className="h-8 w-8"><ThumbsDown className="h-4 w-4" /></Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone. This will permanently reject the lead for this property.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(listing.listingId)}>Confirm Rejection</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
-                                                                  <Button variant="default" size="icon" className="h-8 w-8" onClick={() => handleAcknowledgeClick(property)}><ThumbsUp className="h-4 w-4" /></Button>
+                                                                  
+                                                                  <AlertDialog>
+                                                                    <AlertDialogTrigger asChild>
+                                                                        <Button variant="default" size="icon" className="h-8 w-8" onClick={() => handleAcknowledgeClick(property)}><ThumbsUp className="h-4 w-4" /></Button>
+                                                                    </AlertDialogTrigger>
+                                                                    <AlertDialogContent>
+                                                                        <AlertDialogHeader>
+                                                                            <div className="flex justify-center mb-4">
+                                                                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                                                                    <ShieldCheck className="h-6 w-6 text-primary" />
+                                                                                </div>
+                                                                            </div>
+                                                                            <AlertDialogTitle className="text-center">Formal Acknowledgment</AlertDialogTitle>
+                                                                            <AlertDialogDescription className="text-center">
+                                                                                By proceeding, you formally acknowledge this lead from Lakshmi Balaji O2O. This is an important, non-revocable step to begin the collaboration process.
+                                                                            </AlertDialogDescription>
+                                                                        </AlertDialogHeader>
+                                                                        <AlertDialogFooter>
+                                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                            <AlertDialogAction onClick={() => setIsAcknowledgeDialogOpen(true)}>
+                                                                                Confirm & Proceed
+                                                                            </AlertDialogAction>
+                                                                        </AlertDialogFooter>
+                                                                    </AlertDialogContent>
+                                                                  </AlertDialog>
                                                               </div>
                                                           ) : (
                                                               <Button asChild variant="ghost" size="icon" className="h-8 w-8">

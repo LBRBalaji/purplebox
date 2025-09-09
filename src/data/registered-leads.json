@@ -1,5 +1,35 @@
 [
   {
+    "id": "LDR-MFC6GK2R8WSQK",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Murugan",
+    "leadEmail": "betacustomer2@o2o.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "My AuthProvider component uses these features extensively to manage user sessions and data, but I neglected to add the required 'use client' directive at the top of the file. This caused the application to try and run client-side code on the server, leading to the crash.",
+    "registeredBy": "manager@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-ELTUE2",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-09T06:37:36.561Z",
+            "acknowledgedBy": {
+              "name": "Developer One",
+              "title": "d",
+              "mobile": "5678901234",
+              "email": "wd1@o2o.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-09T06:37:02.124Z"
+  },
+  {
     "id": "LDR-MFC6CXRK0C0UA",
     "customerId": "customer3@o2o.com",
     "leadName": "Gamma Goods",
