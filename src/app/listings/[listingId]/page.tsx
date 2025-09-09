@@ -264,7 +264,7 @@ export default function ListingDetailPage() {
         return <DetailPageSkeleton />;
     }
 
-    const isShortlisted = generalShortlist.includes(listing.listingId);
+    const isShortlisted = !!user && generalShortlist.includes(listing.listingId);
     
     const handleDownloadRequest = () => {
         if (!user) {
