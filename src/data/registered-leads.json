@@ -1,5 +1,35 @@
 [
   {
+    "id": "LDR-MFC6CXRK0C0UA",
+    "customerId": "customer3@o2o.com",
+    "leadName": "Gamma Goods",
+    "leadContact": "Casey Dune",
+    "leadEmail": "customer3@o2o.com",
+    "leadPhone": "4567890123",
+    "requirementsSummary": "Transactions\nManage ongoing transactions and register new business leads.",
+    "registeredBy": "manager@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-ELTUE2",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-09T06:35:04.655Z",
+            "acknowledgedBy": {
+              "name": "Developer One",
+              "title": "manager",
+              "mobile": "5678901234",
+              "email": "wd1@o2o.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-09T06:34:10.514Z"
+  },
+  {
     "id": "LDR-MFC5ZW3RBXZ6U",
     "customerId": "hemal@fedex.com",
     "leadName": "FedEx",
