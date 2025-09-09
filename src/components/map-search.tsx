@@ -267,6 +267,25 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     setWarehouses(activeListings);
   }, [listings]);
 
+  // Handle marker animation when a warehouse is selected
+  React.useEffect(() => {
+    if (!markerLibrary) return;
+    markers.forEach(marker => {
+      const markerPosition = marker.getPosition();
+      if (!markerPosition) return;
+
+      const [lat, lng] = [markerPosition.lat(), markerPosition.lng()];
+      const isSelected = selectedWarehouse &&
+        selectedWarehouse.latLng === `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+      if (isSelected) {
+        marker.setAnimation(markerLibrary.Animation.BOUNCE);
+      } else {
+        marker.setAnimation(null);
+      }
+    });
+  }, [selectedWarehouse, markers, markerLibrary]);
+
   // Init marker clusterer
   React.useEffect(() => {
     if (!map || !markerLibrary || !geometry) return;
