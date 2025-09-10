@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, Building, CheckCircle, ClipboardCheck, Download, Handshake, Search, Users, Zap } from 'lucide-react';
+import { ArrowRight, Building, CheckCircle, ClipboardCheck, Download, Handshake, Search, Users, Zap, Award } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
@@ -59,8 +59,8 @@ export default function AboutUsPage() {
                         <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight text-primary">
                            Simplifying Real Estate Transactions
                         </h1>
-                        <p className="mt-6 text-lg text-accent max-w-3xl mx-auto">
-                           <strong className="text-foreground">O2O</strong> - A Warehouse Lease Transaction Platform.
+                        <p className="mt-6 text-lg text-foreground max-w-3xl mx-auto">
+                           <strong>O2O</strong> - A Warehouse Lease Transaction Platform.
                         </p>
                     </div>
                 </div>
@@ -146,6 +146,18 @@ export default function AboutUsPage() {
             
             <section className="py-20 md:py-28 bg-background">
                  <div className="container mx-auto">
+                    <div className="text-center max-w-3xl mx-auto mb-16">
+                        <h2 className="text-2xl font-bold font-headline tracking-tight text-primary flex items-center justify-center gap-3">
+                            <Award className="h-7 w-7"/> Our Origin Story
+                        </h2>
+                         <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                            In 2014, we were grappling with the inefficiencies of the warehouse lease transactions. So, we built something for ourselves: a powerful application called <strong className="text-foreground">FOLLOWPROP</strong>. It was our own solution, born out of a real-world need.
+                        </p>
+                        <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                            A decade later, we've taken everything we learned and built a complete warehouse lease transaction platform, <strong className="text-foreground">Lakshmi Balaji O2O</strong>, for everyone. We believe our hands-on experience allows us to truly understand and solve the challenges our customers face.
+                        </p>
+                    </div>
+
                     <Card className="bg-primary text-primary-foreground text-center p-8">
                         <CardHeader>
                             <CardTitle className="text-3xl font-bold font-headline">Ready to Get Started?</CardTitle>
