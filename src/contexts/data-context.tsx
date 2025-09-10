@@ -169,7 +169,7 @@ export type AgentLead = {
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const { user: authUser } = useAuth();
+  const { user: authUser, users } = useAuth();
   const [listings, setListings] = useState<ListingSchema[]>(initialListings as ListingSchema[]);
   const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>(initialListingAnalytics as ListingAnalytics[]);
   const [demands, setDemands] = useState<DemandSchema[]>(initialDemands as DemandSchema[]);
@@ -407,17 +407,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistSubmissions]);
   
   const getTodaysTotalDownloads = useCallback((userId: string): number => {
-    const { users } = useAuth();
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const downloadEntries = downloadHistory.filter(d => d.userId === userId && d.timestamp >= startOfDay);
     const uniqueTimestamps = new Set(downloadEntries.map(d => d.timestamp));
     return uniqueTimestamps.size;
-  }, [downloadHistory, useAuth]);
+  }, [downloadHistory]);
 
   const logDownload = useCallback((userId: string, listingsToDownload: ListingSchema[]) => {
     const todaysTotalDownloads = getTodaysTotalDownloads(userId);
-    const { users } = useAuth();
     const user = Object.values(users).find(u => u.email === userId);
 
     if (user?.plan !== 'Paid_Premium' && todaysTotalDownloads >= 2) {
@@ -473,7 +471,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
 
     return { success: true, limitReached: false };
-  }, [downloadHistory, getTodaysTotalDownloads, toast, useAuth, persistListingAnalytics]);
+  }, [downloadHistory, getTodaysTotalDownloads, toast, users, persistListingAnalytics]);
 
   const logListingView = useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {
