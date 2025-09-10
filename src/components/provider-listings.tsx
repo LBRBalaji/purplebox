@@ -14,7 +14,7 @@ import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, BarChart2 } from 'lucide-react';
+import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, BarChart2, Scaling } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { ListingForm } from './listing-form';
@@ -253,9 +253,19 @@ function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { lis
   );
 }
 
+function StatCard({ title, value, icon: Icon }: { title: string, value: string, icon: React.ElementType }) {
+    return (
+        <div className="bg-primary/5 p-4 rounded-lg text-center">
+            <Icon className="h-6 w-6 text-primary mx-auto mb-2" />
+            <p className="text-2xl font-bold text-primary">{value}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">{title}</p>
+        </div>
+    )
+}
+
 export function ProviderListings() {
   const { user } = useAuth();
-  const { listings, addListing, updateListing, updateListingStatus } = useData();
+  const { listings, addListing, updateListing, updateListingStatus, listingAnalytics } = useData();
   const [myListings, setMyListings] = React.useState<ListingSchema[]>([]);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
@@ -304,11 +314,26 @@ export function ProviderListings() {
   const activeListings = myListings.filter(l => l.status !== 'leased');
   const archivedListings = myListings.filter(l => l.status === 'leased');
 
+  const portfolioStats = React.useMemo(() => {
+    const totalListings = activeListings.length;
+    const totalSize = activeListings.reduce((sum, l) => sum + l.sizeSqFt, 0);
+    const totalViews = activeListings.reduce((sum, l) => {
+        const analytics = listingAnalytics.find(a => a.listingId === l.listingId);
+        return sum + (analytics?.views || 0);
+    }, 0);
+    const totalDownloads = activeListings.reduce((sum, l) => {
+        const analytics = listingAnalytics.find(a => a.listingId === l.listingId);
+        return sum + (analytics?.downloads || 0);
+    }, 0);
+
+    return { totalListings, totalSize, totalViews, totalDownloads };
+  }, [activeListings, listingAnalytics]);
+
 
   return (
     <>
       <div className="mt-8">
-        <div className="mb-8 flex justify-between items-center flex-wrap gap-4">
+        <div className="mb-8 flex justify-between items-start flex-wrap gap-4">
           <div>
             <h2 className="text-3xl font-bold font-headline tracking-tight flex items-center gap-2">
                 <Building /> My Property Listings
@@ -322,6 +347,22 @@ export function ProviderListings() {
             Create New Listing
           </Button>
         </div>
+
+        <Card className="mb-8">
+            <CardHeader>
+                <CardTitle>Portfolio Snapshot</CardTitle>
+                <CardDescription>An overview of your active listings' performance.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <StatCard title="Active Listings" value={portfolioStats.totalListings.toString()} icon={Building} />
+                    <StatCard title="Total Size (SFT)" value={portfolioStats.totalSize.toLocaleString()} icon={Scaling} />
+                    <StatCard title="Total Views" value={portfolioStats.totalViews.toLocaleString()} icon={Eye} />
+                    <StatCard title="Total Downloads" value={portfolioStats.totalDownloads.toLocaleString()} icon={Download} />
+                </div>
+            </CardContent>
+        </Card>
+
         <Tabs defaultValue="active">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="active">
