@@ -1,7 +1,7 @@
 [
   {
     "listingId": "LST-0RMXOY",
-    "views": 0,
+    "views": 1,
     "downloads": 1,
     "customerIndustries": {},
     "downloadedBy": [
@@ -13,7 +13,13 @@
         ]
       }
     ],
-    "viewedBy": []
+    "viewedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1757517948480
+      }
+    ]
   },
   {
     "listingId": "LST-XHJLWC",
@@ -78,5 +84,19 @@
       }
     ],
     "viewedBy": []
+  },
+  {
+    "listingId": "LST-ZCKK92",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "downloadedBy": [],
+    "viewedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1757517972334
+      }
+    ]
   }
 ]

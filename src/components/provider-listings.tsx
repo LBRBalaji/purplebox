@@ -72,7 +72,7 @@ function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { lis
             <div>
               <CardTitle>
                 <Link href={`/listings/${listing.listingId}`} className="hover:underline" target="_blank" rel="noopener noreferrer">
-                  {listing.listingId}
+                  {listing.warehouseBoxId || listing.listingId}
                 </Link>
               </CardTitle>
               <CardDescription>{listing.location} - {listing.sizeSqFt.toLocaleString()} sq. ft.</CardDescription>

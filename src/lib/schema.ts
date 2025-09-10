@@ -22,7 +22,7 @@ export const listingSchema = z.object({
   createdAt: z.string().datetime().optional(),
   
   // General Information
-  warehouseBoxId: z.string(),
+  warehouseBoxId: z.string().optional(),
   name: z.string().optional(),
   location: z.string().min(1, "Location is required."),
   latLng: z.string().optional(),
@@ -468,4 +468,5 @@ export const acknowledgmentSchema = z.object({
   email: z.string().email(),
 });
 export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;
+
 

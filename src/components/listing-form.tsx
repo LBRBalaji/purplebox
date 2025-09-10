@@ -70,6 +70,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
       status: 'pending',
       developerId: '',
       listingId: '',
+      warehouseBoxId: '',
       name: '',
       location: '',
       sizeSqFt: undefined,
@@ -255,6 +256,9 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               <div className="space-y-4">
                 <FormLabel className="text-lg font-semibold">General Information</FormLabel>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md">
+                     <FormField control={form.control} name="warehouseBoxId" render={({ field }) => (
+                        <FormItem><FormLabel>Warehouse Box ID</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="Your internal ID for this property" /></FormControl><FormMessage /></FormItem>
+                    )} />
                      <FormField control={form.control} name="location" render={({ field }) => (
                         <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
                     )} />
