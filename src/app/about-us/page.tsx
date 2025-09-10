@@ -56,10 +56,10 @@ export default function AboutUsPage() {
                  <div className="container mx-auto text-center relative">
                     <div className="mx-auto max-w-4xl">
                         <p className="font-bold text-primary font-headline tracking-widest">OUR MISSION</p>
-                        <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight mt-4">
+                        <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight mt-4 text-primary">
                            Simplifying Real Estate Transactions
                         </h1>
-                        <p className="mt-6 text-lg text-muted-foreground max-w-3xl mx-auto">
+                        <p className="mt-6 text-lg text-accent max-w-3xl mx-auto">
                            <strong className="text-foreground">O2O</strong> - A Warehouse Lease Transaction Platform.
                         </p>
                     </div>
