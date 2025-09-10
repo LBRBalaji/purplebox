@@ -60,7 +60,7 @@ export default function AboutUsPage() {
                            Simplifying Real Estate Transactions
                         </h1>
                         <p className="mt-6 text-lg text-muted-foreground max-w-3xl mx-auto">
-                           Lakshmi Balaji <strong>O2O</strong> is a transaction platform from Lakshmi Balaji Realty, built for everyone in the industrial & warehousing ecosystem. We're here to build partnerships and accelerate success through technology and trust.
+                           <strong>O2O</strong> is built for everyone in the industrial & warehousing ecosystem. We're here to build partnerships and accelerate success through technology and trust.
                         </p>
                     </div>
                 </div>
