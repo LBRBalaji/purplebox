@@ -39,6 +39,7 @@ const prompt = ai.definePrompt({
   - Location: {{{location}}}
   - Total Size: {{{sizeSqFt}}} sq. ft.
   - Availability: {{{availabilityDate}}}
+  {{#if developerName}}- Listed By: {{{developerName}}}{{/if}}
   {{#if rentPerSqFt}}- Quoted Rent: ₹{{{rentPerSqFt}}} per sq. ft.{{/if}}
   {{#if serviceModel}}- Service Model: {{{serviceModel}}}{{/if}}
   {{#if buildingType}}- Building Type: {{{buildingType}}}{{/if}}

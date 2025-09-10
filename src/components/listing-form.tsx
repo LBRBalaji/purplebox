@@ -192,7 +192,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     try {
         const data = form.getValues();
         const input: GenerateListingDescriptionInput = {
-            propertyId: data.listingId,
+            listingId: data.listingId,
             name: data.name,
             location: data.location,
             sizeSqFt: data.sizeSqFt,
@@ -202,6 +202,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             buildingType: data.buildingSpecifications.buildingType,
             roofType: data.buildingSpecifications.roofType,
             eveHeightMeters: data.buildingSpecifications.eveHeightMeters,
+            developerName: user?.companyName,
         };
 
         const result = await generateListingDescriptionAction(input);

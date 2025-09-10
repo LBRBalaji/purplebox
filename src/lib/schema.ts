@@ -114,7 +114,7 @@ const optionalCraneSchema = z.object({
 }).optional();
 
 export const GenerateListingDescriptionInputSchema = z.object({
-  propertyId: z.string().describe('The unique identifier for the property.'),
+  listingId: z.string().describe('The unique identifier for the property.'),
   name: z.string().optional().describe("The name of the warehouse or listing."),
   location: z.string().describe('The geographical location of the property.'),
   sizeSqFt: z.coerce.number().describe('The size of the property in square feet.'),
@@ -124,6 +124,7 @@ export const GenerateListingDescriptionInputSchema = z.object({
   buildingType: z.array(z.string()).optional().describe('The type of building (e.g., ["PEB", "RCC"]).'),
   roofType: z.string().optional().describe("The material and type of the roof."),
   eveHeightMeters: z.number().optional().describe("The eve height in meters."),
+  developerName: z.string().optional().describe("The name of the property developer or company listing the property."),
 });
 export type GenerateListingDescriptionInput = z.infer<typeof GenerateListingDescriptionInputSchema>;
 
