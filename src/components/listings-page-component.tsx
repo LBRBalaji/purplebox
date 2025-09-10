@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn, convertGoogleDriveLink } from '@/lib/utils';
 import { LoginDialog } from './login-dialog';
 import { LimitExceededDialog } from './limit-exceeded-dialog';
-import { Badge } from './ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DownloadTermsDialog } from './download-terms-dialog';
@@ -152,7 +152,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
         <div className="flex justify-between items-start gap-4">
             <div className="flex-grow space-y-2">
                 {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 mb-2">
+                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 mb-2">
                         <Star className="mr-1.5 h-3 w-3" />
                         3PL Operated Warehouse
                     </Badge>
