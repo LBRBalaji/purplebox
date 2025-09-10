@@ -243,7 +243,7 @@ function DownloadBar() {
     };
 
     const proceedWithDownload = () => {
-        const { success } = logDownload(user!.email!);
+        const { success } = logDownload(user!.email!, selectedForDownload);
         if (success) {
             const dataToExport = selectedForDownload.map(l => ({
                 'Property ID': l.listingId,
@@ -289,12 +289,6 @@ function DownloadBar() {
                 description: `${selectedForDownload.length} listing(s) have been exported. This counts as one download for today.`
             });
              clearSelectedForDownload();
-        } else {
-             toast({
-                variant: 'destructive',
-                title: 'Daily Download Limit Reached',
-                description: `You have already downloaded twice today. Please try again tomorrow.`
-            });
         }
     }
 

@@ -500,7 +500,7 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 209589,
-    "description": "",
+    "description": "Ready for immediate occupancy, this expansive 209,589 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your industrial needs.  Boasting a 11-meter eave height, a durable Galvalume roof, and listed on the O2O platform, this property provides a standard service model at a competitive rent of ₹26 per sq. ft.  Contact us today to seize this exceptional opportunity.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -508,24 +508,60 @@
     "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
-      "buildingType": [],
-      "craneSupportStructureAvailable": false,
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 28,
+      "craneSupportStructureAvailable": true,
       "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
-      "louvers": false
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      }
+    ]
   },
   {
     "listingId": "LST-IQOMX9",
@@ -535,32 +571,69 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 159959,
-    "description": "",
+    "description": "Secure your business's future in this expansive, ready-to-occupy 159,959 sq ft 3PL-operated warehouse in Thiruvallur.  Boasting a robust PEB structure with a high 11-meter eave height and a durable Galvalume roof, this property offers unparalleled efficiency and storage capacity.  At just ₹26 per sq ft, this exceptional opportunity won't last—contact O2O Platform today to schedule a viewing.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "serviceModel": "3PL Operated Warehouse",
     "area": {},
     "buildingSpecifications": {
-      "buildingType": [],
-      "craneSupportStructureAvailable": false,
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 11,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
       "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
-      "louvers": false
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      }
+    ]
   },
   {
     "listingId": "LST-JSMKFT",
@@ -570,31 +643,68 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 235496,
-    "description": "",
+    "description": "Ready for immediate occupancy, this 235,496 sq ft PEB warehouse in Thiruvallur offers a 11-meter eave height, Galvalume roofing, and is listed on the O2O platform at ₹26/sq ft.  Standard service model.  Inquire now.",
     "rentPerSqFt": 26,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
     "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
-      "buildingType": [],
-      "craneSupportStructureAvailable": false,
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 30,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
       "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
-      "louvers": false
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      }
+    ]
   },
   {
     "listingId": "LST-QWQFTO",
@@ -681,7 +791,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "70%",
-    "serviceModel": "3PL",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 280000,
       "mezzanineArea1": 6000,
@@ -722,22 +832,12 @@
     "documents": [
       {
         "type": "image",
-        "name": "Front View",
-        "url": "https://drive.google.com/uc?export=view&id=1pbN9wZa2oOqDTqQfO2UxQntyRLPkzSxu"
-      },
-      {
-        "type": "image",
-        "name": "Dock Area",
-        "url": "https://picsum.photos/seed/box-two-docks/800/600"
-      },
-      {
-        "type": "image",
-        "name": "Front view",
+        "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
       },
       {
         "type": "image",
-        "name": "front view-elevation",
+        "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
       }
     ]
@@ -762,7 +862,7 @@
       "mezzanineArea1": 4000,
       "canopyArea": 5000,
       "driversRestRoomArea": 1000,
-      "totalChargeableArea": 165000
+      "totalChargeableArea": 149000
     },
     "buildingSpecifications": {
       "buildingType": [
@@ -781,7 +881,7 @@
     },
     "siteSpecifications": {
       "typeOfFlooringInside": "FM2",
-      "typeOfRoad": "Tar Road"
+      "typeOfRoad": "RCC"
     },
     "certificatesAndApprovals": {
       "parkApproval": true,
@@ -793,7 +893,18 @@
       "pcbForWater": true,
       "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
+      }
+    ]
   },
   {
     "listingId": "LST-ZNHZYG",
@@ -804,7 +915,7 @@
     "location": "Mahindra World City, Chengalpet",
     "latLng": "12.7369, 80.0144",
     "sizeSqFt": 200000,
-    "description": "LBR 1: A 200,000 sq. ft. PEB warehouse in MWC is ready for immediate occupancy.  Boasting an 11-meter eave height, a Galvalume roof, and a standard service model, this property offers exceptional value at ₹45 per sq. ft.",
+    "description": "LBR 1, a 200,000 sq ft PEB warehouse in Mahindra World City, Chengalpet, is ready for immediate occupancy.  Boasting an 11-meter eave height, a Galvalume roof, and a competitive rent of ₹45 per sq ft, this exceptional property offers significant operational advantages.  Listed by O2O Platform and featuring a standard service model, this space presents an unparalleled opportunity for businesses seeking prime industrial real estate.  Act quickly to secure this exceptional warehouse.",
     "rentPerSqFt": 45,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -815,7 +926,7 @@
       "mezzanineArea1": 5000,
       "canopyArea": 4000,
       "driversRestRoomArea": 2000,
-      "totalChargeableArea": 214000
+      "totalChargeableArea": 196000
     },
     "buildingSpecifications": {
       "buildingType": [
@@ -834,8 +945,7 @@
     },
     "siteSpecifications": {
       "typeOfFlooringInside": "FM2",
-      "typeOfFlooringOutside": "RCC ",
-      "typeOfRoad": "Tar Road"
+      "typeOfRoad": "Tar"
     },
     "certificatesAndApprovals": {
       "parkApproval": true,
@@ -849,19 +959,14 @@
     },
     "documents": [
       {
-        "type": "layout",
-        "name": "Test Document",
-        "url": "https://drive.google.com/uc?export=view&id=1mfGDvv5h5IIvJuL_9tR29SkI7Eb9L318"
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
       },
       {
         "type": "image",
-        "name": "image 1",
-        "url": "https://drive.google.com/uc?export=view&id=1D7UEbbjdQtA6d4Y_jxpiKvtPXoZB2l1w"
-      },
-      {
-        "type": "image",
-        "name": "image 2",
-        "url": "https://drive.google.com/uc?export=view&id=1pbN9wZa2oOqDTqQfO2UxQntyRLPkzSxu"
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
       }
     ]
   },
@@ -879,22 +984,28 @@
     "rentalSecurityDeposit": 10,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "3PL",
+    "serviceModel": "3PL Operated Warehouse",
     "area": {
-      "totalChargeableArea": 80000
+      "totalChargeableArea": 0
     },
     "buildingSpecifications": {
       "buildingType": [
         "PEB"
       ],
-      "eveHeightMeters": 13,
       "numberOfDocksAndShutters": 12,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
+      "craneAvailable": true,
+      "warehouseLayoutAvailable": true,
       "roofType": "Galvalume",
+      "eveHeightMeters": 13,
       "roofInsulation": "Insulated",
-      "ventilation": "Turbo"
+      "ventilation": "Turbo",
+      "louvers": true
     },
     "siteSpecifications": {
-      "typeOfFlooringInside": "FM2"
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
     },
     "certificatesAndApprovals": {
       "parkApproval": true,
@@ -902,18 +1013,20 @@
       "fireLicense": true,
       "fireNOC": true,
       "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
       "propertyTax": true
     },
     "documents": [
       {
         "type": "image",
-        "name": "3PL Operations Floor",
-        "url": "https://picsum.photos/seed/3pl-floor/800/600"
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
       },
       {
         "type": "image",
-        "name": "Loading Bay",
-        "url": "https://picsum.photos/seed/3pl-bay/800/600"
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
       }
     ]
   }
