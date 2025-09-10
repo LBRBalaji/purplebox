@@ -56,7 +56,7 @@ export default function AboutUsPage() {
                  <div className="container mx-auto text-center relative">
                     <div className="mx-auto max-w-4xl">
                         <p className="font-bold text-primary font-headline tracking-widest">OUR MISSION</p>
-                        <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight mt-4 text-primary">
+                        <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight text-primary">
                            Simplifying Real Estate Transactions
                         </h1>
                         <p className="mt-6 text-lg text-accent max-w-3xl mx-auto">
@@ -146,9 +146,9 @@ export default function AboutUsPage() {
             
             <section className="py-20 md:py-28 bg-background">
                  <div className="container mx-auto">
-                    <Card className="bg-primary text-primary-foreground text-center p-12">
+                    <Card className="bg-primary text-primary-foreground text-center p-8">
                         <CardHeader>
-                            <CardTitle className="text-4xl font-bold font-headline">Ready to Get Started?</CardTitle>
+                            <CardTitle className="text-3xl font-bold font-headline">Ready to Get Started?</CardTitle>
                         </CardHeader>
                         <CardContent>
                              <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto">
