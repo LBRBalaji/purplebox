@@ -241,7 +241,6 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const { user } = useAuth();
   const { listings } = useData();
   
-  const [warehouses, setWarehouses] = React.useState<ListingSchema[]>([]);
   const [searchBox, setSearchBox] = React.useState<google.maps.places.SearchBox | null>(null);
   const [searchInput, setSearchInput] = React.useState('');
   const [summaryData, setSummaryData] = React.useState<RegionalSummary | null>(null);
@@ -261,11 +260,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
   const [measureMarkers, setMeasureMarkers] = React.useState<google.maps.Marker[]>([]);
   const [totalDistance, setTotalDistance] = React.useState(0);
 
-  // Filter listings to only show approved ones and keep it up to date
-  React.useEffect(() => {
-    const activeListings = listings.filter(l => l.status === 'approved' && l.latLng);
-    setWarehouses(activeListings);
-  }, [listings]);
+  const activeListings = React.useMemo(() => listings.filter(l => l.status === 'approved' && l.latLng), [listings]);
 
   // Handle marker animation when a warehouse is selected
   React.useEffect(() => {
@@ -294,8 +289,8 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       markerClustererRef.current.clearMarkers();
     }
     
-    if (warehouses.length > 0) {
-        const newMarkers = warehouses.map(warehouse => {
+    if (activeListings.length > 0) {
+        const newMarkers = activeListings.map(warehouse => {
             const latLngParts = warehouse.latLng?.split(',').map(s => parseFloat(s.trim()));
             if (!latLngParts || latLngParts.length !== 2 || isNaN(latLngParts[0]) || isNaN(latLngParts[1])) {
                 return null;
@@ -333,7 +328,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
             markerClustererRef.current.clearMarkers();
         }
     };
-  }, [map, markerLibrary, warehouses, geometry]);
+  }, [map, markerLibrary, activeListings, geometry]);
 
   // Initialize SearchBox
   React.useEffect(() => {
@@ -350,7 +345,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
 
   // Handle search box places changing
   React.useEffect(() => {
-    if (!searchBox || !map || !geometry || warehouses.length === 0) return;
+    if (!searchBox || !map || !geometry || activeListings.length === 0) return;
 
     const listener = searchBox.addListener('places_changed', async () => {
       const places = searchBox.getPlaces();
@@ -367,7 +362,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
       const searchRadius = 25000;
       const searchCenterLatLng = new google.maps.LatLng(center.lat, center.lng);
 
-      const nearbyWarehouses = warehouses.filter(w => {
+      const nearbyWarehouses = activeListings.filter(w => {
           const latLngParts = w.latLng?.split(',').map(s => parseFloat(s.trim()));
           if (!latLngParts || latLngParts.length !== 2 || isNaN(latLngParts[0]) || isNaN(latLngParts[1])) {
             return false;
@@ -426,7 +421,7 @@ function MapSearchContent({ mapId }: { mapId: string }) {
     return () => {
       google.maps.event.removeListener(listener);
     }
-  }, [searchBox, map, circle, geometry, warehouses]);
+  }, [searchBox, map, circle, geometry, activeListings]);
 
   const handleLogDemandClick = (center?: { lat: number; lng: number } | null) => {
     if (user && user.role === 'User') {
