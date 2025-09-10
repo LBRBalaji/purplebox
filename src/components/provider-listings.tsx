@@ -75,7 +75,7 @@ function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { lis
                   {listing.listingId}
                 </Link>
               </CardTitle>
-              <CardDescription>{listing.location}</CardDescription>
+              <CardDescription>{listing.location} - {listing.sizeSqFt.toLocaleString()} sq. ft.</CardDescription>
             </div>
              <DropdownMenu>
               <DropdownMenuTrigger asChild>
