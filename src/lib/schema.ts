@@ -124,6 +124,7 @@ export const GenerateListingDescriptionInputSchema = z.object({
   roofType: z.string().optional().describe("The material and type of the roof."),
   eveHeightMeters: z.number().optional().describe("The eve height in meters."),
   developerName: z.string().optional().describe("The name of the property developer or company listing the property."),
+  tone: z.enum(['Professional', 'Sales-Oriented', 'Concise']).optional().describe("The desired tone for the description."),
 });
 export type GenerateListingDescriptionInput = z.infer<typeof GenerateListingDescriptionInputSchema>;
 

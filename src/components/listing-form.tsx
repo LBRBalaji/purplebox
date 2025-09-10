@@ -62,6 +62,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const { toast } = useToast();
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
@@ -202,6 +203,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             roofType: data.buildingSpecifications.roofType,
             eveHeightMeters: data.buildingSpecifications.eveHeightMeters,
             developerName: user?.companyName,
+            tone: tone,
         };
 
         const result = await generateListingDescriptionAction(input);
@@ -505,9 +507,21 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             <FormMessage />
                         </FormItem>
                      )} />
-                    <Button type="button" variant="outline" onClick={handleGenerateDescription} disabled={isGenerating}>
-                        {isGenerating ? <><Sparkles className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : <><Wand2 className="mr-2 h-4 w-4" /> Generate with AI</>}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Select value={tone} onValueChange={(value) => setTone(value as any)}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Professional">Professional</SelectItem>
+                                <SelectItem value="Sales-Oriented">Sales-Oriented</SelectItem>
+                                <SelectItem value="Concise">Concise</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Button type="button" variant="outline" onClick={handleGenerateDescription} disabled={isGenerating}>
+                            {isGenerating ? <><Sparkles className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : <><Wand2 className="mr-2 h-4 w-4" /> Generate with AI</>}
+                        </Button>
+                    </div>
                  </div>
               </div>
               <Separator/>

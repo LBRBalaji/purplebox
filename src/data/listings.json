@@ -2,12 +2,12 @@
   {
     "listingId": "LST-0RMXOY",
     "developerId": "admin@ccidevelopers.com",
-    "status": "pending",
+    "status": "approved",
     "warehouseBoxId": "WBX-CCI -U9M5",
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 301097,
-    "description": "",
+    "description": "Ready for immediate occupancy, this expansive 301,097 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your logistics needs.  Boasting a high 11-meter eave height, a durable Galvalume roof, and listed at ₹26 per sq. ft. on the O2O platform, this property provides a cost-effective and efficient space.  With standard service model included, this ready-to-use facility ensures a seamless transition for your operations.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -79,7 +79,7 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 244447,
-    "description": "",
+    "description": "Ready for immediate occupancy, this expansive 244,447 sq. ft. industrial warehouse in Thiruvallur offers a strategic location and standard service model.  Listed on the O2O Platform, the property is available at a competitive rent of ₹26 per sq. ft., making it an ideal solution for businesses seeking ample space and efficient operations.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -104,7 +104,33 @@
       "pcbForWater": false,
       "propertyTax": false
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      }
+    ]
   },
   {
     "listingId": "LST-J9L9NS",
@@ -114,7 +140,7 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 230973,
-    "description": "",
+    "description": "Ready for immediate occupancy, this expansive 230,973 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your industrial needs.  Boasting a high 11-meter eave height and a durable Galvalume roof, this property provides ample space and robust construction. Listed on the O2O platform with a competitive rent of ₹26 per sq. ft. and a standard service model, this space presents a significant opportunity.  Contact us today to learn more.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -122,24 +148,61 @@
     "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
-      "buildingType": [],
-      "craneSupportStructureAvailable": false,
-      "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
-      "louvers": false
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 30,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
+      "craneAvailable": true,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      }
+    ]
   },
   {
     "listingId": "LST-I4S3EK",
@@ -149,7 +212,7 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 117182,
-    "description": "",
+    "description": "Ready for immediate occupancy, this expansive 117,182 sq ft PEB warehouse in Thiruvallur offers a compelling solution for your industrial needs.  Boasting an 11-meter eave height and a robust Galvalume roof, this property, listed on the O2O Platform, provides ample space and durability at a competitive monthly rent of ₹26 per sq ft.  Standard service model included.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -157,24 +220,61 @@
     "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
-      "buildingType": [],
-      "craneSupportStructureAvailable": false,
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 14,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
       "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
-      "louvers": false
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      }
+    ]
   },
   {
     "listingId": "LST-8NGG6W",
@@ -184,7 +284,7 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 57530,
-    "description": "",
+    "description": "Ready for immediate occupancy, this 57,530 sq ft PEB warehouse in Thiruvallur offers a compelling solution for your operational needs.  Boasting an 11-meter eave height and a robust Galvalume roof, this property provides ample space and durable construction.  Listed on the O2O platform, it's available at a competitive ₹26 per sq ft with a standard service model.  Contact us today to learn more about this exceptional industrial space.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -192,24 +292,61 @@
     "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
-      "buildingType": [],
-      "craneSupportStructureAvailable": false,
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 6,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
       "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
-      "louvers": false
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      }
+    ]
   },
   {
     "listingId": "LST-ZCKK92",
@@ -219,7 +356,7 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 116229,
-    "description": "",
+    "description": "Ready for immediate occupancy, this 116,229 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your industrial needs.  Boasting a 11-meter eave height and a durable Galvalume roof, this spacious facility is listed by O2O Platform at a competitive ₹26 per sq. ft.  With standard service model included, this property provides an efficient and cost-effective operational base.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -227,24 +364,61 @@
     "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
-      "buildingType": [],
-      "craneSupportStructureAvailable": false,
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 15,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
       "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
-      "louvers": false
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      }
+    ]
   },
   {
     "listingId": "LST-09CBLQ",
@@ -254,7 +428,7 @@
     "name": "",
     "location": "Thiruvallur",
     "sizeSqFt": 80707,
-    "description": "",
+    "description": "Ready for immediate occupancy, this 80,707 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your operational needs.  Boasting an 11-meter eave height, a robust Galvalume roof, and listed on the O2O platform for a competitive rent of ₹26 per sq. ft. (standard service model), this property provides ample space and efficient design.  Contact us today to schedule a viewing.",
     "rentPerSqFt": 26,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -262,24 +436,61 @@
     "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
-      "buildingType": [],
-      "craneSupportStructureAvailable": false,
-      "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
-      "louvers": false
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 12,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
+      "craneAvailable": true,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      }
+    ]
   },
   {
     "listingId": "LST-Z75P47",
