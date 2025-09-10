@@ -60,7 +60,7 @@ export default function AboutUsPage() {
                            Simplifying Real Estate Transactions
                         </h1>
                         <p className="mt-6 text-lg text-muted-foreground max-w-3xl mx-auto">
-                           <strong>O2O</strong> is a warehouse lease transaction platform.
+                           <strong className="text-foreground">O2O</strong> - A Warehouse Lease Transaction Platform.
                         </p>
                     </div>
                 </div>
