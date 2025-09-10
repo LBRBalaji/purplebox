@@ -192,7 +192,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     try {
         const data = form.getValues();
         const input: GenerateListingDescriptionInput = {
-            listingId: data.listingId,
             name: data.name,
             location: data.location,
             sizeSqFt: data.sizeSqFt,
@@ -360,7 +359,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                              <FormField control={form.control} name="serviceModel" render={({ field }) => (
                                 <FormItem><FormLabel>Service Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
                                     <SelectItem value="Standard">Standard Warehouse</SelectItem>
-                                    <SelectItem value="3PL">3PL Operated Warehouse</SelectItem>
+                                    <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
                                     <SelectItem value="Both">Both</SelectItem>
                                 </SelectContent></Select><FormMessage /></FormItem>
                             )} />

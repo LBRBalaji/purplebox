@@ -36,7 +36,7 @@ export const listingSchema = z.object({
   // Availability & Progress
   availabilityDate: z.string().min(1, "Availability date is required."),
   constructionProgress: z.string().optional(),
-  serviceModel: z.enum(['Standard', '3PL', 'Both']).optional(),
+  serviceModel: z.enum(['Standard', '3PL Operated Warehouse', 'Both']).optional(),
 
   // Area
   area: z.object({
@@ -114,12 +114,11 @@ const optionalCraneSchema = z.object({
 }).optional();
 
 export const GenerateListingDescriptionInputSchema = z.object({
-  listingId: z.string().describe('The unique identifier for the property.'),
   name: z.string().optional().describe("The name of the warehouse or listing."),
   location: z.string().describe('The geographical location of the property.'),
   sizeSqFt: z.coerce.number().describe('The size of the property in square feet.'),
   availabilityDate: z.string().describe('The readiness of the property for occupancy (e.g., "Ready for Occupancy").'),
-  serviceModel: z.enum(['Standard', '3PL', 'Both']).optional().describe('The service model (Standard warehouse, 3PL, or both).'),
+  serviceModel: z.enum(['Standard', '3PL Operated Warehouse', 'Both']).optional().describe('The service model (Standard warehouse, 3PL, or both).'),
   rentPerSqFt: z.number().optional().describe('The rent per square foot.'),
   buildingType: z.array(z.string()).optional().describe('The type of building (e.g., ["PEB", "RCC"]).'),
   roofType: z.string().optional().describe("The material and type of the roof."),
@@ -232,7 +231,7 @@ export const createPropertySchema = (demand?: DemandSchema) => {
         size: z.coerce.number().positive(),
         floor: z.enum(['Ground', 'First Floor', 'Multi-Floor']),
         readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
-        serviceModel: z.enum(['Standard', '3PL', 'Both']),
+        serviceModel: z.enum(['Standard', '3PL Operated Warehouse', 'Both']),
         buildingType: z.enum(['PEB', 'RCC']).optional(),
         safety: z.string().min(1),
         ceilingHeight: z.coerce.number().optional(),
@@ -468,3 +467,4 @@ export const acknowledgmentSchema = z.object({
   email: z.string().email(),
 });
 export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;
+

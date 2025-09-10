@@ -1,5 +1,287 @@
 [
   {
+    "listingId": "LST-0RMXOY",
+    "developerId": "admin@ccidevelopers.com",
+    "status": "pending",
+    "warehouseBoxId": "WBX-CCI -U9M5",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 301097,
+    "description": "",
+    "rentPerSqFt": 26,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "90%",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 35,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "craneSupportStructureAvailable": true,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      }
+    ]
+  },
+  {
+    "listingId": "LST-XHJLWC",
+    "developerId": "admin@ccidevelopers.com",
+    "status": "approved",
+    "warehouseBoxId": "WBX-CCI -KMMM",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 244447,
+    "description": "",
+    "rentPerSqFt": 26,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "90%",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": false,
+      "louvers": false
+    },
+    "siteSpecifications": {},
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": false,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": false
+    },
+    "documents": []
+  },
+  {
+    "listingId": "LST-J9L9NS",
+    "developerId": "admin@ccidevelopers.com",
+    "status": "approved",
+    "warehouseBoxId": "WBX-CCI -ZQNC",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 230973,
+    "description": "",
+    "rentPerSqFt": 26,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "90%",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": false,
+      "louvers": false
+    },
+    "siteSpecifications": {},
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": false,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": false
+    },
+    "documents": []
+  },
+  {
+    "listingId": "LST-I4S3EK",
+    "developerId": "admin@ccidevelopers.com",
+    "status": "approved",
+    "warehouseBoxId": "WBX-CCI -2D53",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 117182,
+    "description": "",
+    "rentPerSqFt": 26,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "90%",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": false,
+      "louvers": false
+    },
+    "siteSpecifications": {},
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": false,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": false
+    },
+    "documents": []
+  },
+  {
+    "listingId": "LST-8NGG6W",
+    "developerId": "admin@ccidevelopers.com",
+    "status": "approved",
+    "warehouseBoxId": "WBX-CCI -O2NH",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 57530,
+    "description": "",
+    "rentPerSqFt": 26,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "90%",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": false,
+      "louvers": false
+    },
+    "siteSpecifications": {},
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": false,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": false
+    },
+    "documents": []
+  },
+  {
+    "listingId": "LST-ZCKK92",
+    "developerId": "admin@ccidevelopers.com",
+    "status": "approved",
+    "warehouseBoxId": "WBX-CCI -EIR8",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 116229,
+    "description": "",
+    "rentPerSqFt": 26,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "80%",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": false,
+      "louvers": false
+    },
+    "siteSpecifications": {},
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": false,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": false
+    },
+    "documents": []
+  },
+  {
+    "listingId": "LST-09CBLQ",
+    "developerId": "admin@ccidevelopers.com",
+    "status": "approved",
+    "warehouseBoxId": "WBX-CCI -J0FL",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 80707,
+    "description": "",
+    "rentPerSqFt": 26,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "80%",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": false,
+      "louvers": false
+    },
+    "siteSpecifications": {},
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": false,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": false
+    },
+    "documents": []
+  },
+  {
     "listingId": "LST-Z75P47",
     "developerId": "admin@ccidevelopers.com",
     "status": "approved",
