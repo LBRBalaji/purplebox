@@ -8,40 +8,40 @@ body {
 
 @layer base {
   :root {
-    --background: 197 31% 96%; /* Almost white Azure for background */
-    --foreground: 251 24% 10%; /* Dark Grey Blue for text */
+    --background: 259 30% 96%;
+    --foreground: 259 25% 10%;
     
-    --card: 197 31% 99%; /* Almost white Azure for cards */
-    --card-foreground: 251 24% 10%;
+    --card: 259 30% 99%;
+    --card-foreground: 259 25% 10%;
     
-    --popover: 197 31% 99%;
-    --popover-foreground: 251 24% 10%;
+    --popover: 259 30% 99%;
+    --popover-foreground: 259 25% 10%;
     
-    --primary: 251 24% 57%; /* Grey Blue: #757bab */
+    --primary: 259 44% 46%; /* #6141ac */
     --primary-foreground: 210 20% 98%;
     
-    --secondary: 197 31% 88%; /* Lighter Azure for secondary elements */
-    --secondary-foreground: 251 24% 15%;
+    --secondary: 259 44% 94%;
+    --secondary-foreground: 259 25% 15%;
 
-    --muted: 197 31% 92%; /* Muted Azure */
-    --muted-foreground: 251 24% 30%;
+    --muted: 259 30% 92%;
+    --muted-foreground: 259 25% 40%;
     
-    --accent: 308 24% 68%; /* Grey Neon Pink: #bf9bba */
-    --accent-foreground: 251 24% 10%;
+    --accent: 259 44% 75%;
+    --accent-foreground: 259 25% 10%;
     
-    --destructive: 308 24% 50%; /* Saturated Grey Neon Pink for destructive actions */
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
     
-    --border: 197 31% 88%;
-    --input: 197 31% 90%;
-    --ring: 197 31% 76%; /* Azure: #8cbecd */
+    --border: 259 30% 88%;
+    --input: 259 30% 90%;
+    --ring: 259 44% 55%;
     
     /* Charts will also use this theme */
-    --chart-1: 251 24% 57%; /* Grey Blue */
-    --chart-2: 197 31% 76%; /* Azure */
-    --chart-3: 308 24% 68%; /* Grey Neon Pink */
-    --chart-4: 251 24% 70%; /* Lighter Grey Blue */
-    --chart-5: 197 31% 60%; /* Darker Azure */
+    --chart-1: 259 44% 46%;
+    --chart-2: 259 44% 66%;
+    --chart-3: 259 44% 30%;
+    --chart-4: 259 44% 78%;
+    --chart-5: 259 44% 20%;
     
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 222.2 84% 4.9%;
@@ -54,40 +54,40 @@ body {
   }
 
   .dark {
-    --background: 251 24% 10%; /* Dark Grey Blue for background */
-    --foreground: 197 31% 92%; /* Light Azure for text */
+    --background: 259 25% 10%;
+    --foreground: 259 30% 92%;
     
-    --card: 251 24% 12%; /* Slightly lighter Dark Grey Blue */
-    --card-foreground: 197 31% 92%;
+    --card: 259 25% 12%;
+    --card-foreground: 259 30% 92%;
 
-    --popover: 251 24% 12%;
-    --popover-foreground: 197 31% 92%;
+    --popover: 259 25% 12%;
+    --popover-foreground: 259 30% 92%;
 
-    --primary: 197 31% 76%; /* Azure as primary in dark mode */
-    --primary-foreground: 251 24% 10%;
+    --primary: 259 44% 75%;
+    --primary-foreground: 259 25% 10%;
 
-    --secondary: 251 24% 20%;
-    --secondary-foreground: 197 31% 92%;
+    --secondary: 259 25% 20%;
+    --secondary-foreground: 259 30% 92%;
 
-    --muted: 251 24% 15%;
-    --muted-foreground: 197 31% 70%;
+    --muted: 259 25% 15%;
+    --muted-foreground: 259 30% 70%;
 
-    --accent: 308 24% 68%; /* Grey Neon Pink */
-    --accent-foreground: 251 24% 10%;
+    --accent: 259 44% 55%;
+    --accent-foreground: 259 30% 98%;
 
-    --destructive: 308 24% 60%;
-    --destructive-foreground: 251 24% 10%;
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 251 24% 20%;
-    --input: 251 24% 20%;
-    --ring: 197 31% 76%; /* Azure */
+    --border: 259 25% 20%;
+    --input: 259 25% 20%;
+    --ring: 259 44% 65%;
 
     /* Charts for dark mode */
-    --chart-1: 197 31% 76%; /* Azure */
-    --chart-2: 308 24% 68%; /* Grey Neon Pink */
-    --chart-3: 251 24% 57%; /* Grey Blue */
-    --chart-4: 197 31% 60%; /* Darker Azure */
-    --chart-5: 308 24% 50%; /* Darker Grey Neon Pink */
+    --chart-1: 259 44% 75%;
+    --chart-2: 259 44% 55%;
+    --chart-3: 259 44% 85%;
+    --chart-4: 259 44% 45%;
+    --chart-5: 259 44% 95%;
     
     --sidebar-background: 222.2 84% 4.9%;
     --sidebar-foreground: 210 40% 98%;
