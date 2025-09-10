@@ -15,7 +15,7 @@ const ValuePill = ({ icon: Icon, title, description }: { icon: React.ElementType
         <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <Icon className="h-6 w-6 text-primary" />
         </div>
-        <h3 className="text-lg font-bold text-foreground">{title}</h3>
+        <h3 className="text-lg font-bold text-foreground font-headline">{title}</h3>
         <p className="text-sm text-muted-foreground mt-1">{description}</p>
     </div>
 );
@@ -49,18 +49,18 @@ const FeatureCard = ({ icon: Icon, title, description, image, hint }: { icon: Re
 
 export default function AboutUsPage() {
     return (
-        <div className="flex-grow flex flex-col">
+        <div className="flex-grow flex flex-col font-sans">
             {/* Hero Section */}
             <section className="relative py-24 md:py-32 bg-secondary/30">
                  <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom_1px_center"></div>
                  <div className="container mx-auto text-center relative">
-                    <div className="mx-auto max-w-3xl">
-                        <p className="font-bold text-primary">OUR MISSION</p>
-                        <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight mt-2">
+                    <div className="mx-auto max-w-4xl">
+                        <p className="font-bold text-primary font-headline tracking-widest">OUR MISSION</p>
+                        <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight mt-4">
                            Simplifying Real Estate Transactions
                         </h1>
-                        <p className="mt-6 text-lg text-muted-foreground leading-8">
-                            Lakshmi Balaji O2O is a transaction platform from Lakshmi Balaji Realty, built for everyone in the industrial & warehousing ecosystem. We're here to build partnerships and accelerate success through technology and trust.
+                        <p className="mt-6 text-lg text-muted-foreground max-w-3xl mx-auto">
+                           Lakshmi Balaji O2O is a transaction platform from Lakshmi Balaji Realty, built for everyone in the industrial & warehousing ecosystem. We're here to build partnerships and accelerate success through technology and trust.
                         </p>
                     </div>
                 </div>
@@ -69,6 +69,14 @@ export default function AboutUsPage() {
             {/* Values Section */}
             <section className="py-20 md:py-28 bg-background">
                 <div className="container mx-auto">
+                    <div className="text-center max-w-3xl mx-auto mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight text-primary">
+                           A Platform Built For Everyone
+                        </h2>
+                        <p className="mt-4 text-lg text-muted-foreground">
+                            Our commitment is to deliver targeted value to every user in the ecosystem.
+                        </p>
+                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <ValuePill icon={Zap} title="Faster Transactions" description="For our Developer partners, we accelerate the journey from listing to signed lease." />
                         <ValuePill icon={CheckCircle} title="Easier Transactions" description="For our Customers, we transform a complex process into a simple, transparent experience." />
@@ -95,7 +103,7 @@ export default function AboutUsPage() {
                         <FeatureCard 
                             icon={Download}
                             title="The Instant Advantage: Search, Select, Download."
-                            description="This is where your journey begins. We provide what you need most upfront: a vast selection of properties with instant, unconditional access to their Technical, Compliance, and Commercial data. Download a clean, structured CSV in seconds. This isn’t just data; it's the power to build a winning proposal faster than anyone else."
+                            description="This is where your journey begins. We provide what you need most upfront: a vast selection of properties with instant, <strong class='text-foreground'>unconditional access to their Technical, Compliance, and Commercial data</strong>. Download a clean, structured CSV in seconds. This isn’t just data; it's the power to build a winning proposal faster than anyone else."
                             image="https://picsum.photos/seed/about1/600/400"
                             hint="data analytics dashboard"
                         />
@@ -110,7 +118,7 @@ export default function AboutUsPage() {
                                     </div>
                                     <h3 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Collaborate Seamlessly with Your Team.</h3>
                                 </div>
-                                <p className="text-muted-foreground text-lg leading-relaxed">We know leasing is a team decision. O2O eliminates messy email trails by providing a central hub for the entire transaction. With role-based access, you can keep every stakeholder—from logistics to legal to leadership—informed and engaged in real-time.</p>
+                                <p className="text-muted-foreground text-lg leading-relaxed">We know leasing is a team decision. O2O eliminates messy email trails by providing a <strong class='text-foreground'>central hub for the entire transaction</strong>. With role-based access, you can keep every stakeholder—from logistics to legal to leadership—informed and engaged in real-time.</p>
                             </div>
                             <div>
                                  <Image 
@@ -127,7 +135,7 @@ export default function AboutUsPage() {
                          <FeatureCard 
                             icon={ClipboardCheck}
                             title="Master the Full Transaction Lifecycle."
-                            description="O2O is your advantage from start to finish. Our platform helps you manage every critical activity: schedule site visits, share improvement lists, use a detailed commercial terms sheet, generate meeting minutes, draft the MoU, and track execution right up to possession."
+                            description="O2O is your advantage from start to finish. Our platform helps you manage every critical activity: schedule site visits, share improvement lists, use a detailed commercial terms sheet, generate meeting minutes, draft the MoU, and track execution right up to possession. <strong class='text-foreground'>We handle the process, so you can focus on your core business.</strong>"
                             image="https://picsum.photos/seed/about3/600/400"
                             hint="checklist planning board"
                         />
