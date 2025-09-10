@@ -183,13 +183,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
   const [isShortlistLoading, setIsShortlistLoading] = useState(true);
   
-  useEffect(() => {
+   useEffect(() => {
+    // This effect runs only on the client, after hydration
+    // It prevents hydration mismatches by ensuring server and client render the same initial UI
     try {
-        setIsShortlistLoading(true);
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
             setGeneralShortlist(JSON.parse(storedShortlist));
@@ -198,6 +199,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         console.error("Could not parse general shortlist from localStorage", e);
     } finally {
         setIsShortlistLoading(false);
+        setIsLoading(false); // Mark initial loading as complete
     }
   }, []);
 
