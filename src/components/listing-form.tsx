@@ -71,6 +71,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
       developerId: '',
       listingId: '',
       warehouseBoxId: '',
+      actualSizeSqFt: undefined,
       name: '',
       location: '',
       sizeSqFt: undefined,
@@ -148,6 +149,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 developerId: user?.email || '',
                 listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                 warehouseBoxId: '',
+                actualSizeSqFt: undefined,
                 name: '',
                 location: '',
                 sizeSqFt: undefined,
@@ -251,19 +253,37 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
           <form id="listing-form" onSubmit={form.handleSubmit(handleSubmit)}>
             <ScrollArea className="h-[70vh] p-1 pr-6">
             <div className="space-y-8">
+              
+              {/* Developer Private Information */}
+              <div className="space-y-4">
+                <FormLabel className="text-lg font-semibold">Developer Private Information</FormLabel>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md bg-secondary/30">
+                    <FormField control={form.control} name="warehouseBoxId" render={({ field }) => (
+                        <FormItem><FormLabel>Warehouse Box ID (Your Internal ID)</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Project-A/Block-3/Unit-5" /></FormControl><FormMessage /></FormItem>
+                    )} />
+                    <FormField control={form.control} name="actualSizeSqFt" render={({ field }) => (
+                        <FormItem><FormLabel>Actual Box Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="Enter the exact internal size" /></FormControl><FormMessage /></FormItem>
+                    )} />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Public Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-primary">Public View Information</h3>
+                <p className="text-sm text-muted-foreground -mt-2">The following information will be visible on the public listing, subject to O2O approval.</p>
+              </div>
 
               {/* General Information */}
               <div className="space-y-4">
                 <FormLabel className="text-lg font-semibold">General Information</FormLabel>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md">
-                     <FormField control={form.control} name="warehouseBoxId" render={({ field }) => (
-                        <FormItem><FormLabel>Warehouse Box ID</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="Your internal ID for this property" /></FormControl><FormMessage /></FormItem>
-                    )} />
                      <FormField control={form.control} name="location" render={({ field }) => (
                         <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
                     )} />
                      <FormField control={form.control} name="sizeSqFt" render={({ field }) => (
-                        <FormItem><FormLabel>Total Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Total Size for Listing (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
               </div>

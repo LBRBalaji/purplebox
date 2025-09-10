@@ -23,6 +23,7 @@ export const listingSchema = z.object({
   
   // General Information
   warehouseBoxId: z.string().optional(),
+  actualSizeSqFt: asOptionalField(z.coerce.number()),
   name: z.string().optional(),
   location: z.string().min(1, "Location is required."),
   latLng: z.string().optional(),
