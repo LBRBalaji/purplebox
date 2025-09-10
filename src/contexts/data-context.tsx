@@ -169,7 +169,7 @@ export type AgentLead = {
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const { user: authUser, users } = useAuth();
+  const { user: authUser } = useAuth();
   const [listings, setListings] = useState<ListingSchema[]>(initialListings as ListingSchema[]);
   const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>(initialListingAnalytics as ListingAnalytics[]);
   const [demands, setDemands] = useState<DemandSchema[]>(initialDemands as DemandSchema[]);
@@ -202,6 +202,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setIsLoading(false); // Mark initial loading as complete
     }
   }, []);
+  
+  // Effect to clear shortlist on logout
+  useEffect(() => {
+    if (!authUser) {
+        setGeneralShortlist([]);
+        // No need to write to localStorage on logout, it's a per-session preference for logged-in users.
+    }
+  }, [authUser])
 
   const toggleGeneralShortlist = (listingId: string) => {
     setGeneralShortlist(prev => {
@@ -418,7 +426,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const logDownload = useCallback((userId: string, listingsToDownload: ListingSchema[]) => {
     const todaysTotalDownloads = getTodaysTotalDownloads(userId);
-    const user = Object.values(users).find(u => u.email === userId);
+    const user = authUser;
 
     if (user?.plan !== 'Paid_Premium' && todaysTotalDownloads >= 2) {
         setLastEvent({
@@ -473,7 +481,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
 
     return { success: true, limitReached: false };
-  }, [downloadHistory, getTodaysTotalDownloads, toast, users, persistListingAnalytics]);
+  }, [downloadHistory, getTodaysTotalDownloads, toast, authUser, persistListingAnalytics]);
 
   const logListingView = useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {
