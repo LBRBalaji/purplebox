@@ -270,11 +270,7 @@ export function Header() {
     <>
       <header className="p-4 border-b bg-card font-sans">
         <div className="container mx-auto flex items-center justify-between gap-4">
-          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 flex-shrink-0">
-              <div className="relative">
-                  <Building className="h-7 w-7 text-primary" />
-                  <Sparkles className="h-4 w-4 text-accent absolute -top-1 -right-2" />
-              </div>
+          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0">
               <div>
                   <h1 className="text-xl font-bold font-headline text-primary">Lakshmi Balaji O2O</h1>
                   <p className="text-xs text-muted-foreground">Sourcing & Leasing Simplified</p>
