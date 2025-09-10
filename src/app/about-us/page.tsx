@@ -78,8 +78,8 @@ export default function AboutUsPage() {
                         </p>
                      </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <ValuePill icon={Zap} title="Faster Transactions" description="For our Developer partners, we accelerate the journey from listing to signed lease." />
                         <ValuePill icon={CheckCircle} title="Easier Transactions" description="For our Customers, we transform a complex process into a simple, transparent experience." />
+                        <ValuePill icon={Zap} title="Faster Transactions" description="For our Developer partners, we accelerate the journey from listing to signed lease." />
                         <ValuePill icon={Handshake} title="More Transactions" description="For our Agent network, we provide the tools and inventory to scale success." />
                     </div>
                 </div>
