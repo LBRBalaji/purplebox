@@ -641,19 +641,19 @@ export function ListingsPage() {
                         </Button>
                     </AlertDescription>
                 </div>
-                <div className="md:col-span-4 space-y-4 p-4 rounded-md bg-green-50 border border-green-200">
-                     <h4 className="font-bold text-green-800 flex items-center gap-2"><Award className="h-5 w-5"/> Zero Brokerage Charges</h4>
-                     <ul className="text-xs text-green-700/90 list-none space-y-2">
+                <div className="md:col-span-4 space-y-4 p-4 rounded-md bg-accent/10 border border-accent/20">
+                     <h4 className="font-bold text-accent-foreground/90 flex items-center gap-2"><Award className="h-5 w-5 text-accent"/> Zero Brokerage Charges</h4>
+                     <ul className="text-xs text-accent-foreground/80 list-none space-y-2">
                         <li className="flex items-start gap-2">
-                            <Award className="h-4 w-4 shrink-0 mt-0.5 text-green-600"/>
+                            <Award className="h-4 w-4 shrink-0 mt-0.5 text-accent/90"/>
                             <div>
-                                <strong className="font-semibold text-green-800">For Startups</strong> on their first transaction.
+                                <strong className="font-semibold text-accent-foreground">For Startups</strong> on their first transaction.
                             </div>
                         </li>
                         <li className="flex items-start gap-2">
-                             <Truck className="h-4 w-4 shrink-0 mt-0.5 text-green-600"/>
+                             <Truck className="h-4 w-4 shrink-0 mt-0.5 text-accent/90"/>
                             <div>
-                                <strong className="font-semibold text-green-800">For Logistics Companies</strong> on all transactions.
+                                <strong className="font-semibold text-accent-foreground">For Logistics Companies</strong> on all transactions.
                             </div>
                         </li>
                      </ul>
@@ -727,6 +727,7 @@ export function ListingsPage() {
 }
 
     
+
 
 
 
