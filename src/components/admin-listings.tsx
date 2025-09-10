@@ -12,7 +12,7 @@ import {
 import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -36,6 +36,12 @@ import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Slider } from './ui/slider';
 import { ListingForm } from './listing-form';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar } from './ui/calendar';
+import { cn } from '@/lib/utils';
+import { format, subDays } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
+import * as XLSX from 'xlsx';
 
 
 function AdminListingCard({ listing, analytics, providerName, onEdit }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string, onEdit: (listing: ListingSchema) => void }) {
@@ -205,6 +211,10 @@ export function AdminListings() {
   const [developerFilter, setDeveloperFilter] = React.useState('all');
   const [availabilityFilter, setAvailabilityFilter] = React.useState('all');
   const [sizeRange, setSizeRange] = React.useState([0, 1000000]);
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+    from: subDays(new Date(), 29),
+    to: new Date(),
+  });
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
@@ -250,6 +260,7 @@ export function AdminListings() {
     setDeveloperFilter('all');
     setAvailabilityFilter('all');
     setSizeRange([0, maxSliderSize]);
+    setDateRange({ from: subDays(new Date(), 29), to: new Date() });
   }
 
   const handleEdit = (listing: ListingSchema) => {
@@ -261,6 +272,82 @@ export function AdminListings() {
     updateListing(data);
     setIsFormOpen(false);
     setSelectedListing(null);
+  };
+  
+  const handleDownloadReport = () => {
+    const from = dateRange?.from;
+    const to = dateRange?.to;
+
+    if (!from || !to) {
+        alert("Please select a valid date range.");
+        return;
+    }
+    
+    // Create location-based averages first
+    const locationStats: Record<string, { totalViews: number; totalDownloads: number; count: number }> = {};
+    listings.forEach(listing => {
+        const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
+        if(!analytics) return;
+
+        const locationKey = listing.location.split(',')[0].trim();
+        if (!locationStats[locationKey]) {
+            locationStats[locationKey] = { totalViews: 0, totalDownloads: 0, count: 0 };
+        }
+        locationStats[locationKey].totalViews += analytics.views;
+        locationStats[locationKey].totalDownloads += analytics.downloads;
+        locationStats[locationKey].count++;
+    });
+
+    const locationAverages: Record<string, { avgViews: number; avgDownloads: number }> = {};
+    for (const loc in locationStats) {
+        locationAverages[loc] = {
+            avgViews: locationStats[loc].totalViews / locationStats[loc].count,
+            avgDownloads: locationStats[loc].totalDownloads / locationStats[loc].count,
+        };
+    }
+
+
+    const reportData = filteredListings.map(listing => {
+        const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
+
+        const viewsInPeriod = analytics?.viewedBy?.filter(v => new Date(v.timestamp) >= from && new Date(v.timestamp) <= to) || [];
+        const downloadsInPeriod = analytics?.downloadedBy?.flatMap(d => d.timestamps.filter(ts => new Date(ts) >= from && new Date(ts) <= to)) || [];
+
+        const viewCount = viewsInPeriod.length;
+        const downloadCount = downloadsInPeriod.length;
+        const conversionRate = viewCount > 0 ? ((downloadCount / viewCount) * 100).toFixed(2) + '%' : '0.00%';
+        
+        const daysOnMarket = listing.createdAt ? Math.ceil((new Date().getTime() - new Date(listing.createdAt).getTime()) / (1000 * 3600 * 24)) : 'N/A';
+        
+        const locationKey = listing.location.split(',')[0].trim();
+        const locAvg = locationAverages[locationKey];
+        const viewPerformance = locAvg && locAvg.avgViews > 0 ? ((viewCount / locAvg.avgViews) * 100).toFixed(0) + '%' : 'N/A';
+
+        const topViewer = viewsInPeriod.reduce((acc, v) => {
+            acc[v.company] = (acc[v.company] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+        const mostEngagedCompany = Object.keys(topViewer).sort((a, b) => topViewer[b] - topViewer[a])[0] || 'N/A';
+
+        return {
+            'Listing ID': listing.listingId,
+            'Name': listing.name,
+            'Location': listing.location,
+            'Developer': getProviderName(listing.developerId),
+            'Status': listing.status,
+            'Days on Market': daysOnMarket,
+            'Views (Period)': viewCount,
+            'Downloads (Period)': downloadCount,
+            'View-to-Download Rate': conversionRate,
+            'Most Engaged Company (Views)': mostEngagedCompany,
+            'Performance vs. Location Avg (Views)': viewPerformance
+        };
+    });
+    
+    const worksheet = XLSX.utils.json_to_sheet(reportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Listings Performance');
+    XLSX.writeFile(workbook, `LBR_O2O_Performance_Report_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
   };
 
   return (
@@ -313,6 +400,20 @@ export function AdminListings() {
                         </SelectContent>
                     </Select>
                 </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">Date Range</label>
+                     <Popover>
+                        <PopoverTrigger asChild>
+                            <Button id="date" variant={"outline"} className={cn("w-full justify-start text-left font-normal",!dateRange && "text-muted-foreground")}>
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>) : (format(dateRange.from, "LLL dd, y"))) : (<span>Pick a date</span>)}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                            <Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={2}/>
+                        </PopoverContent>
+                    </Popover>
+                </div>
                  <div className="lg:col-span-2 space-y-2">
                     <label className="text-sm font-medium">Size (sq. ft.) - {sizeRange[0].toLocaleString()} to {sizeRange[1].toLocaleString()}</label>
                     <Slider
@@ -323,9 +424,12 @@ export function AdminListings() {
                         onValueChange={newRange => setSizeRange(newRange as [number, number])}
                     />
                 </div>
-                <div className="lg:col-span-2 flex justify-end">
-                    <Button onClick={resetFilters} variant="ghost" className="w-full lg:w-auto">
-                        <X className="mr-2 h-4 w-4" /> Reset Filters
+                <div className="flex gap-2">
+                    <Button onClick={resetFilters} variant="ghost" className="w-full">
+                        <X className="mr-2 h-4 w-4" /> Reset
+                    </Button>
+                     <Button onClick={handleDownloadReport} className="w-full">
+                        <Download className="mr-2 h-4 w-4" /> Report
                     </Button>
                 </div>
             </div>
