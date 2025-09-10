@@ -65,7 +65,7 @@ const ListingsDropdown = () => {
                     "text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2",
                      isActive && "text-primary"
                 )}>
-                    <Warehouse className="h-4 w-4" /> Listings <ChevronDown className="h-4 w-4" />
+                    <List className="h-4 w-4" /> Listings <ChevronDown className="h-4 w-4" />
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -311,10 +311,10 @@ export function Header() {
 
            <div className="flex items-center gap-4 flex-shrink-0">
               {user && !(isSuperAdmin || isO2O) && (
-                <Link href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
+                <Link href="https://wa.me/919841098170?text=need%20O2O%20support%20call%20me%20back%20please" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline">
                       <WhatsAppIcon className="mr-2 h-5 w-5" />
-                      WhatsApp O2O Team
+                      Ask a Call Back
                   </Button>
                 </Link>
               )}
