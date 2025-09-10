@@ -306,7 +306,7 @@ export function Header() {
           </nav>
 
            <div className="flex items-center gap-4 flex-shrink-0">
-              {user && !(isSuperAdmin || isO2O) && (
+              {(!user || (user && !isSuperAdmin && !isO2O)) && (
                 <Link href="https://wa.me/919841098170?text=need%20O2O%20support%20call%20me%20back%20please" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline">
                       <WhatsAppIcon className="mr-2 h-5 w-5" />
