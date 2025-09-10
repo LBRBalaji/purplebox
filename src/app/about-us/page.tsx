@@ -60,7 +60,7 @@ export default function AboutUsPage() {
                            Simplifying Real Estate Transactions
                         </h1>
                         <p className="mt-6 text-lg text-muted-foreground max-w-3xl mx-auto">
-                           <strong>O2O</strong> is built for everyone in the industrial & warehousing ecosystem. We're here to build partnerships and accelerate success through technology and trust.
+                           <strong>O2O</strong> is a transaction platform built for everyone in the industrial & warehousing ecosystem. We're here to build partnerships and accelerate success through technology and trust.
                         </p>
                     </div>
                 </div>
@@ -71,7 +71,7 @@ export default function AboutUsPage() {
                 <div className="container mx-auto">
                     <div className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight text-primary">
-                           A PLATFORM FROM LAKSHMI BALAJI REALTY
+                           A Platform From Lakshmi Balaji Realty
                            <span className="block text-foreground mt-2">Built For Everyone.</span>
                         </h2>
                         <p className="mt-4 text-lg text-muted-foreground">
@@ -104,7 +104,7 @@ export default function AboutUsPage() {
                         <FeatureCard 
                             icon={Download}
                             title="The Instant Advantage: Search, Select, Download."
-                            description="This is where your journey begins. We provide what you need most upfront: a vast selection of properties with &lt;strong class='text-foreground'&gt;unconditional access to their Technical, Compliance, and Commercial data&lt;/strong&gt;. Download a clean, structured CSV in seconds. This isn’t just data; it's the power to build a winning proposal faster than anyone else."
+                            description="This is where your journey begins. We provide what you need most upfront: a vast selection of properties with <strong class='text-foreground'>unconditional access to their Technical, Compliance, and Commercial data</strong>. Download a clean, structured CSV in seconds. This isn’t just data; it's the power to build a winning proposal faster than anyone else."
                             image="https://picsum.photos/seed/about1/600/400"
                             hint="data analytics dashboard"
                         />
@@ -119,7 +119,7 @@ export default function AboutUsPage() {
                                     </div>
                                     <h3 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Collaborate Seamlessly with Your Team.</h3>
                                 </div>
-                                <p className="text-muted-foreground text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: "We know leasing is a team decision. O2O eliminates messy email trails by providing a &lt;strong class='text-foreground'&gt;central hub for the entire transaction&lt;/strong&gt;. With role-based access, you can keep every stakeholder—from logistics to legal to leadership—informed and engaged in real-time." }}></p>
+                                <p className="text-muted-foreground text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: "We know leasing is a team decision. O2O eliminates messy email trails by providing a <strong class='text-foreground'>central hub for the entire transaction</strong>. With role-based access, you can keep every stakeholder—from logistics to legal to leadership—informed and engaged in real-time." }}></p>
                             </div>
                             <div>
                                  <Image 
@@ -136,7 +136,7 @@ export default function AboutUsPage() {
                          <FeatureCard 
                             icon={ClipboardCheck}
                             title="Master the Full Transaction Lifecycle."
-                            description="O2O is your advantage from start to finish. Our platform helps you manage every critical activity: schedule site visits, share improvement lists, use a detailed commercial terms sheet, generate meeting minutes, draft the MoU, and track execution right up to possession. &lt;strong class='text-foreground'&gt;We handle the process, so you can focus on your core business.&lt;/strong&gt;"
+                            description="O2O is your advantage from start to finish. Our platform helps you manage every critical activity: schedule site visits, share improvement lists, use a detailed commercial terms sheet, generate meeting minutes, draft the MoU, and track execution right up to possession. <strong class='text-foreground'>We handle the process, so you can focus on your core business.</strong>"
                             image="https://picsum.photos/seed/about3/600/400"
                             hint="checklist planning board"
                         />
