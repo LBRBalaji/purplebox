@@ -8,7 +8,7 @@ body {
 
 @layer base {
   :root {
-    --background: 197 31% 96%; /* Very light Azure for background */
+    --background: 197 31% 96%; /* Almost white Azure for background */
     --foreground: 251 24% 10%; /* Dark Grey Blue for text */
     
     --card: 197 31% 99%; /* Almost white Azure for cards */
