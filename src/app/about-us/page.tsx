@@ -161,7 +161,7 @@ export default function AboutUsPage() {
                                     <Link href="/">Browse Listings <ArrowRight className="ml-2 h-4 w-4" /></Link>
                                 </Button>
                                  <Button asChild size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                                    <Link href="/agent-signup">Become an Agent <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                                    <Link href="/agent-signup">Become an <strong className="mx-1">O2O</strong> Agent Partner <ArrowRight className="ml-2 h-4 w-4" /></Link>
                                 </Button>
                             </div>
                         </CardContent>
