@@ -8,7 +8,7 @@ import { Header } from '@/components/header';
 import Link from 'next/link';
 import { CookieBanner } from '@/components/cookie-banner';
 import { GoogleAnalytics } from '@/components/google-analytics';
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
@@ -20,12 +20,6 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
 });
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-space-grotesk',
-});
-
 
 function Footer() {
   return (
@@ -60,9 +54,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn("antialiased flex flex-col h-full bg-background", inter.variable, spaceGrotesk.variable)}>
+      <body className={cn("antialiased flex flex-col h-full bg-background font-sans", inter.variable)}>
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && <GoogleAnalytics />}
         <AuthProvider>
           <DataProvider>

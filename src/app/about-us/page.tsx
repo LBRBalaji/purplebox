@@ -103,7 +103,7 @@ export default function AboutUsPage() {
                         <FeatureCard 
                             icon={Download}
                             title="The Instant Advantage: Search, Select, Download."
-                            description="This is where your journey begins. We provide what you need most upfront: a vast selection of properties with instant, <strong class='text-foreground'>unconditional access to their Technical, Compliance, and Commercial data</strong>. Download a clean, structured CSV in seconds. This isn’t just data; it's the power to build a winning proposal faster than anyone else."
+                            description="This is where your journey begins. We provide what you need most upfront: a vast selection of properties with <strong class='text-foreground'>unconditional access to their Technical, Compliance, and Commercial data</strong>. Download a clean, structured CSV in seconds. This isn’t just data; it's the power to build a winning proposal faster than anyone else."
                             image="https://picsum.photos/seed/about1/600/400"
                             hint="data analytics dashboard"
                         />
