@@ -14,7 +14,7 @@ import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle } from 'lucide-react';
+import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, BarChart2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { ListingForm } from './listing-form';
@@ -24,6 +24,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collap
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { AdminListings } from './admin-listings';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { startOfDay, startOfWeek, startOfMonth, endOfDay } from 'date-fns';
 
 
 function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { listing: ListingSchema, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema) => void, isAdmin: boolean }) {
@@ -37,6 +39,31 @@ function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { lis
   };
   const status = statusConfig[listing.status] || { text: 'Unknown', className: 'bg-gray-100 text-gray-800', icon: Eye };
   const StatusIcon = status.icon;
+
+  const summaryStats = React.useMemo(() => {
+    const now = new Date();
+    const todayStart = startOfDay(now).getTime();
+    const weekStart = startOfWeek(now).getTime();
+    const monthStart = startOfMonth(now).getTime();
+
+    const views = analytics?.viewedBy || [];
+    const downloads = analytics?.downloadedBy?.flatMap(d => d.timestamps) || [];
+
+    return {
+        today: {
+            views: views.filter(v => v.timestamp >= todayStart).length,
+            downloads: downloads.filter(ts => ts >= todayStart).length,
+        },
+        week: {
+            views: views.filter(v => v.timestamp >= weekStart).length,
+            downloads: downloads.filter(ts => ts >= weekStart).length,
+        },
+        month: {
+            views: views.filter(v => v.timestamp >= monthStart).length,
+            downloads: downloads.filter(ts => ts >= monthStart).length,
+        },
+    };
+  }, [analytics]);
 
   return (
     <Card className="flex flex-col">
@@ -99,6 +126,44 @@ function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { lis
                 <span>{analytics?.downloads || 0} downloads</span>
             </div>
         </div>
+
+        <Collapsible>
+          <CollapsibleTrigger className="w-full flex items-center justify-between text-sm font-medium text-primary py-2 px-3 bg-primary/5 rounded-md hover:bg-primary/10">
+            <span className="flex items-center gap-2"><BarChart2 className="h-4 w-4" /> Performance Summary</span>
+            <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="pt-3">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Period</TableHead>
+                    <TableHead className="text-center">Views</TableHead>
+                    <TableHead className="text-center">Downloads</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Today</TableCell>
+                    <TableCell className="text-center font-medium">{summaryStats.today.views}</TableCell>
+                    <TableCell className="text-center font-medium">{summaryStats.today.downloads}</TableCell>
+                  </TableRow>
+                   <TableRow>
+                    <TableCell>This Week</TableCell>
+                    <TableCell className="text-center font-medium">{summaryStats.week.views}</TableCell>
+                    <TableCell className="text-center font-medium">{summaryStats.week.downloads}</TableCell>
+                  </TableRow>
+                   <TableRow>
+                    <TableCell>This Month</TableCell>
+                    <TableCell className="text-center font-medium">{summaryStats.month.views}</TableCell>
+                    <TableCell className="text-center font-medium">{summaryStats.month.downloads}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+        
         {analytics?.viewedBy && analytics.viewedBy.length > 0 && (
           <Collapsible>
             <CollapsibleTrigger className="w-full flex items-center justify-between text-sm font-medium text-primary py-2 px-3 bg-primary/5 rounded-md hover:bg-primary/10">
