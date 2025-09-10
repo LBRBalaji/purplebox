@@ -205,7 +205,11 @@ const Notifications = () => {
         }
         
         if (isProvider) {
-            const pendingLeads = registeredLeads.filter(l => l.providers.some(p => p.providerEmail === user.email && p.properties.some(prop => prop.status === 'Pending'))).length;
+            const pendingLeads = registeredLeads.filter(l => 
+                (l.providers || []).some(p => 
+                    p.providerEmail === user.email && (p.properties || []).some(prop => prop.status === 'Pending')
+                )
+            ).length;
             if (pendingLeads > 0) {
                 items.push({ text: `${pendingLeads} new lead(s) require your acknowledgment`, href: '/dashboard?tab=registered-leads', icon: UserCheck });
             }
@@ -219,7 +223,11 @@ const Notifications = () => {
         }
         
         if (isAgent) {
-             const pendingAcks = registeredLeads.filter(l => l.registeredBy === user.email && l.providers.some(p => p.properties.some(prop => prop.status === 'Pending'))).length;
+             const pendingAcks = registeredLeads.filter(l => 
+                l.registeredBy === user.email && (l.providers || []).some(p => 
+                    (p.properties || []).some(prop => prop.status === 'Pending')
+                )
+            ).length;
              if (pendingAcks > 0) {
                  items.push({ text: `${pendingAcks} provider acknowledgment(s) are pending`, href: '/dashboard/transactions', icon: HardHat });
              }
