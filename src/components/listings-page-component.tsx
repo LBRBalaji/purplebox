@@ -605,15 +605,15 @@ export function ListingsPage() {
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
              <div className="text-center py-8 md:py-12">
-                <div className="flex items-center justify-center gap-4 text-muted-foreground mb-4">
+                <div className="flex items-center justify-center gap-4 text-primary mb-4">
                     <Search className="w-6 h-6"/>
                     <div className="w-8 h-px bg-border"/>
                     <CheckSquare className="w-6 h-6"/>
                     <div className="w-8 h-px bg-border"/>
                     <Download className="w-6 h-6"/>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight">Search-Select-Download</h1>
-                <p className="mt-4 text-lg text-muted-foreground">Warehouse-Technical-Commercials, in a single CSV</p>
+                <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-primary">Search-Select-Download</h1>
+                <p className="mt-4 text-lg text-accent">Warehouse-Technical-Compliance-Commercials, in a single CSV</p>
                 
                  <div className="mt-8 flex items-center justify-center gap-4 md:gap-8 text-center animate-in fade-in-0 duration-1000">
                     <div className="text-center">
@@ -727,6 +727,7 @@ export function ListingsPage() {
 }
 
     
+
 
 
 
