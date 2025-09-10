@@ -129,7 +129,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                    <CarouselItem>
                     <div className="aspect-video relative">
                       <Image
-                        src="https://placehold.co/800x600/210D42/FFFFFF?text=No+Image"
+                        src="https://placehold.co/800x600/7e32ca/FFFFFF?text=No+Image"
                         alt="Placeholder"
                         fill
                         className="object-cover"
@@ -154,7 +154,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                 {(listing.serviceModel === '3PL' || listing.serviceModel === 'Both') && (
                     <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 mb-2">
                         <Star className="mr-1.5 h-3 w-3" />
-                        3PL Operated
+                        3PL Operated Warehouse
                     </Badge>
                 )}
                 <div className="flex items-center gap-3">
@@ -271,7 +271,7 @@ function DownloadBar() {
                 [],
                 ["Your growth is our growth. Come back tomorrow and download another set of O2O warehouse listings to serve your next customer", "www.LakshmiBalajiO2O.com"],
                 [],
-                ["Powered by Lakshmi Balaji O2O | Warehouse-Technical-Commercials, in a single CSV"]
+                ["Powered by Lakshmi Balaji O2O | Warehouse-Technical-Compliance-Commercials, in a single CSV"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 
@@ -348,7 +348,7 @@ function DownloadBar() {
 const searchPlaceholders = [
     'e.g., search "12m eve height"',
     'e.g., search "crane available"',
-    'e.g., search "3PL operated"',
+    'e.g., search "3PL operated warehouse"',
     'e.g., search "RCC building"',
     'e.g., search "fire NOC approved"',
     'e.g., search "FM2 grade flooring"',
@@ -725,11 +725,3 @@ export function ListingsPage() {
     </>
   );
 }
-
-    
-
-
-
-
-
-

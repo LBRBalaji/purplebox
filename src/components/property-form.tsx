@@ -236,7 +236,7 @@ function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | und
         isLocationConfirmed: false,
         size: listing.sizeSqFt,
         readinessToOccupy: readinessMap[listing.availabilityDate] || "BTS",
-        buildingType: listing.buildingSpecifications.buildingType as 'PEB' | 'RCC' | undefined,
+        buildingType: (listing.buildingSpecifications.buildingType as any[] | undefined)?.includes('PEB') ? 'PEB' : (listing.buildingSpecifications.buildingType as any[] | undefined)?.includes('RCC') ? 'RCC' : undefined,
         floor: "Ground",
         ceilingHeight: listing.buildingSpecifications.eveHeightMeters,
         ceilingHeightUnit: 'm',
@@ -254,7 +254,7 @@ function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | und
         userEmail: user?.email || "",
 
         o2oDealDemandId: demand?.demandId,
-        serviceModel: listing.serviceModel,
+        serviceModel: listing.serviceModel || 'Standard',
         safety: "Fully Compounded",
         approvalAuthority: "DTCP",
         genSetBackup: "Available",

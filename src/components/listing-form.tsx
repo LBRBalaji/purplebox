@@ -356,6 +356,13 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                     <FormMessage />
                                 </FormItem>
                             )} />
+                             <FormField control={form.control} name="serviceModel" render={({ field }) => (
+                                <FormItem><FormLabel>Service Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                    <SelectItem value="Standard">Standard Warehouse</SelectItem>
+                                    <SelectItem value="3PL">3PL Operated Warehouse</SelectItem>
+                                    <SelectItem value="Both">Both</SelectItem>
+                                </SelectContent></Select><FormMessage /></FormItem>
+                            )} />
                             <FormField control={form.control} name="buildingSpecifications.numberOfDocksAndShutters" render={({ field }) => (
                                 <FormItem><FormLabel>Number of Docks/Shutters</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
                             )} />

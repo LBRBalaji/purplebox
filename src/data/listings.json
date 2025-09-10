@@ -1,3 +1,4 @@
+
 [
   {
     "listingId": "LST-RD962F",
@@ -198,47 +199,52 @@
     ]
   },
   {
-    "listingId": "LST-TEST01",
-    "developerId": "wd1@o2o.com",
+    "listingId": "LST-3PL001",
+    "developerId": "wd3@o2o.com",
     "status": "approved",
-    "warehouseBoxId": "WBX-ZENI-PEND",
-    "name": "Zenith Pending Warehouse",
-    "location": "Sriperumbudur",
-    "latLng": "12.9667, 79.9461",
-    "sizeSqFt": 120000,
-    "description": "A new facility in the industrial corridor of Sriperumbudur, awaiting final review and approval.",
-    "rentPerSqFt": 28,
-    "rentalSecurityDeposit": 6,
+    "warehouseBoxId": "WBX-ZENI-3PL1",
+    "name": "Zenith 3PL Center",
+    "location": "Bhiwandi, Mumbai",
+    "latLng": "19.2940, 73.0550",
+    "sizeSqFt": 80000,
+    "description": "State-of-the-art 3PL operated facility in the heart of Bhiwandi's logistics hub. Offering end-to-end supply chain solutions, this 80,000 sq. ft. space is ideal for e-commerce, retail, and FMCG clients. Features modern racking, inventory management systems, and value-added services.",
+    "rentPerSqFt": 35,
+    "rentalSecurityDeposit": 10,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
-    "area": {},
-    "buildingSpecifications": {
-      "buildingType": [
-        "PEB"
-      ]
+    "serviceModel": "3PL",
+    "area": {
+        "totalChargeableArea": 80000
     },
-    "siteSpecifications": {},
+    "buildingSpecifications": {
+        "buildingType": ["PEB"],
+        "eveHeightMeters": 13,
+        "numberOfDocksAndShutters": 12,
+        "roofType": "Galvalume",
+        "roofInsulation": "Insulated",
+        "ventilation": "Turbo"
+    },
+    "siteSpecifications": {
+        "typeOfFlooringInside": "FM2"
+    },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+        "parkApproval": true,
+        "buildingApproval": true,
+        "fireLicense": true,
+        "fireNOC": true,
+        "buildingInsurance": true,
+        "propertyTax": true
     },
     "documents": [
       {
-        "type": "image",
-        "name": "Front View",
-        "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
+          "type": "image",
+          "name": "3PL Operations Floor",
+          "url": "https://picsum.photos/seed/3pl-floor/800/600"
       },
       {
-        "type": "image",
-        "name": "Inside Warehouse",
-        "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
+          "type": "image",
+          "name": "Loading Bay",
+          "url": "https://picsum.photos/seed/3pl-bay/800/600"
       }
     ]
   }
