@@ -1,5 +1,76 @@
 [
   {
+    "listingId": "LST-QWQFTO",
+    "developerId": "admin@ccidevelopers.com",
+    "status": "pending",
+    "warehouseBoxId": "WBX-CCI -9TX9",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 162664,
+    "description": "Ready for immediate occupancy, this expansive 162,664 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your business needs.  Boasting an 11-meter eave height and a durable Galvalume roof, this property provides ample space and robust protection.  At ₹24 per sq. ft., this well-located warehouse offers a competitive rental rate and a flexible service model to suit your operational requirements.",
+    "rentPerSqFt": 24,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "90%",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 15,
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 11,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge",
+      "louvers": true
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1R45pRHyaKn20_rBcho84QhN7v7HZOxIp"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-WQ_Gx7EeL5zJhhriFpt2miLJEO6EG74"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1NhdVZFO64YGNOj82MeLdOB5gJzuIQz3Z"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
+      }
+    ]
+  },
+  {
     "listingId": "LST-RD962F",
     "developerId": "wd2@o2o.com",
     "status": "approved",

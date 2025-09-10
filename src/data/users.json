@@ -92,5 +92,15 @@
     "role": "User",
     "plan": "Paid_Premium",
     "createdAt": "2025-09-08T14:53:54.579Z"
+  },
+  "admin@ccidevelopers.com": {
+    "email": "admin@ccidevelopers.com",
+    "companyName": "CCI Industrial and Logistics Parks",
+    "userName": "Admin",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-10T13:20:42.705Z"
   }
 }
