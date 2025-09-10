@@ -617,12 +617,12 @@ export function ListingsPage() {
                 
                  <div className="mt-8 flex items-center justify-center gap-4 md:gap-8 text-center animate-in fade-in-0 duration-1000">
                     <div className="text-center">
-                        <p className="text-2xl md:text-3xl font-bold text-primary">{inventoryCount}</p>
+                        {isDataLoading ? <Skeleton className="h-9 w-12 mx-auto" /> : <p className="text-2xl md:text-3xl font-bold text-primary">{inventoryCount}</p>}
                         <p className="text-xs text-muted-foreground tracking-wider">WAREHOUSES</p>
                     </div>
                     <Separator orientation="vertical" className="h-10" />
                     <div className="text-center">
-                         <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>
+                         {isDataLoading ? <Skeleton className="h-9 w-20 mx-auto" /> : <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>}
                         <p className="text-xs text-muted-foreground tracking-wider">SQ. FT. LISTED</p>
                     </div>
                 </div>

@@ -1,4 +1,3 @@
-
 [
   {
     "listingId": "LST-RD962F",
@@ -14,7 +13,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "70%",
-    "serviceModel": "Standard",
+    "serviceModel": "3PL",
     "area": {
       "plinthArea": 280000,
       "mezzanineArea1": 6000,
@@ -214,37 +213,39 @@
     "constructionProgress": "100%",
     "serviceModel": "3PL",
     "area": {
-        "totalChargeableArea": 80000
+      "totalChargeableArea": 80000
     },
     "buildingSpecifications": {
-        "buildingType": ["PEB"],
-        "eveHeightMeters": 13,
-        "numberOfDocksAndShutters": 12,
-        "roofType": "Galvalume",
-        "roofInsulation": "Insulated",
-        "ventilation": "Turbo"
+      "buildingType": [
+        "PEB"
+      ],
+      "eveHeightMeters": 13,
+      "numberOfDocksAndShutters": 12,
+      "roofType": "Galvalume",
+      "roofInsulation": "Insulated",
+      "ventilation": "Turbo"
     },
     "siteSpecifications": {
-        "typeOfFlooringInside": "FM2"
+      "typeOfFlooringInside": "FM2"
     },
     "certificatesAndApprovals": {
-        "parkApproval": true,
-        "buildingApproval": true,
-        "fireLicense": true,
-        "fireNOC": true,
-        "buildingInsurance": true,
-        "propertyTax": true
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "propertyTax": true
     },
     "documents": [
       {
-          "type": "image",
-          "name": "3PL Operations Floor",
-          "url": "https://picsum.photos/seed/3pl-floor/800/600"
+        "type": "image",
+        "name": "3PL Operations Floor",
+        "url": "https://picsum.photos/seed/3pl-floor/800/600"
       },
       {
-          "type": "image",
-          "name": "Loading Bay",
-          "url": "https://picsum.photos/seed/3pl-bay/800/600"
+        "type": "image",
+        "name": "Loading Bay",
+        "url": "https://picsum.photos/seed/3pl-bay/800/600"
       }
     ]
   }
