@@ -2,14 +2,15 @@
   {
     "listingId": "LST-0RMXOY",
     "views": 1,
-    "downloads": 1,
+    "downloads": 2,
     "customerIndustries": {},
     "downloadedBy": [
       {
         "name": "Alex Ray",
         "company": "Alpha Logistics",
         "timestamps": [
-          1757516830770
+          1757516830770,
+          1757589118571
         ]
       }
     ],
@@ -24,14 +25,15 @@
   {
     "listingId": "LST-XHJLWC",
     "views": 0,
-    "downloads": 1,
+    "downloads": 2,
     "customerIndustries": {},
     "downloadedBy": [
       {
         "name": "Alex Ray",
         "company": "Alpha Logistics",
         "timestamps": [
-          1757516830770
+          1757516830770,
+          1757589118571
         ]
       }
     ],
@@ -40,14 +42,15 @@
   {
     "listingId": "LST-J9L9NS",
     "views": 0,
-    "downloads": 1,
+    "downloads": 2,
     "customerIndustries": {},
     "downloadedBy": [
       {
         "name": "Alex Ray",
         "company": "Alpha Logistics",
         "timestamps": [
-          1757516830770
+          1757516830770,
+          1757589118571
         ]
       }
     ],
@@ -98,5 +101,37 @@
         "timestamp": 1757517972334
       }
     ]
+  },
+  {
+    "listingId": "LST-Z75P47",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1757589118571
+        ]
+      }
+    ],
+    "viewedBy": []
+  },
+  {
+    "listingId": "LST-IQOMX9",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1757589118571
+        ]
+      }
+    ],
+    "viewedBy": []
   }
 ]

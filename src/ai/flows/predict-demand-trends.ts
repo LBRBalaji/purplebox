@@ -105,7 +105,9 @@ const predictDemandTrendsFlow = ai.defineFlow(
     }
     
     if (input.buildingType) {
-        filteredListings = filteredListings.filter(l => l.buildingSpecifications.buildingType?.toLowerCase() === input.buildingType?.toLowerCase());
+        filteredListings = filteredListings.filter(l => 
+            l.buildingSpecifications.buildingType?.some(type => type.toLowerCase() === input.buildingType?.toLowerCase())
+        );
     }
 
     if (input.serviceModel) {
