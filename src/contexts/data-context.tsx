@@ -5,15 +5,6 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useCa
 import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type CommercialTermsSchema, type AcknowledgmentDetails } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
-import initialListings from '@/data/listings.json';
-import initialDemands from '@/data/demands.json';
-import initialSubmissions from '@/data/submissions.json';
-import initialAgentLeads from '@/data/agent-leads.json';
-import initialListingAnalytics from '@/data/listing-analytics.json';
-import initialRegisteredLeads from '@/data/registered-leads.json';
-import initialTransactionActivities from '@/data/transaction-activities.json';
-import initialTenantImprovements from '@/data/tenant-improvements.json';
-import initialCommercialTerms from '@/data/commercial-terms.json';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -170,38 +161,79 @@ export type AgentLead = {
 export function DataProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const { user: authUser } = useAuth();
-  const [listings, setListings] = useState<ListingSchema[]>(initialListings as ListingSchema[]);
-  const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>(initialListingAnalytics as ListingAnalytics[]);
-  const [demands, setDemands] = useState<DemandSchema[]>(initialDemands as DemandSchema[]);
-  const [submissions, setSubmissions] = useState<Submission[]>(initialSubmissions as Submission[]);
+  const [listings, setListings] = useState<ListingSchema[]>([]);
+  const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>([]);
+  const [demands, setDemands] = useState<DemandSchema[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [lastEvent, setLastEvent] = useState<DataEvent | null>(null);
-  const [agentLeads, setAgentLeads] = useState<AgentLead[]>(initialAgentLeads as AgentLead[]);
-  const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>(initialRegisteredLeads as RegisteredLead[]);
-  const [transactionActivities, setTransactionActivities] = useState<TransactionActivity[]>(initialTransactionActivities as TransactionActivity[]);
-  const [tenantImprovements, setTenantImprovements] = useState<TenantImprovementsSheet[]>(initialTenantImprovements as TenantImprovementsSheet[]);
-  const [commercialTerms, setCommercialTerms] = useState<CommercialTermsSchema[]>(initialCommercialTerms as any[]);
+  const [agentLeads, setAgentLeads] = useState<AgentLead[]>([]);
+  const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>([]);
+  const [transactionActivities, setTransactionActivities] = useState<TransactionActivity[]>([]);
+  const [tenantImprovements, setTenantImprovements] = useState<TenantImprovementsSheet[]>([]);
+  const [commercialTerms, setCommercialTerms] = useState<CommercialTermsSchema[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
   const [isShortlistLoading, setIsShortlistLoading] = useState(true);
-  
+
    useEffect(() => {
-    // This effect runs only on the client, after hydration
-    // It prevents hydration mismatches by ensuring server and client render the same initial UI
-    try {
+    async function loadInitialData() {
+      setIsLoading(true);
+      try {
+        const [
+          listingsRes,
+          demandsRes,
+          submissionsRes,
+          agentLeadsRes,
+          analyticsRes,
+          registeredLeadsRes,
+          activitiesRes,
+          tenantImprovementsRes,
+          commercialTermsRes,
+        ] = await Promise.all([
+          fetch('/api/listings'),
+          fetch('/api/demands'),
+          fetch('/api/submissions'),
+          fetch('/api/agent-leads'),
+          fetch('/api/listing-analytics'),
+          fetch('/api/registered-leads'),
+          fetch('/api/transaction-activities'),
+          fetch('/api/tenant-improvements'),
+          fetch('/api/commercial-terms'),
+        ]);
+
+        setListings(await listingsRes.json());
+        setDemands(await demandsRes.json());
+        setSubmissions(await submissionsRes.json());
+        setAgentLeads(await agentLeadsRes.json());
+        setListingAnalytics(await analyticsRes.json());
+        setRegisteredLeads(await registeredLeadsRes.json());
+        setTransactionActivities(await activitiesRes.json());
+        setTenantImprovements(await tenantImprovementsRes.json());
+        setCommercialTerms(await commercialTermsRes.json());
+
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
             setGeneralShortlist(JSON.parse(storedShortlist));
         }
-    } catch (e) {
-        console.error("Could not parse general shortlist from localStorage", e);
-    } finally {
+
+      } catch (error) {
+        console.error("Failed to load initial data", error);
+        toast({
+          variant: "destructive",
+          title: "Data Loading Error",
+          description: "Could not load application data from the server."
+        });
+      } finally {
         setIsShortlistLoading(false);
-        setIsLoading(false); // Mark initial loading as complete
+        setIsLoading(false);
+      }
     }
-  }, []);
+
+    loadInitialData();
+  }, [toast]);
   
   // Effect to clear shortlist on logout
   useEffect(() => {
@@ -685,3 +717,5 @@ export function useData() {
   }
   return context;
 }
+
+    
