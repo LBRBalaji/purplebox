@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus, Share, Linkedin, Twitter, Facebook, Mail, Star } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus, Share, Linkedin, Twitter, Facebook, Mail, Star, Info } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -281,7 +281,7 @@ export default function ListingDetailPage() {
             return;
         }
 
-        const { success, limitReached } = logDownload(user.email);
+        const { success, limitReached } = logDownload(user.email, [listing]);
         
         if (success) {
             const dataToExport = [{
@@ -476,6 +476,19 @@ export default function ListingDetailPage() {
                                     <p className="text-muted-foreground">{listing.description}</p>
                                 </CardContent>
                             </Card>
+
+                            {/* Additional Information */}
+                            {listing.additionalInformation && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2"><Info className="h-5 w-5"/> Additional Information</CardTitle>
+                                        <CardDescription>Notes provided by the developer.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-muted-foreground whitespace-pre-wrap">{listing.additionalInformation}</p>
+                                    </CardContent>
+                                </Card>
+                            )}
 
                              {/* Building and Site Specifications */}
                             <Card>
