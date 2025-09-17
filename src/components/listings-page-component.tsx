@@ -401,6 +401,7 @@ export function ListingsPage() {
  useEffect(() => {
     let results = approvedListings;
 
+    // Keyword search
     if (searchTerm) {
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
       
@@ -433,27 +434,31 @@ export function ListingsPage() {
       }
     }
 
+    // Location search (with circle logic)
     if (locationFilter) {
-        const lowerLocation = locationFilter.toLowerCase();
-        const circle = locationCircles.find(c => 
-            c.locations.some(loc => loc.toLowerCase().includes(lowerLocation))
-        );
+      const lowerLocation = locationFilter.toLowerCase();
+      const circle = locationCircles.find(c => 
+          c.locations.some(loc => loc.toLowerCase().includes(lowerLocation)) ||
+          c.name.toLowerCase().includes(lowerLocation)
+      );
 
-        if (circle) {
-            const circleLocations = circle.locations.map(loc => loc.toLowerCase());
-            results = results.filter(listing => 
-                (listing.locationCircle === circle.name) || 
-                circleLocations.some(loc => listing.location.toLowerCase().includes(loc))
-            );
-        } else {
-            results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
-        }
+      if (circle) {
+          const circleLocations = circle.locations.map(loc => loc.toLowerCase());
+          results = results.filter(listing => 
+              (listing.locationCircle && listing.locationCircle === circle.name) ||
+              circleLocations.some(loc => listing.location.toLowerCase().includes(loc))
+          );
+      } else {
+          results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
+      }
     }
     
+    // Availability filter
     if (availability !== 'all') {
         results = results.filter(l => l.availabilityDate === availability);
     }
     
+    // Size range filter
     results = results.filter(l => l.sizeSqFt >= sizeRange[0] && l.sizeSqFt <= sizeRange[1]);
 
     setFilteredListings(results);
