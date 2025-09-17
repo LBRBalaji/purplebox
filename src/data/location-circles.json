@@ -1,0 +1,15 @@
+
+[
+    {
+      "name": "Sriperumbudur Circle",
+      "locations": ["sriperumbudur", "oragadam", "walajabad", "sunguvarchatram"]
+    },
+    {
+      "name": "Chennai North Circle",
+      "locations": ["redhills", "periyapalayam", "thatchur", "ponneri"]
+    },
+    {
+      "name": "Bhiwandi Circle",
+      "locations": ["bhiwandi", "thane"]
+    }
+]

@@ -35,6 +35,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import locationCircles from '@/data/location-circles.json';
+
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -435,8 +437,13 @@ export function ListingsPage() {
 
     // Filter by location
     if (locationFilter) {
+      const lowerLocation = locationFilter.toLowerCase();
+      const circle = locationCircles.find(c => c.locations.includes(lowerLocation));
+      const searchLocations = circle ? circle.locations : [lowerLocation];
+
       results = results.filter(listing =>
-        listing.location.toLowerCase().includes(locationFilter.toLowerCase())
+        searchLocations.some(loc => listing.location.toLowerCase().includes(loc)) ||
+        listing.locationCircle === circle?.name
       );
     }
     

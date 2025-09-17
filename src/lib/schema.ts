@@ -26,6 +26,7 @@ export const listingSchema = z.object({
   actualSizeSqFt: asOptionalField(z.coerce.number()),
   name: z.string().optional(),
   location: z.string().min(1, "Location is required."),
+  locationCircle: z.string().optional(), // New field for location grouping
   latLng: z.string().optional(),
   sizeSqFt: z.coerce.number().positive("Size must be a positive number."),
   description: z.string().optional(),

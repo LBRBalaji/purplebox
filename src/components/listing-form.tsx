@@ -43,6 +43,7 @@ import { generateListingDescriptionAction } from "@/lib/actions";
 import { Sparkles } from "lucide-react";
 import { convertGoogleDriveLink } from "@/lib/utils";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
+import locationCircles from '@/data/location-circles.json';
 
 
 type ListingFormProps = {
@@ -63,6 +64,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
+  
+  const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
@@ -82,6 +85,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
       availabilityDate: 'Ready for Occupancy',
       constructionProgress: '',
       serviceModel: 'Standard',
+      locationCircle: '',
       area: {
         plinthArea: undefined,
         mezzanineArea1: undefined,
@@ -161,6 +165,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 availabilityDate: 'Ready for Occupancy',
                 constructionProgress: '',
                 serviceModel: 'Standard',
+                locationCircle: '',
                 area: {
                   plinthArea: undefined,
                   mezzanineArea1: undefined,
@@ -451,6 +456,31 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         </div>
                     </div>
                 </div>
+
+                {/* Admin Only: Location Circle */}
+                {isAdmin && (
+                    <div className="space-y-4">
+                        <FormLabel className="text-lg font-semibold">Admin Settings</FormLabel>
+                        <div className="p-4 border rounded-md">
+                            <FormField control={form.control} name="locationCircle" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Location Circle</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Assign to a location circle..." /></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="">None</SelectItem>
+                                            {locationCircles.map(circle => (
+                                                <SelectItem key={circle.name} value={circle.name}>{circle.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormDescription>Group this listing with others in the same industrial cluster for better search results.</FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                        </div>
+                    </div>
+                )}
 
                  {/* Approvals */}
               <div className="space-y-4">
