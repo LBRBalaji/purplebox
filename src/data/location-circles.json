@@ -5,7 +5,15 @@
       "sriperumbudur",
       "oragadam",
       "walajabad",
-      "sunguvarchatram"
+      "sunguvarchatram",
+      "pondhur",
+      "vallam",
+      "vadagal",
+      "vallam-vadakal",
+      "vadakal",
+      "araneri",
+      "mambakkam",
+      "kattavakkam"
     ]
   },
   {
@@ -31,6 +39,38 @@
       "thatchoor",
       "kannigaiper",
       "kavarapettai"
+    ]
+  },
+  {
+    "name": "Thiruvallur",
+    "locations": [
+      "thiruvallur",
+      "tiruvallur",
+      "mannur",
+      "mappedu",
+      "ulundhai",
+      "mevaloorkuppam",
+      "polivakkam",
+      "aranvoyal",
+      "paparampakkam",
+      "sengadu",
+      "keelacheri",
+      "irungattukottai",
+      "katrambakkam"
+    ]
+  },
+  {
+    "name": "Poonamallee",
+    "locations": [
+      "poonamallee",
+      "thirumazhisai",
+      "kuthambakkam",
+      "chembarambakkam",
+      "irungattukottai",
+      "vanagaram",
+      "maduravoyal",
+      "koyambedu",
+      "thiruverkadu"
     ]
   }
 ]

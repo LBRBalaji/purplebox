@@ -43,7 +43,6 @@ import { generateListingDescriptionAction } from "@/lib/actions";
 import { Sparkles } from "lucide-react";
 import { convertGoogleDriveLink } from "@/lib/utils";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
-import locationCircles from '@/data/location-circles.json';
 import { Badge } from "./ui/badge";
 
 
@@ -66,8 +65,25 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
+  const [locationCircles, setLocationCircles] = React.useState<{name: string, locations: string[]}[]>([]);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+
+  React.useEffect(() => {
+    async function fetchCircles() {
+        try {
+            const response = await fetch('/api/location-circles');
+            if (!response.ok) throw new Error("Failed to fetch location circles");
+            const data = await response.json();
+            setLocationCircles(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    if (isOpen && isAdmin) {
+        fetchCircles();
+    }
+  }, [isOpen, isAdmin]);
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
@@ -128,7 +144,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     if (!watchedCircle) return [];
     const circle = locationCircles.find(c => c.name === watchedCircle);
     return circle?.locations || [];
-  }, [watchedCircle]);
+  }, [watchedCircle, locationCircles]);
 
 
   // Watch for changes in area fields to auto-calculate total
