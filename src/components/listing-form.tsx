@@ -57,6 +57,7 @@ type ListingFormProps = {
 const buildingTypes = [
     { id: 'PEB', label: 'PEB' },
     { id: 'RCC', label: 'RCC' },
+    { id: 'Standard Shed', label: 'Standard Shed' },
 ];
 
 export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: ListingFormProps) {
@@ -487,11 +488,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                     {selectedCircleLocations.length > 0 && (
-                                        <div className="text-sm text-muted-foreground pt-2">
-                                            Locations in this circle: {selectedCircleLocations.map(loc => <Badge key={loc} variant="outline" className="mr-1">{loc}</Badge>)}
-                                        </div>
-                                     )}
+                                    <FormDescription className="pt-2">
+                                        Locations in this circle:
+                                        {selectedCircleLocations.length > 0 ? selectedCircleLocations.map(loc => <Badge key={loc} variant="outline" className="mr-1">{loc}</Badge>) : <span className="ml-2 text-xs">None</span>}
+                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
