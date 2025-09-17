@@ -1,15 +1,16 @@
 [
   {
-    "listingId": "LST-9M05SY",
+    "listingId": "LST-91LUXK",
     "developerId": "namasivayam.lion@gmail.com",
     "status": "approved",
-    "warehouseBoxId": "Blue Warehouse",
+    "warehouseBoxId": "Green Warehouse",
     "actualSizeSqFt": 31000,
     "name": "",
     "location": "Thatchur",
+    "locationCircle": "Karanodai Circle",
     "sizeSqFt": 31000,
-    "description": "Ready for occupancy, this Thatchur warehouse offers 31,000 sq ft of space at ₹20/sq ft (standard service model).  Features include a 7-meter eave height (24 ft sidewall, 31 ft center height), 6 docks (1 ramped, accommodating 40ft containers), 3 acres of truck parking, two 100,000-liter sumps, 4 restrooms, a security office, fire safety systems, and ample manpower options.  Galvalume roof.  Fully compounded. Listed by O2O Platform.",
-    "additionalInformation": "warehouse has a sidewall height of 24 ft and centre height of 31 ft facing North. warehouse is at a floor level of 4.5 ft above the ground level.  warehouse has 6 docks with the facility of loading and unloading even 40 ft container out of which one dock has ramp facility. There is open space nearly 3 acres to accommodate trucks for all warehouses at a time. There are TWO underground closed sumps of 1,00,000 liters capacity.\nwarehouse has 4 separate toilets and bathrooms. warehouses have separate office cum security room. ⁠Entire facility is fully compounded.\n⁠Manpower arrangements can be done to any level to suit your requirements.\n⁠⁠Fire License with hydrants all around and hose reels inside are available.\n\nAny other feasible facility, if needed, may be provided.\n\n\n\n\n\n\n",
+    "description": "Warehousing presents a ready-to-occupy, 31,000 sq. ft. standard shed in Thatchur, featuring a 7-meter eave height and a Galvalume roof.  The property is available immediately at a competitive rent of ₹20 per sq. ft. with a standard service model.  Inquire today for further details.",
+    "additionalInformation": "warehouse has a sidewall height of 24 ft and centre height of 31 ft facing North. warehouse is at a floor level of 4.5 ft above the ground level.  warehouse has 6 docks with the facility of loading and unloading even 40 ft container out of which one dock has ramp facility. There is open space nearly 3 acres to accommodate trucks for all warehouses at a time. There are TWO underground closed sumps of 1,00,000 liters capacity.\nwarehouse has 4 separate toilets and bathrooms. warehouses have separate office cum security room. ⁠Entire facility is fully compounded.\n⁠Manpower arrangements can be done to any level to suit your requirements.\n⁠⁠Fire License with hydrants all around and hose reels inside are available.\n\nAny other feasible facility, if needed, may be provided.",
     "rentPerSqFt": 20,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
@@ -17,13 +18,13 @@
     "serviceModel": "Standard",
     "area": {
       "plinthArea": 30000,
-      "mezzanineArea1": 0,
-      "mezzanineArea2": 0,
-      "canopyArea": 0,
-      "totalChargeableArea": 30000
+      "canopyArea": 1000,
+      "totalChargeableArea": 31000
     },
     "buildingSpecifications": {
-      "buildingType": [],
+      "buildingType": [
+        "Standard Shed"
+      ],
       "numberOfDocksAndShutters": 6,
       "craneSupportStructureAvailable": false,
       "craneAvailable": false,
@@ -48,7 +49,298 @@
       "pcbForWater": false,
       "propertyTax": true
     },
-    "documents": []
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=14bxSQOkpmrep8bS7UicJ7_X1WcLUcbW4"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1ZxrHM_3cKjJ06Vt74JMq0ACjhd0kylbd"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=14oEQvoix6vQgLAlIeVOltcMTcZuGdA_5"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1VeGNC_3arcIFba2SPQOf7FC202eGcTsH"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1e9EY_oiqWepqA6fhXKcVzPJRQrsrPJG-"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1g6XPTmiYHtKP7FRGPYuevGckVIpJSusr"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1392ZnH8M1FuXUtS2MtZda7nvpuiv-Boc"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1V_11Wjho5ovmZJQ8YhUElzQeZFx3Mji7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1idMVHtiI1j3PHj8c7NC-Z4yTjyFwpk19"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1azerYrVP1bTOtkRm_wP5sRlM549QhFfB"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1YHASAO0xQXNNdnxl1mBXRIKzXwQAQw66"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1g5mfFXVTyAsd6BaIwKBdZtuqA4VudCue"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "listingId": "LST-Y06HUI",
+    "developerId": "namasivayam.lion@gmail.com",
+    "status": "approved",
+    "warehouseBoxId": "Red Warehouse",
+    "actualSizeSqFt": 31000,
+    "name": "",
+    "location": "Thatchur",
+    "locationCircle": "Karanodai Circle",
+    "sizeSqFt": 31000,
+    "description": "31,000 sq ft industrial warehouse in Thatchur, ready for immediate occupancy.  This standard shed features a 7-meter eave height and a galvalume roof, all at a competitive rent of ₹20 per sq ft.  Contact us today to secure this property.",
+    "additionalInformation": "warehouse has a sidewall height of 24 ft and centre height of 31 ft facing North. warehouse is at a floor level of 4.5 ft above the ground level.  warehouse has 6 docks with the facility of loading and unloading even 40 ft container out of which one dock has ramp facility. There is open space nearly 3 acres to accommodate trucks for all warehouses at a time. There are TWO underground closed sumps of 1,00,000 liters capacity.\nwarehouse has 4 separate toilets and bathrooms. warehouses have separate office cum security room. ⁠Entire facility is fully compounded.\n⁠Manpower arrangements can be done to any level to suit your requirements.\n⁠⁠Fire License with hydrants all around and hose reels inside are available.\n\nAny other feasible facility, if needed, may be provided.",
+    "rentPerSqFt": 20,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "area": {
+      "plinthArea": 30000,
+      "canopyArea": 1000,
+      "totalChargeableArea": 31000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "Standard Shed"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 7,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo",
+      "louvers": false
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "PCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": false,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1g6XPTmiYHtKP7FRGPYuevGckVIpJSusr"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1e9EY_oiqWepqA6fhXKcVzPJRQrsrPJG-"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1VeGNC_3arcIFba2SPQOf7FC202eGcTsH"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=14oEQvoix6vQgLAlIeVOltcMTcZuGdA_5"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1ZxrHM_3cKjJ06Vt74JMq0ACjhd0kylbd"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=14bxSQOkpmrep8bS7UicJ7_X1WcLUcbW4"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1g5mfFXVTyAsd6BaIwKBdZtuqA4VudCue"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1YHASAO0xQXNNdnxl1mBXRIKzXwQAQw66"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1azerYrVP1bTOtkRm_wP5sRlM549QhFfB"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1idMVHtiI1j3PHj8c7NC-Z4yTjyFwpk19"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1V_11Wjho5ovmZJQ8YhUElzQeZFx3Mji7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1392ZnH8M1FuXUtS2MtZda7nvpuiv-Boc"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "listingId": "LST-9M05SY",
+    "developerId": "namasivayam.lion@gmail.com",
+    "status": "approved",
+    "warehouseBoxId": "Blue Warehouse",
+    "actualSizeSqFt": 31000,
+    "name": "",
+    "location": "Thatchur",
+    "locationCircle": "Karanodai Circle",
+    "sizeSqFt": 31000,
+    "description": "Ready for occupancy, this Thatchur warehouse offers 31,000 sq ft of space at ₹20/sq ft (standard service model).  Features include a 7-meter eave height (24 ft sidewall, 31 ft center height), 6 docks (1 ramped, accommodating 40ft containers), 3 acres of truck parking, two 100,000-liter sumps, 4 restrooms, a security office, fire safety systems, and ample manpower options.  Galvalume roof.  Fully compounded. Listed by O2O Platform.",
+    "additionalInformation": "warehouse has a sidewall height of 24 ft and centre height of 31 ft facing North. warehouse is at a floor level of 4.5 ft above the ground level.  warehouse has 6 docks with the facility of loading and unloading even 40 ft container out of which one dock has ramp facility. There is open space nearly 3 acres to accommodate trucks for all warehouses at a time. There are TWO underground closed sumps of 1,00,000 liters capacity.\nwarehouse has 4 separate toilets and bathrooms. warehouses have separate office cum security room. ⁠Entire facility is fully compounded.\n⁠Manpower arrangements can be done to any level to suit your requirements.\n⁠⁠Fire License with hydrants all around and hose reels inside are available.\n\nAny other feasible facility, if needed, may be provided.\n\n\n\n\n\n\n",
+    "rentPerSqFt": 20,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "area": {
+      "plinthArea": 30000,
+      "mezzanineArea1": 0,
+      "mezzanineArea2": 0,
+      "canopyArea": 0,
+      "totalChargeableArea": 30000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "Standard Shed"
+      ],
+      "numberOfDocksAndShutters": 6,
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 7,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo",
+      "louvers": false
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "PCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": false,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Warehouse Complex",
+        "url": "https://drive.google.com/uc?export=view&id=1g5mfFXVTyAsd6BaIwKBdZtuqA4VudCue"
+      },
+      {
+        "type": "image",
+        "name": "Inside View 1",
+        "url": "https://drive.google.com/uc?export=view&id=1YHASAO0xQXNNdnxl1mBXRIKzXwQAQw66"
+      },
+      {
+        "type": "image",
+        "name": "Outside View 7",
+        "url": "https://drive.google.com/uc?export=view&id=1azerYrVP1bTOtkRm_wP5sRlM549QhFfB"
+      },
+      {
+        "type": "image",
+        "name": "Inside View 3",
+        "url": "https://drive.google.com/uc?export=view&id=1idMVHtiI1j3PHj8c7NC-Z4yTjyFwpk19"
+      },
+      {
+        "type": "image",
+        "name": "Outside View 1",
+        "url": "https://drive.google.com/uc?export=view&id=1V_11Wjho5ovmZJQ8YhUElzQeZFx3Mji7"
+      },
+      {
+        "type": "image",
+        "name": "Inside View 4",
+        "url": "https://drive.google.com/uc?export=view&id=1392ZnH8M1FuXUtS2MtZda7nvpuiv-Boc"
+      },
+      {
+        "type": "image",
+        "name": "Outside View 4",
+        "url": "https://drive.google.com/uc?export=view&id=1g6XPTmiYHtKP7FRGPYuevGckVIpJSusr"
+      },
+      {
+        "type": "image",
+        "name": "Inside View 2",
+        "url": "https://drive.google.com/uc?export=view&id=1e9EY_oiqWepqA6fhXKcVzPJRQrsrPJG-"
+      },
+      {
+        "type": "image",
+        "name": "Outside View 6",
+        "url": "https://drive.google.com/uc?export=view&id=1VeGNC_3arcIFba2SPQOf7FC202eGcTsH"
+      },
+      {
+        "type": "image",
+        "name": "Outside View 2",
+        "url": "https://drive.google.com/uc?export=view&id=14oEQvoix6vQgLAlIeVOltcMTcZuGdA_5"
+      },
+      {
+        "type": "image",
+        "name": "Inside View 6",
+        "url": "https://drive.google.com/uc?export=view&id=1ZxrHM_3cKjJ06Vt74JMq0ACjhd0kylbd"
+      },
+      {
+        "type": "image",
+        "name": "Inside View 5",
+        "url": "https://drive.google.com/uc?export=view&id=14bxSQOkpmrep8bS7UicJ7_X1WcLUcbW4"
+      }
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-OF1T5P",

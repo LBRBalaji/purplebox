@@ -12,7 +12,7 @@ import {
 import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -57,6 +57,15 @@ function AdminListingCard({ listing, analytics, providerName, onEdit }: { listin
   const status = statusConfig[listing.status] || { text: 'Unknown', className: 'bg-gray-100 text-gray-800' };
 
   const handleStatusChange = (newStatus: ListingStatus) => {
+    if (newStatus === 'approved' && !listing.locationCircle) {
+      toast({
+        variant: 'destructive',
+        title: 'Action Required',
+        description: 'Please assign a Location Circle before approving this listing.',
+      });
+      onEdit(listing); // Open the edit form
+      return;
+    }
     updateListingStatus(listing.listingId, newStatus);
     toast({
       title: 'Listing Status Updated',

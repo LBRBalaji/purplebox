@@ -36,7 +36,7 @@ import { Textarea } from "./ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
-import { AlertCircle, Trash2, Wand2 } from "lucide-react";
+import { AlertTriangle, Trash2, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { generateListingDescriptionAction } from "@/lib/actions";
@@ -468,37 +468,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                     </div>
                 </div>
 
-                {/* Admin Only: Location Circle */}
-                {isAdmin && (
-                    <div className="space-y-4">
-                        <FormLabel className="text-lg font-semibold">Admin Settings</FormLabel>
-                        <div className="p-4 border rounded-md">
-                            <FormField control={form.control} name="locationCircle" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Location Circle</FormLabel>
-                                    <Select 
-                                      onValueChange={(value) => field.onChange(value === 'none' ? '' : value)} 
-                                      value={field.value || 'none'}
-                                    >
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Assign to a location circle..." /></SelectTrigger></FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="none">None</SelectItem>
-                                            {locationCircles.map(circle => (
-                                                <SelectItem key={circle.name} value={circle.name}>{circle.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormDescription className="pt-2">Locations in this circle:</FormDescription>
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                        {selectedCircleLocations.length > 0 ? selectedCircleLocations.map(loc => <Badge key={loc} variant="outline" className="mr-1">{loc}</Badge>) : <span className="ml-2 text-xs text-muted-foreground">None</span>}
-                                    </div>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                        </div>
-                    </div>
-                )}
-
                  {/* Approvals */}
               <div className="space-y-4">
                 <FormLabel className="text-lg font-semibold">Certificates & Approvals</FormLabel>
@@ -519,7 +488,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                  <FormLabel className="text-lg font-semibold">Documents & Media</FormLabel>
                  <div className="space-y-4 p-4 border rounded-md">
                     <Alert variant="destructive">
-                        <AlertCircle className="h-4 w-4" />
+                        <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>Important: Do Not Expose Identity</AlertTitle>
                         <AlertDescription>
                             Please do not upload front views, elevations, or any pictures that could reveal the property's or developer's identity. Use only inside views of the building. Any identifying images will be removed by the admin.
@@ -624,8 +593,48 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                  </div>
               </div>
               <Separator/>
+
+              {/* Admin Only: Location Circle */}
+              {isAdmin && (
+                  <Alert variant="default" className="bg-amber-50 border-amber-200">
+                    <AlertTriangle className="h-4 w-4 text-amber-700" />
+                    <AlertTitle className="text-amber-800 font-semibold">Admin Action Required: Assign Location Circle</AlertTitle>
+                    <AlertDescription className="text-amber-700">
+                        This is a mandatory step for approving the listing.
+                    </AlertDescription>
+                    <div className="mt-4">
+                        <FormField control={form.control} name="locationCircle" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Location Circle</FormLabel>
+                                <Select 
+                                  onValueChange={(value) => field.onChange(value === 'none' ? '' : value)} 
+                                  value={field.value || 'none'}
+                                >
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Assign to a location circle..." /></SelectTrigger></FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="none">None</SelectItem>
+                                        {locationCircles.map(circle => (
+                                            <SelectItem key={circle.name} value={circle.name}>{circle.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {selectedCircleLocations.length > 0 && (
+                                  <div className="pt-2">
+                                      <FormDescription>Locations in this circle:</FormDescription>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                          {selectedCircleLocations.map(loc => <Badge key={loc} variant="outline">{loc}</Badge>)}
+                                      </div>
+                                  </div>
+                                )}
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                    </div>
+                  </Alert>
+              )}
+
               <FormField control={form.control} name="status" render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-amber-50 border-amber-200">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">Submission Status</FormLabel>
                     <FormDescription>
