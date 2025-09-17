@@ -152,7 +152,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             form.reset({
                 status: 'pending',
                 developerId: user?.email || '',
-                listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                listingId: '', // Will be set below
                 warehouseBoxId: '',
                 actualSizeSqFt: undefined,
                 additionalInformation: '',
@@ -194,6 +194,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 },
                 documents: [],
             });
+             form.setValue("listingId", `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
         }
     }
   }, [isOpen, isEditMode, listing, form, user]);
@@ -214,7 +215,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             eveHeightMeters: data.buildingSpecifications.eveHeightMeters,
             developerName: user?.companyName,
             tone: tone,
-            additionalInformation: data.additionalInformation,
         };
 
         const result = await generateListingDescriptionAction(input);
@@ -465,10 +465,13 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             <FormField control={form.control} name="locationCircle" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Location Circle</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
+                                    <Select 
+                                      onValueChange={(value) => field.onChange(value === 'none' ? '' : value)} 
+                                      value={field.value || 'none'}
+                                    >
                                         <FormControl><SelectTrigger><SelectValue placeholder="Assign to a location circle..." /></SelectTrigger></FormControl>
                                         <SelectContent>
-                                            <SelectItem value="">None</SelectItem>
+                                            <SelectItem value="none">None</SelectItem>
                                             {locationCircles.map(circle => (
                                                 <SelectItem key={circle.name} value={circle.name}>{circle.name}</SelectItem>
                                             ))}
@@ -558,21 +561,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                  <div className="p-4 border rounded-md space-y-4">
                     <FormField
                       control={form.control}
-                      name="additionalInformation"
+                      name="description"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Additional Information (Optional)</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Provide any extra details or key selling points for the AI to use. e.g., 'Proximity to major highway', 'Power backup details', 'Office space quality', etc."
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField control={form.control} name="description" render={({ field }) => (
                         <FormItem>
                             <FormLabel>AI-Generated Description</FormLabel>
                             <FormControl>
