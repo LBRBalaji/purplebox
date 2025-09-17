@@ -72,6 +72,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
       listingId: '',
       warehouseBoxId: '',
       actualSizeSqFt: undefined,
+      additionalInformation: '',
       name: '',
       location: '',
       sizeSqFt: undefined,
@@ -150,6 +151,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                 warehouseBoxId: '',
                 actualSizeSqFt: undefined,
+                additionalInformation: '',
                 name: '',
                 location: '',
                 sizeSqFt: undefined,
@@ -207,6 +209,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             eveHeightMeters: data.buildingSpecifications.eveHeightMeters,
             developerName: user?.companyName,
             tone: tone,
+            additionalInformation: data.additionalInformation,
         };
 
         const result = await generateListingDescriptionAction(input);
@@ -522,9 +525,26 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                {/* Description */}
               <div className="space-y-4">
                  <FormLabel className="text-lg font-semibold">Description</FormLabel>
-                 <div className="p-4 border rounded-md space-y-2">
+                 <div className="p-4 border rounded-md space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="additionalInformation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Additional Information (Optional)</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Provide any extra details or key selling points for the AI to use. e.g., 'Proximity to major highway', 'Power backup details', 'Office space quality', etc."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <FormField control={form.control} name="description" render={({ field }) => (
                         <FormItem>
+                            <FormLabel>AI-Generated Description</FormLabel>
                             <FormControl>
                                 <Textarea {...field} value={field.value ?? ''} placeholder="Describe the key features of your property, or generate one with AI." className="min-h-32"/>
                             </FormControl>

@@ -1,5 +1,55 @@
 [
   {
+    "listingId": "LST-9M05SY",
+    "developerId": "namasivayam.lion@gmail.com",
+    "status": "pending",
+    "warehouseBoxId": "Blue",
+    "actualSizeSqFt": 31000,
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 31000,
+    "description": "Ready for occupancy, this 31,000 sq. ft. warehouse in Thatchur, listed by Uma Warehousing, offers a 7-meter eave height and a Galvalume roof.  At ₹20 per sq. ft., this standard-service facility provides ample space for immediate operational needs.  Inquire today.",
+    "rentPerSqFt": 20,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "area": {
+      "plinthArea": 30000,
+      "mezzanineArea1": 0,
+      "mezzanineArea2": 0,
+      "canopyArea": 0,
+      "totalChargeableArea": 30000
+    },
+    "buildingSpecifications": {
+      "buildingType": [],
+      "numberOfDocksAndShutters": 6,
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 7,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo",
+      "louvers": false
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "PCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": false,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": []
+  },
+  {
     "listingId": "LST-OF1T5P",
     "developerId": "admin@ccidevelopers.com",
     "status": "approved",

@@ -102,5 +102,15 @@
     "isCompanyAdmin": true,
     "plan": "Paid_Premium",
     "createdAt": "2025-09-10T13:20:42.705Z"
+  },
+  "namasivayam.lion@gmail.com": {
+    "email": "namasivayam.lion@gmail.com",
+    "companyName": "Uma Warehousing",
+    "userName": "Namasivayam",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": false,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-17T05:58:30.367Z"
   }
 }

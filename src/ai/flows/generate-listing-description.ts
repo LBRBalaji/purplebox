@@ -52,6 +52,7 @@ const prompt = ai.definePrompt({
   {{#if buildingType}}- Building Type: {{{buildingType}}}{{/if}}
   {{#if roofType}}- Roof Type: {{{roofType}}}{{/if}}
   {{#if eveHeightMeters}}- Eve Height: {{{eveHeightMeters}}} meters{{/if}}
+  {{#if additionalInformation}}- Additional Information: {{{additionalInformation}}}{{/if}}
 
   Focus on creating a clear, attractive summary that a potential tenant can quickly understand.
   `,
