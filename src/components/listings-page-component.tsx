@@ -434,20 +434,20 @@ export function ListingsPage() {
     }
 
     if (locationFilter) {
-      const lowerLocation = locationFilter.toLowerCase();
-      const circle = locationCircles.find(c => c.locations.includes(lowerLocation));
-      
-      results = results.filter(listing => {
+        const lowerLocation = locationFilter.toLowerCase();
+        const circle = locationCircles.find(c => 
+            c.locations.some(loc => loc.toLowerCase().includes(lowerLocation))
+        );
+
         if (circle) {
-          // If a circle is found, check if the listing is in that circle
-          // or if its location is one of the circle's locations.
-          return listing.locationCircle === circle.name ||
-                 circle.locations.some(loc => listing.location.toLowerCase().includes(loc));
+            const circleLocations = circle.locations.map(loc => loc.toLowerCase());
+            results = results.filter(listing => 
+                (listing.locationCircle === circle.name) || 
+                circleLocations.some(loc => listing.location.toLowerCase().includes(loc))
+            );
         } else {
-          // If no circle, just do a direct location search.
-          return listing.location.toLowerCase().includes(lowerLocation);
+            results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
         }
-      });
     }
     
     if (availability !== 'all') {
