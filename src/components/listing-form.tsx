@@ -555,6 +555,27 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                     </Button>
                  </div>
               </div>
+               {/* Additional Information */}
+              <div className="space-y-4">
+                <FormLabel className="text-lg font-semibold">Additional Information</FormLabel>
+                <div className="p-4 border rounded-md">
+                  <FormField
+                    control={form.control}
+                    name="additionalInformation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Developer Notes</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} value={field.value ?? ''} placeholder="Provide any extra details, special features, or notes about the property here." className="min-h-24"/>
+                        </FormControl>
+                        <FormDescription>This information will be displayed separately on the listing page.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
                {/* Description */}
               <div className="space-y-4">
                  <FormLabel className="text-lg font-semibold">Description</FormLabel>
