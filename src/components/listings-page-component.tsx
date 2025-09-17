@@ -404,7 +404,6 @@ export function ListingsPage() {
     if (searchTerm) {
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
       
-      // Check for eve height search e.g. "11m"
       const heightMatch = lowerCaseSearchTerm.match(/(\d+)\s*m/);
 
       if (heightMatch && heightMatch[1]) {
@@ -415,7 +414,6 @@ export function ListingsPage() {
           );
         }
       } else {
-        // General text search
         results = results.filter(listing => {
             const searchHaystack = [
                 listing.name,
@@ -435,24 +433,27 @@ export function ListingsPage() {
       }
     }
 
-    // Filter by location
     if (locationFilter) {
       const lowerLocation = locationFilter.toLowerCase();
       const circle = locationCircles.find(c => c.locations.includes(lowerLocation));
-      const searchLocations = circle ? circle.locations : [lowerLocation];
-
-      results = results.filter(listing =>
-        searchLocations.some(loc => listing.location.toLowerCase().includes(loc)) ||
-        listing.locationCircle === circle?.name
-      );
+      
+      results = results.filter(listing => {
+        if (circle) {
+          // If a circle is found, check if the listing is in that circle
+          // or if its location is one of the circle's locations.
+          return listing.locationCircle === circle.name ||
+                 circle.locations.some(loc => listing.location.toLowerCase().includes(loc));
+        } else {
+          // If no circle, just do a direct location search.
+          return listing.location.toLowerCase().includes(lowerLocation);
+        }
+      });
     }
     
-    // Filter by availability
     if (availability !== 'all') {
         results = results.filter(l => l.availabilityDate === availability);
     }
     
-    // Filter by size
     results = results.filter(l => l.sizeSqFt >= sizeRange[0] && l.sizeSqFt <= sizeRange[1]);
 
     setFilteredListings(results);
