@@ -1,15 +1,36 @@
-
 [
-    {
-      "name": "Sriperumbudur Circle",
-      "locations": ["sriperumbudur", "oragadam", "walajabad", "sunguvarchatram"]
-    },
-    {
-      "name": "Chennai North Circle",
-      "locations": ["redhills", "periyapalayam", "thatchur", "ponneri"]
-    },
-    {
-      "name": "Bhiwandi Circle",
-      "locations": ["bhiwandi", "thane"]
-    }
+  {
+    "name": "Sriperumbudur Circle",
+    "locations": [
+      "sriperumbudur",
+      "oragadam",
+      "walajabad",
+      "sunguvarchatram"
+    ]
+  },
+  {
+    "name": "Madhavaram Circle",
+    "locations": [
+      "madhavaram",
+      "redhills",
+      "puzhal",
+      "ambattur",
+      "tamaraipakkam",
+      "poochiathipedu",
+      "alamathi"
+    ]
+  },
+  {
+    "name": "Karanodai Circle",
+    "locations": [
+      "sholavaram",
+      " cholavaram",
+      "karanodai",
+      "periyapalayam",
+      "thatchur",
+      "thatchoor",
+      "kannigaiper",
+      "kavarapettai"
+    ]
+  }
 ]

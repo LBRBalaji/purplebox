@@ -102,7 +102,18 @@ export const listingSchema = z.object({
   developerWebsite: z.string().url().optional(),
   projectName: z.string().optional(),
   siteDetails: z.string().optional(),
+}).superRefine((data, ctx) => {
+    // This is a temporary field to pass admin status to the refinement
+    const isAdmin = (data as any).isAdmin; 
+    if (isAdmin && !data.locationCircle) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Location Circle is required for admin submissions.",
+            path: ["locationCircle"],
+        });
+    }
 });
+
 
 export type ListingSchema = z.infer<typeof listingSchema>;
 
@@ -471,5 +482,3 @@ export const acknowledgmentSchema = z.object({
   email: z.string().email(),
 });
 export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;
-
-

@@ -44,6 +44,7 @@ import { Sparkles } from "lucide-react";
 import { convertGoogleDriveLink } from "@/lib/utils";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import locationCircles from '@/data/location-circles.json';
+import { Badge } from "./ui/badge";
 
 
 type ListingFormProps = {
@@ -120,6 +121,14 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     control: form.control,
     name: "documents"
   });
+  
+  const watchedCircle = form.watch('locationCircle');
+  const selectedCircleLocations = React.useMemo(() => {
+    if (!watchedCircle) return [];
+    const circle = locationCircles.find(c => c.name === watchedCircle);
+    return circle?.locations || [];
+  }, [watchedCircle]);
+
 
   // Watch for changes in area fields to auto-calculate total
   const plinthArea = form.watch("area.plinthArea");
@@ -239,7 +248,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
 
   const handleSubmit = (data: ListingSchema) => {
-    onSubmit(data);
+    const finalData = { ...data, isAdmin };
+    onSubmit(finalData);
     toast({
         title: isEditMode ? "Listing Updated" : "Listing Submitted",
         description: `Your listing for "${data.listingId}" has been saved and is pending admin approval.`
@@ -477,7 +487,11 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <FormDescription>Group this listing with others in the same industrial cluster for better search results.</FormDescription>
+                                     {selectedCircleLocations.length > 0 && (
+                                        <FormDescription className="pt-2">
+                                            Locations in this circle: {selectedCircleLocations.map(loc => <Badge key={loc} variant="outline" className="mr-1">{loc}</Badge>)}
+                                        </FormDescription>
+                                     )}
                                     <FormMessage />
                                 </FormItem>
                             )} />
