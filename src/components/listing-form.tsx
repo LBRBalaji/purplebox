@@ -488,10 +488,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <FormDescription className="pt-2">
-                                        Locations in this circle:
-                                        {selectedCircleLocations.length > 0 ? selectedCircleLocations.map(loc => <Badge key={loc} variant="outline" className="mr-1">{loc}</Badge>) : <span className="ml-2 text-xs">None</span>}
-                                    </FormDescription>
+                                    <FormDescription className="pt-2">Locations in this circle:</FormDescription>
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                        {selectedCircleLocations.length > 0 ? selectedCircleLocations.map(loc => <Badge key={loc} variant="outline" className="mr-1">{loc}</Badge>) : <span className="ml-2 text-xs text-muted-foreground">None</span>}
+                                    </div>
                                     <FormMessage />
                                 </FormItem>
                             )} />
