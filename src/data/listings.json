@@ -407,6 +407,7 @@
     "actualSizeSqFt": 301097,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 300000,
     "description": "Ready for immediate occupancy, this expansive 301,097 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your logistics needs.  Boasting a high 11-meter eave height, a durable Galvalume roof, and listed at ₹26 per sq. ft. on the O2O platform, this property provides a cost-effective and efficient space.  With standard service model included, this ready-to-use facility ensures a seamless transition for your operations.",
     "rentPerSqFt": 26,
@@ -470,7 +471,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-XHJLWC",
@@ -480,6 +482,7 @@
     "actualSizeSqFt": 57530,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 58000,
     "description": "Ready for immediate occupancy, this expansive 244,447 sq. ft. industrial warehouse in Thiruvallur offers a strategic location and standard service model.  Listed on the O2O Platform, the property is available at a competitive rent of ₹26 per sq. ft., making it an ideal solution for businesses seeking ample space and efficient operations.",
     "rentPerSqFt": 26,
@@ -532,16 +535,18 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-J9L9NS",
     "developerId": "admin@ccidevelopers.com",
-    "status": "approved",
+    "status": "pending",
     "warehouseBoxId": "Box-17",
     "actualSizeSqFt": 116229,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 120000,
     "description": "Ready for immediate occupancy, this expansive 230,973 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your industrial needs.  Boasting a high 11-meter eave height and a durable Galvalume roof, this property provides ample space and robust construction. Listed on the O2O platform with a competitive rent of ₹26 per sq. ft. and a standard service model, this space presents a significant opportunity.  Contact us today to learn more.",
     "rentPerSqFt": 26,
@@ -605,7 +610,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-I4S3EK",
