@@ -488,9 +488,9 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                         </SelectContent>
                                     </Select>
                                      {selectedCircleLocations.length > 0 && (
-                                        <FormDescription className="pt-2">
+                                        <div className="text-sm text-muted-foreground pt-2">
                                             Locations in this circle: {selectedCircleLocations.map(loc => <Badge key={loc} variant="outline" className="mr-1">{loc}</Badge>)}
-                                        </FormDescription>
+                                        </div>
                                      )}
                                     <FormMessage />
                                 </FormItem>
