@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { PlusCircle, Save, Settings, Trash2 } from 'lucide-react';
-import locationCirclesData from '@/data/location-circles.json';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 
@@ -23,7 +22,7 @@ export default function PlatformSettingsPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-  const [circles, setCircles] = React.useState<LocationCircle[]>(locationCirclesData);
+  const [circles, setCircles] = React.useState<LocationCircle[]>([]);
   const [newCircleName, setNewCircleName] = React.useState('');
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -34,6 +33,27 @@ export default function PlatformSettingsPage() {
       router.push('/dashboard');
     }
   }, [user, isLoading, router, hasAccess]);
+
+  React.useEffect(() => {
+    async function fetchCircles() {
+      try {
+        const response = await fetch('/api/location-circles');
+        if (!response.ok) {
+          throw new Error('Failed to fetch location circles');
+        }
+        const data = await response.json();
+        setCircles(data);
+      } catch (error) {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Could not load location circles data.',
+        });
+      }
+    }
+    fetchCircles();
+  }, [toast]);
 
   const handleAddCircle = () => {
     if (newCircleName && !circles.some(c => c.name.toLowerCase() === newCircleName.toLowerCase())) {

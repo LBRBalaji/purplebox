@@ -34,8 +34,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import locationCircles from '@/data/location-circles.json';
+} from "@/components/ui/dropdown-menu";
 
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -353,6 +352,11 @@ const searchPlaceholders = [
     'e.g., search "Turbo ventilation"',
 ];
 
+type LocationCircle = {
+  name: string;
+  locations: string[];
+};
+
 export function ListingsPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -367,6 +371,21 @@ export function ListingsPage() {
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
+  const [locationCircles, setLocationCircles] = useState<LocationCircle[]>([]);
+
+  useEffect(() => {
+    async function fetchCircles() {
+      try {
+        const response = await fetch('/api/location-circles');
+        if (!response.ok) throw new Error('Failed to fetch');
+        const data = await response.json();
+        setLocationCircles(data);
+      } catch (error) {
+        console.error("Could not fetch location circles", error);
+      }
+    }
+    fetchCircles();
+  }, []);
   
   const approvedListings = useMemo(() => allListings.filter(l => l.status === 'approved'), [allListings]);
 
@@ -469,7 +488,7 @@ export function ListingsPage() {
     } catch (e) {
         console.error("Could not write to sessionStorage", e);
     }
-  }, [searchTerm, locationFilter, availability, sizeRange, approvedListings]);
+  }, [searchTerm, locationFilter, availability, sizeRange, approvedListings, locationCircles]);
 
 
   const resetFilters = () => {

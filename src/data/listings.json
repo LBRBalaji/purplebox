@@ -696,6 +696,7 @@
     "actualSizeSqFt": 209589,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 210000,
     "description": "Ready for immediate occupancy, this 57,530 sq ft PEB warehouse in Thiruvallur offers a compelling solution for your operational needs.  Boasting an 11-meter eave height and a robust Galvalume roof, this property provides ample space and durable construction.  Listed on the O2O platform, it's available at a competitive ₹26 per sq ft with a standard service model.  Contact us today to learn more about this exceptional industrial space.",
     "rentPerSqFt": 26,
@@ -759,7 +760,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-ZCKK92",
@@ -769,6 +771,7 @@
     "actualSizeSqFt": 159959,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 160000,
     "description": "Ready for immediate occupancy, this 116,229 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your industrial needs.  Boasting a 11-meter eave height and a durable Galvalume roof, this spacious facility is listed by O2O Platform at a competitive ₹26 per sq. ft.  With standard service model included, this property provides an efficient and cost-effective operational base.",
     "rentPerSqFt": 26,
@@ -832,7 +835,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-09CBLQ",
@@ -842,6 +846,7 @@
     "actualSizeSqFt": 235496,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 235000,
     "description": "Ready for immediate occupancy, this 80,707 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your operational needs.  Boasting an 11-meter eave height, a robust Galvalume roof, and listed on the O2O platform for a competitive rent of ₹26 per sq. ft. (standard service model), this property provides ample space and efficient design.  Contact us today to schedule a viewing.",
     "rentPerSqFt": 26,
@@ -905,7 +910,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-Z75P47",
@@ -915,6 +921,7 @@
     "actualSizeSqFt": 260410,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 260000,
     "description": "Ready for immediate occupancy, this expansive 209,589 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your industrial needs.  Boasting a 11-meter eave height, a durable Galvalume roof, and listed on the O2O platform, this property provides a standard service model at a competitive rent of ₹26 per sq. ft.  Contact us today to seize this exceptional opportunity.",
     "rentPerSqFt": 26,
@@ -977,7 +984,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-IQOMX9",
@@ -987,6 +995,7 @@
     "actualSizeSqFt": 258143,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 260000,
     "description": "Secure your business's future in this expansive, ready-to-occupy 159,959 sq ft 3PL-operated warehouse in Thiruvallur.  Boasting a robust PEB structure with a high 11-meter eave height and a durable Galvalume roof, this property offers unparalleled efficiency and storage capacity.  At just ₹26 per sq ft, this exceptional opportunity won't last—contact O2O Platform today to schedule a viewing.",
     "rentPerSqFt": 26,
@@ -1050,7 +1059,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-JSMKFT",
@@ -1060,6 +1070,7 @@
     "actualSizeSqFt": 124667,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 125000,
     "description": "Ready for immediate occupancy, this 235,496 sq ft PEB warehouse in Thiruvallur offers a 11-meter eave height, Galvalume roofing, and is listed on the O2O platform at ₹26/sq ft.  Standard service model.  Inquire now.",
     "rentPerSqFt": 26,
@@ -1122,7 +1133,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1Z_kNPty5vLvPdIsKziRbDP3N1Vz_tPC7"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-QWQFTO",
@@ -1132,6 +1144,7 @@
     "actualSizeSqFt": 162664,
     "name": "",
     "location": "Thiruvallur",
+    "locationCircle": "Thiruvallur",
     "sizeSqFt": 165000,
     "description": "Ready for immediate occupancy, this expansive 162,664 sq. ft. PEB warehouse in Thiruvallur offers a compelling solution for your business needs.  Boasting an 11-meter eave height and a durable Galvalume roof, this property provides ample space and robust protection.  At ₹24 per sq. ft., this well-located warehouse offers a competitive rental rate and a flexible service model to suit your operational requirements.",
     "rentPerSqFt": 24,
@@ -1194,7 +1207,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=115fW7UTrxu5vFwgrqhxhB4qlhowRV6Yo"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-RD962F",
@@ -1203,6 +1217,7 @@
     "warehouseBoxId": "WBX-APEX-E8YF",
     "name": "Box two",
     "location": "Chengalpet",
+    "locationCircle": "Chengalpet",
     "latLng": "12.6843, 79.9834",
     "sizeSqFt": 300000,
     "description": "Box two, a ready-to-occupy 300,000 sq. ft. PEB warehouse in Chengalpet, offers an exceptional opportunity.  Boasting an 11-meter eave height, a Galvalume roof, and a standard service model, this expansive space is available at a competitive ₹27 per sq. ft. Ideal for large-scale operations, this ensures efficient logistics and ample storage capacity.",
@@ -1259,7 +1274,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-ELTUE2",
@@ -1268,6 +1284,7 @@
     "warehouseBoxId": "WBX-PRIM-11EQ",
     "name": "LBR 2",
     "location": "Mappedu",
+    "locationCircle": "Thiruvallur",
     "latLng": "13.0900, 79.9400",
     "sizeSqFt": 150000,
     "description": "LBR 2, a 150,000 sq. ft. PEB warehouse under construction in Mappedu, offers an exceptional opportunity.  With a quoted rent of ₹38 per sq. ft. and a standard service model, this property features a 12-meter eave height and a durable Galvalume roof.  Ideal for businesses seeking a large-scale, modern facility.",
@@ -1323,7 +1340,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-ZNHZYG",
@@ -1332,6 +1350,7 @@
     "warehouseBoxId": "WBX-PRIM-SM9L",
     "name": "LBR 1",
     "location": "Mahindra World City, Chengalpet",
+    "locationCircle": "Chengalpet",
     "latLng": "12.7369, 80.0144",
     "sizeSqFt": 200000,
     "description": "LBR 1, a 200,000 sq ft PEB warehouse in Mahindra World City, Chengalpet, is ready for immediate occupancy.  Boasting an 11-meter eave height, a Galvalume roof, and a competitive rent of ₹45 per sq ft, this exceptional property offers significant operational advantages.  Listed by O2O Platform and featuring a standard service model, this space presents an unparalleled opportunity for businesses seeking prime industrial real estate.  Act quickly to secure this exceptional warehouse.",
@@ -1387,7 +1406,8 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1VoJL99spGGYofbnW6tPiuMSN8Iwp1CNu"
       }
-    ]
+    ],
+    "isAdmin": true
   },
   {
     "listingId": "LST-3PL001",
