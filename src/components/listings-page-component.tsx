@@ -372,7 +372,19 @@ export function ListingsPage() {
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
 
-  const approvedListings = useMemo(() => allListings.filter(l => l.status === 'approved'), [allListings]);
+  const approvedListings = useMemo(() => {
+    // Fisher-Yates shuffle algorithm
+    const shuffle = (array: ListingSchema[]) => {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    };
+    return shuffle(allListings.filter(l => l.status === 'approved'));
+  }, [allListings]);
 
   const inventoryCount = approvedListings.length;
   const totalInventorySize = useMemo(() =>
@@ -440,17 +452,17 @@ export function ListingsPage() {
 
     // Location search (with circle logic)
     if (locationFilter) {
-      const lowerLocation = locationFilter.toLowerCase();
-      const matchedCircle = locationCircles.find(circle =>
-        circle.name.toLowerCase().includes(lowerLocation) ||
-        circle.locations.some(loc => lowerLocation.includes(loc))
-      );
+        const lowerLocation = locationFilter.toLowerCase();
+        const matchedCircle = locationCircles.find(circle => 
+            circle.name.toLowerCase().includes(lowerLocation) || 
+            circle.locations.some(loc => lowerLocation.includes(loc))
+        );
 
-      if (matchedCircle) {
-        results = results.filter(listing => listing.locationCircle === matchedCircle.name);
-      } else {
-        results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
-      }
+        if (matchedCircle) {
+            results = results.filter(listing => listing.locationCircle === matchedCircle.name);
+        } else {
+            results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
+        }
     }
     
     // Availability filter
