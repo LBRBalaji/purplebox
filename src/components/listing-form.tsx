@@ -71,7 +71,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const [previewImageUrl, setPreviewImageUrl] = React.useState<string | null>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
 
   const form = useForm<ListingSchema>({
@@ -229,59 +228,58 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     fetchCircles();
   }, [isOpen, isAdmin]);
   
-  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  const handleBulkUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = "image/*,video/*,application/pdf";
+    
+    input.onchange = async (e) => {
+        const files = (e.target as HTMLInputElement).files;
+        if (!files || files.length === 0) return;
 
-    setIsUploading(true);
-    toast({ title: 'Uploading...', description: `Uploading ${files.length} file(s).` });
+        setIsUploading(true);
+        toast({ title: 'Uploading...', description: `Uploading ${files.length} file(s).` });
 
-    const uploadPromises = Array.from(files).map(async (file) => {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Upload failed');
+        const uploadPromises = Array.from(files).map(async (file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Upload failed');
+                }
+                const result = await response.json();
+                return {
+                    type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
+                    name: file.name,
+                    url: result.url,
+                };
+            } catch (error) {
+                console.error('Error uploading file:', file.name, error);
+                return null;
             }
-            const result = await response.json();
-            return {
-                type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
-                name: file.name,
-                url: result.url,
-            };
-        } catch (error) {
-            console.error('Error uploading file:', file.name, error);
-            return null; // Return null for failed uploads
+        });
+        
+        const results = await Promise.all(uploadPromises);
+        const successfulUploads = results.filter(r => r !== null);
+
+        if (successfulUploads.length > 0) {
+            append(successfulUploads as any);
+            toast({ title: 'Upload Complete', description: `${successfulUploads.length} file(s) added.` });
         }
-    });
-
-    const results = await Promise.all(uploadPromises);
-    const successfulUploads = results.filter(r => r !== null);
-
-    if (successfulUploads.length > 0) {
-        append(successfulUploads as any);
-        toast({ title: 'Upload Complete', description: `${successfulUploads.length} file(s) added.` });
-    }
-
-    if (successfulUploads.length < files.length) {
-        toast({ variant: 'destructive', title: 'Upload Failed', description: `${files.length - successfulUploads.length} file(s) could not be uploaded.` });
-    }
-
-    setIsUploading(false);
-    // Reset file input
-    if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-    }
+        if (successfulUploads.length < files.length) {
+            toast({ variant: 'destructive', title: 'Upload Failed', description: `${files.length - successfulUploads.length} file(s) could not be uploaded.` });
+        }
+        setIsUploading(false);
+    };
+    
+    input.click();
   };
-
 
   const handleGenerateDescription = async () => {
     setIsGenerating(true);
@@ -335,15 +333,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
   return (
     <>
-      {/* This input is now outside the form to prevent conflicts */}
-      <input
-        type="file"
-        multiple
-        ref={fileInputRef}
-        onChange={handleBulkUpload}
-        className="hidden"
-        accept="image/*,video/*,application/pdf"
-      />
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-4xl">
           <DialogHeader>
@@ -614,7 +603,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             </AlertDescription>
                         </Alert>
                         
-                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                        <Button type="button" variant="outline" onClick={handleBulkUpload} disabled={isUploading}>
                             <UploadCloud className="mr-2 h-4 w-4" />
                             {isUploading ? 'Uploading...' : 'Upload Media (Bulk)'}
                         </Button>
@@ -795,10 +784,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     
       <Dialog open={!!previewImageUrl} onOpenChange={() => setPreviewImageUrl(null)}>
         <DialogContent className="max-w-4xl h-[90vh] flex flex-col items-center justify-center p-2">
-            <DialogHeader>
-              <DialogTitle className="sr-only">Image Preview</DialogTitle>
-              <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
-            </DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="sr-only">Image Preview</DialogTitle>
+            <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
+          </DialogHeader>
           {previewImageUrl && (
                 <div className="relative w-full h-full">
                     <Image
@@ -814,3 +803,5 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     </>
   );
 }
+
+    
