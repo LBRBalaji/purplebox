@@ -33,9 +33,10 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert real estate copywriter specializing in industrial and warehouse properties.
   Your tone should be professional, concise, and highlight the key selling points.
   Based on the following details, write a compelling, one-paragraph description for the property.
+  **Important**: Do not mention the developer's name or any brand name. Focus only on the property's attributes.
   
   {{#if tone}}
-  **Important**: The user has requested the following tone: **{{{tone}}}**.
+  **Tone Instructions**: The user has requested the following tone: **{{{tone}}}**.
   - **Professional**: Formal, clear, and objective. Focus on specs and facts.
   - **Sales-Oriented**: Use persuasive language to highlight benefits and create a sense of urgency.
   - **Concise**: Be as brief as possible, mentioning only the most critical details.
@@ -46,7 +47,6 @@ const prompt = ai.definePrompt({
   - Location: {{{location}}}
   - Total Size: {{{sizeSqFt}}} sq. ft.
   - Availability: {{{availabilityDate}}}
-  {{#if developerName}}- Listed By: {{{developerName}}}{{/if}}
   {{#if rentPerSqFt}}- Quoted Rent: ₹{{{rentPerSqFt}}} per sq. ft.{{/if}}
   {{#if serviceModel}}- Service Model: {{{serviceModel}}}{{/if}}
   {{#if buildingType}}- Building Type: {{{buildingType}}}{{/if}}
@@ -68,3 +68,4 @@ const generateListingDescriptionFlow = ai.defineFlow(
     return output!;
   }
 );
+
