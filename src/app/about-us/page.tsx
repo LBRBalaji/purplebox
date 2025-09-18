@@ -11,6 +11,8 @@ import Link from 'next/link';
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
+import { useData } from '@/contexts/data-context';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ValuePill = ({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }) => (
     <div className="text-center p-6 bg-card rounded-xl border">
@@ -112,16 +114,23 @@ const FeatureCard = ({ icon: Icon, title, description, image, onImageChange, hin
 
 
 export default function AboutUsPage() {
-    const [images, setImages] = React.useState({
-        feature1: 'https://picsum.photos/seed/about1/600/400',
-        feature2: 'https://picsum.photos/seed/about2/600/400',
-        feature3: 'https://picsum.photos/seed/about3/600/400',
-        originStory: 'https://picsum.photos/seed/origin/600/400',
-    });
+    const { aboutUsContent, updateAboutUsContent, isLoading } = useData();
 
-    const handleImageChange = (key: keyof typeof images) => (newSrc: string) => {
-        setImages(prev => ({...prev, [key]: newSrc }));
+    const handleImageChange = (key: keyof typeof aboutUsContent) => (newSrc: string) => {
+        if (aboutUsContent) {
+            updateAboutUsContent({ ...aboutUsContent, [key]: newSrc });
+        }
     };
+
+    if (isLoading || !aboutUsContent) {
+        return (
+             <div className="container mx-auto p-4 md:p-8 space-y-12">
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-96 w-full" />
+                <Skeleton className="h-96 w-full" />
+            </div>
+        );
+    }
 
     return (
         <div className="flex-grow flex flex-col font-sans">
@@ -180,7 +189,7 @@ export default function AboutUsPage() {
                             icon={Download}
                             title="The Instant Advantage: Search, Select, Download."
                             description="This is where your journey begins. We provide what you need most upfront: a vast selection of properties with <strong class='text-foreground'>unconditional access to their Technical, Compliance, and Commercial data</strong>. Download a clean, structured CSV in seconds. This isn’t just data; it's the power to build a winning proposal faster than anyone else."
-                            image={images.feature1}
+                            image={aboutUsContent.feature1}
                             onImageChange={handleImageChange('feature1')}
                             hint="data analytics dashboard"
                         />
@@ -199,7 +208,7 @@ export default function AboutUsPage() {
                             </div>
                             <div>
                                  <FeatureImage 
-                                    src={images.feature2} 
+                                    src={aboutUsContent.feature2} 
                                     onImageChange={handleImageChange('feature2')}
                                     alt="Team Collaboration" 
                                     hint="team meeting collaboration"
@@ -211,7 +220,7 @@ export default function AboutUsPage() {
                             icon={ClipboardCheck}
                             title="Master the Full Transaction Lifecycle."
                             description="O2O is your advantage from start to finish. Our platform helps you manage every critical activity: schedule site visits, share improvement lists, use a detailed commercial terms sheet, generate meeting minutes, draft the MoU, and track execution right up to possession. <strong class='text-foreground'>We handle the process, so you can focus on your core business.</strong>"
-                            image={images.feature3}
+                            image={aboutUsContent.feature3}
                             onImageChange={handleImageChange('feature3')}
                             hint="checklist planning board"
                         />
@@ -225,7 +234,7 @@ export default function AboutUsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
                         <div className="md:order-2">
                              <FeatureImage
-                                src={images.originStory}
+                                src={aboutUsContent.originStory}
                                 onImageChange={handleImageChange('originStory')}
                                 alt="Origin Story"
                                 hint="team planning whiteboard"

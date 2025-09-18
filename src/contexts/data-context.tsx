@@ -102,6 +102,13 @@ export type TransactionActivity = {
     createdBy: string; // O2O/Admin user email
 }
 
+export type AboutUsContent = {
+    feature1: string;
+    feature2: string;
+    feature3: string;
+    originStory: string;
+};
+
 
 type DataContextType = {
   listings: ListingSchema[];
@@ -141,6 +148,8 @@ type DataContextType = {
   generalShortlist: string[]; // Array of listingIds
   toggleGeneralShortlist: (listingId: string) => void;
   isShortlistLoading: boolean;
+  aboutUsContent: AboutUsContent | null;
+  updateAboutUsContent: (newContent: AboutUsContent) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -177,6 +186,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
   const [isShortlistLoading, setIsShortlistLoading] = useState(true);
+  const [aboutUsContent, setAboutUsContent] = useState<AboutUsContent | null>(null);
 
    useEffect(() => {
     async function loadInitialData() {
@@ -192,6 +202,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           activitiesRes,
           tenantImprovementsRes,
           commercialTermsRes,
+          aboutUsContentRes,
         ] = await Promise.all([
           fetch('/api/listings'),
           fetch('/api/demands'),
@@ -202,6 +213,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/transaction-activities'),
           fetch('/api/tenant-improvements'),
           fetch('/api/commercial-terms'),
+          fetch('/api/about-us-content'),
         ]);
 
         setListings(await listingsRes.json());
@@ -213,6 +225,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setTransactionActivities(await activitiesRes.json());
         setTenantImprovements(await tenantImprovementsRes.json());
         setCommercialTerms(await commercialTermsRes.json());
+        setAboutUsContent(await aboutUsContentRes.json());
 
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
@@ -289,6 +302,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistTenantImprovements = useCallback((updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements'), []);
   const persistCommercialTerms = useCallback((updatedSheets: CommercialTermsSchema[]) => persistData('commercial-terms', updatedSheets, 'commercial terms'), []);
   const persistListingAnalytics = useCallback((updatedAnalytics: ListingAnalytics[]) => persistData('listing-analytics', updatedAnalytics, 'listing analytics'), []);
+  const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), []);
+
+  const updateAboutUsContent = (newContent: AboutUsContent) => {
+    setAboutUsContent(newContent);
+    persistAboutUsContent(newContent);
+  };
 
 
   const addListing = useCallback((listing: ListingSchema, userEmail?: string) => {
@@ -704,6 +723,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         generalShortlist,
         toggleGeneralShortlist,
         isShortlistLoading,
+        aboutUsContent,
+        updateAboutUsContent
         }}>
       {children}
     </DataContext.Provider>
