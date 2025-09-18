@@ -51,27 +51,28 @@ export function DownloadTermsDialog({ isOpen, onOpenChange, onAccept }: Download
             <div className="flex items-start gap-3 p-3 rounded-md bg-secondary/50">
                 <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <p className="text-secondary-foreground">
-                    The information provided is a gesture of goodwill to facilitate collaboration. You agree not to contact property owners directly and to conduct all leasing transactions exclusively through Lakshmi Balaji Realty (LBR).
+                    You agree that you will not contact property owners directly. All leasing transactions must be conducted exclusively through Lakshmi Balaji Realty (LBR).
                 </p>
             </div>
             
-            <div className="p-3 rounded-md border border-green-200 bg-green-50/50">
-                <h4 className="font-semibold text-green-800 mb-2">Our Commitment to You</h4>
-                <ul className="space-y-3 text-green-700">
-                    <li className="flex items-start gap-3">
+            <div className="p-4 rounded-md border border-green-200 bg-green-50/50 space-y-3">
+                <h4 className="font-semibold text-green-800">Our Zero Brokerage Commitment</h4>
+                <div className="space-y-3 text-green-700">
+                    <div className="flex items-start gap-3">
                         <Star className="h-4 w-4 shrink-0 mt-0.5" />
                         <span>
-                            <strong className="font-semibold">Zero Brokerage Charges for Startups:</strong> Government of India recognized startups enjoy a zero transaction fee on their first deal with us.
+                            <strong className="font-semibold">For Startups:</strong> As a token of our support for young entrepreneurs, we offer a zero transaction fee on the first transaction for startups recognized by the Government of India.
                         </span>
-                    </li>
-                    <li className="flex items-start gap-3">
+                    </div>
+                    <div className="flex items-start gap-3">
                         <Truck className="h-4 w-4 shrink-0 mt-0.5" />
                         <span>
-                           <strong className="font-semibold">Zero Brokerage Charges for Logistics Companies:</strong> As a token of our long-term association, logistics companies are offered a zero transaction fee on all deals.
+                           <strong className="font-semibold">For Logistics Companies:</strong> To foster long-term association and continued business, we offer a zero transaction fee for all deals with logistics companies.
                         </span>
-                    </li>
-                </ul>
-                <p className="text-xs text-green-600 mt-3">For all other customers, standard brokerage fees are applicable as per industry norms.</p>
+                    </div>
+                </div>
+                <Separator className="bg-green-200"/>
+                <p className="text-xs text-green-600">For all other customers, standard brokerage fees are applicable as per industry norms.</p>
             </div>
 
 

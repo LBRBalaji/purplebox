@@ -122,5 +122,15 @@
     "isCompanyAdmin": true,
     "plan": "Paid_Premium",
     "createdAt": "2025-09-18T06:38:36.292Z"
+  },
+  "murugan@xyzlogistics.com": {
+    "email": "murugan@xyzlogistics.com",
+    "companyName": "XYZ Logistics",
+    "userName": "Murugan",
+    "phone": "+91 9841098170",
+    "role": "User",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-18T15:11:26.212Z"
   }
 }
