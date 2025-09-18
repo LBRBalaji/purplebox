@@ -46,7 +46,6 @@ import { Badge } from "./ui/badge";
 import Image from "next/image";
 import { FileText } from "lucide-react";
 
-
 type ListingFormProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -103,6 +102,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const [previewImageUrl, setPreviewImageUrl] = React.useState<string | null>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
 
   const form = useForm<ListingSchema>({
@@ -260,21 +261,14 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     fetchCircles();
   }, [isOpen, isAdmin]);
   
-  const handleBulkUpload = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.multiple = true;
-    input.accept = ".jpg, .jpeg, .png, .gif, .mp4, .mov, .pdf";
-    
-    input.onchange = async (e) => {
-        const files = (e.target as HTMLInputElement).files;
-        if (!files) return;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
 
-        setIsUploading(true);
-        toast({ title: 'Uploading...', description: `Uploading ${files.length} file(s).` });
+    setIsUploading(true);
+    toast({ title: 'Uploading...', description: `Uploading ${files.length} file(s).` });
 
-        const results = await uploadFiles(files);
-        
+    uploadFiles(files).then(results => {
         if (results && results.length > 0) {
             append(results);
             toast({ title: 'Upload Complete', description: `${results.length} file(s) added.` });
@@ -285,9 +279,11 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
         }
         
         setIsUploading(false);
-    };
-    
-    input.click();
+        // Reset file input value to allow re-uploading the same file
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    });
   };
 
   const handleGenerateDescription = async () => {
@@ -350,6 +346,14 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               {isEditMode ? 'Update the details for this listing.' : 'Fill out the form to create a new warehouse listing for admin approval.'}
             </DialogDescription>
           </DialogHeader>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden"
+              multiple
+              accept=".jpg, .jpeg, .png, .gif, .mp4, .mov, .pdf"
+              onChange={handleFileChange}
+            />
             <Form {...form}>
             <form id="listing-form-main" onSubmit={form.handleSubmit(handleSubmit)}>
               <ScrollArea className="h-[70vh] p-1 pr-6">
@@ -612,7 +616,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             </AlertDescription>
                         </Alert>
                         
-                        <Button type="button" variant="outline" onClick={handleBulkUpload} disabled={isUploading}>
+                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
                             <UploadCloud className="mr-2 h-4 w-4" />
                             {isUploading ? 'Uploading...' : 'Upload Media (Bulk)'}
                         </Button>
@@ -782,12 +786,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                   )} />
                 </div>
               </ScrollArea>
-              <DialogFooter className="pt-4">
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
-              </DialogFooter>
             </form>
           </Form>
+          <DialogFooter className="pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="submit" form="listing-form-main">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     
