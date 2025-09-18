@@ -36,7 +36,7 @@ import { Textarea } from "./ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
-import { AlertTriangle, Trash2, Wand2, Upload, FileUp } from "lucide-react";
+import { AlertTriangle, Trash2, Wand2, PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { generateListingDescriptionAction } from "@/lib/actions";
@@ -63,10 +63,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const { toast } = useToast();
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
-  const [isUploading, setIsUploading] = React.useState(false);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
   const [locationCircles, setLocationCircles] = React.useState<{name: string, locations: string[]}[]>([]);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
 
@@ -224,38 +222,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     }
     fetchCircles();
   }, [isOpen, isAdmin]);
-
-  const handleBulkUpload = async (files: FileList) => {
-    if (!files || files.length === 0) return;
-
-    setIsUploading(true);
-    let successCount = 0;
-    const uploadPromises = Array.from(files).map(async (file) => {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await fetch('/api/upload', { method: 'POST', body: formData });
-            const result = await response.json();
-            if (result.success) {
-                append({ type: 'image', name: file.name, url: result.url });
-                successCount++;
-            } else {
-                throw new Error(result.error || `Failed to upload ${file.name}`);
-            }
-        } catch (error) {
-            console.error(`Upload failed for ${file.name}:`, error);
-        }
-    });
-
-    await Promise.all(uploadPromises);
-
-    setIsUploading(false);
-    toast({
-      title: "Bulk Upload Complete",
-      description: `${successCount} of ${files.length} files uploaded successfully.`,
-    });
-  };
 
   const handleGenerateDescription = async () => {
     setIsGenerating(true);
@@ -543,24 +509,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             We thank you in advance for your understanding and cooperation in respecting this platform policy.
                         </AlertDescription>
                     </Alert>
-
-                     <Input 
-                        type="file" 
-                        multiple 
-                        className="hidden" 
-                        ref={fileInputRef}
-                        onChange={(e) => {
-                            if (e.target.files) {
-                                handleBulkUpload(e.target.files);
-                            }
-                        }}
-                    />
-                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                        {isUploading ? <><Sparkles className="mr-2 h-4 w-4 animate-spin" /> Uploading...</> : <><FileUp className="mr-2 h-4 w-4" /> Upload Media</>}
-                    </Button>
-                    
                     {fields.map((field, index) => (
-                        <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-4 items-end">
+                        <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                             <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
                                 <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                             )} />
@@ -571,20 +521,15 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                     <SelectItem value="layout">Layout</SelectItem>
                                 </SelectContent></Select><FormMessage /></FormItem>
                             )} />
-                            
-                            <div className="flex items-end gap-2">
-                                <FormItem className="flex-grow">
-                                  <FormLabel>URL</FormLabel>
-                                  <FormControl>
-                                    <Input value={form.getValues(`documents.${index}.url`) || ''} readOnly disabled />
-                                  </FormControl>
-                                </FormItem>
-                                <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
+                            <FormField control={form.control} name={`documents.${index}.url`} render={({ field }) => (
+                                <FormItem><FormLabel>Google Drive Link</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="Shareable Google Drive link" /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
                         </div>
                     ))}
+                    <Button type="button" variant="outline" onClick={() => append({ type: 'image', name: '', url: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Document</Button>
                  </div>
               </div>
                {/* Additional Information */}
