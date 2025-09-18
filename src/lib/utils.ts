@@ -11,8 +11,7 @@ export function convertGoogleDriveLink(url: string): string {
     return 'https://placehold.co/800x600/210D42/FFFFFF?text=Invalid+URL';
   }
   
-  // This function is no longer strictly necessary if all uploads are local,
-  // but we'll keep it for any legacy data that might still use GDrive links.
+  // This function is for backward compatibility with any legacy GDrive links.
   const driveRegex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
   const match = url.match(driveRegex);
 
