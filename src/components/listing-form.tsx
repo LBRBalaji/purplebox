@@ -107,33 +107,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
-    // Memoize default values to prevent unnecessary form resets on re-render.
-    defaultValues: React.useMemo(() => (isEditMode && listing ? 
-      {...listing, documents: listing.documents || []} : 
-      {
-        status: 'pending',
-        developerId: user?.email || '',
-        listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-        warehouseBoxId: '',
-        actualSizeSqFt: undefined,
-        additionalInformation: '',
-        name: '',
-        location: '',
-        sizeSqFt: undefined,
-        description: '',
-        rentPerSqFt: undefined,
-        rentalSecurityDeposit: undefined,
-        availabilityDate: 'Ready for Occupancy',
-        constructionProgress: '',
-        serviceModel: 'Standard',
-        locationCircle: '',
-        area: { plinthArea: undefined, mezzanineArea1: undefined, mezzanineArea2: undefined, canopyArea: undefined, driversRestRoomArea: undefined, totalChargeableArea: undefined, },
-        buildingSpecifications: { buildingType: [], craneSupportStructureAvailable: false, craneAvailable: false, warehouseLayoutAvailable: false, louvers: false, },
-        siteSpecifications: {},
-        certificatesAndApprovals: { parkApproval: false, buildingApproval: false, fireLicense: false, fireNOC: false, buildingInsurance: false, pcbForAir: false, pcbForWater: false, propertyTax: false, },
-        documents: [],
-      }
-    ), [listing, isEditMode, user?.email])
   });
 
   React.useEffect(() => {
