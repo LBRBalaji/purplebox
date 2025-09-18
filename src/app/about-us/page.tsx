@@ -116,6 +116,7 @@ export default function AboutUsPage() {
         feature1: 'https://picsum.photos/seed/about1/600/400',
         feature2: 'https://picsum.photos/seed/about2/600/400',
         feature3: 'https://picsum.photos/seed/about3/600/400',
+        originStory: 'https://picsum.photos/seed/origin/600/400',
     });
 
     const handleImageChange = (key: keyof typeof images) => (newSrc: string) => {
@@ -218,20 +219,38 @@ export default function AboutUsPage() {
                 </div>
             </section>
             
+            {/* Origin Story Section */}
             <section className="py-20 md:py-28 bg-background">
                  <div className="container mx-auto">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-2xl font-bold font-headline tracking-tight text-primary flex items-center justify-center gap-3">
-                            <Award className="h-7 w-7"/> Our Origin Story
-                        </h2>
-                         <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                            In 2014, we were grappling with the inefficiencies of the warehouse lease transactions. So, we built something for ourselves: a powerful application called <strong className="text-foreground">FOLLOWPROP</strong>. It was our own solution, born out of a real-world need.
-                        </p>
-                        <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                            A decade later, we've taken everything we learned and built a complete warehouse lease transaction platform, <strong className="text-foreground">Lakshmi Balaji O2O</strong>, for everyone. We believe our hands-on experience allows us to truly understand and solve the challenges our customers face.
-                        </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+                        <div className="md:order-2">
+                             <FeatureImage
+                                src={images.originStory}
+                                onImageChange={handleImageChange('originStory')}
+                                alt="Origin Story"
+                                hint="team planning whiteboard"
+                            />
+                        </div>
+                        <div className="md:order-1">
+                            <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight text-primary flex items-center gap-3 mb-6">
+                                <Award className="h-8 w-8"/> Our Origin Story
+                            </h2>
+                             <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
+                                <p>
+                                    In 2014, we were grappling with the inefficiencies of the warehouse lease transactions. So, we built something for ourselves: a powerful application called <strong className="text-foreground">FOLLOWPROP</strong>. It was our own solution, born out of a real-world need.
+                                </p>
+                                <p>
+                                    A decade later, we've taken everything we learned and built a complete warehouse lease transaction platform, <strong className="text-foreground">Lakshmi Balaji O2O</strong>, for everyone. We believe our hands-on experience allows us to truly understand and solve the challenges our customers face.
+                                </p>
+                             </div>
+                        </div>
                     </div>
+                 </div>
+            </section>
 
+            {/* CTA Section */}
+            <section className="pb-20 md:pb-28 pt-10 bg-background">
+                <div className="container mx-auto">
                     <Card className="bg-primary text-primary-foreground text-center p-8">
                         <CardHeader>
                             <CardTitle className="text-3xl font-bold font-headline">Ready to Get Started?</CardTitle>
@@ -252,7 +271,7 @@ export default function AboutUsPage() {
                             </div>
                         </CardContent>
                     </Card>
-                 </div>
+                </div>
             </section>
         </div>
     )
