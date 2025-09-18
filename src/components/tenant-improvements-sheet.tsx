@@ -76,7 +76,7 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
   return (
     <Card>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form id="tenant-improvements-form" onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><HardHat /> Tenant Improvements Tracker</CardTitle>
             <CardDescription>
@@ -196,16 +196,16 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
                     </FormControl>
                 )} />
               </div>
-              {(canEdit || canUpdateStatusOnly) && (
-                <div className="flex justify-end">
-                  <Button type="submit">
-                    <Save className="mr-2 h-4 w-4" /> Save Changes
-                  </Button>
-                </div>
-              )}
           </CardFooter>
         </form>
       </Form>
+      {(canEdit || canUpdateStatusOnly) && (
+        <div className="flex justify-end p-6 pt-0">
+          <Button type="submit" form="tenant-improvements-form">
+            <Save className="mr-2 h-4 w-4" /> Save Changes
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }
