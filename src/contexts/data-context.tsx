@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type CommercialTermsSchema, type AcknowledgmentDetails } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type CommercialTermsSchema, type AcknowledgmentDetails, type LayoutRequestData } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, startOfDay } from 'date-fns';
@@ -51,6 +51,12 @@ export type ViewRecord = {
     listingId: string;
     timestamp: number;
 }
+
+export type LayoutRequestRecord = LayoutRequestData & {
+  id: string;
+  requestedAt: string;
+};
+
 
 export type AcknowledgmentRecord = {
     userId: string;
@@ -165,6 +171,8 @@ type DataContextType = {
   downloadAcknowledgments: AcknowledgmentRecord[];
   logAcknowledgment: (userId: string) => void;
   viewHistory: ViewRecord[];
+  layoutRequests: LayoutRequestRecord[];
+  addLayoutRequest: (request: LayoutRequestData) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -205,6 +213,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [aboutUsContent, setAboutUsContent] = useState<AboutUsContent | null>(null);
   const [locationCircles, setLocationCircles] = useState<LocationCircle[]>([]);
   const [downloadAcknowledgments, setDownloadAcknowledgments] = useState<AcknowledgmentRecord[]>([]);
+  const [layoutRequests, setLayoutRequests] = useState<LayoutRequestRecord[]>([]);
 
    useEffect(() => {
     async function loadInitialData() {
@@ -225,6 +234,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           acknowledgmentsRes,
           downloadHistoryRes,
           viewHistoryRes,
+          layoutRequestsRes,
         ] = await Promise.all([
           fetch('/api/listings'),
           fetch('/api/demands'),
@@ -240,6 +250,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/download-acknowledgments'),
           fetch('/api/download-history'),
           fetch('/api/view-history'),
+          fetch('/api/layout-requests'),
         ]);
 
         setListings(await listingsRes.json());
@@ -256,6 +267,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setDownloadAcknowledgments(await acknowledgmentsRes.json());
         setDownloadHistory(await downloadHistoryRes.json());
         setViewHistory(await viewHistoryRes.json());
+        setLayoutRequests(await layoutRequestsRes.json());
 
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
@@ -336,6 +348,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), []);
   const persistDownloadHistory = useCallback((updatedHistory: DownloadRecord[]) => persistData('download-history', updatedHistory, 'download history'), []);
   const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), []);
+  const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), []);
 
 
   const updateAboutUsContent = (newContent: AboutUsContent) => {
@@ -758,6 +771,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistCommercialTerms, toast]);
 
+  const addLayoutRequest = useCallback((request: LayoutRequestData) => {
+    setLayoutRequests(prev => {
+      const newRequest: LayoutRequestRecord = {
+        ...request,
+        id: `LR-${Date.now()}`,
+        requestedAt: new Date().toISOString(),
+      };
+      const updatedRequests = [newRequest, ...prev];
+      persistLayoutRequests(updatedRequests);
+      return updatedRequests;
+    });
+  }, [persistLayoutRequests]);
+
 
   return (
     <DataContext.Provider value={{ 
@@ -785,6 +811,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         downloadAcknowledgments,
         logAcknowledgment,
         viewHistory,
+        layoutRequests,
+        addLayoutRequest,
         }}>
       {children}
     </DataContext.Provider>

@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FileText, ShieldCheck } from 'lucide-react';
+import { useData } from '@/contexts/data-context';
 
 type LayoutRequestDialogProps = {
   isOpen: boolean;
@@ -24,6 +25,7 @@ type LayoutRequestDialogProps = {
 
 export function LayoutRequestDialog({ isOpen, onOpenChange, listingId, listingName }: LayoutRequestDialogProps) {
   const { user } = useAuth();
+  const { addLayoutRequest } = useData();
   const { toast } = useToast();
 
   const form = useForm<LayoutRequestData>({
@@ -61,7 +63,7 @@ export function LayoutRequestDialog({ isOpen, onOpenChange, listingId, listingNa
   }, [isOpen, listingId, listingName, user, form]);
 
   const onSubmit = (data: LayoutRequestData) => {
-    console.log('Layout Request Submitted:', data);
+    addLayoutRequest(data);
     toast({
       title: 'Request Submitted Successfully!',
       description: `Your request for the layout of "${data.listingName}" has been sent to our team. We will get back to you shortly.`,
