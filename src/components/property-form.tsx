@@ -41,7 +41,7 @@ import {
 
 import { useToast } from "@/hooks/use-toast";
 import { createPropertySchema, type PropertySchema, type DemandSchema, type ListingSchema } from "@/lib/schema";
-import { ClipboardList, FileText, ListChecks, CheckCircle, PinIcon, Library, Building, HandCoins, HardHat, FileBadge, Flame, Plug, Truck } from 'lucide-react';
+import { ClipboardList, FileText, ListChecks, CheckCircle, PinIcon, Library, Building, HandCoins, HardHat, FileBadge, Flame, Plug, Truck, Scaling } from 'lucide-react';
 import { useData } from "@/contexts/data-context";
 import { useAuth } from "@/contexts/auth-context";
 import { Badge } from "./ui/badge";
@@ -322,23 +322,57 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
               <Card>
                   <CardHeader><CardTitle className="text-base flex items-center gap-2"><Building className="h-5 w-5"/>General Information</CardTitle></CardHeader>
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <FormField control={form.control} name="size" render={({ field }) => (<FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g. 50000" /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="floor" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Floor</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl><SelectTrigger><SelectValue placeholder="Select floor" /></SelectTrigger></FormControl>
-                            <SelectContent>
-                              <SelectItem value="Ground">Ground</SelectItem>
-                              <SelectItem value="First Floor">First Floor</SelectItem>
-                              <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (<FormItem><FormLabel>Readiness to Occupy</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Immediate">Immediate</SelectItem><SelectItem value="Within 45 Days">Within 45 Days</SelectItem><SelectItem value="Within 90 Days">Within 90 Days</SelectItem><SelectItem value="More than 90 Days">More than 90 Days</SelectItem><SelectItem value="BTS">BTS</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="serviceModel" render={({ field }) => (<FormItem><FormLabel>Service Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Standard">Standard</SelectItem><SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem><SelectItem value="Both">Both</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="size" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Size (Sq. Ft.)</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)}/></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="floor" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Floor</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue placeholder="Select floor" /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Ground">Ground</SelectItem>
+                            <SelectItem value="First Floor">First Floor</SelectItem>
+                            <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Readiness to Occupy</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Immediate">Immediate</SelectItem>
+                            <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
+                            <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
+                            <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
+                            <SelectItem value="BTS">BTS</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="serviceModel" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Service Model</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Standard">Standard</SelectItem>
+                            <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
+                            <SelectItem value="Both">Both</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                   </CardContent>
               </Card>
 
@@ -346,32 +380,142 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
                   <CardHeader><CardTitle className="text-base flex items-center gap-2"><HardHat className="h-5 w-5"/>Specifications</CardTitle></CardHeader>
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <FormField control={form.control} name="buildingType" render={({ field }) => (<FormItem><FormLabel>Building Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select type"/></SelectTrigger></FormControl><SelectContent><SelectItem value="PEB">PEB</SelectItem><SelectItem value="RCC">RCC</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="safety" render={({ field }) => (<FormItem><FormLabel>Safety/Compound</FormLabel><FormControl><Input {...field} placeholder="e.g. Fully Compounded" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="safety" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Safety/Compound</FormLabel>
+                          <FormControl><Input {...field} placeholder="e.g. Fully Compounded" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
                       <div className="flex gap-2">
-                        <FormField control={form.control} name="ceilingHeight" render={({ field: heightField }) => (<FormItem className="flex-grow"><FormLabel>Ceiling Height</FormLabel><FormControl><Input type="number" placeholder="Enter height" {...heightField} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="ceilingHeightUnit" render={({ field: unitField }) => (<FormItem><FormLabel>Unit</FormLabel><Select onValueChange={unitField.onChange} value={unitField.value}><FormControl><SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="ft">ft</SelectItem><SelectItem value="m">m</SelectItem></SelectContent></Select></FormItem>)} />
+                        <FormField control={form.control} name="ceilingHeight" render={({ field: heightField }) => (
+                          <FormItem className="flex-grow">
+                            <FormLabel>Ceiling Height</FormLabel>
+                            <FormControl><Input type="number" placeholder="Enter height" {...heightField} value={heightField.value ?? ''} onChange={e => heightField.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name="ceilingHeightUnit" render={({ field: unitField }) => (
+                          <FormItem>
+                            <FormLabel>Unit</FormLabel>
+                            <Select onValueChange={unitField.onChange} value={unitField.value}>
+                              <FormControl><SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger></FormControl>
+                              <SelectContent>
+                                <SelectItem value="ft">ft</SelectItem>
+                                <SelectItem value="m">m</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )} />
                       </div>
-                      <FormField control={form.control} name="docks" render={({ field }) => (<FormItem><FormLabel>Docks</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g. 10" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="docks" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Docks</FormLabel>
+                          <FormControl><Input type="number" placeholder="e.g. 10" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)}/></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
                   </CardContent>
               </Card>
 
               <Card>
                   <CardHeader><CardTitle className="text-base flex items-center gap-2"><HandCoins className="h-5 w-5"/>Commercials</CardTitle></CardHeader>
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="rentPerSft" render={({ field }) => (<FormItem><FormLabel>Rent per Sq. Ft.</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g. 25" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (<FormItem><FormLabel>Security Deposit (months)</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g. 6" /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="rentPerSft" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rent per Sq. Ft.</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g. 25" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Security Deposit (months)</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g. 6" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)}/></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                   </CardContent>
               </Card>
               
               <Card>
                   <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileBadge className="h-5 w-5"/>Compliance & Utilities</CardTitle></CardHeader>
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <FormField control={form.control} name="approvalStatus" render={({ field }) => (<FormItem><FormLabel>Approval Status</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem><SelectItem value="Un-Approved">Un-Approved</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="fireNoc" render={({ field }) => (<FormItem><FormLabel>Fire NOC</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Obtained">Obtained</SelectItem><SelectItem value="Applied For">Applied For</SelectItem><SelectItem value="To Apply">To Apply</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="fireHydrant" render={({ field }) => (<FormItem><FormLabel>Fire Hydrant</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="availablePower" render={({ field }) => (<FormItem><FormLabel>Available Power (kVA)</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g. 150" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="genSetBackup" render={({ field }) => (<FormItem><FormLabel>Genset Backup</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Available">Available</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="canopy" render={({ field }) => (<FormItem><FormLabel>Canopy</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Installed">Installed</SelectItem><SelectItem value="Can be provided">Can be provided</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="approvalStatus" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Approval Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Obtained">Obtained</SelectItem>
+                            <SelectItem value="Applied For">Applied For</SelectItem>
+                            <SelectItem value="To Apply">To Apply</SelectItem>
+                            <SelectItem value="Un-Approved">Un-Approved</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="fireNoc" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fire NOC</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Obtained">Obtained</SelectItem>
+                            <SelectItem value="Applied For">Applied For</SelectItem>
+                            <SelectItem value="To Apply">To Apply</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="fireHydrant" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fire Hydrant</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Installed">Installed</SelectItem>
+                            <SelectItem value="Can be provided">Can be provided</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="availablePower" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Available Power (kVA)</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g. 150" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="genSetBackup" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Genset Backup</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Available">Available</SelectItem>
+                            <SelectItem value="Can be provided">Can be provided</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="canopy" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Canopy</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="Installed">Installed</SelectItem>
+                            <SelectItem value="Can be provided">Can be provided</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                   </CardContent>
               </Card>
 
