@@ -1,5 +1,104 @@
 [
   {
+    "listingId": "LST-8KQX5D",
+    "developerId": "namasivayam.lion@gmail.com",
+    "status": "approved",
+    "warehouseBoxId": "Bigger Warehouse",
+    "actualSizeSqFt": 92000,
+    "name": "",
+    "location": "Thatchur",
+    "locationCircle": "Karanodai Circle",
+    "sizeSqFt": 92000,
+    "description": "Warehousing presents a 92,000 sq. ft. ready-to-occupy standard shed in Thatchur, featuring a 9-meter eave height and a Galvalume roof.  This property offers 92000 square feet of space at a competitive rate of ₹20 per sq. ft. with a standard service model.  Contact us today to secure this prime industrial space.",
+    "additionalInformation": "The 92,000 Sqft warehouse is 666ft long and 135ft wide with a sidewall height of 30ft and centre height of 39ft with two docks facing\nNorth and South and eight big docks of 18 feet wide facing East.\nwarehouse is at a floor level of 4.5 ft above the ground level.\nwarehouse has 8 double-sized docks and 4 normal sized docks.\n",
+    "rentPerSqFt": 20,
+    "rentalSecurityDeposit": 6,
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "area": {
+      "plinthArea": 90000,
+      "canopyArea": 2000,
+      "totalChargeableArea": 92000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "Standard Shed"
+      ],
+      "numberOfDocksAndShutters": 12,
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo",
+      "louvers": false
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "PCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": false,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1D-ZjkkMeXksfW26DFXB1prelByzZfKp6"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1GHHn99e2z3oPl-dIVM0k8l_8cEDd5nw_"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1vpJPlzxApO-Ce6cGGzUP60tPwrcCumg7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1XC4BkgzPxyUxzr0Eho5rO5oVcV6lPltX"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1BPtvt3RJjx6qShj7vrwhhUyqSZatRvK2"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1-IO_8DgP0w27GqOOh8iut2HKk5TQm6X8"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1lGA98snt-p2w-CRe7sfakni9bvwILwLb"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1CHUfvjH8oXSdaWDfpD871N3Uc93NkST7"
+      },
+      {
+        "type": "image",
+        "name": "",
+        "url": "https://drive.google.com/uc?export=view&id=1miPufje5txqf0qXRRDtv5GAmWEF-MWtn"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
     "listingId": "LST-91LUXK",
     "developerId": "namasivayam.lion@gmail.com",
     "status": "approved",
@@ -1416,6 +1515,7 @@
     "warehouseBoxId": "WBX-ZENI-3PL1",
     "name": "Zenith 3PL Center",
     "location": "Bhiwandi, Mumbai",
+    "locationCircle": "Bhiwandi",
     "latLng": "19.2940, 73.0550",
     "sizeSqFt": 80000,
     "description": "State-of-the-art 3PL operated facility in the heart of Bhiwandi's logistics hub. Offering end-to-end supply chain solutions, this 80,000 sq. ft. space is ideal for e-commerce, retail, and FMCG clients. Features modern racking, inventory management systems, and value-added services.",
@@ -1467,6 +1567,7 @@
         "name": "",
         "url": "https://drive.google.com/uc?export=view&id=1B_7rChBFglTXtWod5OBEEtL9PBT6oiEq"
       }
-    ]
+    ],
+    "isAdmin": true
   }
 ]

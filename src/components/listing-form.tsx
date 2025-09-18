@@ -36,12 +36,11 @@ import { Textarea } from "./ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
-import { AlertTriangle, Trash2, Wand2 } from "lucide-react";
+import { AlertTriangle, Trash2, Wand2, Upload, FileUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { generateListingDescriptionAction } from "@/lib/actions";
 import { Sparkles } from "lucide-react";
-import { convertGoogleDriveLink } from "@/lib/utils";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
 
@@ -64,6 +63,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const { toast } = useToast();
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [isUploading, setIsUploading] = React.useState<number | null>(null);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
   const [locationCircles, setLocationCircles] = React.useState<{name: string, locations: string[]}[]>([]);
   
@@ -224,6 +224,36 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
         }
     }
   }, [isOpen, isEditMode, listing, form, user]);
+
+  const handleFileUpload = async (file: File, index: number) => {
+    if (!file) return;
+
+    setIsUploading(index);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            form.setValue(`documents.${index}.url`, result.url, { shouldValidate: true });
+            toast({ title: "File Uploaded", description: `"${file.name}" has been successfully uploaded.` });
+        } else {
+            throw new Error(result.error || 'Unknown upload error');
+        }
+    } catch (error) {
+        const e = error as Error;
+        toast({ variant: 'destructive', title: 'Upload Failed', description: e.message });
+    } finally {
+        setIsUploading(null);
+    }
+  };
+
 
   const handleGenerateDescription = async () => {
     setIsGenerating(true);
@@ -511,9 +541,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             We thank you in advance for your understanding and cooperation in respecting this platform policy.
                         </AlertDescription>
                     </Alert>
-                    <FormDescription>
-                        Use a Google Drive link. Right-click file {'->'} Share {'->'} Anyone with the link. Paste it here. The system will convert it automatically.
-                    </FormDescription>
                     {fields.map((field, index) => (
                         <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                             <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
@@ -526,20 +553,23 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                     <SelectItem value="layout">Layout</SelectItem>
                                 </SelectContent></Select><FormMessage /></FormItem>
                             )} />
-                            <FormField control={form.control} name={`documents.${index}.url`} render={({ field }) => (
+                            <FormField control={form.control} name={`documents.${index}.url`} render={({ field: urlField }) => (
                                 <FormItem>
-                                    <FormLabel>URL</FormLabel>
+                                    <FormLabel>File</FormLabel>
+                                    {urlField.value && <FormDescription className="text-xs truncate">Current: {urlField.value}</FormDescription>}
                                     <FormControl>
-                                        <Input 
-                                            {...field}
-                                            value={field.value ?? ''} 
-                                            placeholder="https://"
-                                            onBlur={(e) => {
-                                                const convertedUrl = convertGoogleDriveLink(e.target.value);
-                                                field.onChange(convertedUrl);
-                                                field.onBlur();
-                                            }}
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <Input 
+                                                type="file" 
+                                                className="flex-grow"
+                                                onChange={(e) => {
+                                                    if (e.target.files?.[0]) {
+                                                        handleFileUpload(e.target.files[0], index);
+                                                    }
+                                                }} 
+                                            />
+                                            {isUploading === index && <Sparkles className="h-5 w-5 animate-spin text-primary"/>}
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -619,32 +649,40 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         This is a mandatory step for approving the listing.
                     </AlertDescription>
                     <div className="mt-4">
-                        <FormField control={form.control} name="locationCircle" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Location Circle</FormLabel>
-                                <Select 
-                                  onValueChange={(value) => field.onChange(value === 'none' ? '' : value)} 
-                                  value={field.value || 'none'}
-                                >
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Assign to a location circle..." /></SelectTrigger></FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="none">None</SelectItem>
-                                        {locationCircles.map(circle => (
-                                            <SelectItem key={circle.name} value={circle.name}>{circle.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {selectedCircleLocations.length > 0 && (
-                                  <div className="pt-2">
-                                      <FormDescription>Locations in this circle:</FormDescription>
-                                      <div className="flex flex-wrap gap-1 mt-1">
-                                          {selectedCircleLocations.map(loc => <Badge key={loc} variant="outline">{loc}</Badge>)}
-                                      </div>
-                                  </div>
-                                )}
-                                <FormMessage />
-                            </FormItem>
-                        )} />
+                      <FormField
+                        control={form.control}
+                        name="locationCircle"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Location Circle</FormLabel>
+                            <Select 
+                              onValueChange={(value) => field.onChange(value === 'none' ? '' : value)} 
+                              value={field.value || 'none'}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Assign to a location circle..." />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="none">None</SelectItem>
+                                {locationCircles.map(circle => (
+                                  <SelectItem key={circle.name} value={circle.name}>{circle.name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {selectedCircleLocations.length > 0 && (
+                              <div className="pt-2">
+                                <FormDescription>Locations in this circle:</FormDescription>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {selectedCircleLocations.map(loc => <Badge key={loc} variant="outline">{loc}</Badge>)}
+                                </div>
+                              </div>
+                            )}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </Alert>
               )}
