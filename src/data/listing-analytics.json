@@ -204,7 +204,7 @@
   {
     "listingId": "LST-9M05SY",
     "views": 0,
-    "downloads": 5,
+    "downloads": 7,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -222,6 +222,14 @@
           1758208336205,
           1758208725273,
           1758208725273
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208934270,
+          1758208934270
         ]
       }
     ],
@@ -318,14 +326,16 @@
   {
     "listingId": "LST-TGAV6G",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
         "name": "Ben Carter",
         "company": "Beta Retail",
         "timestamps": [
-          1758208040575
+          1758208040575,
+          1758208934270,
+          1758208934270
         ]
       }
     ],
@@ -360,6 +370,54 @@
         "company": "XYZ Logistics",
         "timestamps": [
           1758208725273
+        ]
+      }
+    ],
+    "viewedBy": []
+  },
+  {
+    "listingId": "LST-QWQFTO",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208934270
+        ]
+      }
+    ],
+    "viewedBy": []
+  },
+  {
+    "listingId": "LST-09CBLQ",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208934270
+        ]
+      }
+    ],
+    "viewedBy": []
+  },
+  {
+    "listingId": "LST-Y06HUI",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208934270
         ]
       }
     ],

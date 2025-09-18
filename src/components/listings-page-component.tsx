@@ -221,7 +221,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
 function DownloadBar() {
     const { user } = useAuth();
     const { toast } = useToast();
-    const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
+    const { selectedForDownload, logDownload, clearSelectedForDownload, logAcknowledgment, downloadAcknowledgments } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isTermsOpen, setIsTermsOpen] = useState(false);
 
@@ -238,13 +238,14 @@ function DownloadBar() {
     }
     
     const onTermsAccept = () => {
-        sessionStorage.setItem('warehouse_download_terms_accepted', 'true');
+        if(user?.email) logAcknowledgment(user.email);
         setIsTermsOpen(false);
         proceedWithDownload();
     };
 
     const proceedWithDownload = () => {
-        const { success } = logDownload(user!.email!, selectedForDownload);
+        if (!user) return; // Should not happen if terms are accepted, but as a safeguard.
+        const { success } = logDownload(user.email, selectedForDownload);
         if (success) {
             const dataToExport = selectedForDownload.map(l => ({
                 'Property ID': l.listingId,
@@ -267,7 +268,6 @@ function DownloadBar() {
                 'Roof Insulation': l.buildingSpecifications.roofInsulation,
                 'Ventilation': l.buildingSpecifications.ventilation,
                 'Louvers': l.buildingSpecifications.louvers ? 'Yes' : 'No',
-                // Approvals
                 'Park Approval': l.certificatesAndApprovals.parkApproval ? 'Yes' : 'No',
                 'Building Approval': l.certificatesAndApprovals.buildingApproval ? 'Yes' : 'No',
                 'Fire License': l.certificatesAndApprovals.fireLicense ? 'Yes' : 'No',
@@ -288,7 +288,7 @@ function DownloadBar() {
                 [],
                 ["Powered by Lakshmi Balaji O2O | Simplifying Real Estate Transactions"],
                 [],
-                ["www.lakshmibalajio2o.com", "Ask a Call Back: +91 98410 98170"],
+                ["www.lakshmibalajio2o.com", "Ask a Call Back: +91 9841098170"],
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 
@@ -325,8 +325,8 @@ function DownloadBar() {
             return;
         }
 
-        const hasAcceptedTerms = sessionStorage.getItem('warehouse_download_terms_accepted');
-        if (hasAcceptedTerms) {
+        const hasAcknowledged = downloadAcknowledgments.some(ack => ack.userId === user.email);
+        if (hasAcknowledged) {
             proceedWithDownload();
         } else {
             setIsTermsOpen(true);
@@ -468,17 +468,17 @@ export function ListingsPage() {
 
     // Location search (with circle logic)
     if (locationFilter) {
-        const lowerLocation = locationFilter.toLowerCase();
-        const matchedCircle = locationCircles.find(circle => 
-            circle.name.toLowerCase().includes(lowerLocation) || 
-            circle.locations.some(loc => lowerLocation.includes(loc))
-        );
+      const lowerLocation = locationFilter.toLowerCase();
+      const matchedCircle = locationCircles.find(circle => 
+          circle.name.toLowerCase().includes(lowerLocation) || 
+          circle.locations.some(loc => lowerLocation.includes(loc))
+      );
 
-        if (matchedCircle) {
-            results = results.filter(listing => listing.locationCircle === matchedCircle.name);
-        } else {
-            results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
-        }
+      if (matchedCircle) {
+          results = results.filter(listing => listing.locationCircle === matchedCircle.name);
+      } else {
+          results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
+      }
     }
     
     // Availability filter

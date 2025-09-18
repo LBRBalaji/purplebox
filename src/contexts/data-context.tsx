@@ -51,6 +51,12 @@ export type DownloadRecord = {
     timestamp: number;
 }
 
+export type AcknowledgmentRecord = {
+    userId: string;
+    timestamp: number;
+};
+
+
 type DataEvent = {
   type: 'new_demand' | 'new_submission' | 'new_listing' | 'download_limit_exceeded' | 'listing_status_changed' | 'new_lead_for_provider';
   id: string; // The ID of the demand, submission, or user email
@@ -155,6 +161,8 @@ type DataContextType = {
   aboutUsContent: AboutUsContent | null;
   updateAboutUsContent: (newContent: AboutUsContent) => void;
   locationCircles: LocationCircle[];
+  downloadAcknowledgments: AcknowledgmentRecord[];
+  logAcknowledgment: (userId: string) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -193,6 +201,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [isShortlistLoading, setIsShortlistLoading] = useState(true);
   const [aboutUsContent, setAboutUsContent] = useState<AboutUsContent | null>(null);
   const [locationCircles, setLocationCircles] = useState<LocationCircle[]>([]);
+  const [downloadAcknowledgments, setDownloadAcknowledgments] = useState<AcknowledgmentRecord[]>([]);
 
    useEffect(() => {
     async function loadInitialData() {
@@ -210,6 +219,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           commercialTermsRes,
           aboutUsContentRes,
           locationCirclesRes,
+          acknowledgmentsRes,
         ] = await Promise.all([
           fetch('/api/listings'),
           fetch('/api/demands'),
@@ -222,6 +232,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/commercial-terms'),
           fetch('/api/about-us-content'),
           fetch('/api/location-circles'),
+          fetch('/api/download-acknowledgments'),
         ]);
 
         setListings(await listingsRes.json());
@@ -235,6 +246,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setCommercialTerms(await commercialTermsRes.json());
         setAboutUsContent(await aboutUsContentRes.json());
         setLocationCircles(await locationCirclesRes.json());
+        setDownloadAcknowledgments(await acknowledgmentsRes.json());
 
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
@@ -312,6 +324,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistCommercialTerms = useCallback((updatedSheets: CommercialTermsSchema[]) => persistData('commercial-terms', updatedSheets, 'commercial terms'), []);
   const persistListingAnalytics = useCallback((updatedAnalytics: ListingAnalytics[]) => persistData('listing-analytics', updatedAnalytics, 'listing analytics'), []);
   const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), []);
+  const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), []);
 
   const updateAboutUsContent = (newContent: AboutUsContent) => {
     setAboutUsContent(newContent);
@@ -483,6 +496,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const uniqueTimestamps = new Set(downloadEntries.map(d => d.timestamp));
     return uniqueTimestamps.size;
   }, [downloadHistory]);
+  
+  const logAcknowledgment = useCallback((userId: string) => {
+    setDownloadAcknowledgments(prevAcks => {
+        const alreadyExists = prevAcks.some(ack => ack.userId === userId);
+        if (alreadyExists) {
+            return prevAcks;
+        }
+        const newAck: AcknowledgmentRecord = { userId, timestamp: Date.now() };
+        const updatedAcks = [...prevAcks, newAck];
+        persistDownloadAcknowledgments(updatedAcks);
+        return updatedAcks;
+    });
+  }, [persistDownloadAcknowledgments]);
 
   const logDownload = useCallback((userId: string, listingsToDownload: ListingSchema[]) => {
     const todaysTotalDownloads = getTodaysTotalDownloads(userId);
@@ -734,7 +760,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         isShortlistLoading,
         aboutUsContent,
         updateAboutUsContent,
-        locationCircles
+        locationCircles,
+        downloadAcknowledgments,
+        logAcknowledgment
         }}>
       {children}
     </DataContext.Provider>
