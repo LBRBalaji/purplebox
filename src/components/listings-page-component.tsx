@@ -360,7 +360,7 @@ type LocationCircle = {
 export function ListingsPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { listings: allListings, isLoading: isDataLoading, selectedForDownload, toggleSelectedForDownload, generalShortlist, toggleGeneralShortlist } = useData();
+  const { listings: allListings, isLoading: isDataLoading, selectedForDownload, toggleSelectedForDownload, generalShortlist, toggleGeneralShortlist, locationCircles } = useData();
   const { toast } = useToast();
   const [filteredListings, setFilteredListings] = useState<ListingSchema[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -371,22 +371,7 @@ export function ListingsPage() {
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
-  const [locationCircles, setLocationCircles] = useState<LocationCircle[]>([]);
 
-  useEffect(() => {
-    async function fetchCircles() {
-      try {
-        const response = await fetch('/api/location-circles');
-        if (!response.ok) throw new Error('Failed to fetch');
-        const data = await response.json();
-        setLocationCircles(data);
-      } catch (error) {
-        console.error("Could not fetch location circles", error);
-      }
-    }
-    fetchCircles();
-  }, []);
-  
   const approvedListings = useMemo(() => allListings.filter(l => l.status === 'approved'), [allListings]);
 
   const inventoryCount = approvedListings.length;
@@ -455,17 +440,17 @@ export function ListingsPage() {
 
     // Location search (with circle logic)
     if (locationFilter) {
-        const lowerLocation = locationFilter.toLowerCase();
-        const matchedCircle = locationCircles.find(c => 
-            c.name.toLowerCase().includes(lowerLocation) ||
-            c.locations.some(loc => lowerLocation.includes(loc))
-        );
+      const lowerLocation = locationFilter.toLowerCase();
+      const matchedCircle = locationCircles.find(circle =>
+        circle.name.toLowerCase().includes(lowerLocation) ||
+        circle.locations.some(loc => lowerLocation.includes(loc))
+      );
 
-        if (matchedCircle) {
-            results = results.filter(listing => listing.locationCircle === matchedCircle.name);
-        } else {
-            results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
-        }
+      if (matchedCircle) {
+        results = results.filter(listing => listing.locationCircle === matchedCircle.name);
+      } else {
+        results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
+      }
     }
     
     // Availability filter
