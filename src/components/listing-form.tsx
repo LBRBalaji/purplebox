@@ -96,7 +96,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const { toast } = useToast();
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
-  const [isUploading, setIsUploading] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
   const [locationCircles, setLocationCircles] = React.useState<{name: string, locations: string[]}[]>([]);
   const [previewImageUrl, setPreviewImageUrl] = React.useState<string | null>(null);
@@ -263,30 +263,23 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     if (!event.target.files) return;
     const fileList = Array.from(event.target.files);
     
-    setIsUploading(true);
+    setIsSubmitting(true);
     toast({ title: "Uploading...", description: `${fileList.length} file(s) selected.` });
 
-    try {
-        const uploadResults = await uploadFiles(fileList);
-        if (uploadResults && uploadResults.length > 0) {
-          const newDocuments = uploadResults.map(res => ({
-            ...res,
-            name: res.name || 'Untitled',
-            url: res.url,
-            file: undefined // Clear the temporary file object
-          }));
-          append(newDocuments);
-          toast({ title: "Upload Complete", description: `${uploadResults.length} file(s) successfully added.` });
-        }
-    } catch (error) {
-        toast({ variant: "destructive", title: "Upload Failed", description: "Could not upload files." });
-        console.error(error);
-    } finally {
-        setIsUploading(false);
-        // Reset file input to allow re-uploading the same file
-        if (event.target) {
-            event.target.value = '';
-        }
+    const newDocuments = fileList.map(file => ({
+      type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
+      name: file.name,
+      url: '', // This will be filled after upload
+      file: file, // Store the file object temporarily
+    }));
+
+    append(newDocuments as any);
+
+    setIsSubmitting(false); // Enable form again
+    toast({ title: "Files Ready", description: `Files are ready to be saved with the listing.` });
+
+    if (event.target) {
+        event.target.value = '';
     }
   };
 
@@ -330,19 +323,48 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
 
   const handleSubmitWrapper = async (data: ListingSchema) => {
-    setIsUploading(true); // Re-use the uploading state for submission
-    const finalData = {
-        ...data,
-        isAdmin,
-    };
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
-    onSubmit(finalData);
-    toast({
-        title: isEditMode ? "Listing Updated" : "Listing Submitted",
-        description: `Your listing for "${data.listingId}" has been saved.`
-    });
-    setIsUploading(false);
-    onOpenChange(false);
+    setIsSubmitting(true);
+    
+    try {
+        const documentsToUpload = data.documents?.filter(doc => doc.file) || [];
+        if (documentsToUpload.length > 0) {
+          toast({ title: "Uploading media...", description: "Please wait, this may take a moment." });
+          const uploadedFiles = await uploadFiles(documentsToUpload.map(d => d.file as File));
+
+          if (uploadedFiles) {
+             data.documents = data.documents?.map(doc => {
+              if (doc.file) {
+                const uploadedFile = uploadedFiles.find(f => f.name === doc.name);
+                if (uploadedFile) {
+                  return { ...doc, url: uploadedFile.url, file: undefined };
+                }
+              }
+              return doc;
+            }).filter(doc => doc.url); // Remove any that failed to upload
+          }
+        }
+        
+        const finalData = { ...data, isAdmin };
+        
+        await new Promise(resolve => setTimeout(resolve, 200)); 
+
+        onSubmit(finalData);
+        
+        toast({
+            title: isEditMode ? "Listing Updated" : "Listing Submitted",
+            description: `Your listing for "${data.listingId}" has been saved.`
+        });
+        
+        onOpenChange(false);
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Submission Failed',
+            description: 'An error occurred while saving the listing.'
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
   };
   
    const onInvalidSubmit = (errors: FieldErrors<ListingSchema>) => {
@@ -362,7 +384,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
         <DialogContent 
             className="sm:max-w-4xl"
             onInteractOutside={(e) => {
-                if (isUploading) {
+                if (isSubmitting) {
                     e.preventDefault();
                 }
             }}
@@ -635,9 +657,9 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             </AlertDescription>
                         </Alert>
                         
-                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isSubmitting}>
                             <UploadCloud className="mr-2 h-4 w-4" />
-                            {isUploading ? 'Uploading...' : 'Upload Media'}
+                            {isSubmitting ? 'Uploading...' : 'Upload Media'}
                         </Button>
                         <input
                             ref={fileInputRef}
@@ -650,18 +672,20 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
                         {fields.map((field, index) => {
                             const fileUrl = form.watch(`documents.${index}.url`);
+                            const tempFile = form.watch(`documents.${index}.file`);
+                            const previewUrl = fileUrl || (tempFile ? URL.createObjectURL(tempFile) : null);
                             const fileType = form.watch(`documents.${index}.type`);
                             return (
                                 <div key={field.id} className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_auto] gap-4 items-end">
                                     <button
                                         type="button"
-                                        onClick={() => fileUrl && setPreviewImageUrl(fileUrl)}
+                                        onClick={() => previewUrl && setPreviewImageUrl(previewUrl)}
                                         className="w-20 h-20 relative bg-secondary rounded-md overflow-hidden group"
                                     >
-                                    {fileType === 'image' && fileUrl ? (
+                                    {fileType === 'image' && previewUrl ? (
                                         <>
                                             <Image
-                                                src={fileUrl}
+                                                src={previewUrl}
                                                 alt={field.name || 'Preview'}
                                                 fill
                                                 className="object-cover"
@@ -815,7 +839,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               </ScrollArea>
               <DialogFooter className="pt-4">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit" form="listing-form-main" disabled={isUploading}>{isUploading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Submit')}</Button>
+                <Button type="submit" form="listing-form-main" disabled={isSubmitting}>{isSubmitting ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Submit')}</Button>
               </DialogFooter>
             </form>
           </Form>

@@ -245,17 +245,17 @@ export const createPropertySchema = (demand?: DemandSchema) => {
     let schema = z.object({
         propertyId: z.string(),
         isLocationConfirmed: z.boolean().refine(val => val === true, { message: "You must confirm the location match." }),
-        size: z.coerce.number().positive(),
+        size: z.coerce.number({invalid_type_error: "Size is required"}).positive("Size must be a positive number"),
         floor: z.enum(['Ground', 'First Floor', 'Multi-Floor']),
         readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
         serviceModel: z.enum(['Standard', '3PL Operated Warehouse', 'Both']),
         buildingType: z.enum(['PEB', 'RCC']).optional(),
-        safety: z.string().min(1),
-        ceilingHeight: z.coerce.number().optional(),
+        safety: z.string().min(1, "Safety details are required"),
+        ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height is required"}).positive("Ceiling height must be a positive number"),
         ceilingHeightUnit: z.enum(['ft', 'm']),
-        docks: z.coerce.number().optional(),
-        rentPerSft: z.coerce.number().positive(),
-        rentalSecurityDeposit: z.coerce.number().positive(),
+        docks: z.coerce.number({invalid_type_error: "Number of docks is required"}).int().nonnegative(),
+        rentPerSft: z.coerce.number({invalid_type_error: "Rent is required"}).positive(),
+        rentalSecurityDeposit: z.coerce.number({invalid_type_error: "Security deposit is required"}).positive(),
         userType: z.enum(['Developer', 'Owner']),
         userName: z.string(),
         userCompanyName: z.string(),
@@ -484,5 +484,3 @@ export const acknowledgmentSchema = z.object({
   email: z.string().email(),
 });
 export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;
-
-    
