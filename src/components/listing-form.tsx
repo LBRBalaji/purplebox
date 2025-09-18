@@ -63,27 +63,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const { toast } = useToast();
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
-  const [isUploading, setIsUploading] = React.useState<number | null>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
   const [locationCircles, setLocationCircles] = React.useState<{name: string, locations: string[]}[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
-
-  React.useEffect(() => {
-    async function fetchCircles() {
-        try {
-            const response = await fetch('/api/location-circles');
-            if (!response.ok) throw new Error("Failed to fetch location circles");
-            const data = await response.json();
-            setLocationCircles(data);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-    if (isOpen && isAdmin) {
-        fetchCircles();
-    }
-  }, [isOpen, isAdmin]);
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
@@ -225,35 +210,52 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     }
   }, [isOpen, isEditMode, listing, form, user]);
 
-  const handleFileUpload = async (file: File, index: number) => {
-    if (!file) return;
-
-    setIsUploading(index);
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-        const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            form.setValue(`documents.${index}.url`, result.url, { shouldValidate: true });
-            toast({ title: "File Uploaded", description: `"${file.name}" has been successfully uploaded.` });
-        } else {
-            throw new Error(result.error || 'Unknown upload error');
+  React.useEffect(() => {
+    async function fetchCircles() {
+        if (!isOpen || !isAdmin) return;
+        try {
+            const response = await fetch('/api/location-circles');
+            if (!response.ok) throw new Error("Failed to fetch location circles");
+            const data = await response.json();
+            setLocationCircles(data);
+        } catch (error) {
+            console.error(error);
         }
-    } catch (error) {
-        const e = error as Error;
-        toast({ variant: 'destructive', title: 'Upload Failed', description: e.message });
-    } finally {
-        setIsUploading(null);
     }
-  };
+    fetchCircles();
+  }, [isOpen, isAdmin]);
 
+  const handleBulkUpload = async (files: FileList) => {
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    let successCount = 0;
+    const uploadPromises = Array.from(files).map(async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/api/upload', { method: 'POST', body: formData });
+            const result = await response.json();
+            if (result.success) {
+                append({ type: 'image', name: file.name, url: result.url });
+                successCount++;
+            } else {
+                throw new Error(result.error || `Failed to upload ${file.name}`);
+            }
+        } catch (error) {
+            console.error(`Upload failed for ${file.name}:`, error);
+        }
+    });
+
+    await Promise.all(uploadPromises);
+
+    setIsUploading(false);
+    toast({
+      title: "Bulk Upload Complete",
+      description: `${successCount} of ${files.length} files uploaded successfully.`,
+    });
+  };
 
   const handleGenerateDescription = async () => {
     setIsGenerating(true);
@@ -541,8 +543,24 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             We thank you in advance for your understanding and cooperation in respecting this platform policy.
                         </AlertDescription>
                     </Alert>
+
+                     <Input 
+                        type="file" 
+                        multiple 
+                        className="hidden" 
+                        ref={fileInputRef}
+                        onChange={(e) => {
+                            if (e.target.files) {
+                                handleBulkUpload(e.target.files);
+                            }
+                        }}
+                    />
+                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                        {isUploading ? <><Sparkles className="mr-2 h-4 w-4 animate-spin" /> Uploading...</> : <><FileUp className="mr-2 h-4 w-4" /> Upload Media</>}
+                    </Button>
+                    
                     {fields.map((field, index) => (
-                        <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
+                        <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-4 items-end">
                             <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
                                 <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                             )} />
@@ -553,35 +571,20 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                     <SelectItem value="layout">Layout</SelectItem>
                                 </SelectContent></Select><FormMessage /></FormItem>
                             )} />
-                            <FormField control={form.control} name={`documents.${index}.url`} render={({ field: urlField }) => (
-                                <FormItem>
-                                    <FormLabel>File</FormLabel>
-                                    {urlField.value && <FormDescription className="text-xs truncate">Current: {urlField.value}</FormDescription>}
-                                    <FormControl>
-                                        <div className="flex items-center gap-2">
-                                            <Input 
-                                                type="file" 
-                                                className="flex-grow"
-                                                onChange={(e) => {
-                                                    if (e.target.files?.[0]) {
-                                                        handleFileUpload(e.target.files[0], index);
-                                                    }
-                                                }} 
-                                            />
-                                            {isUploading === index && <Sparkles className="h-5 w-5 animate-spin text-primary"/>}
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
+                            
+                            <div className="flex items-end gap-2">
+                                <FormItem className="flex-grow">
+                                  <FormLabel>URL</FormLabel>
+                                  <FormControl>
+                                    <Input value={form.getValues(`documents.${index}.url`) || ''} readOnly disabled />
+                                  </FormControl>
                                 </FormItem>
-                            )} />
-                            <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
+                                <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))}
-                     <Button type="button" variant="outline" size="sm" onClick={() => append({ type: 'image', name: '', url: '' })}>
-                        Add Document
-                    </Button>
                  </div>
               </div>
                {/* Additional Information */}
