@@ -36,7 +36,7 @@ import { Textarea } from "./ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
-import { AlertTriangle, Trash2, Wand2, PlusCircle, UploadCloud } from "lucide-react";
+import { AlertTriangle, Trash2, Wand2, PlusCircle, UploadCloud, Maximize } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { generateListingDescriptionAction } from "@/lib/actions";
@@ -67,6 +67,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const [isUploading, setIsUploading] = React.useState(false);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
   const [locationCircles, setLocationCircles] = React.useState<{name: string, locations: string[]}[]>([]);
+  const [previewImageUrl, setPreviewImageUrl] = React.useState<string | null>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -331,6 +332,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const approvalFields = Object.keys(form.getValues().certificatesAndApprovals || {}) as (keyof ListingSchema['certificatesAndApprovals'])[];
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
@@ -340,7 +342,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <form id="listing-form" onSubmit={form.handleSubmit(handleSubmit)}>
             <ScrollArea className="h-[70vh] p-1 pr-6">
             <div className="space-y-8">
               
@@ -619,16 +621,29 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         const fileType = form.watch(`documents.${index}.type`);
                         return (
                             <div key={field.id} className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_auto] gap-4 items-end">
-                                <div className="w-20 h-20 relative bg-secondary rounded-md overflow-hidden">
-                                {fileType === 'image' && fileUrl && (
-                                    <Image
-                                        src={fileUrl}
-                                        alt={field.name || 'Preview'}
-                                        fill
-                                        className="object-cover"
-                                    />
+                                <button
+                                    type="button"
+                                    onClick={() => fileUrl && setPreviewImageUrl(fileUrl)}
+                                    className="w-20 h-20 relative bg-secondary rounded-md overflow-hidden group"
+                                >
+                                {fileType === 'image' && fileUrl ? (
+                                    <>
+                                        <Image
+                                            src={fileUrl}
+                                            alt={field.name || 'Preview'}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Maximize className="h-6 w-6 text-white" />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                        <FileText className="h-8 w-8" />
+                                    </div>
                                 )}
-                                </div>
+                                </button>
                                 <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
                                     <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                                 )} />
@@ -766,13 +781,29 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               )} />
             </div>
             </ScrollArea>
-             <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
-            </DialogFooter>
           </form>
         </Form>
+        <DialogFooter className="pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="submit" form="listing-form">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
+    
+    <Dialog open={!!previewImageUrl} onOpenChange={() => setPreviewImageUrl(null)}>
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col items-center justify-center p-2">
+           {previewImageUrl && (
+                <div className="relative w-full h-full">
+                    <Image
+                        src={previewImageUrl}
+                        alt="Image Preview"
+                        fill
+                        className="object-contain"
+                    />
+                </div>
+           )}
+        </DialogContent>
+    </Dialog>
+    </>
   );
 }
