@@ -105,9 +105,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const form = useForm<ListingSchema>({
-    resolver: zodResolver(listingSchema),
-  });
+  const form = useForm<ListingSchema>();
 
   React.useEffect(() => {
     if (isOpen) {
