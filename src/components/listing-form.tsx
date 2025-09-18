@@ -184,24 +184,29 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
     setIsSubmitting(true);
     toast({ title: "Uploading...", description: `${fileList.length} file(s) selected.` });
 
-    const uploadedFiles = await uploadFiles(fileList);
-    
-    if (uploadedFiles && uploadedFiles.length > 0) {
-      const newDocuments = uploadedFiles.map(file => ({
-        type: file.type as 'image' | 'video' | 'layout',
-        name: file.name,
-        url: file.url,
-      }));
-      append(newDocuments);
-      toast({ title: "Upload Complete", description: `${newDocuments.length} file(s) added.` });
-    } else {
-      toast({ variant: 'destructive', title: "Upload Failed", description: `Could not upload the selected files.` });
+    try {
+        const uploadedFiles = await uploadFiles(fileList);
+        
+        if (uploadedFiles && uploadedFiles.length > 0) {
+          const newDocuments = uploadedFiles.map(file => ({
+            type: file.type as 'image' | 'video' | 'layout',
+            name: file.name,
+            url: file.url,
+          }));
+          append(newDocuments);
+          toast({ title: "Upload Complete", description: `${newDocuments.length} file(s) added.` });
+        } else {
+          toast({ variant: 'destructive', title: "Upload Failed", description: `Could not upload the selected files.` });
+        }
+    } catch (error) {
+        console.error(error);
+        toast({ variant: 'destructive', title: "Upload Error", description: `An unexpected error occurred during upload.` });
+    } finally {
+        if (event.target) {
+            event.target.value = ''; // Reset file input
+        }
+        setIsSubmitting(false);
     }
-
-    if (event.target) {
-        event.target.value = ''; // Reset file input
-    }
-    setIsSubmitting(false);
   };
 
   const handleGenerateDescription = async () => {
