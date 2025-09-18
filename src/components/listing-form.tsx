@@ -232,7 +232,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
-    input.accept = "image/*,video/*,application/pdf";
+    input.accept = ".jpg, .jpeg, .png, .gif, .mp4, .mov, .pdf";
     
     input.onchange = async (e) => {
         const files = (e.target as HTMLInputElement).files;
@@ -341,7 +341,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               {isEditMode ? 'Update the details for this listing.' : 'Fill out the form to create a new warehouse listing for admin approval.'}
             </DialogDescription>
           </DialogHeader>
-          <Form {...form}>
+            <Form {...form}>
             <form id="listing-form" onSubmit={form.handleSubmit(handleSubmit)}>
               <ScrollArea className="h-[70vh] p-1 pr-6">
                 <div className="space-y-8">
@@ -775,7 +775,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               </ScrollArea>
               <DialogFooter className="pt-4">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit" form="listing-form">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
+                <Button type="submit">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
               </DialogFooter>
             </form>
           </Form>
