@@ -278,7 +278,7 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
     toast({
         variant: 'destructive',
         title: 'Please fix the errors',
-        description: errorMessages.join('\n') || 'Some required fields are missing or invalid.',
+        description: `There are missing or invalid fields on the form. Please review and try again.`,
     });
   }
 
@@ -323,7 +323,20 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
                   <CardHeader><CardTitle className="text-base flex items-center gap-2"><Building className="h-5 w-5"/>General Information</CardTitle></CardHeader>
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <FormField control={form.control} name="size" render={({ field }) => (<FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g. 50000" /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="floor" render={({ field }) => (<FormItem><FormLabel>Floor</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Ground">Ground</SelectItem><SelectItem value="First Floor">First Floor</SelectItem><SelectItem value="Multi-Floor">Multi-Floor</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="floor" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Floor</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select floor" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                              <SelectItem value="Ground">Ground</SelectItem>
+                              <SelectItem value="First Floor">First Floor</SelectItem>
+                              <SelectItem value="Multi-Floor">Multi-Floor</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
                       <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (<FormItem><FormLabel>Readiness to Occupy</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Immediate">Immediate</SelectItem><SelectItem value="Within 45 Days">Within 45 Days</SelectItem><SelectItem value="Within 90 Days">Within 90 Days</SelectItem><SelectItem value="More than 90 Days">More than 90 Days</SelectItem><SelectItem value="BTS">BTS</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                       <FormField control={form.control} name="serviceModel" render={({ field }) => (<FormItem><FormLabel>Service Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Standard">Standard</SelectItem><SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem><SelectItem value="Both">Both</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                   </CardContent>
