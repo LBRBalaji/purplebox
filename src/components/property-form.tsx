@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast";
 import { createPropertySchema, type PropertySchema, type DemandSchema, type ListingSchema } from "@/lib/schema";
-import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin, Library } from 'lucide-react';
+import { Building2, HandCoins, User, FileBadge, Plug, Flame, Truck, Images, Info, Copy, Check, Sparkles, Wand, ClipboardList, FileText, ListChecks, ChevronsUpDown, Building, Factory, Construction as CraneIcon, Car, HardHat, Droplets, Wind, CircuitBoard, Lightbulb, UserCog, Briefcase, PlusCircle, ShieldCheck, Scaling, Zap, AlertTriangle, CheckCircle, Pin, Library, PinIcon } from 'lucide-react';
 import { useData } from "@/contexts/data-context";
 import { useAuth } from "@/contexts/auth-context";
 import { Badge } from "./ui/badge";
@@ -501,6 +501,31 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
                   </p>
                 </CardContent>
               </Card>
+
+              <FormField
+                control={form.control}
+                name="isLocationConfirmed"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4 shadow-sm bg-card">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="flex items-center gap-2">
+                        <PinIcon className="h-4 w-4" /> I confirm the location of my property matches this demand.
+                      </FormLabel>
+                      <FormDescription>
+                        You must confirm that your property is within the customer's specified radius of {demandToMatch?.radius}km from {demandToMatch?.locationName}.
+                      </FormDescription>
+                       <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+
             </div>
 
             <div className="lg:col-span-1 space-y-6">
@@ -539,3 +564,4 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
     </>
   );
 }
+
