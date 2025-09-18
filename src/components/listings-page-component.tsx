@@ -760,5 +760,3 @@ export function ListingsPage() {
     </>
   );
 }
-
-    

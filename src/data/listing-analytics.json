@@ -25,7 +25,7 @@
   {
     "listingId": "LST-XHJLWC",
     "views": 0,
-    "downloads": 2,
+    "downloads": 4,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -35,6 +35,14 @@
           1757516830770,
           1757589118571
         ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706
+        ]
       }
     ],
     "viewedBy": []
@@ -42,7 +50,7 @@
   {
     "listingId": "LST-J9L9NS",
     "views": 0,
-    "downloads": 2,
+    "downloads": 4,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -51,6 +59,14 @@
         "timestamps": [
           1757516830770,
           1757589118571
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706
         ]
       }
     ],
@@ -93,9 +109,18 @@
   {
     "listingId": "LST-ZCKK92",
     "views": 1,
-    "downloads": 0,
+    "downloads": 2,
     "customerIndustries": {},
-    "downloadedBy": [],
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706
+        ]
+      }
+    ],
     "viewedBy": [
       {
         "name": "Alex Ray",
@@ -107,7 +132,7 @@
   {
     "listingId": "LST-Z75P47",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -116,6 +141,14 @@
         "timestamps": [
           1757589118571
         ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706
+        ]
       }
     ],
     "viewedBy": []
@@ -123,7 +156,7 @@
   {
     "listingId": "LST-IQOMX9",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -131,6 +164,14 @@
         "company": "Alpha Logistics",
         "timestamps": [
           1757589118571
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706
         ]
       }
     ],
