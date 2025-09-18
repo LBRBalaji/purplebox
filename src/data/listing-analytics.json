@@ -2,7 +2,7 @@
   {
     "listingId": "LST-0RMXOY",
     "views": 1,
-    "downloads": 6,
+    "downloads": 8,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -24,7 +24,9 @@
       {
         "timestamps": [
           1758210663897,
-          1758210663897
+          1758210663897,
+          1758211431099,
+          1758211431099
         ]
       }
     ],
@@ -39,7 +41,7 @@
   {
     "listingId": "LST-XHJLWC",
     "views": 0,
-    "downloads": 8,
+    "downloads": 10,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -63,7 +65,9 @@
       {
         "timestamps": [
           1758210663897,
-          1758210663897
+          1758210663897,
+          1758211370639,
+          1758211370639
         ]
       }
     ],
@@ -99,7 +103,7 @@
   {
     "listingId": "LST-I4S3EK",
     "views": 0,
-    "downloads": 3,
+    "downloads": 5,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -116,6 +120,12 @@
           1758209364190,
           1758209364190
         ]
+      },
+      {
+        "timestamps": [
+          1758211431099,
+          1758211431099
+        ]
       }
     ],
     "viewedBy": []
@@ -123,7 +133,7 @@
   {
     "listingId": "LST-8NGG6W",
     "views": 0,
-    "downloads": 3,
+    "downloads": 5,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -133,6 +143,12 @@
           1758206985167,
           1758206985167,
           1757516830770
+        ]
+      },
+      {
+        "timestamps": [
+          1758211370639,
+          1758211370639
         ]
       }
     ],
@@ -228,7 +244,7 @@
   {
     "listingId": "LST-9M05SY",
     "views": 0,
-    "downloads": 7,
+    "downloads": 9,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -255,6 +271,12 @@
           1758208934270,
           1758208934270
         ]
+      },
+      {
+        "timestamps": [
+          1758211431099,
+          1758211431099
+        ]
       }
     ],
     "viewedBy": []
@@ -262,7 +284,7 @@
   {
     "listingId": "LST-3PL001",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -270,6 +292,12 @@
         "company": "Alpha Logistics",
         "timestamps": [
           1758206985167
+        ]
+      },
+      {
+        "timestamps": [
+          1758211431099,
+          1758211431099
         ]
       }
     ],
@@ -336,7 +364,7 @@
   {
     "listingId": "LST-L4WAS7",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -344,6 +372,12 @@
         "company": "Beta Retail",
         "timestamps": [
           1758208040575
+        ]
+      },
+      {
+        "timestamps": [
+          1758211370639,
+          1758211370639
         ]
       }
     ],
@@ -410,7 +444,7 @@
   {
     "listingId": "LST-QWQFTO",
     "views": 0,
-    "downloads": 3,
+    "downloads": 5,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -423,7 +457,9 @@
       {
         "timestamps": [
           1758210663897,
-          1758210663897
+          1758210663897,
+          1758211431099,
+          1758211431099
         ]
       }
     ],
@@ -472,6 +508,34 @@
       {
         "timestamps": [
           1758210663897
+        ]
+      }
+    ],
+    "viewedBy": []
+  },
+  {
+    "listingId": "LST-8KQX5D",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "timestamps": [
+          1758211370639
+        ]
+      }
+    ],
+    "viewedBy": []
+  },
+  {
+    "listingId": "LST-ELTUE2",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "timestamps": [
+          1758211370639
         ]
       }
     ],

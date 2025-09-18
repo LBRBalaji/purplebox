@@ -52,7 +52,7 @@ type ListingFormProps = {
   onOpenChange: (open: boolean) => void;
   listing?: ListingSchema | null;
   onSubmit: (data: ListingSchema) => void;
-  locationCircles: LocationCircle[];
+  locationCircles?: LocationCircle[];
 };
 
 const buildingTypes = [
@@ -93,7 +93,7 @@ async function uploadFiles(files: File[]): Promise<{ name: string; url: string; 
 }
 
 
-export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationCircles }: ListingFormProps) {
+export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationCircles = [] }: ListingFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const isEditMode = !!listing;
@@ -762,3 +762,4 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
     </>
   );
 }
+

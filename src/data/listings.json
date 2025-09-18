@@ -2,6 +2,723 @@
   {
     "status": "approved",
     "developerId": "admin@indospace.com",
+    "listingId": "LST-49GCZW",
+    "warehouseBoxId": "Vishnuvakkam B 600",
+    "actualSizeSqFt": 32136,
+    "additionalInformation": "BTS-Built To Suit",
+    "name": "",
+    "location": "Tamaraipakkam",
+    "sizeSqFt": 35000,
+    "description": "Secure a prime 35,000 sq. ft. industrial warehouse in Tamaraipakkam, currently under construction.  This PEB structure boasts a 12-meter eave height and a durable Galvalume roof, offering ample space and a robust design.  Standard service model available.  Contact us immediately for leasing opportunities.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "0",
+    "serviceModel": "Standard",
+    "locationCircle": "Madhavaram Circle",
+    "area": {
+      "plinthArea": 35000,
+      "totalChargeableArea": 35000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 3,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-1Q1Q5Y",
+    "warehouseBoxId": "Vishnuvakkam B 500",
+    "actualSizeSqFt": 38408,
+    "additionalInformation": "BTS - Built To Suit",
+    "name": "",
+    "location": "Tamaraipakkam",
+    "sizeSqFt": 40000,
+    "description": "Secure a prime 40,000 sq ft industrial space in Tamaraipakkam. This under-construction PEB building features a 12-meter eave height and a durable Galvalume roof, offering a standard service model ideal for immediate occupancy.  Act now to secure your ideal warehouse location.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "0",
+    "serviceModel": "Standard",
+    "locationCircle": "Madhavaram Circle",
+    "area": {
+      "plinthArea": 40000,
+      "totalChargeableArea": 40000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 4,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 10.11.29 PM.png",
+        "url": "/uploads/1758213699351-Screenshot_2025-09-18_at_10.11.29_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-YMLUBS",
+    "warehouseBoxId": "Vishnuvakkam B 400",
+    "actualSizeSqFt": 381224,
+    "additionalInformation": "Floor Loading\n5 Ton/Sq.m\nPower\nAs per requirement\nDocking\n25 Dock pits + 1 Ramp\nFire Compliance\nHydrants & K115 Sprinklers are provisioned\nApron Area\n16.5 m wide with concrete finish",
+    "name": "",
+    "location": "Tamaraipakkam",
+    "sizeSqFt": 400000,
+    "description": "Ready for occupancy, this 400,000 sq ft Tamaraipakkam warehouse boasts a 12-meter eave height, galvalume roof, and PEB structure, offering immediate solutions for your business needs.  Standard service model included.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "locationCircle": "Madhavaram Circle",
+    "area": {
+      "plinthArea": 400000,
+      "totalChargeableArea": 400000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 25,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 10.02.30 PM.png",
+        "url": "/uploads/1758213455379-Screenshot_2025-09-18_at_10.02.30_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 10.07.16 PM.png",
+        "url": "/uploads/1758213455341-Screenshot_2025-09-18_at_10.07.16_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-KKGGMD",
+    "warehouseBoxId": "Vishnuvakkam B 100",
+    "actualSizeSqFt": 70164,
+    "additionalInformation": "Floor Loading\n5 Ton/Sq.m\nPower\nAs per requirement\nDocking\n10 Docks + 1 Ramp\nFire Compliance\nHydrants & Sprinklers are provisioned\nApron Area\n16.5 m wide with concrete finish",
+    "name": "",
+    "location": "Tamaraipakkam",
+    "sizeSqFt": 73000,
+    "description": "Ready for occupancy, this 73,000 sq. ft. industrial warehouse in Tamaraipakkam offers a 12-meter eave height in a robust PEB structure with a Galvalume roof.  Standard services are included.  Act now to secure this prime space.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "locationCircle": "Madhavaram Circle",
+    "area": {
+      "plinthArea": 73000,
+      "totalChargeableArea": 73000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 8,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Turbo"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 10.02.17 PM.png",
+        "url": "/uploads/1758213192176-Screenshot_2025-09-18_at_10.02.17_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 10.02.30 PM.png",
+        "url": "/uploads/1758213192208-Screenshot_2025-09-18_at_10.02.30_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-KC5RZI",
+    "warehouseBoxId": "Vishnuvakkam B 350",
+    "actualSizeSqFt": 332432,
+    "additionalInformation": "The ready built facility is compliant for both Warehousing and Manufacturing purposes as per DTCP and TNPCB.\n5 Ton/sqm Floor loading\n- Hydrants & Sprinklers provisioned",
+    "name": "",
+    "location": "Tamaraipakkam",
+    "sizeSqFt": 350000,
+    "description": "Ready for immediate occupancy, this 350,000 sq. ft. PEB warehouse in Thiruvallur offers a 12-meter eave height and a robust Galvalume roof.  The standard service model and expansive size make this property ideal for large-scale industrial operations.  ",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "80%",
+    "serviceModel": "Standard",
+    "locationCircle": "Madhavaram Circle",
+    "area": {
+      "plinthArea": 350000,
+      "totalChargeableArea": 350000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 40,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.51.50 PM.png",
+        "url": "/uploads/1758212902658-Screenshot_2025-09-18_at_9.51.50_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.52.08 PM.png",
+        "url": "/uploads/1758212902445-Screenshot_2025-09-18_at_9.52.08_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.52.01 PM.png",
+        "url": "/uploads/1758212902504-Screenshot_2025-09-18_at_9.52.01_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-5TMPYK",
+    "warehouseBoxId": "Koodapakkam B 100",
+    "actualSizeSqFt": 70164,
+    "additionalInformation": "5 Ton/sqm Floor loading\n- Hydrants & Sprinklers provisioned\nThe ready built facility is compliant for both Warehousing and Manufacturing purposes as per DTCP and TNPCB.",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 73000,
+    "description": "Ready for immediate occupancy, this 73,000 sq ft industrial warehouse in Thiruvallur offers a high-quality, standard service model.  Its PEB structure with a 12-meter eave height and durable Galvalume roof ensures optimal functionality and durability, making it an ideal space for various industrial and warehousing needs.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "locationCircle": "Thiruvallur",
+    "area": {
+      "plinthArea": 73000,
+      "totalChargeableArea": 73000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 9,
+      "internalLighting": "LED-HI Bay 300 lux",
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.51.50 PM.png",
+        "url": "/uploads/1758212719960-Screenshot_2025-09-18_at_9.51.50_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.52.08 PM.png",
+        "url": "/uploads/1758212719706-Screenshot_2025-09-18_at_9.52.08_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.52.01 PM.png",
+        "url": "/uploads/1758212719709-Screenshot_2025-09-18_at_9.52.01_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-NBP7VL",
+    "warehouseBoxId": "Koodapakkam B 200 B",
+    "actualSizeSqFt": 168995,
+    "additionalInformation": "Floor Loading\n5 Ton/Sq.m\nPower\nAs per requirement\nDocking\n11 Dock pits + 1 Ramp (Proposed)\nFire Compliance\nHydrants & Sprinklers are available\nApron Area\n16.5 m wide with concrete finish\nComments\nThe ready built facility is compliant for both Warehousing and Manufacturing purposes as per DTCP and TNPCB.",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 175000,
+    "description": "Ready for immediate occupancy, this 175,000 sq ft PEB warehouse in Thiruvallur offers a 12-meter eave height and a Galvalume roof, providing ample space and superior protection.  The standard service model ensures efficient operations.  This property presents a significant opportunity for businesses seeking a large-scale, high-quality industrial space.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "locationCircle": "Thiruvallur",
+    "area": {
+      "plinthArea": 175000,
+      "totalChargeableArea": 175000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "internalLighting": "LED-HI Bay 200 lux",
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.52.08 PM.png",
+        "url": "/uploads/1758212558304-Screenshot_2025-09-18_at_9.52.08_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.52.01 PM.png",
+        "url": "/uploads/1758212558356-Screenshot_2025-09-18_at_9.52.01_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.51.50 PM.png",
+        "url": "/uploads/1758212558498-Screenshot_2025-09-18_at_9.51.50_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-UC3IN5",
+    "warehouseBoxId": "Polivakkam B 400 C",
+    "actualSizeSqFt": 42826,
+    "additionalInformation": "5 Ton/sqm Floor loading\n- Hydrants & Sprinklers provisioned",
+    "name": "",
+    "location": "Thiruvallur",
+    "sizeSqFt": 45000,
+    "description": "Ready for immediate occupancy, this 45,000 sq ft PEB warehouse in Oragadam offers a practical and efficient workspace.  Featuring a 9.2-meter eave height and a durable galvalume roof, this standard-service model building provides ample space and robust construction.  Act now to secure this prime industrial property.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "locationCircle": "Thiruvallur",
+    "area": {
+      "plinthArea": 45000,
+      "totalChargeableArea": 45000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 5,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.47.46 PM.png",
+        "url": "/uploads/1758212288587-Screenshot_2025-09-18_at_9.47.46_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.47.40 PM.png",
+        "url": "/uploads/1758212288509-Screenshot_2025-09-18_at_9.47.40_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.47.32 PM.png",
+        "url": "/uploads/1758212288601-Screenshot_2025-09-18_at_9.47.32_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-90DWHQ",
+    "warehouseBoxId": "Oragadam II B100",
+    "actualSizeSqFt": 26421,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 28000,
+    "description": "Ready for immediate occupancy, this 28,000 sq. ft. PEB warehouse in Oragadam offers a 12-meter eave height and a robust galvalume roof.  The standard service model ensures efficient operations in this strategically located facility.  Ideal for businesses seeking a spacious and functional industrial space.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 28000,
+      "totalChargeableArea": 28000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 3,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.14 PM.png",
+        "url": "/uploads/1758212065335-Screenshot_2025-09-18_at_9.37.14_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.32 PM.png",
+        "url": "/uploads/1758212065207-Screenshot_2025-09-18_at_9.37.32_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.26 PM.png",
+        "url": "/uploads/1758212065191-Screenshot_2025-09-18_at_9.37.26_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.44.51 PM.png",
+        "url": "/uploads/1758212103082-Screenshot_2025-09-18_at_9.44.51_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-U0L6J6",
+    "warehouseBoxId": "Oragadam II B300C",
+    "actualSizeSqFt": 93646,
+    "additionalInformation": "Floor Loading\n5 Ton/Sq.m\nPower\nAs per requirement\nDocking\n12 Docking bays + 2 Ramps\nFire Compliance\nHydrants are available; Sprinklers are provisioned\nApron Area\n16.5 m wide with concrete finish\nComments\nThe facility has a ready partition option of 24,004 SF",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 95000,
+    "description": "Ready for immediate occupancy, this 95,000 sq. ft. PEB warehouse in Oragadam offers a 12-meter eave height and a galvalume roof.  The standard-service model facility provides ample space for various industrial and warehousing needs.  ",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 95000,
+      "totalChargeableArea": 95000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.14 PM.png",
+        "url": "/uploads/1758211937436-Screenshot_2025-09-18_at_9.37.14_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.32 PM.png",
+        "url": "/uploads/1758211937330-Screenshot_2025-09-18_at_9.37.32_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.26 PM.png",
+        "url": "/uploads/1758211937281-Screenshot_2025-09-18_at_9.37.26_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-UJ2NM9",
+    "warehouseBoxId": "Oragadam II B300A/B",
+    "actualSizeSqFt": 31169,
+    "additionalInformation": "Chargeable Area (Sq.Ft)\n31,169\nClear Height\n12 m at Eaves\n\nFloor Loading\n5 Ton/Sq.m\n\nPower\nAs per requirement\n\nDocking\n4 Docking bays + 1 Ramp\n\nFire Compliance\nHydrants are available; Sprinklers are provisioned\n\nApron Area\n16.5 m wide with concrete finish\n\nThe facility has a ready partition option of 15,870 SF and 15,299 SF",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 32000,
+    "description": "Ready for immediate occupancy, this 32,000 sq ft industrial property in Oragadam offers a 12-meter eave height in a robust PEB structure with a durable Galvalume roof.  The standard service model ensures efficient operations.  This expansive space is ideal for businesses seeking a high-quality, readily available warehouse solution.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "serviceModel": "Standard",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 32000,
+      "totalChargeableArea": 32000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 4,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.14 PM.png",
+        "url": "/uploads/1758211769322-Screenshot_2025-09-18_at_9.37.14_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.32 PM.png",
+        "url": "/uploads/1758211763283-Screenshot_2025-09-18_at_9.37.32_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 9.37.26 PM.png",
+        "url": "/uploads/1758211763239-Screenshot_2025-09-18_at_9.37.26_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
     "listingId": "LST-SKFITH",
     "warehouseBoxId": "Ulavur B600",
     "actualSizeSqFt": 270000,
