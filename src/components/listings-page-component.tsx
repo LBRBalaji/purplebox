@@ -17,7 +17,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Checkbox } from '@/components/ui/checkbox';
 import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
-import { cn, convertGoogleDriveLink } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { LoginDialog } from './login-dialog';
 import { LimitExceededDialog } from './limit-exceeded-dialog';
 import { Badge } from '@/components/ui/badge';
@@ -118,7 +118,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                   <CarouselItem key={index}>
                     <div className="aspect-video relative">
                       <Image
-                        src={convertGoogleDriveLink(doc.url)}
+                        src={doc.url}
                         alt={doc.name || listing.listingId}
                         fill
                         className="object-cover"
@@ -457,7 +457,7 @@ export function ListingsPage() {
     if (locationFilter) {
       const lowerLocation = locationFilter.toLowerCase();
       const circle = locationCircles.find(c => 
-          c.locations.some(loc => loc.toLowerCase().includes(lowerLocation)) ||
+          c.locations.some(loc => lowerLocation.includes(loc.toLowerCase())) ||
           c.name.toLowerCase().includes(lowerLocation)
       );
 
