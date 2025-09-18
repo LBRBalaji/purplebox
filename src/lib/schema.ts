@@ -9,7 +9,7 @@ function asOptionalField<T extends z.ZodTypeAny>(schema: T) {
 
 export const documentSchema = z.object({
   type: z.enum(["layout", "image", "video"]),
-  name: z.string(),
+  name: z.string().optional(),
   url: z.string().url(),
   file: z.any().optional(), // Temporary field to hold the file object
 });
@@ -484,3 +484,5 @@ export const acknowledgmentSchema = z.object({
   email: z.string().email(),
 });
 export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;
+
+    
