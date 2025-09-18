@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,14 +35,13 @@ import { Textarea } from "./ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
-import { AlertTriangle, Trash2, Wand2, PlusCircle } from "lucide-react";
+import { AlertTriangle, Trash2, Wand2, PlusCircle, UploadCloud } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { generateListingDescriptionAction } from "@/lib/actions";
 import { Sparkles } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
-import { convertGoogleDriveLink } from "@/lib/utils";
 import Image from "next/image";
 
 
@@ -65,10 +63,13 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const { toast } = useToast();
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [isUploading, setIsUploading] = React.useState(false);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
   const [locationCircles, setLocationCircles] = React.useState<{name: string, locations: string[]}[]>([]);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
@@ -224,6 +225,59 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     }
     fetchCircles();
   }, [isOpen, isAdmin]);
+  
+  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    toast({ title: 'Uploading...', description: `Uploading ${files.length} file(s).` });
+
+    const uploadPromises = Array.from(files).map(async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Upload failed');
+            }
+            const result = await response.json();
+            return {
+                type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
+                name: file.name,
+                url: result.url,
+            };
+        } catch (error) {
+            console.error('Error uploading file:', file.name, error);
+            return null; // Return null for failed uploads
+        }
+    });
+
+    const results = await Promise.all(uploadPromises);
+    const successfulUploads = results.filter(r => r !== null);
+
+    if (successfulUploads.length > 0) {
+        append(successfulUploads as any);
+        toast({ title: 'Upload Complete', description: `${successfulUploads.length} file(s) added.` });
+    }
+
+    if (successfulUploads.length < files.length) {
+        toast({ variant: 'destructive', title: 'Upload Failed', description: `${files.length - successfulUploads.length} file(s) could not be uploaded.` });
+    }
+
+    setIsUploading(false);
+    // Reset file input
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+  };
+
 
   const handleGenerateDescription = async () => {
     setIsGenerating(true);
@@ -511,15 +565,29 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             We thank you in advance for your understanding and cooperation in respecting this platform policy.
                         </AlertDescription>
                     </Alert>
+                    
+                    <input
+                      type="file"
+                      multiple
+                      ref={fileInputRef}
+                      onChange={handleBulkUpload}
+                      className="hidden"
+                      accept="image/*,video/*,application/pdf"
+                    />
+                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                        <UploadCloud className="mr-2 h-4 w-4" />
+                        {isUploading ? 'Uploading...' : 'Upload Media (Bulk)'}
+                    </Button>
+
                     {fields.map((field, index) => {
                         const fileUrl = form.watch(`documents.${index}.url`);
                         const fileType = form.watch(`documents.${index}.type`);
                         return (
-                            <div key={field.id} className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_1fr_auto] gap-4 items-end">
+                            <div key={field.id} className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_auto] gap-4 items-end">
                                 <div className="w-20 h-20 relative bg-secondary rounded-md overflow-hidden">
                                 {fileType === 'image' && fileUrl && (
                                     <Image
-                                        src={convertGoogleDriveLink(fileUrl)}
+                                        src={fileUrl}
                                         alt={field.name || 'Preview'}
                                         fill
                                         className="object-cover"
@@ -533,11 +601,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                                     <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
                                         <SelectItem value="image">Image</SelectItem>
                                         <SelectItem value="video">Video</SelectItem>
-                                        <SelectItem value="layout">Layout</SelectItem>
+                                        <SelectItem value="layout">Layout/PDF</SelectItem>
                                     </SelectContent></Select><FormMessage /></FormItem>
-                                )} />
-                                <FormField control={form.control} name={`documents.${index}.url`} render={({ field }) => (
-                                    <FormItem><FormLabel>Google Drive Link</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="Shareable Google Drive link" /></FormControl><FormMessage /></FormItem>
                                 )} />
                                 <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
                                     <Trash2 className="h-4 w-4" />
@@ -545,7 +610,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             </div>
                         );
                     })}
-                    <Button type="button" variant="outline" onClick={() => append({ type: 'image', name: '', url: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Document</Button>
+                    {fields.length === 0 && <p className="text-sm text-muted-foreground">No media uploaded yet.</p>}
                  </div>
               </div>
                {/* Additional Information */}
