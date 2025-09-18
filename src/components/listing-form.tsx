@@ -60,6 +60,38 @@ const buildingTypes = [
     { id: 'Standard Shed', label: 'Standard Shed' },
 ];
 
+async function uploadFiles(files: FileList): Promise<{ type: 'image' | 'video' | 'layout'; name: string; url: string; }[] | null> {
+    if (!files || files.length === 0) return null;
+
+    const uploadPromises = Array.from(files).map(async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Upload failed');
+            }
+            const result = await response.json();
+            return {
+                type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
+                name: file.name,
+                url: result.url,
+            };
+        } catch (error) {
+            console.error('Error uploading file:', file.name, error);
+            return null;
+        }
+    });
+
+    const results = await Promise.all(uploadPromises);
+    return results.filter(r => r !== null) as { type: 'image' | 'video' | 'layout'; name: string; url: string; }[];
+}
+
+
 export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: ListingFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -236,45 +268,22 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     
     input.onchange = async (e) => {
         const files = (e.target as HTMLInputElement).files;
-        if (!files || files.length === 0) return;
+        if (!files) return;
 
         setIsUploading(true);
         toast({ title: 'Uploading...', description: `Uploading ${files.length} file(s).` });
 
-        const uploadPromises = Array.from(files).map(async (file) => {
-            const formData = new FormData();
-            formData.append('file', file);
-            try {
-                const response = await fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Upload failed');
-                }
-                const result = await response.json();
-                return {
-                    type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
-                    name: file.name,
-                    url: result.url,
-                };
-            } catch (error) {
-                console.error('Error uploading file:', file.name, error);
-                return null;
-            }
-        });
+        const results = await uploadFiles(files);
         
-        const results = await Promise.all(uploadPromises);
-        const successfulUploads = results.filter(r => r !== null);
+        if (results && results.length > 0) {
+            append(results);
+            toast({ title: 'Upload Complete', description: `${results.length} file(s) added.` });
+        }
 
-        if (successfulUploads.length > 0) {
-            append(successfulUploads as any);
-            toast({ title: 'Upload Complete', description: `${successfulUploads.length} file(s) added.` });
+        if (!results || results.length < files.length) {
+            toast({ variant: 'destructive', title: 'Upload Incomplete', description: `${files.length - (results?.length || 0)} file(s) could not be uploaded.` });
         }
-        if (successfulUploads.length < files.length) {
-            toast({ variant: 'destructive', title: 'Upload Failed', description: `${files.length - successfulUploads.length} file(s) could not be uploaded.` });
-        }
+        
         setIsUploading(false);
     };
     
@@ -342,7 +351,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             </DialogDescription>
           </DialogHeader>
             <Form {...form}>
-            <form id="listing-form" onSubmit={form.handleSubmit(handleSubmit)}>
+            <form id="listing-form-main" onSubmit={form.handleSubmit(handleSubmit)}>
               <ScrollArea className="h-[70vh] p-1 pr-6">
                 <div className="space-y-8">
                   
@@ -784,10 +793,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     
       <Dialog open={!!previewImageUrl} onOpenChange={() => setPreviewImageUrl(null)}>
         <DialogContent className="max-w-4xl h-[90vh] flex flex-col items-center justify-center p-2">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Image Preview</DialogTitle>
-            <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
-          </DialogHeader>
+           <DialogHeader>
+             <DialogTitle className="sr-only">Image Preview</DialogTitle>
+             <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
+           </DialogHeader>
           {previewImageUrl && (
                 <div className="relative w-full h-full">
                     <Image
@@ -803,5 +812,3 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     </>
   );
 }
-
-    
