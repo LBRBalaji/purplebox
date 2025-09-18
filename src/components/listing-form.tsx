@@ -106,51 +106,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
-    defaultValues: {
-      status: 'pending',
-      developerId: '',
-      listingId: '',
-      warehouseBoxId: '',
-      actualSizeSqFt: undefined,
-      additionalInformation: '',
-      name: '',
-      location: '',
-      sizeSqFt: undefined,
-      description: '',
-      rentPerSqFt: undefined,
-      rentalSecurityDeposit: undefined,
-      availabilityDate: 'Ready for Occupancy',
-      constructionProgress: '',
-      serviceModel: 'Standard',
-      locationCircle: '',
-      area: {
-        plinthArea: undefined,
-        mezzanineArea1: undefined,
-        mezzanineArea2: undefined,
-        canopyArea: undefined,
-        driversRestRoomArea: undefined,
-        totalChargeableArea: undefined,
-      },
-      buildingSpecifications: {
-        buildingType: [],
-        craneSupportStructureAvailable: false,
-        craneAvailable: false,
-        warehouseLayoutAvailable: false,
-        louvers: false,
-      },
-      siteSpecifications: {},
-      certificatesAndApprovals: {
-        parkApproval: false,
-        buildingApproval: false,
-        fireLicense: false,
-        fireNOC: false,
-        buildingInsurance: false,
-        pcbForAir: false,
-        pcbForWater: false,
-        propertyTax: false,
-      },
-      documents: [],
-    },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -191,56 +146,32 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
   React.useEffect(() => {
     if (isOpen) {
-        if (isEditMode && listing) {
-            form.reset(listing);
-        } else {
-            form.reset({
-                status: 'pending',
-                developerId: user?.email || '',
-                listingId: '', // Will be set below
-                warehouseBoxId: '',
-                actualSizeSqFt: undefined,
-                additionalInformation: '',
-                name: '',
-                location: '',
-                sizeSqFt: undefined,
-                description: '',
-                rentPerSqFt: undefined,
-                rentalSecurityDeposit: undefined,
-                availabilityDate: 'Ready for Occupancy',
-                constructionProgress: '',
-                serviceModel: 'Standard',
-                locationCircle: '',
-                area: {
-                  plinthArea: undefined,
-                  mezzanineArea1: undefined,
-                  mezzanineArea2: undefined,
-                  canopyArea: undefined,
-                  driversRestRoomArea: undefined,
-                  totalChargeableArea: undefined,
-                },
-                buildingSpecifications: {
-                  buildingType: [],
-                  craneSupportStructureAvailable: false,
-                  craneAvailable: false,
-                  warehouseLayoutAvailable: false,
-                  louvers: false,
-                },
-                siteSpecifications: {},
-                certificatesAndApprovals: {
-                  parkApproval: false,
-                  buildingApproval: false,
-                  fireLicense: false,
-                  fireNOC: false,
-                  buildingInsurance: false,
-                  pcbForAir: false,
-                  pcbForWater: false,
-                  propertyTax: false,
-                },
-                documents: [],
-            });
-             form.setValue("listingId", `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
-        }
+        const defaultValues: ListingSchema = isEditMode && listing ? 
+            {...listing, documents: listing.documents || []} : 
+            {
+              status: 'pending',
+              developerId: user?.email || '',
+              listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+              warehouseBoxId: '',
+              actualSizeSqFt: undefined,
+              additionalInformation: '',
+              name: '',
+              location: '',
+              sizeSqFt: undefined,
+              description: '',
+              rentPerSqFt: undefined,
+              rentalSecurityDeposit: undefined,
+              availabilityDate: 'Ready for Occupancy',
+              constructionProgress: '',
+              serviceModel: 'Standard',
+              locationCircle: '',
+              area: { plinthArea: undefined, mezzanineArea1: undefined, mezzanineArea2: undefined, canopyArea: undefined, driversRestRoomArea: undefined, totalChargeableArea: undefined, },
+              buildingSpecifications: { buildingType: [], craneSupportStructureAvailable: false, craneAvailable: false, warehouseLayoutAvailable: false, louvers: false, },
+              siteSpecifications: {},
+              certificatesAndApprovals: { parkApproval: false, buildingApproval: false, fireLicense: false, fireNOC: false, buildingInsurance: false, pcbForAir: false, pcbForWater: false, propertyTax: false, },
+              documents: [],
+            };
+        form.reset(defaultValues);
     }
   }, [isOpen, isEditMode, listing, form, user]);
 
@@ -340,14 +271,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                 }
               }
               return doc;
-            }).filter(doc => doc.url); // Remove any that failed to upload
+            }).filter(doc => doc.url || doc.file); // Keep existing or newly uploaded
           }
         }
         
         const finalData = { ...data, isAdmin };
         
-        await new Promise(resolve => setTimeout(resolve, 200)); 
-
         onSubmit(finalData);
         
         toast({
@@ -396,7 +325,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             </DialogDescription>
           </DialogHeader>
             <Form {...form}>
-            <form id="listing-form-main" onSubmit={form.handleSubmit(handleSubmitWrapper, onInvalidSubmit)}>
+            <form onSubmit={form.handleSubmit(handleSubmitWrapper, onInvalidSubmit)}>
               <ScrollArea className="h-[70vh] p-1 pr-6">
                 <div className="space-y-8">
                   
@@ -839,7 +768,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               </ScrollArea>
               <DialogFooter className="pt-4">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit" form="listing-form-main" disabled={isSubmitting}>{isSubmitting ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Submit')}</Button>
+                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Submit')}</Button>
               </DialogFooter>
             </form>
           </Form>
