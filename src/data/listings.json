@@ -1,5 +1,42 @@
 [
   {
+    "listingId": "LST-L4WAS7",
+    "developerId": "admin@indospace.com",
+    "status": "pending",
+    "warehouseBoxId": "Ulavur B400",
+    "actualSizeSqFt": 351309,
+    "name": "",
+    "location": "Oragadam",
+    "locationCircle": "",
+    "sizeSqFt": 350000,
+    "description": "",
+    "additionalInformation": "",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "serviceModel": "Standard",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": false,
+      "louvers": false
+    },
+    "siteSpecifications": {},
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": false,
+      "fireLicense": false,
+      "fireNOC": false,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": false
+    },
+    "documents": [],
+    "isAdmin": false
+  },
+  {
     "listingId": "LST-8KQX5D",
     "developerId": "namasivayam.lion@gmail.com",
     "status": "approved",
