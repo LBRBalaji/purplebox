@@ -44,8 +44,7 @@ import type { DateRange } from 'react-day-picker';
 import * as XLSX from 'xlsx';
 
 
-function AdminListingCard({ listing, analytics, providerName, onEdit }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string, onEdit: (listing: ListingSchema) => void }) {
-  const { updateListingStatus } = useData();
+function AdminListingCard({ listing, analytics, providerName, onStatusChange, onEdit }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema, intent?: 'approve') => void }) {
   const { toast } = useToast();
 
   const statusConfig = {
@@ -56,22 +55,18 @@ function AdminListingCard({ listing, analytics, providerName, onEdit }: { listin
   };
   const status = statusConfig[listing.status] || { text: 'Unknown', className: 'bg-gray-100 text-gray-800' };
 
-  const handleStatusChange = (newStatus: ListingStatus) => {
-    if (newStatus === 'approved' && !listing.locationCircle) {
+  const handleApproveClick = () => {
+    if (!listing.locationCircle) {
       toast({
         variant: 'destructive',
         title: 'Action Required',
         description: 'Please assign a Location Circle before approving this listing.',
       });
-      onEdit(listing); // Open the edit form
+      onEdit(listing, 'approve'); // Open the edit form with intent to approve
       return;
     }
-    updateListingStatus(listing.listingId, newStatus);
-    toast({
-      title: 'Listing Status Updated',
-      description: `Listing "${listing.listingId}" has been set to ${newStatus}.`,
-    });
-  }
+    onStatusChange('approved');
+  };
 
   return (
     <Card className="flex flex-col">
@@ -99,16 +94,16 @@ function AdminListingCard({ listing, analytics, providerName, onEdit }: { listin
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Manage Status</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => handleStatusChange('approved')}>
+                <DropdownMenuItem onClick={handleApproveClick}>
                   <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Approve
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusChange('rejected')}>
+                <DropdownMenuItem onClick={() => onStatusChange('rejected')}>
                   <XCircle className="mr-2 h-4 w-4 text-red-500" /> Reject
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusChange('pending')}>
+                <DropdownMenuItem onClick={() => onStatusChange('pending')}>
                   <PauseCircle className="mr-2 h-4 w-4 text-amber-500" /> Set to Pending
                 </DropdownMenuItem>
-                 <DropdownMenuItem onClick={() => handleStatusChange('leased')}>
+                 <DropdownMenuItem onClick={() => onStatusChange('leased')}>
                   <PauseCircle className="mr-2 h-4 w-4 text-blue-500" /> Mark as Leased
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -212,8 +207,9 @@ function AdminListingCard({ listing, analytics, providerName, onEdit }: { listin
 }
 
 export function AdminListings() {
-  const { listings, listingAnalytics, updateListing, locationCircles } = useData();
+  const { listings, listingAnalytics, updateListing, updateListingStatus, locationCircles } = useData();
   const { users } = useAuth();
+  const { toast } = useToast();
   
   const [filteredListings, setFilteredListings] = React.useState<ListingSchema[]>([]);
   const [locationFilter, setLocationFilter] = React.useState('');
@@ -227,6 +223,7 @@ export function AdminListings() {
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
+  const [editIntent, setEditIntent] = React.useState<'approve' | undefined>(undefined);
 
   const allDevelopers = React.useMemo(() => {
     const developerEmails = new Set(listings.map(l => l.developerId));
@@ -272,8 +269,9 @@ export function AdminListings() {
     setDateRange({ from: subDays(new Date(), 29), to: new Date() });
   }
 
-  const handleEdit = (listing: ListingSchema) => {
+  const handleEdit = (listing: ListingSchema, intent?: 'approve') => {
     setSelectedListing(listing);
+    setEditIntent(intent);
     setIsFormOpen(true);
   };
 
@@ -281,7 +279,16 @@ export function AdminListings() {
     updateListing(data);
     setIsFormOpen(false);
     setSelectedListing(null);
+    setEditIntent(undefined);
   };
+
+  const handleStatusChange = (listingId: string, status: ListingStatus) => {
+    updateListingStatus(listingId, status);
+    toast({
+      title: 'Listing Status Updated',
+      description: `Listing "${listingId}" has been set to ${status}.`,
+    });
+  }
   
   const handleDownloadReport = () => {
     const from = dateRange?.from;
@@ -450,7 +457,7 @@ export function AdminListings() {
             {filteredListings.map(listing => {
               const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
               const providerName = getProviderName(listing.developerId);
-              return <AdminListingCard key={listing.listingId} listing={listing} analytics={analytics} providerName={providerName} onEdit={handleEdit} />;
+              return <AdminListingCard key={listing.listingId} listing={listing} analytics={analytics} providerName={providerName} onStatusChange={(newStatus) => handleStatusChange(listing.listingId, newStatus)} onEdit={handleEdit} />;
             })}
           </div>
         ) : (
@@ -466,6 +473,7 @@ export function AdminListings() {
         listing={selectedListing}
         onSubmit={handleFormSubmit}
         locationCircles={locationCircles}
+        initialIntent={editIntent}
       />
     </>
   );

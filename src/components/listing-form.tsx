@@ -53,6 +53,7 @@ type ListingFormProps = {
   listing?: ListingSchema | null;
   onSubmit: (data: ListingSchema) => void;
   locationCircles?: LocationCircle[];
+  initialIntent?: 'approve';
 };
 
 const buildingTypes = [
@@ -93,7 +94,7 @@ async function uploadFiles(files: File[]): Promise<{ name: string; url: string; 
 }
 
 
-export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationCircles = [] }: ListingFormProps) {
+export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationCircles = [], initialIntent }: ListingFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const isEditMode = !!listing;
@@ -105,7 +106,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const form = useForm<ListingSchema>();
+  const form = useForm<ListingSchema>({
+      // No defaultValues here; we will use form.reset() in useEffect for controlled initialization
+  });
+
 
   React.useEffect(() => {
     if (isOpen) {
@@ -242,13 +246,18 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   const handleSubmitWrapper = async (data: ListingSchema) => {
     setIsSubmitting(true);
     try {
+        // Smart Approval Logic for Admins
+        if (isAdmin && initialIntent === 'approve' && data.locationCircle && listing?.status === 'pending') {
+            data.status = 'approved';
+        }
+        
         const finalData = { ...data, isAdmin };
         await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
         onSubmit(finalData);
         
         toast({
             title: isEditMode ? "Listing Updated" : "Listing Submitted",
-            description: `Your listing for "${data.listingId}" has been saved.`
+            description: `Your listing for "${data.listingId}" has been saved. New status: ${data.status}.`
         });
         
         onOpenChange(false);
@@ -762,4 +771,3 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
     </>
   );
 }
-
