@@ -11,18 +11,31 @@
     "sizeSqFt": 350000,
     "description": "",
     "additionalInformation": "",
-    "availabilityDate": "Ready for Occupancy",
-    "constructionProgress": "",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "40%",
     "serviceModel": "Standard",
-    "area": {},
+    "area": {
+      "plinthArea": 351309,
+      "totalChargeableArea": 351309
+    },
     "buildingSpecifications": {
-      "buildingType": [],
+      "buildingType": [
+        "PEB"
+      ],
+      "numberOfDocksAndShutters": 35,
       "craneSupportStructureAvailable": false,
       "craneAvailable": false,
-      "warehouseLayoutAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
       "louvers": false
     },
-    "siteSpecifications": {},
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
     "certificatesAndApprovals": {
       "parkApproval": false,
       "buildingApproval": false,

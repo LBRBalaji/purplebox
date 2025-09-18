@@ -781,17 +781,21 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               )} />
             </div>
             </ScrollArea>
+             <DialogFooter className="pt-4">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+              <Button type="submit" form="listing-form">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
+            </DialogFooter>
           </form>
         </Form>
-        <DialogFooter className="pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" form="listing-form">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
     
     <Dialog open={!!previewImageUrl} onOpenChange={() => setPreviewImageUrl(null)}>
         <DialogContent className="max-w-4xl h-[90vh] flex flex-col items-center justify-center p-2">
+            <DialogHeader>
+                <DialogTitle className="sr-only">Image Preview</DialogTitle>
+                <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
+            </DialogHeader>
            {previewImageUrl && (
                 <div className="relative w-full h-full">
                     <Image
