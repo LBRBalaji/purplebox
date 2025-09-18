@@ -2,7 +2,7 @@
   {
     "listingId": "LST-0RMXOY",
     "views": 1,
-    "downloads": 4,
+    "downloads": 6,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -20,6 +20,12 @@
           1758208336205,
           1758208336205
         ]
+      },
+      {
+        "timestamps": [
+          1758210663897,
+          1758210663897
+        ]
       }
     ],
     "viewedBy": [
@@ -33,7 +39,7 @@
   {
     "listingId": "LST-XHJLWC",
     "views": 0,
-    "downloads": 6,
+    "downloads": 8,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -52,6 +58,12 @@
           1758207777706,
           1758209364190,
           1758209364190
+        ]
+      },
+      {
+        "timestamps": [
+          1758210663897,
+          1758210663897
         ]
       }
     ],
@@ -376,7 +388,7 @@
   {
     "listingId": "LST-91LUXK",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -385,6 +397,12 @@
         "timestamps": [
           1758208725273
         ]
+      },
+      {
+        "timestamps": [
+          1758210663897,
+          1758210663897
+        ]
       }
     ],
     "viewedBy": []
@@ -392,7 +410,7 @@
   {
     "listingId": "LST-QWQFTO",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -400,6 +418,12 @@
         "company": "Beta Retail",
         "timestamps": [
           1758208934270
+        ]
+      },
+      {
+        "timestamps": [
+          1758210663897,
+          1758210663897
         ]
       }
     ],
@@ -434,6 +458,20 @@
           1758208934270,
           1758209364190,
           1758209364190
+        ]
+      }
+    ],
+    "viewedBy": []
+  },
+  {
+    "listingId": "LST-JSMKFT",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "timestamps": [
+          1758210663897
         ]
       }
     ],

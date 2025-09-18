@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useCa
 import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type CommercialTermsSchema, type AcknowledgmentDetails } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { startOfWeek, endOfWeek } from 'date-fns';
+import { startOfWeek, startOfDay } from 'date-fns';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -222,6 +222,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           aboutUsContentRes,
           locationCirclesRes,
           acknowledgmentsRes,
+          downloadHistoryRes,
         ] = await Promise.all([
           fetch('/api/listings'),
           fetch('/api/demands'),
@@ -235,6 +236,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/about-us-content'),
           fetch('/api/location-circles'),
           fetch('/api/download-acknowledgments'),
+          fetch('/api/download-history'),
         ]);
 
         setListings(await listingsRes.json());
@@ -249,6 +251,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setAboutUsContent(await aboutUsContentRes.json());
         setLocationCircles(await locationCirclesRes.json());
         setDownloadAcknowledgments(await acknowledgmentsRes.json());
+        setDownloadHistory(await downloadHistoryRes.json());
 
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
@@ -327,6 +330,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistListingAnalytics = useCallback((updatedAnalytics: ListingAnalytics[]) => persistData('listing-analytics', updatedAnalytics, 'listing analytics'), []);
   const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), []);
   const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), []);
+  const persistDownloadHistory = useCallback((updatedHistory: DownloadRecord[]) => persistData('download-history', updatedHistory, 'download history'), []);
 
   const updateAboutUsContent = (newContent: AboutUsContent) => {
     setAboutUsContent(newContent);
@@ -493,13 +497,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   
   const getCompanyDownloadCounts = useCallback((companyName: string): { daily: number; weekly: number } => {
     const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const startOfThisWeek = startOfWeek(now, { weekStartsOn: 1 }).getTime(); // Assuming week starts on Monday
+    const todayStart = startOfDay(now).getTime();
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 }).getTime();
 
     const companyDownloads = downloadHistory.filter(d => d.companyName === companyName);
     
-    const dailyTimestamps = new Set(companyDownloads.filter(d => d.timestamp >= startOfToday).map(d => d.timestamp));
-    const weeklyTimestamps = new Set(companyDownloads.filter(d => d.timestamp >= startOfThisWeek).map(d => d.timestamp));
+    const dailyTimestamps = new Set(companyDownloads.filter(d => d.timestamp >= todayStart).map(d => d.timestamp));
+    const weeklyTimestamps = new Set(companyDownloads.filter(d => d.timestamp >= weekStart).map(d => d.timestamp));
 
     return {
         daily: dailyTimestamps.size,
@@ -537,13 +541,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
     
     const now = new Date().getTime();
-    const updatedHistory = [...downloadHistory];
+    const newDownloadRecords: DownloadRecord[] = [];
     
     setListingAnalytics(prevAnalytics => {
         const newAnalytics = [...prevAnalytics];
         listingsToDownload.forEach(listing => {
             const record: DownloadRecord = { userId: user.email, companyName: user.companyName, listingId: listing.listingId, location: listing.location, timestamp: now };
-            updatedHistory.push(record);
+            newDownloadRecords.push(record);
 
             let analytic = newAnalytics.find(a => a.listingId === listing.listingId);
             if (!analytic) {
@@ -570,12 +574,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return newAnalytics;
     });
 
-    setDownloadHistory(updatedHistory);
-    // In a real app, this would also be persisted to a server.
-    // localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
+    setDownloadHistory(prev => {
+        const updatedHistory = [...prev, ...newDownloadRecords];
+        persistDownloadHistory(updatedHistory);
+        return updatedHistory;
+    });
 
     return { success: true, limitReached: false, message: "Download successful." };
-  }, [downloadHistory, getCompanyDownloadCounts, toast, authUser, persistListingAnalytics]);
+  }, [downloadHistory, getCompanyDownloadCounts, toast, persistListingAnalytics, persistDownloadHistory]);
 
   const logListingView = useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {
@@ -605,18 +611,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistListingAnalytics]);
 
   const toggleSelectedForDownload = useCallback((listing: ListingSchema): { limitReached: boolean } => {
-    const isSelected = selectedForDownload.some(item => item.listingId === listing.listingId);
-
-    if (isSelected) {
-      setSelectedForDownload(prev => prev.filter(item => item.listingId !== listing.listingId));
-      return { limitReached: false };
-    } else {
-      if (selectedForDownload.length >= 5) {
-        return { limitReached: true };
-      }
-      setSelectedForDownload(prev => [...prev, listing]);
-      return { limitReached: false };
+    if (selectedForDownload.length >= 5 && !selectedForDownload.some(item => item.listingId === listing.listingId)) {
+      return { limitReached: true };
     }
+
+    setSelectedForDownload(prev => {
+      const isSelected = prev.some(item => item.listingId === listing.listingId);
+      if (isSelected) {
+        return prev.filter(item => item.listingId !== listing.listingId);
+      } else {
+        return [...prev, listing];
+      }
+    });
+
+    return { limitReached: false };
   }, [selectedForDownload]);
 
 
