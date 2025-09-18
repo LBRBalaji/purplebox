@@ -250,10 +250,24 @@ function DownloadBar() {
                 'Property ID': l.listingId,
                 'Name': l.name,
                 'Location': l.location,
-                'Size (Sq. Ft.)': l.sizeSqFt,
+                'Total Area (Sq. Ft.)': l.sizeSqFt,
+                'Building Type': Array.isArray(l.buildingSpecifications.buildingType) ? l.buildingSpecifications.buildingType.join(', ') : l.buildingSpecifications.buildingType,
                 'Availability': l.availabilityDate,
+                'Docks': l.buildingSpecifications.numberOfDocksAndShutters,
+                'Shop Floor Dimension': l.buildingSpecifications.shopFloorLevelDimension,
+                'Natural Light/Ventilation': l.buildingSpecifications.naturalLightingAndVentilation,
+                'Inside Flooring': l.siteSpecifications.typeOfFlooringInside,
+                'Access Road': l.siteSpecifications.typeOfRoad,
                 'Rent (per Sq. Ft.)': l.rentPerSqFt || 'Contact for details',
-                 // Approvals
+                'Security Deposit (Months)': l.rentalSecurityDeposit || 'Contact for details',
+                'Crane Support Structure': l.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
+                'Crane Available': l.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
+                'Roof Type': l.buildingSpecifications.roofType,
+                'Eve Height (M)': l.buildingSpecifications.eveHeightMeters,
+                'Roof Insulation': l.buildingSpecifications.roofInsulation,
+                'Ventilation': l.buildingSpecifications.ventilation,
+                'Louvers': l.buildingSpecifications.louvers ? 'Yes' : 'No',
+                // Approvals
                 'Park Approval': l.certificatesAndApprovals.parkApproval ? 'Yes' : 'No',
                 'Building Approval': l.certificatesAndApprovals.buildingApproval ? 'Yes' : 'No',
                 'Fire License': l.certificatesAndApprovals.fireLicense ? 'Yes' : 'No',
@@ -270,9 +284,11 @@ function DownloadBar() {
                 ["For Startups on their first transaction."],
                 ["For Logistics Companies on all transactions."],
                 [],
-                ["Your growth is our growth. Come back tomorrow and download another set of O2O warehouse listings to serve your next customer", "www.LakshmiBalajiO2O.com"],
+                ["Your growth is our growth. Come back tomorrow and download another set of O2O warehouse listings to serve your next customer. 😊"],
                 [],
-                ["Powered by Lakshmi Balaji O2O | Warehouse-Technical-Compliance-Commercials, in a single CSV"]
+                ["Powered by Lakshmi Balaji O2O | Simplifying Real Estate Transactions"],
+                [],
+                ["www.lakshmibalajio2o.com", "Ask a Call Back: +91 98410 98170"],
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 
