@@ -44,6 +44,7 @@ import { Sparkles } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
+import { FileText } from "lucide-react";
 
 
 type ListingFormProps = {
@@ -342,7 +343,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form id="listing-form" onSubmit={form.handleSubmit(handleSubmit)}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
             <ScrollArea className="h-[70vh] p-1 pr-6">
             <div className="space-y-8">
               
@@ -783,7 +784,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             </ScrollArea>
              <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type="submit" form="listing-form">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
+              <Button type="submit">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -791,22 +792,22 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     </Dialog>
     
     <Dialog open={!!previewImageUrl} onOpenChange={() => setPreviewImageUrl(null)}>
-        <DialogContent className="max-w-4xl h-[90vh] flex flex-col items-center justify-center p-2">
-            <DialogHeader>
-                <DialogTitle className="sr-only">Image Preview</DialogTitle>
-                <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
-            </DialogHeader>
-           {previewImageUrl && (
-                <div className="relative w-full h-full">
-                    <Image
-                        src={previewImageUrl}
-                        alt="Image Preview"
-                        fill
-                        className="object-contain"
-                    />
-                </div>
-           )}
-        </DialogContent>
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col items-center justify-center p-2">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Image Preview</DialogTitle>
+          <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
+        </DialogHeader>
+       {previewImageUrl && (
+            <div className="relative w-full h-full">
+                <Image
+                    src={previewImageUrl}
+                    alt="Image Preview"
+                    fill
+                    className="object-contain"
+                />
+            </div>
+       )}
+      </DialogContent>
     </Dialog>
     </>
   );
