@@ -230,6 +230,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   }, [isOpen, isAdmin]);
   
   const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
@@ -812,3 +813,4 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     </>
   );
 }
+
