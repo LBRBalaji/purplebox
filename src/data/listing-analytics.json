@@ -33,7 +33,7 @@
   {
     "listingId": "LST-XHJLWC",
     "views": 0,
-    "downloads": 4,
+    "downloads": 6,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -49,7 +49,9 @@
         "company": "Beta Retail",
         "timestamps": [
           1758207777706,
-          1758207777706
+          1758207777706,
+          1758209364190,
+          1758209364190
         ]
       }
     ],
@@ -58,7 +60,7 @@
   {
     "listingId": "LST-J9L9NS",
     "views": 0,
-    "downloads": 4,
+    "downloads": 6,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -74,7 +76,9 @@
         "company": "Beta Retail",
         "timestamps": [
           1758207777706,
-          1758207777706
+          1758207777706,
+          1758209364190,
+          1758209364190
         ]
       }
     ],
@@ -83,7 +87,7 @@
   {
     "listingId": "LST-I4S3EK",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -91,6 +95,14 @@
         "company": "Alpha Logistics",
         "timestamps": [
           1757516830770
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758209364190,
+          1758209364190
         ]
       }
     ],
@@ -278,7 +290,7 @@
   {
     "listingId": "LST-SKFITH",
     "views": 0,
-    "downloads": 5,
+    "downloads": 7,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -293,7 +305,9 @@
         "company": "Beta Retail",
         "timestamps": [
           1758208040575,
-          1758208040575
+          1758208040575,
+          1758209364190,
+          1758209364190
         ]
       },
       {
@@ -410,14 +424,16 @@
   {
     "listingId": "LST-Y06HUI",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
         "name": "Ben Carter",
         "company": "Beta Retail",
         "timestamps": [
-          1758208934270
+          1758208934270,
+          1758209364190,
+          1758209364190
         ]
       }
     ],

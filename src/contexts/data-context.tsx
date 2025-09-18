@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useCa
 import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type CommercialTermsSchema, type AcknowledgmentDetails } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
+import { startOfWeek, endOfWeek } from 'date-fns';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -46,6 +47,7 @@ export type ListingAnalytics = {
 
 export type DownloadRecord = {
     userId: string;
+    companyName: string;
     listingId: string;
     location: string;
     timestamp: number;
@@ -142,7 +144,7 @@ type DataContextType = {
   addAgentLead: (lead: Omit<AgentLead, 'id' | 'status'>) => void;
   updateAgentLeadStatus: (leadId: string, status: AgentStatus) => void;
   isLoading: boolean;
-  logDownload: (userId: string, listings: ListingSchema[]) => { success: boolean; limitReached: boolean };
+  logDownload: (user: User, listings: ListingSchema[]) => { success: boolean; limitReached: boolean; message: string };
   selectedForDownload: ListingSchema[];
   toggleSelectedForDownload: (listing: ListingSchema) => { limitReached: boolean };
   clearSelectedForDownload: () => void;
@@ -489,12 +491,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistSubmissions]);
   
-  const getTodaysTotalDownloads = useCallback((userId: string): number => {
+  const getCompanyDownloadCounts = useCallback((companyName: string): { daily: number; weekly: number } => {
     const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const downloadEntries = downloadHistory.filter(d => d.userId === userId && d.timestamp >= startOfDay);
-    const uniqueTimestamps = new Set(downloadEntries.map(d => d.timestamp));
-    return uniqueTimestamps.size;
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startOfThisWeek = startOfWeek(now, { weekStartsOn: 1 }).getTime(); // Assuming week starts on Monday
+
+    const companyDownloads = downloadHistory.filter(d => d.companyName === companyName);
+    
+    const dailyTimestamps = new Set(companyDownloads.filter(d => d.timestamp >= startOfToday).map(d => d.timestamp));
+    const weeklyTimestamps = new Set(companyDownloads.filter(d => d.timestamp >= startOfThisWeek).map(d => d.timestamp));
+
+    return {
+        daily: dailyTimestamps.size,
+        weekly: weeklyTimestamps.size,
+    };
   }, [downloadHistory]);
   
   const logAcknowledgment = useCallback((userId: string) => {
@@ -510,23 +520,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistDownloadAcknowledgments]);
 
-  const logDownload = useCallback((userId: string, listingsToDownload: ListingSchema[]) => {
-    const todaysTotalDownloads = getTodaysTotalDownloads(userId);
-    const user = authUser;
+  const logDownload = useCallback((user: User, listingsToDownload: ListingSchema[]): { success: boolean; limitReached: boolean; message: string } => {
+    const { daily, weekly } = getCompanyDownloadCounts(user.companyName);
 
-    if (user?.plan !== 'Paid_Premium' && todaysTotalDownloads >= 2) {
-        setLastEvent({
-            type: 'download_limit_exceeded',
-            id: userId,
-            timestamp: new Date().toISOString(),
-            triggeredBy: userId,
-        });
-        toast({
-            variant: "destructive",
-            title: "Daily Download Limit Reached",
-            description: "You have downloaded twice today. Premium users have unlimited downloads.",
-        });
-        return { success: false, limitReached: true };
+    if (user.plan !== 'Paid_Premium') {
+        if (daily >= 2) {
+            const message = "Your company has reached its daily download limit of 2. Premium users have unlimited downloads.";
+            toast({ variant: "destructive", title: "Daily Limit Reached", description: message });
+            return { success: false, limitReached: true, message };
+        }
+        if (weekly >= 4) {
+            const message = "Your company has reached its weekly download limit of 4. Premium users have unlimited downloads.";
+            toast({ variant: "destructive", title: "Weekly Limit Reached", description: message });
+            return { success: false, limitReached: true, message };
+        }
     }
     
     const now = new Date().getTime();
@@ -535,7 +542,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setListingAnalytics(prevAnalytics => {
         const newAnalytics = [...prevAnalytics];
         listingsToDownload.forEach(listing => {
-            const record: DownloadRecord = { userId, listingId: listing.listingId, location: listing.location, timestamp: now };
+            const record: DownloadRecord = { userId: user.email, companyName: user.companyName, listingId: listing.listingId, location: listing.location, timestamp: now };
             updatedHistory.push(record);
 
             let analytic = newAnalytics.find(a => a.listingId === listing.listingId);
@@ -564,10 +571,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
 
     setDownloadHistory(updatedHistory);
-    localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
+    // In a real app, this would also be persisted to a server.
+    // localStorage.setItem('warehouseorigin_downloads', JSON.stringify(updatedHistory));
 
-    return { success: true, limitReached: false };
-  }, [downloadHistory, getTodaysTotalDownloads, toast, authUser, persistListingAnalytics]);
+    return { success: true, limitReached: false, message: "Download successful." };
+  }, [downloadHistory, getCompanyDownloadCounts, toast, authUser, persistListingAnalytics]);
 
   const logListingView = useCallback((user: User, listingId: string) => {
     setListingAnalytics(prevAnalytics => {

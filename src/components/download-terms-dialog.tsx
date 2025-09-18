@@ -35,6 +35,12 @@ export function DownloadTermsDialog({ isOpen, onOpenChange, onAccept }: Download
         }
     }, [isOpen]);
 
+    const handleAccept = () => {
+        if (isChecked) {
+            onAccept();
+        }
+    };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0">
@@ -91,7 +97,7 @@ export function DownloadTermsDialog({ isOpen, onOpenChange, onAccept }: Download
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="button" onClick={onAccept} disabled={!isChecked}>
+            <Button type="button" onClick={handleAccept} disabled={!isChecked}>
               Agree & Continue
             </Button>
         </DialogFooter>
