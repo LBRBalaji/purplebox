@@ -43,6 +43,8 @@ import { generateListingDescriptionAction } from "@/lib/actions";
 import { Sparkles } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
+import { convertGoogleDriveLink } from "@/lib/utils";
+import Image from "next/image";
 
 
 type ListingFormProps = {
@@ -509,26 +511,40 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             We thank you in advance for your understanding and cooperation in respecting this platform policy.
                         </AlertDescription>
                     </Alert>
-                    {fields.map((field, index) => (
-                        <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
-                            <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
-                                <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-                            )} />
-                             <FormField control={form.control} name={`documents.${index}.type`} render={({ field }) => (
-                                <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
-                                    <SelectItem value="image">Image</SelectItem>
-                                    <SelectItem value="video">Video</SelectItem>
-                                    <SelectItem value="layout">Layout</SelectItem>
-                                </SelectContent></Select><FormMessage /></FormItem>
-                            )} />
-                            <FormField control={form.control} name={`documents.${index}.url`} render={({ field }) => (
-                                <FormItem><FormLabel>Google Drive Link</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="Shareable Google Drive link" /></FormControl><FormMessage /></FormItem>
-                            )} />
-                            <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    ))}
+                    {fields.map((field, index) => {
+                        const fileUrl = form.watch(`documents.${index}.url`);
+                        const fileType = form.watch(`documents.${index}.type`);
+                        return (
+                            <div key={field.id} className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_1fr_auto] gap-4 items-end">
+                                <div className="w-20 h-20 relative bg-secondary rounded-md overflow-hidden">
+                                {fileType === 'image' && fileUrl && (
+                                    <Image
+                                        src={convertGoogleDriveLink(fileUrl)}
+                                        alt={field.name || 'Preview'}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                )}
+                                </div>
+                                <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
+                                    <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                                )} />
+                                <FormField control={form.control} name={`documents.${index}.type`} render={({ field }) => (
+                                    <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                        <SelectItem value="image">Image</SelectItem>
+                                        <SelectItem value="video">Video</SelectItem>
+                                        <SelectItem value="layout">Layout</SelectItem>
+                                    </SelectContent></Select><FormMessage /></FormItem>
+                                )} />
+                                <FormField control={form.control} name={`documents.${index}.url`} render={({ field }) => (
+                                    <FormItem><FormLabel>Google Drive Link</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="Shareable Google Drive link" /></FormControl><FormMessage /></FormItem>
+                                )} />
+                                <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        );
+                    })}
                     <Button type="button" variant="outline" onClick={() => append({ type: 'image', name: '', url: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Document</Button>
                  </div>
               </div>
