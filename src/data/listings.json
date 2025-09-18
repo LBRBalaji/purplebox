@@ -47,7 +47,13 @@
       "pcbForWater": true,
       "propertyTax": true
     },
-    "documents": [],
+    "documents": [
+      {
+        "name": "Screenshot 2025-09-18 at 12.14.20 PM.png",
+        "url": "/uploads/1758184383455-Screenshot_2025-09-18_at_12.14.20_PM.png",
+        "type": "image"
+      }
+    ],
     "isAdmin": false
   },
   {

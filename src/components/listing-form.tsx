@@ -103,9 +103,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
 
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
@@ -261,26 +258,35 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     fetchCircles();
   }, [isOpen, isAdmin]);
   
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  const handleBulkUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = ".jpg, .jpeg, .png, .gif, .mp4, .mov, .pdf";
+    
+    input.onchange = async (event) => {
+        const target = event.target as HTMLInputElement;
+        if (!target.files) return;
 
-    const newDocuments = Array.from(files).map(file => {
-      const doc: Document & { file?: File } = {
-        name: file.name,
-        type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
-        url: URL.createObjectURL(file), // Create a temporary local URL for preview
-        file: file, // Store the actual file object
-      };
-      return doc;
-    });
+        const files = Array.from(target.files);
+        
+        setIsUploading(true);
+        toast({ title: "Uploading...", description: `${files.length} file(s) selected.` });
 
-    append(newDocuments);
+        try {
+            const uploadResults = await uploadFiles(files);
+            if (uploadResults && uploadResults.length > 0) {
+                append(uploadResults);
+                toast({ title: "Upload Complete", description: `${uploadResults.length} file(s) successfully uploaded and added.` });
+            }
+        } catch (error) {
+            toast({ variant: "destructive", title: "Upload Failed", description: "Could not upload files." });
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
-    // Reset file input to allow selecting the same file again
-    if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-    }
+    input.click();
   };
 
   const handleGenerateDescription = async () => {
@@ -323,57 +329,15 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
 
   const handleSubmitWrapper = async (data: ListingSchema) => {
-    setIsUploading(true);
-    toast({ title: "Submitting...", description: "Please wait while we process your listing." });
-    
-    try {
-        const documentsToUpload = data.documents?.filter(doc => doc.file) || [];
-        const existingDocuments = data.documents?.filter(doc => !doc.file) || [];
-
-        let uploadedDocuments: (Document | null)[] = [];
-
-        if (documentsToUpload.length > 0) {
-            const filesToUpload = documentsToUpload.map(doc => doc.file as File);
-            const uploadResults = await uploadFiles(filesToUpload);
-
-            if (uploadResults) {
-                uploadedDocuments = documentsToUpload.map((doc, index) => {
-                    const result = uploadResults.find(res => res.name === doc.name);
-                    if (result) {
-                        return { name: result.name, url: result.url, type: result.type };
-                    }
-                    return null;
-                });
-            }
-        }
-        
-        const finalDocuments = [...existingDocuments, ...uploadedDocuments.filter((d): d is Document => d !== null)];
-        
-        const finalData = {
-            ...data,
-            documents: finalDocuments,
-            isAdmin,
-        };
-
-        // Cleanup temporary file objects before submission
-        finalData.documents.forEach(doc => delete (doc as any).file);
-
-        onSubmit(finalData);
-        toast({
-            title: isEditMode ? "Listing Updated" : "Listing Submitted",
-            description: `Your listing for "${data.listingId}" has been saved.`
-        });
-
-    } catch (error) {
-        const e = error as Error;
-        toast({
-            variant: "destructive",
-            title: "Submission Failed",
-            description: e.message || "An unexpected error occurred during submission."
-        });
-    } finally {
-        setIsUploading(false);
-    }
+    const finalData = {
+        ...data,
+        isAdmin,
+    };
+    onSubmit(finalData);
+    toast({
+        title: isEditMode ? "Listing Updated" : "Listing Submitted",
+        description: `Your listing for "${data.listingId}" has been saved.`
+    });
   };
 
   const approvalFields = Object.keys(form.getValues().certificatesAndApprovals || {}) as (keyof ListingSchema['certificatesAndApprovals'])[];
@@ -388,16 +352,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               {isEditMode ? 'Update the details for this listing.' : 'Fill out the form to create a new warehouse listing for admin approval.'}
             </DialogDescription>
           </DialogHeader>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden"
-              multiple
-              accept=".jpg, .jpeg, .png, .gif, .mp4, .mov, .pdf"
-              onChange={handleFileChange}
-            />
             <Form {...form}>
-            <form id="listing-form-main" onSubmit={form.handleSubmit(handleSubmitWrapper)}>
+            <form onSubmit={form.handleSubmit(handleSubmitWrapper)}>
               <ScrollArea className="h-[70vh] p-1 pr-6">
                 <div className="space-y-8">
                   
@@ -658,7 +614,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             </AlertDescription>
                         </Alert>
                         
-                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                        <Button type="button" variant="outline" onClick={handleBulkUpload} disabled={isUploading}>
                             <UploadCloud className="mr-2 h-4 w-4" />
                             {isUploading ? 'Uploading...' : 'Upload Media'}
                         </Button>
