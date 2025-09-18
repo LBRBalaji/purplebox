@@ -112,5 +112,15 @@
     "isCompanyAdmin": false,
     "plan": "Paid_Premium",
     "createdAt": "2025-09-17T05:58:30.367Z"
+  },
+  "admin@indospace.com": {
+    "email": "admin@indospace.com",
+    "companyName": "Indospace",
+    "userName": "admin",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-18T06:38:36.292Z"
   }
 }

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -289,7 +290,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             sizeSqFt: data.sizeSqFt,
             availabilityDate: data.availabilityDate,
             serviceModel: data.serviceModel,
-            rentPerSqFt: data.rentPerSqFt,
+            rentPerSqFt: typeof data.rentPerSqFt === 'number' ? data.rentPerSqFt : undefined,
             buildingType: data.buildingSpecifications.buildingType,
             roofType: data.buildingSpecifications.roofType,
             eveHeightMeters: data.buildingSpecifications.eveHeightMeters,
@@ -392,10 +393,44 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         <FormItem><FormLabel>Construction Progress</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., 80% or 'Structure Complete'" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="rentPerSqFt" render={({ field }) => (
-                        <FormItem><FormLabel>Rent per Sq. Ft.</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g., 25" /></FormControl><FormMessage /></FormItem>
+                        <FormItem>
+                            <FormLabel>Rent per Sq. Ft.</FormLabel>
+                            <FormControl>
+                                <Input 
+                                    type={typeof field.value === 'number' ? 'number' : 'text'} 
+                                    {...field} 
+                                    value={field.value ?? ''} 
+                                    onChange={e => field.onChange(e.target.value === '' ? undefined : (typeof field.value === 'number' ? +e.target.value : e.target.value))}
+                                    placeholder="e.g., 25"
+                                    disabled={field.value === 'Get Quote'}
+                                />
+                            </FormControl>
+                            <div className="flex items-center space-x-2 pt-1">
+                                <Checkbox id="rent-get-quote" checked={field.value === 'Get Quote'} onCheckedChange={(checked) => field.onChange(checked ? 'Get Quote' : undefined)} />
+                                <label htmlFor="rent-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Get Quote"</label>
+                            </div>
+                            <FormMessage />
+                        </FormItem>
                     )} />
                     <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (
-                        <FormItem><FormLabel>Security Deposit (Months)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g., 6" /></FormControl><FormMessage /></FormItem>
+                       <FormItem>
+                            <FormLabel>Security Deposit</FormLabel>
+                            <FormControl>
+                                 <Input 
+                                    type={typeof field.value === 'number' ? 'number' : 'text'} 
+                                    {...field} 
+                                    value={field.value ?? ''} 
+                                    onChange={e => field.onChange(e.target.value === '' ? undefined : (typeof field.value === 'number' ? +e.target.value : e.target.value))}
+                                    placeholder="e.g., 6 months"
+                                    disabled={field.value === 'Get Quote'}
+                                />
+                            </FormControl>
+                            <div className="flex items-center space-x-2 pt-1">
+                                <Checkbox id="deposit-get-quote" checked={field.value === 'Get Quote'} onCheckedChange={(checked) => field.onChange(checked ? 'Get Quote' : undefined)} />
+                                <label htmlFor="deposit-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Get Quote"</label>
+                            </div>
+                            <FormMessage />
+                        </FormItem>
                     )} />
                 </div>
               </div>

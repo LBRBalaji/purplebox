@@ -96,7 +96,7 @@
         "url": "https://drive.google.com/uc?export=view&id=1miPufje5txqf0qXRRDtv5GAmWEF-MWtn"
       }
     ],
-    "isAdmin": true
+    "isAdmin": false
   },
   {
     "listingId": "LST-91LUXK",
@@ -210,7 +210,7 @@
         "url": "https://drive.google.com/uc?export=view&id=1g5mfFXVTyAsd6BaIwKBdZtuqA4VudCue"
       }
     ],
-    "isAdmin": true
+    "isAdmin": false
   },
   {
     "listingId": "LST-Y06HUI",
@@ -328,7 +328,7 @@
   {
     "listingId": "LST-9M05SY",
     "developerId": "namasivayam.lion@gmail.com",
-    "status": "approved",
+    "status": "pending",
     "warehouseBoxId": "Blue Warehouse",
     "actualSizeSqFt": 31000,
     "name": "",

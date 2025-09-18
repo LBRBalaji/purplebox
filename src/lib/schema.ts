@@ -33,8 +33,8 @@ export const listingSchema = z.object({
   additionalInformation: z.string().optional(),
   
   // Commercial Terms
-  rentPerSqFt: asOptionalField(z.coerce.number().positive("Rent must be a positive number.")),
-  rentalSecurityDeposit: asOptionalField(z.coerce.number().positive("Deposit must be positive.")),
+  rentPerSqFt: asOptionalField(z.union([z.coerce.number().positive("Rent must be a positive number."), z.literal('Get Quote')])),
+  rentalSecurityDeposit: asOptionalField(z.union([z.coerce.number().positive("Deposit must be positive."), z.literal('Get Quote')])),
   
   // Availability & Progress
   availabilityDate: z.string().min(1, "Availability date is required."),
