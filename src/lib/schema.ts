@@ -1,5 +1,4 @@
 
-
 import { z } from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -12,7 +11,10 @@ export const documentSchema = z.object({
   type: z.enum(["layout", "image", "video"]),
   name: z.string(),
   url: z.string().url(),
+  file: z.any().optional(), // Temporary field to hold the file object
 });
+export type Document = z.infer<typeof documentSchema>;
+
 
 export const listingSchema = z.object({
   // System Metadata

@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from './ui/input';
-import { listingSchema, type ListingSchema, type GenerateListingDescriptionInput } from '@/lib/schema';
+import { listingSchema, type ListingSchema, type GenerateListingDescriptionInput, type Document } from '@/lib/schema';
 import {
   Select,
   SelectContent,
@@ -59,10 +59,10 @@ const buildingTypes = [
     { id: 'Standard Shed', label: 'Standard Shed' },
 ];
 
-async function uploadFiles(files: FileList): Promise<{ type: 'image' | 'video' | 'layout'; name: string; url: string; }[] | null> {
+async function uploadFiles(files: File[]): Promise<{ name: string; url: string; type: 'image' | 'video' | 'layout'; }[] | null> {
     if (!files || files.length === 0) return null;
 
-    const uploadPromises = Array.from(files).map(async (file) => {
+    const uploadPromises = files.map(async (file) => {
         const formData = new FormData();
         formData.append('file', file);
         try {
@@ -87,7 +87,7 @@ async function uploadFiles(files: FileList): Promise<{ type: 'image' | 'video' |
     });
 
     const results = await Promise.all(uploadPromises);
-    return results.filter(r => r !== null) as { type: 'image' | 'video' | 'layout'; name: string; url: string; }[];
+    return results.filter(r => r !== null) as { name: string; url: string; type: 'image' | 'video' | 'layout'; }[];
 }
 
 
@@ -263,27 +263,24 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    setIsUploading(true);
-    toast({ title: 'Uploading...', description: `Uploading ${files.length} file(s).` });
-
-    uploadFiles(files).then(results => {
-        if (results && results.length > 0) {
-            append(results);
-            toast({ title: 'Upload Complete', description: `${results.length} file(s) added.` });
-        }
-
-        if (!results || results.length < files.length) {
-            toast({ variant: 'destructive', title: 'Upload Incomplete', description: `${files.length - (results?.length || 0)} file(s) could not be uploaded.` });
-        }
-        
-        setIsUploading(false);
-        // Reset file input value to allow re-uploading the same file
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+    const newDocuments = Array.from(files).map(file => {
+      const doc: Document & { file?: File } = {
+        name: file.name,
+        type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
+        url: URL.createObjectURL(file), // Create a temporary local URL for preview
+        file: file, // Store the actual file object
+      };
+      return doc;
     });
+
+    append(newDocuments);
+
+    // Reset file input to allow selecting the same file again
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
   };
 
   const handleGenerateDescription = async () => {
@@ -325,13 +322,58 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   };
 
 
-  const handleSubmit = (data: ListingSchema) => {
-    const finalData = { ...data, isAdmin };
-    onSubmit(finalData);
-    toast({
-        title: isEditMode ? "Listing Updated" : "Listing Submitted",
-        description: `Your listing for "${data.listingId}" has been saved and is pending admin approval.`
-    })
+  const handleSubmitWrapper = async (data: ListingSchema) => {
+    setIsUploading(true);
+    toast({ title: "Submitting...", description: "Please wait while we process your listing." });
+    
+    try {
+        const documentsToUpload = data.documents?.filter(doc => doc.file) || [];
+        const existingDocuments = data.documents?.filter(doc => !doc.file) || [];
+
+        let uploadedDocuments: (Document | null)[] = [];
+
+        if (documentsToUpload.length > 0) {
+            const filesToUpload = documentsToUpload.map(doc => doc.file as File);
+            const uploadResults = await uploadFiles(filesToUpload);
+
+            if (uploadResults) {
+                uploadedDocuments = documentsToUpload.map((doc, index) => {
+                    const result = uploadResults.find(res => res.name === doc.name);
+                    if (result) {
+                        return { name: result.name, url: result.url, type: result.type };
+                    }
+                    return null;
+                });
+            }
+        }
+        
+        const finalDocuments = [...existingDocuments, ...uploadedDocuments.filter((d): d is Document => d !== null)];
+        
+        const finalData = {
+            ...data,
+            documents: finalDocuments,
+            isAdmin,
+        };
+
+        // Cleanup temporary file objects before submission
+        finalData.documents.forEach(doc => delete (doc as any).file);
+
+        onSubmit(finalData);
+        toast({
+            title: isEditMode ? "Listing Updated" : "Listing Submitted",
+            description: `Your listing for "${data.listingId}" has been saved.`
+        });
+
+    } catch (error) {
+        const e = error as Error;
+        toast({
+            variant: "destructive",
+            title: "Submission Failed",
+            description: e.message || "An unexpected error occurred during submission."
+        });
+    } finally {
+        setIsUploading(false);
+    }
   };
 
   const approvalFields = Object.keys(form.getValues().certificatesAndApprovals || {}) as (keyof ListingSchema['certificatesAndApprovals'])[];
@@ -355,7 +397,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               onChange={handleFileChange}
             />
             <Form {...form}>
-            <form id="listing-form-main" onSubmit={form.handleSubmit(handleSubmit)}>
+            <form id="listing-form-main" onSubmit={form.handleSubmit(handleSubmitWrapper)}>
               <ScrollArea className="h-[70vh] p-1 pr-6">
                 <div className="space-y-8">
                   
@@ -618,7 +660,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                         
                         <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
                             <UploadCloud className="mr-2 h-4 w-4" />
-                            {isUploading ? 'Uploading...' : 'Upload Media (Bulk)'}
+                            {isUploading ? 'Uploading...' : 'Upload Media'}
                         </Button>
 
                         {fields.map((field, index) => {
@@ -786,12 +828,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                   )} />
                 </div>
               </ScrollArea>
+              <DialogFooter className="pt-4">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                <Button type="submit" disabled={isUploading}>{isUploading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Submit')}</Button>
+              </DialogFooter>
             </form>
           </Form>
-          <DialogFooter className="pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" form="listing-form-main">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     
