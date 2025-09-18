@@ -1,13 +1,129 @@
 [
   {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-SKFITH",
+    "warehouseBoxId": "Ulavur B600",
+    "actualSizeSqFt": 270000,
+    "additionalInformation": "Dry Access by January 2026",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 270000,
+    "description": "Located in Oragadam, this under-construction PEB warehouse offers 270,000 sq. ft. of space.  Featuring a 12-meter eave height, galvalume roofing, and a standard service model, this property provides an efficient and modern solution for your warehousing needs.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "40%",
+    "serviceModel": "Standard",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 270000,
+      "totalChargeableArea": 270000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 25,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Turbo"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 12.14.20 PM.png",
+        "url": "/uploads/1758205719617-Screenshot_2025-09-18_at_12.14.20_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@indospace.com",
+    "listingId": "LST-TGAV6G",
+    "warehouseBoxId": "Ulavur B700",
+    "actualSizeSqFt": 312142,
+    "additionalInformation": "Dry Access by February 2026",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 310000,
+    "description": "Located in Oragadam, this under-construction industrial facility offers 310,000 sq. ft. of space.  The pre-engineered building (PEB) features a 12-meter eave height and a durable Galvalume roof, providing a robust and efficient warehouse solution with standard service model.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "40%",
+    "serviceModel": "Standard",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 312142,
+      "totalChargeableArea": 312142
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 30,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 12,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "RCC"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-18 at 12.14.20 PM.png",
+        "url": "/uploads/1758205569341-Screenshot_2025-09-18_at_12.14.20_PM.png"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
     "listingId": "LST-L4WAS7",
     "developerId": "admin@indospace.com",
-    "status": "pending",
+    "status": "approved",
     "warehouseBoxId": "Ulavur B400",
     "actualSizeSqFt": 351309,
     "name": "",
     "location": "Oragadam",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "sizeSqFt": 350000,
     "description": "Secure a prime 350,000 sq. ft. industrial warehouse space in Oragadam, currently under construction. This state-of-the-art facility features a Pre-Engineered Building (PEB) structure with a robust Galvalume roof and impressive 9.2-meter eave height, ensuring optimal operational efficiency.  The standard service model provides a seamless and cost-effective solution for your business needs.  Don't miss this opportunity to establish your operations in this strategically located, high-quality warehouse.",
     "additionalInformation": "",
@@ -54,7 +170,7 @@
         "type": "image"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
     "listingId": "LST-8KQX5D",

@@ -457,15 +457,12 @@ export function ListingsPage() {
     if (locationFilter) {
         const lowerLocation = locationFilter.toLowerCase();
         const matchedCircle = locationCircles.find(c => 
-            c.locations.some(loc => lowerLocation.includes(loc)) || c.name.toLowerCase().includes(lowerLocation)
+            c.name.toLowerCase().includes(lowerLocation) ||
+            c.locations.some(loc => lowerLocation.includes(loc))
         );
 
         if (matchedCircle) {
-            const circleLocations = matchedCircle.locations.map(loc => loc.toLowerCase());
-            results = results.filter(listing => 
-                (listing.locationCircle && listing.locationCircle === matchedCircle.name) ||
-                circleLocations.some(loc => listing.location.toLowerCase().includes(loc))
-            );
+            results = results.filter(listing => listing.locationCircle === matchedCircle.name);
         } else {
             results = results.filter(listing => listing.location.toLowerCase().includes(lowerLocation));
         }
@@ -750,3 +747,5 @@ export function ListingsPage() {
     </>
   );
 }
+
+    
