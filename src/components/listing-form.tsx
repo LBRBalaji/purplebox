@@ -197,21 +197,24 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     setIsSubmitting(true);
     toast({ title: "Uploading...", description: `${fileList.length} file(s) selected.` });
 
-    const newDocuments = fileList.map(file => ({
-      type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
-      name: file.name,
-      url: '', // This will be filled after upload
-      file: file, // Store the file object temporarily
-    }));
-
-    append(newDocuments as any);
-
-    setIsSubmitting(false); // Enable form again
-    toast({ title: "Files Ready", description: `Files are ready to be saved with the listing.` });
+    const uploadedFiles = await uploadFiles(fileList);
+    
+    if (uploadedFiles && uploadedFiles.length > 0) {
+      const newDocuments = uploadedFiles.map(file => ({
+        type: file.type as 'image' | 'video' | 'layout',
+        name: file.name,
+        url: file.url,
+      }));
+      append(newDocuments);
+      toast({ title: "Upload Complete", description: `${newDocuments.length} file(s) added.` });
+    } else {
+      toast({ variant: 'destructive', title: "Upload Failed", description: `Could not upload the selected files.` });
+    }
 
     if (event.target) {
-        event.target.value = '';
+        event.target.value = ''; // Reset file input
     }
+    setIsSubmitting(false);
   };
 
   const handleGenerateDescription = async () => {
@@ -255,28 +258,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
   const handleSubmitWrapper = async (data: ListingSchema) => {
     setIsSubmitting(true);
-    
     try {
-        const documentsToUpload = data.documents?.filter(doc => doc.file) || [];
-        if (documentsToUpload.length > 0) {
-          toast({ title: "Uploading media...", description: "Please wait, this may take a moment." });
-          const uploadedFiles = await uploadFiles(documentsToUpload.map(d => d.file as File));
-
-          if (uploadedFiles) {
-             data.documents = data.documents?.map(doc => {
-              if (doc.file) {
-                const uploadedFile = uploadedFiles.find(f => f.name === doc.name);
-                if (uploadedFile) {
-                  return { ...doc, url: uploadedFile.url, file: undefined };
-                }
-              }
-              return doc;
-            }).filter(doc => doc.url || doc.file); // Keep existing or newly uploaded
-          }
-        }
-        
         const finalData = { ...data, isAdmin };
-        
         onSubmit(finalData);
         
         toast({
@@ -601,20 +584,18 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
                         {fields.map((field, index) => {
                             const fileUrl = form.watch(`documents.${index}.url`);
-                            const tempFile = form.watch(`documents.${index}.file`);
-                            const previewUrl = fileUrl || (tempFile ? URL.createObjectURL(tempFile) : null);
                             const fileType = form.watch(`documents.${index}.type`);
                             return (
                                 <div key={field.id} className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_auto] gap-4 items-end">
                                     <button
                                         type="button"
-                                        onClick={() => previewUrl && setPreviewImageUrl(previewUrl)}
+                                        onClick={() => fileUrl && setPreviewImageUrl(fileUrl)}
                                         className="w-20 h-20 relative bg-secondary rounded-md overflow-hidden group"
                                     >
-                                    {fileType === 'image' && previewUrl ? (
+                                    {fileType === 'image' && fileUrl ? (
                                         <>
                                             <Image
-                                                src={previewUrl}
+                                                src={fileUrl}
                                                 alt={field.name || 'Preview'}
                                                 fill
                                                 className="object-cover"
