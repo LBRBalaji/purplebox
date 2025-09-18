@@ -354,7 +354,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const updateListing = useCallback((updatedListing: ListingSchema) => {
     setListings(prevListings => {
-        const newListings = prevListings.map(l => l.listingId === updatedListing.listingId ? { ...updatedListing, status: 'pending' as const } : l);
+        const newListings = prevListings.map(l => l.listingId === updatedListing.listingId ? updatedListing : l);
         persistListings(newListings);
         setLastEvent({
           type: 'new_listing',
