@@ -102,6 +102,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const [previewImageUrl, setPreviewImageUrl] = React.useState<string | null>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
@@ -258,35 +259,38 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     fetchCircles();
   }, [isOpen, isAdmin]);
   
-  const handleBulkUpload = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.multiple = true;
-    input.accept = ".jpg, .jpeg, .png, .gif, .mp4, .mov, .pdf";
-    
-    input.onchange = async (event) => {
-        const target = event.target as HTMLInputElement;
-        if (!target.files) return;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
 
-        const files = Array.from(target.files);
-        
-        setIsUploading(true);
-        toast({ title: "Uploading...", description: `${files.length} file(s) selected.` });
+    const fileList = Array.from(files);
 
-        try {
-            const uploadResults = await uploadFiles(files);
-            if (uploadResults && uploadResults.length > 0) {
-                append(uploadResults);
-                toast({ title: "Upload Complete", description: `${uploadResults.length} file(s) successfully uploaded and added.` });
-            }
-        } catch (error) {
-            toast({ variant: "destructive", title: "Upload Failed", description: "Could not upload files." });
-        } finally {
-            setIsUploading(false);
+    setIsUploading(true);
+    toast({ title: "Uploading...", description: `${fileList.length} file(s) selected.` });
+
+    uploadFiles(fileList)
+      .then(uploadResults => {
+        if (uploadResults && uploadResults.length > 0) {
+          const newDocuments = uploadResults.map(res => ({
+            ...res,
+            name: res.name || 'Untitled',
+            url: res.url
+          }));
+          append(newDocuments);
+          toast({ title: "Upload Complete", description: `${uploadResults.length} file(s) successfully added.` });
         }
-    };
-
-    input.click();
+      })
+      .catch(error => {
+        toast({ variant: "destructive", title: "Upload Failed", description: "Could not upload files." });
+        console.error(error);
+      })
+      .finally(() => {
+        setIsUploading(false);
+        // Reset the input value to allow selecting the same file again
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      });
   };
 
   const handleGenerateDescription = async () => {
@@ -331,7 +335,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   const handleSubmitWrapper = async (data: ListingSchema) => {
     const finalData = {
         ...data,
-        isAdmin,
+        isAdmin, // Pass admin status for validation purposes
     };
     onSubmit(finalData);
     toast({
@@ -344,6 +348,14 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
   return (
     <>
+      <input
+        type="file"
+        ref={fileInputRef}
+        multiple
+        accept=".jpg, .jpeg, .png, .gif, .mp4, .mov, .pdf"
+        onChange={handleFileChange}
+        className="hidden"
+      />
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-4xl">
           <DialogHeader>
@@ -353,7 +365,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
             </DialogDescription>
           </DialogHeader>
             <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmitWrapper)}>
+            <form onSubmit={form.handleSubmit(handleSubmitWrapper)} id="listing-form-main">
               <ScrollArea className="h-[70vh] p-1 pr-6">
                 <div className="space-y-8">
                   
@@ -614,7 +626,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
                             </AlertDescription>
                         </Alert>
                         
-                        <Button type="button" variant="outline" onClick={handleBulkUpload} disabled={isUploading}>
+                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
                             <UploadCloud className="mr-2 h-4 w-4" />
                             {isUploading ? 'Uploading...' : 'Upload Media'}
                         </Button>
@@ -786,7 +798,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
               </ScrollArea>
               <DialogFooter className="pt-4">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit" disabled={isUploading}>{isUploading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Submit')}</Button>
+                <Button type="submit" form="listing-form-main" disabled={isUploading}>{isUploading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Submit')}</Button>
               </DialogFooter>
             </form>
           </Form>

@@ -104,13 +104,13 @@ export const listingSchema = z.object({
   developerWebsite: z.string().url().optional(),
   projectName: z.string().optional(),
   siteDetails: z.string().optional(),
+  // This is a temporary field to pass admin status to the refinement
+  isAdmin: z.boolean().optional(),
 }).superRefine((data, ctx) => {
-    // This is a temporary field to pass admin status to the refinement
-    const isAdmin = (data as any).isAdmin; 
-    if (isAdmin && !data.locationCircle) {
+    if (data.isAdmin && data.status === 'approved' && !data.locationCircle) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Location Circle is required for admin submissions.",
+            message: "Location Circle is required to approve this listing.",
             path: ["locationCircle"],
         });
     }
