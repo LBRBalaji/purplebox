@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus } from '@/contexts/data-context';
+import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus, type LocationCircle } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
 import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
@@ -212,7 +212,7 @@ function AdminListingCard({ listing, analytics, providerName, onEdit }: { listin
 }
 
 export function AdminListings() {
-  const { listings, listingAnalytics, updateListing } = useData();
+  const { listings, listingAnalytics, updateListing, locationCircles } = useData();
   const { users } = useAuth();
   
   const [filteredListings, setFilteredListings] = React.useState<ListingSchema[]>([]);
@@ -465,6 +465,7 @@ export function AdminListings() {
         onOpenChange={setIsFormOpen}
         listing={selectedListing}
         onSubmit={handleFormSubmit}
+        locationCircles={locationCircles}
       />
     </>
   );

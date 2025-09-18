@@ -45,12 +45,14 @@ import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
 import { FileText } from "lucide-react";
+import type { LocationCircle } from "@/contexts/data-context";
 
 type ListingFormProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   listing?: ListingSchema | null;
   onSubmit: (data: ListingSchema) => void;
+  locationCircles: LocationCircle[];
 };
 
 const buildingTypes = [
@@ -91,14 +93,13 @@ async function uploadFiles(files: File[]): Promise<{ name: string; url: string; 
 }
 
 
-export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: ListingFormProps) {
+export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationCircles }: ListingFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
-  const [locationCircles, setLocationCircles] = React.useState<{name: string, locations: string[]}[]>([]);
   const [previewImageUrl, setPreviewImageUrl] = React.useState<string | null>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
@@ -106,7 +107,65 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
   const form = useForm<ListingSchema>({
     resolver: zodResolver(listingSchema),
+    // Memoize default values to prevent unnecessary form resets on re-render.
+    defaultValues: React.useMemo(() => (isEditMode && listing ? 
+      {...listing, documents: listing.documents || []} : 
+      {
+        status: 'pending',
+        developerId: user?.email || '',
+        listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+        warehouseBoxId: '',
+        actualSizeSqFt: undefined,
+        additionalInformation: '',
+        name: '',
+        location: '',
+        sizeSqFt: undefined,
+        description: '',
+        rentPerSqFt: undefined,
+        rentalSecurityDeposit: undefined,
+        availabilityDate: 'Ready for Occupancy',
+        constructionProgress: '',
+        serviceModel: 'Standard',
+        locationCircle: '',
+        area: { plinthArea: undefined, mezzanineArea1: undefined, mezzanineArea2: undefined, canopyArea: undefined, driversRestRoomArea: undefined, totalChargeableArea: undefined, },
+        buildingSpecifications: { buildingType: [], craneSupportStructureAvailable: false, craneAvailable: false, warehouseLayoutAvailable: false, louvers: false, },
+        siteSpecifications: {},
+        certificatesAndApprovals: { parkApproval: false, buildingApproval: false, fireLicense: false, fireNOC: false, buildingInsurance: false, pcbForAir: false, pcbForWater: false, propertyTax: false, },
+        documents: [],
+      }
+    ), [listing, isEditMode, user?.email])
   });
+
+  React.useEffect(() => {
+    if (isOpen) {
+      const defaultValues = isEditMode && listing ? 
+            {...listing, documents: listing.documents || []} : 
+            {
+              status: 'pending' as const,
+              developerId: user?.email || '',
+              listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+              warehouseBoxId: '',
+              actualSizeSqFt: undefined,
+              additionalInformation: '',
+              name: '',
+              location: '',
+              sizeSqFt: undefined,
+              description: '',
+              rentPerSqFt: undefined,
+              rentalSecurityDeposit: undefined,
+              availabilityDate: 'Ready for Occupancy',
+              constructionProgress: '',
+              serviceModel: 'Standard',
+              locationCircle: '',
+              area: { plinthArea: undefined, mezzanineArea1: undefined, mezzanineArea2: undefined, canopyArea: undefined, driversRestRoomArea: undefined, totalChargeableArea: undefined, },
+              buildingSpecifications: { buildingType: [], craneSupportStructureAvailable: false, craneAvailable: false, warehouseLayoutAvailable: false, louvers: false, },
+              siteSpecifications: {},
+              certificatesAndApprovals: { parkApproval: false, buildingApproval: false, fireLicense: false, fireNOC: false, buildingInsurance: false, pcbForAir: false, pcbForWater: false, propertyTax: false, },
+              documents: [],
+            };
+      form.reset(defaultValues);
+    }
+  }, [isOpen, isEditMode, listing, form, user]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -142,53 +201,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
         form.setValue("area.totalChargeableArea", total, { shouldValidate: true });
     }
   }, [plinthArea, mezzanineArea1, mezzanineArea2, canopyArea, driversRestRoomArea, form]);
-
-
-  React.useEffect(() => {
-    if (isOpen) {
-        const defaultValues: ListingSchema = isEditMode && listing ? 
-            {...listing, documents: listing.documents || []} : 
-            {
-              status: 'pending',
-              developerId: user?.email || '',
-              listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-              warehouseBoxId: '',
-              actualSizeSqFt: undefined,
-              additionalInformation: '',
-              name: '',
-              location: '',
-              sizeSqFt: undefined,
-              description: '',
-              rentPerSqFt: undefined,
-              rentalSecurityDeposit: undefined,
-              availabilityDate: 'Ready for Occupancy',
-              constructionProgress: '',
-              serviceModel: 'Standard',
-              locationCircle: '',
-              area: { plinthArea: undefined, mezzanineArea1: undefined, mezzanineArea2: undefined, canopyArea: undefined, driversRestRoomArea: undefined, totalChargeableArea: undefined, },
-              buildingSpecifications: { buildingType: [], craneSupportStructureAvailable: false, craneAvailable: false, warehouseLayoutAvailable: false, louvers: false, },
-              siteSpecifications: {},
-              certificatesAndApprovals: { parkApproval: false, buildingApproval: false, fireLicense: false, fireNOC: false, buildingInsurance: false, pcbForAir: false, pcbForWater: false, propertyTax: false, },
-              documents: [],
-            };
-        form.reset(defaultValues);
-    }
-  }, [isOpen, isEditMode, listing, form, user]);
-
-  React.useEffect(() => {
-    async function fetchCircles() {
-        if (!isOpen || !isAdmin) return;
-        try {
-            const response = await fetch('/api/location-circles');
-            if (!response.ok) throw new Error("Failed to fetch location circles");
-            const data = await response.json();
-            setLocationCircles(data);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-    fetchCircles();
-  }, [isOpen, isAdmin]);
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
@@ -260,6 +272,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     setIsSubmitting(true);
     try {
         const finalData = { ...data, isAdmin };
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
         onSubmit(finalData);
         
         toast({
@@ -280,15 +293,16 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
   };
   
    const onInvalidSubmit = (errors: FieldErrors<ListingSchema>) => {
+    console.log("Form Errors:", errors);
     const errorFields = Object.keys(errors);
     toast({
         variant: 'destructive',
         title: 'Missing Required Fields',
-        description: `Please review the form for errors. Required fields are missing in: ${errorFields.join(', ')}`
+        description: `Please review the form for errors. Required fields missing in: ${errorFields.join(', ')}`
     });
   };
 
-  const approvalFields = Object.keys(form.getValues().certificatesAndApprovals || {}) as (keyof ListingSchema['certificatesAndApprovals'])[];
+  const approvalFields = Object.keys(form.formState.defaultValues?.certificatesAndApprovals || {}) as (keyof ListingSchema['certificatesAndApprovals'])[];
 
   return (
     <>
@@ -777,5 +791,3 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
     </>
   );
 }
-
-    

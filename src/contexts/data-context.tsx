@@ -109,6 +109,10 @@ export type AboutUsContent = {
     originStory: string;
 };
 
+export type LocationCircle = {
+  name: string;
+  locations: string[];
+};
 
 type DataContextType = {
   listings: ListingSchema[];
@@ -150,6 +154,7 @@ type DataContextType = {
   isShortlistLoading: boolean;
   aboutUsContent: AboutUsContent | null;
   updateAboutUsContent: (newContent: AboutUsContent) => void;
+  locationCircles: LocationCircle[];
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -187,6 +192,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
   const [isShortlistLoading, setIsShortlistLoading] = useState(true);
   const [aboutUsContent, setAboutUsContent] = useState<AboutUsContent | null>(null);
+  const [locationCircles, setLocationCircles] = useState<LocationCircle[]>([]);
 
    useEffect(() => {
     async function loadInitialData() {
@@ -203,6 +209,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           tenantImprovementsRes,
           commercialTermsRes,
           aboutUsContentRes,
+          locationCirclesRes,
         ] = await Promise.all([
           fetch('/api/listings'),
           fetch('/api/demands'),
@@ -214,6 +221,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/tenant-improvements'),
           fetch('/api/commercial-terms'),
           fetch('/api/about-us-content'),
+          fetch('/api/location-circles'),
         ]);
 
         setListings(await listingsRes.json());
@@ -226,6 +234,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setTenantImprovements(await tenantImprovementsRes.json());
         setCommercialTerms(await commercialTermsRes.json());
         setAboutUsContent(await aboutUsContentRes.json());
+        setLocationCircles(await locationCirclesRes.json());
 
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
@@ -724,7 +733,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         toggleGeneralShortlist,
         isShortlistLoading,
         aboutUsContent,
-        updateAboutUsContent
+        updateAboutUsContent,
+        locationCircles
         }}>
       {children}
     </DataContext.Provider>
@@ -738,5 +748,3 @@ export function useData() {
   }
   return context;
 }
-
-    
