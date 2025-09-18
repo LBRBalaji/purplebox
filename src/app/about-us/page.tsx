@@ -1,14 +1,16 @@
 
+'use client';
 // src/app/about-us/page.tsx
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, Building, CheckCircle, ClipboardCheck, Download, Handshake, Search, Users, Zap, Award } from 'lucide-react';
+import { ArrowRight, Building, CheckCircle, ClipboardCheck, Download, Handshake, Search, Users, Zap, Award, Edit } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
+import { useAuth } from '@/contexts/auth-context';
+import { useToast } from '@/hooks/use-toast';
 
 const ValuePill = ({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }) => (
     <div className="text-center p-6 bg-card rounded-xl border">
@@ -20,7 +22,76 @@ const ValuePill = ({ icon: Icon, title, description }: { icon: React.ElementType
     </div>
 );
 
-const FeatureCard = ({ icon: Icon, title, description, image, hint }: { icon: React.ElementType, title:string, description:string, image:string, hint:string }) => (
+const FeatureImage = ({ src, onImageChange, alt, hint }: { src: string, onImageChange: (newSrc: string) => void, alt: string, hint: string }) => {
+    const { user } = useAuth();
+    const { toast } = useToast();
+    const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        toast({ title: "Uploading...", description: "Your new image is being uploaded." });
+
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Upload failed');
+            }
+
+            const result = await response.json();
+            onImageChange(result.url);
+            toast({ title: "Image updated successfully!" });
+
+        } catch (error) {
+            const e = error as Error;
+            toast({ variant: 'destructive', title: "Upload Failed", description: e.message });
+        }
+    };
+    
+    return (
+        <div className="relative group">
+            <Image 
+                src={src}
+                alt={alt}
+                width={600}
+                height={400}
+                className="rounded-xl object-cover shadow-lg"
+                data-ai-hint={hint}
+            />
+            {isAdmin && (
+                <>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/*"
+                        className="hidden"
+                    />
+                    <Button 
+                        variant="secondary" 
+                        size="sm"
+                        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <Edit className="mr-2 h-4 w-4" /> Change Image
+                    </Button>
+                </>
+            )}
+        </div>
+    );
+};
+
+const FeatureCard = ({ icon: Icon, title, description, image, onImageChange, hint }: { icon: React.ElementType, title:string, description:string, image:string, onImageChange: (newSrc: string) => void, hint:string }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8 md:gap-16">
         <div className="md:order-2">
              <div className="flex items-center gap-4 mb-4">
@@ -34,20 +105,23 @@ const FeatureCard = ({ icon: Icon, title, description, image, hint }: { icon: Re
             <p className="text-muted-foreground text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: description }}></p>
         </div>
         <div className="md:order-1">
-             <Image 
-                src={image}
-                alt={title}
-                width={600}
-                height={400}
-                className="rounded-xl object-cover shadow-lg"
-                data-ai-hint={hint}
-            />
+             <FeatureImage src={image} onImageChange={onImageChange} alt={title} hint={hint} />
         </div>
     </div>
 );
 
 
 export default function AboutUsPage() {
+    const [images, setImages] = React.useState({
+        feature1: 'https://picsum.photos/seed/about1/600/400',
+        feature2: 'https://picsum.photos/seed/about2/600/400',
+        feature3: 'https://picsum.photos/seed/about3/600/400',
+    });
+
+    const handleImageChange = (key: keyof typeof images) => (newSrc: string) => {
+        setImages(prev => ({...prev, [key]: newSrc }));
+    };
+
     return (
         <div className="flex-grow flex flex-col font-sans">
             {/* Hero Section */}
@@ -105,7 +179,8 @@ export default function AboutUsPage() {
                             icon={Download}
                             title="The Instant Advantage: Search, Select, Download."
                             description="This is where your journey begins. We provide what you need most upfront: a vast selection of properties with <strong class='text-foreground'>unconditional access to their Technical, Compliance, and Commercial data</strong>. Download a clean, structured CSV in seconds. This isn’t just data; it's the power to build a winning proposal faster than anyone else."
-                            image="https://picsum.photos/seed/about1/600/400"
+                            image={images.feature1}
+                            onImageChange={handleImageChange('feature1')}
                             hint="data analytics dashboard"
                         />
                         
@@ -122,13 +197,11 @@ export default function AboutUsPage() {
                                 <p className="text-muted-foreground text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: "We know leasing is a team decision. O2O eliminates messy email trails by providing a <strong class='text-foreground'>central hub for the entire transaction</strong>. With role-based access, you can keep every stakeholder—from logistics to legal to leadership—informed and engaged in real-time." }}></p>
                             </div>
                             <div>
-                                 <Image 
-                                    src="https://picsum.photos/seed/about2/600/400"
-                                    alt="Team Collaboration"
-                                    width={600}
-                                    height={400}
-                                    className="rounded-xl object-cover shadow-lg"
-                                    data-ai-hint="team meeting collaboration"
+                                 <FeatureImage 
+                                    src={images.feature2} 
+                                    onImageChange={handleImageChange('feature2')}
+                                    alt="Team Collaboration" 
+                                    hint="team meeting collaboration"
                                 />
                             </div>
                         </div>
@@ -137,7 +210,8 @@ export default function AboutUsPage() {
                             icon={ClipboardCheck}
                             title="Master the Full Transaction Lifecycle."
                             description="O2O is your advantage from start to finish. Our platform helps you manage every critical activity: schedule site visits, share improvement lists, use a detailed commercial terms sheet, generate meeting minutes, draft the MoU, and track execution right up to possession. <strong class='text-foreground'>We handle the process, so you can focus on your core business.</strong>"
-                            image="https://picsum.photos/seed/about3/600/400"
+                            image={images.feature3}
+                            onImageChange={handleImageChange('feature3')}
                             hint="checklist planning board"
                         />
                      </div>
