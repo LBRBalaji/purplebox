@@ -30,6 +30,7 @@
       "warehouseLayoutAvailable": true,
       "roofType": "Galvalume",
       "eveHeightMeters": 9.2,
+      "ventilation": "Turbo",
       "louvers": false
     },
     "siteSpecifications": {
@@ -37,14 +38,14 @@
       "typeOfRoad": "RCC"
     },
     "certificatesAndApprovals": {
-      "parkApproval": false,
-      "buildingApproval": false,
-      "fireLicense": false,
-      "fireNOC": false,
-      "buildingInsurance": false,
-      "pcbForAir": false,
-      "pcbForWater": false,
-      "propertyTax": false
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
     },
     "documents": [],
     "isAdmin": false

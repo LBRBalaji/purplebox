@@ -335,482 +335,482 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit }: Listing
 
   return (
     <>
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Warehouse Listing' : 'Create a New Warehouse Listing'}</DialogTitle>
-          <DialogDescription>
-            {isEditMode ? 'Update the details for this listing.' : 'Fill out the form to create a new warehouse listing for admin approval.'}
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <ScrollArea className="h-[70vh] p-1 pr-6">
-            <div className="space-y-8">
-              
-              {/* Developer Private Information */}
-              <div className="space-y-4">
-                <FormLabel className="text-lg font-semibold">Developer Private Information</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md bg-secondary/30">
-                    <FormField control={form.control} name="warehouseBoxId" render={({ field }) => (
-                        <FormItem><FormLabel>Warehouse Box ID (Your Internal ID)</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Project-A/Block-3/Unit-5" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="actualSizeSqFt" render={({ field }) => (
-                        <FormItem><FormLabel>Actual Box Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="Enter the exact internal size" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Public Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-primary">Public View Information</h3>
-                <p className="text-sm text-muted-foreground -mt-2">The following information will be visible on the public listing, subject to O2O approval.</p>
-              </div>
-
-              {/* General Information */}
-              <div className="space-y-4">
-                <FormLabel className="text-lg font-semibold">General Information</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md">
-                     <FormField control={form.control} name="location" render={({ field }) => (
-                        <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                     <FormField control={form.control} name="sizeSqFt" render={({ field }) => (
-                        <FormItem><FormLabel>Total Size for Listing (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                </div>
-              </div>
-              
-               {/* Availability & Commercials */}
-              <div className="space-y-4">
-                <FormLabel className="text-lg font-semibold">Availability &amp; Commercials</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4 border rounded-md">
-                    <FormField control={form.control} name="availabilityDate" render={({ field }) => (
-                        <FormItem><FormLabel>Availability</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
-                            <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
-                            <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
-                            <SelectItem value="Under Construction">Under Construction</SelectItem>
-                        </SelectContent></Select><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="constructionProgress" render={({ field }) => (
-                        <FormItem><FormLabel>Construction Progress</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., 80% or 'Structure Complete'" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="rentPerSqFt" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Rent per Sq. Ft.</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    type={typeof field.value === 'number' ? 'number' : 'text'} 
-                                    {...field} 
-                                    value={field.value ?? ''} 
-                                    onChange={e => field.onChange(e.target.value === '' ? undefined : (typeof field.value === 'number' ? +e.target.value : e.target.value))}
-                                    placeholder="e.g., 25"
-                                    disabled={field.value === 'Get Quote'}
-                                />
-                            </FormControl>
-                            <div className="flex items-center space-x-2 pt-1">
-                                <Checkbox id="rent-get-quote" checked={field.value === 'Get Quote'} onCheckedChange={(checked) => field.onChange(checked ? 'Get Quote' : undefined)} />
-                                <label htmlFor="rent-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Get Quote"</label>
-                            </div>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
-                    <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (
-                       <FormItem>
-                            <FormLabel>Security Deposit</FormLabel>
-                            <FormControl>
-                                 <Input 
-                                    type={typeof field.value === 'number' ? 'number' : 'text'} 
-                                    {...field} 
-                                    value={field.value ?? ''} 
-                                    onChange={e => field.onChange(e.target.value === '' ? undefined : (typeof field.value === 'number' ? +e.target.value : e.target.value))}
-                                    placeholder="e.g., 6 months"
-                                    disabled={field.value === 'Get Quote'}
-                                />
-                            </FormControl>
-                            <div className="flex items-center space-x-2 pt-1">
-                                <Checkbox id="deposit-get-quote" checked={field.value === 'Get Quote'} onCheckedChange={(checked) => field.onChange(checked ? 'Get Quote' : undefined)} />
-                                <label htmlFor="deposit-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Get Quote"</label>
-                            </div>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
-                </div>
-              </div>
-
-               {/* Area Specifications */}
-              <div className="space-y-4">
-                <FormLabel className="text-lg font-semibold">Area Specifications (in Sq. Ft.)</FormLabel>
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 p-4 border rounded-md">
-                    <FormField control={form.control} name="area.plinthArea" render={({ field }) => (
-                        <FormItem><FormLabel>Plinth Area (Shop Floor)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="area.mezzanineArea1" render={({ field }) => (
-                        <FormItem><FormLabel>Mezzanine Area 1</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
-                    )} />
-                     <FormField control={form.control} name="area.mezzanineArea2" render={({ field }) => (
-                        <FormItem><FormLabel>Mezzanine Area 2</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
-                    )} />
-                     <FormField control={form.control} name="area.canopyArea" render={({ field }) => (
-                        <FormItem><FormLabel>Canopy Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="area.driversRestRoomArea" render={({ field }) => (
-                        <FormItem><FormLabel>Driver's Rest Room Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="area.totalChargeableArea" render={({ field }) => (
-                        <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} readOnly className="bg-secondary" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                </div>
-              </div>
-
-                {/* Building & Site Specifications */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                     <div className="space-y-4">
-                        <FormLabel className="text-lg font-semibold">Building Specifications</FormLabel>
-                        <div className="space-y-4 p-4 border rounded-md">
-                             <FormField control={form.control} name="buildingSpecifications.buildingType" render={() => (
-                                <FormItem>
-                                    <FormLabel>Building Type</FormLabel>
-                                    <div className="flex flex-wrap gap-4 pt-2">
-                                    {buildingTypes.map((item) => (
-                                        <FormField
-                                        key={item.id}
-                                        control={form.control}
-                                        name="buildingSpecifications.buildingType"
-                                        render={({ field }) => {
-                                            return (
-                                            <FormItem
-                                                key={item.id}
-                                                className="flex flex-row items-start space-x-3 space-y-0"
-                                            >
-                                                <FormControl>
-                                                <Checkbox
-                                                    checked={field.value?.includes(item.id)}
-                                                    onCheckedChange={(checked) => {
-                                                    return checked
-                                                        ? field.onChange([...(field.value || []), item.id])
-                                                        : field.onChange(
-                                                            field.value?.filter(
-                                                            (value) => value !== item.id
-                                                            )
-                                                        )
-                                                    }}
-                                                />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                {item.label}
-                                                </FormLabel>
-                                            </FormItem>
-                                            )
-                                        }}
-                                        />
-                                    ))}
-                                    </div>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                             <FormField control={form.control} name="serviceModel" render={({ field }) => (
-                                <FormItem><FormLabel>Service Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
-                                    <SelectItem value="Standard">Standard Warehouse</SelectItem>
-                                    <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
-                                    <SelectItem value="Both">Both</SelectItem>
-                                </SelectContent></Select><FormMessage /></FormItem>
-                            )} />
-                            <FormField control={form.control} name="buildingSpecifications.numberOfDocksAndShutters" render={({ field }) => (
-                                <FormItem><FormLabel>Number of Docks/Shutters</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
-                            )} />
-                             <FormField control={form.control} name="buildingSpecifications.internalLighting" render={({ field }) => (
-                                <FormItem><FormLabel>Internal Lighting</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., LED-HI Bay 300 lux" /></FormControl><FormMessage /></FormItem>
-                            )} />
-                             <FormField control={form.control} name="buildingSpecifications.warehouseLayoutAvailable" render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                  <div className="space-y-0.5">
-                                    <FormLabel>Warehouse Layout Available?</FormLabel>
-                                  </div>
-                                  <FormControl>
-                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                            <FormField control={form.control} name="buildingSpecifications.craneSupportStructureAvailable" render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                  <div className="space-y-0.5">
-                                    <FormLabel>Crane Support Structure</FormLabel>
-                                  </div>
-                                  <FormControl>
-                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                            <FormField control={form.control} name="buildingSpecifications.craneAvailable" render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                  <div className="space-y-0.5">
-                                    <FormLabel>Crane Available</FormLabel>
-                                  </div>
-                                  <FormControl>
-                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                        </div>
+      {/* This input is now outside the form to prevent conflicts */}
+      <input
+        type="file"
+        multiple
+        ref={fileInputRef}
+        onChange={handleBulkUpload}
+        className="hidden"
+        accept="image/*,video/*,application/pdf"
+      />
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>{isEditMode ? 'Edit Warehouse Listing' : 'Create a New Warehouse Listing'}</DialogTitle>
+            <DialogDescription>
+              {isEditMode ? 'Update the details for this listing.' : 'Fill out the form to create a new warehouse listing for admin approval.'}
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form id="listing-form" onSubmit={form.handleSubmit(handleSubmit)}>
+              <ScrollArea className="h-[70vh] p-1 pr-6">
+                <div className="space-y-8">
+                  
+                  {/* Developer Private Information */}
+                  <div className="space-y-4">
+                    <FormLabel className="text-lg font-semibold">Developer Private Information</FormLabel>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md bg-secondary/30">
+                        <FormField control={form.control} name="warehouseBoxId" render={({ field }) => (
+                            <FormItem><FormLabel>Warehouse Box ID (Your Internal ID)</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Project-A/Block-3/Unit-5" /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="actualSizeSqFt" render={({ field }) => (
+                            <FormItem><FormLabel>Actual Box Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="Enter the exact internal size" /></FormControl><FormMessage /></FormItem>
+                        )} />
                     </div>
-                     <div className="space-y-4">
-                        <FormLabel className="text-lg font-semibold">Site &amp; Roof</FormLabel>
-                        <div className="space-y-4 p-4 border rounded-md">
-                             <FormField control={form.control} name="siteSpecifications.typeOfFlooringInside" render={({ field }) => (
-                                <FormItem><FormLabel>Inside Flooring Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="FM2">FM2</SelectItem><SelectItem value="VDF-RCC">VDF-RCC</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="PCC">PCC</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-                            )} />
-                             <FormField control={form.control} name="siteSpecifications.typeOfRoad" render={({ field }) => (
-                                <FormItem><FormLabel>Access Road Flooring</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Tar">Tar</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="PCC">PCC</SelectItem><SelectItem value="Gravel">Gravel</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-                            )} />
-                             <Separator />
-                            <FormField control={form.control} name="buildingSpecifications.roofType" render={({ field }) => (<FormItem><FormLabel>Roof Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Galvalume">Galvalume</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="ACC">ACC</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                            <FormField control={form.control} name="buildingSpecifications.eveHeightMeters" render={({ field }) => (<FormItem><FormLabel>Eve Height (in Meters)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
-                             <FormField control={form.control} name="buildingSpecifications.roofInsulation" render={({ field }) => (<FormItem><FormLabel>Roof Insulation</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Insulated">Insulated</SelectItem><SelectItem value="Non-Insulated">Non-Insulated</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                            <FormField control={form.control} name="buildingSpecifications.ventilation" render={({ field }) => (<FormItem><FormLabel>Ventilation</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Turbo">Turbo</SelectItem><SelectItem value="Ridge">Ridge</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                            <FormField control={form.control} name="buildingSpecifications.louvers" render={({ field }) => (<FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm"><FormLabel>Louvers</FormLabel><FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl></FormItem>)} />
-                        </div>
-                    </div>
-                </div>
+                  </div>
 
-                 {/* Approvals */}
-              <div className="space-y-4">
-                <FormLabel className="text-lg font-semibold">Certificates & Approvals</FormLabel>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 border rounded-md">
-                    {approvalFields.map((fieldName) => (
-                        <FormField key={fieldName} control={form.control} name={`certificatesAndApprovals.${fieldName}`} render={({ field }) => (
-                            <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                                <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                <FormLabel className="font-normal capitalize">{fieldName.replace(/([A-Z])/g, ' $1').trim()}</FormLabel>
+                  <Separator />
+
+                  {/* Public Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-primary">Public View Information</h3>
+                    <p className="text-sm text-muted-foreground -mt-2">The following information will be visible on the public listing, subject to O2O approval.</p>
+                  </div>
+
+                  {/* General Information */}
+                  <div className="space-y-4">
+                    <FormLabel className="text-lg font-semibold">General Information</FormLabel>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md">
+                        <FormField control={form.control} name="location" render={({ field }) => (
+                            <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="sizeSqFt" render={({ field }) => (
+                            <FormItem><FormLabel>Total Size for Listing (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
+                        )} />
+                    </div>
+                  </div>
+                  
+                  {/* Availability & Commercials */}
+                  <div className="space-y-4">
+                    <FormLabel className="text-lg font-semibold">Availability &amp; Commercials</FormLabel>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4 border rounded-md">
+                        <FormField control={form.control} name="availabilityDate" render={({ field }) => (
+                            <FormItem><FormLabel>Availability</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
+                                <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
+                                <SelectItem value="Under Construction">Under Construction</SelectItem>
+                            </SelectContent></Select><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="constructionProgress" render={({ field }) => (
+                            <FormItem><FormLabel>Construction Progress</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., 80% or 'Structure Complete'" /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="rentPerSqFt" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Rent per Sq. Ft.</FormLabel>
+                                <FormControl>
+                                    <Input 
+                                        type={typeof field.value === 'number' ? 'number' : 'text'} 
+                                        {...field} 
+                                        value={field.value ?? ''} 
+                                        onChange={e => field.onChange(e.target.value === '' ? undefined : (typeof field.value === 'number' ? +e.target.value : e.target.value))}
+                                        placeholder="e.g., 25"
+                                        disabled={field.value === 'Get Quote'}
+                                    />
+                                </FormControl>
+                                <div className="flex items-center space-x-2 pt-1">
+                                    <Checkbox id="rent-get-quote" checked={field.value === 'Get Quote'} onCheckedChange={(checked) => field.onChange(checked ? 'Get Quote' : undefined)} />
+                                    <label htmlFor="rent-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Get Quote"</label>
+                                </div>
+                                <FormMessage />
                             </FormItem>
                         )} />
-                    ))}
-                </div>
-              </div>
-            
-              {/* Documents */}
-              <div className="space-y-4">
-                 <FormLabel className="text-lg font-semibold">Documents & Media</FormLabel>
-                 <div className="space-y-4 p-4 border rounded-md">
-                    <Alert variant="destructive">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>Important: Do Not Expose Identity</AlertTitle>
-                        <AlertDescription>
-                            Please do not upload front views, elevations, or any pictures that could reveal the property's or developer's identity. Use only inside views of the building. Any identifying images will be removed by the admin.
-                            We thank you in advance for your understanding and cooperation in respecting this platform policy.
-                        </AlertDescription>
-                    </Alert>
-                    
-                    <input
-                      type="file"
-                      multiple
-                      ref={fileInputRef}
-                      onChange={handleBulkUpload}
-                      className="hidden"
-                      accept="image/*,video/*,application/pdf"
-                    />
-                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                        <UploadCloud className="mr-2 h-4 w-4" />
-                        {isUploading ? 'Uploading...' : 'Upload Media (Bulk)'}
-                    </Button>
+                        <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (
+                          <FormItem>
+                                <FormLabel>Security Deposit</FormLabel>
+                                <FormControl>
+                                    <Input 
+                                        type={typeof field.value === 'number' ? 'number' : 'text'} 
+                                        {...field} 
+                                        value={field.value ?? ''} 
+                                        onChange={e => field.onChange(e.target.value === '' ? undefined : (typeof field.value === 'number' ? +e.target.value : e.target.value))}
+                                        placeholder="e.g., 6 months"
+                                        disabled={field.value === 'Get Quote'}
+                                    />
+                                </FormControl>
+                                <div className="flex items-center space-x-2 pt-1">
+                                    <Checkbox id="deposit-get-quote" checked={field.value === 'Get Quote'} onCheckedChange={(checked) => field.onChange(checked ? 'Get Quote' : undefined)} />
+                                    <label htmlFor="deposit-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Get Quote"</label>
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                    </div>
+                  </div>
 
-                    {fields.map((field, index) => {
-                        const fileUrl = form.watch(`documents.${index}.url`);
-                        const fileType = form.watch(`documents.${index}.type`);
-                        return (
-                            <div key={field.id} className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_auto] gap-4 items-end">
-                                <button
-                                    type="button"
-                                    onClick={() => fileUrl && setPreviewImageUrl(fileUrl)}
-                                    className="w-20 h-20 relative bg-secondary rounded-md overflow-hidden group"
-                                >
-                                {fileType === 'image' && fileUrl ? (
-                                    <>
-                                        <Image
-                                            src={fileUrl}
-                                            alt={field.name || 'Preview'}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Maximize className="h-6 w-6 text-white" />
+                  {/* Area Specifications */}
+                  <div className="space-y-4">
+                    <FormLabel className="text-lg font-semibold">Area Specifications (in Sq. Ft.)</FormLabel>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 p-4 border rounded-md">
+                        <FormField control={form.control} name="area.plinthArea" render={({ field }) => (
+                            <FormItem><FormLabel>Plinth Area (Shop Floor)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="area.mezzanineArea1" render={({ field }) => (
+                            <FormItem><FormLabel>Mezzanine Area 1</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="area.mezzanineArea2" render={({ field }) => (
+                            <FormItem><FormLabel>Mezzanine Area 2</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="area.canopyArea" render={({ field }) => (
+                            <FormItem><FormLabel>Canopy Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="area.driversRestRoomArea" render={({ field }) => (
+                            <FormItem><FormLabel>Driver's Rest Room Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="area.totalChargeableArea" render={({ field }) => (
+                            <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} readOnly className="bg-secondary" /></FormControl><FormMessage /></FormItem>
+                        )} />
+                    </div>
+                  </div>
+
+                    {/* Building & Site Specifications */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="space-y-4">
+                            <FormLabel className="text-lg font-semibold">Building Specifications</FormLabel>
+                            <div className="space-y-4 p-4 border rounded-md">
+                                <FormField control={form.control} name="buildingSpecifications.buildingType" render={() => (
+                                    <FormItem>
+                                        <FormLabel>Building Type</FormLabel>
+                                        <div className="flex flex-wrap gap-4 pt-2">
+                                        {buildingTypes.map((item) => (
+                                            <FormField
+                                            key={item.id}
+                                            control={form.control}
+                                            name="buildingSpecifications.buildingType"
+                                            render={({ field }) => {
+                                                return (
+                                                <FormItem
+                                                    key={item.id}
+                                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                                >
+                                                    <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value?.includes(item.id)}
+                                                        onCheckedChange={(checked) => {
+                                                        return checked
+                                                            ? field.onChange([...(field.value || []), item.id])
+                                                            : field.onChange(
+                                                                field.value?.filter(
+                                                                (value) => value !== item.id
+                                                                )
+                                                            )
+                                                        }}
+                                                    />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                    {item.label}
+                                                    </FormLabel>
+                                                </FormItem>
+                                                )
+                                            }}
+                                            />
+                                        ))}
                                         </div>
-                                    </>
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                        <FileText className="h-8 w-8" />
-                                    </div>
-                                )}
-                                </button>
-                                <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
-                                    <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                                        <FormMessage />
+                                    </FormItem>
                                 )} />
-                                <FormField control={form.control} name={`documents.${index}.type`} render={({ field }) => (
-                                    <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
-                                        <SelectItem value="image">Image</SelectItem>
-                                        <SelectItem value="video">Video</SelectItem>
-                                        <SelectItem value="layout">Layout/PDF</SelectItem>
+                                <FormField control={form.control} name="serviceModel" render={({ field }) => (
+                                    <FormItem><FormLabel>Service Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                        <SelectItem value="Standard">Standard Warehouse</SelectItem>
+                                        <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
+                                        <SelectItem value="Both">Both</SelectItem>
                                     </SelectContent></Select><FormMessage /></FormItem>
                                 )} />
-                                <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <FormField control={form.control} name="buildingSpecifications.numberOfDocksAndShutters" render={({ field }) => (
+                                    <FormItem><FormLabel>Number of Docks/Shutters</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                                )} />
+                                <FormField control={form.control} name="buildingSpecifications.internalLighting" render={({ field }) => (
+                                    <FormItem><FormLabel>Internal Lighting</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., LED-HI Bay 300 lux" /></FormControl><FormMessage /></FormItem>
+                                )} />
+                                <FormField control={form.control} name="buildingSpecifications.warehouseLayoutAvailable" render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                      <div className="space-y-0.5">
+                                        <FormLabel>Warehouse Layout Available?</FormLabel>
+                                      </div>
+                                      <FormControl>
+                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField control={form.control} name="buildingSpecifications.craneSupportStructureAvailable" render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                      <div className="space-y-0.5">
+                                        <FormLabel>Crane Support Structure</FormLabel>
+                                      </div>
+                                      <FormControl>
+                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField control={form.control} name="buildingSpecifications.craneAvailable" render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                      <div className="space-y-0.5">
+                                        <FormLabel>Crane Available</FormLabel>
+                                      </div>
+                                      <FormControl>
+                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
                             </div>
-                        );
-                    })}
-                    {fields.length === 0 && <p className="text-sm text-muted-foreground">No media uploaded yet.</p>}
-                 </div>
-              </div>
-               {/* Additional Information */}
-              <div className="space-y-4">
-                <FormLabel className="text-lg font-semibold">Additional Information</FormLabel>
-                <div className="p-4 border rounded-md">
-                  <FormField
-                    control={form.control}
-                    name="additionalInformation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Developer Notes</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} value={field.value ?? ''} placeholder="Provide any extra details, special features, or notes about the property here." className="min-h-24"/>
-                        </FormControl>
-                        <FormDescription>This information will be displayed separately on the listing page.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-               {/* Description */}
-              <div className="space-y-4">
-                 <FormLabel className="text-lg font-semibold">Description</FormLabel>
-                 <div className="p-4 border rounded-md space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>AI-Generated Description</FormLabel>
-                            <FormControl>
-                                <Textarea {...field} value={field.value ?? ''} placeholder="Describe the key features of your property, or generate one with AI." className="min-h-32"/>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                     )} />
-                    <div className="flex items-center gap-2">
-                        <Select value={tone} onValueChange={(value) => setTone(value as any)}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Professional">Professional</SelectItem>
-                                <SelectItem value="Sales-Oriented">Sales-Oriented</SelectItem>
-                                <SelectItem value="Concise">Concise</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Button type="button" variant="outline" onClick={handleGenerateDescription} disabled={isGenerating}>
-                            {isGenerating ? <><Sparkles className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : <><Wand2 className="mr-2 h-4 w-4" /> Generate with AI</>}
-                        </Button>
+                        </div>
+                        <div className="space-y-4">
+                            <FormLabel className="text-lg font-semibold">Site &amp; Roof</FormLabel>
+                            <div className="space-y-4 p-4 border rounded-md">
+                                <FormField control={form.control} name="siteSpecifications.typeOfFlooringInside" render={({ field }) => (
+                                    <FormItem><FormLabel>Inside Flooring Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="FM2">FM2</SelectItem><SelectItem value="VDF-RCC">VDF-RCC</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="PCC">PCC</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                                )} />
+                                <FormField control={form.control} name="siteSpecifications.typeOfRoad" render={({ field }) => (
+                                    <FormItem><FormLabel>Access Road Flooring</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Tar">Tar</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="PCC">PCC</SelectItem><SelectItem value="Gravel">Gravel</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                                )} />
+                                <Separator />
+                                <FormField control={form.control} name="buildingSpecifications.roofType" render={({ field }) => (<FormItem><FormLabel>Roof Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Galvalume">Galvalume</SelectItem><SelectItem value="RCC">RCC</SelectItem><SelectItem value="ACC">ACC</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="buildingSpecifications.eveHeightMeters" render={({ field }) => (<FormItem><FormLabel>Eve Height (in Meters)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="buildingSpecifications.roofInsulation" render={({ field }) => (<FormItem><FormLabel>Roof Insulation</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Insulated">Insulated</SelectItem><SelectItem value="Non-Insulated">Non-Insulated</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="buildingSpecifications.ventilation" render={({ field }) => (<FormItem><FormLabel>Ventilation</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Turbo">Turbo</SelectItem><SelectItem value="Ridge">Ridge</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                                <FormField control={form.control} name="buildingSpecifications.louvers" render={({ field }) => (<FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm"><FormLabel>Louvers</FormLabel><FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl></FormItem>)} />
+                            </div>
+                        </div>
                     </div>
-                 </div>
-              </div>
-              <Separator/>
 
-              {/* Admin Only: Location Circle */}
-              {isAdmin && (
-                  <Alert variant="default" className="bg-amber-50 border-amber-200">
-                    <AlertTriangle className="h-4 w-4 text-amber-700" />
-                    <AlertTitle className="text-amber-800 font-semibold">Admin Action Required: Assign Location Circle</AlertTitle>
-                    <AlertDescription className="text-amber-700">
-                        This is a mandatory step for approving the listing.
-                    </AlertDescription>
-                    <div className="mt-4">
+                    {/* Approvals */}
+                  <div className="space-y-4">
+                    <FormLabel className="text-lg font-semibold">Certificates & Approvals</FormLabel>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 border rounded-md">
+                        {approvalFields.map((fieldName) => (
+                            <FormField key={fieldName} control={form.control} name={`certificatesAndApprovals.${fieldName}`} render={({ field }) => (
+                                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                                    <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    <FormLabel className="font-normal capitalize">{fieldName.replace(/([A-Z])/g, ' $1').trim()}</FormLabel>
+                                </FormItem>
+                            )} />
+                        ))}
+                    </div>
+                  </div>
+                
+                  {/* Documents */}
+                  <div className="space-y-4">
+                    <FormLabel className="text-lg font-semibold">Documents & Media</FormLabel>
+                    <div className="space-y-4 p-4 border rounded-md">
+                        <Alert variant="destructive">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Important: Do Not Expose Identity</AlertTitle>
+                            <AlertDescription>
+                                Please do not upload front views, elevations, or any pictures that could reveal the property's or developer's identity. Use only inside views of the building. Any identifying images will be removed by the admin.
+                                We thank you in advance for your understanding and cooperation in respecting this platform policy.
+                            </AlertDescription>
+                        </Alert>
+                        
+                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                            <UploadCloud className="mr-2 h-4 w-4" />
+                            {isUploading ? 'Uploading...' : 'Upload Media (Bulk)'}
+                        </Button>
+
+                        {fields.map((field, index) => {
+                            const fileUrl = form.watch(`documents.${index}.url`);
+                            const fileType = form.watch(`documents.${index}.type`);
+                            return (
+                                <div key={field.id} className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_auto] gap-4 items-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => fileUrl && setPreviewImageUrl(fileUrl)}
+                                        className="w-20 h-20 relative bg-secondary rounded-md overflow-hidden group"
+                                    >
+                                    {fileType === 'image' && fileUrl ? (
+                                        <>
+                                            <Image
+                                                src={fileUrl}
+                                                alt={field.name || 'Preview'}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Maximize className="h-6 w-6 text-white" />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                            <FileText className="h-8 w-8" />
+                                        </div>
+                                    )}
+                                    </button>
+                                    <FormField control={form.control} name={`documents.${index}.name`} render={({ field }) => (
+                                        <FormItem><FormLabel>Document Name</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                                    )} />
+                                    <FormField control={form.control} name={`documents.${index}.type`} render={({ field }) => (
+                                        <FormItem><FormLabel>Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                            <SelectItem value="image">Image</SelectItem>
+                                            <SelectItem value="video">Video</SelectItem>
+                                            <SelectItem value="layout">Layout/PDF</SelectItem>
+                                        </SelectContent></Select><FormMessage /></FormItem>
+                                    )} />
+                                    <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            );
+                        })}
+                        {fields.length === 0 && <p className="text-sm text-muted-foreground">No media uploaded yet.</p>}
+                    </div>
+                  </div>
+                  {/* Additional Information */}
+                  <div className="space-y-4">
+                    <FormLabel className="text-lg font-semibold">Additional Information</FormLabel>
+                    <div className="p-4 border rounded-md">
                       <FormField
                         control={form.control}
-                        name="locationCircle"
+                        name="additionalInformation"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Location Circle</FormLabel>
-                            <Select 
-                              onValueChange={(value) => field.onChange(value === 'none' ? '' : value)} 
-                              value={field.value || 'none'}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Assign to a location circle..." />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="none">None</SelectItem>
-                                {locationCircles.map(circle => (
-                                  <SelectItem key={circle.name} value={circle.name}>{circle.name}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            {selectedCircleLocations.length > 0 && (
-                              <div className="pt-2">
-                                <FormDescription>Locations in this circle:</FormDescription>
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {selectedCircleLocations.map(loc => <Badge key={loc} variant="outline">{loc}</Badge>)}
-                                </div>
-                              </div>
-                            )}
+                            <FormLabel>Developer Notes</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} value={field.value ?? ''} placeholder="Provide any extra details, special features, or notes about the property here." className="min-h-24"/>
+                            </FormControl>
+                            <FormDescription>This information will be displayed separately on the listing page.</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                  </Alert>
-              )}
-
-              <FormField control={form.control} name="status" render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Submission Status</FormLabel>
-                    <FormDescription>
-                        This listing will be submitted as '{field.value}'. An admin will review it.
-                    </FormDescription>
                   </div>
-                  <FormControl>
-                    <Input {...field} className="hidden" />
-                  </FormControl>
-                </FormItem>
-              )} />
-            </div>
-            </ScrollArea>
-             <DialogFooter className="pt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type="submit">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+
+                  {/* Description */}
+                  <div className="space-y-4">
+                    <FormLabel className="text-lg font-semibold">Description</FormLabel>
+                    <div className="p-4 border rounded-md space-y-4">
+                        <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>AI-Generated Description</FormLabel>
+                                <FormControl>
+                                    <Textarea {...field} value={field.value ?? ''} placeholder="Describe the key features of your property, or generate one with AI." className="min-h-32"/>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                        <div className="flex items-center gap-2">
+                            <Select value={tone} onValueChange={(value) => setTone(value as any)}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Professional">Professional</SelectItem>
+                                    <SelectItem value="Sales-Oriented">Sales-Oriented</SelectItem>
+                                    <SelectItem value="Concise">Concise</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button type="button" variant="outline" onClick={handleGenerateDescription} disabled={isGenerating}>
+                                {isGenerating ? <><Sparkles className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : <><Wand2 className="mr-2 h-4 w-4" /> Generate with AI</>}
+                            </Button>
+                        </div>
+                    </div>
+                  </div>
+                  <Separator/>
+
+                  {/* Admin Only: Location Circle */}
+                  {isAdmin && (
+                      <Alert variant="default" className="bg-amber-50 border-amber-200">
+                        <AlertTriangle className="h-4 w-4 text-amber-700" />
+                        <AlertTitle className="text-amber-800 font-semibold">Admin Action Required: Assign Location Circle</AlertTitle>
+                        <AlertDescription className="text-amber-700">
+                            This is a mandatory step for approving the listing.
+                        </AlertDescription>
+                        <div className="mt-4">
+                          <FormField
+                            control={form.control}
+                            name="locationCircle"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Location Circle</FormLabel>
+                                <Select 
+                                  onValueChange={(value) => field.onChange(value === 'none' ? '' : value)} 
+                                  value={field.value || 'none'}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Assign to a location circle..." />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="none">None</SelectItem>
+                                    {locationCircles.map(circle => (
+                                      <SelectItem key={circle.name} value={circle.name}>{circle.name}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                {selectedCircleLocations.length > 0 && (
+                                  <div className="pt-2">
+                                    <FormDescription>Locations in this circle:</FormDescription>
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                      {selectedCircleLocations.map(loc => <Badge key={loc} variant="outline">{loc}</Badge>)}
+                                    </div>
+                                  </div>
+                                )}
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </Alert>
+                  )}
+
+                  <FormField control={form.control} name="status" render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Submission Status</FormLabel>
+                        <FormDescription>
+                            This listing will be submitted as '{field.value}'. An admin will review it.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Input {...field} className="hidden" />
+                      </FormControl>
+                    </FormItem>
+                  )} />
+                </div>
+              </ScrollArea>
+              <DialogFooter className="pt-4">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                <Button type="submit" form="listing-form">{isEditMode ? 'Save Changes' : 'Submit'}</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     
-    <Dialog open={!!previewImageUrl} onOpenChange={() => setPreviewImageUrl(null)}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col items-center justify-center p-2">
-        <DialogHeader>
-          <DialogTitle className="sr-only">Image Preview</DialogTitle>
-          <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
-        </DialogHeader>
-       {previewImageUrl && (
-            <div className="relative w-full h-full">
-                <Image
-                    src={previewImageUrl}
-                    alt="Image Preview"
-                    fill
-                    className="object-contain"
-                />
-            </div>
-       )}
-      </DialogContent>
-    </Dialog>
+      <Dialog open={!!previewImageUrl} onOpenChange={() => setPreviewImageUrl(null)}>
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col items-center justify-center p-2">
+            <DialogHeader>
+              <DialogTitle className="sr-only">Image Preview</DialogTitle>
+              <DialogDescription className="sr-only">A larger preview of the selected image.</DialogDescription>
+            </DialogHeader>
+          {previewImageUrl && (
+                <div className="relative w-full h-full">
+                    <Image
+                        src={previewImageUrl}
+                        alt="Image Preview"
+                        fill
+                        className="object-contain"
+                    />
+                </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
-
