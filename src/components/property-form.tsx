@@ -241,8 +241,8 @@ function mapListingToProperty(listing: ListingSchema, demand: DemandSchema | und
         ceilingHeight: listing.buildingSpecifications.eveHeightMeters,
         ceilingHeightUnit: 'm',
         docks: listing.buildingSpecifications.numberOfDocksAndShutters,
-        rentPerSft: listing.rentPerSqFt || 0,
-        rentalSecurityDeposit: listing.rentalSecurityDeposit || 0,
+        rentPerSft: typeof listing.rentPerSqFt === 'number' ? listing.rentPerSqFt : 0,
+        rentalSecurityDeposit: typeof listing.rentalSecurityDeposit === 'number' ? listing.rentalSecurityDeposit : 0,
         approvalStatus: listing.certificatesAndApprovals.buildingApproval ? 'Obtained' : 'To Apply',
         fireNoc: listing.certificatesAndApprovals.fireNOC ? 'Obtained' : 'To Apply',
         fireHydrant: listing.certificatesAndApprovals.fireLicense ? 'Installed' : 'Can be provided',
@@ -448,7 +448,7 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
     toast({
         variant: 'destructive',
         title: 'Missing Required Fields',
-        description: `Please fill out: ${errorFieldNames}`
+        description: `Please fill out all required fields.`
     });
 
 
@@ -526,6 +526,31 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
                 )}
               />
 
+              <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <HandCoins className="h-5 w-5 text-primary" />
+                        Commercials
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="rentPerSft" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Rent per Sq. Ft.</FormLabel>
+                            <FormControl><Input type="number" {...field} placeholder="e.g., 25" /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                     <FormField control={form.control} name="rentalSecurityDeposit" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Rental Security Deposit (in months)</FormLabel>
+                            <FormControl><Input type="number" {...field} placeholder="e.g., 6" /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                </CardContent>
+              </Card>
+
             </div>
 
             <div className="lg:col-span-1 space-y-6">
@@ -564,4 +589,3 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
     </>
   );
 }
-
