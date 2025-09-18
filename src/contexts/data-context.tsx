@@ -23,18 +23,11 @@ export type Submission = {
     status: SubmissionStatus;
 }
 
-export type ViewedByRecord = {
-  name: string;
-  company: string;
-  timestamp: number;
-};
-
 export type DownloadedByRecord = {
   name: string;
   company: string;
   timestamps: number[];
 };
-
 
 export type ListingAnalytics = {
   listingId: string;
@@ -42,7 +35,6 @@ export type ListingAnalytics = {
   downloads: number;
   customerIndustries: Record<string, number>;
   downloadedBy?: DownloadedByRecord[];
-  viewedBy?: ViewedByRecord[];
 };
 
 export type DownloadRecord = {
@@ -50,6 +42,13 @@ export type DownloadRecord = {
     companyName: string;
     listingId: string;
     location: string;
+    timestamp: number;
+}
+
+export type ViewRecord = {
+    userId: string;
+    companyName: string;
+    listingId: string;
     timestamp: number;
 }
 
@@ -165,6 +164,7 @@ type DataContextType = {
   locationCircles: LocationCircle[];
   downloadAcknowledgments: AcknowledgmentRecord[];
   logAcknowledgment: (userId: string) => void;
+  viewHistory: ViewRecord[];
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -197,6 +197,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [commercialTerms, setCommercialTerms] = useState<CommercialTermsSchema[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
+  const [viewHistory, setViewHistory] = useState<ViewRecord[]>([]);
   const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
@@ -223,6 +224,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           locationCirclesRes,
           acknowledgmentsRes,
           downloadHistoryRes,
+          viewHistoryRes,
         ] = await Promise.all([
           fetch('/api/listings'),
           fetch('/api/demands'),
@@ -237,6 +239,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/location-circles'),
           fetch('/api/download-acknowledgments'),
           fetch('/api/download-history'),
+          fetch('/api/view-history'),
         ]);
 
         setListings(await listingsRes.json());
@@ -252,6 +255,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setLocationCircles(await locationCirclesRes.json());
         setDownloadAcknowledgments(await acknowledgmentsRes.json());
         setDownloadHistory(await downloadHistoryRes.json());
+        setViewHistory(await viewHistoryRes.json());
 
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
@@ -280,7 +284,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setGeneralShortlist([]);
         // No need to write to localStorage on logout, it's a per-session preference for logged-in users.
     }
-  }, [authUser])
+  }, [authUser]);
 
   const toggleGeneralShortlist = (listingId: string) => {
     setGeneralShortlist(prev => {
@@ -331,6 +335,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), []);
   const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), []);
   const persistDownloadHistory = useCallback((updatedHistory: DownloadRecord[]) => persistData('download-history', updatedHistory, 'download history'), []);
+  const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), []);
+
 
   const updateAboutUsContent = (newContent: AboutUsContent) => {
     setAboutUsContent(newContent);
@@ -551,7 +557,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
             let analytic = newAnalytics.find(a => a.listingId === listing.listingId);
             if (!analytic) {
-                analytic = { listingId: listing.listingId, views: 0, downloads: 0, customerIndustries: {}, downloadedBy: [], viewedBy: [] };
+                analytic = { listingId: listing.listingId, views: 0, downloads: 0, customerIndustries: {}, downloadedBy: [] };
                 newAnalytics.push(analytic);
             }
             analytic.downloads = (analytic.downloads || 0) + 1;
@@ -584,31 +590,30 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [downloadHistory, getCompanyDownloadCounts, toast, persistListingAnalytics, persistDownloadHistory]);
 
   const logListingView = useCallback((user: User, listingId: string) => {
-    setListingAnalytics(prevAnalytics => {
-      const newAnalytics = [...prevAnalytics];
-      let analytic = newAnalytics.find(a => a.listingId === listingId);
+    const lastView = viewHistory
+      .slice()
+      .reverse()
+      .find(v => v.userId === user.email && v.listingId === listingId);
 
-      if (!analytic) {
-        analytic = { listingId, views: 0, downloads: 0, customerIndustries: {}, downloadedBy: [], viewedBy: [] };
-        newAnalytics.push(analytic);
-      }
+    const fiveMinutes = 5 * 60 * 1000;
+    if (lastView && (Date.now() - lastView.timestamp < fiveMinutes)) {
+      return; // No change if viewed recently by same user
+    }
 
-      const newViewer: ViewedByRecord = { name: user.userName, company: user.companyName, timestamp: Date.now() };
-      const existingViewers = analytic.viewedBy || [];
-      const lastView = existingViewers.slice().reverse().find(v => v.company === newViewer.company);
-      
-      const fiveMinutes = 5 * 60 * 1000;
-      if (lastView && (Date.now() - lastView.timestamp < fiveMinutes)) {
-          return prevAnalytics; // No change if viewed recently by same company
-      }
+    const newView: ViewRecord = {
+      userId: user.email,
+      companyName: user.companyName,
+      listingId: listingId,
+      timestamp: Date.now(),
+    };
 
-      analytic.views = (analytic.views || 0) + 1;
-      analytic.viewedBy = [...existingViewers, newViewer];
-      
-      persistListingAnalytics(newAnalytics);
-      return newAnalytics;
+    setViewHistory(prev => {
+      const updatedHistory = [...prev, newView];
+      persistViewHistory(updatedHistory);
+      return updatedHistory;
     });
-  }, [persistListingAnalytics]);
+  }, [viewHistory, persistViewHistory]);
+
 
   const toggleSelectedForDownload = useCallback((listing: ListingSchema): { limitReached: boolean } => {
     if (selectedForDownload.length >= 5 && !selectedForDownload.some(item => item.listingId === listing.listingId)) {
@@ -778,7 +783,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         updateAboutUsContent,
         locationCircles,
         downloadAcknowledgments,
-        logAcknowledgment
+        logAcknowledgment,
+        viewHistory,
         }}>
       {children}
     </DataContext.Provider>
