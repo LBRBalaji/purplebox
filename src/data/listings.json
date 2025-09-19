@@ -2,6 +2,523 @@
   {
     "status": "pending",
     "developerId": "admin@welspun.com",
+    "listingId": "LST-VTQ5LE",
+    "warehouseBoxId": "Block A-7 ",
+    "actualSizeSqFt": 42238,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 50000,
+    "description": "Located in Thatchur, this 50,000 sq. ft. warehouse is currently under construction.  The non-temperature-controlled Pre-Engineered Building (PEB) features a robust Galvalume roof and boasts a generous 10-meter eave height, providing ample storage and operational space.  Ideal for businesses seeking efficient and modern warehouse solutions.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 50000,
+      "totalChargeableArea": 50000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 4,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758266776440-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758266776177-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758266775919-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758266775861-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758266776422-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758266776422-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758266776315-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758266776500-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-JU9TGZ",
+    "warehouseBoxId": "Block A-5 ",
+    "actualSizeSqFt": 138533,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 150000,
+    "description": "Located in Thatchur, this under-construction, 150,000 sq. ft. warehouse offers a non-temperature controlled, PEB building with a 10-meter eave height and a durable Galvalume roof.  Ideal for businesses seeking significant storage and operational space, this property presents a timely opportunity to secure prime industrial real estate.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 150000,
+      "totalChargeableArea": 150000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 10,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758266674636-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758266673082-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758266674508-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758266674472-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758266674687-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758266674754-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758266674549-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758266674793-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-3RV9B9",
+    "warehouseBoxId": "Block A-4 ",
+    "actualSizeSqFt": 229747,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 235000,
+    "description": "Located in Thatchur, this expansive 235,000 sq. ft. warehouse is currently under construction.  The non-temperature-controlled facility boasts a Pre-Engineered Building (PEB) design, featuring a robust Galvalume roof and impressive 10-meter eave height, ideal for efficient storage and operations.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 235000,
+      "totalChargeableArea": 235000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 20,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758266567566-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758266567139-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758266568019-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758266568004-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758266568230-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758266568305-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758266568305-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758266568301-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-HYZBYS",
+    "warehouseBoxId": "Block A-3 ",
+    "actualSizeSqFt": 152526,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 155000,
+    "description": "Located in Thatchur, this 155,000 sq. ft. warehouse is currently under construction.  The non-temperature controlled building features a pre-engineered metal building (PEB) design, a durable Galvalume roof, and a generous 10-meter eave height, offering ample space for efficient operations.  This property presents a significant opportunity for businesses seeking a modern, spacious warehouse in a prime location.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 155000,
+      "totalChargeableArea": 155000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 10,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758266454836-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758266454853-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758266454675-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758266455446-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758266455225-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758266455270-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758266455781-under_construction-6.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758266455814-under_construction-7.jpeg"
+      }
+    ],
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-N28NI8",
+    "warehouseBoxId": "Block A-2A ",
+    "actualSizeSqFt": 219413,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 225000,
+    "description": "Located in Thatchur, this 225,000 sq. ft. warehouse is currently under construction.  The non-temperature-controlled facility features a Pre-Engineered Building (PEB) design with a durable Galvalume roof and impressive 10-meter eave height, offering significant storage and operational advantages.  Ideal for businesses seeking efficient and spacious warehouse solutions.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 225000,
+      "totalChargeableArea": 225000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 20,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [],
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-1X5XIX",
+    "warehouseBoxId": "Block-A1 ",
+    "actualSizeSqFt": 81376,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 82000,
+    "description": "Secure your ideal industrial space in Thatchur. This 82,000 sq. ft. warehouse, currently under construction, features a robust PEB design with a 10-meter eave height and a durable Galvalume roof.  The non-temperature-controlled warehouse offers ample space for various industrial and logistics needs. Act now to secure this prime location.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 82000,
+      "totalChargeableArea": 82000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 8,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758266262678-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758266261797-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758266262041-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758266262071-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758266262822-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758266262545-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758266262359-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758266262927-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
     "listingId": "LST-KFX5QP",
     "warehouseBoxId": "Block-A ",
     "actualSizeSqFt": 100364,
