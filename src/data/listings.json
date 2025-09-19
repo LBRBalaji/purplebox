@@ -1,7 +1,99 @@
-
 [
   {
-    "status": "pending",
+    "status": "approved",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-6BDQYG",
+    "warehouseBoxId": "Block-B6 ",
+    "actualSizeSqFt": 280488,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 290000,
+    "description": "Thatchur's premier 290,000 sq. ft. warehouse, currently under construction, offers an exceptional opportunity for businesses seeking a state-of-the-art facility.  This Pre-Engineered Building (PEB) boasts a robust Galvalume roof and impressive 10-meter eave height, providing ample storage and operational space.  The non-temperature-controlled design ensures cost-effectiveness and suitability for a broad range of industrial needs. Secure your space now in this prime Thatchur location.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Karanodai Circle",
+    "area": {
+      "plinthArea": 290000,
+      "totalChargeableArea": 290000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 25,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758268675907-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758268675357-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758268676088-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758268675043-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758268676823-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758268676617-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758268676407-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758268677100-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-XC7X0X",
     "warehouseBoxId": "Block-B5 ",
@@ -16,7 +108,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "canopyArea": 320000,
       "totalChargeableArea": 320000
@@ -91,10 +183,10 @@
         "url": "/uploads/1758267788785-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-Q8YWJB",
     "warehouseBoxId": "Block-B4 ",
@@ -109,7 +201,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 320000,
       "totalChargeableArea": 320000
@@ -183,15 +275,15 @@
         "url": "/uploads/1758267641433-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-M7IWA7",
     "warehouseBoxId": "Block-B3 ",
     "actualSizeSqFt": 253932,
-    "additionalInformation": "",
+    "additionalInformation": "217352-Non Temperature Controlled\nTemperature Controlled-36580 SFT",
     "name": "",
     "location": "Thatchur",
     "sizeSqFt": 270000,
@@ -201,12 +293,10 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Temp & Non-Temp Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 270000,
-      "totalChargeableArea": 270000,
-      "tempControlledArea": 36580,
-      "nonTempControlledArea": 217352
+      "totalChargeableArea": 270000
     },
     "buildingSpecifications": {
       "buildingType": [
@@ -277,10 +367,10 @@
         "url": "/uploads/1758267469482-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-FSHLEB",
     "warehouseBoxId": "Block-B2 ",
@@ -295,7 +385,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 62000,
       "totalChargeableArea": 62000
@@ -370,10 +460,10 @@
         "url": "/uploads/1758267188610-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-BUTCRF",
     "warehouseBoxId": "Block-B1 ",
@@ -388,7 +478,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 115000,
       "totalChargeableArea": 115000
@@ -463,10 +553,10 @@
         "url": "/uploads/1758267087651-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-UNQVVC",
     "warehouseBoxId": "Block A-8 ",
@@ -481,7 +571,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 52000,
       "totalChargeableArea": 52000
@@ -556,10 +646,10 @@
         "url": "/uploads/1758266948202-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-VTQ5LE",
     "warehouseBoxId": "Block A-7 ",
@@ -574,7 +664,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 50000,
       "totalChargeableArea": 50000
@@ -649,10 +739,10 @@
         "url": "/uploads/1758266776500-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-JU9TGZ",
     "warehouseBoxId": "Block A-5 ",
@@ -667,7 +757,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 150000,
       "totalChargeableArea": 150000
@@ -742,10 +832,10 @@
         "url": "/uploads/1758266674793-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-3RV9B9",
     "warehouseBoxId": "Block A-4 ",
@@ -760,7 +850,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 235000,
       "totalChargeableArea": 235000
@@ -835,10 +925,10 @@
         "url": "/uploads/1758266568301-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-HYZBYS",
     "warehouseBoxId": "Block A-3 ",
@@ -853,7 +943,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 155000,
       "totalChargeableArea": 155000
@@ -928,10 +1018,10 @@
         "url": "/uploads/1758266455814-under_construction-7.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-N28NI8",
     "warehouseBoxId": "Block A-2A ",
@@ -946,7 +1036,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 225000,
       "totalChargeableArea": 225000
@@ -979,11 +1069,52 @@
       "pcbForWater": true,
       "propertyTax": true
     },
-    "documents": [],
-    "isAdmin": false
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758268562113-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758268567167-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758268567879-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758268566556-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758268568800-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758268568576-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758268567437-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758268569019-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-1X5XIX",
     "warehouseBoxId": "Block-A1 ",
@@ -998,7 +1129,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 82000,
       "totalChargeableArea": 82000
@@ -1073,10 +1204,10 @@
         "url": "/uploads/1758266262927-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-KFX5QP",
     "warehouseBoxId": "Block-A ",
@@ -1091,7 +1222,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 110000,
       "totalChargeableArea": 110000
@@ -1166,7 +1297,7 @@
         "url": "/uploads/1758265347820-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true
   },
   {
     "status": "approved",
@@ -1183,7 +1314,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 360000,
@@ -1266,7 +1397,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 300000,
@@ -1349,7 +1480,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 310000,
@@ -1432,7 +1563,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 324000,
@@ -1515,7 +1646,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "0",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 35000,
@@ -1573,7 +1704,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "0",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 40000,
@@ -1631,7 +1762,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 400000,
@@ -1689,12 +1820,12 @@
     "name": "",
     "location": "Tamaraipakkam",
     "sizeSqFt": 73000,
-    "description": "Ready for immediate occupancy, this 73,000 sq. ft. industrial warehouse in Tamaraipakkam offers a 12-meter eave height in a robust PEB structure with a Galvalume roof.  Standard services are included.  Act now to secure this prime space.",
+    "description": "Ready for occupancy, this 73,000 sq. ft. industrial warehouse in Tamaraipakkam offers a 12-meter eave height in a robust PEB structure with a Galvalume roof.  Standard services are included.  Act now to secure this prime space.",
     "rentPerSqFt": "Get Quote",
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 73000,
@@ -1757,7 +1888,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "80%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 350000,
@@ -1825,7 +1956,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 73000,
@@ -1894,7 +2025,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 175000,
@@ -1962,7 +2093,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 45000,
@@ -2030,7 +2161,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 28000,
@@ -2103,7 +2234,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 95000,
@@ -2170,7 +2301,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 32000,
@@ -2238,7 +2369,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "40%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 270000,
@@ -2296,7 +2427,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "40%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 312142,
@@ -2355,7 +2486,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "40%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 351309,
       "totalChargeableArea": 351309
@@ -2412,7 +2543,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 90000,
       "canopyArea": 2000,
@@ -2511,7 +2642,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 30000,
       "canopyArea": 1000,
@@ -2625,7 +2756,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 30000,
       "canopyArea": 1000,
@@ -2733,12 +2864,12 @@
     "locationCircle": "Karanodai Circle",
     "sizeSqFt": 31000,
     "description": "Ready for occupancy, this Thatchur warehouse offers 31,000 sq ft of space at ₹20/sq ft (standard service model).  Features include a 7-meter eave height (24 ft sidewall, 31 ft center height), 6 docks (1 ramped, accommodating 40ft containers), 3 acres of truck parking, two 100,000-liter sumps, 4 restrooms, a security office, fire safety systems, and ample manpower options.  Galvalume roof.  Fully compounded. Listed by O2O Platform.",
-    "additionalInformation": "warehouse has a sidewall height of 24 ft and centre height of 31 ft facing North. warehouse is at a floor level of 4.5 ft above the ground level.  warehouse has 6 docks with the facility of loading and unloading even 40 ft container out of which one dock has ramp facility. There is open space nearly 3 acres to accommodate trucks for all warehouses at a time. There are TWO underground closed sumps of 1,00,000 liters capacity.\nwarehouse has 4 separate toilets and bathrooms. warehouses have separate office cum security room. ⁠Entire facility is fully compounded.\n⁠Manpower arrangements can be done to any level to suit your requirements.\n⁠⁠Fire License with hydrants all around and hose reels inside are available.\n\nAny other feasible facility, if needed, may be provided.\n\n\n\n\n",
+    "additionalInformation": "warehouse has a sidewall height of 24 ft and centre height of 31 ft facing North. warehouse is at a floor level of 4.5 ft above the ground level.  warehouse has 6 docks with the facility of loading and unloading even 40 ft container out of which one dock has ramp facility. There is open space nearly 3 acres to accommodate trucks for all warehouses at a time. There are TWO underground closed sumps of 1,00,000 liters capacity.\nwarehouse has 4 separate toilets and bathrooms. warehouses have separate office cum security room. ⁠Entire facility is fully compounded.\n⁠Manpower arrangements can be done to any level to suit your requirements.\n⁠⁠Fire License with hydrants all around and hose reels inside are available.\n\nAny other feasible facility, if needed, may be provided.\n\n\n\n\n\n\n",
     "rentPerSqFt": 20,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 30000,
       "mezzanineArea1": 0,
@@ -2852,7 +2983,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Available in 3 months",
     "constructionProgress": "70%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -2910,7 +3041,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -2985,7 +3116,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [],
@@ -3049,7 +3180,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3124,7 +3255,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3199,7 +3330,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3274,7 +3405,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "80%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3349,7 +3480,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "80%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3424,7 +3555,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "70%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3498,7 +3629,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "3PL Operated Warehouse",
+    "serviceModel": "3PL Operated Warehouse",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3572,7 +3703,7 @@
     "rentPerSqFt": 26,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3647,7 +3778,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3709,7 +3840,7 @@
   {
     "listingId": "LST-RD962F",
     "developerId": "wd2@o2o.com",
-    "status": "approved",
+    "status": "rejected",
     "warehouseBoxId": "WBX-APEX-E8YF",
     "name": "Box two",
     "location": "Chengalpet",
@@ -3721,7 +3852,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "70%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 280000,
       "mezzanineArea1": 6000,
@@ -3776,7 +3907,7 @@
   {
     "listingId": "LST-ELTUE2",
     "developerId": "wd1@o2o.com",
-    "status": "approved",
+    "status": "rejected",
     "warehouseBoxId": "WBX-PRIM-11EQ",
     "name": "LBR 2",
     "location": "Mappedu",
@@ -3788,7 +3919,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Under Construction",
     "constructionProgress": "40",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 139000,
       "mezzanineArea1": 4000,
@@ -3842,7 +3973,7 @@
   {
     "listingId": "LST-ZNHZYG",
     "developerId": "wd1@o2o.com",
-    "status": "approved",
+    "status": "rejected",
     "warehouseBoxId": "WBX-PRIM-SM9L",
     "name": "LBR 1",
     "location": "Mahindra World City, Chengalpet",
@@ -3854,7 +3985,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "warehouseModel": "Standard",
+    "serviceModel": "Standard",
     "area": {
       "plinthArea": 185000,
       "mezzanineArea1": 5000,
@@ -3908,7 +4039,7 @@
   {
     "listingId": "LST-3PL001",
     "developerId": "wd3@o2o.com",
-    "status": "approved",
+    "status": "rejected",
     "warehouseBoxId": "WBX-ZENI-3PL1",
     "name": "Zenith 3PL Center",
     "location": "Bhiwandi, Mumbai",
@@ -3920,7 +4051,7 @@
     "rentalSecurityDeposit": 10,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "warehouseModel": "3PL Operated Warehouse",
+    "serviceModel": "3PL Operated Warehouse",
     "area": {
       "totalChargeableArea": 0
     },

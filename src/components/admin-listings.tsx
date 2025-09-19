@@ -215,11 +215,17 @@ function AdminListingCard({ listing, analytics, providerName, onStatusChange, on
 }
 
 function ProviderSummaryTable({ allDevelopers, providerSummary }: { allDevelopers: any[], providerSummary: ProviderSummary }) {
+    const totalActiveListings = React.useMemo(() => {
+        return Object.values(providerSummary).reduce((sum, current) => sum + current.listingCount, 0);
+    }, [providerSummary]);
+    
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Provider Supply Summary</CardTitle>
-                <CardDescription>An overview of active listings from {allDevelopers.length} developers.</CardDescription>
+                <CardDescription>
+                    An overview of active listings from {allDevelopers.length} developers, totaling {totalActiveListings} active properties.
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
