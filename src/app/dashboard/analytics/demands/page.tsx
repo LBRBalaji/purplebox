@@ -1,3 +1,4 @@
+
 // src/app/dashboard/analytics/demands/page.tsx
 'use client';
 
@@ -6,15 +7,21 @@ import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BarChart, Users, List, Clock, CheckCircle, PieChart, Star, Calendar as CalendarIcon, Factory, Warehouse, Building, Repeat } from 'lucide-react';
+import { BarChart as BarChartIcon, Users, List, Clock, CheckCircle, PieChart, Star, Calendar as CalendarIcon, Factory, Warehouse, Building, Repeat } from 'lucide-react';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Pie,
+  Cell
 } from "@/components/ui/chart"
-import { Bar, Pie, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { ResponsiveContainer } from "recharts"
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -272,22 +279,20 @@ export default function DemandAnalyticsPage() {
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                      <Card>
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><BarChart className="text-primary"/> Demand by Type</CardTitle>
+                            <CardTitle className="flex items-center gap-2"><BarChartIcon className="text-primary"/> Demand by Type</CardTitle>
                             <CardDescription>Breakdown of demands by the type of operation.</CardDescription>
                         </CardHeader>
                         <CardContent>
                              {filteredDemands.length > 0 ? (
                                 <ChartContainer config={demandChartConfig} className="h-[250px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart accessibilityLayer data={demandTypeData} margin={{ top: 20 }}>
-                                            <XAxis dataKey="type" tickLine={false} axisLine={false} tickMargin={8} />
-                                            <YAxis />
-                                            <ChartTooltip content={<ChartTooltipContent />} />
-                                            <Bar dataKey="count" radius={4}>
-                                                {demandTypeData.map((entry) => ( <Cell key={entry.type} fill={entry.fill} /> ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                    <BarChart accessibilityLayer data={demandTypeData} margin={{ top: 20 }}>
+                                        <XAxis dataKey="type" tickLine={false} axisLine={false} tickMargin={8} />
+                                        <YAxis />
+                                        <ChartTooltip content={<ChartTooltipContent />} />
+                                        <Bar dataKey="count" radius={4}>
+                                            {demandTypeData.map((entry) => ( <Cell key={entry.type} fill={entry.fill} /> ))}
+                                        </Bar>
+                                    </BarChart>
                                 </ChartContainer>
                              ) : (
                                  <p className="text-sm text-muted-foreground text-center py-4">No demand data to display.</p>
