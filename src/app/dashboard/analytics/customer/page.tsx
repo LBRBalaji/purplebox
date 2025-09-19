@@ -1,4 +1,3 @@
-
 // src/app/dashboard/analytics/customer/page.tsx
 'use client';
 
@@ -23,6 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function StatCard({ title, value, icon: Icon }: { title: string; value: string | number; icon: React.ElementType; }) {
     return (
@@ -55,7 +56,7 @@ function groupAndSort<T>(items: T[], keyExtractor: (item: T) => string) {
 
 export default function CustomerAnalyticsPage() {
     const { user: currentUser, users } = useAuth();
-    const { demands, viewHistory, downloadHistory, listings } = useData();
+    const { demands, viewHistory, downloadHistory, listings, isLoading: isDataLoading } = useData();
     const router = useRouter();
 
     const [selectedUserId, setSelectedUserId] = React.useState<string>('all');
@@ -72,9 +73,21 @@ export default function CustomerAnalyticsPage() {
         }
     }, [currentUser, hasAccess, router]);
 
-    const customers = React.useMemo(() => Object.values(users).filter(u => u.role === 'User'), [users]);
+    const customers = React.useMemo(() => Object.values(users || {}).filter(u => u.role === 'User'), [users]);
 
     const filteredData = React.useMemo(() => {
+        if (!demands || !viewHistory || !downloadHistory || !listings || !users) {
+            return {
+                totalDemands: 0,
+                totalViews: 0,
+                totalDownloads: 0,
+                topViewedLocations: [],
+                topViewedDevelopers: [],
+                recentActivities: [],
+                selectedUser: null,
+            };
+        }
+
         const from = dateRange?.from || new Date(0);
         const to = dateRange?.to || new Date();
 
@@ -117,6 +130,7 @@ export default function CustomerAnalyticsPage() {
                     type: 'userId' in item ? 'View' : 'Download',
                     listingName: listing?.name || item.listingId,
                     timestamp: new Date(item.timestamp).toLocaleString(),
+                    listingId: item.listingId
                 }
             });
 
@@ -133,6 +147,24 @@ export default function CustomerAnalyticsPage() {
     }, [selectedUserId, dateRange, demands, viewHistory, downloadHistory, listings, users]);
 
     if (!hasAccess) return null;
+    
+    if (isDataLoading) {
+        return (
+             <div className="container mx-auto p-4 md:p-8 space-y-8">
+                <Skeleton className="h-12 w-1/3" />
+                <Skeleton className="h-32 w-full" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                </div>
+                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <Skeleton className="h-64 w-full" />
+                    <Skeleton className="h-64 w-full" />
+                 </div>
+            </div>
+        )
+    }
 
     return (
         <main className="container mx-auto p-4 md:p-8">
@@ -195,9 +227,9 @@ export default function CustomerAnalyticsPage() {
                              <Table>
                                 <TableHeader><TableRow><TableHead>Location</TableHead><TableHead className="text-right">Views</TableHead></TableRow></TableHeader>
                                 <TableBody>
-                                    {filteredData.topViewedLocations.map(loc => (
+                                    {filteredData.topViewedLocations.length > 0 ? filteredData.topViewedLocations.map(loc => (
                                         <TableRow key={loc.name}><TableCell>{loc.name}</TableCell><TableCell className="text-right">{loc.count}</TableCell></TableRow>
-                                    ))}
+                                    )) : <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground">No data for this period.</TableCell></TableRow>}
                                 </TableBody>
                             </Table>
                         </CardContent>
@@ -210,9 +242,9 @@ export default function CustomerAnalyticsPage() {
                              <Table>
                                 <TableHeader><TableRow><TableHead>Developer</TableHead><TableHead className="text-right">Views</TableHead></TableRow></TableHeader>
                                 <TableBody>
-                                    {filteredData.topViewedDevelopers.map(dev => (
+                                    {filteredData.topViewedDevelopers.length > 0 ? filteredData.topViewedDevelopers.map(dev => (
                                         <TableRow key={dev.name}><TableCell>{dev.name}</TableCell><TableCell className="text-right">{dev.count}</TableCell></TableRow>
-                                    ))}
+                                    )) : <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground">No data for this period.</TableCell></TableRow>}
                                 </TableBody>
                             </Table>
                         </CardContent>
@@ -230,13 +262,17 @@ export default function CustomerAnalyticsPage() {
                          <Table>
                             <TableHeader><TableRow><TableHead>Activity</TableHead><TableHead>Listing</TableHead><TableHead className="text-right">Time</TableHead></TableRow></TableHeader>
                             <TableBody>
-                                {filteredData.recentActivities.map((act, index) => (
+                                {filteredData.recentActivities.length > 0 ? filteredData.recentActivities.map((act, index) => (
                                     <TableRow key={index}>
                                         <TableCell><Badge variant={act.type === 'View' ? 'outline' : 'secondary'}>{act.type}</Badge></TableCell>
-                                        <TableCell>{act.listingName}</TableCell>
+                                        <TableCell>
+                                            <a href={`/listings/${act.listingId}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                                {act.listingName}
+                                            </a>
+                                        </TableCell>
                                         <TableCell className="text-right text-xs text-muted-foreground">{act.timestamp}</TableCell>
                                     </TableRow>
-                                ))}
+                                )) : <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No recent activity for this period.</TableCell></TableRow>}
                             </TableBody>
                         </Table>
                     </CardContent>
