@@ -12,7 +12,7 @@ import {
 import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus, type LocationCircle } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle, Building, Scaling, Circle, Check } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle, Building, Scaling, Circle, Check, Warehouse } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -45,6 +45,7 @@ import * as XLSX from 'xlsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
+import { Separator } from './ui/separator';
 
 type ProviderSummary = {
   [email: string]: {
@@ -52,6 +53,20 @@ type ProviderSummary = {
     totalSize: number;
   };
 };
+
+function FilterStatCard({ title, value, icon: Icon }: { title: string, value: string | number, icon: React.ElementType }) {
+    return (
+        <div className="bg-secondary/50 p-4 rounded-lg">
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <p className="text-sm font-medium">{title}</p>
+                <Icon className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div>
+                <div className="text-2xl font-bold">{value}</div>
+            </div>
+        </div>
+    );
+}
 
 function AdminListingCard({ listing, analytics, providerName, onStatusChange, onEdit }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema, intent?: 'approve') => void }) {
   const { toast } = useToast();
@@ -331,6 +346,16 @@ export function AdminListings() {
      setFilteredListings(results);
 
   }, [listings, keywordFilter, developerFilter, circleFilter, availabilityFilter, sizeRange]);
+  
+  const filteredStats = React.useMemo(() => {
+    const developerIds = new Set(filteredListings.map(l => l.developerId));
+    const totalSize = filteredListings.reduce((acc, l) => acc + l.sizeSqFt, 0);
+    return {
+        listingCount: filteredListings.length,
+        developerCount: developerIds.size,
+        totalSize: totalSize.toLocaleString(),
+    }
+  }, [filteredListings]);
 
   const getProviderName = (developerId: string) => {
     const provider = Object.values(users).find(u => u.email === developerId);
@@ -420,7 +445,7 @@ export function AdminListings() {
         const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
 
         const viewsInPeriod = analytics?.viewedBy?.filter(v => new Date(v.timestamp) >= from && new Date(v.timestamp) <= to) || [];
-        const downloadsInPeriod = analytics?.downloadedBy?.flatMap(d => d.timestamps.filter(ts => new Date(ts) >= from && new Date(ts) <= to)) || [];
+        const downloadsInPeriod = analytics?.downloadedBy?.flatMap(d => d.timestamps.filter(ts => ts >= from && new Date(ts) <= to)) || [];
 
         const viewCount = viewsInPeriod.length;
         const downloadCount = downloadsInPeriod.length;
@@ -593,6 +618,20 @@ export function AdminListings() {
                     </div>
                 </Card>
 
+                <Card className="mb-8">
+                    <CardHeader>
+                        <CardTitle>Filtered Results</CardTitle>
+                        <CardDescription>A summary of the listings matching your current filters.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FilterStatCard title="Total Listings" value={filteredStats.listingCount} icon={Warehouse} />
+                            <FilterStatCard title="Unique Developers" value={filteredStats.developerCount} icon={Users} />
+                            <FilterStatCard title="Total Size (Sq. Ft.)" value={filteredStats.totalSize} icon={Scaling} />
+                        </div>
+                    </CardContent>
+                </Card>
+
 
                 {filteredListings.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -628,4 +667,5 @@ export function AdminListings() {
 
     
     
+
 

@@ -2,6 +2,153 @@
   {
     "status": "pending",
     "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-EDCYH9",
+    "warehouseBoxId": "Devariyambakkam B-08 ",
+    "actualSizeSqFt": 132471,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 135000,
+    "description": "Ready for immediate occupancy, this 135,000 sq. ft. warehouse in Oragadam offers a spacious, non-temperature-controlled environment ideal for various industrial needs.  The Pre-Engineered Building (PEB) structure features a robust Galvalume roof and boasts a generous 9.2-meter eave height, maximizing storage and operational efficiency.  Act now to secure this prime industrial space.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 135000,
+      "totalChargeableArea": 135000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 8,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [],
+    "rentPerSft": "Get Quote",
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-KEN0P1",
+    "warehouseBoxId": "Devariyambakkam B-07 ",
+    "actualSizeSqFt": 29193,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 30000,
+    "description": "Located in Oragadam, this 30,000 sq. ft. warehouse is currently under construction.  The pre-engineered building (PEB) features a non-temperature controlled design, a durable Galvalume roof, and a generous 9.2-meter eave height, offering ample storage and operational space.  ",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 2,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.37 (1).jpeg",
+        "url": "/uploads/1758278744768-WhatsApp_Image_2025-09-19_at_13.48.37_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.37.jpeg",
+        "url": "/uploads/1758278744812-WhatsApp_Image_2025-09-19_at_13.48.37.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36 (2).jpeg",
+        "url": "/uploads/1758278744731-WhatsApp_Image_2025-09-19_at_13.48.36_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36 (1).jpeg",
+        "url": "/uploads/1758278744731-WhatsApp_Image_2025-09-19_at_13.48.36_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36.jpeg",
+        "url": "/uploads/1758278745076-WhatsApp_Image_2025-09-19_at_13.48.36.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.35 (1).jpeg",
+        "url": "/uploads/1758278744620-WhatsApp_Image_2025-09-19_at_13.48.35_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.35.jpeg",
+        "url": "/uploads/1758278745170-WhatsApp_Image_2025-09-19_at_13.48.35.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.34 (1).jpeg",
+        "url": "/uploads/1758278745112-WhatsApp_Image_2025-09-19_at_13.48.34_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.34.jpeg",
+        "url": "/uploads/1758278744964-WhatsApp_Image_2025-09-19_at_13.48.34.jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-60VN9K",
     "warehouseBoxId": "Devariyambakkam B-06 ",
     "actualSizeSqFt": 78519,
