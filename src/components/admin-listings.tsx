@@ -212,7 +212,7 @@ export function AdminListings() {
   const { toast } = useToast();
   
   const [filteredListings, setFilteredListings] = React.useState<ListingSchema[]>([]);
-  const [locationFilter, setLocationFilter] = React.useState('');
+  const [keywordFilter, setKeywordFilter] = React.useState('');
   const [developerFilter, setDeveloperFilter] = React.useState('all');
   const [availabilityFilter, setAvailabilityFilter] = React.useState('all');
   const [sizeRange, setSizeRange] = React.useState([0, 1000000]);
@@ -238,8 +238,12 @@ export function AdminListings() {
   React.useEffect(() => {
      let results = [...listings];
 
-     if (locationFilter) {
-       results = results.filter(l => l.location.toLowerCase().includes(locationFilter.toLowerCase()));
+     if (keywordFilter) {
+       const lowerCaseFilter = keywordFilter.toLowerCase();
+       results = results.filter(l => 
+          l.location.toLowerCase().includes(lowerCaseFilter) ||
+          l.listingId.toLowerCase().includes(lowerCaseFilter)
+        );
      }
 
      if (developerFilter !== 'all') {
@@ -254,7 +258,7 @@ export function AdminListings() {
 
      setFilteredListings(results);
 
-  }, [listings, locationFilter, developerFilter, availabilityFilter, sizeRange]);
+  }, [listings, keywordFilter, developerFilter, availabilityFilter, sizeRange]);
 
   const getProviderName = (developerId: string) => {
     const provider = Object.values(users).find(u => u.email === developerId);
@@ -262,7 +266,7 @@ export function AdminListings() {
   };
   
   const resetFilters = () => {
-    setLocationFilter('');
+    setKeywordFilter('');
     setDeveloperFilter('all');
     setAvailabilityFilter('all');
     setSizeRange([0, maxSliderSize]);
@@ -379,11 +383,11 @@ export function AdminListings() {
          <Card className="mb-8 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Location</label>
+                    <label className="text-sm font-medium">Location or Listing ID</label>
                     <Input 
-                        placeholder="Search by city or area..."
-                        value={locationFilter}
-                        onChange={e => setLocationFilter(e.target.value)}
+                        placeholder="Search by city, area, or ID..."
+                        value={keywordFilter}
+                        onChange={e => setKeywordFilter(e.target.value)}
                     />
                 </div>
                  <div className="space-y-2">
