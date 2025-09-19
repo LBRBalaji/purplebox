@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DemandForm } from '@/components/demand-form';
 import { MyDemands } from '@/components/my-demands';
@@ -27,6 +27,7 @@ const MainDashboard = () => {
     const { user } = useAuth();
     const { submissions, listings } = useData();
     const searchParams = useSearchParams();
+    const router = useRouter();
     
     // Read URL params to control active tabs
     const defaultTabParam = searchParams.get('tab');
@@ -39,6 +40,13 @@ const MainDashboard = () => {
     const isProvider = user?.role === 'Warehouse Developer';
     const isCustomer = user?.role === 'User';
     const isAgent = user?.role === 'Agent';
+
+    React.useEffect(() => {
+        // Redirect providers and customers to the listings page by default.
+        if (isProvider || isCustomer) {
+            router.replace('/');
+        }
+    }, [isProvider, isCustomer, router]);
 
     const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'my-listings');
     const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-demands');
@@ -177,12 +185,10 @@ const MainDashboard = () => {
       </Tabs>
     );
     
+    // Redirect logic handles providers and customers, so they shouldn't see this.
+    // This is a fallback for admin roles.
     if (isSuperAdmin) {
         return renderMainAdminContent();
-    } else if (isProvider) {
-        return renderProviderContent();
-    } else if (isCustomer) {
-        return renderCustomerContent();
     } else if (isO2OManager) {
         return renderO2OContent();
     } else if (isAgent) {
@@ -193,8 +199,8 @@ const MainDashboard = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Loading...</CardTitle>
-                <CardDescription>Please wait while we load your dashboard.</CardDescription>
+                <CardTitle>Loading Dashboard...</CardTitle>
+                <CardDescription>Please wait while we prepare your workspace.</CardDescription>
             </CardHeader>
         </Card>
     );
