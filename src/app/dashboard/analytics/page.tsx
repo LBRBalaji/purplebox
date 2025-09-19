@@ -35,16 +35,16 @@ export default function AnalyticsHubPage() {
                             </CardHeader>
                         </Card>
                    </Link>
-                    <Link href="/dashboard/analytics/demands" className="group">
+                    <Link href="/dashboard/analytics/customer" className="group">
                         <Card className="h-full hover:border-primary transition-colors">
                             <CardHeader className="flex flex-row items-center justify-between">
                                 <div>
                                     <CardTitle className="flex items-center gap-2">
-                                        <List className="text-primary" />
-                                        Demand & Customer Analytics
+                                        <Users className="text-primary" />
+                                        Customer Analytics
                                     </CardTitle>
                                     <CardDescription className="mt-2">
-                                        Analyze demand trends, success rates, and customer activity.
+                                        Analyze demand trends, success rates, and individual customer activity.
                                     </CardDescription>
                                 </div>
                                  <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
