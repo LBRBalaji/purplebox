@@ -472,6 +472,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                                     <FormItem><FormLabel>Warehouse Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
                                         <SelectItem value="Non-Temperature Controlled">Non-Temperature Controlled</SelectItem>
                                         <SelectItem value="Temperature Controlled">Temperature Controlled</SelectItem>
+                                        <SelectItem value="Temp & Non-Temp Controlled">Temp & Non-Temp Controlled</SelectItem>
                                         <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
                                     </SelectContent></Select><FormMessage /></FormItem>
                                 )} />

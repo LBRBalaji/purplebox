@@ -367,6 +367,7 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
                           <SelectContent>
                             <SelectItem value="Non-Temperature Controlled">Non-Temperature Controlled</SelectItem>
                             <SelectItem value="Temperature Controlled">Temperature Controlled</SelectItem>
+                            <SelectItem value="Temp & Non-Temp Controlled">Temp & Non-Temp Controlled</SelectItem>
                             <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
                           </SelectContent>
                         </Select>
