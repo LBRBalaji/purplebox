@@ -132,5 +132,215 @@
     "isCompanyAdmin": true,
     "plan": "Paid_Premium",
     "createdAt": "2025-09-18T15:11:26.212Z"
+  },
+  "admin@pragati.com": {
+    "email": "admin@pragati.com",
+    "companyName": "Pragati",
+    "userName": "Pragati",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T04:56:09.951Z"
+  },
+  "admin@hoh.com": {
+    "email": "admin@hoh.com",
+    "companyName": "House of Hiranandani",
+    "userName": "HoH",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T04:56:41.066Z"
+  },
+  "admin@welspun.com": {
+    "email": "admin@welspun.com",
+    "companyName": "Welspun",
+    "userName": "Welspun",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T04:57:15.169Z"
+  },
+  "admin@prologis.com": {
+    "email": "admin@prologis.com",
+    "companyName": "Prologis",
+    "userName": "Prologis",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T04:57:47.106Z"
+  },
+  "admin@ampleparks.com": {
+    "email": "admin@ampleparks.com",
+    "companyName": "Ample Parks",
+    "userName": "Ample Parks",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T04:59:51.647Z"
+  },
+  "admin@ascendas.com": {
+    "email": "admin@ascendas.com",
+    "companyName": "Ascendas",
+    "userName": "Ascendas One",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:00:17.750Z"
+  },
+  "admin@mapletree.com": {
+    "email": "admin@mapletree.com",
+    "companyName": "MapleTree",
+    "userName": "MapleTree",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:01:09.274Z"
+  },
+  "admin@kailashlogistics.com": {
+    "email": "admin@kailashlogistics.com",
+    "companyName": "Kailash Logistics",
+    "userName": "Kailash Logistics",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:01:46.628Z"
+  },
+  "admin@tvsilp.com": {
+    "email": "admin@tvsilp.com",
+    "companyName": "TVS Industrial and Logistics Park",
+    "userName": "TVS ILP",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:02:23.696Z"
+  },
+  "admin@horizon.com": {
+    "email": "admin@horizon.com",
+    "companyName": "Horizon",
+    "userName": "Horizon",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:02:51.568Z"
+  },
+  "admin@rmz.com": {
+    "email": "admin@rmz.com",
+    "companyName": "RMZ",
+    "userName": "RMZ",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:03:20.103Z"
+  },
+  "admin@lodha.com": {
+    "email": "admin@lodha.com",
+    "companyName": "Lodha Developers",
+    "userName": "Lodha",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:03:58.269Z"
+  },
+  "admin@isteel.com": {
+    "email": "admin@isteel.com",
+    "companyName": "I Steel",
+    "userName": "I Steel",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:04:45.486Z"
+  },
+  "admin@ndr.com": {
+    "email": "admin@ndr.com",
+    "companyName": "NDR",
+    "userName": "NDR",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:05:13.059Z"
+  },
+  "admin@kochar.com": {
+    "email": "admin@kochar.com",
+    "companyName": "Kochar",
+    "userName": "Kochar",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:05:39.430Z"
+  },
+  "admin@snd.com": {
+    "email": "admin@snd.com",
+    "companyName": "Sugal and Damani",
+    "userName": "Sugal and Damani",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:06:13.381Z"
+  },
+  "admin@scalar.com": {
+    "email": "admin@scalar.com",
+    "companyName": "Scalar",
+    "userName": "Scalar",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:07:00.700Z"
+  },
+  "admin@ascargo.com": {
+    "email": "admin@ascargo.com",
+    "companyName": "AS Cargo",
+    "userName": "AS Cargo",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:07:45.387Z"
+  },
+  "admin@avigna.com": {
+    "email": "admin@avigna.com",
+    "companyName": "Avigna",
+    "userName": "Avigna",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:08:14.709Z"
+  },
+  "arihant@gothi.com": {
+    "email": "arihant@gothi.com",
+    "companyName": "Gothi",
+    "userName": "Gothi",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:08:41.393Z"
+  },
+  "admin@bagmar.com": {
+    "email": "admin@bagmar.com",
+    "companyName": "Bagmar Warehouse",
+    "userName": "Bagmar Warehouse",
+    "phone": "+91 9841098170",
+    "role": "Warehouse Developer",
+    "isCompanyAdmin": true,
+    "plan": "Paid_Premium",
+    "createdAt": "2025-09-19T05:10:09.434Z"
   }
 }
