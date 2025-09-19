@@ -158,14 +158,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
     }
     
-    // New users default to the 'Free' plan and are not company admins
-    const newUserWithDefaults: NewUser = { ...details, plan: 'Free', isCompanyAdmin: false };
+    const newUser: User = { 
+        ...details, 
+        plan: 'Free', 
+        isCompanyAdmin: false,
+        createdAt: new Date().toISOString() 
+    };
 
-    const newUserWithTimestamp: User = { ...newUserWithDefaults, createdAt: new Date().toISOString() };
-    addUser(newUserWithTimestamp);
+    addUser(newUser);
 
-    setUser(newUserWithTimestamp);
-    sessionStorage.setItem('user', JSON.stringify(newUserWithTimestamp));
+    setUser(newUser);
+    sessionStorage.setItem('user', JSON.stringify(newUser));
     router.push('/dashboard');
   }
 
@@ -175,7 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/');
   };
 
-  const addUser = async (details: NewUser) => {
+  const addUser = async (details: User) => {
     if (users[details.email.toLowerCase()]) {
       toast({
         variant: "destructive",
@@ -184,8 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       return;
     }
-    const newUserWithTimestamp: User = { ...details, createdAt: new Date().toISOString() };
-    const newUsers = { ...users, [details.email.toLowerCase()]: newUserWithTimestamp };
+    const newUsers = { ...users, [details.email.toLowerCase()]: details };
     await persistUsers(newUsers);
   };
   
