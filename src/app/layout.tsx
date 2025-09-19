@@ -10,6 +10,9 @@ import { CookieBanner } from '@/components/cookie-banner';
 import { GoogleAnalytics } from '@/components/google-analytics';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { AlertTriangle, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: 'Lakshmi Balaji O2O: Sourcing & Leasing Simplified',
@@ -36,6 +39,26 @@ function Footer() {
             <Link href="/cookie-policy" className="hover:underline">
               Cookie Policy
             </Link>
+          </div>
+          <div className="mt-4 text-xs text-muted-foreground/80">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1.5 mx-auto hover:text-foreground transition-colors">
+                  <AlertTriangle className="h-3 w-3" />
+                  <span>Disclaimer: O2O Data can be in-accurate, so check with developer.</span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="max-w-sm text-left">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none flex items-center gap-2"><Info className="h-4 w-4"/>Data Accuracy</h4>
+                    <p className="text-sm text-muted-foreground">
+                      The information on this platform is provided by third parties. While we strive for accuracy, we do not independently verify all data. Users are encouraged to conduct their own due diligence.
+                    </p>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
       </div>
     </footer>

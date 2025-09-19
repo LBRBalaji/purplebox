@@ -1,6 +1,6 @@
 [
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-EDCYH9",
     "warehouseBoxId": "Devariyambakkam B-08 ",
@@ -14,7 +14,7 @@
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 135000,
       "totalChargeableArea": 135000
@@ -47,12 +47,23 @@
       "pcbForWater": false,
       "propertyTax": true
     },
-    "documents": [],
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.52.29 (2).jpeg",
+        "url": "/uploads/1758279639010-WhatsApp_Image_2025-09-19_at_13.52.29_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.52.29 (3).jpeg",
+        "url": "/uploads/1758279638762-WhatsApp_Image_2025-09-19_at_13.52.29_(3).jpeg"
+      }
+    ],
     "rentPerSft": "Get Quote",
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-KEN0P1",
     "warehouseBoxId": "Devariyambakkam B-07 ",
@@ -66,7 +77,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -144,10 +155,10 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-60VN9K",
     "warehouseBoxId": "Devariyambakkam B-06 ",
@@ -161,7 +172,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 80000,
       "totalChargeableArea": 80000
@@ -242,10 +253,10 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-HJEO8N",
     "warehouseBoxId": "Devariyambakkam B-05 ",
@@ -259,7 +270,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 60000,
       "totalChargeableArea": 60000
@@ -340,10 +351,10 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-RAZOVL",
     "warehouseBoxId": "Devariyambakkam B-04 ",
@@ -357,7 +368,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 240000,
       "totalChargeableArea": 240000
@@ -438,10 +449,10 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-2UOHJH",
     "warehouseBoxId": "Devariyambakkam B-03 ",
@@ -455,7 +466,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -533,10 +544,10 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-GLWXFK",
     "warehouseBoxId": "Devariyambakkam B-02 ",
@@ -550,7 +561,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 238000,
       "totalChargeableArea": 238000
@@ -631,10 +642,10 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": false
+    "isAdmin": true
   },
   {
-    "status": "pending",
+    "status": "approved",
     "developerId": "admin@kailashlogistics.com",
     "listingId": "LST-YLX4O7",
     "warehouseBoxId": "Devariyambakkam B-01 ",
@@ -648,7 +659,7 @@
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
     "warehouseModel": "Non-Temperature Controlled",
-    "locationCircle": "",
+    "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 250000,
       "totalChargeableArea": 250000
@@ -724,7 +735,7 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": false
+    "isAdmin": true
   },
   {
     "status": "approved",
