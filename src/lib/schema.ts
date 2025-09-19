@@ -39,7 +39,7 @@ export const listingSchema = z.object({
   rentalSecurityDeposit: asOptionalField(z.union([z.coerce.number().positive("Deposit must be positive."), z.literal('Get Quote')])),
   
   // Availability & Progress
-  availabilityDate: z.string().min(1, "Availability date is required."),
+  availabilityDate: z.string().min(1, "Possession Readiness is required."),
   constructionProgress: z.string().optional(),
   warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse']).optional(),
 

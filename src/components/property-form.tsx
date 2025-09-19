@@ -345,7 +345,7 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
                     )} />
                     <FormField control={form.control} name="readinessToOccupy" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Readiness to Occupy</FormLabel>
+                        <FormLabel>Possession Readiness</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                           <SelectContent>
@@ -353,7 +353,7 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
                             <SelectItem value="Within 45 Days">Within 45 Days</SelectItem>
                             <SelectItem value="Within 90 Days">Within 90 Days</SelectItem>
                             <SelectItem value="More than 90 Days">More than 90 Days</SelectItem>
-                            <SelectItem value="BTS">BTS</SelectItem>
+                            <SelectItem value="BTS">BTS-Built To Suit</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

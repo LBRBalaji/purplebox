@@ -1,5 +1,989 @@
 [
   {
+    "status": "pending",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-2UOHJH",
+    "warehouseBoxId": "Devariyambakkam B-03 ",
+    "actualSizeSqFt": 53990,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 54000,
+    "description": "Located in Oragadam, this 54,000 sq. ft. warehouse is currently under construction.  The non-temperature controlled PEB structure features a robust Galvalume roof and a generous 9.2-meter eave height, ideal for various industrial and warehousing needs.  Secure your space now in this prime location.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {},
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 3,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.37 (1).jpeg",
+        "url": "/uploads/1758278027690-WhatsApp_Image_2025-09-19_at_13.48.37_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.37.jpeg",
+        "url": "/uploads/1758278028284-WhatsApp_Image_2025-09-19_at_13.48.37.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36 (2).jpeg",
+        "url": "/uploads/1758278028163-WhatsApp_Image_2025-09-19_at_13.48.36_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36 (1).jpeg",
+        "url": "/uploads/1758278028473-WhatsApp_Image_2025-09-19_at_13.48.36_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36.jpeg",
+        "url": "/uploads/1758278028983-WhatsApp_Image_2025-09-19_at_13.48.36.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.35 (1).jpeg",
+        "url": "/uploads/1758278028489-WhatsApp_Image_2025-09-19_at_13.48.35_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.35.jpeg",
+        "url": "/uploads/1758278028950-WhatsApp_Image_2025-09-19_at_13.48.35.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.34 (1).jpeg",
+        "url": "/uploads/1758278028897-WhatsApp_Image_2025-09-19_at_13.48.34_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.34.jpeg",
+        "url": "/uploads/1758278028949-WhatsApp_Image_2025-09-19_at_13.48.34.jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-GLWXFK",
+    "warehouseBoxId": "Devariyambakkam B-02 ",
+    "actualSizeSqFt": 235020,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 238000,
+    "description": "Located in Oragadam, this under-construction, 238,000 sq ft warehouse offers a non-temperature controlled, PEB building design.  The property features a robust Galvalume roof and a generous 9.2-meter eave height, ideal for efficient warehousing and logistics operations.  ",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 238000,
+      "totalChargeableArea": 238000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 18,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.37 (1).jpeg",
+        "url": "/uploads/1758277913992-WhatsApp_Image_2025-09-19_at_13.48.37_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.37.jpeg",
+        "url": "/uploads/1758277914213-WhatsApp_Image_2025-09-19_at_13.48.37.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36 (2).jpeg",
+        "url": "/uploads/1758277914009-WhatsApp_Image_2025-09-19_at_13.48.36_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36 (1).jpeg",
+        "url": "/uploads/1758277914649-WhatsApp_Image_2025-09-19_at_13.48.36_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36.jpeg",
+        "url": "/uploads/1758277915322-WhatsApp_Image_2025-09-19_at_13.48.36.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.35 (1).jpeg",
+        "url": "/uploads/1758277915021-WhatsApp_Image_2025-09-19_at_13.48.35_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.35.jpeg",
+        "url": "/uploads/1758277915336-WhatsApp_Image_2025-09-19_at_13.48.35.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.34 (1).jpeg",
+        "url": "/uploads/1758277915374-WhatsApp_Image_2025-09-19_at_13.48.34_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.34.jpeg",
+        "url": "/uploads/1758277915336-WhatsApp_Image_2025-09-19_at_13.48.34.jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-YLX4O7",
+    "warehouseBoxId": "Devariyambakkam B-01 ",
+    "actualSizeSqFt": 244183,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Oragadam",
+    "sizeSqFt": 250000,
+    "description": "Strategically located in Oragadam, this expansive 250,000 sq. ft. warehouse is currently under construction.  Featuring a non-temperature controlled PEB structure with a durable Galvalume roof and impressive 9.2-meter eave height, this property offers significant potential for businesses seeking efficient and spacious storage or operational space.  Contact us today to learn more about leasing opportunities.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 250000,
+      "totalChargeableArea": 250000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 18,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": false,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.34.jpeg",
+        "url": "/uploads/1758277695863-WhatsApp_Image_2025-09-19_at_13.48.34.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.37.jpeg",
+        "url": "/uploads/1758277695604-WhatsApp_Image_2025-09-19_at_13.48.37.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36 (2).jpeg",
+        "url": "/uploads/1758277695387-WhatsApp_Image_2025-09-19_at_13.48.36_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36 (1).jpeg",
+        "url": "/uploads/1758277695833-WhatsApp_Image_2025-09-19_at_13.48.36_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.36.jpeg",
+        "url": "/uploads/1758277696058-WhatsApp_Image_2025-09-19_at_13.48.36.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.35 (1).jpeg",
+        "url": "/uploads/1758277695842-WhatsApp_Image_2025-09-19_at_13.48.35_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.35.jpeg",
+        "url": "/uploads/1758277696147-WhatsApp_Image_2025-09-19_at_13.48.35.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.48.34 (1).jpeg",
+        "url": "/uploads/1758277696068-WhatsApp_Image_2025-09-19_at_13.48.34_(1).jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": false
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-792AJZ",
+    "warehouseBoxId": "Seemavaram Part-C",
+    "actualSizeSqFt": 51979,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Cholavaram",
+    "sizeSqFt": 52000,
+    "description": "Ready for immediate occupancy, this 52,000 sq. ft. warehouse in Cholavaram offers a non-temperature controlled, PEB-constructed building with a durable Galvalume roof and impressive 9.2-meter eave height.  Ideal for various industrial and warehousing needs.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Karanodai Circle",
+    "area": {
+      "plinthArea": 52000,
+      "totalChargeableArea": 52000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 4,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41.jpeg",
+        "url": "/uploads/1758276116619-WhatsApp_Image_2025-09-19_at_13.47.41.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.40 (1).jpeg",
+        "url": "/uploads/1758276117123-WhatsApp_Image_2025-09-19_at_13.47.40_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42 (2).jpeg",
+        "url": "/uploads/1758276116930-WhatsApp_Image_2025-09-19_at_13.47.42_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (3).jpeg",
+        "url": "/uploads/1758276116922-WhatsApp_Image_2025-09-19_at_13.47.41_(3).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42 (1).jpeg",
+        "url": "/uploads/1758276117123-WhatsApp_Image_2025-09-19_at_13.47.42_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43 (2).jpeg",
+        "url": "/uploads/1758276117243-WhatsApp_Image_2025-09-19_at_13.47.43_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43 (1).jpeg",
+        "url": "/uploads/1758276117439-WhatsApp_Image_2025-09-19_at_13.47.43_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42.jpeg",
+        "url": "/uploads/1758276117638-WhatsApp_Image_2025-09-19_at_13.47.42.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (2).jpeg",
+        "url": "/uploads/1758276117637-WhatsApp_Image_2025-09-19_at_13.47.41_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.40.jpeg",
+        "url": "/uploads/1758276117637-WhatsApp_Image_2025-09-19_at_13.47.40.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (1).jpeg",
+        "url": "/uploads/1758276117645-WhatsApp_Image_2025-09-19_at_13.47.41_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43.jpeg",
+        "url": "/uploads/1758276117841-WhatsApp_Image_2025-09-19_at_13.47.43.jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-SYXJNY",
+    "warehouseBoxId": "Seemavaram Part-B",
+    "actualSizeSqFt": 54491,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Cholavaram",
+    "sizeSqFt": 55000,
+    "description": "Ready for immediate occupancy, this 55,000 sq. ft. warehouse in Cholavaram offers a non-temperature controlled, PEB-constructed building with a robust Galvalume roof and impressive 9.2-meter eave height.  Ideal for various industrial and warehousing needs.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Karanodai Circle",
+    "area": {
+      "plinthArea": 55000,
+      "totalChargeableArea": 55000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 4,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41.jpeg",
+        "url": "/uploads/1758275996837-WhatsApp_Image_2025-09-19_at_13.47.41.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.40 (1).jpeg",
+        "url": "/uploads/1758275997545-WhatsApp_Image_2025-09-19_at_13.47.40_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42 (2).jpeg",
+        "url": "/uploads/1758275997761-WhatsApp_Image_2025-09-19_at_13.47.42_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (3).jpeg",
+        "url": "/uploads/1758275997552-WhatsApp_Image_2025-09-19_at_13.47.41_(3).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42 (1).jpeg",
+        "url": "/uploads/1758275997939-WhatsApp_Image_2025-09-19_at_13.47.42_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43 (2).jpeg",
+        "url": "/uploads/1758275997733-WhatsApp_Image_2025-09-19_at_13.47.43_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43 (1).jpeg",
+        "url": "/uploads/1758275997944-WhatsApp_Image_2025-09-19_at_13.47.43_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42.jpeg",
+        "url": "/uploads/1758275997969-WhatsApp_Image_2025-09-19_at_13.47.42.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (2).jpeg",
+        "url": "/uploads/1758275997935-WhatsApp_Image_2025-09-19_at_13.47.41_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.40.jpeg",
+        "url": "/uploads/1758275998120-WhatsApp_Image_2025-09-19_at_13.47.40.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (1).jpeg",
+        "url": "/uploads/1758275998241-WhatsApp_Image_2025-09-19_at_13.47.41_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43.jpeg",
+        "url": "/uploads/1758275998240-WhatsApp_Image_2025-09-19_at_13.47.43.jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-X635SS",
+    "warehouseBoxId": "Seemavaram Part-A",
+    "actualSizeSqFt": 51979,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Cholavaram",
+    "sizeSqFt": 53000,
+    "description": "Ready for immediate occupancy, this 53,000 sq. ft. warehouse in Cholavaram offers a spacious, non-temperature controlled environment ideal for various industrial needs.  The Pre-Engineered Building (PEB) structure features a robust Galvalume roof and boasts a generous 9.2-meter eave height, maximizing storage and operational efficiency.  ",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Karanodai Circle",
+    "area": {
+      "plinthArea": 53000,
+      "totalChargeableArea": 53000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 4,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41.jpeg",
+        "url": "/uploads/1758275853328-WhatsApp_Image_2025-09-19_at_13.47.41.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.40 (1).jpeg",
+        "url": "/uploads/1758275853584-WhatsApp_Image_2025-09-19_at_13.47.40_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42 (2).jpeg",
+        "url": "/uploads/1758275853820-WhatsApp_Image_2025-09-19_at_13.47.42_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (3).jpeg",
+        "url": "/uploads/1758275854053-WhatsApp_Image_2025-09-19_at_13.47.41_(3).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42 (1).jpeg",
+        "url": "/uploads/1758275854198-WhatsApp_Image_2025-09-19_at_13.47.42_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43 (2).jpeg",
+        "url": "/uploads/1758275854371-WhatsApp_Image_2025-09-19_at_13.47.43_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43 (1).jpeg",
+        "url": "/uploads/1758275854119-WhatsApp_Image_2025-09-19_at_13.47.43_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.42.jpeg",
+        "url": "/uploads/1758275854414-WhatsApp_Image_2025-09-19_at_13.47.42.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (2).jpeg",
+        "url": "/uploads/1758275854301-WhatsApp_Image_2025-09-19_at_13.47.41_(2).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.40.jpeg",
+        "url": "/uploads/1758275854493-WhatsApp_Image_2025-09-19_at_13.47.40.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.41 (1).jpeg",
+        "url": "/uploads/1758275854567-WhatsApp_Image_2025-09-19_at_13.47.41_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.47.43.jpeg",
+        "url": "/uploads/1758275854566-WhatsApp_Image_2025-09-19_at_13.47.43.jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-029KQO",
+    "warehouseBoxId": "Kunnam B-300 ",
+    "actualSizeSqFt": 99484,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Sunguvarchatram",
+    "sizeSqFt": 100000,
+    "description": "Ready for immediate occupancy, this 100,000 sq ft warehouse in Sunguvarchatram offers a non-temperature controlled, PEB-constructed building with a high 9.2-meter eave height and a durable Galvalume roof.  Ideal for various industrial and storage needs.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 100000,
+      "totalChargeableArea": 100000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 7,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.22 (1).jpeg",
+        "url": "/uploads/1758275072846-WhatsApp_Image_2025-09-19_at_13.49.22_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.24.jpeg",
+        "url": "/uploads/1758275073004-WhatsApp_Image_2025-09-19_at_13.49.24.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.23 (2).jpeg",
+        "url": "/uploads/1758275073085-WhatsApp_Image_2025-09-19_at_13.49.23_(2).jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-QM0CX2",
+    "warehouseBoxId": "Kunnam B-200 ",
+    "actualSizeSqFt": 276499,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Sunguvarchatram",
+    "sizeSqFt": 280000,
+    "description": "Ready for immediate occupancy, this 280,000 sq. ft. warehouse in Sunguvarchatram offers a spacious, non-temperature controlled facility.  The Pre-Engineered Building (PEB) structure features a robust Galvalume roof and boasts a generous 9.2-meter eave height, ideal for high-volume storage and operational efficiency.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "100%",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 280000,
+      "totalChargeableArea": 280000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 20,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.22 (1).jpeg",
+        "url": "/uploads/1758274845563-WhatsApp_Image_2025-09-19_at_13.49.22_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.24.jpeg",
+        "url": "/uploads/1758274845630-WhatsApp_Image_2025-09-19_at_13.49.24.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.23 (2).jpeg",
+        "url": "/uploads/1758274845666-WhatsApp_Image_2025-09-19_at_13.49.23_(2).jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-KWQZH4",
+    "warehouseBoxId": "Kunnam B-100 ",
+    "actualSizeSqFt": 46851,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Sunguvarchatram",
+    "sizeSqFt": 47000,
+    "description": "Ready for immediate occupancy, this 47,000 sq. ft. warehouse in Sunguvarchatram offers a spacious, non-temperature controlled facility.  The pre-engineered building (PEB) features a robust Galvalume roof and boasts a generous 9.2-meter eave height, ideal for efficient operations and high-volume storage.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 47000,
+      "totalChargeableArea": 47000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 3,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9.2,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.22 (1).jpeg",
+        "url": "/uploads/1758274716978-WhatsApp_Image_2025-09-19_at_13.49.22_(1).jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.24.jpeg",
+        "url": "/uploads/1758274717076-WhatsApp_Image_2025-09-19_at_13.49.24.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "WhatsApp Image 2025-09-19 at 13.49.23 (2).jpeg",
+        "url": "/uploads/1758274717196-WhatsApp_Image_2025-09-19_at_13.49.23_(2).jpeg"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-R41ULG",
+    "warehouseBoxId": "Schedule-B",
+    "actualSizeSqFt": 40649,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Sriperumbudur",
+    "sizeSqFt": 41000,
+    "description": "Ready for immediate occupancy, this 41,000 sq. ft. warehouse in Sriperumbudur offers a non-temperature controlled, standard shed building with a 9-meter eave height and a durable Galvalume roof.  Ideal for various industrial and storage needs.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 41000,
+      "totalChargeableArea": 41000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "Standard Shed"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": false,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "VDF-RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.42.39 PM.png",
+        "url": "/uploads/1758273408756-Screenshot_2025-09-19_at_2.42.39_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.44.21 PM.png",
+        "url": "/uploads/1758273408511-Screenshot_2025-09-19_at_2.44.21_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.44.14 PM.png",
+        "url": "/uploads/1758273408659-Screenshot_2025-09-19_at_2.44.14_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.44.05 PM.png",
+        "url": "/uploads/1758273408577-Screenshot_2025-09-19_at_2.44.05_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.42.47 PM.png",
+        "url": "/uploads/1758273408872-Screenshot_2025-09-19_at_2.42.47_PM.png"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": true
+  },
+  {
+    "status": "approved",
+    "developerId": "admin@kailashlogistics.com",
+    "listingId": "LST-MMX3PE",
+    "warehouseBoxId": "Schedule-A",
+    "actualSizeSqFt": 22318,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Sriperumbudur",
+    "sizeSqFt": 22000,
+    "description": "Ready for immediate occupancy, this 22,000 sq ft industrial warehouse in Sriperumbudur offers a non-temperature controlled, PEB building with a 9-meter eave height and a durable Galvalume roof.  Ideal for businesses requiring ample space and immediate availability.",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Ready for Occupancy",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "Sriperumbudur Circle",
+    "area": {
+      "plinthArea": 22000,
+      "totalChargeableArea": 22000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": false,
+      "numberOfDocksAndShutters": 2,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 9,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Turbo"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "RCC",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": false,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": false,
+      "pcbForWater": false,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.42.39 PM.png",
+        "url": "/uploads/1758273286733-Screenshot_2025-09-19_at_2.42.39_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.44.21 PM.png",
+        "url": "/uploads/1758273286699-Screenshot_2025-09-19_at_2.44.21_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.44.14 PM.png",
+        "url": "/uploads/1758273286613-Screenshot_2025-09-19_at_2.44.14_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.44.05 PM.png",
+        "url": "/uploads/1758273285862-Screenshot_2025-09-19_at_2.44.05_PM.png"
+      },
+      {
+        "type": "image",
+        "name": "Screenshot 2025-09-19 at 2.42.47 PM.png",
+        "url": "/uploads/1758273286535-Screenshot_2025-09-19_at_2.42.47_PM.png"
+      }
+    ],
+    "rentPerSft": "Get Quote",
+    "isAdmin": true
+  },
+  {
     "status": "approved",
     "developerId": "admin@welspun.com",
     "listingId": "LST-6BDQYG",
@@ -296,7 +1280,9 @@
     "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 270000,
-      "totalChargeableArea": 270000
+      "totalChargeableArea": 270000,
+      "tempControlledArea": 36580,
+      "nonTempControlledArea": 217352
     },
     "buildingSpecifications": {
       "buildingType": [
@@ -367,7 +1353,7 @@
         "url": "/uploads/1758267469482-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": false
   },
   {
     "status": "approved",

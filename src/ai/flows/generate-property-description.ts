@@ -1,99 +1,67 @@
-// This file is machine-generated - edit at your own risk.
 
 'use server';
 
 /**
  * @fileOverview An AI agent that generates a property description based on given details.
  *
- * - generatePropertyDescription - A function that generates a property description.
- * - GeneratePropertyDescriptionInput - The input type for the generatePropertyDescription function.
- * - GeneratePropertyDescriptionOutput - The return type for the generatePropertyDescription function.
+ * - generateListingDescription - A function that generates a property description.
+ * - GenerateListingDescriptionInput - The input type for the generateListingDescription function.
+ * - GenerateListingDescriptionOutput - The return type for the generateListingDescription function.
  */
 
 import {ai} from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
+import { GenerateListingDescriptionInputSchema } from '@/lib/schema';
+import type { GenerateListingDescriptionInput } from '@/lib/schema';
 
-const GeneratePropertyDescriptionInputSchema = z.object({
-  propertyId: z.string().describe('The unique identifier for the property.'),
-  propertyGeoLocation: z.string().describe('The geographical location of the property.'),
-  size: z.number().describe('The size of the property (e.g., in square feet).'),
-  floor: z.string().describe('The floor of the property, if it is in a building.'),
-  readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']).describe('The readiness of the property for occupancy.'),
-  siteType: z.enum(['Standalone', 'Part of Industrial Park', 'Part of Commercial Project']).describe('The type of site.'),
-  safety: z.string().describe('Safety features of the property (e.g., compounded fully, partially, or 3 sides).'),
-  ceilingHeight: z.number().describe('The ceiling height of the property.'),
-  rentPerSft: z.number().describe('The rent per square foot.'),
-  rentalSecurityDeposit: z.number().describe('The rental security deposit (number of months).'),
-  userType: z.enum(['Developer', 'Owner']).describe('The type of user submitting the property.'),
-  userName: z.string().describe('The name of the user submitting the property.'),
-  userCompanyName: z.string().describe('The company name of the user submitting the property.'),
-  userPhoneNumber: z.string().describe('The phone number of the user submitting the property.'),
-  userEmail: z.string().describe('The email of the user submitting the property.'),
-  approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']).describe('The approval status of the property.'),
-  approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']).describe('The approval authority for the property.'),
-  installedCapacity: z.string().describe('The installed electricity capacity (kva/mva).'),
-  availablePower: z.string().describe('The available power for the property.'),
-  genSetBackup: z.enum(['Available', 'Can be provided']).describe('Whether a generator set backup is available.'),
-  fireHydrant: z.enum(['Installed', 'Can be provided']).describe('Whether a fire hydrant is installed or can be provided.'),
-  fireNoc: z.enum(['Obtained', 'Applied For', 'To Apply']).describe('The fire safety NOC status.'),
-  docks: z.number().describe('The number of docks available.'),
-  canopy: z.enum(['Installed', 'Can be provided']).describe('Whether a canopy is installed or can be provided.'),
-  additionalInformation: z.string().describe('Any additional information about the property.'),
+const GenerateListingDescriptionOutputSchema = z.object({
+  generatedDescription: z.string().describe('The AI-generated description of the property.'),
 });
 
-export type GeneratePropertyDescriptionInput = z.infer<typeof GeneratePropertyDescriptionInputSchema>;
+export type GenerateListingDescriptionOutput = z.infer<typeof GenerateListingDescriptionOutputSchema>;
 
-const GeneratePropertyDescriptionOutputSchema = z.object({
-  propertyDescription: z.string().describe('The AI-generated description of the property.'),
-});
-
-export type GeneratePropertyDescriptionOutput = z.infer<typeof GeneratePropertyDescriptionOutputSchema>;
-
-export async function generatePropertyDescription(input: GeneratePropertyDescriptionInput): Promise<GeneratePropertyDescriptionOutput> {
-  return generatePropertyDescriptionFlow(input);
+export async function generateListingDescription(input: GenerateListingDescriptionInput): Promise<GenerateListingDescriptionOutput> {
+  return generateListingDescriptionFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'generatePropertyDescriptionPrompt',
-  input: {schema: GeneratePropertyDescriptionInputSchema},
-  output: {schema: GeneratePropertyDescriptionOutputSchema},
-  prompt: `You are an expert commercial real estate copywriter.
+  name: 'generateListingDescriptionPrompt',
+  model: googleAI.model('gemini-1.5-flash-latest'),
+  input: {schema: GenerateListingDescriptionInputSchema},
+  output: {schema: GenerateListingDescriptionOutputSchema},
+  prompt: `You are an expert real estate copywriter specializing in industrial and warehouse properties.
+  Your tone should be professional, concise, and highlight the key selling points.
+  Based on the following details, write a compelling, one-paragraph description for the property.
+  **Important**: Do not mention the developer's name or any brand name. Focus only on the property's attributes.
+  
+  {{#if tone}}
+  **Tone Instructions**: The user has requested the following tone: **{{{tone}}}**.
+  - **Professional**: Formal, clear, and objective. Focus on specs and facts.
+  - **Sales-Oriented**: Use persuasive language to highlight benefits and create a sense of urgency.
+  - **Concise**: Be as brief as possible, mentioning only the most critical details.
+  {{/if}}
 
-  Based on the following details, write a compelling description of the property.
+  **Property Details:**
+  {{#if name}}- Listing Name: {{{name}}}{{/if}}
+  - Location: {{{location}}}
+  - Total Size: {{{sizeSqFt}}} sq. ft.
+  - Possession Readiness: {{{availabilityDate}}}
+  {{#if rentPerSqFt}}- Quoted Rent: ₹{{{rentPerSqFt}}} per sq. ft.{{/if}}
+  {{#if warehouseModel}}- Warehouse Model: {{{warehouseModel}}}{{/if}}
+  {{#if buildingType}}- Building Type: {{{buildingType}}}{{/if}}
+  {{#if roofType}}- Roof Type: {{{roofType}}}{{/if}}
+  {{#if eveHeightMeters}}- Eve Height: {{{eveHeightMeters}}} meters{{/if}}
 
-  Property ID: {{{propertyId}}}
-  Geo Location: {{{propertyGeoLocation}}}
-  Size: {{{size}}}
-  Floor: {{{floor}}}
-  Readiness to Occupy: {{{readinessToOccupy}}}
-  Site Type: {{{siteType}}}
-  Safety: {{{safety}}}
-  Ceiling Height: {{{ceilingHeight}}}
-  Rent Per Sft: {{{rentPerSft}}}
-  Rental Security Deposit: {{{rentalSecurityDeposit}}}
-  User Type: {{{userType}}}
-  User Name: {{{userName}}}
-  User Company Name: {{{userCompanyName}}}
-  User Phone Number: {{{userPhoneNumber}}}
-  User Email: {{{userEmail}}}
-  Approval Status: {{{approvalStatus}}}
-  Approval Authority: {{{approvalAuthority}}}
-  Installed Capacity: {{{installedCapacity}}}
-  Available Power: {{{availablePower}}}
-  Gen-set Backup: {{{genSetBackup}}}
-  Fire Hydrant: {{{fireHydrant}}}
-  Fire NOC: {{{fireNoc}}}
-  Docks: {{{docks}}}
-  Canopy: {{{canopy}}}
-  Additional Information: {{{additionalInformation}}}
+  Focus on creating a clear, attractive summary that a potential tenant can quickly understand.
   `,
 });
 
-const generatePropertyDescriptionFlow = ai.defineFlow(
+const generateListingDescriptionFlow = ai.defineFlow(
   {
-    name: 'generatePropertyDescriptionFlow',
-    inputSchema: GeneratePropertyDescriptionInputSchema,
-    outputSchema: GeneratePropertyDescriptionOutputSchema,
+    name: 'generateListingDescriptionFlow',
+    inputSchema: GenerateListingDescriptionInputSchema,
+    outputSchema: GenerateListingDescriptionOutputSchema,
   },
   async input => {
     const {output} = await prompt(input);

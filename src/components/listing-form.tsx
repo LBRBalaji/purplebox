@@ -343,13 +343,14 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                   
                   {/* Availability & Commercials */}
                   <div className="space-y-4">
-                    <FormLabel className="text-lg font-semibold">Availability &amp; Commercials</FormLabel>
+                    <FormLabel className="text-lg font-semibold">Possession Readiness &amp; Commercials</FormLabel>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4 border rounded-md">
                         <FormField control={form.control} name="availabilityDate" render={({ field }) => (
-                            <FormItem><FormLabel>Availability</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                            <FormItem><FormLabel>Possession Readiness</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
                                 <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
                                 <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
                                 <SelectItem value="Under Construction">Under Construction</SelectItem>
+                                <SelectItem value="BTS-Built To Suit">BTS-Built To Suit</SelectItem>
                             </SelectContent></Select><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="constructionProgress" render={({ field }) => (
