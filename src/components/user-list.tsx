@@ -1,4 +1,3 @@
-
 'use client';
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -14,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import type { User, NewUser } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from './ui/button';
-import { Pencil, PlusCircle, Trash2, Shield, Users, Search } from 'lucide-react';
+import { Pencil, PlusCircle, Trash2, Shield, Users, Search, Building, Scaling } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,6 +44,12 @@ function StatCard({ title, value, icon: Icon }: { title: string, value: string |
     );
 }
 
+type ProviderSummary = {
+  [email: string]: {
+    listingCount: number;
+    totalSize: number;
+  };
+};
 
 export function UserList() {
   const { users, addUser, updateUser, deleteUser, user: currentUser } = useAuth();
@@ -52,6 +57,22 @@ export function UserList() {
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [providerSummary, setProviderSummary] = React.useState<ProviderSummary>({});
+
+  React.useEffect(() => {
+    async function fetchProviderSummary() {
+      try {
+        const response = await fetch('/api/provider-summary');
+        if (response.ok) {
+          const data = await response.json();
+          setProviderSummary(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch provider summary:", error);
+      }
+    }
+    fetchProviderSummary();
+  }, [users]); // Re-fetch if users change
 
   const { filteredUsers, roleCounts } = React.useMemo(() => {
     const allUsers = Object.values(users).filter(u => u.email !== 'admin@example.com');
@@ -145,74 +166,87 @@ export function UserList() {
               <TableRow>
                 <TableHead>User Name</TableHead>
                 <TableHead>Company</TableHead>
-                <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Plan</TableHead>
+                <TableHead>Active Listings</TableHead>
+                <TableHead>Total Size</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map(user => (
-                <TableRow key={user.email}>
-                  <TableCell className="font-medium flex items-center gap-2">
-                    {user.userName}
-                    {user.isCompanyAdmin && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Shield className="h-4 w-4 text-primary" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Company Admin</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    )}
-                  </TableCell>
-                  <TableCell>{user.companyName}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                     <Badge variant={user.role === 'SuperAdmin' ? "destructive" : user.role === 'O2O' ? 'default' : "outline"}>
-                        {user.role === 'SuperAdmin' ? 'O2O Super Admin' : user.role === 'O2O' ? 'O2O Manager' : user.role === 'Warehouse Developer' ? 'Provider' : user.role === 'User' ? 'Customer' : user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                     <Badge variant={user.plan === 'Free' ? "secondary" : "default"}>
-                        {user.plan}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button variant="outline" size="icon" onClick={() => handleOpenForm(user)}>
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                           <Button variant="destructive" size="icon" disabled={user.email === currentUser?.email}>
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete this user account.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(user.email)}>
-                                Continue
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filteredUsers.map(user => {
+                const summary = providerSummary[user.email];
+                return (
+                  <TableRow key={user.email}>
+                    <TableCell className="font-medium flex items-center gap-2">
+                      {user.userName}
+                      {user.isCompanyAdmin && (
+                          <TooltipProvider>
+                              <Tooltip>
+                                  <TooltipTrigger>
+                                      <Shield className="h-4 w-4 text-primary" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                      <p>Company Admin</p>
+                                  </TooltipContent>
+                              </Tooltip>
+                          </TooltipProvider>
+                      )}
+                    </TableCell>
+                    <TableCell>{user.companyName}</TableCell>
+                    <TableCell>
+                       <Badge variant={user.role === 'SuperAdmin' ? "destructive" : user.role === 'O2O' ? 'default' : "outline"}>
+                          {user.role === 'SuperAdmin' ? 'O2O Super Admin' : user.role === 'O2O' ? 'O2O Manager' : user.role === 'Warehouse Developer' ? 'Provider' : user.role === 'User' ? 'Customer' : user.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {summary ? (
+                        <div className="flex items-center gap-2">
+                           <Building className="h-4 w-4 text-muted-foreground" />
+                           {summary.listingCount}
+                        </div>
+                      ) : 'N/A'}
+                    </TableCell>
+                     <TableCell>
+                      {summary ? (
+                        <div className="flex items-center gap-2">
+                           <Scaling className="h-4 w-4 text-muted-foreground" />
+                           {summary.totalSize.toLocaleString()} sqft
+                        </div>
+                      ) : 'N/A'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="outline" size="icon" onClick={() => handleOpenForm(user)}>
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                             <Button variant="destructive" size="icon" disabled={user.email === currentUser?.email}>
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete</span>
+                             </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                              <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete this user account.
+                                  </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete(user.email)}>
+                                  Continue
+                                  </AlertDialogAction>
+                              </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
            {filteredUsers.length === 0 && (
