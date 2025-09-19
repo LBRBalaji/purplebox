@@ -41,10 +41,10 @@ export default function AnalyticsHubPage() {
                                 <div>
                                     <CardTitle className="flex items-center gap-2">
                                         <Users className="text-primary" />
-                                        Customer Analytics
+                                        Customer Engagement Analytics
                                     </CardTitle>
                                     <CardDescription className="mt-2">
-                                        Analyze demand trends, success rates, and individual customer activity.
+                                        Drill down into a specific customer's activity, including views, downloads, and interests.
                                     </CardDescription>
                                 </div>
                                  <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
