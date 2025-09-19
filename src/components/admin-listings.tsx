@@ -12,7 +12,7 @@ import {
 import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus, type LocationCircle } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle, Building, Scaling } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle, Building, Scaling, Circle, Check } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -44,6 +44,7 @@ import type { DateRange } from 'react-day-picker';
 import * as XLSX from 'xlsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
 
 type ProviderSummary = {
   [email: string]: {
@@ -262,6 +263,7 @@ export function AdminListings() {
   const [filteredListings, setFilteredListings] = React.useState<ListingSchema[]>([]);
   const [keywordFilter, setKeywordFilter] = React.useState('');
   const [developerFilter, setDeveloperFilter] = React.useState('all');
+  const [circleFilter, setCircleFilter] = React.useState<string[]>([]);
   const [availabilityFilter, setAvailabilityFilter] = React.useState('all');
   const [sizeRange, setSizeRange] = React.useState([0, 1000000]);
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
@@ -273,6 +275,7 @@ export function AdminListings() {
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
   const [editIntent, setEditIntent] = React.useState<'approve' | undefined>(undefined);
   const [providerSummary, setProviderSummary] = React.useState<ProviderSummary>({});
+  const [openCirclePopover, setOpenCirclePopover] = React.useState(false);
 
   const allDevelopers = React.useMemo(() => {
     return Object.values(users).filter(u => u.role === 'Warehouse Developer');
@@ -313,6 +316,11 @@ export function AdminListings() {
      if (developerFilter !== 'all') {
        results = results.filter(l => l.developerId === developerFilter);
      }
+
+     if (circleFilter.length > 0) {
+       const circleSet = new Set(circleFilter);
+       results = results.filter(l => l.locationCircle && circleSet.has(l.locationCircle));
+     }
      
      if (availabilityFilter !== 'all') {
        results = results.filter(l => l.availabilityDate === availabilityFilter);
@@ -322,7 +330,7 @@ export function AdminListings() {
 
      setFilteredListings(results);
 
-  }, [listings, keywordFilter, developerFilter, availabilityFilter, sizeRange]);
+  }, [listings, keywordFilter, developerFilter, circleFilter, availabilityFilter, sizeRange]);
 
   const getProviderName = (developerId: string) => {
     const provider = Object.values(users).find(u => u.email === developerId);
@@ -332,6 +340,7 @@ export function AdminListings() {
   const resetFilters = () => {
     setKeywordFilter('');
     setDeveloperFilter('all');
+    setCircleFilter([]);
     setAvailabilityFilter('all');
     setSizeRange([0, maxSliderSize]);
     setDateRange({ from: subDays(new Date(), 29), to: new Date() });
@@ -492,6 +501,49 @@ export function AdminListings() {
                                 </SelectContent>
                             </Select>
                         </div>
+                         <div className="space-y-2">
+                            <label className="text-sm font-medium">Location Circle</label>
+                            <Popover open={openCirclePopover} onOpenChange={setOpenCirclePopover}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" className="w-full justify-start">
+                                        {circleFilter.length > 0 ? (
+                                            <div className="flex gap-1 flex-wrap">
+                                                {circleFilter.slice(0, 2).map(circle => (
+                                                    <Badge variant="secondary" key={circle}>{circle}</Badge>
+                                                ))}
+                                                {circleFilter.length > 2 && <Badge variant="secondary">+{circleFilter.length - 2}</Badge>}
+                                            </div>
+                                        ) : "Select circles..."}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search circles..." />
+                                        <CommandList>
+                                            <CommandEmpty>No circles found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {locationCircles.map((circle) => (
+                                                    <CommandItem
+                                                        key={circle.name}
+                                                        value={circle.name}
+                                                        onSelect={() => {
+                                                            setCircleFilter(prev => 
+                                                                prev.includes(circle.name)
+                                                                ? prev.filter(c => c !== circle.name)
+                                                                : [...prev, circle.name]
+                                                            )
+                                                        }}
+                                                    >
+                                                        <Check className={cn("mr-2 h-4 w-4", circleFilter.includes(circle.name) ? "opacity-100" : "opacity-0")} />
+                                                        <span>{circle.name}</span>
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Availability</label>
                             <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
@@ -506,8 +558,18 @@ export function AdminListings() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Date Range</label>
+                        <div className="lg:col-span-2 space-y-2">
+                            <label className="text-sm font-medium">Size (sq. ft.) - {sizeRange[0].toLocaleString()} to {sizeRange[1].toLocaleString()}</label>
+                            <Slider
+                                min={0}
+                                max={maxSliderSize}
+                                step={10000}
+                                value={sizeRange}
+                                onValueChange={newRange => setSizeRange(newRange as [number, number])}
+                            />
+                        </div>
+                         <div className="lg:col-span-2 space-y-2">
+                            <label className="text-sm font-medium">Date Range (for engagement stats)</label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button id="date" variant={"outline"} className={cn("w-full justify-start text-left font-normal",!dateRange && "text-muted-foreground")}>
@@ -520,17 +582,7 @@ export function AdminListings() {
                                 </PopoverContent>
                             </Popover>
                         </div>
-                        <div className="lg:col-span-2 space-y-2">
-                            <label className="text-sm font-medium">Size (sq. ft.) - {sizeRange[0].toLocaleString()} to {sizeRange[1].toLocaleString()}</label>
-                            <Slider
-                                min={0}
-                                max={maxSliderSize}
-                                step={10000}
-                                value={sizeRange}
-                                onValueChange={newRange => setSizeRange(newRange as [number, number])}
-                            />
-                        </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-end">
                             <Button onClick={resetFilters} variant="ghost" className="w-full">
                                 <X className="mr-2 h-4 w-4" /> Reset
                             </Button>
@@ -576,3 +628,4 @@ export function AdminListings() {
 
     
     
+
