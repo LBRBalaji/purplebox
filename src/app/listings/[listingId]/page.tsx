@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -576,16 +577,9 @@ export default function ListingDetailPage() {
                                         <CardTitle>Commercials</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        {!user && !isLoading ? (
-                                            <Alert>
-                                                <Lock className="h-4 w-4" />
-                                                <AlertTitle>Login Required</AlertTitle>
-                                                <AlertDescription>
-                                                    Please log in or sign up to view detailed commercial terms and other sensitive data.
-                                                </AlertDescription>
-                                                <Button className="w-full mt-4" onClick={() => setIsLoginDialogOpen(true)}>Login</Button>
-                                            </Alert>
-                                        ) : (
+                                        {isLoading ? (
+                                            <Skeleton className="h-24 w-full" />
+                                        ) : user ? (
                                             <div className="space-y-4">
                                                 <div className="flex items-baseline justify-center text-center">
                                                     <span className="text-4xl font-bold">₹{listing.rentPerSqFt || '??'}</span>
@@ -595,6 +589,15 @@ export default function ListingDetailPage() {
                                                 <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
                                                 <DetailRow label="Construction Progress" value={listing.constructionProgress} />
                                             </div>
+                                        ) : (
+                                            <Alert>
+                                                <Lock className="h-4 w-4" />
+                                                <AlertTitle>Login Required</AlertTitle>
+                                                <AlertDescription>
+                                                    Please log in or sign up to view detailed commercial terms and other sensitive data.
+                                                </AlertDescription>
+                                                <Button className="w-full mt-4" onClick={() => setIsLoginDialogOpen(true)}>Login</Button>
+                                            </Alert>
                                         )}
                                     </CardContent>
                                     {!isLoading && user && (
@@ -622,7 +625,13 @@ export default function ListingDetailPage() {
                                         <CardTitle>Certificates & Approvals</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        {!isLoading && user ? (
+                                        {isLoading ? (
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-full" />
+                                                <Skeleton className="h-4 w-full" />
+                                                <Skeleton className="h-4 w-full" />
+                                            </div>
+                                        ) : user ? (
                                             <div className="space-y-1">
                                                 <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
                                                 <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
@@ -664,3 +673,5 @@ export default function ListingDetailPage() {
         </>
     );
 }
+
+    
