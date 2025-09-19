@@ -42,11 +42,11 @@ const MainDashboard = () => {
     const isAgent = user?.role === 'Agent';
 
     React.useEffect(() => {
-        // Redirect providers and customers to the listings page by default.
-        if (isProvider || isCustomer) {
+        // Redirect non-dashboard users to the listings page by default on first load if no other params are set.
+        if ((isCustomer) && !defaultTabParam && !logNewDemand && !editDemandId) {
             router.replace('/');
         }
-    }, [isProvider, isCustomer, router]);
+    }, [isCustomer, router, defaultTabParam, logNewDemand, editDemandId]);
 
     const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'my-listings');
     const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-demands');
@@ -185,16 +185,18 @@ const MainDashboard = () => {
       </Tabs>
     );
     
-    // Redirect logic handles providers and customers, so they shouldn't see this.
-    // This is a fallback for admin roles.
+    // Main render logic
     if (isSuperAdmin) {
         return renderMainAdminContent();
     } else if (isO2OManager) {
         return renderO2OContent();
     } else if (isAgent) {
         return renderAgentContent();
+    } else if (isProvider) {
+        return renderProviderContent();
+    } else if (isCustomer) {
+        return renderCustomerContent();
     }
-
 
     return (
         <Card>

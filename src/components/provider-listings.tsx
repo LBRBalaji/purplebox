@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -264,19 +265,40 @@ function StatCard({ title, value, icon: Icon }: { title: string, value: string, 
 
 export function ProviderListings() {
   const { user } = useAuth();
-  const { listings, addListing, updateListing, updateListingStatus, listingAnalytics } = useData();
+  const { addListing, updateListing, updateListingStatus, listingAnalytics } = useData();
   const [myListings, setMyListings] = React.useState<ListingSchema[]>([]);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = React.useState(true);
   
   const isAdmin = user?.role === 'SuperAdmin';
   
   React.useEffect(() => {
-    if (user?.email) {
-      setMyListings(listings.filter(l => l.developerId === user.email));
+    async function fetchProviderListings() {
+      if (!user?.email) return;
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/provider-listings/${encodeURIComponent(user.email)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMyListings(data);
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not fetch your listings.',
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch provider listings:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [listings, user]);
+
+    fetchProviderListings();
+  }, [user, toast]);
   
   const handleStatusChange = (listingId: string, status: ListingStatus) => {
     updateListingStatus(listingId, status, user?.email);
@@ -299,8 +321,10 @@ export function ProviderListings() {
   const handleFormSubmit = (data: ListingSchema) => {
     if (selectedListing) {
       updateListing(data);
+      setMyListings(prev => prev.map(l => l.listingId === data.listingId ? data : l));
     } else {
       addListing(data, user?.email);
+      setMyListings(prev => [data, ...prev]);
     }
     setIsFormOpen(false);
     setSelectedListing(null);
@@ -328,6 +352,9 @@ export function ProviderListings() {
     return { totalListings, totalSize, totalViews, totalDownloads };
   }, [activeListings, listingAnalytics]);
 
+  if (isLoading) {
+      return <div className="mt-8 text-center">Loading your listings...</div>
+  }
 
   return (
     <>
