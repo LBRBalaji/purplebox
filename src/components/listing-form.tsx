@@ -132,7 +132,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
               constructionProgress: '',
               warehouseModel: 'Non-Temperature Controlled',
               locationCircle: '',
-              area: { plinthArea: undefined, mezzanineArea1: undefined, mezzanineArea2: undefined, canopyArea: undefined, driversRestRoomArea: undefined, totalChargeableArea: undefined, },
+              area: { plinthArea: undefined, mezzanineArea1: undefined, mezzanineArea2: undefined, canopyArea: undefined, driversRestRoomArea: undefined, totalChargeableArea: undefined, tempControlledArea: undefined, nonTempControlledArea: undefined },
               buildingSpecifications: { buildingType: [], craneSupportStructureAvailable: false, craneAvailable: false, warehouseLayoutAvailable: false, louvers: false, },
               siteSpecifications: {},
               certificatesAndApprovals: { parkApproval: false, buildingApproval: false, fireLicense: false, fireNOC: false, buildingInsurance: false, pcbForAir: false, pcbForWater: false, propertyTax: false, },
@@ -148,6 +148,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   });
   
   const watchedCircle = form.watch('locationCircle');
+  const warehouseModel = form.watch('warehouseModel');
   const selectedCircleLocations = React.useMemo(() => {
     if (!watchedCircle) return [];
     const circle = locationCircles.find(c => c.name === watchedCircle);
@@ -354,7 +355,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                         <FormField control={form.control} name="constructionProgress" render={({ field }) => (
                             <FormItem><FormLabel>Construction Progress</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., 80% or 'Structure Complete'" /></FormControl><FormMessage /></FormItem>
                         )} />
-                        <FormField control={form.control} name="rentPerSqFt" render={({ field }) => (
+                        <FormField control={form.control} name="rentPerSft" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Rent per Sq. Ft.</FormLabel>
                                 <FormControl>
@@ -476,6 +477,16 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                                         <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
                                     </SelectContent></Select><FormMessage /></FormItem>
                                 )} />
+                                {warehouseModel === 'Temp & Non-Temp Controlled' && (
+                                    <div className="grid grid-cols-2 gap-4 p-4 border rounded-md bg-secondary/50">
+                                        <FormField control={form.control} name="area.tempControlledArea" render={({ field }) => (
+                                            <FormItem><FormLabel>Temp-Controlled Area (SFT)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                                        )} />
+                                        <FormField control={form.control} name="area.nonTempControlledArea" render={({ field }) => (
+                                            <FormItem><FormLabel>Non-Temp-Controlled Area (SFT)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
+                                        )} />
+                                    </div>
+                                )}
                                 <FormField control={form.control} name="buildingSpecifications.numberOfDocksAndShutters" render={({ field }) => (
                                     <FormItem><FormLabel>Number of Docks/Shutters</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
                                 )} />

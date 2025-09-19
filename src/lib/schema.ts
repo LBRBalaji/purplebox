@@ -51,6 +51,8 @@ export const listingSchema = z.object({
     canopyArea: asOptionalField(z.coerce.number()),
     driversRestRoomArea: asOptionalField(z.coerce.number()),
     totalChargeableArea: asOptionalField(z.coerce.number()),
+    tempControlledArea: asOptionalField(z.coerce.number()),
+    nonTempControlledArea: asOptionalField(z.coerce.number()),
   }),
 
   // Building Specifications
@@ -431,7 +433,7 @@ export const PredictDemandTrendsInputSchema = z.object({
     .describe('The time period for which to predict demand trends.'),
   location: z.string().optional().describe('An optional location (e.g., city or industrial park) to focus the analysis on.'),
   buildingType: z.string().optional().describe('An optional building type to filter the analysis.'),
-  serviceModel: z.string().optional().describe('An optional service model to filter the analysis.'),
+  warehouseModel: z.string().optional().describe('An optional warehouse model to filter the analysis.'),
   availability: z.string().optional().describe('Filter by property availability status.'),
   craneAvailable: z.boolean().optional().describe('Filter by whether a crane is available.'),
   roofType: z.string().optional().describe('Filter by the type of roof.'),

@@ -1,15 +1,16 @@
+
 [
   {
     "status": "pending",
     "developerId": "admin@welspun.com",
-    "listingId": "LST-M7IWA7",
-    "warehouseBoxId": "Block-B3 ",
-    "actualSizeSqFt": 253932,
-    "additionalInformation": "217352-Non Temperature Controlled\nTemperature Controlled-36580 SFT",
+    "listingId": "LST-XC7X0X",
+    "warehouseBoxId": "Block-B5 ",
+    "actualSizeSqFt": 314847,
+    "additionalInformation": "",
     "name": "",
     "location": "Thatchur",
-    "sizeSqFt": 270000,
-    "description": "This 270,000 sq. ft. warehouse in Thatchur is currently under construction.  The pre-engineered building (PEB) features a non-temperature controlled design with a durable Galvalume roof and impressive 10-meter eave height, ideal for efficient storage and operations.  Secure your space now in this prime Thatchur location.",
+    "sizeSqFt": 320000,
+    "description": "Located in Thatchur, this under-construction, 320,000 sq. ft. warehouse offers an exceptional opportunity.  The non-temperature-controlled PEB structure features a durable Galvalume roof and boasts a generous 10-meter eave height, ideal for efficient operations and high-volume storage.",
     "rentPerSqFt": "Get Quote",
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
@@ -17,8 +18,195 @@
     "warehouseModel": "Non-Temperature Controlled",
     "locationCircle": "",
     "area": {
+      "canopyArea": 320000,
+      "totalChargeableArea": 320000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 25,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758267788682-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758267788471-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758267788364-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758267788325-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758267788635-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758267788785-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758267788628-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758267788785-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-Q8YWJB",
+    "warehouseBoxId": "Block-B4 ",
+    "actualSizeSqFt": 314847,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 320000,
+    "description": "Thatchur's premier 320,000 sq ft warehouse space is currently under construction.  This non-temperature controlled Pre-Engineered Building (PEB) features a robust Galvalume roof and impressive 10-meter eave height, ideal for efficient warehousing and distribution operations.  Secure your space now in this prime Thatchur location.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 320000,
+      "totalChargeableArea": 320000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 25,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758267641315-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758267640955-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758267641216-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758267640924-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758267641315-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758267641315-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758267641056-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758267641433-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": false
+  },
+  {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-M7IWA7",
+    "warehouseBoxId": "Block-B3 ",
+    "actualSizeSqFt": 253932,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 270000,
+    "description": "Thatchur's premier 270,000 sq ft industrial warehouse, currently under construction, offers a unique blend of temperature-controlled and non-temperature-controlled spaces within a robust PEB structure.  Featuring a high 10-meter eave height and a durable Galvalume roof, this property provides optimal storage and operational efficiency, ideal for businesses seeking a modern, expansive facility in a strategic location.  Contact us today to learn more about leasing opportunities.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Temp & Non-Temp Controlled",
+    "locationCircle": "",
+    "area": {
       "plinthArea": 270000,
-      "totalChargeableArea": 270000
+      "totalChargeableArea": 270000,
+      "tempControlledArea": 36580,
+      "nonTempControlledArea": 217352
     },
     "buildingSpecifications": {
       "buildingType": [
@@ -995,7 +1183,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 360000,
@@ -1078,7 +1266,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 300000,
@@ -1161,7 +1349,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 310000,
@@ -1244,7 +1432,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 324000,
@@ -1327,7 +1515,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "0",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 35000,
@@ -1385,7 +1573,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "0",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 40000,
@@ -1443,7 +1631,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 400000,
@@ -1501,12 +1689,12 @@
     "name": "",
     "location": "Tamaraipakkam",
     "sizeSqFt": 73000,
-    "description": "Ready for occupancy, this 73,000 sq. ft. industrial warehouse in Tamaraipakkam offers a 12-meter eave height in a robust PEB structure with a Galvalume roof.  Standard services are included.  Act now to secure this prime space.",
+    "description": "Ready for immediate occupancy, this 73,000 sq. ft. industrial warehouse in Tamaraipakkam offers a 12-meter eave height in a robust PEB structure with a Galvalume roof.  Standard services are included.  Act now to secure this prime space.",
     "rentPerSqFt": "Get Quote",
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 73000,
@@ -1569,7 +1757,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "80%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Madhavaram Circle",
     "area": {
       "plinthArea": 350000,
@@ -1637,7 +1825,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 73000,
@@ -1706,7 +1894,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 175000,
@@ -1774,7 +1962,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Thiruvallur",
     "area": {
       "plinthArea": 45000,
@@ -1842,7 +2030,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 28000,
@@ -1915,7 +2103,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 95000,
@@ -1982,7 +2170,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 32000,
@@ -2050,7 +2238,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "40%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 270000,
@@ -2108,7 +2296,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "40%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 312142,
@@ -2167,7 +2355,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "40%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {
       "plinthArea": 351309,
       "totalChargeableArea": 351309
@@ -2224,7 +2412,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {
       "plinthArea": 90000,
       "canopyArea": 2000,
@@ -2323,7 +2511,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {
       "plinthArea": 30000,
       "canopyArea": 1000,
@@ -2437,7 +2625,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {
       "plinthArea": 30000,
       "canopyArea": 1000,
@@ -2545,12 +2733,12 @@
     "locationCircle": "Karanodai Circle",
     "sizeSqFt": 31000,
     "description": "Ready for occupancy, this Thatchur warehouse offers 31,000 sq ft of space at ₹20/sq ft (standard service model).  Features include a 7-meter eave height (24 ft sidewall, 31 ft center height), 6 docks (1 ramped, accommodating 40ft containers), 3 acres of truck parking, two 100,000-liter sumps, 4 restrooms, a security office, fire safety systems, and ample manpower options.  Galvalume roof.  Fully compounded. Listed by O2O Platform.",
-    "additionalInformation": "warehouse has a sidewall height of 24 ft and centre height of 31 ft facing North. warehouse is at a floor level of 4.5 ft above the ground level.  warehouse has 6 docks with the facility of loading and unloading even 40 ft container out of which one dock has ramp facility. There is open space nearly 3 acres to accommodate trucks for all warehouses at a time. There are TWO underground closed sumps of 1,00,000 liters capacity.\nwarehouse has 4 separate toilets and bathrooms. warehouses have separate office cum security room. ⁠Entire facility is fully compounded.\n⁠Manpower arrangements can be done to any level to suit your requirements.\n⁠⁠Fire License with hydrants all around and hose reels inside are available.\n\nAny other feasible facility, if needed, may be provided.\n\n\n\n\n\n\n",
+    "additionalInformation": "warehouse has a sidewall height of 24 ft and centre height of 31 ft facing North. warehouse is at a floor level of 4.5 ft above the ground level.  warehouse has 6 docks with the facility of loading and unloading even 40 ft container out of which one dock has ramp facility. There is open space nearly 3 acres to accommodate trucks for all warehouses at a time. There are TWO underground closed sumps of 1,00,000 liters capacity.\nwarehouse has 4 separate toilets and bathrooms. warehouses have separate office cum security room. ⁠Entire facility is fully compounded.\n⁠Manpower arrangements can be done to any level to suit your requirements.\n⁠⁠Fire License with hydrants all around and hose reels inside are available.\n\nAny other feasible facility, if needed, may be provided.\n\n\n\n\n",
     "rentPerSqFt": 20,
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {
       "plinthArea": 30000,
       "mezzanineArea1": 0,
@@ -2664,7 +2852,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Available in 3 months",
     "constructionProgress": "70%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -2722,7 +2910,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -2797,7 +2985,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [],
@@ -2861,7 +3049,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -2936,7 +3124,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3011,7 +3199,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3086,7 +3274,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "80%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3161,7 +3349,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "80%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3236,7 +3424,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "70%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3310,7 +3498,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "3PL Operated Warehouse",
+    "warehouseModel": "3PL Operated Warehouse",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3384,7 +3572,7 @@
     "rentPerSqFt": 26,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3459,7 +3647,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {},
     "buildingSpecifications": {
       "buildingType": [
@@ -3533,7 +3721,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "70%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {
       "plinthArea": 280000,
       "mezzanineArea1": 6000,
@@ -3600,7 +3788,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Under Construction",
     "constructionProgress": "40",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {
       "plinthArea": 139000,
       "mezzanineArea1": 4000,
@@ -3666,7 +3854,7 @@
     "rentalSecurityDeposit": 6,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "90%",
-    "serviceModel": "Standard",
+    "warehouseModel": "Standard",
     "area": {
       "plinthArea": 185000,
       "mezzanineArea1": 5000,
@@ -3732,7 +3920,7 @@
     "rentalSecurityDeposit": 10,
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "100%",
-    "serviceModel": "3PL Operated Warehouse",
+    "warehouseModel": "3PL Operated Warehouse",
     "area": {
       "totalChargeableArea": 0
     },
