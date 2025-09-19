@@ -12,7 +12,7 @@ import {
 import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus, type LocationCircle } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle, Building, Scaling } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -42,7 +42,15 @@ import { cn } from '@/lib/utils';
 import { format, subDays } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
 import * as XLSX from 'xlsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 
+type ProviderSummary = {
+  [email: string]: {
+    listingCount: number;
+    totalSize: number;
+  };
+};
 
 function AdminListingCard({ listing, analytics, providerName, onStatusChange, onEdit }: { listing: ListingSchema, analytics?: { views: number; downloads: number; downloadedBy?: DownloadedByRecord[], viewedBy?: ViewedByRecord[] }, providerName: string, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema, intent?: 'approve') => void }) {
   const { toast } = useToast();
@@ -206,6 +214,40 @@ function AdminListingCard({ listing, analytics, providerName, onStatusChange, on
   );
 }
 
+function ProviderSummaryTable({ allDevelopers, providerSummary }: { allDevelopers: any[], providerSummary: ProviderSummary }) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Provider Supply Summary</CardTitle>
+                <CardDescription>An overview of active listings contributed by each developer.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Developer Company</TableHead>
+                            <TableHead className="text-right">Active Listings</TableHead>
+                            <TableHead className="text-right">Total Size (Sq. Ft.)</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {allDevelopers.map(dev => {
+                            const summary = providerSummary[dev.email];
+                            return (
+                                <TableRow key={dev.email}>
+                                    <TableCell className="font-medium">{dev.companyName}</TableCell>
+                                    <TableCell className="text-right">{summary?.listingCount || 0}</TableCell>
+                                    <TableCell className="text-right">{summary?.totalSize.toLocaleString() || 0}</TableCell>
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    )
+}
+
 export function AdminListings() {
   const { listings, listingAnalytics, updateListing, updateListingStatus, locationCircles } = useData();
   const { users } = useAuth();
@@ -224,11 +266,27 @@ export function AdminListings() {
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
   const [editIntent, setEditIntent] = React.useState<'approve' | undefined>(undefined);
+  const [providerSummary, setProviderSummary] = React.useState<ProviderSummary>({});
 
   const allDevelopers = React.useMemo(() => {
-    const developerEmails = new Set(listings.map(l => l.developerId));
-    return Object.values(users).filter(u => developerEmails.has(u.email));
-  }, [listings, users]);
+    return Object.values(users).filter(u => u.role === 'Warehouse Developer');
+  }, [users]);
+  
+  React.useEffect(() => {
+    async function fetchProviderSummary() {
+      try {
+        const response = await fetch('/api/provider-summary');
+        if (response.ok) {
+          const data = await response.json();
+          setProviderSummary(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch provider summary:", error);
+      }
+    }
+    fetchProviderSummary();
+  }, [users]);
+
 
   const maxSliderSize = React.useMemo(() => {
     const max = Math.max(...listings.map(w => w.sizeSqFt), 0);
@@ -280,7 +338,23 @@ export function AdminListings() {
   };
 
   const handleFormSubmit = (data: ListingSchema) => {
-    updateListing(data);
+    if (data.isAdmin && editIntent === 'approve' && data.locationCircle) {
+      data.status = 'approved';
+      toast({
+        title: 'Listing Approved',
+        description: `Listing "${data.listingId}" has been assigned a circle and approved.`
+      });
+    } else {
+        toast({
+            title: selectedListing ? "Listing Updated" : "Listing Submitted",
+            description: `Your listing for "${data.listingId}" has been saved.`
+        });
+    }
+
+    if (selectedListing) {
+      updateListing(data);
+    }
+    
     setIsFormOpen(false);
     setSelectedListing(null);
     setEditIntent(undefined);
@@ -374,102 +448,113 @@ export function AdminListings() {
     <>
       <div className="mt-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold font-headline tracking-tight">All Listings &amp; Performance</h2>
+          <h2 className="text-3xl font-bold font-headline tracking-tight">Listings Performance Dashboard</h2>
           <p className="text-muted-foreground mt-2">
             Filter and analyze all listings on the platform. Use the actions menu on each card to approve or reject them.
           </p>
         </div>
-        
-         <Card className="mb-8 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
-                 <div className="space-y-2">
-                    <label className="text-sm font-medium">Location or Listing ID</label>
-                    <Input 
-                        placeholder="Search by city, area, or ID..."
-                        value={keywordFilter}
-                        onChange={e => setKeywordFilter(e.target.value)}
-                    />
-                </div>
-                 <div className="space-y-2">
-                    <label className="text-sm font-medium">Developer</label>
-                    <Select value={developerFilter} onValueChange={setDeveloperFilter}>
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Developers</SelectItem>
-                            {allDevelopers.map(dev => (
-                                <SelectItem key={dev.email} value={dev.email}>
-                                    {dev.companyName}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                 <div className="space-y-2">
-                    <label className="text-sm font-medium">Availability</label>
-                    <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
-                            <SelectItem value="Under Construction">Under Construction</SelectItem>
-                            <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-2">
-                    <label className="text-sm font-medium">Date Range</label>
-                     <Popover>
-                        <PopoverTrigger asChild>
-                            <Button id="date" variant={"outline"} className={cn("w-full justify-start text-left font-normal",!dateRange && "text-muted-foreground")}>
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>) : (format(dateRange.from, "LLL dd, y"))) : (<span>Pick a date</span>)}
+
+        <Tabs defaultValue="all-listings">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="all-listings">All Listings</TabsTrigger>
+                <TabsTrigger value="provider-summary">Provider Summary</TabsTrigger>
+            </TabsList>
+            <TabsContent value="all-listings">
+                 <Card className="mb-8 p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Location or Listing ID</label>
+                            <Input 
+                                placeholder="Search by city, area, or ID..."
+                                value={keywordFilter}
+                                onChange={e => setKeywordFilter(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Developer</label>
+                            <Select value={developerFilter} onValueChange={setDeveloperFilter}>
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Developers</SelectItem>
+                                    {allDevelopers.map(dev => (
+                                        <SelectItem key={dev.email} value={dev.email}>
+                                            {dev.companyName}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Availability</label>
+                            <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All</SelectItem>
+                                    <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
+                                    <SelectItem value="Under Construction">Under Construction</SelectItem>
+                                    <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Date Range</label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button id="date" variant={"outline"} className={cn("w-full justify-start text-left font-normal",!dateRange && "text-muted-foreground")}>
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>) : (format(dateRange.from, "LLL dd, y"))) : (<span>Pick a date</span>)}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="end">
+                                    <Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={2}/>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        <div className="lg:col-span-2 space-y-2">
+                            <label className="text-sm font-medium">Size (sq. ft.) - {sizeRange[0].toLocaleString()} to {sizeRange[1].toLocaleString()}</label>
+                            <Slider
+                                min={0}
+                                max={maxSliderSize}
+                                step={10000}
+                                value={sizeRange}
+                                onValueChange={newRange => setSizeRange(newRange as [number, number])}
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <Button onClick={resetFilters} variant="ghost" className="w-full">
+                                <X className="mr-2 h-4 w-4" /> Reset
                             </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="end">
-                            <Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={2}/>
-                        </PopoverContent>
-                    </Popover>
-                </div>
-                 <div className="lg:col-span-2 space-y-2">
-                    <label className="text-sm font-medium">Size (sq. ft.) - {sizeRange[0].toLocaleString()} to {sizeRange[1].toLocaleString()}</label>
-                    <Slider
-                        min={0}
-                        max={maxSliderSize}
-                        step={10000}
-                        value={sizeRange}
-                        onValueChange={newRange => setSizeRange(newRange as [number, number])}
-                    />
-                </div>
-                <div className="flex gap-2">
-                    <Button onClick={resetFilters} variant="ghost" className="w-full">
-                        <X className="mr-2 h-4 w-4" /> Reset
-                    </Button>
-                     <Button onClick={handleDownloadReport} className="w-full">
-                        <Download className="mr-2 h-4 w-4" /> Report
-                    </Button>
-                </div>
-            </div>
-        </Card>
+                            <Button onClick={handleDownloadReport} className="w-full">
+                                <Download className="mr-2 h-4 w-4" /> Report
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
 
 
-        {filteredListings.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredListings.map(listing => {
-              const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
-              const providerName = getProviderName(listing.developerId);
-              return <AdminListingCard key={listing.listingId} listing={listing} analytics={analytics} providerName={providerName} onStatusChange={(newStatus) => handleStatusChange(listing.listingId, newStatus)} onEdit={handleEdit} />;
-            })}
-          </div>
-        ) : (
-          <Card className="text-center p-12">
-              <CardTitle>No Listings Match Your Filters</CardTitle>
-              <CardDescription className="mt-2">Try adjusting or resetting your search criteria.</CardDescription>
-          </Card>
-        )}
+                {filteredListings.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredListings.map(listing => {
+                    const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
+                    const providerName = getProviderName(listing.developerId);
+                    return <AdminListingCard key={listing.listingId} listing={listing} analytics={analytics} providerName={providerName} onStatusChange={(newStatus) => handleStatusChange(listing.listingId, newStatus)} onEdit={handleEdit} />;
+                    })}
+                </div>
+                ) : (
+                <Card className="text-center p-12">
+                    <CardTitle>No Listings Match Your Filters</CardTitle>
+                    <CardDescription className="mt-2">Try adjusting or resetting your search criteria.</CardDescription>
+                </Card>
+                )}
+            </TabsContent>
+            <TabsContent value="provider-summary">
+                <ProviderSummaryTable allDevelopers={allDevelopers} providerSummary={providerSummary} />
+            </TabsContent>
+        </Tabs>
       </div>
       <ListingForm
         isOpen={isFormOpen}
@@ -482,3 +567,5 @@ export function AdminListings() {
     </>
   );
 }
+
+    
