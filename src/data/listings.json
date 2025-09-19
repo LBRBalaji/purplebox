@@ -1,5 +1,98 @@
 [
   {
+    "status": "pending",
+    "developerId": "admin@welspun.com",
+    "listingId": "LST-KFX5QP",
+    "warehouseBoxId": "Block-A ",
+    "actualSizeSqFt": 100364,
+    "additionalInformation": "",
+    "name": "",
+    "location": "Thatchur",
+    "sizeSqFt": 110000,
+    "description": "Thatchur's premier 110,000 sq ft warehouse space, currently under construction, offers a non-temperature controlled PEB structure ideal for various industrial needs.  Boasting a 10-meter eave height and a durable Galvalume roof, this property provides ample storage and operational efficiency. Secure this exceptional facility and benefit from its strategic location and modern design.",
+    "rentPerSqFt": "Get Quote",
+    "rentalSecurityDeposit": "Get Quote",
+    "availabilityDate": "Under Construction",
+    "constructionProgress": "",
+    "warehouseModel": "Non-Temperature Controlled",
+    "locationCircle": "",
+    "area": {
+      "plinthArea": 110000,
+      "totalChargeableArea": 110000
+    },
+    "buildingSpecifications": {
+      "buildingType": [
+        "PEB"
+      ],
+      "craneSupportStructureAvailable": false,
+      "craneAvailable": false,
+      "warehouseLayoutAvailable": true,
+      "louvers": true,
+      "numberOfDocksAndShutters": 10,
+      "roofType": "Galvalume",
+      "eveHeightMeters": 10,
+      "roofInsulation": "Non-Insulated",
+      "ventilation": "Ridge"
+    },
+    "siteSpecifications": {
+      "typeOfFlooringInside": "FM2",
+      "typeOfRoad": "Tar"
+    },
+    "certificatesAndApprovals": {
+      "parkApproval": true,
+      "buildingApproval": true,
+      "fireLicense": true,
+      "fireNOC": true,
+      "buildingInsurance": true,
+      "pcbForAir": true,
+      "pcbForWater": true,
+      "propertyTax": true
+    },
+    "documents": [
+      {
+        "type": "image",
+        "name": "under construction-7.jpeg",
+        "url": "/uploads/1758265347755-under_construction-7.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction.jpeg",
+        "url": "/uploads/1758265347477-under_construction.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-2.jpeg",
+        "url": "/uploads/1758265347407-under_construction-2.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-external.jpeg",
+        "url": "/uploads/1758265347362-under_construction-external.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-3.jpeg",
+        "url": "/uploads/1758265347687-under_construction-3.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-4.jpeg",
+        "url": "/uploads/1758265347736-under_construction-4.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construciton-5.jpeg",
+        "url": "/uploads/1758265347578-under_construciton-5.jpeg"
+      },
+      {
+        "type": "image",
+        "name": "under construction-6.jpeg",
+        "url": "/uploads/1758265347820-under_construction-6.jpeg"
+      }
+    ],
+    "isAdmin": false
+  },
+  {
     "status": "approved",
     "developerId": "admin@pragati.com",
     "listingId": "LST-80DJ0W",

@@ -219,7 +219,7 @@ function ProviderSummaryTable({ allDevelopers, providerSummary }: { allDeveloper
         <Card>
             <CardHeader>
                 <CardTitle>Provider Supply Summary</CardTitle>
-                <CardDescription>An overview of active listings contributed by each developer.</CardDescription>
+                <CardDescription>An overview of active listings from {allDevelopers.length} developers.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
@@ -568,4 +568,5 @@ export function AdminListings() {
   );
 }
 
+    
     
