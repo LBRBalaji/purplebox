@@ -21,11 +21,11 @@ type LayoutRequestDialogProps = {
   onOpenChange: (open: boolean) => void;
   listingId: string;
   listingName: string;
+  onSubmit: (request: LayoutRequestData) => void;
 };
 
-export function LayoutRequestDialog({ isOpen, onOpenChange, listingId, listingName }: LayoutRequestDialogProps) {
+export function LayoutRequestDialog({ isOpen, onOpenChange, listingId, listingName, onSubmit }: LayoutRequestDialogProps) {
   const { user } = useAuth();
-  const { addLayoutRequest } = useData();
   const { toast } = useToast();
 
   const form = useForm<LayoutRequestData>({
@@ -62,8 +62,8 @@ export function LayoutRequestDialog({ isOpen, onOpenChange, listingId, listingNa
     }
   }, [isOpen, listingId, listingName, user, form]);
 
-  const onSubmit = (data: LayoutRequestData) => {
-    addLayoutRequest(data);
+  const handleFormSubmit = (data: LayoutRequestData) => {
+    onSubmit(data);
     toast({
       title: 'Request Submitted Successfully!',
       description: `Your request for the layout of "${data.listingName}" has been sent to our team. We will get back to you shortly.`,
@@ -86,7 +86,7 @@ export function LayoutRequestDialog({ isOpen, onOpenChange, listingId, listingNa
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <FormField
                     control={form.control}

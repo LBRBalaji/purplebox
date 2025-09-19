@@ -201,7 +201,7 @@ export default function ListingDetailPage() {
     const router = useRouter();
     const { user } = useAuth();
     const { toast } = useToast();
-    const { listings, logDownload, logListingView, isLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading } = useData();
+    const { listings, logDownload, logListingView, isLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
@@ -280,7 +280,7 @@ export default function ListingDetailPage() {
             return;
         }
 
-        const { success, limitReached } = logDownload(user.email, [listing]);
+        const { success, limitReached } = logDownload(user, [listing]);
         
         if (success) {
             const dataToExport = [{
@@ -658,7 +658,7 @@ export default function ListingDetailPage() {
                 </div>
             </main>
             <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => setIsLoginDialogOpen(false)} />
-            {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name || `Warehouse in ${listing.location}`}/>}
+            {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name || `Warehouse in ${listing.location}`} onSubmit={addLayoutRequest} />}
         </>
     );
 }
