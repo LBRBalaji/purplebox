@@ -130,7 +130,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
               rentalSecurityDeposit: undefined,
               availabilityDate: 'Ready for Occupancy',
               constructionProgress: '',
-              serviceModel: 'Standard',
+              warehouseModel: 'Non-Temperature Controlled',
               locationCircle: '',
               area: { plinthArea: undefined, mezzanineArea1: undefined, mezzanineArea2: undefined, canopyArea: undefined, driversRestRoomArea: undefined, totalChargeableArea: undefined, },
               buildingSpecifications: { buildingType: [], craneSupportStructureAvailable: false, craneAvailable: false, warehouseLayoutAvailable: false, louvers: false, },
@@ -218,7 +218,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
             location: data.location,
             sizeSqFt: data.sizeSqFt,
             availabilityDate: data.availabilityDate,
-            serviceModel: data.serviceModel,
+            warehouseModel: data.warehouseModel,
             rentPerSqFt: typeof data.rentPerSqFt === 'number' ? data.rentPerSqFt : undefined,
             buildingType: data.buildingSpecifications.buildingType,
             roofType: data.buildingSpecifications.roofType,
@@ -259,11 +259,6 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
         const finalData = { ...data, isAdmin };
         await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
         onSubmit(finalData);
-        
-        toast({
-            title: isEditMode ? "Listing Updated" : "Listing Submitted",
-            description: `Your listing for "${data.listingId}" has been saved. New status: ${data.status}.`
-        });
         
         onOpenChange(false);
     } catch (error) {
@@ -473,11 +468,11 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                                         <FormMessage />
                                     </FormItem>
                                 )} />
-                                <FormField control={form.control} name="serviceModel" render={({ field }) => (
-                                    <FormItem><FormLabel>Service Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
-                                        <SelectItem value="Standard">Standard Warehouse</SelectItem>
+                                <FormField control={form.control} name="warehouseModel" render={({ field }) => (
+                                    <FormItem><FormLabel>Warehouse Model</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                        <SelectItem value="Non-Temperature Controlled">Non-Temperature Controlled</SelectItem>
+                                        <SelectItem value="Temperature Controlled">Temperature Controlled</SelectItem>
                                         <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
-                                        <SelectItem value="Both">Both</SelectItem>
                                     </SelectContent></Select><FormMessage /></FormItem>
                                 )} />
                                 <FormField control={form.control} name="buildingSpecifications.numberOfDocksAndShutters" render={({ field }) => (

@@ -1,3 +1,4 @@
+
 // src/ai/flows/predict-demand-trends.ts
 'use server';
 
@@ -35,7 +36,7 @@ const prompt = ai.definePrompt({
     timeHorizon: z.string(),
     location: z.string().optional(),
     buildingType: z.string().optional(),
-    serviceModel: z.string().optional(),
+    warehouseModel: z.string().optional(),
     availability: z.string().optional(),
     craneAvailable: z.boolean().optional(),
     roofType: z.string().optional(),
@@ -58,7 +59,7 @@ const prompt = ai.definePrompt({
   Your analysis should be based on the provided historical data, filtered by the following user-defined criteria:
   {{#if location}}- **Location Focus**: The analysis should specifically focus on the **{{{location}}}** area.{{/if}}
   {{#if buildingType}}- **Building Type**: Filter for **{{{buildingType}}}** building types.{{/if}}
-  {{#if serviceModel}}- **Service Model**: Filter for **{{{serviceModel}}}** service models.{{/if}}
+  {{#if warehouseModel}}- **Warehouse Model**: Filter for **{{{warehouseModel}}}** warehouse models.{{/if}}
   {{#if availability}}- **Availability**: Filter for properties with status **{{{availability}}}**.{{/if}}
   {{#if craneAvailable}}- **Crane**: Filter for properties where a crane is available.{{/if}}
   {{#if roofType}}- **Roof Type**: Filter for properties with a **{{{roofType}}}** roof.{{/if}}
@@ -110,8 +111,8 @@ const predictDemandTrendsFlow = ai.defineFlow(
         );
     }
 
-    if (input.serviceModel) {
-        filteredListings = filteredListings.filter(l => l.serviceModel?.toLowerCase() === input.serviceModel?.toLowerCase());
+    if (input.warehouseModel) {
+        filteredListings = filteredListings.filter(l => l.warehouseModel?.toLowerCase() === input.warehouseModel?.toLowerCase());
     }
     
     if (input.availability) {

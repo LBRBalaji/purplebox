@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
   - Total Size: {{{sizeSqFt}}} sq. ft.
   - Availability: {{{availabilityDate}}}
   {{#if rentPerSqFt}}- Quoted Rent: ₹{{{rentPerSqFt}}} per sq. ft.{{/if}}
-  {{#if serviceModel}}- Service Model: {{{serviceModel}}}{{/if}}
+  {{#if warehouseModel}}- Warehouse Model: {{{warehouseModel}}}{{/if}}
   {{#if buildingType}}- Building Type: {{{buildingType}}}{{/if}}
   {{#if roofType}}- Roof Type: {{{roofType}}}{{/if}}
   {{#if eveHeightMeters}}- Eve Height: {{{eveHeightMeters}}} meters{{/if}}
@@ -68,4 +68,3 @@ const generateListingDescriptionFlow = ai.defineFlow(
     return output!;
   }
 );
-

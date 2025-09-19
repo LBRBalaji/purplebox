@@ -196,7 +196,7 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
       size: undefined,
       floor: "Ground",
       readinessToOccupy: "Immediate",
-      serviceModel: "Standard",
+      warehouseModel: "Non-Temperature Controlled",
       buildingType: undefined,
       safety: "Fully Compounded",
       ceilingHeight: undefined,
@@ -359,15 +359,15 @@ export function PropertyForm({ demandId }: { demandId: string | null }) {
                         <FormMessage />
                       </FormItem>
                     )} />
-                    <FormField control={form.control} name="serviceModel" render={({ field }) => (
+                    <FormField control={form.control} name="warehouseModel" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Service Model</FormLabel>
+                        <FormLabel>Warehouse Model</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                           <SelectContent>
-                            <SelectItem value="Standard">Standard</SelectItem>
+                            <SelectItem value="Non-Temperature Controlled">Non-Temperature Controlled</SelectItem>
+                            <SelectItem value="Temperature Controlled">Temperature Controlled</SelectItem>
                             <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
-                            <SelectItem value="Both">Both</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

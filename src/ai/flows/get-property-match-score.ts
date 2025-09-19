@@ -29,7 +29,7 @@ const GetPropertyMatchScoreOutputSchema = z.object({
       fireSafety: z.number().min(0).max(1).describe('Score for fire safety compliance (0-1). Assumed 0.9 if no specifics from customer.'),
       approvals: z.number().min(0).max(1).describe('Score for statutory approvals (0-1). Assumed 0.9 if no specifics from customer.'),
       amenities: z.number().min(0).max(1).describe('Score for amenities like docks and canopy (0-1).'),
-      serviceModel: z.number().min(0).max(1).describe('Score for the service model (Standard vs 3PL) (0-1). Assumed 0.9 if no specifics from customer.'),
+      warehouseModel: z.number().min(0).max(1).describe('Score for the warehouse model (e.g. Temperature Controlled) (0-1). Assumed 0.9 if no specifics from customer.'),
     }).describe('A breakdown of scores for different categories.'),
   justification: z.string().describe('A detailed explanation for the calculated scores, highlighting strengths and weaknesses of the match for each category.'),
 });
@@ -47,7 +47,7 @@ export async function getPropertyMatchScore(input: GetPropertyMatchScoreInput): 
       fireSafety: 0,
       approvals: 0,
       amenities: 0,
-      serviceModel: 0,
+      warehouseModel: 0,
     },
     justification: "AI scoring is temporarily suspended."
   });
