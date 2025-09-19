@@ -199,14 +199,16 @@ function ShareDropdown({ listing }: { listing: ListingSchema }) {
 export default function ListingDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, isLoading: isAuthLoading } = useAuth();
     const { toast } = useToast();
-    const { listings, logDownload, logListingView, isLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest } = useData();
+    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
     const [navigationList, setNavigationList] = React.useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = React.useState(-1);
+    
+    const isLoading = isAuthLoading || isDataLoading;
 
     React.useEffect(() => {
         if (isLoading) return;
@@ -499,10 +501,10 @@ export default function ListingDetailPage() {
                                         <div>
                                             <h4 className="font-semibold mb-2">Building</h4>
                                             <Separator />
-                                            <DetailRow label="Shop Floor Dimension" value={listing.buildingSpecifications.shopFloorLevelDimension} />
-                                            {user && <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} />}
-                                            {user && <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} />}
-                                            {user && <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />}
+                                            <DetailRow label="Shop Floor Dimension" value={listing.buildingSpecifications.shopFloorLevelDimension} isBlurred={!user} />
+                                            <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} isBlurred={!user} />
+                                            <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} isBlurred={!user} />
+                                            <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} isBlurred={!user} />
                                             <DetailRow label="Crane Support Structure" value={listing.buildingSpecifications.craneSupportStructureAvailable} />
                                             <DetailRow label="Crane Available" value={listing.buildingSpecifications.craneAvailable} />
                                             <DetailRow label="Warehouse Layout Available" value={listing.buildingSpecifications.warehouseLayoutAvailable} />
@@ -574,7 +576,16 @@ export default function ListingDetailPage() {
                                         <CardTitle>Commercials</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        {user ? (
+                                        {!user && !isLoading ? (
+                                            <Alert>
+                                                <Lock className="h-4 w-4" />
+                                                <AlertTitle>Login Required</AlertTitle>
+                                                <AlertDescription>
+                                                    Please log in or sign up to view detailed commercial terms and other sensitive data.
+                                                </AlertDescription>
+                                                <Button className="w-full mt-4" onClick={() => setIsLoginDialogOpen(true)}>Login</Button>
+                                            </Alert>
+                                        ) : (
                                             <div className="space-y-4">
                                                 <div className="flex items-baseline justify-center text-center">
                                                     <span className="text-4xl font-bold">₹{listing.rentPerSqFt || '??'}</span>
@@ -584,18 +595,9 @@ export default function ListingDetailPage() {
                                                 <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
                                                 <DetailRow label="Construction Progress" value={listing.constructionProgress} />
                                             </div>
-                                        ) : (
-                                            <Alert>
-                                                <Lock className="h-4 w-4" />
-                                                <AlertTitle>Login Required</AlertTitle>
-                                                <AlertDescription>
-                                                    Please log in or sign up to view detailed commercial terms and other sensitive data.
-                                                </AlertDescription>
-                                                <Button className="w-full mt-4" onClick={() => setIsLoginDialogOpen(true)}>Login</Button>
-                                            </Alert>
                                         )}
                                     </CardContent>
-                                    {user && (
+                                    {!isLoading && user && (
                                         <CardFooter className="flex flex-col gap-2">
                                             <Button
                                                 variant={isShortlisted ? 'default' : 'outline'}
@@ -620,7 +622,7 @@ export default function ListingDetailPage() {
                                         <CardTitle>Certificates & Approvals</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        {user ? (
+                                        {!isLoading && user ? (
                                             <div className="space-y-1">
                                                 <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
                                                 <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
