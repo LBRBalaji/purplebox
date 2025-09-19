@@ -571,15 +571,13 @@ export default function ListingDetailPage() {
                         
                         {/* Sticky Sidebar */}
                         <div className="lg:col-span-1 space-y-6">
-                            <div className="sticky top-8 space-y-6">
+                            <div className="sticky top-24 space-y-6">
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Commercials</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        {isLoading ? (
-                                            <Skeleton className="h-24 w-full" />
-                                        ) : user ? (
+                                        {user ? (
                                             <div className="space-y-4">
                                                 <div className="flex items-baseline justify-center text-center">
                                                     <span className="text-4xl font-bold">₹{listing.rentPerSqFt || '??'}</span>
@@ -600,7 +598,7 @@ export default function ListingDetailPage() {
                                             </Alert>
                                         )}
                                     </CardContent>
-                                    {!isLoading && user && (
+                                    {user && (
                                         <CardFooter className="flex flex-col gap-2">
                                             <Button
                                                 variant={isShortlisted ? 'default' : 'outline'}
@@ -625,13 +623,7 @@ export default function ListingDetailPage() {
                                         <CardTitle>Certificates & Approvals</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        {isLoading ? (
-                                            <div className="space-y-2">
-                                                <Skeleton className="h-4 w-full" />
-                                                <Skeleton className="h-4 w-full" />
-                                                <Skeleton className="h-4 w-full" />
-                                            </div>
-                                        ) : user ? (
+                                        {user ? (
                                             <div className="space-y-1">
                                                 <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
                                                 <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
