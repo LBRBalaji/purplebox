@@ -41,7 +41,7 @@ export default function AnalyticsHubPage() {
                                 <div>
                                     <CardTitle className="flex items-center gap-2">
                                         <List className="text-primary" />
-                                        Demand Analytics
+                                        Demand & Customer Analytics
                                     </CardTitle>
                                     <CardDescription className="mt-2">
                                         Analyze demand trends, success rates, and customer activity.
