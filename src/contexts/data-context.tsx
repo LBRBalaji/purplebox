@@ -29,12 +29,21 @@ export type DownloadedByRecord = {
   timestamps: number[];
 };
 
+export type ViewedByRecord = {
+    userId: string;
+    name: string;
+    company: string;
+    timestamp: number;
+};
+
+
 export type ListingAnalytics = {
   listingId: string;
   views: number;
   downloads: number;
   customerIndustries: Record<string, number>;
   downloadedBy?: DownloadedByRecord[];
+  viewedBy?: ViewedByRecord[];
 };
 
 export type DownloadRecord = {
@@ -192,7 +201,7 @@ export type AgentLead = {
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const { user: authUser } = useAuth();
+  const { user: authUser, users: allUsers } = useAuth();
   const [listings, setListings] = useState<ListingSchema[]>([]);
   const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>([]);
   const [demands, setDemands] = useState<DemandSchema[]>([]);
@@ -359,7 +368,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addListing = useCallback((listing: ListingSchema, userEmail?: string) => {
     setListings(prevListings => {
-        const newListings = [{ ...listing, status: 'pending' as const }, ...prevListings];
+        const newListings = [{ ...listing, status: 'pending' as const, createdAt: new Date().toISOString() }, ...prevListings];
         persistListings(newListings);
         setLastEvent({
           type: 'new_listing',
@@ -603,29 +612,55 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [downloadHistory, getCompanyDownloadCounts, toast, persistListingAnalytics, persistDownloadHistory]);
 
   const logListingView = useCallback((user: User, listingId: string) => {
-    const lastView = viewHistory
-      .slice()
-      .reverse()
-      .find(v => v.userId === user.email && v.listingId === listingId);
+      const now = Date.now();
+      const fiveMinutes = 5 * 60 * 1000;
 
-    const fiveMinutes = 5 * 60 * 1000;
-    if (lastView && (Date.now() - lastView.timestamp < fiveMinutes)) {
-      return; // No change if viewed recently by same user
-    }
+      const lastView = viewHistory
+          .slice()
+          .reverse()
+          .find(v => v.userId === user.email && v.listingId === listingId);
 
-    const newView: ViewRecord = {
-      userId: user.email,
-      companyName: user.companyName,
-      listingId: listingId,
-      timestamp: Date.now(),
-    };
+      if (lastView && (now - lastView.timestamp < fiveMinutes)) {
+          return;
+      }
 
-    setViewHistory(prev => {
-      const updatedHistory = [...prev, newView];
-      persistViewHistory(updatedHistory);
-      return updatedHistory;
-    });
-  }, [viewHistory, persistViewHistory]);
+      const newView: ViewRecord = {
+          userId: user.email,
+          companyName: user.companyName,
+          listingId: listingId,
+          timestamp: now,
+      };
+
+      setViewHistory(prev => {
+          const updatedHistory = [...prev, newView];
+          persistViewHistory(updatedHistory);
+          return updatedHistory;
+      });
+
+      setListingAnalytics(prevAnalytics => {
+          const newAnalytics = [...prevAnalytics];
+          let analytic = newAnalytics.find(a => a.listingId === listingId);
+
+          if (!analytic) {
+              analytic = { listingId: listingId, views: 0, downloads: 0, customerIndustries: {}, viewedBy: [] };
+              newAnalytics.push(analytic);
+          }
+          
+          analytic.views = (analytic.views || 0) + 1;
+          
+          analytic.viewedBy = analytic.viewedBy || [];
+          analytic.viewedBy.push({
+              userId: user.email,
+              name: user.userName,
+              company: user.companyName,
+              timestamp: now,
+          });
+
+          persistListingAnalytics(newAnalytics);
+          return newAnalytics;
+      });
+
+  }, [viewHistory, persistViewHistory, persistListingAnalytics]);
 
 
   const toggleSelectedForDownload = useCallback((listing: ListingSchema): { limitReached: boolean } => {

@@ -34,7 +34,7 @@
   },
   {
     "listingId": "LST-XHJLWC",
-    "views": 0,
+    "views": 1,
     "downloads": 10,
     "customerIndustries": {},
     "downloadedBy": [
@@ -63,6 +63,14 @@
           1758211370639,
           1758211370639
         ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758216192471
       }
     ]
   },
@@ -123,7 +131,7 @@
   },
   {
     "listingId": "LST-8NGG6W",
-    "views": 0,
+    "views": 1,
     "downloads": 5,
     "customerIndustries": {},
     "downloadedBy": [
@@ -141,6 +149,14 @@
           1758211370639,
           1758211370639
         ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758216002962
       }
     ]
   },
