@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, MessageSquare, Paperclip, File as FileIcon, ExternalLink } from 'lucide-react';
+import { Send, MessageSquare, Paperclip, File as FileIcon, ExternalLink, Smile } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type Submission } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
@@ -20,6 +20,7 @@ import { useData, type ChatMessage } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from './ui/progress';
 import Link from 'next/link';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 
 export type ChatSubmission = Submission & { 
@@ -202,6 +203,10 @@ export function ChatPanel({
     }
   };
 
+  const onEmojiSelect = (emoji: string) => {
+    setNewMessage(prev => prev + emoji);
+  }
+
   if (!submission?.listing) return null;
   
   const getInitialMessage = () => {
@@ -220,6 +225,8 @@ export function ChatPanel({
   };
   
   const initialMessage = getInitialMessage();
+  const emojis = ['😀', '😂', '😍', '👍', '🙏', '🔥', '🚀', '🎉', '🤔', '😊', '😎', '💯'];
+
 
   return (
     <div className="absolute inset-0 flex flex-col">
@@ -302,6 +309,29 @@ export function ChatPanel({
                 <Paperclip className="h-5 w-5"/>
                 <span className="sr-only">Attach file</span>
             </Button>
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button type="button" variant="ghost" size="icon">
+                        <Smile className="h-5 w-5" />
+                        <span className="sr-only">Add emoji</span>
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-2">
+                    <div className="grid grid-cols-4 gap-2">
+                        {emojis.map((emoji) => (
+                            <Button
+                                key={emoji}
+                                variant="ghost"
+                                size="icon"
+                                className="text-xl"
+                                onClick={() => onEmojiSelect(emoji)}
+                            >
+                                {emoji}
+                            </Button>
+                        ))}
+                    </div>
+                </PopoverContent>
+            </Popover>
             <Textarea
             placeholder="Type your message..."
             value={newMessage}

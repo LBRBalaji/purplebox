@@ -823,7 +823,7 @@
   },
   {
     "listingId": "LST-R41ULG",
-    "views": 1,
+    "views": 2,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -832,6 +832,38 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758360779795
+      },
+      {
+        "userId": "anonymous_anon_1758361464259_b0q5qq5",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758361466067
+      }
+    ]
+  },
+  {
+    "listingId": "LST-90DWHQ",
+    "views": 3,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "anonymous_anon_1758361228847_kh0u5tw",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758361230470
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758361241638
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758361241638
       }
     ]
   }

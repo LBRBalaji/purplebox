@@ -14,7 +14,10 @@
         "properties": [
           {
             "listingId": "LST-R41ULG",
-            "status": "Pending"
+            "status": "Pending",
+            "rentPerSft": 30,
+            "rentalSecurityDeposit": 12,
+            "actualChargeableArea": 41000
           }
         ]
       }
