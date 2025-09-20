@@ -72,7 +72,6 @@ export type AcknowledgmentRecord = {
     timestamp: number;
 };
 
-
 type DataEvent = {
   type: 'new_demand' | 'new_submission' | 'new_listing' | 'download_limit_exceeded' | 'listing_status_changed' | 'new_lead_for_provider';
   id: string; // The ID of the demand, submission, or user email
@@ -87,6 +86,9 @@ export type RegisteredLeadProperty = {
   acknowledgedAt?: string;
   rejectionReason?: string;
   acknowledgedBy?: AcknowledgmentDetails;
+  rentPerSft?: number;
+  rentalSecurityDeposit?: number;
+  actualChargeableArea?: number;
 }
 
 export type RegisteredLeadProvider = {

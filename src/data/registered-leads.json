@@ -14,7 +14,9 @@
         "properties": [
           {
             "listingId": "LST-KKGGMD",
-            "status": "Pending"
+            "status": "Pending",
+            "rentPerSft": 28,
+            "rentalSecurityDeposit": 6
           }
         ]
       }
