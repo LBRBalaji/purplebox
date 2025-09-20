@@ -565,7 +565,7 @@ export default function ListingDetailPage() {
                             {/* Documents */}
                              <Card>
                                 <CardHeader>
-                                    <CardTitle>Documents &amp; Media</CardTitle>
+                                    <CardTitle>Documents & Media</CardTitle>
                                     <CardDescription>
                                         Download available media files and layouts.
                                     </CardDescription>
@@ -624,7 +624,7 @@ export default function ListingDetailPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
-                                     {listing.rentPerSqFt === 'Get Quote' ? (
+                                     {listing.rentPerSqFt === 'Get Quote' && (
                                         hasRequestedQuote ? (
                                             <div className="w-full text-center space-y-2">
                                                 <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
@@ -639,7 +639,7 @@ export default function ListingDetailPage() {
                                                 Get Commercials Quote
                                             </Button>
                                         )
-                                     ) : null}
+                                     )}
                                     <Button
                                         variant={isShortlisted ? 'default' : 'outline'}
                                         className="w-full"
@@ -657,7 +657,7 @@ export default function ListingDetailPage() {
 
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Certificates &amp; Approvals</CardTitle>
+                                    <CardTitle>Certificates & Approvals</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-1">

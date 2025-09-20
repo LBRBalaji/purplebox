@@ -592,5 +592,19 @@
         "timestamp": 1758333332670
       }
     ]
+  },
+  {
+    "listingId": "LST-QM0CX2",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758345908010
+      }
+    ]
   }
 ]
