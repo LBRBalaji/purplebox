@@ -41,13 +41,6 @@ const MainDashboard = () => {
     const isCustomer = user?.role === 'User';
     const isAgent = user?.role === 'Agent';
 
-    React.useEffect(() => {
-        // Redirect non-dashboard users to the listings page by default on first load if no other params are set.
-        if ((isCustomer) && !defaultTabParam && !logNewDemand && !editDemandId) {
-            router.replace('/');
-        }
-    }, [isCustomer, router, defaultTabParam, logNewDemand, editDemandId]);
-
     const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'my-listings');
     const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-demands');
     const [adminTab, setAdminTab] = React.useState(defaultTabParam || 'approval-queue');
