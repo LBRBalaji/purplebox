@@ -14,11 +14,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send } from 'lucide-react';
+import { Send, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type Submission } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
+import { generateChatResponse } from '@/ai/flows/generate-chat-response';
 
 type ChatSubmission = Submission & { listing?: ListingSchema };
 
@@ -27,6 +28,12 @@ type Message = {
   sender: 'User' | 'SuperAdmin';
   text: string;
   timestamp: string;
+};
+
+// Genkit compatible message format
+type ChatHistoryMessage = {
+  role: 'user' | 'model';
+  content: { text: string }[];
 };
 
 export function ChatDialog({
@@ -41,7 +48,25 @@ export function ChatDialog({
   const { user } = useAuth();
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [newMessage, setNewMessage] = React.useState('');
+  const [isGenerating, setIsGenerating] = React.useState(false);
   const scrollViewportRef = React.useRef<HTMLDivElement>(null);
+  const audioRef = React.useRef<HTMLAudioElement>(null);
+
+  // Request notification permission
+  React.useEffect(() => {
+    if (isOpen && "Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+    }
+  }, [isOpen]);
+
+  const showNotification = (body: string) => {
+      if ("Notification" in window && Notification.permission === "granted") {
+          const notification = new Notification("New Message from O2O Assistant", {
+              body,
+              icon: '/logo.png' 
+          });
+      }
+  }
 
   React.useEffect(() => {
     if (submission?.listing) {
@@ -49,7 +74,7 @@ export function ChatDialog({
         {
           id: 1,
           sender: 'SuperAdmin',
-          text: `Hi ${user?.userName || 'there'}, I see you're interested in property ${submission.listing.listingId}. How can I help?`,
+          text: `Hi ${user?.userName || 'there'}, this is the O2O Assistant. I see you're interested in property ${submission.listing.listingId}. How can I help you?`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -64,9 +89,9 @@ export function ChatDialog({
     }
   }, [messages]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !submission) return;
+    if (!newMessage.trim() || !submission || !user) return;
 
     const userMessage: Message = {
       id: Date.now(),
@@ -75,18 +100,48 @@ export function ChatDialog({
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setNewMessage('');
+    setIsGenerating(true);
 
-    setTimeout(() => {
-      const adminResponse: Message = {
-        id: Date.now() + 1,
-        sender: 'SuperAdmin',
-        text: 'Thank you for your message. I will check with the property provider and get back to you shortly with more details.',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-      setMessages((prev) => [...prev, adminResponse]);
-    }, 1500);
+    try {
+        const history: ChatHistoryMessage[] = updatedMessages.map(msg => ({
+            role: msg.sender === 'User' ? 'user' : 'model',
+            content: [{ text: msg.text }]
+        }));
+
+        const aiResponse = await generateChatResponse({
+            history,
+            listingId: submission.listingId,
+            demandId: submission.demandId,
+            userName: user.userName,
+        });
+        
+        if (aiResponse.response) {
+            const adminResponse: Message = {
+                id: Date.now() + 1,
+                sender: 'SuperAdmin',
+                text: aiResponse.response,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            };
+            setMessages(prev => [...prev, adminResponse]);
+            showNotification(aiResponse.response);
+            audioRef.current?.play();
+        }
+
+    } catch (error) {
+        console.error("Failed to get AI response", error);
+        const errorResponse: Message = {
+            id: Date.now() + 1,
+            sender: 'SuperAdmin',
+            text: "Sorry, I'm having trouble connecting right now. Please try again in a moment.",
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages(prev => [...prev, errorResponse]);
+    } finally {
+        setIsGenerating(false);
+    }
   };
 
   if (!submission?.listing) return null;
@@ -97,7 +152,7 @@ export function ChatDialog({
         <DialogHeader className="p-6 pb-2">
           <DialogTitle>Chat about Property: {submission.listing.listingId}</DialogTitle>
           <DialogDescription>
-            For Demand ID: {submission.demandId}. Your messages will be sent to the admin.
+            For Demand ID: {submission.demandId}. Your messages will be sent to the O2O Assistant.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-grow overflow-hidden px-6">
@@ -134,6 +189,17 @@ export function ChatDialog({
                     )}
                 </div>
                 ))}
+                {isGenerating && (
+                    <div className="flex items-end gap-2 justify-start">
+                        <Avatar className="h-8 w-8">
+                           <AvatarFallback>A</AvatarFallback>
+                        </Avatar>
+                        <div className="rounded-lg p-3 max-w-xs md:max-w-sm bg-muted flex items-center gap-2">
+                            <Sparkles className="h-4 w-4 animate-spin"/>
+                            <span className="text-sm italic">O2O Assistant is typing...</span>
+                        </div>
+                    </div>
+                )}
             </div>
             </ScrollArea>
         </div>
@@ -151,12 +217,13 @@ export function ChatDialog({
                   }
               }}
             />
-            <Button type="submit" size="icon" disabled={!newMessage.trim()}>
+            <Button type="submit" size="icon" disabled={!newMessage.trim() || isGenerating}>
               <Send className="h-4 w-4" />
               <span className="sr-only">Send</span>
             </Button>
           </form>
         </DialogFooter>
+        <audio ref={audioRef} src="/notification.mp3" preload="auto" />
       </DialogContent>
     </Dialog>
   );
