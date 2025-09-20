@@ -5,11 +5,12 @@ import * as React from 'react';
 import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Minus, X, ArrowLeft, Users } from 'lucide-react';
+import { MessageSquare, Minus, X, ArrowLeft, Users, ExternalLink } from 'lucide-react';
 import { ChatPanel, type ChatSubmission } from './chat-dialog';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Badge } from './ui/badge';
+import Link from 'next/link';
 
 function ConversationList({ onSelectConversation }: { onSelectConversation: (chat: ChatSubmission) => void }) {
     const { user, users } = useAuth();
@@ -26,7 +27,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
 
         return allUserLeads.flatMap(lead => 
             lead.providers
-              .filter(provider => provider.properties && provider.properties.length > 0) // Defensive check
+              .filter(provider => provider.properties && provider.properties.length > 0)
               .map(provider => {
                 const listing = listings.find(l => l.listingId === provider.properties[0]?.listingId);
                 const customer = users[lead.customerId];
@@ -120,6 +121,24 @@ export function GlobalChatWidget() {
         )
     }
 
+    const isCustomer = activeChat && user?.email === activeChat.customerName;
+
+    let title = "Conversations";
+    let subtitle = null;
+    let linkHref = null;
+
+    if (activeChat) {
+        title = activeChat.chatPartnerName;
+        if (isCustomer) {
+            subtitle = `Re: ${activeChat.listing?.listingId || 'Listing'}`;
+            linkHref = `/listings/${activeChat.listingId}`;
+        } else {
+            subtitle = `Re: ${activeChat.demandId}`;
+            linkHref = `/dashboard/leads/${activeChat.demandId}`;
+        }
+    }
+
+
     return (
         <div className="fixed bottom-0 right-8 z-50 w-full max-w-sm h-[600px]">
             <Card className="flex flex-col h-full shadow-2xl border-border">
@@ -130,15 +149,18 @@ export function GlobalChatWidget() {
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>
                         )}
-                        <CardTitle className="text-base flex items-center gap-2">
-                            {activeChat ? (
-                                <>
-                                 <Users className="h-4 w-4" /> {activeChat.chatPartnerName}
-                                </>
-                            ) : (
-                                "Conversations"
-                            )}
-                        </CardTitle>
+                        <div className="flex-grow">
+                            <CardTitle className="text-base flex items-center gap-2">
+                                <Users className="h-4 w-4" /> 
+                                {title}
+                                {linkHref && (
+                                    <Link href={linkHref} target="_blank">
+                                        <ExternalLink className="h-3 w-3 text-muted-foreground hover:text-primary" />
+                                    </Link>
+                                )}
+                            </CardTitle>
+                            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+                        </div>
                     </div>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsOpen(false)}>
                         <X className="h-4 w-4" />
@@ -155,4 +177,3 @@ export function GlobalChatWidget() {
         </div>
     );
 }
-
