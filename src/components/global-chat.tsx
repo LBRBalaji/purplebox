@@ -25,7 +25,9 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
         );
 
         return allUserLeads.flatMap(lead => 
-            lead.providers.map(provider => {
+            lead.providers
+              .filter(provider => provider.properties && provider.properties.length > 0) // Defensive check
+              .map(provider => {
                 const listing = listings.find(l => l.listingId === provider.properties[0]?.listingId);
                 const customer = users[lead.customerId];
                 const developer = users[provider.providerEmail];
@@ -153,3 +155,4 @@ export function GlobalChatWidget() {
         </div>
     );
 }
+
