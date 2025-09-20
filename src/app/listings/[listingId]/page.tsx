@@ -42,6 +42,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import type { RegisteredLead } from '@/contexts/data-context';
 
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -202,7 +203,7 @@ export default function ListingDetailPage() {
     const router = useRouter();
     const { user, users, isLoading: isAuthLoading } = useAuth();
     const { toast } = useToast();
-    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest } = useData();
+    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest, addRegisteredLead } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
@@ -263,15 +264,33 @@ export default function ListingDetailPage() {
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
 
     const handleGetQuote = () => {
+        if (!user) {
+            setIsLoginDialogOpen(true);
+            return;
+        }
         if (!listing) return;
-        
-        const developer = users[listing.developerId];
-        const isPremium = developer?.plan === 'Paid_Premium';
-        const phoneNumber = isPremium ? developer.phone : '919841098170';
-        const message = `Hi, I am interested in getting a quote for Property ID: ${listing.warehouseBoxId || listing.listingId}. Please connect with me.`;
-        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        
-        window.open(whatsappUrl, '_blank');
+
+        const newLead: Omit<RegisteredLead, 'registeredAt'> = {
+            id: `LDR-QUOTE-${Date.now()}`,
+            customerId: user.email,
+            leadName: user.companyName,
+            leadContact: user.userName,
+            leadEmail: user.email,
+            leadPhone: user.phone,
+            requirementsSummary: `Quote requested for Property ID: ${listing.warehouseBoxId || listing.listingId}`,
+            registeredBy: user.email,
+            providers: [{
+                providerEmail: listing.developerId,
+                properties: [{ listingId: listing.listingId, status: 'Pending' }]
+            }],
+            isO2OCollaborator: true, // Mark as a direct inquiry
+        };
+
+        addRegisteredLead(newLead, user.email);
+        toast({
+            title: 'Quote Request Sent!',
+            description: `The developer has been notified of your interest in "${listing.warehouseBoxId || listing.listingId}".`,
+        });
     };
 
     if (isLoading || !listing) {
@@ -607,7 +626,7 @@ export default function ListingDetailPage() {
                                 <CardFooter className="flex flex-col gap-2">
                                      {listing.rentPerSqFt === 'Get Quote' && (
                                         <Button onClick={handleGetQuote} className="w-full">
-                                            <WhatsAppIcon className="mr-2 h-4 w-4"/> Get Quote
+                                            Get Commercials Quote
                                         </Button>
                                      )}
                                     <Button
@@ -667,4 +686,4 @@ export default function ListingDetailPage() {
         </>
     );
 
-    
+}
