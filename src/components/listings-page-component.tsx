@@ -148,7 +148,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
               )}
             </Carousel>
              {listing.plan === 'Paid_Premium' && (
-                <Badge className="absolute top-2 right-2 bg-primary/80 backdrop-blur-sm text-primary-foreground shadow-lg border-primary/50">
+                <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground">
                     <Sparkles className="mr-1.5 h-3 w-3"/>
                     Premium Listing
                 </Badge>

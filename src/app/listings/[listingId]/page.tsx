@@ -443,8 +443,8 @@ export default function ListingDetailPage() {
                         <div>
                             <div className="flex items-center gap-4 mb-2">
                                 <Badge variant="secondary">{listing.listingId}</Badge>
-                                {listing.plan === 'Paid_Premium' && (
-                                    <Badge className="bg-primary/80 backdrop-blur-sm text-primary-foreground shadow-lg border-primary/50">
+                                {isPremiumListing && (
+                                    <Badge className="bg-accent text-accent-foreground">
                                         <Sparkles className="mr-1.5 h-3 w-3"/>
                                         Premium Listing
                                     </Badge>
@@ -687,7 +687,7 @@ export default function ListingDetailPage() {
                                             <Sparkles className="h-4 w-4" />
                                             <AlertTitle>Engage Directly!</AlertTitle>
                                             <AlertDescription className="text-xs">
-                                                Look for the <Badge className="bg-primary text-primary-foreground">Premium</Badge> badge on listings to connect directly with providers.
+                                                Look for the <Badge className="bg-accent text-accent-foreground">Premium</Badge> badge on listings to connect directly with providers.
                                             </AlertDescription>
                                             <Button size="sm" className="w-full mt-4" onClick={handleLogDemandClick}>Available on Broking Model - Connect with O2O</Button>
                                         </Alert>
