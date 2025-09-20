@@ -327,7 +327,7 @@ export const createPropertySchema = (demand?: DemandSchema) => {
     return schema;
 };
 
-export type PropertySchema = z.infer<typeof createPropertySchema>;
+export type PropertySchema = z.infer<ReturnType<typeof createPropertySchema>>;
 
 const historyEntrySchema = z.object({
   previousValue: z.string().optional().default(''),
@@ -345,6 +345,7 @@ const negotiableValueSchema = z.object({
 const negotiableFieldSchema = z.object({
     id: z.string(),
     label: z.string().default(''),
+    isLabelEditable: z.boolean().optional(),
     agreedTerms: negotiableValueSchema,
     proposedBy: negotiableValueSchema,
     status: negotiableValueSchema,

@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown, AlertTriangle, History, Info } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown, AlertTriangle, History, Info, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, TableFooter } from './ui/table';
 import { Textarea } from './ui/textarea';
@@ -47,11 +47,20 @@ const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; contr
     const { getValues, setValue, watch } = form;
     const { user } = useAuth();
     
+    const [focusedFieldValue, setFocusedFieldValue] = React.useState<{field: string, value: string} | null>(null);
+    const [editingLabel, setEditingLabel] = React.useState(false);
+    
     const fieldLabel = watch(`${fieldName}.label`);
-    const isLabelEditable = !fieldLabel;
+    const isLabelEditable = watch(`${fieldName}.isLabelEditable`);
 
-    const handleFieldChange = (field: 'agreedTerms' | 'status' | 'proposedBy', newValue: string, oldValue: string) => {
-        if(oldValue !== newValue) {
+    const handleFieldChange = (field: 'agreedTerms' | 'proposedBy' | 'status', newValue: string) => {
+        if (!focusedFieldValue || focusedFieldValue.field !== field || focusedFieldValue.value === newValue) {
+            return;
+        }
+
+        const oldValue = focusedFieldValue.value;
+
+        if (oldValue !== newValue) {
             const fieldPath = `${fieldName}.${field}`;
             const historyPath = `${fieldPath}.history`;
             const currentHistory = getValues(historyPath) || [];
@@ -66,9 +75,9 @@ const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; contr
     };
     
     const fullHistory = [
-        ...(watch(`${fieldName}.agreedTerms.history`) || []),
-        ...(watch(`${fieldName}.proposedBy.history`) || []),
-        ...(watch(`${fieldName}.status.history`) || []),
+        ...(watch(`${fieldName}.agreedTerms.history`) || []).map(h => ({...h, field: 'Agreed Terms'})),
+        ...(watch(`${fieldName}.proposedBy.history`) || []).map(h => ({...h, field: 'Proposed By'})),
+        ...(watch(`${fieldName}.status.history`) || []).map(h => ({...h, field: 'Status'})),
     ].sort((a,b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime());
 
     const hasHistory = fullHistory.length > 0;
@@ -90,27 +99,30 @@ const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; contr
                         </Tooltip>
                     </TooltipProvider>
                 )}
-                {isLabelEditable ? (
+                {editingLabel ? (
                      <FormField control={control} name={`${fieldName}.label`} render={({ field }) => (
-                         <Input placeholder="New Field Name" {...field} value={field.value ?? ''} className="h-9" disabled={disabled}/>
+                         <Input autoFocus placeholder="New Field Name" {...field} value={field.value ?? ''} className="h-9" disabled={disabled} onBlur={() => setEditingLabel(false)}/>
                      )} />
                 ) : (
                     <FormLabel>{fieldLabel}</FormLabel>
                 )}
+                {isLabelEditable && !editingLabel && !disabled && (
+                    <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => setEditingLabel(true)}><Edit className="h-3 w-3"/></Button>
+                )}
             </div>
             <div className="col-span-12 md:col-span-3">
                 <FormField control={control} name={`${fieldName}.agreedTerms.current`} render={({ field }) => (
-                    <FormItem><FormControl><Input placeholder="Agreed terms..." {...field} value={field.value ?? ''} className="h-10 p-2" disabled={disabled} onBlur={(e) => handleFieldChange('agreedTerms', e.target.value, field.value ?? '')} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormControl><Input placeholder="Agreed terms..." {...field} value={field.value ?? ''} className="h-10 p-2" disabled={disabled} onFocus={() => setFocusedFieldValue({field: 'agreedTerms', value: field.value})} onBlur={() => handleFieldChange('agreedTerms', field.value)} /></FormControl><FormMessage /></FormItem>
                 )} />
             </div>
              <div className="col-span-6 md:col-span-2">
                  <FormField control={control} name={`${fieldName}.proposedBy.current`} render={({ field }) => (
-                    <FormItem><Select onValueChange={(val) => { handleFieldChange('proposedBy', val, field.value); field.onChange(val); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                    <FormItem><Select onValueChange={(val) => { setFocusedFieldValue({field: 'proposedBy', value: field.value}); field.onChange(val); handleFieldChange('proposedBy', val); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
              <div className="col-span-6 md:col-span-3">
                  <FormField control={control} name={`${fieldName}.status.current`} render={({ field }) => (
-                    <FormItem><Select onValueChange={(val) => { handleFieldChange('status', val, field.value); field.onChange(val); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                    <FormItem><Select onValueChange={(val) => { setFocusedFieldValue({field: 'status', value: field.value}); field.onChange(val); handleFieldChange('status', val); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
              <div className="col-span-12 md:col-span-1 flex items-center justify-end">
@@ -126,7 +138,8 @@ const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; contr
                                 <div className="space-y-3">
                                 {fullHistory.map((entry, i) => (
                                     <div key={i} className="text-xs p-2 rounded-md bg-secondary/50">
-                                        <p>Value changed from <strong className="text-destructive">"{entry.previousValue || 'empty'}"</strong> to <strong className="text-primary">"{entry.newValue || 'empty'}"</strong></p>
+                                        <p className="font-semibold">{entry.field} changed:</p>
+                                        <p>from <strong className="text-destructive">"{entry.previousValue || 'empty'}"</strong> to <strong className="text-primary">"{entry.newValue || 'empty'}"</strong></p>
                                         <p className="text-muted-foreground">{entry.changedBy} on {new Date(entry.changedAt).toLocaleString()}</p>
                                     </div>
                                     ))}
@@ -195,7 +208,8 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
         const sections = getValues(`${sessionPath}.sections`);
         const newField = {
             id: `field-${Date.now()}`,
-            label: '', // Start with an empty label to make it editable
+            label: '',
+            isLabelEditable: true,
             agreedTerms: { current: '', history: [] },
             proposedBy: { current: 'Customer', history: [] },
             status: { current: 'Reserved For Discussion', history: [] },
