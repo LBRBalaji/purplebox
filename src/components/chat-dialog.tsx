@@ -60,7 +60,7 @@ export function ChatPanel({
   const threadId = submission ? `${submission.demandId}-${submission.listingId}` : null;
   const otherUserTyping = threadId ? typingStatus[threadId] : null;
   
-  const fetchMessages = React.useCallback(async () => {
+  const fetchMessages = useCallback(async () => {
     if (!threadId) return;
     try {
       const response = await fetch('/api/chat-messages');
@@ -68,19 +68,16 @@ export function ChatPanel({
       const threadMessages = allMessages[threadId] || [];
       
       setMessages(currentMessages => {
-          if(threadMessages.length > currentMessages.length) {
-              const lastMessage = threadMessages[threadMessages.length - 1];
-              if (user && lastMessage.senderEmail !== user.email) {
-                  // Notification logic can be re-added here if needed
-              }
+          if(JSON.stringify(threadMessages) !== JSON.stringify(currentMessages)) {
+              return threadMessages;
           }
-          return threadMessages;
+          return currentMessages;
       });
 
     } catch (error) {
       console.error("Failed to fetch chat messages:", error);
     }
-  }, [threadId, user]);
+  }, [threadId]);
 
   React.useEffect(() => {
     if (threadId) {
@@ -161,6 +158,7 @@ export function ChatPanel({
             fileType: file.type
           }
         };
+        setMessages(prev => [...prev, message]);
         await addChatMessage(threadId, message);
       } else {
         toast({ variant: 'destructive', title: 'Upload Failed', description: 'Could not upload the file.' });
@@ -251,7 +249,7 @@ export function ChatPanel({
                         )}
                         <div
                             className={cn(
-                            'rounded-lg p-3 max-w-xs md:max-w-sm',
+                            'rounded-lg p-3 max-w-[80%]',
                             isUser
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-muted'
