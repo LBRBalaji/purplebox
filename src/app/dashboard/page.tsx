@@ -41,6 +41,16 @@ const MainDashboard = () => {
     const isCustomer = user?.role === 'User';
     const isAgent = user?.role === 'Agent';
 
+    // Set the initial default tab based on the user's role.
+    const getInitialTabForRole = () => {
+        if (isProvider) return 'registered-leads';
+        if (isCustomer) return 'my-transactions';
+        if (isO2OManager) return 'approval-queue';
+        if (isSuperAdmin) return 'all-listings';
+        if (isAgent) return 'transactions';
+        return ''; // Default fallback
+    };
+    
     const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'registered-leads');
     const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-transactions');
     const [adminTab, setAdminTab] = React.useState(defaultTabParam || 'approval-queue');
@@ -63,12 +73,16 @@ const MainDashboard = () => {
         setProviderTab('submit-match');
         setAdminTab('submit-match'); // For O2O manager if they use it
       } else if (defaultTabParam) {
-        // Handle general tab switching from notifications
+        // Handle general tab switching from notifications or direct links
         if (isProvider) setProviderTab(defaultTabParam);
         if (isCustomer) setCustomerTab(defaultTabParam);
         if (isO2OManager) setAdminTab(defaultTabParam);
         if (isSuperAdmin) setSuperAdminTab(defaultTabParam);
         if (isAgent) setAgentTab(defaultTabParam);
+      } else {
+        // If no URL params are present, ensure the correct default is set on initial load
+        if (isProvider) setProviderTab('registered-leads');
+        if (isCustomer) setCustomerTab('my-transactions');
       }
     }, [logNewDemand, editDemandId, propertyMatchDemandId, defaultTabParam, isProvider, isCustomer, isO2OManager, isSuperAdmin, isAgent]);
 
