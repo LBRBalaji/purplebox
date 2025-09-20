@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from './ui/tooltip';
+import { ScrollArea } from './ui/scroll-area';
 
 const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; title: string, description?: string }) => {
     const Icon = icon;
@@ -463,3 +464,5 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
         </div>
     );
 }
+
+    
