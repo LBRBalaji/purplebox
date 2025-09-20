@@ -114,11 +114,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   React.useEffect(() => {
     if (isOpen) {
       const defaultValues = isEditMode && listing ? 
-            {...listing, documents: listing.documents || []} : 
+            {...listing, plan: listing.plan || 'Free', documents: listing.documents || []} : 
             {
               status: 'pending' as const,
               developerId: user?.email || '',
               listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+              plan: 'Free' as const,
               warehouseBoxId: '',
               actualSizeSqFt: undefined,
               additionalInformation: '',
@@ -310,13 +311,21 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                   {/* Developer Private Information */}
                   <div className="space-y-4">
                     <FormLabel className="text-lg font-semibold">Developer Private Information</FormLabel>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-md bg-secondary/30">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 border rounded-md bg-secondary/30">
                         <FormField control={form.control} name="warehouseBoxId" render={({ field }) => (
                             <FormItem><FormLabel>Warehouse Box ID (Your Internal ID)</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Project-A/Block-3/Unit-5" /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="actualSizeSqFt" render={({ field }) => (
                             <FormItem><FormLabel>Actual Box Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="Enter the exact internal size" /></FormControl><FormMessage /></FormItem>
                         )} />
+                        {(user?.role === 'Warehouse Developer' || isAdmin) && (
+                            <FormField control={form.control} name="plan" render={({ field }) => (
+                                <FormItem><FormLabel>Subscription Plan</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+                                    <SelectItem value="Free">Free</SelectItem>
+                                    <SelectItem value="Paid_Premium">Paid Premium</SelectItem>
+                                </SelectContent></Select><FormMessage /></FormItem>
+                            )} />
+                        )}
                     </div>
                   </div>
 
@@ -356,7 +365,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                         <FormField control={form.control} name="constructionProgress" render={({ field }) => (
                             <FormItem><FormLabel>Construction Progress</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g., 80% or 'Structure Complete'" /></FormControl><FormMessage /></FormItem>
                         )} />
-                        <FormField control={form.control} name="rentPerSft" render={({ field }) => (
+                        <FormField control={form.control} name="rentPerSqFt" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Rent per Sq. Ft.</FormLabel>
                                 <FormControl>
