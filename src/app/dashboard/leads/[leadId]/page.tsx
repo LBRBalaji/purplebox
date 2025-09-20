@@ -545,6 +545,5 @@ export default function LeadDetailPage() {
           )}
         </div>
       </main>
-    </>
   );
 }
