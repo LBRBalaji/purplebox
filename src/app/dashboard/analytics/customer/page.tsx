@@ -111,13 +111,15 @@ export default function CustomerAnalyticsPage() {
         const isUserSelected = selectedUserId && selectedUserId !== 'all';
         const selectedUser = users[selectedUserId];
         const selectedUserEmail = selectedUser?.email;
+        const selectedUserName = selectedUser?.userName;
 
-        const userFilter = (item: { customerId?: string, userEmail?: string, userId?: string, userName?: string }) => {
+        const userFilter = (item: { customerId?: string; userEmail?: string; userId?: string; userName?: string }) => {
             if (!isUserSelected || !selectedUserEmail) return true;
+            // Match by email OR by username if available
             return item.customerId === selectedUserEmail || 
                    item.userEmail === selectedUserEmail || 
                    item.userId === selectedUserEmail ||
-                   (item.userName && selectedUser && item.userName === selectedUser.userName);
+                   (selectedUserName && item.userName === selectedUserName);
         };
         
         const leadUserFilter = (leadId: string) => {
@@ -135,8 +137,8 @@ export default function CustomerAnalyticsPage() {
         const relevantLeadsSet = new Set(relevantLeads);
 
         const relevantDemands = demands.filter(d => userFilter({ customerId: d.userEmail }) && d.createdAt && dateFilter(d.createdAt));
-        const relevantViews = viewHistory.filter(v => userFilter({ userId: v.userId }) && dateFilter(v.timestamp));
-        const relevantDownloads = downloadHistory.filter(d => userFilter({userId: d.userId}) && dateFilter(d.timestamp));
+        const relevantViews = viewHistory.filter(v => userFilter({ userId: v.userId, userName: v.companyName }) && dateFilter(v.timestamp));
+        const relevantDownloads = downloadHistory.filter(d => userFilter({userId: d.userId, userName: d.companyName}) && dateFilter(d.timestamp));
         const relevantQuoteRequests = registeredLeads.filter(l => userFilter({ customerId: l.customerId }) && dateFilter(l.registeredAt));
         const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userName: r.userName}) && dateFilter(r.requestedAt)); 
         const relevantShortlists = isUserSelected ? generalShortlist.length : 0; 
