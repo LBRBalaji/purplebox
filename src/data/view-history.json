@@ -88,5 +88,11 @@
     "companyName": "XYZ Logistics",
     "listingId": "LST-3RV9B9",
     "timestamp": 1758348788491
+  },
+  {
+    "userId": "customer1@o2o.com",
+    "companyName": "Alpha Logistics",
+    "listingId": "LST-KEN0P1",
+    "timestamp": 1758351151211
   }
 ]

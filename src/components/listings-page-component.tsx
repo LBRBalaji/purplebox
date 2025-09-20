@@ -345,6 +345,7 @@ export function ListingsPage() {
   const [locationFilter, setLocationFilter] = useState('');
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
+  const [showOnlyPremium, setShowOnlyPremium] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
@@ -405,6 +406,11 @@ const searchPlaceholders = [
 
  useEffect(() => {
     let results = approvedListings;
+
+    // Premium filter
+    if (showOnlyPremium) {
+        results = results.filter(l => l.plan === 'Paid_Premium');
+    }
 
     // Keyword search
     if (searchTerm) {
@@ -470,13 +476,14 @@ const searchPlaceholders = [
     } catch (e) {
         console.error("Could not write to sessionStorage", e);
     }
-  }, [searchTerm, locationFilter, availability, sizeRange, approvedListings, locationCircles]);
+  }, [searchTerm, locationFilter, availability, sizeRange, approvedListings, locationCircles, showOnlyPremium]);
 
 
   const resetFilters = () => {
     setSearchTerm('');
     setLocationFilter('');
     setAvailability('all');
+    setShowOnlyPremium(false);
     
     const maxArea = Math.max(...approvedListings.map(w => w.sizeSqFt), 0);
     if (maxArea > 0) {
@@ -691,33 +698,59 @@ const searchPlaceholders = [
                             onChange={(e) => setLocationFilter(e.target.value)}
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="availability">Possession Readiness</Label>
-                        <Select value={availability} onValueChange={setAvailability}>
-                            <SelectTrigger>
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All</SelectItem>
-                                <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
-                                <SelectItem value="Under Construction">Under Construction</SelectItem>
-                                <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
-                                <SelectItem value="BTS-Built To Suit">BTS-Built To Suit</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="lg:col-span-3 space-y-2">
-                         <label className="text-sm font-medium">Size (sq. ft.) - from {sizeRange[0].toLocaleString()} to {sizeRange[1].toLocaleString()}</label>
-                         <Slider
-                            min={0}
-                            max={maxSliderSize}
-                            step={10000}
-                            value={sizeRange}
-                            onValueChange={(value) => setSizeRange(value as [number, number])}
-                        />
-                    </div>
-                    <div>
-                         <Button onClick={resetFilters} variant="ghost" className="w-full">Reset Filters</Button>
+                     <div className="flex gap-2 items-end">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                            <Button variant="outline" className="w-full justify-start text-left font-normal">
+                                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                                <span>More Filters</span>
+                            </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80" align="start">
+                                <div className="grid gap-4">
+                                    <div className="space-y-2">
+                                    <h4 className="font-medium leading-none">Advanced Filters</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        Refine your search further.
+                                    </p>
+                                    </div>
+                                    <div className="grid gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="availability">Possession Readiness</Label>
+                                            <Select value={availability} onValueChange={setAvailability}>
+                                                <SelectTrigger id="availability"><SelectValue /></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">All</SelectItem>
+                                                    <SelectItem value="Ready for Occupancy">Ready for Occupancy</SelectItem>
+                                                    <SelectItem value="Under Construction">Under Construction</SelectItem>
+                                                    <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
+                                                    <SelectItem value="BTS-Built To Suit">BTS-Built To Suit</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Size (sq. ft.)</Label>
+                                            <Slider
+                                                min={0}
+                                                max={maxSliderSize}
+                                                step={10000}
+                                                value={sizeRange}
+                                                onValueChange={(value) => setSizeRange(value as [number, number])}
+                                            />
+                                            <div className="flex justify-between text-xs text-muted-foreground">
+                                                <span>{sizeRange[0].toLocaleString()}</span>
+                                                <span>{sizeRange[1].toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox id="premium-filter" checked={showOnlyPremium} onCheckedChange={(checked) => setShowOnlyPremium(!!checked)} />
+                                            <label htmlFor="premium-filter" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Show Premium Listings Only</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                        <Button onClick={resetFilters} variant="ghost" className="w-full">Reset</Button>
                     </div>
                 </div>
             </div>
@@ -734,3 +767,4 @@ const searchPlaceholders = [
     </>
   );
 }
+
