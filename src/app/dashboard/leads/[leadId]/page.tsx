@@ -268,7 +268,9 @@ export default function LeadDetailPage() {
   
   const customer = lead ? users[lead.customerId] : null;
   const providerUser = selectedProvider ? users[selectedProvider.providerEmail] : null;
-  const isPremiumProvider = providerUser?.plan === 'Paid_Premium';
+
+  const primaryListingForTransaction = selectedProviderListings.length > 0 ? selectedProviderListings[0] : null;
+  const isPremiumListing = primaryListingForTransaction?.plan === 'Paid_Premium';
 
   const isCustomer = user?.email === lead?.customerId;
   
@@ -280,7 +282,7 @@ export default function LeadDetailPage() {
 
     // Determine the chat partner based on the plan
     let chatPartnerName = "O2O Team";
-    if (isPremiumProvider) {
+    if (isPremiumListing) {
         if (isCustomer) {
             chatPartnerName = providerUser?.companyName || "Developer";
         } else {
@@ -321,7 +323,7 @@ export default function LeadDetailPage() {
   const isProvider = user?.email === providerUser?.email;
   const isAgent = user?.email === lead.agentId;
   
-  const canAddActivity = isO2O || isAgent || (isPremiumProvider && (isCustomer || isProvider));
+  const canAddActivity = isO2O || isAgent || (isPremiumListing && (isCustomer || isProvider));
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
   
   return (
@@ -428,7 +430,7 @@ export default function LeadDetailPage() {
                                   </div>
                                   <Button variant="outline" className="w-full mt-4" onClick={handleChatInit}>
                                       <MessageSquare className="mr-2 h-4 w-4" />
-                                      Chat with {isPremiumProvider ? (isCustomer ? (providerUser?.companyName || 'Developer') : (customer?.companyName || 'Customer')) : 'O2O Team'}
+                                      Chat with {isPremiumListing ? (isCustomer ? (providerUser?.companyName || 'Developer') : (customer?.companyName || 'Customer')) : 'O2O Team'}
                                   </Button>
                                 </CardContent>
                              </Card>
@@ -484,7 +486,7 @@ export default function LeadDetailPage() {
                                                               <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
                                                           </Button>
                                                       </div>
-                                                       {isProvider && isPremiumProvider && (
+                                                       {isProvider && isPremiumListing && (
                                                           <ProposalForm 
                                                               listing={listing} 
                                                               lead={lead} 

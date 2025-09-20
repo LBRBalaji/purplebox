@@ -429,12 +429,11 @@ export default function ListingDetailPage() {
             });
             return;
         }
-        toggleGeneralShortlist(listing.listingId);
+        toggleGeneralShortlist(listing.id);
     };
-
-    const developer = users[listing.developerId];
-    const isPremiumDeveloper = developer?.plan === 'Paid_Premium';
-    const showQuoteButton = isPremiumDeveloper || listing.rentPerSqFt === 'Get Quote';
+    
+    const isPremiumListing = listing.plan === 'Paid_Premium';
+    const showQuoteButton = isPremiumListing || listing.rentPerSqFt === 'Get Quote';
 
     return (
         <>
@@ -641,7 +640,7 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-center text-center">
-                                            {listing.rentPerSqFt === 'Get Quote' || isPremiumDeveloper ? (
+                                            {listing.rentPerSqFt === 'Get Quote' || isPremiumListing ? (
                                                 <span className="text-2xl font-bold">Price on Request</span>
                                             ) : (
                                                 <>
