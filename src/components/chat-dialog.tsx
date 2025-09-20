@@ -161,7 +161,7 @@ export function ChatPanel({
             fileType: file.type
           }
         };
-        addChatMessage(threadId, message);
+        await addChatMessage(threadId, message);
       } else {
         toast({ variant: 'destructive', title: 'Upload Failed', description: 'Could not upload the file.' });
       }
@@ -224,107 +224,105 @@ export function ChatPanel({
   const initialMessage = getInitialMessage();
 
   return (
-    <>
-        <div className="h-96 flex flex-col p-0">
-            <ScrollArea className="flex-grow pr-4" scrollableViewportRef={scrollViewportRef}>
-                <div className="space-y-4 p-4">
-                    {initialMessage && messages.length === 0 && (
-                        <div className="text-center text-sm text-muted-foreground py-10 px-4 border border-dashed rounded-lg">
-                            {initialMessage}
-                        </div>
-                    )}
-                    {messages.map((message, index) => {
-                    const isUser = message.senderEmail === user?.email;
-                    const senderInitial = message.senderName ? message.senderName[0].toUpperCase() : '?';
+    <div className="h-96 flex flex-col p-0">
+        <ScrollArea className="flex-grow" scrollableViewportRef={scrollViewportRef}>
+            <div className="space-y-4 p-4 pr-6">
+                {initialMessage && messages.length === 0 && (
+                    <div className="text-center text-sm text-muted-foreground py-10 px-4 border border-dashed rounded-lg">
+                        {initialMessage}
+                    </div>
+                )}
+                {messages.map((message, index) => {
+                const isUser = message.senderEmail === user?.email;
+                const senderInitial = message.senderName ? message.senderName[0].toUpperCase() : '?';
 
-                    return (
+                return (
+                    <div
+                        key={index}
+                        className={cn(
+                        'flex items-end gap-2',
+                        isUser ? 'justify-end' : 'justify-start'
+                        )}
+                    >
+                        {!isUser && (
+                            <Avatar className="h-8 w-8">
+                                <AvatarFallback>{senderInitial}</AvatarFallback>
+                            </Avatar>
+                        )}
                         <div
-                            key={index}
                             className={cn(
-                            'flex items-end gap-2',
-                            isUser ? 'justify-end' : 'justify-start'
+                            'rounded-lg p-3 max-w-xs md:max-w-sm',
+                            isUser
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted'
                             )}
                         >
-                            {!isUser && (
-                                <Avatar className="h-8 w-8">
-                                    <AvatarFallback>{senderInitial}</AvatarFallback>
-                                </Avatar>
+                            {message.text && <p className="text-sm whitespace-pre-wrap">{linkify(message.text)}</p>}
+                            {message.attachment && (
+                                <a href={message.attachment.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mt-2 p-2 rounded-md bg-black/10 hover:bg-black/20">
+                                    <FileIcon className="h-5 w-5 shrink-0" />
+                                    <span className="text-sm truncate">{message.attachment.fileName}</span>
+                                    <ExternalLink className="h-4 w-4 shrink-0 ml-auto" />
+                                </a>
                             )}
-                            <div
-                                className={cn(
-                                'rounded-lg p-3 max-w-xs md:max-w-sm',
-                                isUser
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
-                                )}
-                            >
-                                {message.text && <p className="text-sm whitespace-pre-wrap">{linkify(message.text)}</p>}
-                                {message.attachment && (
-                                    <a href={message.attachment.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mt-2 p-2 rounded-md bg-black/10 hover:bg-black/20">
-                                        <FileIcon className="h-5 w-5 shrink-0" />
-                                        <span className="text-sm truncate">{message.attachment.fileName}</span>
-                                        <ExternalLink className="h-4 w-4 shrink-0 ml-auto" />
-                                    </a>
-                                )}
-                                <p className="text-xs opacity-70 mt-1 text-right">
-                                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                            </div>
-                            {isUser && (
-                                <Avatar className="h-8 w-8">
-                                    <AvatarFallback>{senderInitial}</AvatarFallback>
-                                </Avatar>
-                            )}
+                            <p className="text-xs opacity-70 mt-1 text-right">
+                            {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
                         </div>
-                    )
-                    })}
-                </div>
-            </ScrollArea>
-            <div className="h-6 pt-2 text-xs text-muted-foreground px-4">
-            {otherUserTyping && otherUserTyping.isTyping && otherUserTyping.userEmail !== user?.email && (
-                <div className="animate-pulse flex items-center gap-2">
-                <Avatar className="h-5 w-5">
-                    <AvatarFallback className="text-xs">{otherUserTyping.userName?.[0]}</AvatarFallback>
-                </Avatar>
-                <span>{otherUserTyping.userName} is typing...</span>
-                </div>
-            )}
+                        {isUser && (
+                            <Avatar className="h-8 w-8">
+                                <AvatarFallback>{senderInitial}</AvatarFallback>
+                            </Avatar>
+                        )}
+                    </div>
+                )
+                })}
             </div>
-            <div className="pt-2 px-4 pb-4">
-            {uploadProgress !== null && <Progress value={uploadProgress} className="mb-2 h-1" />}
-            <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    className="hidden"
-                />
-                <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isSending}>
-                    <Paperclip className="h-5 w-5"/>
-                    <span className="sr-only">Attach file</span>
-                </Button>
-                <Textarea
-                placeholder="Type your message..."
-                value={newMessage}
-                onChange={(e) => {
-                    setNewMessage(e.target.value);
-                    handleTyping();
-                }}
-                className="min-h-0 h-12 resize-none"
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage(e);
-                    }
-                }}
-                />
-                <Button type="submit" size="icon" disabled={!newMessage.trim() || isSending}>
-                <Send className="h-4 w-4" />
-                <span className="sr-only">Send</span>
-                </Button>
-            </form>
+        </ScrollArea>
+        <div className="h-6 pt-2 text-xs text-muted-foreground px-4">
+        {otherUserTyping && otherUserTyping.isTyping && otherUserTyping.userEmail !== user?.email && (
+            <div className="animate-pulse flex items-center gap-2">
+            <Avatar className="h-5 w-5">
+                <AvatarFallback className="text-xs">{otherUserTyping.userName?.[0]}</AvatarFallback>
+            </Avatar>
+            <span>{otherUserTyping.userName} is typing...</span>
             </div>
+        )}
         </div>
-    </>
+        <div className="pt-2 px-4 pb-4">
+        {uploadProgress !== null && <Progress value={uploadProgress} className="mb-2 h-1" />}
+        <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                className="hidden"
+            />
+            <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isSending}>
+                <Paperclip className="h-5 w-5"/>
+                <span className="sr-only">Attach file</span>
+            </Button>
+            <Textarea
+            placeholder="Type your message..."
+            value={newMessage}
+            onChange={(e) => {
+                setNewMessage(e.target.value);
+                handleTyping();
+            }}
+            className="min-h-0 h-12 resize-none"
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage(e);
+                }
+            }}
+            />
+            <Button type="submit" size="icon" disabled={!newMessage.trim() || isSending}>
+            <Send className="h-4 w-4" />
+            <span className="sr-only">Send</span>
+            </Button>
+        </form>
+        </div>
+    </div>
   );
 }
