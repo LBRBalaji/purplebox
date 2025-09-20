@@ -42,6 +42,7 @@ const activityIcons: { [key in TransactionActivity['activityType']]: React.Eleme
 const ProposalFormSchema = z.object({
   rentPerSft: z.coerce.number().positive("Rent must be a positive number."),
   rentalSecurityDeposit: z.coerce.number().positive("Deposit must be positive."),
+  actualChargeableArea: z.coerce.number().positive("Area must be positive."),
 });
 type ProposalFormValues = z.infer<typeof ProposalFormSchema>;
 
@@ -101,6 +102,7 @@ function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingS
         defaultValues: {
             rentPerSft: listing.rentPerSqFt === 'Get Quote' ? undefined : Number(listing.rentPerSqFt),
             rentalSecurityDeposit: typeof listing.rentalSecurityDeposit === 'number' ? listing.rentalSecurityDeposit : undefined,
+            actualChargeableArea: listing.sizeSqFt,
         }
     });
 
@@ -110,6 +112,9 @@ function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingS
     const submittedRent = propertyInLead?.rentPerSft;
     // @ts-ignore
     const submittedDeposit = propertyInLead?.rentalSecurityDeposit;
+    // @ts-ignore
+    const submittedArea = propertyInLead?.actualChargeableArea;
+
 
     if (submittedRent !== undefined) {
         return (
@@ -119,6 +124,10 @@ function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingS
                     <div>
                         <p className="text-muted-foreground">Quoted Rent</p>
                         <p className="font-medium">₹{submittedRent}/sft</p>
+                    </div>
+                     <div>
+                        <p className="text-muted-foreground">Chargeable Area</p>
+                        <p className="font-medium">{submittedArea?.toLocaleString()} sft</p>
                     </div>
                     <div>
                         <p className="text-muted-foreground">Security Deposit</p>
@@ -132,6 +141,17 @@ function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingS
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit((values) => onSubmit(listing.listingId, values))} className="space-y-4">
+                 <FormField
+                    control={form.control}
+                    name="actualChargeableArea"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Actual Chargeable Area (SFT)</FormLabel>
+                            <FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
                 <FormField
                     control={form.control}
                     name="rentPerSft"
@@ -240,6 +260,8 @@ export default function LeadDetailPage() {
     updatedLead.providers[providerIndex].properties[propertyIndex].rentPerSft = values.rentPerSft;
     // @ts-ignore
     updatedLead.providers[providerIndex].properties[propertyIndex].rentalSecurityDeposit = values.rentalSecurityDeposit;
+    // @ts-ignore
+    updatedLead.providers[providerIndex].properties[propertyIndex].actualChargeableArea = values.actualChargeableArea;
     
     updateRegisteredLead(updatedLead);
     toast({ title: "Proposal Submitted", description: "The customer has been notified of your commercial proposal." });
@@ -423,6 +445,11 @@ export default function LeadDetailPage() {
                                                                             <p className="text-muted-foreground">Quoted Rent</p>
                                                                             {/* @ts-ignore */}
                                                                             <p className="font-medium">₹{property.rentPerSft}/sft</p>
+                                                                        </div>
+                                                                         <div>
+                                                                            <p className="text-muted-foreground">Chargeable Area</p>
+                                                                             {/* @ts-ignore */}
+                                                                            <p className="font-medium">{property.actualChargeableArea?.toLocaleString()} sft</p>
                                                                         </div>
                                                                         <div>
                                                                             <p className="text-muted-foreground">Security Deposit</p>
