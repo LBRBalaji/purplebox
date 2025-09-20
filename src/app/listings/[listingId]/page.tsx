@@ -534,7 +534,7 @@ export default function ListingDetailPage() {
                             {/* Documents */}
                              <Card>
                                 <CardHeader>
-                                    <CardTitle>Documents & Media</CardTitle>
+                                    <CardTitle>Documents &amp; Media</CardTitle>
                                     <CardDescription>
                                         {user ? "You have access to download media files." : "Log in to download layouts and other sensitive documents."}
                                     </CardDescription>
@@ -577,66 +577,47 @@ export default function ListingDetailPage() {
                                         <CardTitle>Commercials</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        {user ? (
-                                            <div className="space-y-4">
-                                                <div className="flex items-baseline justify-center text-center">
-                                                    <span className="text-4xl font-bold">₹{listing.rentPerSqFt || '??'}</span>
-                                                    <span className="text-sm text-muted-foreground">/sq.ft./month</span>
-                                                </div>
-                                                <Separator/>
-                                                <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
-                                                <DetailRow label="Construction Progress" value={listing.constructionProgress} />
+                                        <div className="space-y-4">
+                                            <div className="flex items-baseline justify-center text-center">
+                                                <span className="text-4xl font-bold">₹{listing.rentPerSqFt || '??'}</span>
+                                                <span className="text-sm text-muted-foreground">/sq.ft./month</span>
                                             </div>
-                                        ) : (
-                                            <Alert>
-                                                <Lock className="h-4 w-4" />
-                                                <AlertTitle>Login Required</AlertTitle>
-                                                <AlertDescription>
-                                                    Please log in or sign up to view detailed commercial terms and other sensitive data.
-                                                </AlertDescription>
-                                                <Button className="w-full mt-4" onClick={() => setIsLoginDialogOpen(true)}>Login</Button>
-                                            </Alert>
-                                        )}
+                                            <Separator/>
+                                            <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
+                                            <DetailRow label="Construction Progress" value={listing.constructionProgress} />
+                                        </div>
                                     </CardContent>
-                                    {user && (
-                                        <CardFooter className="flex flex-col gap-2">
-                                            <Button
-                                                variant={isShortlisted ? 'default' : 'outline'}
-                                                className="w-full"
-                                                onClick={handleShortlistClick}
-                                                disabled={isShortlistLoading}
-                                            >
-                                                <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
-                                                {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist'}
+                                    <CardFooter className="flex flex-col gap-2">
+                                        <Button
+                                            variant={isShortlisted ? 'default' : 'outline'}
+                                            className="w-full"
+                                            onClick={handleShortlistClick}
+                                            disabled={isShortlistLoading}
+                                        >
+                                            <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
+                                            {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist'}
+                                        </Button>
+                                        {user && user.role === 'User' && (
+                                            <Button className="w-full" onClick={handleDownloadRequest}>
+                                                <Download className="mr-2 h-4 w-4" /> Download Details as CSV
                                             </Button>
-                                            {user.role === 'User' && (
-                                                <Button className="w-full" onClick={handleDownloadRequest}>
-                                                    <Download className="mr-2 h-4 w-4" /> Download Details as CSV
-                                                </Button>
-                                            )}
-                                        </CardFooter>
-                                    )}
+                                        )}
+                                    </CardFooter>
                                 </Card>
 
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Certificates & Approvals</CardTitle>
+                                        <CardTitle>Certificates &amp; Approvals</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        {user ? (
-                                            <div className="space-y-1">
-                                                <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
-                                                <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
-                                                <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
-                                                <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
-                                                <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
-                                                <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
-                                            </div>
-                                        ) : (
-                                            <p className="text-sm text-muted-foreground text-center p-4">
-                                                Login to view compliance details.
-                                            </p>
-                                        )}
+                                        <div className="space-y-1">
+                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
+                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
+                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
+                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
+                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
+                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
+                                        </div>
                                     </CardContent>
                                 </Card>
 
