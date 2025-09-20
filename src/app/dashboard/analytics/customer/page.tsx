@@ -112,12 +112,12 @@ export default function CustomerAnalyticsPage() {
         const selectedUser = users[selectedUserId];
         const selectedUserEmail = selectedUser?.email;
 
-        // This is the corrected user filter
         const userFilter = (item: { customerId?: string, userEmail?: string, userId?: string, userName?: string }) => {
             if (!isUserSelected || !selectedUserEmail) return true;
             return item.customerId === selectedUserEmail || 
                    item.userEmail === selectedUserEmail || 
-                   item.userId === selectedUserEmail;
+                   item.userId === selectedUserEmail ||
+                   (item.userName && selectedUser && item.userName === selectedUser.userName);
         };
         
         const leadUserFilter = (leadId: string) => {
@@ -139,7 +139,7 @@ export default function CustomerAnalyticsPage() {
         const relevantDownloads = downloadHistory.filter(d => userFilter({userId: d.userId}) && dateFilter(d.timestamp));
         const relevantQuoteRequests = registeredLeads.filter(l => userFilter({ customerId: l.customerId }) && dateFilter(l.registeredAt));
         const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userName: r.userName}) && dateFilter(r.requestedAt)); 
-        const relevantShortlists = isUserSelected ? generalShortlist.length : 0; // Shortlist is only per user, not global
+        const relevantShortlists = isUserSelected ? generalShortlist.length : 0; 
         const relevantTenantImprovements = transactionActivities.filter(a => a.activityType === 'Tenant Improvements' && leadUserFilter(a.leadId) && dateFilter(a.createdAt));
         const relevantNegotiationUpdates = negotiationBoards.filter(n => relevantLeadsSet.has(n.leadId)).flatMap(n => n.sessions.filter(s => dateFilter(s.date))).length;
         

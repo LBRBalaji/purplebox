@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758360784201",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Schedule-B",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-R41ULG",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T09:33:04.203Z"
+  },
+  {
     "id": "LDR-QUOTE-1758360477894",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

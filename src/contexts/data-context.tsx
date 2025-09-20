@@ -164,7 +164,7 @@ type DataContextType = {
   updateListing: (listing: ListingSchema) => void;
   updateListingStatus: (listingId: string, status: ListingStatus, userEmail?: string) => void;
   listingAnalytics: ListingAnalytics[];
-  logListingView: (user: User, listingId: string) => void;
+  logListingView: (user: User | null, listingId: string) => void;
 
   demands: DemandSchema[];
   addDemand: (demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => void;
@@ -212,6 +212,7 @@ type DataContextType = {
   activeChatSubmission: ChatSubmission | null;
   openChat: (submission: ChatSubmission) => void;
   closeChat: () => void;
+  reassignAnonymousViews: (anonymousId: string, user: User) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -677,22 +678,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return { success: true, limitReached: false, message: "Download successful." };
   }, [downloadHistory, getCompanyDownloadCounts, toast, persistListingAnalytics, persistDownloadHistory]);
 
-  const logListingView = useCallback((user: User, listingId: string) => {
+  const logListingView = useCallback((user: User | null, listingId: string) => {
       const now = Date.now();
       const fiveMinutes = 5 * 60 * 1000;
+      const userId = user?.email || `anonymous_${sessionStorage.getItem('anonymousId')}`;
 
       const lastView = viewHistory
           .slice()
           .reverse()
-          .find(v => v.userId === user.email && v.listingId === listingId);
+          .find(v => v.userId === userId && v.listingId === listingId);
 
       if (lastView && (now - lastView.timestamp < fiveMinutes)) {
           return;
       }
 
       const newView: ViewRecord = {
-          userId: user.email,
-          companyName: user.companyName,
+          userId: userId,
+          companyName: user?.companyName || 'Anonymous',
           listingId: listingId,
           timestamp: now,
       };
@@ -716,9 +718,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
           
           analytic.viewedBy = analytic.viewedBy || [];
           analytic.viewedBy.push({
-              userId: user.email,
-              name: user.userName,
-              company: user.companyName,
+              userId: userId,
+              name: user?.userName || 'Anonymous',
+              company: user?.companyName || 'Anonymous',
               timestamp: now,
           });
 
@@ -727,6 +729,46 @@ export function DataProvider({ children }: { children: ReactNode }) {
       });
 
   }, [viewHistory, persistViewHistory, persistListingAnalytics]);
+
+  const reassignAnonymousViews = useCallback((anonymousId: string, user: User) => {
+    const anonymousUserId = `anonymous_${anonymousId}`;
+
+    setViewHistory(prev => {
+        const updatedHistory = prev.map(record => {
+            if (record.userId === anonymousUserId) {
+                return {
+                    ...record,
+                    userId: user.email,
+                    companyName: user.companyName,
+                };
+            }
+            return record;
+        });
+        persistViewHistory(updatedHistory);
+        return updatedHistory;
+    });
+
+    setListingAnalytics(prev => {
+        const updatedAnalytics = prev.map(analytic => {
+            if (analytic.viewedBy) {
+                analytic.viewedBy = analytic.viewedBy.map(viewer => {
+                    if (viewer.userId === anonymousUserId) {
+                        return {
+                            ...viewer,
+                            userId: user.email,
+                            name: user.userName,
+                            company: user.companyName,
+                        };
+                    }
+                    return viewer;
+                });
+            }
+            return analytic;
+        });
+        persistListingAnalytics(updatedAnalytics);
+        return updatedAnalytics;
+    });
+  }, [persistViewHistory, persistListingAnalytics]);
 
 
   const toggleSelectedForDownload = useCallback((listing: ListingSchema): { limitReached: boolean } => {
@@ -907,6 +949,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         activeChatSubmission,
         openChat,
         closeChat,
+        reassignAnonymousViews
         }}>
       {children}
     </DataContext.Provider>

@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
+import { useData } from './data-context';
 
 export type User = {
   email: string;
@@ -80,6 +81,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetchUsers();
     try {
+      let anonymousId = sessionStorage.getItem('anonymousId');
+      if (!anonymousId) {
+        anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        sessionStorage.setItem('anonymousId', anonymousId);
+      }
+
       const storedUser = sessionStorage.getItem('user');
       if (storedUser) {
         setUser(JSON.parse(storedUser));
@@ -173,6 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     sessionStorage.removeItem('user');
+    // We keep the anonymousId in case they log back in during the same session
     router.push('/');
   };
 

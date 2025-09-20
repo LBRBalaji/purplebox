@@ -206,6 +206,7 @@ export default function ListingDetailPage() {
     const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest, addRegisteredLead, registeredLeads } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
+    const [pendingAction, setPendingAction] = React.useState<(() => void) | null>(null);
     const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
     const [navigationList, setNavigationList] = React.useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = React.useState(-1);
@@ -220,16 +221,14 @@ export default function ListingDetailPage() {
         const foundListing = listings.find(l => l.listingId === listingId);
 
         if (!foundListing || foundListing.status !== 'approved') {
-            router.push('/listings');
+            if (!isDataLoading) router.push('/listings');
             return;
         }
 
         setListing(foundListing);
-        setJustRequestedQuote(false); // Reset on new page load
+        setJustRequestedQuote(false);
         
-        if (user) { // Only log view if a user is logged in
-             logListingView(user, listingId);
-        }
+        logListingView(user, listingId);
         
         try {
             const storedResultIds = sessionStorage.getItem('warehouse_search_results');
@@ -257,12 +256,8 @@ export default function ListingDetailPage() {
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
 
-    const handleGetQuote = (isBrokered = false) => {
-        if (!user) {
-            setIsLoginDialogOpen(true);
-            return;
-        }
-        if (!listing) return;
+    const executeQuoteRequest = (isBrokered = false) => {
+        if (!user || !listing) return;
 
         const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
 
@@ -279,11 +274,11 @@ export default function ListingDetailPage() {
                 providerEmail: providerEmail,
                 properties: [{ listingId: listing.listingId, status: 'Pending' }]
             }],
-            isO2OCollaborator: true, // Mark as a direct inquiry
+            isO2OCollaborator: true,
         };
 
         addRegisteredLead(newLead, user.email);
-        setJustRequestedQuote(true); // Update local state immediately
+        setJustRequestedQuote(true);
         
         const partnerName = isBrokered ? "the O2O team" : "the developer";
         
@@ -292,6 +287,24 @@ export default function ListingDetailPage() {
             description: `You have been connected with ${partnerName} for listing "${listing.warehouseBoxId || listing.listingId}". Your interaction begins on the 'My Transactions' page, where you can track all communications.`,
         });
     };
+
+    const handleGetQuote = (isBrokered = false) => {
+        const action = () => executeQuoteRequest(isBrokered);
+        if (!user) {
+            setPendingAction(() => action);
+            setIsLoginDialogOpen(true);
+        } else {
+            action();
+        }
+    };
+    
+    const handleLoginSuccess = () => {
+        setIsLoginDialogOpen(false);
+        if (pendingAction) {
+            pendingAction();
+            setPendingAction(null);
+        }
+    }
 
     const quoteRequestLead = React.useMemo(() => {
         if (!user || !listing) return null;
@@ -305,6 +318,7 @@ export default function ListingDetailPage() {
 
     const handleDownloadRequest = () => {
         if (!user) {
+            setPendingAction(() => handleDownloadRequest);
             setIsLoginDialogOpen(true);
             return;
         }
@@ -405,15 +419,18 @@ export default function ListingDetailPage() {
     const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
 
     const handleLayoutRequest = () => {
+        const action = () => setIsLayoutRequestOpen(true);
         if (!user) {
+            setPendingAction(() => action);
             setIsLoginDialogOpen(true);
             return;
         }
-        setIsLayoutRequestOpen(true);
+        action();
     };
 
     const handleShortlistClick = () => {
         if (!user) {
+            setPendingAction(() => () => toggleGeneralShortlist(listing.id));
             setIsLoginDialogOpen(true);
             return;
         }
@@ -728,11 +745,9 @@ export default function ListingDetailPage() {
                     </div>
                 </div>
             </main>
-            <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => setIsLoginDialogOpen(false)} />
+            <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={handleLoginSuccess} />
             {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name || `Warehouse in ${listing.location}`} onSubmit={addLayoutRequest} />}
         </>
     );
 
 }
-
-    

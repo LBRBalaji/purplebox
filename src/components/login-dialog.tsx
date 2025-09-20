@@ -23,13 +23,11 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, onLoginSuccess); // Pass the callback to the login function
-    onOpenChange(false);
+    login(email, onLoginSuccess); 
   };
   
   const handleTestUserLogin = (testEmail: string) => {
     login(testEmail, onLoginSuccess);
-    onOpenChange(false);
   }
 
   return (
