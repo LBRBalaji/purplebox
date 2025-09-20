@@ -600,7 +600,7 @@ export default function ListingDetailPage() {
                                             </div>
                                         )}
                                         <Separator/>
-                                        <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
+                                        <DetailRow label="Security Deposit" value={typeof listing.rentalSecurityDeposit === 'number' ? `${listing.rentalSecurityDeposit} months` : (listing.rentalSecurityDeposit || 'N/A')} />
                                         <DetailRow label="Construction Progress" value={listing.constructionProgress} />
                                     </div>
                                 </CardContent>
