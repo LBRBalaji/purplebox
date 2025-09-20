@@ -20,7 +20,8 @@ import { type DemandSchema, type ListingSchema } from '@/lib/schema';
 import { type Submission } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from './ui/button';
-import { ChatDialog } from './chat-dialog';
+import { Dialog, DialogContent } from './ui/dialog';
+import { ChatPanel } from './chat-dialog';
 
 
 type DemandWithMatches = DemandSchema & {
@@ -253,7 +254,11 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
           </Card>
         )}
       </div>
-      <ChatDialog submission={selectedChat} isOpen={!!selectedChat} onOpenChange={() => setSelectedChat(null)} />
+      <Dialog open={!!selectedChat} onOpenChange={() => setSelectedChat(null)}>
+        <DialogContent>
+            <ChatPanel submission={selectedChat as any} />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

@@ -9,7 +9,7 @@ import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase, FileSignature, DollarSign, Notebook, UserPlus, Users } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase, FileSignature, DollarSign, Notebook, UserPlus, Users, ChevronsUpDown } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -28,7 +28,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChatDialog } from '@/components/chat-dialog';
+import { ChatPanel, type ChatSubmission } from '@/components/chat-dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
   'Site Visit Request': CalendarIcon,
@@ -43,14 +45,6 @@ const ProposalFormSchema = z.object({
   actualChargeableArea: z.coerce.number().positive("Area must be positive."),
 });
 type ProposalFormValues = z.infer<typeof ProposalFormSchema>;
-
-
-type ChatSubmission = Submission & { 
-    listing?: ListingSchema,
-    chatPartnerName: string,
-    customerName: string,
-    customerCompany: string,
-};
 
 
 function LeadDetailPageSkeleton() {
@@ -196,7 +190,7 @@ export default function LeadDetailPage() {
   
   const [selectedProvider, setSelectedProvider] = React.useState<RegisteredLeadProvider | null>(null);
   const [selectedProviderListings, setSelectedProviderListings] = React.useState<ListingSchema[]>([]);
-  const [selectedChat, setSelectedChat] = React.useState<ChatSubmission | null>(null);
+  const [chatSubmission, setChatSubmission] = React.useState<ChatSubmission | null>(null);
   const [agentToAdd, setAgentToAdd] = React.useState<string | null>(null);
   
 
@@ -280,7 +274,7 @@ export default function LeadDetailPage() {
 
   const isCustomer = user?.email === lead?.customerId;
   
-  const handleChatClick = () => {
+  const handleChatInit = () => {
     if (!lead || !selectedProvider) return;
 
     const listingId = selectedProvider.properties[0]?.listingId;
@@ -307,7 +301,7 @@ export default function LeadDetailPage() {
       customerName: customer?.userName || 'Customer',
       customerCompany: customer?.companyName || 'Customer Company',
     };
-    setSelectedChat(mockSubmission);
+    setChatSubmission(mockSubmission);
   };
 
    const handleAddAgent = (agentEmail: string) => {
@@ -333,7 +327,6 @@ export default function LeadDetailPage() {
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
   
   return (
-    <>
       <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
@@ -409,66 +402,74 @@ export default function LeadDetailPage() {
                           <div className="space-y-6 sticky top-24">
                                <Card>
                                   <CardHeader>
-                                    <CardTitle>Communication</CardTitle>
+                                    <CardTitle>Participants &amp; Chat</CardTitle>
                                   </CardHeader>
                                   <CardContent>
-                                    <Button onClick={handleChatClick} className="w-full">
-                                        <MessageSquare className="mr-2 h-4 w-4" />
-                                        Chat with {isPremiumProvider ? (isCustomer ? (providerUser?.companyName || 'Developer') : (customer?.companyName || 'Customer')) : 'O2O Team'}
-                                    </Button>
+                                    <div className="space-y-4 text-sm">
+                                      {customer && (
+                                          <div className="p-3 bg-secondary/50 rounded-md">
+                                              <p className="text-xs text-muted-foreground">Customer</p>
+                                              <p className="font-semibold">{customer.companyName}</p>
+                                              <p className="text-xs">{customer.userName}</p>
+                                          </div>
+                                      )}
+                                      {providerUser && (
+                                          <div className="p-3 bg-secondary/50 rounded-md">
+                                              <p className="text-xs text-muted-foreground">Provider</p>
+                                              <p className="font-semibold">{providerUser.companyName}</p>
+                                              <p className="text-xs">{providerUser.userName}</p>
+                                          </div>
+                                      )}
+                                      {agentUser && (
+                                          <div className="p-3 bg-secondary/50 rounded-md">
+                                              <p className="text-xs text-muted-foreground">Agent</p>
+                                              <p className="font-semibold">{agentUser.companyName}</p>
+                                              <p className="text-xs">{agentUser.userName}</p>
+                                          </div>
+                                      )}
+                                    </div>
+                                    <Collapsible onOpenChange={(isOpen) => { if (isOpen && !chatSubmission) handleChatInit() }}>
+                                      <CollapsibleTrigger asChild>
+                                          <Button variant="outline" className="w-full mt-4">
+                                              <MessageSquare className="mr-2 h-4 w-4" />
+                                              Chat with {isPremiumProvider ? (isCustomer ? (providerUser?.companyName || 'Developer') : (customer?.companyName || 'Customer')) : 'O2O Team'}
+                                              <ChevronsUpDown className="ml-auto h-4 w-4" />
+                                          </Button>
+                                      </CollapsibleTrigger>
+                                      <CollapsibleContent className="mt-4 border-t pt-4">
+                                        <ChatPanel submission={chatSubmission} />
+                                      </CollapsibleContent>
+                                    </Collapsible>
                                   </CardContent>
                                </Card>
-                              <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5"/> Participants</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4 text-sm">
-                                    {customer && (
-                                        <div className="p-3 bg-secondary/50 rounded-md">
-                                            <p className="text-xs text-muted-foreground">Customer</p>
-                                            <p className="font-semibold">{customer.companyName}</p>
-                                            <p className="text-xs">{customer.userName}</p>
-                                        </div>
-                                    )}
-                                    {providerUser && (
-                                        <div className="p-3 bg-secondary/50 rounded-md">
-                                            <p className="text-xs text-muted-foreground">Provider</p>
-                                            <p className="font-semibold">{providerUser.companyName}</p>
-                                            <p className="text-xs">{providerUser.userName}</p>
-                                        </div>
-                                    )}
+                               { (isO2O || isAgent) && (
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5" /> Agent Facilitation</CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
                                     {agentUser ? (
-                                        <div className="p-3 bg-secondary/50 rounded-md">
-                                            <p className="text-xs text-muted-foreground">Agent</p>
-                                            <p className="font-semibold">{agentUser.companyName}</p>
-                                            <p className="text-xs">{agentUser.userName}</p>
+                                        <div className="p-3 bg-secondary/50 rounded-md text-sm">
+                                          <p className="font-semibold">Facilitated by:</p>
+                                          <p>{agentUser.userName} ({agentUser.companyName})</p>
                                         </div>
-                                    ) : (isCustomer || isProvider) && (
-                                        <div className="pt-2">
-                                            {agentToAdd ? (
-                                                <div className="space-y-2">
-                                                    <Select onValueChange={setAgentToAdd} defaultValue={agentToAdd}>
-                                                        <SelectTrigger><SelectValue placeholder="Select an agent..." /></SelectTrigger>
-                                                        <SelectContent>
-                                                            {allAgents.map(agent => (
-                                                                <SelectItem key={agent.email} value={agent.email}>{agent.userName} ({agent.companyName})</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <div className="flex gap-2">
-                                                        <Button size="sm" className="w-full" onClick={() => handleAddAgent(agentToAdd)}>Confirm</Button>
-                                                        <Button size="sm" variant="ghost" onClick={() => setAgentToAdd(null)}>Cancel</Button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <Button variant="outline" size="sm" className="w-full" onClick={() => setAgentToAdd('')}>
-                                                    <UserPlus className="mr-2 h-4 w-4" /> Add Agent as Facilitator
-                                                </Button>
-                                            )}
+                                    ) : (
+                                        <div className="space-y-2">
+                                          <p className="text-sm text-muted-foreground">Add an agent to facilitate this transaction.</p>
+                                          <Select onValueChange={setAgentToAdd}>
+                                              <SelectTrigger><SelectValue placeholder="Select an agent..." /></SelectTrigger>
+                                              <SelectContent>
+                                                  {allAgents.map(agent => (
+                                                      <SelectItem key={agent.email} value={agent.email}>{agent.userName} ({agent.companyName})</SelectItem>
+                                                  ))}
+                                              </SelectContent>
+                                          </Select>
+                                          <Button size="sm" className="w-full" onClick={() => agentToAdd && handleAddAgent(agentToAdd)} disabled={!agentToAdd}>Confirm Agent</Button>
                                         </div>
                                     )}
-                                </CardContent>
-                              </Card>
+                                  </CardContent>
+                                </Card>
+                               )}
 
                                {selectedProviderListings.length > 0 && (
                                   <Card>
@@ -544,11 +545,6 @@ export default function LeadDetailPage() {
           )}
         </div>
       </main>
-      <ChatDialog
-        submission={selectedChat}
-        isOpen={!!selectedChat}
-        onOpenChange={() => setSelectedChat(null)}
-      />
     </>
   );
 }
