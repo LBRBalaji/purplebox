@@ -284,7 +284,7 @@ export default function ListingDetailPage() {
         setJustRequestedQuote(true); // Update local state immediately
         toast({
             title: 'Quote Request Sent!',
-            description: `The developer has been notified of your interest in "${listing.warehouseBoxId || listing.listingId}".`,
+            description: `The developer has been notified of your interest in "${listing.warehouseBoxId || listing.listingId}". Your interaction with developer begins on the 'My Transactions' page. Starting with commercial quote, track all communication, site visits, and negotiations for this property on 'My Transactions' page.`,
         });
     };
 
@@ -674,7 +674,7 @@ export default function ListingDetailPage() {
                                                             Go to Transactions <ArrowRight className="ml-2 h-4 w-4"/>
                                                         </Link>
                                                     </Button>
-                                                    <p className="text-xs text-muted-foreground px-2">Your Interaction with Developer Begins Here.. Starting with Commercial Quote, track all communication, site visits, and negotiations for this property on the Transactions page.</p>
+                                                    <p className="text-xs text-muted-foreground px-2">Your interaction with the developer begins here. Track all communication, site visits, and negotiations for this property on the 'My Transactions' page.</p>
                                                 </div>
                                             ) : (
                                                 <Button onClick={handleGetQuote} className="w-full">
@@ -689,7 +689,12 @@ export default function ListingDetailPage() {
                                             <AlertDescription className="text-xs">
                                                 Look for the <Badge className="bg-amber-100 text-amber-800 border-amber-200">Premium</Badge> badge on listings to connect directly with providers.
                                             </AlertDescription>
-                                            <Button size="sm" className="w-full mt-4" onClick={handleLogDemandClick}>Available on Broking Model - Connect with O2O</Button>
+                                            <Button size="sm" className="w-full mt-4 h-auto py-2" onClick={handleLogDemandClick}>
+                                                <div className="flex flex-col text-center">
+                                                    <span>Available on Broking Model</span>
+                                                    <span className="font-normal text-xs">- Connect with O2O -</span>
+                                                </div>
+                                            </Button>
                                         </Alert>
                                      )}
                                 </CardFooter>
