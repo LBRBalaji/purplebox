@@ -60,21 +60,6 @@ export function ChatPanel({
   const threadId = submission ? `${submission.demandId}-${submission.listingId}` : null;
   const otherUserTyping = threadId ? typingStatus[threadId] : null;
   
-  React.useEffect(() => {
-    if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission();
-    }
-  }, []);
-
-  const showNotification = React.useCallback((body: string, senderName: string) => {
-      if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
-          const notification = new Notification(`New Message from ${senderName}`, {
-              body,
-              icon: '/logo.png'
-          });
-      }
-  }, []);
-  
   const fetchMessages = React.useCallback(async () => {
     if (!threadId) return;
     try {
@@ -86,7 +71,7 @@ export function ChatPanel({
           if(threadMessages.length > currentMessages.length) {
               const lastMessage = threadMessages[threadMessages.length - 1];
               if (user && lastMessage.senderEmail !== user.email) {
-                  showNotification(lastMessage.text || 'New Attachment', lastMessage.senderName);
+                  // Notification logic can be re-added here if needed
               }
           }
           return threadMessages;
@@ -95,7 +80,7 @@ export function ChatPanel({
     } catch (error) {
       console.error("Failed to fetch chat messages:", error);
     }
-  }, [threadId, user, showNotification]);
+  }, [threadId, user]);
 
   React.useEffect(() => {
     if (threadId) {
@@ -243,8 +228,8 @@ export function ChatPanel({
   return (
     <>
         <div className="h-96 flex flex-col p-0">
-            <ScrollArea className="flex-grow pr-4" scrollableViewportRef={scrollViewportRef}>
-                <div className="space-y-4 p-1">
+            <ScrollArea className="flex-grow" scrollableViewportRef={scrollViewportRef}>
+                <div className="space-y-4 p-4">
                     {initialMessage && messages.length === 0 && (
                         <div className="text-center text-sm text-muted-foreground py-10 px-4 border border-dashed rounded-lg">
                             {initialMessage}
@@ -297,7 +282,7 @@ export function ChatPanel({
                     })}
                 </div>
             </ScrollArea>
-            <div className="h-6 pt-2 text-xs text-muted-foreground">
+            <div className="h-6 pt-2 text-xs text-muted-foreground px-4">
             {otherUserTyping && otherUserTyping.isTyping && otherUserTyping.userEmail !== user?.email && (
                 <div className="animate-pulse flex items-center gap-2">
                 <Avatar className="h-5 w-5">
@@ -307,7 +292,7 @@ export function ChatPanel({
                 </div>
             )}
             </div>
-            <div className="pt-2">
+            <div className="pt-2 px-4 pb-4">
             {uploadProgress !== null && <Progress value={uploadProgress} className="mb-2 h-1" />}
             <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
                 <input
@@ -345,4 +330,3 @@ export function ChatPanel({
     </>
   );
 }
-
