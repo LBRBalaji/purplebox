@@ -42,6 +42,7 @@ const userFormSchema = z.object({
     userName: z.string().min(1, 'User name is required.'),
     phone: z.string().min(1, 'Phone number is required.'),
     role: z.enum(['User', 'SuperAdmin', 'O2O', 'Warehouse Developer', 'Agent']),
+    plan: z.enum(['Free', 'Paid_Premium']).optional(),
     isCompanyAdmin: z.boolean().optional(),
 });
 
@@ -71,6 +72,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
       userName: '',
       phone: '',
       role: 'User',
+      plan: 'Free',
       isCompanyAdmin: false,
     },
   });
@@ -84,6 +86,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                 userName: user.userName,
                 phone: user.phone,
                 role: user.role,
+                plan: user.plan || 'Free',
                 isCompanyAdmin: user.isCompanyAdmin || false,
             });
         } else {
@@ -93,6 +96,7 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
               userName: '',
               phone: '',
               role: 'User',
+              plan: 'Free',
               isCompanyAdmin: false,
             });
         }
@@ -162,6 +166,20 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                           <SelectItem value="Agent">Agent</SelectItem>
                           <SelectItem value="O2O">O2O Platform Manager</SelectItem>
                           <SelectItem value="SuperAdmin">O2O Super Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField control={form.control} name="plan" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subscription Plan</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="Free">Free</SelectItem>
+                          <SelectItem value="Paid_Premium">Paid Premium</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

@@ -8,6 +8,7 @@ import { toast } from '@/hooks/use-toast';
 export type User = {
   email: string;
   role: 'SuperAdmin' | 'User' | 'O2O' | 'Warehouse Developer' | 'Agent';
+  plan?: 'Free' | 'Paid_Premium';
   isCompanyAdmin?: boolean;
   companyName: string;
   userName: string;

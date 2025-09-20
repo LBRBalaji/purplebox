@@ -549,7 +549,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -647,7 +648,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1081,7 +1083,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1149,7 +1152,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1217,7 +1221,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1285,7 +1290,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1362,7 +1368,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1440,7 +1447,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1533,7 +1541,8 @@
         "url": "/uploads/1758268677100-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1626,7 +1635,8 @@
         "url": "/uploads/1758267788785-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1718,7 +1728,8 @@
         "url": "/uploads/1758267641433-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1812,7 +1823,8 @@
         "url": "/uploads/1758267469482-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": false
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1905,7 +1917,8 @@
         "url": "/uploads/1758267188610-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -1998,7 +2011,8 @@
         "url": "/uploads/1758267087651-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2091,7 +2105,8 @@
         "url": "/uploads/1758266948202-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2184,7 +2199,8 @@
         "url": "/uploads/1758266776500-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2277,7 +2293,8 @@
         "url": "/uploads/1758266674793-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2370,7 +2387,8 @@
         "url": "/uploads/1758266568301-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2463,7 +2481,8 @@
         "url": "/uploads/1758266455814-under_construction-7.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2556,7 +2575,8 @@
         "url": "/uploads/1758268569019-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2649,7 +2669,8 @@
         "url": "/uploads/1758266262927-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2742,7 +2763,8 @@
         "url": "/uploads/1758265347820-under_construction-6.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2825,7 +2847,8 @@
         "url": "/uploads/1758262247900-WhatsApp_Image_2025-09-11_at_14.51.18.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2908,7 +2931,8 @@
         "url": "/uploads/1758261488340-WhatsApp_Image_2025-09-11_at_14.51.18.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -2991,7 +3015,8 @@
         "url": "/uploads/1758261373392-WhatsApp_Image_2025-09-11_at_14.51.18.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -3074,7 +3099,8 @@
         "url": "/uploads/1758261180874-WhatsApp_Image_2025-09-11_at_14.51.18.jpeg"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -3132,7 +3158,8 @@
         "url": "/uploads/1758259336471-Screenshot_2025-09-18_at_10.11.29_PM.png"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -3190,7 +3217,8 @@
         "url": "/uploads/1758213699351-Screenshot_2025-09-18_at_10.11.29_PM.png"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -3253,7 +3281,8 @@
         "url": "/uploads/1758213455341-Screenshot_2025-09-18_at_10.07.16_PM.png"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -3316,7 +3345,8 @@
         "url": "/uploads/1758213192208-Screenshot_2025-09-18_at_10.02.30_PM.png"
       }
     ],
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
