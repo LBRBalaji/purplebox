@@ -92,7 +92,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
 
     return (
         <div className="flex flex-col h-full">
-            <div className="p-4 border-b">
+            <div className="p-4 border-b shrink-0">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
@@ -159,31 +159,48 @@ export function GlobalChatWidget() {
     let linkHref = null;
 
     if (activeChat) {
-        title = activeChat.chatPartnerName;
         const demand = demands.find(d => d.demandId === activeChat.demandId);
 
         const listingInfo = activeChat.listing 
             ? `${activeChat.listing.location} | ${activeChat.listing.sizeSqFt.toLocaleString()} sq. ft.`
             : 'N/A';
         const requirementInfo = demand
-            ? `${demand.locationName} | ${demand.size.toLocaleString()} sq. ft.`
+            ? `${demand.locationName || demand.location} | ${demand.size.toLocaleString()} sq. ft.`
             : 'N/A';
         
+        let headerTitle: string;
+        let headerSubtitle: React.ReactNode;
+
+        if (user?.email === activeChat.customerId) {
+            // Customer's view
+            headerTitle = activeChat.chatPartnerName;
+            headerSubtitle = <p className="text-xs text-muted-foreground truncate">Re: {activeChat.listing?.name || activeChat.listingId}</p>;
+        } else {
+            // Developer or Admin's view
+            headerTitle = activeChat.customerCompany || 'Customer';
+            headerSubtitle = <p className="text-xs text-muted-foreground truncate">Lead: {activeChat.demandId}</p>;
+        }
+
+        title = headerTitle;
         subtitle = (
             <div className="text-xs text-muted-foreground space-y-1">
-                <p><strong className="font-semibold">Listing:</strong> {listingInfo}</p>
-                <p><strong className="font-semibold">Demand:</strong> {requirementInfo}</p>
+                <p>
+                    <span className="font-semibold">Listing:</span> {activeChat.listingId} | {listingInfo}
+                </p>
+                <p>
+                    <span className="font-semibold">Demand:</span> {activeChat.demandId} | {requirementInfo}
+                </p>
             </div>
         );
-        
+
         linkHref = `/dashboard/leads/${activeChat.demandId}`;
     }
 
 
     return (
-        <div className="fixed bottom-0 right-8 z-50 w-full max-w-sm h-[600px]">
+        <div className="fixed bottom-0 right-8 z-50 w-full max-w-sm h-[600px] flex flex-col">
             <Card className="flex flex-col h-full shadow-2xl border-border">
-                <CardHeader className="flex flex-row items-center justify-between p-4 border-b bg-secondary/50 rounded-t-lg">
+                <CardHeader className="flex flex-row items-center justify-between p-4 border-b bg-secondary/50 rounded-t-lg shrink-0">
                     <div className="flex items-center gap-2 overflow-hidden">
                         {activeChat && (
                              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={handleBackToList}>
