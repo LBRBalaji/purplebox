@@ -330,10 +330,12 @@ export const createPropertySchema = (demand?: DemandSchema) => {
 export type PropertySchema = z.infer<typeof createPropertySchema>;
 
 const historyEntrySchema = z.object({
-  value: z.string().optional().default(''),
+  previousValue: z.string().optional().default(''),
+  newValue: z.string().optional().default(''),
   changedBy: z.string(),
   changedAt: z.string().datetime(),
 });
+export type HistoryEntry = z.infer<typeof historyEntrySchema>;
 
 const negotiableValueSchema = z.object({
   current: z.string().optional().default(''),

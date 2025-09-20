@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useForm, useFieldArray, Controller, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { negotiationBoardSchema, type NegotiationBoardSchema, type ListingSchema } from '@/lib/schema';
+import { negotiationBoardSchema, type NegotiationBoardSchema, type ListingSchema, type HistoryEntry } from '@/lib/schema';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
@@ -43,40 +43,38 @@ const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; 
     );
 };
 
-const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: any; label: string; control: any; form: any, isTextarea?: boolean, disabled?: boolean }) => {
-    const InputComponent = isTextarea ? Textarea : Input;
-    const { watch, getValues, setValue } = form;
+const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; control: any; form: any, disabled?: boolean }) => {
+    const { getValues, setValue, watch } = form;
     const { user } = useAuth();
     
-    const agreedTermsValue = watch(`${name}.agreedTerms.current`);
-    const statusValue = watch(`${name}.status.current`);
-    const proposedByValue = watch(`${name}.proposedBy.current`);
+    const fieldLabel = watch(`${fieldName}.label`);
+    const isLabelEditable = !fieldLabel;
 
-    const handleFieldChange = (field: 'agreedTerms' | 'status' | 'proposedBy', newValue: string) => {
-        const fieldPath = `${name}.${field}`;
-        const oldValue = getValues(`${fieldPath}.current`);
-
+    const handleFieldChange = (field: 'agreedTerms' | 'status' | 'proposedBy', newValue: string, oldValue: string) => {
         if(oldValue !== newValue) {
+            const fieldPath = `${fieldName}.${field}`;
             const historyPath = `${fieldPath}.history`;
             const currentHistory = getValues(historyPath) || [];
-            const newHistoryEntry = {
-                value: oldValue,
+            const newHistoryEntry: HistoryEntry = {
+                previousValue: oldValue,
+                newValue: newValue,
                 changedBy: user?.userName || 'System',
                 changedAt: new Date().toISOString(),
             };
             setValue(historyPath, [newHistoryEntry, ...currentHistory]);
-            setValue(`${fieldPath}.current`, newValue);
         }
     };
     
-    const agreedTermsHistory = watch(`${name}.agreedTerms.history`) || [];
-    const statusHistory = watch(`${name}.status.history`) || [];
-    const proposedByHistory = watch(`${name}.proposedBy.history`) || [];
+    const fullHistory = [
+        ...(watch(`${fieldName}.agreedTerms.history`) || []),
+        ...(watch(`${fieldName}.proposedBy.history`) || []),
+        ...(watch(`${fieldName}.status.history`) || []),
+    ].sort((a,b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime());
 
-    const hasHistory = agreedTermsHistory.length > 0 || statusHistory.length > 0 || proposedByHistory.length > 0;
+    const hasHistory = fullHistory.length > 0;
 
     return (
-        <div className={cn("grid grid-cols-12 gap-x-6 gap-y-2 py-4 border-b", statusValue === 'Reserved For Discussion' && 'bg-amber-100/50 rounded-md p-4')}>
+        <div className={cn("grid grid-cols-12 gap-x-6 gap-y-2 py-4 border-b", watch(`${fieldName}.status.current`) === 'Reserved For Discussion' && 'bg-amber-100/50 rounded-md p-4')}>
             <div className="col-span-12 md:col-span-3 flex items-center gap-2">
                 {hasHistory && (
                     <TooltipProvider>
@@ -92,21 +90,27 @@ const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: a
                         </Tooltip>
                     </TooltipProvider>
                 )}
-                <FormLabel>{label}</FormLabel>
+                {isLabelEditable ? (
+                     <FormField control={control} name={`${fieldName}.label`} render={({ field }) => (
+                         <Input placeholder="New Field Name" {...field} value={field.value ?? ''} className="h-9" disabled={disabled}/>
+                     )} />
+                ) : (
+                    <FormLabel>{fieldLabel}</FormLabel>
+                )}
             </div>
             <div className="col-span-12 md:col-span-3">
-                <FormField control={control} name={`${name}.agreedTerms.current`} render={({ field }) => (
-                    <FormItem><FormControl><InputComponent placeholder="Agreed terms..." {...field} value={field.value ?? ''} className="h-10 p-2" disabled={disabled} onChange={(e) => handleFieldChange('agreedTerms', e.target.value)} /></FormControl><FormMessage /></FormItem>
+                <FormField control={control} name={`${fieldName}.agreedTerms.current`} render={({ field }) => (
+                    <FormItem><FormControl><Input placeholder="Agreed terms..." {...field} value={field.value ?? ''} className="h-10 p-2" disabled={disabled} onBlur={(e) => handleFieldChange('agreedTerms', e.target.value, field.value ?? '')} /></FormControl><FormMessage /></FormItem>
                 )} />
             </div>
              <div className="col-span-6 md:col-span-2">
-                 <FormField control={control} name={`${name}.proposedBy.current`} render={({ field }) => (
-                    <FormItem><Select onValueChange={(val) => handleFieldChange('proposedBy', val)} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                 <FormField control={control} name={`${fieldName}.proposedBy.current`} render={({ field }) => (
+                    <FormItem><Select onValueChange={(val) => { handleFieldChange('proposedBy', val, field.value); field.onChange(val); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
              <div className="col-span-6 md:col-span-3">
-                 <FormField control={control} name={`${name}.status.current`} render={({ field }) => (
-                    <FormItem><Select onValueChange={(val) => handleFieldChange('status', val)} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                 <FormField control={control} name={`${fieldName}.status.current`} render={({ field }) => (
+                    <FormItem><Select onValueChange={(val) => { handleFieldChange('status', val, field.value); field.onChange(val); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
              <div className="col-span-12 md:col-span-1 flex items-center justify-end">
@@ -116,15 +120,13 @@ const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: a
                     </PopoverTrigger>
                     <PopoverContent className="w-96">
                         <div className="space-y-4">
-                            <h4 className="font-semibold">Version History for "{label}"</h4>
-                            {(agreedTermsHistory.length > 0 || proposedByHistory.length > 0 || statusHistory.length > 0) ? (
+                            <h4 className="font-semibold">Version History for "{fieldLabel}"</h4>
+                            {fullHistory.length > 0 ? (
                                 <ScrollArea className="h-64">
                                 <div className="space-y-3">
-                                {[...agreedTermsHistory, ...proposedByHistory, ...statusHistory]
-                                    .sort((a,b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime())
-                                    .map((entry, i) => (
+                                {fullHistory.map((entry, i) => (
                                     <div key={i} className="text-xs p-2 rounded-md bg-secondary/50">
-                                        <p>Value changed to <strong className="text-primary">"{entry.value}"</strong></p>
+                                        <p>Value changed from <strong className="text-destructive">"{entry.previousValue || 'empty'}"</strong> to <strong className="text-primary">"{entry.newValue || 'empty'}"</strong></p>
                                         <p className="text-muted-foreground">{entry.changedBy} on {new Date(entry.changedAt).toLocaleString()}</p>
                                     </div>
                                     ))}
@@ -193,7 +195,7 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
         const sections = getValues(`${sessionPath}.sections`);
         const newField = {
             id: `field-${Date.now()}`,
-            label: 'New Field',
+            label: '', // Start with an empty label to make it editable
             agreedTerms: { current: '', history: [] },
             proposedBy: { current: 'Customer', history: [] },
             status: { current: 'Reserved For Discussion', history: [] },
@@ -234,8 +236,7 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
                                         <FormRow 
                                             key={field.id}
                                             form={form} 
-                                            name={`${sessionPath}.sections.${sectionIndex}.fields.${fieldIndex}`} 
-                                            label={field.label} 
+                                            fieldName={`${sessionPath}.sections.${sectionIndex}.fields.${fieldIndex}`} 
                                             control={control} 
                                             disabled={!canEdit} />
                                     ))}
