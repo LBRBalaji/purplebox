@@ -39,8 +39,13 @@ export async function generateChatResponse(input: GenerateChatResponseInput): Pr
   return generateChatResponseFlow(input);
 }
 
+const PromptMessageSchema = MessageSchema.extend({
+    isUser: z.boolean().optional(),
+});
+
 const promptInputSchema = GenerateChatResponseInputSchema.extend({
   isO2O: z.boolean().describe('Whether the AI is acting as the O2O Team.'),
+  history: z.array(PromptMessageSchema),
 });
 
 const prompt = ai.definePrompt({
@@ -69,8 +74,7 @@ const prompt = ai.definePrompt({
 
   **Conversation History:**
   {{#each history}}
-    {{#if (eq role 'user')}}User ({{{../userName}}}): {{content.[0].text}}{{/if}}
-    {{#if (eq role 'model')}}You ({{{../chatPartnerName}}}): {{content.[0].text}}{{/if}}
+    {{#if isUser}}User ({{{../userName}}}): {{content.[0].text}}{{else}}You ({{{../chatPartnerName}}}): {{content.[0].text}}{{/if}}
   {{/each}}
 
   **Your next response:**`,
@@ -84,7 +88,13 @@ const generateChatResponseFlow = ai.defineFlow(
   },
   async (input) => {
     const isO2O = input.chatPartnerName === 'O2O Team';
-    const promptData = { ...input, isO2O };
+
+    const historyWithRoles = input.history.map(msg => ({
+      ...msg,
+      isUser: msg.role === 'user',
+    }));
+
+    const promptData = { ...input, history: historyWithRoles, isO2O };
     const {output} = await prompt(promptData);
     return output!;
   }
