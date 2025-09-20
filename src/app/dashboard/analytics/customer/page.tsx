@@ -92,6 +92,7 @@ export default function CustomerAnalyticsPage() {
                 totalViews: 0,
                 totalDownloads: 0,
                 totalQuoteRequests: 0,
+                totalLayoutRequests: 0,
                 totalShortlists: 0,
                 topViewedLocations: [],
                 topViewedDevelopers: [],
@@ -117,11 +118,11 @@ export default function CustomerAnalyticsPage() {
             return date >= from && date <= to;
         }
 
-        const relevantDemands = demands.filter(d => userFilter(d) && d.createdAt && dateFilter(d.createdAt));
+        const relevantDemands = demands.filter(d => userFilter({ customerId: d.userEmail }) && d.createdAt && dateFilter(d.createdAt));
         const relevantViews = viewHistory.filter(v => userFilter(v) && dateFilter(v.timestamp));
-        const relevantDownloads = downloadHistory.filter(d => userFilter(d) && dateFilter(d.timestamp));
+        const relevantDownloads = downloadHistory.filter(d => userFilter({userId: d.userId}) && dateFilter(d.timestamp));
         const relevantQuoteRequests = registeredLeads.filter(l => userFilter(l) && dateFilter(l.registeredAt));
-        const relevantLayoutRequests = layoutRequests.filter(r => userFilter(r) && dateFilter(r.requestedAt)); 
+        const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userName: r.userName}) && dateFilter(r.requestedAt)); 
         const relevantShortlists = isUserSelected ? generalShortlist.length : 0; // Shortlist is only per user, not global
 
         const topViewedLocations = groupAndSort(relevantViews, view => {
@@ -179,6 +180,7 @@ export default function CustomerAnalyticsPage() {
             totalViews: relevantViews.length,
             totalDownloads: relevantDownloads.length,
             totalQuoteRequests: relevantQuoteRequests.length,
+            totalLayoutRequests: relevantLayoutRequests.length,
             totalShortlists: relevantShortlists,
             topViewedLocations,
             topViewedDevelopers,
@@ -256,11 +258,12 @@ export default function CustomerAnalyticsPage() {
                     </CardContent>
                 </Card>
 
-                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
                     <StatCard title="Total Demands" value={filteredData.totalDemands} icon={List} />
                     <StatCard title="Listings Viewed" value={filteredData.totalViews} icon={Eye} />
                     <StatCard title="Listings Downloaded" value={filteredData.totalDownloads} icon={Download} />
                     <StatCard title="Quote Requests" value={filteredData.totalQuoteRequests} icon={MessageCircle} />
+                    <StatCard title="Layout Requests" value={filteredData.totalLayoutRequests} icon={FileQuestion} />
                     <StatCard title="Shortlisted" value={filteredData.totalShortlists} icon={Star} />
                 </div>
                 
