@@ -38,15 +38,15 @@ export function ChatDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const { user } = useAuth();
-  const { chatMessages, addChatMessage } = useData();
+  const { addChatMessage } = useData();
+  const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = React.useState('');
   const [isSending, setIsSending] = React.useState(false);
   const scrollViewportRef = React.useRef<HTMLDivElement>(null);
   const audioRef = React.useRef<HTMLAudioElement>(null);
 
   const threadId = submission ? `${submission.demandId}-${submission.listingId}` : null;
-  const messages = threadId ? chatMessages[threadId] || [] : [];
-
+  
   // Request notification permission
   React.useEffect(() => {
     if (isOpen && "Notification" in window && Notification.permission === "default") {
@@ -62,19 +62,42 @@ export function ChatDialog({
           });
       }
   }
-  
-  // Effect to play sound on new message
+
+  // Fetch messages and set up polling when the dialog opens
   React.useEffect(() => {
-    if (messages.length > 0) {
-        const lastMessage = messages[messages.length - 1];
-        if (user && lastMessage.senderEmail !== user.email) {
-            audioRef.current?.play();
-            showNotification(lastMessage.text, lastMessage.senderName);
+    let intervalId: NodeJS.Timeout;
+
+    const fetchMessages = async () => {
+      if (!threadId) return;
+      try {
+        const response = await fetch('/api/chat-messages');
+        const allMessages = await response.json();
+        const threadMessages = allMessages[threadId] || [];
+        
+        if (threadMessages.length > messages.length) {
+            const lastMessage = threadMessages[threadMessages.length - 1];
+            if (user && lastMessage.senderEmail !== user.email) {
+                audioRef.current?.play();
+                showNotification(lastMessage.text, lastMessage.senderName);
+            }
         }
+        setMessages(threadMessages);
+      } catch (error) {
+        console.error("Failed to fetch chat messages:", error);
+      }
+    };
+
+    if (isOpen) {
+      fetchMessages(); // Initial fetch
+      intervalId = setInterval(fetchMessages, 3000); // Poll every 3 seconds
     }
-    // This dependency array intentionally ignores 'user' to only trigger on new messages.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isOpen, threadId, messages.length, user]);
 
 
   React.useEffect(() => {
@@ -96,9 +119,13 @@ export function ChatDialog({
       timestamp: new Date().toISOString(),
     };
     
+    // Add message locally for immediate feedback
+    setMessages(prev => [...prev, message]);
+    setNewMessage('');
+    
+    // Persist message
     await addChatMessage(threadId, message);
     
-    setNewMessage('');
     setIsSending(false);
   };
 
