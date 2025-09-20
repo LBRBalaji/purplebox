@@ -128,5 +128,19 @@
       "text": "can we schedule an online meeting?",
       "timestamp": "2025-09-20T09:57:25.573Z"
     }
+  ],
+  "chat-LDR-QUOTE-1758360784201-admin@kailashlogistics.com": [
+    {
+      "senderEmail": "admin@kailashlogistics.com",
+      "senderName": "Kailash Logistics",
+      "text": "hi",
+      "timestamp": "2025-09-20T12:17:27.096Z"
+    },
+    {
+      "senderEmail": "admin@kailashlogistics.com",
+      "senderName": "Kailash Logistics",
+      "text": "🙏🙏",
+      "timestamp": "2025-09-20T12:17:37.257Z"
+    }
   ]
 }
