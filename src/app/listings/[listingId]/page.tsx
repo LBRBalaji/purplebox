@@ -322,7 +322,7 @@ export default function ListingDetailPage() {
                 'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
                 'Shop Floor Dimension': listing.buildingSpecifications.shopFloorLevelDimension,
                 'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
-                'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
+                'Internal Lighting': listing.buildingSpecifications.internalLighting,
                 'Access Road': listing.siteSpecifications.typeOfRoad,
                 'Rent (per Sq. Ft.)': listing.rentPerSqFt || 'Contact for details',
                 'Security Deposit (Months)': listing.rentalSecurityDeposit || 'Contact for details',
@@ -535,7 +535,6 @@ export default function ListingDetailPage() {
                                             <h4 className="font-semibold mb-2">Building</h4>
                                             <Separator />
                                             <DetailRow label="Shop Floor Dimension" value={listing.buildingSpecifications.shopFloorLevelDimension} />
-                                            <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} />
                                             <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} />
                                             <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />
                                             <DetailRow label="Crane Support Structure" value={listing.buildingSpecifications.craneSupportStructureAvailable} />
@@ -610,11 +609,13 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-center text-center">
-                                            <span className="text-4xl font-bold">₹{listing.rentPerSqFt === 'Get Quote' ? '' : listing.rentPerSqFt}</span>
                                             {listing.rentPerSqFt === 'Get Quote' ? (
                                                 <span className="text-2xl font-bold">Price on Request</span>
                                             ) : (
-                                                <span className="text-sm text-muted-foreground">/sq.ft./month</span>
+                                                <>
+                                                    <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
+                                                    <span className="text-sm text-muted-foreground">/sq.ft./month</span>
+                                                </>
                                             )}
                                         </div>
                                         <Separator/>
@@ -697,3 +698,5 @@ export default function ListingDetailPage() {
     );
 
 }
+
+    
