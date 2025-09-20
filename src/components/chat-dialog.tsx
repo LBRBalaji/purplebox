@@ -222,8 +222,8 @@ export function ChatPanel({
   const initialMessage = getInitialMessage();
 
   return (
-    <div className="h-96 flex flex-col p-0">
-        <ScrollArea className="flex-grow pr-4" scrollableViewportRef={scrollViewportRef}>
+    <div className="h-full flex flex-col p-0">
+        <ScrollArea className="flex-grow" scrollableViewportRef={scrollViewportRef}>
             <div className="space-y-4 p-4">
                 {initialMessage && messages.length === 0 && (
                     <div className="text-center text-sm text-muted-foreground py-10 px-4 border border-dashed rounded-lg">
@@ -255,7 +255,7 @@ export function ChatPanel({
                             : 'bg-muted'
                             )}
                         >
-                            {message.text && <p className="text-sm whitespace-pre-wrap">{linkify(message.text)}</p>}
+                            {message.text && <p className="text-sm break-words [overflow-wrap:anywhere]">{linkify(message.text)}</p>}
                             {message.attachment && (
                                 <a href={message.attachment.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mt-2 p-2 rounded-md bg-black/10 hover:bg-black/20">
                                     <FileIcon className="h-5 w-5 shrink-0" />
