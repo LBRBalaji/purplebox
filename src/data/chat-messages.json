@@ -178,5 +178,13 @@
       "text": "can you lease part of the facility?",
       "timestamp": "2025-09-20T16:27:57.011Z"
     }
+  ],
+  "chat-LDR-QUOTE-1758347284148-admin@indospace.com": [
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "hi",
+      "timestamp": "2025-09-20T16:55:57.842Z"
+    }
   ]
 }
