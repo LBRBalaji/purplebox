@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -53,25 +54,25 @@ const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; contr
     const fieldLabel = watch(`${fieldName}.label`);
     const isLabelEditable = watch(`${fieldName}.isLabelEditable`);
 
-    const handleFieldChange = (field: 'agreedTerms' | 'proposedBy' | 'status', newValue: string) => {
-        if (!focusedFieldValue || focusedFieldValue.field !== field || focusedFieldValue.value === newValue) {
+    const handleFieldChange = (field: 'agreedTerms' | 'proposedBy' | 'status', newValue: string, oldValue?: string) => {
+        const valueBeforeChange = oldValue ?? focusedFieldValue?.value;
+        
+        if (valueBeforeChange === undefined || valueBeforeChange === newValue) {
+            setFocusedFieldValue(null);
             return;
         }
 
-        const oldValue = focusedFieldValue.value;
-
-        if (oldValue !== newValue) {
-            const fieldPath = `${fieldName}.${field}`;
-            const historyPath = `${fieldPath}.history`;
-            const currentHistory = getValues(historyPath) || [];
-            const newHistoryEntry: HistoryEntry = {
-                previousValue: oldValue,
-                newValue: newValue,
-                changedBy: user?.userName || 'System',
-                changedAt: new Date().toISOString(),
-            };
-            setValue(historyPath, [newHistoryEntry, ...currentHistory]);
-        }
+        const fieldPath = `${fieldName}.${field}`;
+        const historyPath = `${fieldPath}.history`;
+        const currentHistory = getValues(historyPath) || [];
+        const newHistoryEntry: HistoryEntry = {
+            previousValue: valueBeforeChange,
+            newValue: newValue,
+            changedBy: user?.userName || 'System',
+            changedAt: new Date().toISOString(),
+        };
+        setValue(historyPath, [newHistoryEntry, ...currentHistory]);
+        setFocusedFieldValue(null);
     };
     
     const fullHistory = [
@@ -117,12 +118,12 @@ const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; contr
             </div>
              <div className="col-span-6 md:col-span-2">
                  <FormField control={control} name={`${fieldName}.proposedBy.current`} render={({ field }) => (
-                    <FormItem><Select onValueChange={(val) => { setFocusedFieldValue({field: 'proposedBy', value: field.value}); field.onChange(val); handleFieldChange('proposedBy', val); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                    <FormItem><Select onValueChange={(val) => { const oldVal = field.value; field.onChange(val); handleFieldChange('proposedBy', val, oldVal); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
              <div className="col-span-6 md:col-span-3">
                  <FormField control={control} name={`${fieldName}.status.current`} render={({ field }) => (
-                    <FormItem><Select onValueChange={(val) => { setFocusedFieldValue({field: 'status', value: field.value}); field.onChange(val); handleFieldChange('status', val); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                    <FormItem><Select onValueChange={(val) => { const oldVal = field.value; field.onChange(val); handleFieldChange('status', val, oldVal); }} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
              <div className="col-span-12 md:col-span-1 flex items-center justify-end">
