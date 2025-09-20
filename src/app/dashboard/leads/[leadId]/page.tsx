@@ -192,6 +192,7 @@ export default function LeadDetailPage() {
   const [selectedProvider, setSelectedProvider] = React.useState<RegisteredLeadProvider | null>(null);
   const [selectedProviderListings, setSelectedProviderListings] = React.useState<ListingSchema[]>([]);
   const [selectedChat, setSelectedChat] = React.useState<ChatSubmission | null>(null);
+  const [agentToAdd, setAgentToAdd] = React.useState<string | null>(null);
   
 
   React.useEffect(() => {
@@ -283,14 +284,22 @@ export default function LeadDetailPage() {
     };
     setSelectedChat(mockSubmission);
   };
+
+   const handleAddAgent = (agentEmail: string) => {
+    if (lead) {
+        addAgentToLead(lead.id, agentEmail);
+        toast({ title: 'Agent Added', description: 'The agent now has access to this transaction.' });
+        setAgentToAdd(null);
+    }
+  };
   
   if (isAuthLoading || isDataLoading || !lead) {
     return <LeadDetailPageSkeleton />;
   }
 
   const customer = users[lead.customerId];
-  const leadSourceUser = users[lead.registeredBy];
   const agentUser = lead.agentId ? users[lead.agentId] : null;
+  const allAgents = Object.values(users).filter(u => u.role === 'Agent');
 
   const providerUser = selectedProvider ? users[selectedProvider.providerEmail] : null;
   const isPremiumProvider = providerUser?.plan === 'Paid_Premium';
@@ -300,10 +309,19 @@ export default function LeadDetailPage() {
   const isProvider = user?.email === providerUser?.email;
   const isAgent = user?.email === lead.agentId;
   
-  const canAddActivity = isO2O || (isPremiumProvider && (isCustomer || isProvider || isAgent));
+  const canAddActivity = isO2O || isAgent || (isPremiumProvider && (isCustomer || isProvider));
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
   
-  const chatPartner = isPremiumProvider ? (isCustomer ? 'Developer' : 'Customer') : 'O2O Team';
+  let chatPartnerName = "O2O Team";
+
+  if (isPremiumProvider) {
+    if (isCustomer) {
+      chatPartnerName = providerUser?.companyName || "Developer";
+    } else if (isProvider) {
+      chatPartnerName = customer?.companyName || "Customer";
+    }
+  }
+
 
   return (
     <>
@@ -387,7 +405,7 @@ export default function LeadDetailPage() {
                                   <CardContent>
                                     <Button onClick={handleChatClick} className="w-full">
                                         <MessageSquare className="mr-2 h-4 w-4" />
-                                        Chat with {chatPartner}
+                                        Chat with {chatPartnerName}
                                     </Button>
                                   </CardContent>
                                </Card>
@@ -410,11 +428,34 @@ export default function LeadDetailPage() {
                                             <p className="text-xs">{providerUser.userName}</p>
                                         </div>
                                     )}
-                                    {agentUser && (
+                                    {agentUser ? (
                                         <div className="p-3 bg-secondary/50 rounded-md">
                                             <p className="text-xs text-muted-foreground">Agent</p>
                                             <p className="font-semibold">{agentUser.companyName}</p>
                                             <p className="text-xs">{agentUser.userName}</p>
+                                        </div>
+                                    ) : (isCustomer || isProvider) && (
+                                        <div className="pt-2">
+                                            {agentToAdd ? (
+                                                <div className="space-y-2">
+                                                    <Select onValueChange={setAgentToAdd} defaultValue={agentToAdd}>
+                                                        <SelectTrigger><SelectValue placeholder="Select an agent..." /></SelectTrigger>
+                                                        <SelectContent>
+                                                            {allAgents.map(agent => (
+                                                                <SelectItem key={agent.email} value={agent.email}>{agent.userName} ({agent.companyName})</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <div className="flex gap-2">
+                                                        <Button size="sm" className="w-full" onClick={() => handleAddAgent(agentToAdd)}>Confirm</Button>
+                                                        <Button size="sm" variant="ghost" onClick={() => setAgentToAdd(null)}>Cancel</Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <Button variant="outline" size="sm" className="w-full" onClick={() => setAgentToAdd('')}>
+                                                    <UserPlus className="mr-2 h-4 w-4" /> Add Agent as Facilitator
+                                                </Button>
+                                            )}
                                         </div>
                                     )}
                                 </CardContent>
@@ -451,7 +492,7 @@ export default function LeadDetailPage() {
                                                                 onSubmit={handleProposalSubmit} 
                                                             />
                                                         )}
-                                                         {(isCustomer || isAgent) && (
+                                                         {(isCustomer || isAgent || isO2O) && (
                                                             <div className="p-3 bg-secondary/50 rounded-md">
                                                                 <p className="text-sm font-semibold mb-2 text-primary">Developer's Proposal</p>
                                                                 {property.rentPerSft !== undefined ? (
