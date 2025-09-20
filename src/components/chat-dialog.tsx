@@ -72,10 +72,22 @@ export function ChatDialog({
   }
 
   React.useEffect(() => {
-    if (submission?.listing && submission.chatPartnerName) {
-        let initialMessageText = `Hi ${user?.userName || 'there'}, this is the O2O Assistant. I see you're interested in property ${submission.listing.listingId}. How can I help you?`;
-        if(submission.chatPartnerName !== 'O2O Team') {
-            initialMessageText = `Hi ${user?.userName || 'there'}, thank you for your interest in property ${submission.listing.listingId}. I represent ${submission.chatPartnerName}. How can I assist you?`;
+    if (isOpen && submission?.listing && submission.chatPartnerName && user) {
+        let initialMessageText: string;
+        const isCustomerView = user.email === submission.demandUserEmail;
+
+        if (submission.chatPartnerName === 'O2O Team') {
+            // Brokered Model
+            initialMessageText = `Hi ${user.userName || 'there'}, this is the O2O Assistant. I see you're interested in property ${submission.listing.listingId}. How can I help you?`;
+        } else {
+            // Direct Model (Paid_Premium)
+            if (isCustomerView) {
+                // Customer is viewing the chat. The initial message is from the Developer's perspective.
+                initialMessageText = `Hi ${user.userName}, thank you for your interest in property ${submission.listing.listingId}. I represent ${submission.chatPartnerName}. How can I assist you?`;
+            } else {
+                // Developer or Agent is viewing the chat. The initial message is from the Customer's perspective.
+                 initialMessageText = `Hi ${submission.chatPartnerName}, I am interested in property ${submission.listing.listingId}. I represent ${user.companyName}.`;
+            }
         }
 
       setMessages([
@@ -89,7 +101,7 @@ export function ChatDialog({
     } else {
         setMessages([]);
     }
-  }, [submission, user]);
+  }, [submission, user, isOpen]);
 
   React.useEffect(() => {
     if (scrollViewportRef.current) {
@@ -154,14 +166,23 @@ export function ChatDialog({
   };
 
   if (!submission?.listing) return null;
+  
+  const dialogTitle = submission.chatPartnerName === 'O2O Team' 
+    ? `Chat about Property: ${submission.listing.listingId}`
+    : `Chat with ${submission.chatPartnerName}`;
+    
+  const dialogDescription = submission.chatPartnerName === 'O2O Team'
+    ? 'Your messages will be sent to the O2O Assistant.'
+    : `This is a direct channel to ${submission.chatPartnerName}.`;
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg h-[70vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-2">
-          <DialogTitle>Chat about Property: {submission.listing.listingId}</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
-            You are now chatting with {submission.chatPartnerName}.
+            {dialogDescription}
           </DialogDescription>
         </DialogHeader>
         <div className="flex-grow overflow-hidden px-6">
