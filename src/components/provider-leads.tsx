@@ -91,10 +91,10 @@ export function ProviderLeads() {
         <div className="mt-8">
             <div className="mb-8">
                 <h2 className="text-3xl font-bold font-headline tracking-tight">
-                    {isAgent ? 'My Registered Leads' : 'Registered Leads'}
+                    {isAgent ? 'My Registered Leads' : 'My Leads & Proposals'}
                 </h2>
                 <p className="text-muted-foreground mt-2">
-                    {isAgent ? 'Track the status and activity of the leads you have registered.' : 'Review new leads and manage their activity. Click "View Activity" to acknowledge or reject.'}
+                    {isAgent ? 'Track the status and activity of the leads you have registered.' : 'Review new leads, submit your commercial proposals, and manage transaction activities.'}
                 </p>
             </div>
             <Card>

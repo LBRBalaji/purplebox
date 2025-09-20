@@ -76,7 +76,7 @@ const MainDashboard = () => {
       <Tabs value={providerTab} onValueChange={setProviderTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="my-listings">My Listings</TabsTrigger>
-          <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
+          <TabsTrigger value="registered-leads">My Leads & Proposals</TabsTrigger>
           <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
         <TabsContent value="my-listings"><ProviderListings /></TabsContent>
