@@ -6,27 +6,16 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { ArrowRight, Building, Check, Clock, MessageSquare, User, X } from 'lucide-react';
+import { ArrowRight, Building } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus, Submission } from '@/contexts/data-context';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { ChatDialog } from './chat-dialog';
 import type { ListingSchema } from '@/lib/schema';
-
-const providerStatusConfig: { [key in RegisteredLeadStatus]: { text: string; icon: React.ElementType, color: string } } = {
-  Pending: { text: 'Pending', icon: Clock, color: 'text-amber-600' },
-  Acknowledged: { text: 'Acknowledged', icon: Check, color: 'text-green-600' },
-  Rejected: { text: 'Rejected', icon: X, color: 'text-red-600' },
-};
-
-type ChatSubmission = Submission & { listing?: ListingSchema };
 
 export function CustomerTransactions() {
   const { user, users } = useAuth();
-  const { registeredLeads, listings } = useData();
-  const [selectedChat, setSelectedChat] = React.useState<ChatSubmission | null>(null);
+  const { registeredLeads } = useData();
 
   const myTransactions = React.useMemo(() => {
     if (!user) return [];
@@ -42,22 +31,6 @@ export function CustomerTransactions() {
         </Card>
       </div>
     );
-  }
-
-  const handleChatClick = (lead: RegisteredLead, providerEmail: string) => {
-    const listingId = lead.providers.find(p => p.providerEmail === providerEmail)?.properties[0]?.listingId;
-    const listing = listings.find(l => l.listingId === listingId);
-    
-    // We create a mock submission object to pass to the chat dialog
-    const mockSubmission: ChatSubmission = {
-      submissionId: `chat-${lead.id}-${providerEmail}`,
-      listingId: listingId || '',
-      demandId: lead.id,
-      providerEmail: providerEmail,
-      status: 'Approved', 
-      listing: listing,
-    };
-    setSelectedChat(mockSubmission);
   }
 
   return (
@@ -99,9 +72,6 @@ export function CustomerTransactions() {
                         </TableCell>
                         <TableCell className="text-right">
                             <div className="flex gap-2 justify-end">
-                                <Button variant="outline" size="sm" onClick={() => handleChatClick(lead, lead.providers[0].providerEmail)}>
-                                    <MessageSquare className="mr-2 h-4 w-4" /> Chat
-                                </Button>
                                 <Button asChild variant="outline" size="sm">
                                     <Link href={`/dashboard/leads/${lead.id}`}>
                                         View Activity <ArrowRight className="ml-2 h-4 w-4" />
@@ -117,7 +87,6 @@ export function CustomerTransactions() {
             </CardContent>
         </Card>
       </div>
-      <ChatDialog submission={selectedChat} isOpen={!!selectedChat} onOpenChange={() => setSelectedChat(null)} />
     </>
   );
 }

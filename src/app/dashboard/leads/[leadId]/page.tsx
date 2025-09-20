@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
-import { useData, type TransactionActivity, type RegisteredLead, type RegisteredLeadProvider, type RegisteredLeadProperty } from '@/contexts/data-context';
+import { useData, type TransactionActivity, type RegisteredLead, type RegisteredLeadProvider, type RegisteredLeadProperty, type Submission } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-
+import { ChatDialog } from '@/components/chat-dialog';
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
   'Site Visit Request': CalendarIcon,
@@ -45,6 +45,9 @@ const ProposalFormSchema = z.object({
   actualChargeableArea: z.coerce.number().positive("Area must be positive."),
 });
 type ProposalFormValues = z.infer<typeof ProposalFormSchema>;
+
+
+type ChatSubmission = Submission & { listing?: ListingSchema };
 
 
 function LeadDetailPageSkeleton() {
@@ -193,6 +196,7 @@ export default function LeadDetailPage() {
   
   const [selectedProvider, setSelectedProvider] = React.useState<RegisteredLeadProvider | null>(null);
   const [selectedProviderListings, setSelectedProviderListings] = React.useState<ListingSchema[]>([]);
+  const [selectedChat, setSelectedChat] = React.useState<ChatSubmission | null>(null);
   
 
   React.useEffect(() => {
@@ -271,6 +275,22 @@ export default function LeadDetailPage() {
       setSelectedProvider(provider);
       setSelectedProviderListings(devListings);
   }
+  
+  const handleChatClick = () => {
+    if (!lead || !selectedProvider) return;
+    const listingId = selectedProvider.properties[0]?.listingId;
+    const listing = listings.find(l => l.listingId === listingId);
+
+    const mockSubmission: ChatSubmission = {
+      submissionId: `chat-${lead.id}-${selectedProvider.providerEmail}`,
+      listingId: listingId || '',
+      demandId: lead.id,
+      providerEmail: selectedProvider.providerEmail,
+      status: 'Approved',
+      listing: listing,
+    };
+    setSelectedChat(mockSubmission);
+  };
   
   if (isAuthLoading || isDataLoading || !lead) {
     return <LeadDetailPageSkeleton />;
@@ -365,6 +385,17 @@ export default function LeadDetailPage() {
                               </Card>
                           </div>
                           <div className="space-y-6 sticky top-24">
+                               <Card>
+                                  <CardHeader>
+                                    <CardTitle>Communication</CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <Button onClick={handleChatClick} className="w-full">
+                                        <MessageSquare className="mr-2 h-4 w-4" />
+                                        Chat with O2O Team
+                                    </Button>
+                                  </CardContent>
+                               </Card>
                               {!isCustomer && (
                                   <Card>
                                       <CardHeader>
@@ -482,6 +513,11 @@ export default function LeadDetailPage() {
           )}
         </div>
       </main>
+      <ChatDialog
+        submission={selectedChat}
+        isOpen={!!selectedChat}
+        onOpenChange={() => setSelectedChat(null)}
+      />
     </>
   );
 }

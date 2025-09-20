@@ -39,7 +39,10 @@
         "properties": [
           {
             "listingId": "LST-TGAV6G",
-            "status": "Pending"
+            "status": "Pending",
+            "rentPerSft": 28,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 350000
           }
         ]
       }
