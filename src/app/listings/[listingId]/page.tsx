@@ -213,28 +213,20 @@ export default function ListingDetailPage() {
     const isLoading = isAuthLoading || isDataLoading;
 
     React.useEffect(() => {
-        if (isLoading) return;
+        if (isDataLoading) return;
         
         const listingId = params.listingId as string;
         const foundListing = listings.find(l => l.listingId === listingId);
 
-        if (!foundListing) {
+        if (!foundListing || foundListing.status !== 'approved') {
             router.push('/listings');
             return;
         }
 
-        const isSuperAdminOrO2O = user?.role === 'SuperAdmin' || user?.role === 'O2O';
-        const isOwner = user?.email === foundListing.developerId;
-        const isApproved = foundListing.status === 'approved';
-
-        if (isApproved || isSuperAdminOrO2O || isOwner) {
-            setListing(foundListing);
-            if (user && isApproved) {
-                 logListingView(user, listingId);
-            }
-        } else {
-             router.push('/listings');
-             return;
+        setListing(foundListing);
+        
+        if (user) { // Only log view if a user is logged in
+             logListingView(user, listingId);
         }
         
         try {
@@ -258,7 +250,7 @@ export default function ListingDetailPage() {
              setCurrentIndex(foundIndex);
         }
 
-    }, [params.listingId, listings, isLoading, user, router, logListingView]);
+    }, [params.listingId, listings, isDataLoading, user, router, logListingView]);
 
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
@@ -301,12 +293,6 @@ export default function ListingDetailPage() {
         );
     }, [user, listing, registeredLeads]);
 
-    if (isLoading || !listing) {
-        return <DetailPageSkeleton />;
-    }
-
-    const isShortlisted = !!user && generalShortlist.includes(listing.listingId);
-    
     const handleDownloadRequest = () => {
         if (!user) {
             setIsLoginDialogOpen(true);
@@ -322,6 +308,7 @@ export default function ListingDetailPage() {
             return;
         }
 
+        if (!listing) return;
         const { success, limitReached } = logDownload(user, [listing]);
         
         if (success) {
@@ -398,6 +385,12 @@ export default function ListingDetailPage() {
             });
         }
     };
+
+    if (isLoading || !listing) {
+        return <DetailPageSkeleton />;
+    }
+
+    const isShortlisted = !!user && generalShortlist.includes(listing.listingId);
     
     const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
 
@@ -657,11 +650,9 @@ export default function ListingDetailPage() {
                                         <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
                                         {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist'}
                                     </Button>
-                                    {user && user.role === 'User' && (
-                                        <Button className="w-full" onClick={handleDownloadRequest}>
-                                            <Download className="mr-2 h-4 w-4" /> Download Details as CSV
-                                        </Button>
-                                    )}
+                                    <Button className="w-full" onClick={handleDownloadRequest}>
+                                        <Download className="mr-2 h-4 w-4" /> Download Details as CSV
+                                    </Button>
                                 </CardFooter>
                             </Card>
 
@@ -706,5 +697,3 @@ export default function ListingDetailPage() {
     );
 
 }
-
-    
