@@ -257,12 +257,14 @@ export default function ListingDetailPage() {
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
 
-    const handleGetQuote = () => {
+    const handleGetQuote = (isBrokered = false) => {
         if (!user) {
             setIsLoginDialogOpen(true);
             return;
         }
         if (!listing) return;
+
+        const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
 
         const newLead: Omit<RegisteredLead, 'registeredAt'> = {
             id: `LDR-QUOTE-${Date.now()}`,
@@ -274,7 +276,7 @@ export default function ListingDetailPage() {
             requirementsSummary: `Quote requested for Property ID: ${listing.warehouseBoxId || listing.listingId}`,
             registeredBy: user.email,
             providers: [{
-                providerEmail: listing.developerId,
+                providerEmail: providerEmail,
                 properties: [{ listingId: listing.listingId, status: 'Pending' }]
             }],
             isO2OCollaborator: true, // Mark as a direct inquiry
@@ -282,9 +284,12 @@ export default function ListingDetailPage() {
 
         addRegisteredLead(newLead, user.email);
         setJustRequestedQuote(true); // Update local state immediately
+        
+        const partnerName = isBrokered ? "the O2O team" : "the developer";
+        
         toast({
             title: 'Quote Request Sent!',
-            description: `The developer has been notified of your interest in "${listing.warehouseBoxId || listing.listingId}". Your interaction with developer begins on the 'My Transactions' page. Starting with commercial quote, track all communication, site visits, and negotiations for this property on 'My Transactions' page.`,
+            description: `You have been connected with ${partnerName} for listing "${listing.warehouseBoxId || listing.listingId}". Your interaction begins on the 'My Transactions' page, where you can track all communications.`,
         });
     };
 
@@ -406,14 +411,6 @@ export default function ListingDetailPage() {
         }
         setIsLayoutRequestOpen(true);
     };
-
-    const handleLogDemandClick = () => {
-      if (!user) {
-        setIsLoginDialogOpen(true);
-        return;
-      }
-      router.push('/dashboard?logNew=true');
-    }
 
     const handleShortlistClick = () => {
         if (!user) {
@@ -662,26 +659,22 @@ export default function ListingDetailPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
-                                     {isPremiumListing ? (
-                                        <>
-                                            {hasRequestedQuote ? (
-                                                <div className="w-full text-center space-y-2">
-                                                    <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
-                                                        <Check className="h-4 w-4" /> Commercials Requested
-                                                    </p>
-                                                    <Button asChild variant="outline" className="w-full">
-                                                        <Link href={`/dashboard/leads/${quoteRequestLead?.id}`}>
-                                                            Go to Transactions <ArrowRight className="ml-2 h-4 w-4"/>
-                                                        </Link>
-                                                    </Button>
-                                                    <p className="text-xs text-muted-foreground px-2">Your interaction with the developer begins here. Track all communication, site visits, and negotiations for this property on the 'My Transactions' page.</p>
-                                                </div>
-                                            ) : (
-                                                <Button onClick={handleGetQuote} className="w-full">
-                                                    Get Commercials Quote
-                                                </Button>
-                                            )}
-                                        </>
+                                     {hasRequestedQuote ? (
+                                        <div className="w-full text-center space-y-2">
+                                            <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
+                                                <Check className="h-4 w-4" /> Commercials Requested
+                                            </p>
+                                            <Button asChild variant="outline" className="w-full">
+                                                <Link href={`/dashboard/leads/${quoteRequestLead?.id}`}>
+                                                    Go to Transactions <ArrowRight className="ml-2 h-4 w-4"/>
+                                                </Link>
+                                            </Button>
+                                            <p className="text-xs text-muted-foreground px-2">Your interaction begins here. Track all communication, site visits, and negotiations for this property on the 'My Transactions' page.</p>
+                                        </div>
+                                     ) : isPremiumListing ? (
+                                        <Button onClick={() => handleGetQuote(false)} className="w-full">
+                                            Get Commercials Quote
+                                        </Button>
                                      ) : (
                                         <Alert variant="default" className="text-center p-4">
                                             <Sparkles className="h-4 w-4" />
@@ -689,7 +682,7 @@ export default function ListingDetailPage() {
                                             <AlertDescription className="text-xs">
                                                 Look for the <Badge className="bg-amber-100 text-amber-800 border-amber-200">Premium</Badge> badge on listings to connect directly with providers.
                                             </AlertDescription>
-                                            <Button size="sm" className="w-full mt-4 h-auto py-2" onClick={handleLogDemandClick}>
+                                            <Button size="sm" className="w-full mt-4 h-auto py-2" onClick={() => handleGetQuote(true)}>
                                                 <div className="flex flex-col text-center">
                                                     <span>Available on Broking Model</span>
                                                     <span className="font-normal text-xs">- Connect with O2O -</span>
@@ -726,7 +719,7 @@ export default function ListingDetailPage() {
                                     </p>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button className="w-full" onClick={handleLogDemandClick}>
+                                    <Button className="w-full" onClick={() => handleGetQuote(true)}>
                                         <ClipboardPlus className="mr-2 h-4 w-4" /> Log Demand
                                     </Button>
                                 </CardFooter>
