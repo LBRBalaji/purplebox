@@ -42,7 +42,7 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
 
 export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'broking' }) {
   const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads } = useData();
+  const { registeredLeads, addRegisteredLead } = useData();
   const router = useRouter();
   
   const isAgent = user?.role === 'Agent';
@@ -72,7 +72,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
     const query = new URLSearchParams();
     query.set('tab', 'register');
     query.set('prefillFromLead', lead.id);
-    router.push(`/dashboard?${query.toString()}`);
+    router.push(`/dashboard/transactions?${query.toString()}`);
   };
 
 

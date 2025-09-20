@@ -139,7 +139,7 @@ const ManageDropdown = ({ isSuperAdmin, isO2O }: { isSuperAdmin: boolean, isO2O:
                     </>
                  )}
                  <DropdownMenuItem asChild><Link href="/dashboard/transactions"><UserCheck className="mr-2 h-4 w-4" /> Lead Registration</Link></DropdownMenuItem>
-                 <DropdownMenuItem asChild><Link href="/dashboard/broking-transactions"><Briefcase className="mr-2 h-4 w-4" /> Broking Transactions</Link></DropdownMenuItem>
+                 <DropdownMenuItem asChild><Link href="/dashboard?tab=broking-desk"><Briefcase className="mr-2 h-4 w-4" /> Broking Transactions</Link></DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

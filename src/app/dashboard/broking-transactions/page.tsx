@@ -16,6 +16,7 @@ export default function BrokingTransactionsPage() {
     React.useEffect(() => {
         if (!isAuthLoading) {
             if (hasAccess) {
+                // Redirect to the new primary broking desk view
                 router.replace('/dashboard?tab=broking-desk');
             } else {
                 router.replace('/dashboard');

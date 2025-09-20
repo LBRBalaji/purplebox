@@ -41,6 +41,7 @@ const MainDashboard = () => {
     const isCustomer = user?.role === 'User';
     const isAgent = user?.role === 'Agent';
 
+    // State for each role's dashboard tabs
     const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'registered-leads');
     const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-transactions');
     const [adminTab, setAdminTab] = React.useState(defaultTabParam || 'approval-queue');
