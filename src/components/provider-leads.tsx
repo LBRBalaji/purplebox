@@ -39,21 +39,22 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
   Rejected: { text: 'Rejected', color: 'text-red-600', icon: X },
 };
 
-export function ProviderLeads() {
+export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'broking' }) {
   const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
   const { registeredLeads } = useData();
   
   const isAgent = user?.role === 'Agent';
-  const isAdminOrO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+  const isAdminOrO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
 
   const myLeads = React.useMemo(() => {
     if (!user) return [];
+
+    if (view === 'broking' && isAdminOrO2O) {
+        return registeredLeads.filter(lead => lead.isO2OCollaborator);
+    }
     
     if (isAdminOrO2O) {
-        return registeredLeads.filter(lead => {
-            const registeringUser = allUsers[lead.registeredBy];
-            return lead.isO2OCollaborator || registeringUser?.role !== 'Agent';
-        });
+        return registeredLeads.filter(lead => !lead.isO2OCollaborator);
     }
 
     if (isAgent) {
@@ -62,9 +63,9 @@ export function ProviderLeads() {
     
     // Default to provider view
     return registeredLeads.filter(lead => 
-      lead.providers.some(p => p.providerEmail === user.email)
+      lead.providers.some(p => p.providerEmail === user.email) && !lead.isO2OCollaborator
     );
-  }, [registeredLeads, user, isAgent, isAdminOrO2O, allUsers]);
+  }, [registeredLeads, user, isAgent, isAdminOrO2O, allUsers, view]);
 
 
   if (isAuthLoading) {
@@ -76,10 +77,10 @@ export function ProviderLeads() {
       <div className="mt-8">
         <Card className="text-center p-12">
             <CardTitle>
-                {isAgent ? 'You Have Not Registered Any Leads' : 'No Leads Registered With You'}
+                {isAgent ? 'You Have Not Registered Any Leads' : 'No Leads Found'}
             </CardTitle>
             <CardDescription className="mt-2">
-                 {isAgent ? 'Use the "Register New Lead" tab to get started.' : 'When the Lakshmi Balaji O2O team registers a new lead with you, it will appear here for your acknowledgment.'}
+                 {isAgent ? 'Use the "Register New Lead" tab to get started.' : 'When a new lead is registered, it will appear here.'}
             </CardDescription>
         </Card>
       </div>
@@ -89,14 +90,6 @@ export function ProviderLeads() {
   return (
     <>
         <div className="mt-8">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold font-headline tracking-tight">
-                    {isAgent ? 'My Registered Leads' : 'My Leads & Proposals'}
-                </h2>
-                <p className="text-muted-foreground mt-2">
-                    {isAgent ? 'Track the status and activity of the leads you have registered.' : 'Review new leads, submit your commercial proposals, and manage transaction activities.'}
-                </p>
-            </div>
             <Card>
                 <CardContent className="p-0">
                     <Table>
