@@ -567,7 +567,7 @@
   },
   {
     "listingId": "LST-MMX3PE",
-    "views": 1,
+    "views": 3,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -576,6 +576,18 @@
         "name": "Kailash Logistics",
         "company": "Kailash Logistics",
         "timestamp": 1758331404141
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347695711
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347695711
       }
     ]
   },

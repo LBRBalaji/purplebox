@@ -571,6 +571,29 @@ export default function ListingDetailPage() {
                                 </CardContent>
                             </Card>
 
+                             {/* Final Actions */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Next Steps</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <Button
+                                            variant={isShortlisted ? 'default' : 'outline'}
+                                            className="w-full h-12"
+                                            onClick={handleShortlistClick}
+                                            disabled={isShortlistLoading}
+                                        >
+                                            <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
+                                            {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist this Property'}
+                                        </Button>
+                                         <Button className="w-full h-12" onClick={handleDownloadRequest}>
+                                            <Download className="mr-2 h-4 w-4" /> Download Details as CSV
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
                             {/* Documents */}
                              <Card>
                                 <CardHeader>
@@ -618,7 +641,7 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-center text-center">
-                                            {listing.rentPerSqFt === 'Get Quote' || (isPremiumDeveloper && !hasRequestedQuote) ? (
+                                            {listing.rentPerSqFt === 'Get Quote' || isPremiumDeveloper ? (
                                                 <span className="text-2xl font-bold">Price on Request</span>
                                             ) : (
                                                 <>
@@ -654,18 +677,6 @@ export default function ListingDetailPage() {
                                             )}
                                         </>
                                      )}
-                                    <Button
-                                        variant={isShortlisted ? 'default' : 'outline'}
-                                        className="w-full"
-                                        onClick={handleShortlistClick}
-                                        disabled={isShortlistLoading}
-                                    >
-                                        <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
-                                        {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist'}
-                                    </Button>
-                                    <Button className="w-full" onClick={handleDownloadRequest}>
-                                        <Download className="mr-2 h-4 w-4" /> Download Details as CSV
-                                    </Button>
                                 </CardFooter>
                             </Card>
 
@@ -710,5 +721,3 @@ export default function ListingDetailPage() {
     );
 
 }
-
-    
