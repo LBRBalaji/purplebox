@@ -9,7 +9,7 @@ import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase, FileSignature, DollarSign, Notebook, UserPlus } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase, FileSignature, DollarSign, Notebook, UserPlus, Users } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -101,7 +101,7 @@ function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingS
     const form = useForm<ProposalFormValues>({
         resolver: zodResolver(ProposalFormSchema),
         defaultValues: {
-            rentPerSft: listing.rentPerSqFt === 'Get Quote' ? undefined : Number(listing.rentPerSqFt),
+            rentPerSft: typeof listing.rentPerSqFt === 'number' ? listing.rentPerSqFt : undefined,
             rentalSecurityDeposit: typeof listing.rentalSecurityDeposit === 'number' ? listing.rentalSecurityDeposit : undefined,
             actualChargeableArea: listing.sizeSqFt,
         }
@@ -109,11 +109,8 @@ function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingS
 
     const propertyInLead = provider.properties.find(p => p.listingId === listing.listingId);
     
-    // @ts-ignore
     const submittedRent = propertyInLead?.rentPerSft;
-    // @ts-ignore
     const submittedDeposit = propertyInLead?.rentalSecurityDeposit;
-    // @ts-ignore
     const submittedArea = propertyInLead?.actualChargeableArea;
 
 
@@ -258,11 +255,8 @@ export default function LeadDetailPage() {
     const propertyIndex = updatedLead.providers[providerIndex].properties.findIndex(p => p.listingId === listingId);
     if(propertyIndex === -1) return;
 
-    // @ts-ignore
     updatedLead.providers[providerIndex].properties[propertyIndex].rentPerSft = values.rentPerSft;
-    // @ts-ignore
     updatedLead.providers[providerIndex].properties[propertyIndex].rentalSecurityDeposit = values.rentalSecurityDeposit;
-    // @ts-ignore
     updatedLead.providers[providerIndex].properties[propertyIndex].actualChargeableArea = values.actualChargeableArea;
     
     updateRegisteredLead(updatedLead);
@@ -303,10 +297,11 @@ export default function LeadDetailPage() {
   
   const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
   const isCustomer = user?.email === lead.customerId;
-  const isAgent = user?.email === lead.agentId;
   const isProvider = user?.role === 'Warehouse Developer';
+  const isAgent = user?.email === lead.agentId;
+  const isPremiumUser = isCustomer && isPremiumProvider;
 
-  const canAddActivity = isO2O || (isPremiumProvider && (isCustomer || isProvider || isAgent));
+  const canAddActivity = isO2O || isPremiumUser || (isProvider && isPremiumProvider);
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
 
   return (
@@ -391,7 +386,7 @@ export default function LeadDetailPage() {
                                   <CardContent>
                                     <Button onClick={handleChatClick} className="w-full">
                                         <MessageSquare className="mr-2 h-4 w-4" />
-                                        Chat about this Transaction
+                                        Chat with O2O Team
                                     </Button>
                                   </CardContent>
                                </Card>
@@ -506,3 +501,5 @@ export default function LeadDetailPage() {
     </>
   );
 }
+
+    
