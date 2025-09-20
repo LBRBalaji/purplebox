@@ -1,5 +1,27 @@
 [
   {
+    "type": "new_lead_for_provider",
+    "title": "New Lead: XYZ Logistics",
+    "message": "A new lead has been registered with you for 1 propert(y/ies). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@indospace.com",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "id": "notif-1758386099585",
+    "timestamp": "2025-09-20T16:34:59.585Z",
+    "isRead": false
+  },
+  {
+    "type": "new_lead_for_provider",
+    "title": "New Lead: XYZ Logistics",
+    "message": "A new lead has been registered with you for 1 propert(y/ies). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@indospace.com",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "id": "notif-1758386099583",
+    "timestamp": "2025-09-20T16:34:59.583Z",
+    "isRead": false
+  },
+  {
     "type": "new_chat_message",
     "title": "New message from Murugan",
     "message": "Regarding transaction LDR-QUOTE-1758348790692: \"can you lease part of the facility?...\"",

@@ -247,7 +247,10 @@
         "properties": [
           {
             "listingId": "LST-U0L6J6",
-            "status": "Pending"
+            "status": "Pending",
+            "rentPerSft": 32,
+            "rentalSecurityDeposit": 8,
+            "actualChargeableArea": 95000
           }
         ]
       }

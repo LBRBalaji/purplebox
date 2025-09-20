@@ -121,24 +121,24 @@ export function GlobalChatWidget() {
             </div>
         )
     }
-
-    const isCustomer = activeChat && user?.email === activeChat.customerId;
-
+    
     let title = "Conversations";
     let subtitle = null;
     let linkHref = null;
 
     if (activeChat) {
+        const isCustomer = user?.email === activeChat.customerId;
         title = activeChat.chatPartnerName;
-        if (isCustomer) {
-            subtitle = `Re: ${activeChat.listing?.listingId} | ${activeChat.listing?.location} | ${activeChat.listing?.sizeSqFt.toLocaleString()} sq. ft.`;
-            linkHref = `/listings/${activeChat.listingId}`;
-        } else {
-            const demand = demands.find(d => d.demandId === activeChat.demandId);
-            const requirement = demand ? `${demand.size.toLocaleString()} sq. ft. in ${demand.locationName}` : 'requirement';
-            subtitle = `Re: ${activeChat.demandId} | ${requirement}`;
-            linkHref = `/dashboard/leads/${activeChat.demandId}`;
-        }
+        
+        const demand = demands.find(d => d.demandId === activeChat.demandId);
+        
+        const leadSummary = `Lead: ${activeChat.demandId}`;
+        const listingSummary = `Listing: ${activeChat.listing?.listingId || 'N/A'}`;
+        
+        subtitle = `${leadSummary} | ${listingSummary}`;
+        
+        // Link to transaction detail page for everyone for consistency
+        linkHref = `/dashboard/leads/${activeChat.demandId}`;
     }
 
 
