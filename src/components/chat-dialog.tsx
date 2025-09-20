@@ -11,12 +11,16 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, MessageSquare } from 'lucide-react';
+import { Send, MessageSquare, Paperclip, File as FileIcon, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type Submission } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
 import { useData, type ChatMessage } from '@/contexts/data-context';
+import { useToast } from '@/hooks/use-toast';
+import { Progress } from './ui/progress';
+import Link from 'next/link';
+
 
 export type ChatSubmission = Submission & { 
     listing?: ListingSchema,
@@ -25,18 +29,33 @@ export type ChatSubmission = Submission & {
     customerCompany: string,
 };
 
+// Function to detect URLs in text and wrap them in <a> tags
+const linkify = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.split(urlRegex).map((part, i) => {
+        if (part.match(urlRegex)) {
+            return <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">{part}</a>;
+        }
+        return part;
+    });
+};
+
+
 export function ChatPanel({
   submission,
 }: {
   submission: ChatSubmission | null;
 }) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const { addChatMessage, typingStatus, updateTypingStatus, fetchTypingStatus } = useData();
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = React.useState('');
   const [isSending, setIsSending] = React.useState(false);
+  const [uploadProgress, setUploadProgress] = React.useState<number | null>(null);
   const scrollViewportRef = React.useRef<HTMLDivElement>(null);
   const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const threadId = submission ? `${submission.demandId}-${submission.listingId}` : null;
   const otherUserTyping = threadId ? typingStatus[threadId] : null;
@@ -67,7 +86,7 @@ export function ChatPanel({
         if (threadMessages.length > prevMessages.length) {
             const lastMessage = threadMessages[threadMessages.length - 1];
             if (user && lastMessage.senderEmail !== user.email) {
-                showNotification(lastMessage.text, lastMessage.senderName);
+                showNotification(lastMessage.text || 'New Attachment', lastMessage.senderName);
             }
         }
         return threadMessages;
@@ -122,6 +141,58 @@ export function ChatPanel({
       });
     }, 2000);
   };
+  
+   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !threadId || !user) return;
+    
+    setIsSending(true);
+    setUploadProgress(0);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload', true);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        setUploadProgress((e.loaded / e.total) * 100);
+      }
+    };
+    
+    xhr.onload = async () => {
+      setUploadProgress(null);
+      setIsSending(false);
+      if (xhr.status === 200) {
+        const result = JSON.parse(xhr.responseText);
+        const message: ChatMessage = {
+          senderEmail: user.email,
+          senderName: user.userName,
+          text: `Attachment: ${file.name}`,
+          timestamp: new Date().toISOString(),
+          attachment: {
+            fileName: file.name,
+            fileUrl: result.url,
+            fileType: file.type
+          }
+        };
+        await addChatMessage(threadId, message);
+        setMessages(prev => [...prev, message]);
+      } else {
+        toast({ variant: 'destructive', title: 'Upload Failed', description: 'Could not upload the file.' });
+      }
+    };
+
+    xhr.onerror = () => {
+      setUploadProgress(null);
+      setIsSending(false);
+      toast({ variant: 'destructive', title: 'Upload Error', description: 'An error occurred during the file upload.' });
+    };
+
+    xhr.send(formData);
+  };
+
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,7 +211,6 @@ export function ChatPanel({
     setNewMessage('');
     updateTypingStatus(threadId, { isTyping: false, userEmail: user.email, userName: user.userName });
     if(typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-
 
     try {
       await addChatMessage(threadId, message);
@@ -201,17 +271,24 @@ export function ChatPanel({
                                 </Avatar>
                             )}
                             <div
-                            className={cn(
+                                className={cn(
                                 'rounded-lg p-3 max-w-xs md:max-w-sm',
                                 isUser
                                 ? 'bg-primary text-primary-foreground'
                                 : 'bg-muted'
-                            )}
+                                )}
                             >
-                            <p className="text-sm">{message.text}</p>
-                            <p className="text-xs opacity-70 mt-1 text-right">
-                            {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
+                                {message.text && <p className="text-sm whitespace-pre-wrap">{linkify(message.text)}</p>}
+                                {message.attachment && (
+                                    <a href={message.attachment.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mt-2 p-2 rounded-md bg-black/10 hover:bg-black/20">
+                                        <FileIcon className="h-5 w-5 shrink-0" />
+                                        <span className="text-sm truncate">{message.attachment.fileName}</span>
+                                        <ExternalLink className="h-4 w-4 shrink-0 ml-auto" />
+                                    </a>
+                                )}
+                                <p className="text-xs opacity-70 mt-1 text-right">
+                                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
                             </div>
                             {isUser && (
                                 <Avatar className="h-8 w-8">
@@ -235,7 +312,18 @@ export function ChatPanel({
             )}
             </div>
             <div className="pt-2">
+            {uploadProgress !== null && <Progress value={uploadProgress} className="mb-2 h-1" />}
             <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                />
+                <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isSending}>
+                    <Paperclip className="h-5 w-5"/>
+                    <span className="sr-only">Attach file</span>
+                </Button>
                 <Textarea
                 placeholder="Type your message..."
                 value={newMessage}

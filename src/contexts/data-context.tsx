@@ -142,8 +142,13 @@ export type LocationCircle = {
 export type ChatMessage = {
     senderEmail: string;
     senderName: string;
-    text: string;
+    text?: string;
     timestamp: string;
+    attachment?: {
+      fileName: string;
+      fileUrl: string;
+      fileType: string;
+    };
 };
 
 export type TypingStatus = {
