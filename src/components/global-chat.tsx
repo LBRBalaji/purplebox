@@ -33,8 +33,8 @@ export function GlobalChatWidget() {
     }
 
     return (
-        <div className="fixed bottom-0 right-8 z-50 w-full max-w-sm">
-            <Card className="flex flex-col h-[500px] shadow-2xl border-border">
+        <div className="fixed bottom-0 right-8 z-50 w-full max-w-sm h-[500px]">
+            <Card className="flex flex-col h-full shadow-2xl border-border">
                 <CardHeader className="flex flex-row items-center justify-between p-4 border-b bg-secondary/50 rounded-t-lg">
                     <CardTitle className="text-base flex items-center gap-2">
                        <MessageSquare className="h-4 w-4" /> Chat with {partnerName}
@@ -48,7 +48,7 @@ export function GlobalChatWidget() {
                         </Button>
                     </div>
                 </CardHeader>
-                <CardContent className="p-0 flex-grow">
+                <CardContent className="p-0 flex-grow relative">
                     <ChatPanel submission={activeChatSubmission} />
                 </CardContent>
             </Card>

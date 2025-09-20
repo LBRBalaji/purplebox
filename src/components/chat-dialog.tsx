@@ -222,62 +222,64 @@ export function ChatPanel({
   const initialMessage = getInitialMessage();
 
   return (
-    <div className="h-full flex flex-col p-0">
-        <ScrollArea className="flex-grow" scrollableViewportRef={scrollViewportRef}>
-            <div className="space-y-4 p-4">
-                {initialMessage && messages.length === 0 && (
-                    <div className="text-center text-sm text-muted-foreground py-10 px-4 border border-dashed rounded-lg">
-                        {initialMessage}
-                    </div>
-                )}
-                {messages.map((message, index) => {
-                const isUser = message.senderEmail === user?.email;
-                const senderInitial = message.senderName ? message.senderName[0].toUpperCase() : '?';
+    <div className="absolute inset-0 flex flex-col">
+        <div className="flex-grow overflow-y-auto">
+            <ScrollArea className="h-full" scrollableViewportRef={scrollViewportRef}>
+                <div className="space-y-4 p-4">
+                    {initialMessage && messages.length === 0 && (
+                        <div className="text-center text-sm text-muted-foreground py-10 px-4 border border-dashed rounded-lg">
+                            {initialMessage}
+                        </div>
+                    )}
+                    {messages.map((message, index) => {
+                    const isUser = message.senderEmail === user?.email;
+                    const senderInitial = message.senderName ? message.senderName[0].toUpperCase() : '?';
 
-                return (
-                    <div
-                        key={index}
-                        className={cn(
-                        'flex items-end gap-2',
-                        isUser ? 'justify-end' : 'justify-start'
-                        )}
-                    >
-                        {!isUser && (
-                            <Avatar className="h-8 w-8">
-                                <AvatarFallback>{senderInitial}</AvatarFallback>
-                            </Avatar>
-                        )}
+                    return (
                         <div
+                            key={index}
                             className={cn(
-                            'rounded-lg p-3 max-w-[80%]',
-                            isUser
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
+                            'flex items-end gap-2',
+                            isUser ? 'justify-end' : 'justify-start'
                             )}
                         >
-                            {message.text && <p className="text-sm break-words [overflow-wrap:anywhere]">{linkify(message.text)}</p>}
-                            {message.attachment && (
-                                <a href={message.attachment.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mt-2 p-2 rounded-md bg-black/10 hover:bg-black/20">
-                                    <FileIcon className="h-5 w-5 shrink-0" />
-                                    <span className="text-sm truncate">{message.attachment.fileName}</span>
-                                    <ExternalLink className="h-4 w-4 shrink-0 ml-auto" />
-                                </a>
+                            {!isUser && (
+                                <Avatar className="h-8 w-8">
+                                    <AvatarFallback>{senderInitial}</AvatarFallback>
+                                </Avatar>
                             )}
-                            <p className="text-xs opacity-70 mt-1 text-right">
-                            {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
+                            <div
+                                className={cn(
+                                'rounded-lg p-3 max-w-[80%]',
+                                isUser
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted'
+                                )}
+                            >
+                                {message.text && <p className="text-sm break-words [overflow-wrap:anywhere]">{linkify(message.text)}</p>}
+                                {message.attachment && (
+                                    <a href={message.attachment.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mt-2 p-2 rounded-md bg-black/10 hover:bg-black/20">
+                                        <FileIcon className="h-5 w-5 shrink-0" />
+                                        <span className="text-sm truncate">{message.attachment.fileName}</span>
+                                        <ExternalLink className="h-4 w-4 shrink-0 ml-auto" />
+                                    </a>
+                                )}
+                                <p className="text-xs opacity-70 mt-1 text-right">
+                                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                            </div>
+                            {isUser && (
+                                <Avatar className="h-8 w-8">
+                                    <AvatarFallback>{senderInitial}</AvatarFallback>
+                                </Avatar>
+                            )}
                         </div>
-                        {isUser && (
-                            <Avatar className="h-8 w-8">
-                                <AvatarFallback>{senderInitial}</AvatarFallback>
-                            </Avatar>
-                        )}
-                    </div>
-                )
-                })}
-            </div>
-        </ScrollArea>
-        <div className="h-6 pt-2 text-xs text-muted-foreground px-4">
+                    )
+                    })}
+                </div>
+            </ScrollArea>
+        </div>
+        <div className="h-6 pt-2 text-xs text-muted-foreground px-4 shrink-0">
         {otherUserTyping && otherUserTyping.isTyping && otherUserTyping.userEmail !== user?.email && (
             <div className="animate-pulse flex items-center gap-2">
             <Avatar className="h-5 w-5">
@@ -287,7 +289,7 @@ export function ChatPanel({
             </div>
         )}
         </div>
-        <div className="pt-2 px-4 pb-4">
+        <div className="pt-2 px-4 pb-4 shrink-0">
         {uploadProgress !== null && <Progress value={uploadProgress} className="mb-2 h-1" />}
         <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
             <input
