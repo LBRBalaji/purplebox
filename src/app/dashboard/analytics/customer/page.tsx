@@ -40,7 +40,7 @@ function StatCard({ title, value, icon: Icon }: { title: string; value: string |
     );
 }
 
-function groupAndSort<T>(items: T[], keyExtractor: (item: T) => string) {
+function groupAndSort<T>(items: T[], keyExtractor: (item: T) => string | undefined) {
   if (!items) return [];
   const counts = items.reduce((acc, item) => {
     const key = keyExtractor(item);
@@ -68,7 +68,7 @@ const activityIconMap: { [key: string]: React.ElementType } = {
 
 export default function CustomerAnalyticsPage() {
     const { user: currentUser, users } = useAuth();
-    const { demands, viewHistory, downloadHistory, listings, isLoading: isDataLoading, registeredLeads, layoutRequests, generalShortlist, transactionActivities, negotiationBoards } = useData();
+    const { demands, viewHistory, downloadHistory, listings, isLoading: isDataLoading, registeredLeads, layoutRequests, transactionActivities, negotiationBoards } = useData();
     const router = useRouter();
 
     const [selectedCompany, setSelectedCompany] = React.useState<string>('all');
@@ -87,7 +87,7 @@ export default function CustomerAnalyticsPage() {
 
     const customerCompanies = React.useMemo(() => {
         const companies = new Set(Object.values(users || {}).filter(u => u.role === 'User').map(u => u.companyName));
-        return Array.from(companies);
+        return Array.from(companies).sort();
     }, [users]);
 
     const filteredData = React.useMemo(() => {
@@ -111,41 +111,57 @@ export default function CustomerAnalyticsPage() {
         const to = dateRange?.to || new Date();
         to.setHours(23, 59, 59, 999);
 
-        const isCompanySelected = selectedCompany && selectedCompany !== 'all';
+        const isAllCompanies = selectedCompany === 'all';
         
-        // Create a set of emails for all users belonging to the selected company
-        const companyUserEmails = isCompanySelected 
-            ? new Set(Object.values(users).filter(u => u.companyName === selectedCompany).map(u => u.email))
-            : new Set(Object.values(users).filter(u => u.role === 'User').map(u => u.email));
+        // Create a set of user emails to filter by.
+        const companyUserEmails = new Set<string>();
+        if (isAllCompanies) {
+            Object.values(users).forEach(u => {
+                if (u.role === 'User') {
+                    companyUserEmails.add(u.email);
+                }
+            });
+        } else {
+             Object.values(users).forEach(u => {
+                if (u.companyName === selectedCompany) {
+                    companyUserEmails.add(u.email);
+                }
+            });
+        }
 
-        const dateFilter = (timestamp: string | number) => {
+        const dateFilter = (timestamp: string | number | Date) => {
             const date = new Date(timestamp);
             return date >= from && date <= to;
         };
         
+        // Filter each data source by the user email set and date range
         const relevantDemands = demands.filter(d => companyUserEmails.has(d.userEmail) && d.createdAt && dateFilter(d.createdAt));
         const relevantViews = viewHistory.filter(v => companyUserEmails.has(v.userId) && dateFilter(v.timestamp));
         const relevantDownloads = downloadHistory.filter(d => companyUserEmails.has(d.userId) && dateFilter(d.timestamp));
         const relevantQuoteRequests = registeredLeads.filter(l => companyUserEmails.has(l.customerId) && dateFilter(l.registeredAt));
-        const relevantLayoutRequests = layoutRequests.filter(r => r.userName === selectedCompany && dateFilter(r.requestedAt)); 
+        const relevantLayoutRequests = layoutRequests.filter(r => {
+             const userForRequest = Object.values(users).find(u => u.email === r.userEmail);
+             return userForRequest && companyUserEmails.has(userForRequest.email) && dateFilter(r.requestedAt);
+        });
 
-        const relevantLeads = registeredLeads.filter(lead => companyUserEmails.has(lead.customerId));
-        const relevantLeadsSet = new Set(relevantLeads.map(l => l.id));
-
-        const relevantTenantImprovements = transactionActivities.filter(a => a.activityType === 'Tenant Improvements' && relevantLeadsSet.has(a.leadId) && dateFilter(a.createdAt));
-        const relevantNegotiationUpdates = negotiationBoards.filter(n => relevantLeadsSet.has(n.leadId)).flatMap(n => n.sessions.filter(s => dateFilter(s.date))).length;
+        const relevantLeadsSet = new Set(registeredLeads.filter(lead => companyUserEmails.has(lead.customerId)).map(l => l.id));
         
+        const relevantTenantImprovements = transactionActivities.filter(a => a.activityType === 'Tenant Improvements' && relevantLeadsSet.has(a.leadId) && dateFilter(a.createdAt));
+        const relevantNegotiationUpdates = negotiationBoards.flatMap(n => n.sessions.filter(s => relevantLeadsSet.has(n.leadId) && dateFilter(s.date))).length;
+        
+        // Group and sort for top lists
         const topViewedLocations = groupAndSort(relevantViews, view => {
             const listing = listings.find(l => l.listingId === view.listingId);
-            return listing?.location || '';
+            return listing?.location;
         });
 
         const topViewedDevelopers = groupAndSort(relevantViews, view => {
             const listing = listings.find(l => l.listingId === view.listingId);
             const developer = listing ? Object.values(users).find(u => u.email === listing.developerId) : null;
-            return developer?.companyName || 'Unknown';
+            return developer?.companyName;
         });
-        
+
+        // Consolidate all activities into a single stream
         const viewActivities = relevantViews.map(item => ({
             type: 'View' as const,
             subject: listings.find(l => l.listingId === item.listingId)?.name || item.listingId,
@@ -213,15 +229,15 @@ export default function CustomerAnalyticsPage() {
             totalDownloads: relevantDownloads.length,
             totalQuoteRequests: relevantQuoteRequests.length,
             totalLayoutRequests: relevantLayoutRequests.length,
-            totalShortlists: 0,
+            totalShortlists: 0, // This logic was not implemented. Keeping at 0.
             totalTenantImprovements: relevantTenantImprovements.length,
-            totalNegotiationUpdates: relevantNegotiationUpdates,
+            totalNegotiationUpdates,
             topViewedLocations,
             topViewedDevelopers,
             recentActivities,
         }
 
-    }, [selectedCompany, dateRange, demands, viewHistory, downloadHistory, listings, users, registeredLeads, layoutRequests, generalShortlist, transactionActivities, negotiationBoards, isDataLoading]);
+    }, [selectedCompany, dateRange, demands, viewHistory, downloadHistory, listings, users, registeredLeads, layoutRequests, transactionActivities, negotiationBoards, isDataLoading]);
 
     if (!hasAccess) return null;
     
