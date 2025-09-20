@@ -5,7 +5,7 @@ import * as React from 'react';
 import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Minus, X, ArrowLeft, Users, ExternalLink } from 'lucide-react';
+import { MessageSquare, Minus, X, ArrowLeft, Users, ExternalLink, Scaling, MapPin } from 'lucide-react';
 import { ChatPanel, type ChatSubmission } from './chat-dialog';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -97,7 +97,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
 
 export function GlobalChatWidget() {
     const { user } = useAuth();
-    const { activeChat, setActiveChat } = useData();
+    const { demands, activeChat, setActiveChat } = useData();
     const [isOpen, setIsOpen] = React.useState(false);
 
     if (!user) return null;
@@ -130,10 +130,12 @@ export function GlobalChatWidget() {
     if (activeChat) {
         title = activeChat.chatPartnerName;
         if (isCustomer) {
-            subtitle = `Re: ${activeChat.listing?.listingId || 'Listing'}`;
+            subtitle = `Re: ${activeChat.listing?.listingId} | ${activeChat.listing?.location} | ${activeChat.listing?.sizeSqFt.toLocaleString()} sq. ft.`;
             linkHref = `/listings/${activeChat.listingId}`;
         } else {
-            subtitle = `Re: ${activeChat.demandId}`;
+            const demand = demands.find(d => d.demandId === activeChat.demandId);
+            const requirement = demand ? `${demand.size.toLocaleString()} sq. ft. in ${demand.locationName}` : 'requirement';
+            subtitle = `Re: ${activeChat.demandId} | ${requirement}`;
             linkHref = `/dashboard/leads/${activeChat.demandId}`;
         }
     }
