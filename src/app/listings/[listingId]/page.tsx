@@ -212,13 +212,13 @@ export default function ListingDetailPage() {
     const isLoading = isAuthLoading || isDataLoading;
 
     React.useEffect(() => {
-        if (isAuthLoading || isDataLoading) return;
+        if (isLoading) return;
         
         const listingId = params.listingId as string;
         const foundListing = listings.find(l => l.listingId === listingId);
 
         if (!foundListing) {
-            if (!isDataLoading) router.push('/listings');
+            router.push('/listings');
             return;
         }
 
@@ -257,7 +257,7 @@ export default function ListingDetailPage() {
              setCurrentIndex(foundIndex);
         }
 
-    }, [params.listingId, listings, isAuthLoading, isDataLoading, user, router, logListingView]);
+    }, [params.listingId, listings, isLoading, user, router, logListingView]);
 
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
