@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus, Share, Linkedin, Twitter, Facebook, Mail, Star, Info, MessageCircle, FileQuestion, HelpCircle, Check, NotepadText } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus, Share, Linkedin, Twitter, Facebook, Mail, Star, Info, MessageCircle, FileQuestion, HelpCircle, Check, NotepadText, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -440,9 +440,17 @@ export default function ListingDetailPage() {
             <main className="container mx-auto p-4 md:p-8">
                 <div className="max-w-6xl mx-auto space-y-8">
                     {/* Header with Navigation */}
-                    <div className="flex justify-between items-center flex-wrap gap-4">
+                    <div className="flex justify-between items-start flex-wrap gap-4">
                         <div>
-                            <Badge variant="secondary">{listing.listingId}</Badge>
+                            <div className="flex items-center gap-4 mb-2">
+                                <Badge variant="secondary">{listing.listingId}</Badge>
+                                {listing.plan === 'Paid_Premium' && (
+                                    <Badge className="bg-amber-400 text-amber-900 shadow-lg border-amber-500">
+                                        <Sparkles className="mr-1.5 h-3 w-3"/>
+                                        Premium Listing
+                                    </Badge>
+                                )}
+                            </div>
                             <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.name || `Warehouse in ${listing.location}`}</h1>
                             <p className="text-lg text-muted-foreground flex items-center gap-2 mt-2">
                                 <MapPin className="h-5 w-5" /> {listing.location}
@@ -655,7 +663,7 @@ export default function ListingDetailPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
-                                    {showQuoteButton && (
+                                    {showQuoteButton ? (
                                         <>
                                             {hasRequestedQuote ? (
                                                 <div className="w-full text-center space-y-2">
@@ -675,6 +683,14 @@ export default function ListingDetailPage() {
                                                 </Button>
                                             )}
                                         </>
+                                     ) : (
+                                        <Alert variant="default" className="text-center">
+                                            <Sparkles className="h-4 w-4" />
+                                            <AlertTitle>Engage Directly!</AlertTitle>
+                                            <AlertDescription>
+                                                Look for the <Badge className="bg-amber-400 text-amber-900">Premium</Badge> badge on listings to connect directly with providers.
+                                            </AlertDescription>
+                                        </Alert>
                                      )}
                                 </CardFooter>
                             </Card>

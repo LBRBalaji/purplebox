@@ -7,7 +7,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare, Smile, Share, Mail, Linkedin, Twitter, Facebook } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare, Smile, Share, Mail, Linkedin, Twitter, Facebook, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { LoginDialog } from './login-dialog';
 import { LimitExceededDialog } from './limit-exceeded-dialog';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from './ui/badge';
 import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DownloadTermsDialog } from './download-terms-dialog';
@@ -147,6 +147,12 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                   </>
               )}
             </Carousel>
+             {listing.plan === 'Paid_Premium' && (
+                <Badge className="absolute top-2 right-2 bg-amber-400 text-amber-900 shadow-lg border-amber-500">
+                    <Sparkles className="mr-1.5 h-3 w-3"/>
+                    Premium Listing
+                </Badge>
+            )}
         </div>
        </CardHeader>
        <CardContent className="flex-grow p-6 space-y-4">
@@ -252,7 +258,7 @@ function DownloadBar() {
                 'Name': l.name,
                 'Location': l.location,
                 'Size (Sq. Ft.)': l.sizeSqFt,
-                'Possession Readiness': l.availabilityDate,
+                'Availability': l.availabilityDate,
                 'Rent (per Sq. Ft.)': l.rentPerSqFt || 'Contact for details',
             }));
 

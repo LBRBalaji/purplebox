@@ -21,7 +21,7 @@ export const listingSchema = z.object({
   listingId: z.string(),
   developerId: z.string(), // references userId
   status: z.enum(['pending', 'approved', 'rejected', 'leased']),
-  plan: z.enum(['Free', 'Paid_Premium']).optional().default('Free'),
+  plan: z.enum(['Free', 'Paid_Premium']).optional().default('Paid_Premium'),
   createdAt: z.string().datetime().optional(),
   
   // General Information
