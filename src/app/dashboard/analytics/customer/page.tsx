@@ -104,7 +104,6 @@ export default function CustomerAnalyticsPage() {
                 topViewedLocations: [],
                 topViewedDevelopers: [],
                 recentActivities: [],
-                selectedUser: null,
             };
         }
 
@@ -114,33 +113,23 @@ export default function CustomerAnalyticsPage() {
 
         const isCompanySelected = selectedCompany && selectedCompany !== 'all';
         
+        // Create a set of emails for all users belonging to the selected company
         const companyUserEmails = isCompanySelected 
-            ? Object.values(users).filter(u => u.companyName === selectedCompany).map(u => u.email)
-            : [];
-        const companyUserEmailsSet = new Set(companyUserEmails);
+            ? new Set(Object.values(users).filter(u => u.companyName === selectedCompany).map(u => u.email))
+            : new Set(Object.values(users).filter(u => u.role === 'User').map(u => u.email));
 
         const dateFilter = (timestamp: string | number) => {
             const date = new Date(timestamp);
             return date >= from && date <= to;
         };
         
-        const userFilter = (item: { customerId?: string; userEmail?: string; userId?: string; userName?: string; companyName?: string; }) => {
-            if (!isCompanySelected) return true; // 'All' selected
-            // Check against company name directly, and also against the list of user emails for that company
-            return item.companyName === selectedCompany || 
-                   (item.customerId && companyUserEmailsSet.has(item.customerId)) ||
-                   (item.userEmail && companyUserEmailsSet.has(item.userEmail)) ||
-                   (item.userId && companyUserEmailsSet.has(item.userId)) ||
-                   (item.userName === selectedCompany) // For layout requests which log company name in userName field
-        };
+        const relevantDemands = demands.filter(d => companyUserEmails.has(d.userEmail) && d.createdAt && dateFilter(d.createdAt));
+        const relevantViews = viewHistory.filter(v => companyUserEmails.has(v.userId) && dateFilter(v.timestamp));
+        const relevantDownloads = downloadHistory.filter(d => companyUserEmails.has(d.userId) && dateFilter(d.timestamp));
+        const relevantQuoteRequests = registeredLeads.filter(l => companyUserEmails.has(l.customerId) && dateFilter(l.registeredAt));
+        const relevantLayoutRequests = layoutRequests.filter(r => r.userName === selectedCompany && dateFilter(r.requestedAt)); 
 
-        const relevantDemands = demands.filter(d => userFilter({ userEmail: d.userEmail, companyName: d.companyName }) && d.createdAt && dateFilter(d.createdAt));
-        const relevantViews = viewHistory.filter(v => userFilter({ userId: v.userId, companyName: v.companyName }) && dateFilter(v.timestamp));
-        const relevantDownloads = downloadHistory.filter(d => userFilter({ userId: d.userId, companyName: d.companyName}) && dateFilter(d.timestamp));
-        const relevantQuoteRequests = registeredLeads.filter(l => userFilter({ customerId: l.customerId, companyName: l.leadName }) && dateFilter(l.registeredAt));
-        const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userName: r.userName, companyName: r.userName}) && dateFilter(r.requestedAt)); 
-        
-        const relevantLeads = registeredLeads.filter(lead => userFilter({ customerId: lead.customerId, companyName: lead.leadName }));
+        const relevantLeads = registeredLeads.filter(lead => companyUserEmails.has(lead.customerId));
         const relevantLeadsSet = new Set(relevantLeads.map(l => l.id));
 
         const relevantTenantImprovements = transactionActivities.filter(a => a.activityType === 'Tenant Improvements' && relevantLeadsSet.has(a.leadId) && dateFilter(a.createdAt));
@@ -230,7 +219,6 @@ export default function CustomerAnalyticsPage() {
             topViewedLocations,
             topViewedDevelopers,
             recentActivities,
-            selectedUser: users[selectedCompany],
         }
 
     }, [selectedCompany, dateRange, demands, viewHistory, downloadHistory, listings, users, registeredLeads, layoutRequests, generalShortlist, transactionActivities, negotiationBoards, isDataLoading]);
