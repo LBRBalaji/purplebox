@@ -45,7 +45,10 @@ const ProposalFormSchema = z.object({
 type ProposalFormValues = z.infer<typeof ProposalFormSchema>;
 
 
-type ChatSubmission = Submission & { listing?: ListingSchema };
+type ChatSubmission = Submission & { 
+    listing?: ListingSchema,
+    chatPartnerName: string,
+};
 
 
 function LeadDetailPageSkeleton() {
@@ -269,6 +272,21 @@ export default function LeadDetailPage() {
       setSelectedProviderListings(devListings);
   }
   
+  const customer = lead ? users[lead.customerId] : null;
+  const providerUser = selectedProvider ? users[selectedProvider.providerEmail] : null;
+  const isPremiumProvider = providerUser?.plan === 'Paid_Premium';
+
+  const isCustomer = user?.email === lead?.customerId;
+  
+  let chatPartnerName = "O2O Team";
+  if (isPremiumProvider) {
+    if (isCustomer) {
+      chatPartnerName = providerUser?.companyName || "Developer";
+    } else { // For developer or agent on a premium deal
+      chatPartnerName = customer?.companyName || "Customer";
+    }
+  }
+
   const handleChatClick = () => {
     if (!lead || !selectedProvider) return;
     const listingId = selectedProvider.properties[0]?.listingId;
@@ -281,6 +299,7 @@ export default function LeadDetailPage() {
       providerEmail: selectedProvider.providerEmail,
       status: 'Approved',
       listing: listing,
+      chatPartnerName,
     };
     setSelectedChat(mockSubmission);
   };
@@ -297,32 +316,16 @@ export default function LeadDetailPage() {
     return <LeadDetailPageSkeleton />;
   }
 
-  const customer = users[lead.customerId];
   const agentUser = lead.agentId ? users[lead.agentId] : null;
   const allAgents = Object.values(users).filter(u => u.role === 'Agent');
-
-  const providerUser = selectedProvider ? users[selectedProvider.providerEmail] : null;
-  const isPremiumProvider = providerUser?.plan === 'Paid_Premium';
   
   const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
-  const isCustomer = user?.email === lead.customerId;
   const isProvider = user?.email === providerUser?.email;
   const isAgent = user?.email === lead.agentId;
   
   const canAddActivity = isO2O || isAgent || (isPremiumProvider && (isCustomer || isProvider));
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
   
-  let chatPartnerName = "O2O Team";
-
-  if (isPremiumProvider) {
-    if (isCustomer) {
-      chatPartnerName = providerUser?.companyName || "Developer";
-    } else if (isProvider) {
-      chatPartnerName = customer?.companyName || "Customer";
-    }
-  }
-
-
   return (
     <>
       <main className="container mx-auto p-4 md:p-8">

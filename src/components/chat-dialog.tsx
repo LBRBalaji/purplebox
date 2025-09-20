@@ -21,11 +21,14 @@ import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
 import { generateChatResponse } from '@/ai/flows/generate-chat-response';
 
-type ChatSubmission = Submission & { listing?: ListingSchema };
+type ChatSubmission = Submission & { 
+    listing?: ListingSchema,
+    chatPartnerName: string,
+};
 
 type Message = {
   id: number;
-  sender: 'User' | 'SuperAdmin';
+  sender: 'User' | 'Model';
   text: string;
   timestamp: string;
 };
@@ -69,12 +72,17 @@ export function ChatDialog({
   }
 
   React.useEffect(() => {
-    if (submission?.listing) {
+    if (submission?.listing && submission.chatPartnerName) {
+        let initialMessageText = `Hi ${user?.userName || 'there'}, this is the O2O Assistant. I see you're interested in property ${submission.listing.listingId}. How can I help you?`;
+        if(submission.chatPartnerName !== 'O2O Team') {
+            initialMessageText = `Hi ${user?.userName || 'there'}, thank you for your interest in property ${submission.listing.listingId}. I represent ${submission.chatPartnerName}. How can I assist you?`;
+        }
+
       setMessages([
         {
           id: 1,
-          sender: 'SuperAdmin',
-          text: `Hi ${user?.userName || 'there'}, this is the O2O Assistant. I see you're interested in property ${submission.listing.listingId}. How can I help you?`,
+          sender: 'Model',
+          text: initialMessageText,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -116,12 +124,13 @@ export function ChatDialog({
             listingId: submission.listingId,
             demandId: submission.demandId,
             userName: user.userName,
+            chatPartnerName: submission.chatPartnerName,
         });
         
         if (aiResponse.response) {
             const adminResponse: Message = {
                 id: Date.now() + 1,
-                sender: 'SuperAdmin',
+                sender: 'Model',
                 text: aiResponse.response,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             };
@@ -134,7 +143,7 @@ export function ChatDialog({
         console.error("Failed to get AI response", error);
         const errorResponse: Message = {
             id: Date.now() + 1,
-            sender: 'SuperAdmin',
+            sender: 'Model',
             text: "Sorry, I'm having trouble connecting right now. Please try again in a moment.",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
@@ -152,7 +161,7 @@ export function ChatDialog({
         <DialogHeader className="p-6 pb-2">
           <DialogTitle>Chat about Property: {submission.listing.listingId}</DialogTitle>
           <DialogDescription>
-            For Demand ID: {submission.demandId}. Your messages will be sent to the O2O Assistant.
+            You are now chatting with {submission.chatPartnerName}.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-grow overflow-hidden px-6">
@@ -166,9 +175,9 @@ export function ChatDialog({
                     message.sender === 'User' ? 'justify-end' : 'justify-start'
                     )}
                 >
-                    {message.sender === 'SuperAdmin' && (
+                    {message.sender === 'Model' && (
                         <Avatar className="h-8 w-8">
-                            <AvatarFallback>A</AvatarFallback>
+                            <AvatarFallback>{submission.chatPartnerName[0]}</AvatarFallback>
                         </Avatar>
                     )}
                     <div
@@ -192,11 +201,11 @@ export function ChatDialog({
                 {isGenerating && (
                     <div className="flex items-end gap-2 justify-start">
                         <Avatar className="h-8 w-8">
-                           <AvatarFallback>A</AvatarFallback>
+                           <AvatarFallback>{submission.chatPartnerName[0]}</AvatarFallback>
                         </Avatar>
                         <div className="rounded-lg p-3 max-w-xs md:max-w-sm bg-muted flex items-center gap-2">
                             <Sparkles className="h-4 w-4 animate-spin"/>
-                            <span className="text-sm italic">O2O Assistant is typing...</span>
+                            <span className="text-sm italic">Typing...</span>
                         </div>
                     </div>
                 )}

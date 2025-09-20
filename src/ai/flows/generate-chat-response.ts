@@ -1,3 +1,4 @@
+
 // src/ai/flows/generate-chat-response.ts
 'use server';
 
@@ -23,6 +24,7 @@ const GenerateChatResponseInputSchema = z.object({
   listingId: z.string().describe("The ID of the property being discussed."),
   demandId: z.string().describe("The ID of the demand this chat pertains to."),
   userName: z.string().describe("The name of the user you are chatting with."),
+  chatPartnerName: z.string().describe("The name of the entity the user is chatting with (e.g., 'O2O Team' or a developer company name)."),
 });
 
 export type GenerateChatResponseInput = z.infer<typeof GenerateChatResponseInputSchema>;
@@ -42,14 +44,20 @@ const prompt = ai.definePrompt({
   model: googleAI.model('gemini-1.5-flash-latest'),
   input: {schema: GenerateChatResponseInputSchema},
   output: {schema: GenerateChatResponseOutputSchema},
-  prompt: `You are an expert real estate assistant for Lakshmi Balaji O2O.
+  prompt: `You are an expert real estate assistant.
   Your name is 'O2O Assistant'. You are chatting with a user named {{{userName}}}.
+
+  {{#if (eq chatPartnerName 'O2O Team')}}
+  You are acting as a neutral intermediary for Lakshmi Balaji O2O.
+  {{else}}
+  You are acting as a direct representative for the property provider, **{{{chatPartnerName}}}**. Do NOT mention you are an AI.
+  {{/if}}
 
   The conversation is about Listing ID: **{{{listingId}}}** in relation to Demand ID: **{{{demandId}}}**.
 
   Your role is to be helpful, professional, and concise.
   - Answer any questions the user has about the property or the process.
-  - If you don't have the information, politely state that you will check with the property provider or your internal team and get back to them.
+  - If you don't have the information, politely state that you will check with your internal team (or the other party) and get back to them.
   - Keep your responses brief and to the point.
   - Do not make up information.
   - End your response by asking if there is anything else you can help with.
