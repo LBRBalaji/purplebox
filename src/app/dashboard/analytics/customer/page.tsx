@@ -1,3 +1,4 @@
+
 // src/app/dashboard/analytics/customer/page.tsx
 'use client';
 
@@ -143,7 +144,7 @@ export default function CustomerAnalyticsPage() {
         
         const downloadActivities = relevantDownloads.map(item => ({
             type: 'Download' as const,
-            subject: listings.find(l => l.listingId === item.listingId)?.name || item.listingId,
+            subject: `Downloaded ${item.listingId ? 'listing ' + item.listingId : 'data'}`,
             timestamp: new Date(item.timestamp).toISOString(),
             link: `/listings/${item.listingId}`,
         }));
@@ -335,3 +336,5 @@ export default function CustomerAnalyticsPage() {
         </main>
     )
 }
+
+    
