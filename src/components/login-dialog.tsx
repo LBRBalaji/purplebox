@@ -23,11 +23,21 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, onLoginSuccess); 
+    login(email, () => {
+        onOpenChange(false);
+        if (onLoginSuccess) {
+            onLoginSuccess();
+        }
+    }); 
   };
   
   const handleTestUserLogin = (testEmail: string) => {
-    login(testEmail, onLoginSuccess);
+    login(testEmail, () => {
+        onOpenChange(false);
+        if (onLoginSuccess) {
+            onLoginSuccess();
+        }
+    });
   }
 
   return (
