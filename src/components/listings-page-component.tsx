@@ -245,7 +245,7 @@ function DownloadBar() {
 
     const proceedWithDownload = () => {
         if (!user) return; // Should not happen if terms are accepted, but as a safeguard.
-        const { success } = logDownload(user.email, selectedForDownload);
+        const { success } = logDownload(user, selectedForDownload);
         if (success) {
             const dataToExport = selectedForDownload.map(l => ({
                 'Property ID': l.listingId,
@@ -330,7 +330,7 @@ function DownloadBar() {
 }
 
 export function ListingsPage() {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const { listings: allListings, isLoading: isDataLoading, selectedForDownload, toggleSelectedForDownload, generalShortlist, toggleGeneralShortlist, locationCircles } = useData();
   const { toast } = useToast();
@@ -542,7 +542,7 @@ const searchPlaceholders = [
   }
 
   const renderContent = () => {
-    if (isDataLoading) {
+    if (isDataLoading || isAuthLoading) {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (

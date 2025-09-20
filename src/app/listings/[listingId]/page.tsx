@@ -212,13 +212,13 @@ export default function ListingDetailPage() {
     const isLoading = isAuthLoading || isDataLoading;
 
     React.useEffect(() => {
-        if (isLoading) return;
+        if (isAuthLoading || isDataLoading) return;
         
         const listingId = params.listingId as string;
         const foundListing = listings.find(l => l.listingId === listingId);
 
         if (!foundListing) {
-            if (!isLoading) router.push('/listings');
+            if (!isDataLoading) router.push('/listings');
             return;
         }
 
@@ -257,7 +257,7 @@ export default function ListingDetailPage() {
              setCurrentIndex(foundIndex);
         }
 
-    }, [params.listingId, listings, isLoading, user, router, logListingView]);
+    }, [params.listingId, listings, isAuthLoading, isDataLoading, user, router, logListingView]);
 
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
@@ -563,7 +563,7 @@ export default function ListingDetailPage() {
                                             </TableBody>
                                         </Table>
                                     ) : (
-                                        <p className="text-muted-foreground text-sm">No documents have been uploaded for this listing.</p>
+                                        <p className="text-sm text-muted-foreground">No documents have been uploaded for this listing.</p>
                                     )}
                                 </CardContent>
                             </Card>
@@ -571,7 +571,7 @@ export default function ListingDetailPage() {
                         
                         {/* Sticky Sidebar */}
                         <div className="lg:col-span-1 space-y-6">
-                            <div className="sticky top-24 space-y-6">
+                           <div className="sticky top-24 space-y-6">
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Commercials</CardTitle>
@@ -665,5 +665,3 @@ export default function ListingDetailPage() {
         </>
     );
 }
-
-    
