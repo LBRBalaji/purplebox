@@ -22,21 +22,6 @@ import { cn } from '@/lib/utils';
 import { buttonVariants } from './ui/button';
 import type { ChatSubmission } from './chat-dialog';
 
-const priorityLabels: { [key: string]: string } = {
-  size: 'Size Range',
-  location: 'Location & Radius',
-  ceilingHeight: 'Ceiling Height',
-  docks: 'Number of Docks',
-  readiness: 'Readiness',
-  approvals: 'Approvals Status',
-  fireNoc: 'Fire NOC Status',
-  power: 'Sufficient Power',
-  fireSafety: 'Fire Safety Compliance',
-  buildingType: 'Building Type',
-  crane: 'Crane Details',
-  operations: 'Operations Details'
-};
-
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -109,12 +94,6 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                 <h2 className="text-3xl font-bold font-headline tracking-tight">My Demands & Matches</h2>
                 <p className="text-muted-foreground mt-2">Review approved matches submitted for your active demands.</p>
             </div>
-            <a href="https://wa.me/919841098170" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="lg">
-                  <WhatsAppIcon className="mr-2 h-5 w-5" />
-                  Chat with O2O Team
-              </Button>
-            </a>
         </div>
         {myDemandsWithMatches.length > 0 ? (
           <Accordion type="single" collapsible className="w-full space-y-4" onValueChange={handleAccordionChange}>
