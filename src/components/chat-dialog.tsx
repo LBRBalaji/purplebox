@@ -106,7 +106,7 @@ export function ChatDialog({
 
   if (!submission?.listing) return null;
   
-  const isPremium = submission.listing.developerId === user?.email || submission.demandUserEmail === user?.email;
+  const isPremiumProvider = submission.listing.developerId === user?.email || submission.demandUserEmail === user?.email;
   
   const dialogTitle = `Chat with ${submission.chatPartnerName}`;
   const dialogDescription = `Conversation regarding Property ${submission.listing.listingId} and Demand ${submission.demandId}`;
@@ -114,7 +114,7 @@ export function ChatDialog({
   const getInitialMessage = () => {
     if (messages.length > 0) return null;
 
-    if (!isPremium) {
+    if (!isPremiumProvider) {
         return `Hi ${user?.userName}, this is the O2O Assistant. I see you're interested in property ${submission.listing?.listingId}. How can I help you?`;
     }
     
