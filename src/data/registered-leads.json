@@ -1,5 +1,51 @@
 [
   {
+    "id": "LDR-QUOTE-1758347917597",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Seemavaram Part-A",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-X635SS",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:58:37.598Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758347851492",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:57:31.494Z"
+  },
+  {
     "id": "LDR-QUOTE-1758347700510",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

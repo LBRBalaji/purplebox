@@ -668,7 +668,7 @@ export default function ListingDetailPage() {
                                                             Go to Transactions <ArrowRight className="ml-2 h-4 w-4"/>
                                                         </Link>
                                                     </Button>
-                                                    <p className="text-xs text-muted-foreground px-2">Your Interaction with Developer Begins Here.. Track all communication, site visits, and negotiations for this property on the Transactions page.</p>
+                                                    <p className="text-xs text-muted-foreground px-2">Your Interaction with Developer Begins Here.. Starting with Commercial Quote, track all communication, site visits, and negotiations for this property on the Transactions page.</p>
                                                 </div>
                                             ) : (
                                                 <Button onClick={handleGetQuote} className="w-full">
