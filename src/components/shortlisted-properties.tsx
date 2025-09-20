@@ -9,14 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Star, MessageSquare, Download } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import type { Submission } from '@/contexts/data-context';
-import { ChatDialog } from './chat-dialog';
+import type { Submission, ChatSubmission } from '@/contexts/data-context';
 import * as XLSX from 'xlsx';
 
 export function ShortlistedProperties() {
-  const { user } = useAuth();
-  const { shortlistedItems, toggleShortlist } = useData();
-  const [selectedChat, setSelectedChat] = React.useState<Submission | null>(null);
+  const { user, users } = useAuth();
+  const { shortlistedItems, toggleShortlist, openChat } = useData();
 
   const handleDownload = () => {
     const dataToExport = shortlistedItems.map(item => {
@@ -63,6 +61,18 @@ export function ShortlistedProperties() {
     const filename = `Lakshmi_Balaji_O2O_Shortlisted_Properties_${timestamp}.csv`;
 
     XLSX.writeFile(workbook, filename, { bookType: "csv" });
+  };
+  
+  const handleChatInit = (match: Submission) => {
+    if (!user) return;
+    const provider = users[match.providerEmail];
+    const submissionForChat: ChatSubmission = {
+      ...match,
+      chatPartnerName: provider?.companyName || "Developer",
+      customerName: user.userName,
+      customerCompany: user.companyName,
+    };
+    openChat(submissionForChat);
   };
 
   return (
@@ -123,7 +133,7 @@ export function ShortlistedProperties() {
                             <Star className="mr-2 h-4 w-4 fill-current text-yellow-400" />
                             Remove
                         </Button>
-                        <Button className="w-full" onClick={() => setSelectedChat(match)}>
+                        <Button className="w-full" onClick={() => handleChatInit(match)}>
                             <MessageSquare className="mr-2 h-4 w-4" /> Chat
                         </Button>
                         </CardFooter>
@@ -139,9 +149,6 @@ export function ShortlistedProperties() {
           </CardContent>
         </Card>
       </div>
-      <ChatDialog submission={selectedChat} isOpen={!!selectedChat} onOpenChange={() => setSelectedChat(null)} />
     </>
   );
 }
-
-    

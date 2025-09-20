@@ -8,7 +8,7 @@
     "triggeredBy": "admin@kailashlogistics.com",
     "id": "notif-1758370657595",
     "timestamp": "2025-09-20T12:17:37.595Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_chat_message",
@@ -19,6 +19,6 @@
     "triggeredBy": "admin@kailashlogistics.com",
     "id": "notif-1758370647590",
     "timestamp": "2025-09-20T12:17:27.590Z",
-    "isRead": false
+    "isRead": true
   }
 ]
