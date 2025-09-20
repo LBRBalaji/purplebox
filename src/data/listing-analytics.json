@@ -161,7 +161,7 @@
   },
   {
     "listingId": "LST-ZCKK92",
-    "views": 1,
+    "views": 3,
     "downloads": 2,
     "customerIndustries": {},
     "downloadedBy": [
@@ -172,6 +172,20 @@
           1758207777706,
           1758207777706
         ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758345226603
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758345226603
       }
     ]
   },
