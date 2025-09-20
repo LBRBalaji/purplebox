@@ -28,8 +28,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChatPanel, type ChatSubmission } from '@/components/chat-dialog';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChatSubmission } from '@/components/chat-dialog';
 
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
@@ -182,7 +181,7 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead } = useData();
+  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead, openChat } = useData();
   const { toast } = useToast();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
@@ -190,7 +189,6 @@ export default function LeadDetailPage() {
   
   const [selectedProvider, setSelectedProvider] = React.useState<RegisteredLeadProvider | null>(null);
   const [selectedProviderListings, setSelectedProviderListings] = React.useState<ListingSchema[]>([]);
-  const [chatSubmission, setChatSubmission] = React.useState<ChatSubmission | null>(null);
   const [agentToAdd, setAgentToAdd] = React.useState<string | null>(null);
   
 
@@ -290,7 +288,7 @@ export default function LeadDetailPage() {
         }
     }
 
-    const mockSubmission: ChatSubmission = {
+    const submissionForChat: ChatSubmission = {
       submissionId: `chat-${lead.id}-${selectedProvider.providerEmail}`,
       listingId: listingId || '',
       demandId: lead.id,
@@ -301,7 +299,7 @@ export default function LeadDetailPage() {
       customerName: customer?.userName || 'Customer',
       customerCompany: customer?.companyName || 'Customer Company',
     };
-    setChatSubmission(mockSubmission);
+    openChat(submissionForChat);
   };
 
    const handleAddAgent = (agentEmail: string) => {
@@ -327,223 +325,215 @@ export default function LeadDetailPage() {
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
   
   return (
-      <main className="container mx-auto p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-              {lead.providers.length > 1 && selectedProvider && !isProvider ? (
-                  <Button variant="ghost" onClick={() => setSelectedProvider(null)} className="mb-4">
-                      <ArrowLeft className="mr-2 h-4 w-4" /> Back to Developer Selection
-                  </Button>
-              ) : (
-                  <Button variant="ghost" asChild className="mb-4">
-                      <Link href={backLink}>
-                          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Transactions
-                      </Link>
-                  </Button>
-              )}
-              <h2 className="text-3xl font-bold font-headline tracking-tight">Transaction Details</h2>
-              <p className="text-muted-foreground mt-2">
-                  Tracking all activities for Transaction ID: <span className="font-mono text-primary">{lead.id}</span>
-              </p>
-          </div>
+    <main className="container mx-auto p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+            {lead.providers.length > 1 && selectedProvider && !isProvider ? (
+                <Button variant="ghost" onClick={() => setSelectedProvider(null)} className="mb-4">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Developer Selection
+                </Button>
+            ) : (
+                <Button variant="ghost" asChild className="mb-4">
+                    <Link href={backLink}>
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Transactions
+                    </Link>
+                </Button>
+            )}
+            <h2 className="text-3xl font-bold font-headline tracking-tight">Transaction Details</h2>
+            <p className="text-muted-foreground mt-2">
+                Tracking all activities for Transaction ID: <span className="font-mono text-primary">{lead.id}</span>
+            </p>
+        </div>
 
-          {!selectedProvider ? (
-              <DeveloperSelection lead={lead} onSelect={handleProviderSelect} />
-          ) : (
-              <Tabs defaultValue="activity" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
-                      <TabsTrigger value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
-                      <TabsTrigger value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="activity" className="mt-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-                          <div className="md:col-span-2 space-y-6">
-                              {canAddActivity && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
-                              <Card>
-                                  <CardHeader>
-                                      <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>
-                                  </CardHeader>
-                                  <CardContent>
-                                  {activities.length > 0 ? (
-                                          <Timeline>
-                                              {activities.map((activity) => {
-                                                  const Icon = activityIcons[activity.activityType] || Mic;
-                                                  return(
-                                                      <TimelineItem key={activity.activityId}>
-                                                          <TimelineConnector />
-                                                          <TimelineHeader>
-                                                              <TimelineIcon><Icon /></TimelineIcon>
-                                                              <TimelineTitle>{activity.activityType}</TimelineTitle>
-                                                          </TimelineHeader>
-                                                          <TimelineBody className="space-y-2">
-                                                              {activity.details.visitDateTime && <p className="text-sm"><b>Date & Time:</b> {new Date(activity.details.visitDateTime).toLocaleString()}</p>}
-                                                              {activity.details.status && <p className="text-sm"><b>Status:</b> <span className="font-semibold text-primary">{activity.details.status}</span></p>}
-                                                              {activity.details.message && <p className="text-sm"><b>Message:</b> {activity.details.message}</p>}
-                                                              {activity.details.notes && <p className="text-sm"><b>O2O Notes:</b> {activity.details.notes}</p>}
-                                                              {activity.details.feedbackText && <p className="text-sm"><b>Feedback:</b> {activity.details.feedbackText}</p>}
-                                                              {activity.details.improvementsText && <p className="text-sm"><b>Requirements:</b> {activity.details.improvementsText}</p>}
-                                                              <TimelineDescription>
-                                                                  Logged by {users[activity.createdBy]?.userName || activity.createdBy} on {new Date(activity.createdAt).toLocaleDateString()}
-                                                              </TimelineDescription>
-                                                          </TimelineBody>
-                                                      </TimelineItem>
-                                                  )
-                                              })}
-                                          </Timeline>
-                                  ) : (
-                                      <div className="text-center py-8 text-muted-foreground">
-                                          <p>No activities have been logged for this lead yet.</p>
-                                      </div>
-                                  )}
-                                  </CardContent>
-                              </Card>
-                          </div>
-                          <div className="space-y-6 sticky top-24">
-                               <Card>
-                                  <CardHeader>
-                                    <CardTitle>Participants &amp; Chat</CardTitle>
-                                  </CardHeader>
-                                  <CardContent>
-                                    <div className="space-y-4 text-sm">
-                                      {customer && (
-                                          <div className="p-3 bg-secondary/50 rounded-md">
-                                              <p className="text-xs text-muted-foreground">Customer</p>
-                                              <p className="font-semibold">{customer.companyName}</p>
-                                              <p className="text-xs">{customer.userName}</p>
-                                          </div>
-                                      )}
-                                      {providerUser && (
-                                          <div className="p-3 bg-secondary/50 rounded-md">
-                                              <p className="text-xs text-muted-foreground">Provider</p>
-                                              <p className="font-semibold">{providerUser.companyName}</p>
-                                              <p className="text-xs">{providerUser.userName}</p>
-                                          </div>
-                                      )}
-                                      {agentUser && (
-                                          <div className="p-3 bg-secondary/50 rounded-md">
-                                              <p className="text-xs text-muted-foreground">Agent</p>
-                                              <p className="font-semibold">{agentUser.companyName}</p>
-                                              <p className="text-xs">{agentUser.userName}</p>
-                                          </div>
-                                      )}
-                                    </div>
-                                    <Collapsible onOpenChange={(isOpen) => { if (isOpen && !chatSubmission) handleChatInit() }}>
-                                      <CollapsibleTrigger asChild>
-                                          <Button variant="outline" className="w-full mt-4">
-                                              <MessageSquare className="mr-2 h-4 w-4" />
-                                              Chat with {isPremiumProvider ? (isCustomer ? (providerUser?.companyName || 'Developer') : (customer?.companyName || 'Customer')) : 'O2O Team'}
-                                              <ChevronsUpDown className="ml-auto h-4 w-4" />
-                                          </Button>
-                                      </CollapsibleTrigger>
-                                      <CollapsibleContent className="mt-4 border-t pt-4">
-                                        <ChatPanel submission={chatSubmission} />
-                                      </CollapsibleContent>
-                                    </Collapsible>
-                                  </CardContent>
-                               </Card>
-                               { (isO2O || isAgent) && (
-                                <Card>
-                                  <CardHeader>
-                                    <CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5" /> Agent Facilitation</CardTitle>
-                                  </CardHeader>
-                                  <CardContent>
-                                    {agentUser ? (
-                                        <div className="p-3 bg-secondary/50 rounded-md text-sm">
-                                          <p className="font-semibold">Facilitated by:</p>
-                                          <p>{agentUser.userName} ({agentUser.companyName})</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2">
-                                          <p className="text-sm text-muted-foreground">Add an agent to facilitate this transaction.</p>
-                                          <Select onValueChange={setAgentToAdd}>
-                                              <SelectTrigger><SelectValue placeholder="Select an agent..." /></SelectTrigger>
-                                              <SelectContent>
-                                                  {allAgents.map(agent => (
-                                                      <SelectItem key={agent.email} value={agent.email}>{agent.userName} ({agent.companyName})</SelectItem>
-                                                  ))}
-                                              </SelectContent>
-                                          </Select>
-                                          <Button size="sm" className="w-full" onClick={() => agentToAdd && handleAddAgent(agentToAdd)} disabled={!agentToAdd}>Confirm Agent</Button>
-                                        </div>
-                                    )}
-                                  </CardContent>
-                                </Card>
-                               )}
-
-                               {selectedProviderListings.length > 0 && (
-                                  <Card>
-                                      <CardHeader>
-                                          <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Linked Properties</CardTitle>
-                                      </CardHeader>
-                                      <CardContent className="space-y-4">
-                                            {selectedProvider.properties.map((property, index) => {
-                                                const listing = listings.find(l => l.listingId === property.listingId);
-                                                if (!listing) return null;
-                                                
-                                                return (
-                                                  <React.Fragment key={property.listingId}>
-                                                    {index > 0 && <Separator />}
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-start justify-between gap-4">
-                                                            <div className="flex-grow space-y-1">
-                                                                <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-semibold hover:underline">{listing.name}</Link>
-                                                                <p className="text-xs text-muted-foreground">{listing.location} &bull; {listing.sizeSqFt.toLocaleString()} sq. ft.</p>
-                                                            </div>
-                                                            <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                                                                <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
-                                                            </Button>
-                                                        </div>
-                                                         {isProvider && isPremiumProvider && (
-                                                            <ProposalForm 
-                                                                listing={listing} 
-                                                                lead={lead} 
-                                                                provider={selectedProvider} 
-                                                                onSubmit={handleProposalSubmit} 
-                                                            />
-                                                        )}
-                                                         {(isCustomer || isAgent || isO2O) && (
-                                                            <div className="p-3 bg-secondary/50 rounded-md">
-                                                                <p className="text-sm font-semibold mb-2 text-primary">Developer's Proposal</p>
-                                                                {property.rentPerSft !== undefined ? (
-                                                                     <div className="grid grid-cols-2 gap-4 text-sm">
-                                                                        <div>
-                                                                            <p className="text-muted-foreground">Quoted Rent</p>
-                                                                            <p className="font-medium">₹{property.rentPerSft}/sft</p>
-                                                                        </div>
-                                                                         <div>
-                                                                            <p className="text-muted-foreground">Chargeable Area</p>
-                                                                            <p className="font-medium">{property.actualChargeableArea?.toLocaleString()} sft</p>
-                                                                        </div>
-                                                                        <div>
-                                                                            <p className="text-muted-foreground">Security Deposit</p>
-                                                                            <p className="font-medium">{property.rentalSecurityDeposit} months</p>
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    <p className="text-sm text-muted-foreground">Waiting for developer to submit their proposal.</p>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                  </React.Fragment>
+        {!selectedProvider ? (
+            <DeveloperSelection lead={lead} onSelect={handleProviderSelect} />
+        ) : (
+            <Tabs defaultValue="activity" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
+                    <TabsTrigger value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
+                    <TabsTrigger value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
+                </TabsList>
+                <TabsContent value="activity" className="mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                        <div className="md:col-span-2 space-y-6">
+                            {canAddActivity && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                {activities.length > 0 ? (
+                                        <Timeline>
+                                            {activities.map((activity) => {
+                                                const Icon = activityIcons[activity.activityType] || Mic;
+                                                return(
+                                                    <TimelineItem key={activity.activityId}>
+                                                        <TimelineConnector />
+                                                        <TimelineHeader>
+                                                            <TimelineIcon><Icon /></TimelineIcon>
+                                                            <TimelineTitle>{activity.activityType}</TimelineTitle>
+                                                        </TimelineHeader>
+                                                        <TimelineBody className="space-y-2">
+                                                            {activity.details.visitDateTime && <p className="text-sm"><b>Date & Time:</b> {new Date(activity.details.visitDateTime).toLocaleString()}</p>}
+                                                            {activity.details.status && <p className="text-sm"><b>Status:</b> <span className="font-semibold text-primary">{activity.details.status}</span></p>}
+                                                            {activity.details.message && <p className="text-sm"><b>Message:</b> {activity.details.message}</p>}
+                                                            {activity.details.notes && <p className="text-sm"><b>O2O Notes:</b> {activity.details.notes}</p>}
+                                                            {activity.details.feedbackText && <p className="text-sm"><b>Feedback:</b> {activity.details.feedbackText}</p>}
+                                                            {activity.details.improvementsText && <p className="text-sm"><b>Requirements:</b> {activity.details.improvementsText}</p>}
+                                                            <TimelineDescription>
+                                                                Logged by {users[activity.createdBy]?.userName || activity.createdBy} on {new Date(activity.createdAt).toLocaleDateString()}
+                                                            </TimelineDescription>
+                                                        </TimelineBody>
+                                                    </TimelineItem>
                                                 )
                                             })}
-                                      </CardContent>
-                                  </Card>
-                              )}
-                          </div>
-                      </div>
-                  </TabsContent>
-                  <TabsContent value="negotiation-board" className="mt-6">
-                      <NegotiationBoard lead={lead} primaryListing={selectedProviderListings[0] || null} />
-                  </TabsContent>
-                   <TabsContent value="improvements" className="mt-6">
-                      <TenantImprovementsSheet leadId={lead.id} />
-                  </TabsContent>
-              </Tabs>
-          )}
-        </div>
-      </main>
+                                        </Timeline>
+                                ) : (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        <p>No activities have been logged for this lead yet.</p>
+                                    </div>
+                                )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                        <div className="space-y-6 sticky top-24">
+                             <Card>
+                                <CardHeader>
+                                  <CardTitle>Participants &amp; Chat</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  <div className="space-y-4 text-sm">
+                                    {customer && (
+                                        <div className="p-3 bg-secondary/50 rounded-md">
+                                            <p className="text-xs text-muted-foreground">Customer</p>
+                                            <p className="font-semibold">{customer.companyName}</p>
+                                            <p className="text-xs">{customer.userName}</p>
+                                        </div>
+                                    )}
+                                    {providerUser && (
+                                        <div className="p-3 bg-secondary/50 rounded-md">
+                                            <p className="text-xs text-muted-foreground">Provider</p>
+                                            <p className="font-semibold">{providerUser.companyName}</p>
+                                            <p className="text-xs">{providerUser.userName}</p>
+                                        </div>
+                                    )}
+                                    {agentUser && (
+                                        <div className="p-3 bg-secondary/50 rounded-md">
+                                            <p className="text-xs text-muted-foreground">Agent</p>
+                                            <p className="font-semibold">{agentUser.companyName}</p>
+                                            <p className="text-xs">{agentUser.userName}</p>
+                                        </div>
+                                    )}
+                                  </div>
+                                  <Button variant="outline" className="w-full mt-4" onClick={handleChatInit}>
+                                      <MessageSquare className="mr-2 h-4 w-4" />
+                                      Chat with {isPremiumProvider ? (isCustomer ? (providerUser?.companyName || 'Developer') : (customer?.companyName || 'Customer')) : 'O2O Team'}
+                                  </Button>
+                                </CardContent>
+                             </Card>
+                             { (isO2O || isAgent) && (
+                              <Card>
+                                <CardHeader>
+                                  <CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5" /> Agent Facilitation</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  {agentUser ? (
+                                      <div className="p-3 bg-secondary/50 rounded-md text-sm">
+                                        <p className="font-semibold">Facilitated by:</p>
+                                        <p>{agentUser.userName} ({agentUser.companyName})</p>
+                                      </div>
+                                  ) : (
+                                      <div className="space-y-2">
+                                        <p className="text-sm text-muted-foreground">Add an agent to facilitate this transaction.</p>
+                                        <Select onValueChange={setAgentToAdd}>
+                                            <SelectTrigger><SelectValue placeholder="Select an agent..." /></SelectTrigger>
+                                            <SelectContent>
+                                                {allAgents.map(agent => (
+                                                    <SelectItem key={agent.email} value={agent.email}>{agent.userName} ({agent.companyName})</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <Button size="sm" className="w-full" onClick={() => agentToAdd && handleAddAgent(agentToAdd)} disabled={!agentToAdd}>Confirm Agent</Button>
+                                      </div>
+                                  )}
+                                </CardContent>
+                              </Card>
+                             )}
+
+                             {selectedProviderListings.length > 0 && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Linked Properties</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                          {selectedProvider.properties.map((property, index) => {
+                                              const listing = listings.find(l => l.listingId === property.listingId);
+                                              if (!listing) return null;
+                                              
+                                              return (
+                                                <React.Fragment key={property.listingId}>
+                                                  {index > 0 && <Separator />}
+                                                  <div className="space-y-3">
+                                                      <div className="flex items-start justify-between gap-4">
+                                                          <div className="flex-grow space-y-1">
+                                                              <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-semibold hover:underline">{listing.name}</Link>
+                                                              <p className="text-xs text-muted-foreground">{listing.location} &bull; {listing.sizeSqFt.toLocaleString()} sq. ft.</p>
+                                                          </div>
+                                                          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                                                              <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
+                                                          </Button>
+                                                      </div>
+                                                       {isProvider && isPremiumProvider && (
+                                                          <ProposalForm 
+                                                              listing={listing} 
+                                                              lead={lead} 
+                                                              provider={selectedProvider} 
+                                                              onSubmit={handleProposalSubmit} 
+                                                          />
+                                                      )}
+                                                       {(isCustomer || isAgent || isO2O) && (
+                                                          <div className="p-3 bg-secondary/50 rounded-md">
+                                                              <p className="text-sm font-semibold mb-2 text-primary">Developer's Proposal</p>
+                                                              {property.rentPerSft !== undefined ? (
+                                                                   <div className="grid grid-cols-2 gap-4 text-sm">
+                                                                      <div>
+                                                                          <p className="text-muted-foreground">Quoted Rent</p>
+                                                                          <p className="font-medium">₹{property.rentPerSft}/sft</p>
+                                                                      </div>
+                                                                       <div>
+                                                                          <p className="text-muted-foreground">Chargeable Area</p>
+                                                                          <p className="font-medium">{property.actualChargeableArea?.toLocaleString()} sft</p>
+                                                                      </div>
+                                                                      <div>
+                                                                          <p className="text-muted-foreground">Security Deposit</p>
+                                                                          <p className="font-medium">{property.rentalSecurityDeposit} months</p>
+                                                                      </div>
+                                                                  </div>
+                                                              ) : (
+                                                                  <p className="text-sm text-muted-foreground">Waiting for developer to submit their proposal.</p>
+                                                              )}
+                                                          </div>
+                                                      )}
+                                                  </div>
+                                                </React.Fragment>
+                                              )
+                                          })}
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
+                    </div>
+                </TabsContent>
+                <TabsContent value="negotiation-board" className="mt-6">
+                    <NegotiationBoard lead={lead} primaryListing={selectedProviderListings[0] || null} />
+                </TabsContent>
+                 <TabsContent value="improvements" className="mt-6">
+                    <TenantImprovementsSheet leadId={lead.id} />
+                </TabsContent>
+            </Tabs>
+        )}
+      </div>
+    </main>
   );
 }

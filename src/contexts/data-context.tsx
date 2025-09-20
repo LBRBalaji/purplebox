@@ -6,6 +6,7 @@ import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, ty
 import { type User, useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, startOfDay } from 'date-fns';
+import type { ChatSubmission } from '@/components/chat-dialog';
 
 export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
 export type AgentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Hold';
@@ -208,6 +209,9 @@ type DataContextType = {
   typingStatus: Record<string, TypingStatus>;
   updateTypingStatus: (threadId: string, status: TypingStatus) => Promise<void>;
   fetchTypingStatus: (threadId: string) => Promise<void>;
+  activeChatSubmission: ChatSubmission | null;
+  openChat: (submission: ChatSubmission) => void;
+  closeChat: () => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -251,6 +255,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [layoutRequests, setLayoutRequests] = useState<LayoutRequestRecord[]>([]);
   const [chatMessages, setChatMessages] = useState<Record<string, ChatMessage[]>>({});
   const [typingStatus, setTypingStatus] = useState<Record<string, TypingStatus>>({});
+  const [activeChatSubmission, setActiveChatSubmission] = useState<ChatSubmission | null>(null);
 
    useEffect(() => {
     async function loadInitialData() {
@@ -858,6 +863,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistLayoutRequests]);
 
+  const openChat = useCallback((submission: ChatSubmission) => {
+    setActiveChatSubmission(submission);
+  }, []);
+
+  const closeChat = useCallback(() => {
+    setActiveChatSubmission(null);
+  }, []);
 
   return (
     <DataContext.Provider value={{ 
@@ -892,6 +904,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         typingStatus,
         updateTypingStatus,
         fetchTypingStatus,
+        activeChatSubmission,
+        openChat,
+        closeChat,
         }}>
       {children}
     </DataContext.Provider>

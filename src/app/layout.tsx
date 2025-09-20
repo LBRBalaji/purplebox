@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AlertTriangle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GlobalChatWidget } from '@/components/global-chat';
 
 export const metadata: Metadata = {
   title: 'Lakshmi Balaji O2O: Sourcing & Leasing Simplified',
@@ -85,6 +86,7 @@ export default function RootLayout({
             <Header />
             <main className="flex-grow flex flex-col">{children}</main>
             <Footer />
+            <GlobalChatWidget />
           </DataProvider>
         </AuthProvider>
         <Toaster />
