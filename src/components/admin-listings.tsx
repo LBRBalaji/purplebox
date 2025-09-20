@@ -361,13 +361,26 @@ export function AdminListings() {
   }, [listings, keywordFilter, developerFilter, circleFilter, availabilityFilter, sizeRange, premiumOnly]);
   
   const filteredStats = React.useMemo(() => {
-    const developerIds = new Set(filteredListings.map(l => l.developerId));
-    const totalSize = filteredListings.reduce((acc, l) => acc + l.sizeSqFt, 0);
+    const premiumListings = filteredListings.filter(l => l.plan === 'Paid_Premium');
+    const nonPremiumListings = filteredListings.filter(l => l.plan !== 'Paid_Premium');
+    
     return {
-        listingCount: filteredListings.length,
-        developerCount: developerIds.size,
-        totalSize: totalSize.toLocaleString(),
-    }
+        total: {
+            listingCount: filteredListings.length,
+            developerCount: new Set(filteredListings.map(l => l.developerId)).size,
+            totalSize: filteredListings.reduce((acc, l) => acc + l.sizeSqFt, 0).toLocaleString(),
+        },
+        premium: {
+            listingCount: premiumListings.length,
+            developerCount: new Set(premiumListings.map(l => l.developerId)).size,
+            totalSize: premiumListings.reduce((acc, l) => acc + l.sizeSqFt, 0).toLocaleString(),
+        },
+        nonPremium: {
+            listingCount: nonPremiumListings.length,
+            developerCount: new Set(nonPremiumListings.map(l => l.developerId)).size,
+            totalSize: nonPremiumListings.reduce((acc, l) => acc + l.sizeSqFt, 0).toLocaleString(),
+        }
+    };
   }, [filteredListings]);
 
   const getProviderName = (developerId: string) => {
@@ -636,16 +649,34 @@ export function AdminListings() {
                     </div>
                 </Card>
 
-                <Card className="mb-8">
+                 <Card className="mb-8">
                     <CardHeader>
                         <CardTitle>Filtered Results</CardTitle>
                         <CardDescription>A summary of the listings matching your current filters.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <FilterStatCard title="Total Listings" value={filteredStats.listingCount} icon={Warehouse} />
-                            <FilterStatCard title="Unique Developers" value={filteredStats.developerCount} icon={Users} />
-                            <FilterStatCard title="Total Size (Sq. Ft.)" value={filteredStats.totalSize} icon={Scaling} />
+                    <CardContent className="space-y-6">
+                        <div className="space-y-4">
+                            <h3 className="font-semibold flex items-center gap-2">
+                                <Sparkles className="h-5 w-5 text-amber-500" />
+                                Premium Listings
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <FilterStatCard title="Listings" value={filteredStats.premium.listingCount} icon={Warehouse} />
+                                <FilterStatCard title="Unique Developers" value={filteredStats.premium.developerCount} icon={Users} />
+                                <FilterStatCard title="Total Size (Sq. Ft.)" value={filteredStats.premium.totalSize} icon={Scaling} />
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="space-y-4">
+                             <h3 className="font-semibold flex items-center gap-2">
+                                <Building className="h-5 w-5 text-muted-foreground" />
+                                Non-Premium Listings
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <FilterStatCard title="Listings" value={filteredStats.nonPremium.listingCount} icon={Warehouse} />
+                                <FilterStatCard title="Unique Developers" value={filteredStats.nonPremium.developerCount} icon={Users} />
+                                <FilterStatCard title="Total Size (Sq. Ft.)" value={filteredStats.nonPremium.totalSize} icon={Scaling} />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -688,5 +719,7 @@ export function AdminListings() {
 
 
 
+
+    
 
     
