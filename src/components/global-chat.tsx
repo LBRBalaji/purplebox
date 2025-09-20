@@ -98,7 +98,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
 
 export function GlobalChatWidget() {
     const { user } = useAuth();
-    const { demands, activeChat, setActiveChat } = useData();
+    const { activeChat, setActiveChat, demands } = useData();
     const [isOpen, setIsOpen] = React.useState(false);
 
     if (!user) return null;
@@ -123,7 +123,7 @@ export function GlobalChatWidget() {
     }
     
     let title = "Conversations";
-    let subtitle = null;
+    let subtitle: React.ReactNode = null;
     let linkHref = null;
 
     if (activeChat) {
@@ -133,11 +133,20 @@ export function GlobalChatWidget() {
         const demand = demands.find(d => d.demandId === activeChat.demandId);
         
         const leadSummary = `Lead: ${activeChat.demandId}`;
-        const listingSummary = `Listing: ${activeChat.listing?.listingId || 'N/A'}`;
+        const listingInfo = activeChat.listing 
+            ? `${activeChat.listing.location} | ${activeChat.listing.sizeSqFt.toLocaleString()} sq. ft.`
+            : 'N/A';
+        const requirementInfo = demand
+            ? `${demand.locationName} | ${demand.size.toLocaleString()} sq. ft.`
+            : 'N/A';
+
+        subtitle = (
+            <div className="text-xs text-muted-foreground space-y-1">
+                <p><span className="font-semibold">Listing:</span> {listingInfo}</p>
+                <p><span className="font-semibold">Demand:</span> {requirementInfo}</p>
+            </div>
+        );
         
-        subtitle = `${leadSummary} | ${listingSummary}`;
-        
-        // Link to transaction detail page for everyone for consistency
         linkHref = `/dashboard/leads/${activeChat.demandId}`;
     }
 
@@ -152,7 +161,7 @@ export function GlobalChatWidget() {
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>
                         )}
-                        <div className="flex-grow">
+                        <div className="flex-grow space-y-1">
                             <CardTitle className="text-base flex items-center gap-2">
                                 <Users className="h-4 w-4" /> 
                                 {title}
@@ -162,7 +171,7 @@ export function GlobalChatWidget() {
                                     </Link>
                                 )}
                             </CardTitle>
-                            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+                            {subtitle}
                         </div>
                     </div>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsOpen(false)}>

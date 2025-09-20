@@ -8,7 +8,7 @@
     "triggeredBy": "murugan@xyzlogistics.com",
     "id": "notif-1758386099585",
     "timestamp": "2025-09-20T16:34:59.585Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_lead_for_provider",
@@ -19,7 +19,7 @@
     "triggeredBy": "murugan@xyzlogistics.com",
     "id": "notif-1758386099583",
     "timestamp": "2025-09-20T16:34:59.583Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_chat_message",
