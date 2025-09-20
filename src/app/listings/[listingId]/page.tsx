@@ -68,12 +68,12 @@ const InfoPill = ({ icon: Icon, label, value }: { icon: React.ElementType, label
     </div>
 );
 
-const DetailRow = ({ label, value, isBlurred }: { label: string, value: string | number | boolean | undefined, isBlurred?: boolean }) => {
+const DetailRow = ({ label, value }: { label: string, value: string | number | boolean | undefined }) => {
     const displayValue = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : (value || 'Not specified');
     return (
         <div className="flex justify-between items-center py-2">
             <p className="text-sm text-muted-foreground">{label}</p>
-            <p className={cn("text-sm font-medium text-right", isBlurred && "blur-sm")}>{String(displayValue)}</p>
+            <p className={cn("text-sm font-medium text-right")}>{String(displayValue)}</p>
         </div>
     );
 };
@@ -200,7 +200,7 @@ function ShareDropdown({ listing }: { listing: ListingSchema }) {
 export default function ListingDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const { user, isLoading: isAuthLoading } = useAuth();
+    const { user, users, isLoading: isAuthLoading } = useAuth();
     const { toast } = useToast();
     const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
@@ -261,6 +261,18 @@ export default function ListingDetailPage() {
 
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
+
+    const handleGetQuote = () => {
+        if (!listing) return;
+        
+        const developer = users[listing.developerId];
+        const isPremium = developer?.plan === 'Paid_Premium';
+        const phoneNumber = isPremium ? developer.phone : '919841098170';
+        const message = `Hi, I am interested in getting a quote for Property ID: ${listing.warehouseBoxId || listing.listingId}. Please connect with me.`;
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        
+        window.open(whatsappUrl, '_blank');
+    };
 
     if (isLoading || !listing) {
         return <DetailPageSkeleton />;
@@ -324,7 +336,7 @@ export default function ListingDetailPage() {
                 ["For Leasing, Contact"],
                 ["Lakshmi Balaji Realty"],
                 ["Email: balaji@lakshmibalajio2o.com"],
-                ["Mobile: +91 98410 98170"],
+                ["Mobile: +91 9841098170"],
                 [],
                 ["Zero Brokerage Charges"],
                 ["For Startups on their first transaction."],
@@ -502,10 +514,10 @@ export default function ListingDetailPage() {
                                         <div>
                                             <h4 className="font-semibold mb-2">Building</h4>
                                             <Separator />
-                                            <DetailRow label="Shop Floor Dimension" value={listing.buildingSpecifications.shopFloorLevelDimension} isBlurred={!user} />
-                                            <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} isBlurred={!user} />
-                                            <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} isBlurred={!user} />
-                                            <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} isBlurred={!user} />
+                                            <DetailRow label="Shop Floor Dimension" value={listing.buildingSpecifications.shopFloorLevelDimension} />
+                                            <DetailRow label="Natural Light/Ventilation" value={listing.buildingSpecifications.naturalLightingAndVentilation} />
+                                            <DetailRow label="Internal Lighting" value={listing.buildingSpecifications.internalLighting} />
+                                            <DetailRow label="Mezzanine Details" value={listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension} />
                                             <DetailRow label="Crane Support Structure" value={listing.buildingSpecifications.craneSupportStructureAvailable} />
                                             <DetailRow label="Crane Available" value={listing.buildingSpecifications.craneAvailable} />
                                             <DetailRow label="Warehouse Layout Available" value={listing.buildingSpecifications.warehouseLayoutAvailable} />
@@ -536,7 +548,7 @@ export default function ListingDetailPage() {
                                 <CardHeader>
                                     <CardTitle>Documents &amp; Media</CardTitle>
                                     <CardDescription>
-                                        {user ? "You have access to download media files." : "Log in to download layouts and other sensitive documents."}
+                                        Download available media files and layouts.
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -578,10 +590,19 @@ export default function ListingDetailPage() {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="space-y-4">
-                                            <div className="flex items-baseline justify-center text-center">
-                                                <span className="text-4xl font-bold">₹{listing.rentPerSqFt || '??'}</span>
-                                                <span className="text-sm text-muted-foreground">/sq.ft./month</span>
-                                            </div>
+                                            {typeof listing.rentPerSqFt === 'number' ? (
+                                                <div className="flex items-baseline justify-center text-center">
+                                                    <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
+                                                    <span className="text-sm text-muted-foreground">/sq.ft./month</span>
+                                                </div>
+                                            ) : (
+                                                <div className="text-center">
+                                                    <p className="text-lg font-semibold">Price on Request</p>
+                                                     <Button onClick={handleGetQuote} className="mt-2 w-full">
+                                                        <WhatsAppIcon className="mr-2 h-4 w-4"/> Get Quote
+                                                    </Button>
+                                                </div>
+                                            )}
                                             <Separator/>
                                             <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
                                             <DetailRow label="Construction Progress" value={listing.constructionProgress} />
@@ -646,3 +667,4 @@ export default function ListingDetailPage() {
         </>
     );
 }
+
