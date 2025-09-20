@@ -71,7 +71,7 @@ export default function CustomerAnalyticsPage() {
     const { demands, viewHistory, downloadHistory, listings, isLoading: isDataLoading, registeredLeads, layoutRequests, generalShortlist, transactionActivities, negotiationBoards } = useData();
     const router = useRouter();
 
-    const [selectedUserId, setSelectedUserId] = React.useState<string>('all');
+    const [selectedCompany, setSelectedCompany] = React.useState<string>('all');
     const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
         from: subDays(new Date(), 29),
         to: new Date(),
@@ -85,7 +85,10 @@ export default function CustomerAnalyticsPage() {
         }
     }, [currentUser, hasAccess, router, isDataLoading]);
 
-    const customers = React.useMemo(() => Object.values(users || {}).filter(u => u.role === 'User'), [users]);
+    const customerCompanies = React.useMemo(() => {
+        const companies = new Set(Object.values(users || {}).filter(u => u.role === 'User').map(u => u.companyName));
+        return Array.from(companies);
+    }, [users]);
 
     const filteredData = React.useMemo(() => {
         if (isDataLoading || !demands || !viewHistory || !downloadHistory || !listings || !users || !registeredLeads || !layoutRequests || !transactionActivities || !negotiationBoards) {
@@ -107,42 +110,40 @@ export default function CustomerAnalyticsPage() {
 
         const from = dateRange?.from || new Date(0);
         const to = dateRange?.to || new Date();
+        to.setHours(23, 59, 59, 999);
 
-        const isUserSelected = selectedUserId && selectedUserId !== 'all';
-        const selectedUser = users[selectedUserId];
-        const selectedUserEmail = selectedUser?.email;
-        const selectedUserName = selectedUser?.userName;
-
-        const userFilter = (item: { customerId?: string; userEmail?: string; userId?: string; userName?: string }) => {
-            if (!isUserSelected || !selectedUserEmail) return true;
-            // Match by email OR by username if available
-            return item.customerId === selectedUserEmail || 
-                   item.userEmail === selectedUserEmail || 
-                   item.userId === selectedUserEmail ||
-                   (selectedUserName && item.userName === selectedUserName);
-        };
+        const isCompanySelected = selectedCompany && selectedCompany !== 'all';
         
-        const leadUserFilter = (leadId: string) => {
-          if (!isUserSelected || !selectedUserEmail) return true;
-          const lead = registeredLeads.find(l => l.id === leadId);
-          return lead?.customerId === selectedUserEmail;
-        };
+        const companyUserEmails = isCompanySelected 
+            ? Object.values(users).filter(u => u.companyName === selectedCompany).map(u => u.email)
+            : [];
+        const companyUserEmailsSet = new Set(companyUserEmails);
 
         const dateFilter = (timestamp: string | number) => {
             const date = new Date(timestamp);
             return date >= from && date <= to;
         };
         
-        const relevantLeads = isUserSelected ? registeredLeads.filter(l => l.customerId === selectedUserEmail).map(l => l.id) : registeredLeads.map(l => l.id);
-        const relevantLeadsSet = new Set(relevantLeads);
+        const userFilter = (item: { customerId?: string; userEmail?: string; userId?: string; userName?: string; companyName?: string; }) => {
+            if (!isCompanySelected) return true; // 'All' selected
+            // Check against company name directly, and also against the list of user emails for that company
+            return item.companyName === selectedCompany || 
+                   (item.customerId && companyUserEmailsSet.has(item.customerId)) ||
+                   (item.userEmail && companyUserEmailsSet.has(item.userEmail)) ||
+                   (item.userId && companyUserEmailsSet.has(item.userId)) ||
+                   (item.userName === selectedCompany) // For layout requests which log company name in userName field
+        };
 
-        const relevantDemands = demands.filter(d => userFilter({ customerId: d.userEmail }) && d.createdAt && dateFilter(d.createdAt));
-        const relevantViews = viewHistory.filter(v => userFilter({ userId: v.userId, userName: v.companyName }) && dateFilter(v.timestamp));
-        const relevantDownloads = downloadHistory.filter(d => userFilter({userId: d.userId, userName: d.companyName}) && dateFilter(d.timestamp));
-        const relevantQuoteRequests = registeredLeads.filter(l => userFilter({ customerId: l.customerId }) && dateFilter(l.registeredAt));
-        const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userName: r.userName}) && dateFilter(r.requestedAt)); 
-        const relevantShortlists = isUserSelected ? generalShortlist.length : 0; 
-        const relevantTenantImprovements = transactionActivities.filter(a => a.activityType === 'Tenant Improvements' && leadUserFilter(a.leadId) && dateFilter(a.createdAt));
+        const relevantDemands = demands.filter(d => userFilter({ userEmail: d.userEmail, companyName: d.companyName }) && d.createdAt && dateFilter(d.createdAt));
+        const relevantViews = viewHistory.filter(v => userFilter({ userId: v.userId, companyName: v.companyName }) && dateFilter(v.timestamp));
+        const relevantDownloads = downloadHistory.filter(d => userFilter({ userId: d.userId, companyName: d.companyName}) && dateFilter(d.timestamp));
+        const relevantQuoteRequests = registeredLeads.filter(l => userFilter({ customerId: l.customerId, companyName: l.leadName }) && dateFilter(l.registeredAt));
+        const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userName: r.userName, companyName: r.userName}) && dateFilter(r.requestedAt)); 
+        
+        const relevantLeads = registeredLeads.filter(lead => userFilter({ customerId: lead.customerId, companyName: lead.leadName }));
+        const relevantLeadsSet = new Set(relevantLeads.map(l => l.id));
+
+        const relevantTenantImprovements = transactionActivities.filter(a => a.activityType === 'Tenant Improvements' && relevantLeadsSet.has(a.leadId) && dateFilter(a.createdAt));
         const relevantNegotiationUpdates = negotiationBoards.filter(n => relevantLeadsSet.has(n.leadId)).flatMap(n => n.sessions.filter(s => dateFilter(s.date))).length;
         
         const topViewedLocations = groupAndSort(relevantViews, view => {
@@ -161,6 +162,7 @@ export default function CustomerAnalyticsPage() {
             subject: listings.find(l => l.listingId === item.listingId)?.name || item.listingId,
             timestamp: new Date(item.timestamp).toISOString(),
             link: `/listings/${item.listingId}`,
+            userName: users[item.userId]?.userName || item.companyName,
         }));
         
         const downloadActivities = relevantDownloads.map(item => ({
@@ -168,27 +170,31 @@ export default function CustomerAnalyticsPage() {
             subject: `Downloaded ${item.listingId ? 'listing ' + item.listingId : 'data'}`,
             timestamp: new Date(item.timestamp).toISOString(),
             link: `/listings/${item.listingId}`,
+            userName: users[item.userId]?.userName || item.companyName,
         }));
 
         const quoteActivities = relevantQuoteRequests.map(item => ({
              type: 'Quote Request' as const,
              subject: item.requirementsSummary,
              timestamp: item.registeredAt,
-             link: `/dashboard/leads/${item.id}`
+             link: `/dashboard/leads/${item.id}`,
+             userName: item.leadContact,
         }));
 
         const demandActivities = relevantDemands.map(item => ({
              type: 'New Demand' as const,
              subject: item.demandId,
              timestamp: item.createdAt!,
-             link: `/dashboard?editDemandId=${item.demandId}`
+             link: `/dashboard?editDemandId=${item.demandId}`,
+             userName: item.userName,
         }));
         
         const layoutRequestActivities = relevantLayoutRequests.map(item => ({
              type: 'Layout Request' as const,
              subject: item.listingName,
              timestamp: item.requestedAt,
-             link: `/listings/${item.listingId}`
+             link: `/listings/${item.listingId}`,
+             userName: item.userName,
         }));
         
         const tenantImprovementActivities = relevantTenantImprovements.map(item => ({
@@ -196,6 +202,7 @@ export default function CustomerAnalyticsPage() {
              subject: `Update for Lead ${item.leadId}`,
              timestamp: item.createdAt,
              link: `/dashboard/leads/${item.leadId}?tab=improvements`,
+             userName: registeredLeads.find(l => l.id === item.leadId)?.leadContact || 'N/A'
         }));
         
         const negotiationActivities = negotiationBoards.filter(n => relevantLeadsSet.has(n.leadId)).flatMap(n => n.sessions.filter(s => dateFilter(s.date)).map(s => ({
@@ -203,6 +210,7 @@ export default function CustomerAnalyticsPage() {
             subject: `Session for Lead ${n.leadId}`,
             timestamp: s.date,
             link: `/dashboard/leads/${n.leadId}?tab=negotiation-board`,
+            userName: registeredLeads.find(l => l.id === n.leadId)?.leadContact || 'N/A'
         })));
 
 
@@ -216,16 +224,16 @@ export default function CustomerAnalyticsPage() {
             totalDownloads: relevantDownloads.length,
             totalQuoteRequests: relevantQuoteRequests.length,
             totalLayoutRequests: relevantLayoutRequests.length,
-            totalShortlists: relevantShortlists,
+            totalShortlists: 0,
             totalTenantImprovements: relevantTenantImprovements.length,
             totalNegotiationUpdates: relevantNegotiationUpdates,
             topViewedLocations,
             topViewedDevelopers,
             recentActivities,
-            selectedUser,
+            selectedUser: users[selectedCompany],
         }
 
-    }, [selectedUserId, dateRange, demands, viewHistory, downloadHistory, listings, users, registeredLeads, layoutRequests, generalShortlist, transactionActivities, negotiationBoards, isDataLoading]);
+    }, [selectedCompany, dateRange, demands, viewHistory, downloadHistory, listings, users, registeredLeads, layoutRequests, generalShortlist, transactionActivities, negotiationBoards, isDataLoading]);
 
     if (!hasAccess) return null;
     
@@ -265,14 +273,14 @@ export default function CustomerAnalyticsPage() {
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Select Customer or Company</label>
-                            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                            <label className="text-sm font-medium">Select Customer Company</label>
+                            <Select value={selectedCompany} onValueChange={setSelectedCompany}>
                                 <SelectTrigger><SelectValue/></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Customers</SelectItem>
-                                    {customers.map(customer => (
-                                        <SelectItem key={customer.email} value={customer.email}>
-                                            {customer.companyName} ({customer.userName})
+                                    <SelectItem value="all">All Customer Companies</SelectItem>
+                                    {customerCompanies.map(company => (
+                                        <SelectItem key={company} value={company}>
+                                            {company}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -343,12 +351,12 @@ export default function CustomerAnalyticsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Activity className="text-primary"/> Recent Activity</CardTitle>
                          <CardDescription>
-                            Latest activities by {filteredData.selectedUser ? filteredData.selectedUser.userName : 'all customers'}.
+                            Latest activities by {selectedCompany === 'all' ? 'all customers' : selectedCompany}.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                          <Table>
-                            <TableHeader><TableRow><TableHead>Activity</TableHead><TableHead>Subject</TableHead><TableHead className="text-right">Time</TableHead></TableRow></TableHeader>
+                            <TableHeader><TableRow><TableHead>Activity</TableHead><TableHead>Subject</TableHead><TableHead>User</TableHead><TableHead className="text-right">Time</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {filteredData.recentActivities.length > 0 ? filteredData.recentActivities.map((act, index) => {
                                     const Icon = activityIconMap[act.type] || Activity;
@@ -365,10 +373,11 @@ export default function CustomerAnalyticsPage() {
                                                     {act.subject}
                                                 </a>
                                             </TableCell>
+                                            <TableCell className="text-xs text-muted-foreground">{act.userName}</TableCell>
                                             <TableCell className="text-right text-xs text-muted-foreground">{new Date(act.timestamp).toLocaleString()}</TableCell>
                                         </TableRow>
                                     )
-                                }) : <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No recent activity for this period.</TableCell></TableRow>}
+                                }) : <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No recent activity for this period.</TableCell></TableRow>}
                             </TableBody>
                         </Table>
                     </CardContent>
