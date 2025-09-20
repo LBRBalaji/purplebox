@@ -20,13 +20,7 @@ import { type DemandSchema, type ListingSchema } from '@/lib/schema';
 import { type Submission } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from './ui/button';
-import { Dialog, DialogContent } from './ui/dialog';
-import { ChatPanel } from './chat-dialog';
-
-
-type DemandWithMatches = DemandSchema & {
-  matches: (Submission & { listing: ListingSchema | undefined })[];
-}
+import type { ChatSubmission } from './chat-dialog';
 
 const priorityLabels: { [key: string]: string } = {
   size: 'Size Range',
@@ -39,6 +33,8 @@ const priorityLabels: { [key: string]: string } = {
   power: 'Sufficient Power',
   fireSafety: 'Fire Safety Compliance',
   buildingType: 'Building Type',
+  crane: 'Crane Details',
+  operations: 'Operations Details'
 };
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -57,10 +53,9 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   );
 
 export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void }) {
-  const { user } = useAuth();
-  const { demands, submissions, listings, shortlistedItems, toggleShortlist, clearNewSubmissions } = useData();
+  const { user, users } = useAuth();
+  const { demands, submissions, listings, shortlistedItems, toggleShortlist, clearNewSubmissions, openChat } = useData();
   const [myDemandsWithMatches, setMyDemandsWithMatches] = React.useState<DemandWithMatches[]>([]);
-  const [selectedChat, setSelectedChat] = React.useState<Submission | null>(null);
   const router = useRouter();
 
   React.useEffect(() => {
@@ -89,6 +84,22 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
     }
   };
   
+  type DemandWithMatches = DemandSchema & {
+    matches: (Submission & { listing: ListingSchema | undefined })[];
+  }
+  
+  const handleChatInit = (match: any) => {
+    if (!user) return;
+    const provider = users[match.providerEmail];
+    const submissionForChat: ChatSubmission = {
+      ...match,
+      chatPartnerName: provider?.companyName || "Developer",
+      customerName: user.userName,
+      customerCompany: user.companyName,
+    };
+    openChat(submissionForChat);
+  };
+
 
   return (
     <>
@@ -228,7 +239,7 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
                                 <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-current text-yellow-400")} /> 
                                 {isShortlisted ? 'Shortlisted' : 'Shortlist'}
                                 </Button>
-                                <Button className="w-full" onClick={() => setSelectedChat(match)}>
+                                <Button className="w-full" onClick={() => handleChatInit(match)}>
                                 <MessageSquare className="mr-2 h-4 w-4" /> Chat
                                 </Button>
                             </CardFooter>
@@ -254,11 +265,6 @@ export function MyDemands({ onSwitchTab }: { onSwitchTab: (tab: string) => void 
           </Card>
         )}
       </div>
-      <Dialog open={!!selectedChat} onOpenChange={() => setSelectedChat(null)}>
-        <DialogContent>
-            <ChatPanel submission={selectedChat as any} />
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
