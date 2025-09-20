@@ -329,12 +329,23 @@ export const createPropertySchema = (demand?: DemandSchema) => {
 
 export type PropertySchema = z.infer<typeof createPropertySchema>;
 
+const historyEntrySchema = z.object({
+  value: z.string().optional().default(''),
+  changedBy: z.string(),
+  changedAt: z.string().datetime(),
+});
+
+const negotiableValueSchema = z.object({
+  current: z.string().optional().default(''),
+  history: z.array(historyEntrySchema).optional().default([]),
+});
+
 const negotiableFieldSchema = z.object({
     id: z.string(),
     label: z.string().default(''),
-    agreedTerms: z.string().optional().default(''),
-    proposedBy: z.enum(['Customer', 'Provider']).optional(),
-    status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
+    agreedTerms: negotiableValueSchema,
+    proposedBy: negotiableValueSchema,
+    status: negotiableValueSchema,
 });
 
 const negotiationSectionSchema = z.object({

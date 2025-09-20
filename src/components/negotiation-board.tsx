@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown, AlertTriangle, History, Info } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, TableFooter } from './ui/table';
 import { Textarea } from './ui/textarea';
@@ -21,6 +21,8 @@ import { Separator } from './ui/separator';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from './ui/tooltip';
 
 const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; title: string, description?: string }) => {
     const Icon = icon;
@@ -42,26 +44,97 @@ const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; 
 
 const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: any; label: string; control: any; form: any, isTextarea?: boolean, disabled?: boolean }) => {
     const InputComponent = isTextarea ? Textarea : Input;
-    const { watch } = form;
-    const status = watch(`${name}.status`);
+    const { watch, getValues, setValue } = form;
+    const { user } = useAuth();
+    
+    const agreedTermsValue = watch(`${name}.agreedTerms.current`);
+    const statusValue = watch(`${name}.status.current`);
+    const proposedByValue = watch(`${name}.proposedBy.current`);
+
+    const handleFieldChange = (field: 'agreedTerms' | 'status' | 'proposedBy', newValue: string) => {
+        const fieldPath = `${name}.${field}`;
+        const oldValue = getValues(`${fieldPath}.current`);
+
+        if(oldValue !== newValue) {
+            const historyPath = `${fieldPath}.history`;
+            const currentHistory = getValues(historyPath) || [];
+            const newHistoryEntry = {
+                value: oldValue,
+                changedBy: user?.userName || 'System',
+                changedAt: new Date().toISOString(),
+            };
+            setValue(historyPath, [newHistoryEntry, ...currentHistory]);
+            setValue(`${fieldPath}.current`, newValue);
+        }
+    };
+    
+    const agreedTermsHistory = watch(`${name}.agreedTerms.history`) || [];
+    const statusHistory = watch(`${name}.status.history`) || [];
+    const proposedByHistory = watch(`${name}.proposedBy.history`) || [];
+
+    const hasHistory = agreedTermsHistory.length > 0 || statusHistory.length > 0 || proposedByHistory.length > 0;
 
     return (
-         <div className={cn("grid grid-cols-12 gap-x-6 gap-y-2 py-4 border-b", status === 'Reserved For Discussion' && 'bg-amber-100/50 rounded-md p-4')}>
-            <div className="col-span-12 md:col-span-3"><FormLabel>{label}</FormLabel></div>
-            <div className="col-span-12 md:col-span-4">
-                <FormField control={control} name={`${name}.agreedTerms`} render={({ field }) => (
-                    <FormItem><FormControl><InputComponent placeholder="Agreed terms..." {...field} value={field.value ?? ''} className="h-10 p-2" disabled={disabled} /></FormControl><FormMessage /></FormItem>
+        <div className={cn("grid grid-cols-12 gap-x-6 gap-y-2 py-4 border-b", statusValue === 'Reserved For Discussion' && 'bg-amber-100/50 rounded-md p-4')}>
+            <div className="col-span-12 md:col-span-3 flex items-center gap-2">
+                {hasHistory && (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button type="button" className="text-muted-foreground hover:text-foreground">
+                                    <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>This term has been modified.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
+                <FormLabel>{label}</FormLabel>
+            </div>
+            <div className="col-span-12 md:col-span-3">
+                <FormField control={control} name={`${name}.agreedTerms.current`} render={({ field }) => (
+                    <FormItem><FormControl><InputComponent placeholder="Agreed terms..." {...field} value={field.value ?? ''} className="h-10 p-2" disabled={disabled} onChange={(e) => handleFieldChange('agreedTerms', e.target.value)} /></FormControl><FormMessage /></FormItem>
                 )} />
             </div>
-            <div className="col-span-6 md:col-span-2">
-                 <FormField control={control} name={`${name}.proposedBy`} render={({ field }) => (
-                    <FormItem><Select onValueChange={field.onChange} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+             <div className="col-span-6 md:col-span-2">
+                 <FormField control={control} name={`${name}.proposedBy.current`} render={({ field }) => (
+                    <FormItem><Select onValueChange={(val) => handleFieldChange('proposedBy', val)} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Proposed By" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Customer">Customer</SelectItem><SelectItem value="Provider">Provider</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
             </div>
-            <div className="col-span-6 md:col-span-3">
-                 <FormField control={control} name={`${name}.status`} render={({ field }) => (
-                    <FormItem><Select onValueChange={field.onChange} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+             <div className="col-span-6 md:col-span-3">
+                 <FormField control={control} name={`${name}.status.current`} render={({ field }) => (
+                    <FormItem><Select onValueChange={(val) => handleFieldChange('status', val)} value={field.value} disabled={disabled}><FormControl><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Agreed">Agreed</SelectItem><SelectItem value="Reserved For Discussion">Reserved</SelectItem><SelectItem value="Not Applicable">Not Applicable</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
+            </div>
+             <div className="col-span-12 md:col-span-1 flex items-center justify-end">
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button type="button" variant="ghost" size="icon" disabled={!hasHistory}><History className="h-4 w-4"/></Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-96">
+                        <div className="space-y-4">
+                            <h4 className="font-semibold">Version History for "{label}"</h4>
+                            {(agreedTermsHistory.length > 0 || proposedByHistory.length > 0 || statusHistory.length > 0) ? (
+                                <ScrollArea className="h-64">
+                                <div className="space-y-3">
+                                {[...agreedTermsHistory, ...proposedByHistory, ...statusHistory]
+                                    .sort((a,b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime())
+                                    .map((entry, i) => (
+                                    <div key={i} className="text-xs p-2 rounded-md bg-secondary/50">
+                                        <p>Value changed to <strong className="text-primary">"{entry.value}"</strong></p>
+                                        <p className="text-muted-foreground">{entry.changedBy} on {new Date(entry.changedAt).toLocaleString()}</p>
+                                    </div>
+                                    ))}
+                                </div>
+                                </ScrollArea>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">No changes have been made to this item.</p>
+                            )}
+                        </div>
+                    </PopoverContent>
+                </Popover>
             </div>
         </div>
     )
@@ -96,54 +169,45 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 
 
 const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any }) => {
-    const { control, watch, setValue } = useFormContext<NegotiationBoardSchema>();
-    
-    // Auto-calculation for Total Chargeable Area
-    const areaFields = watch([
-        `sessions.${sessionIndex}.area.plinthArea.agreedTerms`,
-        `sessions.${sessionIndex}.area.mezzanineArea1.agreedTerms`,
-        `sessions.${sessionIndex}.area.mezzanineArea2.agreedTerms`,
-        `sessions.${sessionIndex}.area.canopyArea.agreedTerms`,
-        `sessions.${sessionIndex}.area.driversRestRoom.agreedTerms`,
-    ]);
+    const { control, watch, setValue, getValues } = useFormContext<NegotiationBoardSchema>();
+    const { user } = useAuth();
+    const sessionPath = `sessions.${sessionIndex}`;
+    const { fields, append, remove } = useFieldArray({ name: `${sessionPath}.sections`, control });
 
-    React.useEffect(() => {
-        const [plinth, mezz1, mezz2, canopy, driversRoom] = areaFields.map(v => parseFloat(v || '0'));
-        const totalArea = [plinth, mezz1, mezz2, canopy, driversRoom]
-            .filter(v => !isNaN(v))
-            .reduce((acc, v) => acc + v, 0);
+    const [newSectionName, setNewSectionName] = React.useState('');
 
-        const currentTotal = parseFloat(watch(`sessions.${sessionIndex}.area.totalChargeableArea.agreedTerms`) || '0');
-        if (totalArea !== currentTotal) {
-            setValue(`sessions.${sessionIndex}.area.totalChargeableArea.agreedTerms`, String(totalArea));
+    const handleAddNewSection = () => {
+        if (newSectionName.trim()) {
+            append({
+                id: `sec-${Date.now()}`,
+                title: newSectionName,
+                icon: 'FileText',
+                fields: []
+            });
+            setNewSectionName('');
         }
-    }, [areaFields, setValue, sessionIndex, watch]);
+    }
+
+     const handleAddNewField = (sectionIndex: number) => {
+        const sections = getValues(`${sessionPath}.sections`);
+        const newField = {
+            id: `field-${Date.now()}`,
+            label: 'New Field',
+            agreedTerms: { current: '', history: [] },
+            proposedBy: { current: 'Customer', history: [] },
+            status: { current: 'Reserved For Discussion', history: [] },
+        };
+        sections[sectionIndex].fields.push(newField);
+        setValue(`${sessionPath}.sections`, sections);
+    }
     
-     // Auto-calculation for Total Rent
-    const commercialFields = watch([
-         `sessions.${sessionIndex}.commercialTerms.buildingRentPerSft.agreedTerms`,
-         `sessions.${sessionIndex}.area.totalChargeableArea.agreedTerms`, // Use the calculated total area
-    ]);
-
-    React.useEffect(() => {
-        const [rentPerSft, chargeableArea] = commercialFields.map(v => parseFloat(v || '0'));
-         if (!isNaN(rentPerSft) && !isNaN(chargeableArea)) {
-            const totalRent = rentPerSft * chargeableArea;
-             const currentTotal = parseFloat(watch(`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth.agreedTerms`) || '0');
-             if(totalRent !== currentTotal) {
-                setValue(`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth.agreedTerms`, String(totalRent));
-             }
-        }
-    }, [commercialFields, setValue, sessionIndex, watch]);
-
-
     return (
         <Card className="bg-secondary/30">
             <Collapsible defaultOpen={sessionIndex === watch('sessions').length - 1}>
                 <CollapsibleTrigger asChild>
                     <div className="flex justify-between items-center p-4 cursor-pointer hover:bg-secondary/50 rounded-t-lg">
                         <h3 className="text-lg font-semibold text-primary">
-                            Negotiation Session {sessionIndex + 1}: {new Date(watch(`sessions.${sessionIndex}.date`)).toLocaleString()}
+                            Negotiation Session {sessionIndex + 1}: {new Date(watch(`${sessionPath}.date`)).toLocaleString()}
                         </h3>
                         <div className="flex items-center gap-2">
                             {canEdit && <Button type="button" variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onRemove(); }}><Trash2 className="h-4 w-4 text-destructive"/></Button>}
@@ -154,7 +218,7 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
                 <CollapsibleContent>
                     <div className="p-6 space-y-6">
                         <div className="p-4 border rounded-lg bg-background space-y-4">
-                            <FormField control={control} name={`sessions.${sessionIndex}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={!canEdit} /></FormControl></FormItem> )} />
+                            <FormField control={control} name={`${sessionPath}.venue`} render={({ field }) => ( <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="e.g. LBR Office, Online" {...field} value={field.value ?? ''} disabled={!canEdit} /></FormControl></FormItem> )} />
                             
                             <AttendeeSection sessionIndex={sessionIndex} type="customer" disabled={!canEdit} />
                             <AttendeeSection sessionIndex={sessionIndex} type="provider" disabled={!canEdit} />
@@ -162,34 +226,30 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
                         </div>
 
                          <div className="space-y-6">
-                            <SectionHeader icon={MapPin} title="Site Information" />
-                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.listingId`} label="Listing ID" control={control} disabled={!canEdit} />
-                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.postalAddress`} label="Postal Address" control={control} disabled={!canEdit} />
-                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.buildingNumber`} label="Building Number" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.googleCoordinates`} label="Google Coordinates" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.siteInfo.buildingStatus`} label="Building Status" control={control} disabled={!canEdit}/>
-
-                            <SectionHeader icon={Home} title="Area (in SFT)" />
-                            <FormRow form={form} name={`sessions.${sessionIndex}.area.plinthArea`} label="Plinth Area (Shop Floor)" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.area.mezzanineArea1`} label="Mezzanine Area 1" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.area.mezzanineArea2`} label="Mezzanine Area 2" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.area.canopyArea`} label="Canopy Area" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.area.driversRestRoom`} label="Driver's Rest Room" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.area.totalChargeableArea`} label="Total Chargeable Area" control={control} disabled={true}/>
-                            
-                            <SectionHeader icon={ListChecks} title="Lease Terms" />
-                            <FormRow form={form} name={`sessions.${sessionIndex}.leaseTerms.leaseTenure`} label="Lease Tenure" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.leaseTerms.leaseLockIn`} label="Lease Lock-In Period" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.leaseTerms.rentEscalation`} label="Rent Escalation (% and Freq.)" control={control} disabled={!canEdit}/>
-                            
-                            <SectionHeader icon={HandCoins} title="Commercial Terms" />
-                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.chargeableArea`} label="Chargeable Area (SFT)" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.buildingRentPerSft`} label="Building Rent per SFT (INR)" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.totalRentPerMonth`} label="Total Rent per Month (INR)" control={control} disabled={true}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.camCharges`} label="CAM Charges per SFT" control={control} disabled={!canEdit}/>
-                            <FormRow form={form} name={`sessions.${sessionIndex}.commercialTerms.ifrsd`} label="IFRSD (Security Deposit)" control={control} disabled={!canEdit}/>
-
-                        </div>
+                           {fields.map((section, sectionIndex) => (
+                                <div key={section.id}>
+                                    <SectionHeader icon={FileText} title={section.title} />
+                                     {(section.fields || []).map((field, fieldIndex) => (
+                                        <FormRow 
+                                            key={field.id}
+                                            form={form} 
+                                            name={`${sessionPath}.sections.${sectionIndex}.fields.${fieldIndex}`} 
+                                            label={field.label} 
+                                            control={control} 
+                                            disabled={!canEdit} />
+                                    ))}
+                                    {canEdit && <Button type="button" size="sm" variant="ghost" className="mt-2" onClick={() => handleAddNewField(sectionIndex)}><PlusCircle className="mr-2 h-4 w-4"/>Add Field</Button>}
+                                </div>
+                            ))}
+                         </div>
+                         {canEdit && (
+                            <div className="pt-6 border-t">
+                                <div className="flex items-center gap-2">
+                                <Input value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} placeholder="New section name"/>
+                                <Button type="button" onClick={handleAddNewSection}><PlusCircle className="mr-2 h-4 w-4" /> Add Section</Button>
+                                </div>
+                            </div>
+                         )}
                     </div>
                 </CollapsibleContent>
             </Collapsible>
@@ -201,16 +261,12 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
     const { user } = useAuth();
     const { getNegotiationBoard, updateNegotiationBoard } = useData();
     
-    const isCustomer = user?.role === 'User';
-    const isProvider = user?.role === 'Warehouse Developer';
-    const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
-    const isAgent = user?.role === 'Agent';
-    const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
-    const canEdit = isO2O || isPremiumAgent || isCustomer || isProvider;
+    const canEdit = true;
 
     const form = useForm<NegotiationBoardSchema>({
         resolver: zodResolver(negotiationBoardSchema),
         defaultValues: {
+            leadId: lead.id,
             sessions: [],
             actionableItems: [],
             overallRemarks: "",
@@ -221,33 +277,36 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
      const { fields: actionableItemFields, append: appendActionableItem, remove: removeActionableItem } = useFieldArray({ name: "actionableItems", control: form.control });
 
     
-    // Load existing data
     React.useEffect(() => {
         const existingData = getNegotiationBoard(lead.id);
         if (existingData && existingData.sessions.length > 0) {
             form.reset(existingData);
         } else {
+            const defaultSections = [
+                { id: 'siteInfo', title: 'Site Information', icon: 'MapPin', fields: [
+                    { id: 'listingId', label: 'Listing ID', agreedTerms: { current: primaryListing?.listingId || '' }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                    { id: 'postalAddress', label: 'Postal Address', agreedTerms: { current: primaryListing?.location || '' }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                    { id: 'buildingNumber', label: 'Building Number', agreedTerms: { current: '' }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                    { id: 'googleCoordinates', label: 'Google Coordinates', agreedTerms: { current: primaryListing?.latLng || '' }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                    { id: 'buildingStatus', label: 'Building Status', agreedTerms: { current: primaryListing?.availabilityDate || '' }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                ]},
+                { id: 'area', title: 'Area (in SFT)', icon: 'Home', fields: [
+                    { id: 'totalChargeableArea', label: 'Total Chargeable Area', agreedTerms: { current: String(primaryListing?.sizeSqFt || '') }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                ]},
+                { id: 'leaseTerms', title: 'Lease Terms', icon: 'ListChecks', fields: [] },
+                { id: 'commercialTerms', title: 'Commercial Terms', icon: 'HandCoins', fields: [
+                     { id: 'buildingRentPerSft', label: 'Building Rent per SFT (INR)', agreedTerms: { current: String(primaryListing?.rentPerSqFt || '') }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                     { id: 'totalRentPerMonth', label: 'Total Rent per Month (INR)', agreedTerms: { current: String((primaryListing?.rentPerSqFt || 0) * (primaryListing?.sizeSqFt || 0)) }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                     { id: 'ifrsd', label: 'IFRSD (Security Deposit)', agreedTerms: { current: `INR ${((primaryListing?.rentPerSqFt || 0) * (primaryListing?.sizeSqFt || 0) * (primaryListing?.rentalSecurityDeposit || 0)).toLocaleString()}` }, proposedBy: { current: 'Provider' }, status: { current: 'Agreed' }},
+                ]}
+            ];
              const defaultSession = {
                 date: new Date().toISOString(),
                 venue: '',
                 customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
-                providerAttendees: [{ name: '', title: '' }],
+                providerAttendees: [],
                 facilitatorAttendees: [],
-                siteInfo: {
-                    listingId: { agreedTerms: primaryListing?.listingId || '', status: 'Agreed' },
-                    postalAddress: { agreedTerms: primaryListing?.location || '', status: 'Agreed' },
-                    buildingStatus: { agreedTerms: primaryListing?.availabilityDate || '', status: 'Agreed' },
-                    googleCoordinates: { agreedTerms: primaryListing?.latLng || '', status: 'Agreed' },
-                },
-                area: {
-                    totalChargeableArea: { agreedTerms: String(primaryListing?.sizeSqFt || ''), status: 'Agreed' },
-                },
-                commercialTerms: {
-                    chargeableArea: { agreedTerms: String(primaryListing?.sizeSqFt || ''), status: 'Agreed' },
-                    buildingRentPerSft: { agreedTerms: String(primaryListing?.rentPerSqFt || ''), status: 'Agreed' },
-                    ifrsd: { agreedTerms: `INR ${((primaryListing?.rentPerSqFt || 0) * (primaryListing?.sizeSqFt || 0) * (primaryListing?.rentalSecurityDeposit || 0)).toLocaleString()}`, status: 'Agreed' },
-                },
-                leaseTerms: {}
+                sections: defaultSections,
              };
              form.reset({
                 ...form.getValues(),
@@ -303,11 +362,9 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                     </CardDescription>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                     {(isCustomer || isProvider) && (
-                                        <Button type="button" variant="outline" onClick={handlePrint}>
-                                            <Download className="mr-2 h-4 w-4" /> Download as PDF
-                                        </Button>
-                                    )}
+                                     <Button type="button" variant="outline" onClick={handlePrint}>
+                                        <Download className="mr-2 h-4 w-4" /> Download as PDF
+                                    </Button>
                                     {canEdit && (
                                         <>
                                             <Button type="button" variant="outline" onClick={handleGenerateFollowUp}>
@@ -385,9 +442,7 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                 />
                             </div>
                              <div className="flex items-center gap-2 justify-end pt-4 no-print">
-                                {(isCustomer || isProvider) && (
-                                    <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
-                                )}
+                                <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
                                 {canEdit && (
                                     <>
                                         <Button type="button" variant="outline" onClick={handleFinalizeMoM}>
