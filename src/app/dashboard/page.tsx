@@ -41,7 +41,7 @@ const MainDashboard = () => {
     const isCustomer = user?.role === 'User';
     const isAgent = user?.role === 'Agent';
 
-    const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'my-listings');
+    const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'registered-leads');
     const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-transactions');
     const [adminTab, setAdminTab] = React.useState(defaultTabParam || 'approval-queue');
     const [superAdminTab, setSuperAdminTab] = React.useState(defaultTabParam || 'all-listings');
