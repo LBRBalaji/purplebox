@@ -12,7 +12,7 @@ import {
 import { useData, type DownloadedByRecord, type ViewedByRecord, type ListingStatus, type LocationCircle } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle, Building, Scaling, Circle, Check, Warehouse } from 'lucide-react';
+import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, SlidersHorizontal, Search, X, Edit, Calendar as CalendarIcon, AlertTriangle, Building, Scaling, Circle, Check, Warehouse, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useAuth } from '@/contexts/auth-context';
@@ -46,6 +46,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
 import { Separator } from './ui/separator';
+import { Label } from './ui/label';
+import { Switch } from './ui/switch';
 
 type ProviderSummary = {
   [email: string]: {
@@ -133,8 +135,14 @@ function AdminListingCard({ listing, analytics, providerName, onStatusChange, on
               </DropdownMenuContent>
             </DropdownMenu>
         </div>
-        <div className="mt-2">
+        <div className="mt-2 flex gap-2">
            <Badge className={status.className}>{status.text}</Badge>
+           {listing.plan === 'Paid_Premium' && (
+             <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+                <Sparkles className="mr-1.5 h-3 w-3"/>
+                Premium Listing
+             </Badge>
+           )}
         </div>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
@@ -149,7 +157,7 @@ function AdminListingCard({ listing, analytics, providerName, onStatusChange, on
             </div>
         </div>
         {analytics?.viewedBy && analytics.viewedBy.length > 0 && (
-          <Collapsible defaultOpen={true}>
+          <Collapsible>
             <CollapsibleTrigger className="w-full flex items-center justify-between text-sm font-medium text-primary py-2 px-3 bg-primary/5 rounded-md hover:bg-primary/10">
               <span className="flex items-center gap-2"><Eye className="h-4 w-4" /> Viewed By ({analytics.viewedBy.length})</span>
               <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
@@ -175,7 +183,7 @@ function AdminListingCard({ listing, analytics, providerName, onStatusChange, on
           </Collapsible>
         )}
         {analytics?.downloadedBy && analytics.downloadedBy.length > 0 && (
-          <Collapsible defaultOpen={true}>
+          <Collapsible>
             <CollapsibleTrigger className="w-full flex items-center justify-between text-sm font-medium text-primary py-2 px-3 bg-primary/5 rounded-md hover:bg-primary/10">
               <span className="flex items-center gap-2"><Users className="h-4 w-4" /> Downloaded By ({analytics.downloadedBy.length})</span>
               <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
@@ -281,6 +289,7 @@ export function AdminListings() {
   const [circleFilter, setCircleFilter] = React.useState<string[]>([]);
   const [availabilityFilter, setAvailabilityFilter] = React.useState('all');
   const [sizeRange, setSizeRange] = React.useState([0, 1000000]);
+  const [premiumOnly, setPremiumOnly] = React.useState(false);
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
     from: subDays(new Date(), 29),
     to: new Date(),
@@ -320,6 +329,10 @@ export function AdminListings() {
   React.useEffect(() => {
      let results = [...listings];
 
+     if (premiumOnly) {
+         results = results.filter(l => l.plan === 'Paid_Premium');
+     }
+
      if (keywordFilter) {
        const lowerCaseFilter = keywordFilter.toLowerCase();
        results = results.filter(l => 
@@ -345,7 +358,7 @@ export function AdminListings() {
 
      setFilteredListings(results);
 
-  }, [listings, keywordFilter, developerFilter, circleFilter, availabilityFilter, sizeRange]);
+  }, [listings, keywordFilter, developerFilter, circleFilter, availabilityFilter, sizeRange, premiumOnly]);
   
   const filteredStats = React.useMemo(() => {
     const developerIds = new Set(filteredListings.map(l => l.developerId));
@@ -368,6 +381,7 @@ export function AdminListings() {
     setCircleFilter([]);
     setAvailabilityFilter('all');
     setSizeRange([0, maxSliderSize]);
+    setPremiumOnly(false);
     setDateRange({ from: subDays(new Date(), 29), to: new Date() });
   }
 
@@ -607,6 +621,10 @@ export function AdminListings() {
                                 </PopoverContent>
                             </Popover>
                         </div>
+                         <div className="flex items-center space-x-2 pt-5">
+                          <Switch id="premium-filter" checked={premiumOnly} onCheckedChange={setPremiumOnly} />
+                          <Label htmlFor="premium-filter">Show Premium Only</Label>
+                        </div>
                         <div className="flex gap-2 items-end">
                             <Button onClick={resetFilters} variant="ghost" className="w-full">
                                 <X className="mr-2 h-4 w-4" /> Reset
@@ -669,3 +687,6 @@ export function AdminListings() {
     
 
 
+
+
+    

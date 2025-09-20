@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758352425269",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Block-B6 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-6BDQYG",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T07:13:45.271Z"
+  },
+  {
     "id": "LDR-QUOTE-1758348790692",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

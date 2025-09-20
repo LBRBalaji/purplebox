@@ -156,7 +156,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -254,7 +255,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -352,7 +354,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -450,7 +453,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -849,7 +853,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
@@ -962,7 +967,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",
