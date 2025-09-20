@@ -7,7 +7,7 @@ import { useAuth, type User } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Users, List, Download, Eye, MapPin, Building, Activity, Clock, BarChart as BarChartIcon, Star, FileQuestion, MessageCircle, ClipboardList, PackagePlus } from 'lucide-react';
+import { Users, List, Download, Eye, MapPin, Building, Activity, Clock, BarChart as BarChartIcon, Star, FileQuestion, MessageCircle, ClipboardList, PackagePlus, HardHat, Notebook } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -62,11 +62,13 @@ const activityIconMap: { [key: string]: React.ElementType } = {
     'Quote Request': MessageCircle,
     'New Demand': ClipboardList,
     'Layout Request': FileQuestion,
+    'Tenant Improvements': HardHat,
+    'Negotiation Board Update': Notebook,
 };
 
 export default function CustomerAnalyticsPage() {
     const { user: currentUser, users } = useAuth();
-    const { demands, viewHistory, downloadHistory, listings, isLoading: isDataLoading, registeredLeads, layoutRequests, generalShortlist } = useData();
+    const { demands, viewHistory, downloadHistory, listings, isLoading: isDataLoading, registeredLeads, layoutRequests, generalShortlist, transactionActivities, negotiationBoards } = useData();
     const router = useRouter();
 
     const [selectedUserId, setSelectedUserId] = React.useState<string>('all');
@@ -86,7 +88,7 @@ export default function CustomerAnalyticsPage() {
     const customers = React.useMemo(() => Object.values(users || {}).filter(u => u.role === 'User'), [users]);
 
     const filteredData = React.useMemo(() => {
-        if (isDataLoading || !demands || !viewHistory || !downloadHistory || !listings || !users || !registeredLeads || !layoutRequests) {
+        if (isDataLoading || !demands || !viewHistory || !downloadHistory || !listings || !users || !registeredLeads || !layoutRequests || !transactionActivities || !negotiationBoards) {
             return {
                 totalDemands: 0,
                 totalViews: 0,
@@ -94,6 +96,8 @@ export default function CustomerAnalyticsPage() {
                 totalQuoteRequests: 0,
                 totalLayoutRequests: 0,
                 totalShortlists: 0,
+                totalTenantImprovements: 0,
+                totalNegotiationUpdates: 0,
                 topViewedLocations: [],
                 topViewedDevelopers: [],
                 recentActivities: [],
@@ -112,19 +116,30 @@ export default function CustomerAnalyticsPage() {
             if (!isUserSelected) return true;
             return item.customerId === selectedUserEmail || item.userEmail === selectedUserEmail || item.userId === selectedUserEmail || item.userName === selectedUserEmail;
         }
+        
+        const leadUserFilter = (leadId: string) => {
+          if (!isUserSelected) return true;
+          const lead = registeredLeads.find(l => l.id === leadId);
+          return lead?.customerId === selectedUserEmail;
+        }
 
         const dateFilter = (timestamp: string | number) => {
             const date = new Date(timestamp);
             return date >= from && date <= to;
         }
+        
+        const relevantLeads = isUserSelected ? registeredLeads.filter(l => l.customerId === selectedUserEmail).map(l => l.id) : registeredLeads.map(l => l.id);
+        const relevantLeadsSet = new Set(relevantLeads);
 
         const relevantDemands = demands.filter(d => userFilter({ customerId: d.userEmail }) && d.createdAt && dateFilter(d.createdAt));
-        const relevantViews = viewHistory.filter(v => userFilter(v) && dateFilter(v.timestamp));
+        const relevantViews = viewHistory.filter(v => userFilter({ userId: v.userId }) && dateFilter(v.timestamp));
         const relevantDownloads = downloadHistory.filter(d => userFilter({userId: d.userId}) && dateFilter(d.timestamp));
-        const relevantQuoteRequests = registeredLeads.filter(l => userFilter(l) && dateFilter(l.registeredAt));
+        const relevantQuoteRequests = registeredLeads.filter(l => userFilter({ customerId: l.customerId }) && dateFilter(l.registeredAt));
         const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userName: r.userName}) && dateFilter(r.requestedAt)); 
         const relevantShortlists = isUserSelected ? generalShortlist.length : 0; // Shortlist is only per user, not global
-
+        const relevantTenantImprovements = transactionActivities.filter(a => a.activityType === 'Tenant Improvements' && leadUserFilter(a.leadId) && dateFilter(a.createdAt));
+        const relevantNegotiationUpdates = negotiationBoards.filter(n => relevantLeadsSet.has(n.leadId)).flatMap(n => n.sessions.filter(s => dateFilter(s.date))).length;
+        
         const topViewedLocations = groupAndSort(relevantViews, view => {
             const listing = listings.find(l => l.listingId === view.listingId);
             return listing?.location || '';
@@ -170,8 +185,23 @@ export default function CustomerAnalyticsPage() {
              timestamp: item.requestedAt,
              link: `/listings/${item.listingId}`
         }));
+        
+        const tenantImprovementActivities = relevantTenantImprovements.map(item => ({
+             type: 'Tenant Improvements' as const,
+             subject: `Update for Lead ${item.leadId}`,
+             timestamp: item.createdAt,
+             link: `/dashboard/leads/${item.leadId}?tab=improvements`,
+        }));
+        
+        const negotiationActivities = negotiationBoards.filter(n => relevantLeadsSet.has(n.leadId)).flatMap(n => n.sessions.filter(s => dateFilter(s.date)).map(s => ({
+            type: 'Negotiation Board Update' as const,
+            subject: `Session for Lead ${n.leadId}`,
+            timestamp: s.date,
+            link: `/dashboard/leads/${n.leadId}?tab=negotiation-board`,
+        })));
 
-        const recentActivities = [...viewActivities, ...downloadActivities, ...quoteActivities, ...demandActivities, ...layoutRequestActivities]
+
+        const recentActivities = [...viewActivities, ...downloadActivities, ...quoteActivities, ...demandActivities, ...layoutRequestActivities, ...tenantImprovementActivities, ...negotiationActivities]
             .sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
             .slice(0, 10);
 
@@ -182,13 +212,15 @@ export default function CustomerAnalyticsPage() {
             totalQuoteRequests: relevantQuoteRequests.length,
             totalLayoutRequests: relevantLayoutRequests.length,
             totalShortlists: relevantShortlists,
+            totalTenantImprovements: relevantTenantImprovements.length,
+            totalNegotiationUpdates: relevantNegotiationUpdates,
             topViewedLocations,
             topViewedDevelopers,
             recentActivities,
             selectedUser,
         }
 
-    }, [selectedUserId, dateRange, demands, viewHistory, downloadHistory, listings, users, registeredLeads, layoutRequests, generalShortlist, isDataLoading]);
+    }, [selectedUserId, dateRange, demands, viewHistory, downloadHistory, listings, users, registeredLeads, layoutRequests, generalShortlist, transactionActivities, negotiationBoards, isDataLoading]);
 
     if (!hasAccess) return null;
     
@@ -258,13 +290,15 @@ export default function CustomerAnalyticsPage() {
                     </CardContent>
                 </Card>
 
-                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <StatCard title="Total Demands" value={filteredData.totalDemands} icon={List} />
                     <StatCard title="Listings Viewed" value={filteredData.totalViews} icon={Eye} />
                     <StatCard title="Listings Downloaded" value={filteredData.totalDownloads} icon={Download} />
                     <StatCard title="Quote Requests" value={filteredData.totalQuoteRequests} icon={MessageCircle} />
                     <StatCard title="Layout Requests" value={filteredData.totalLayoutRequests} icon={FileQuestion} />
                     <StatCard title="Shortlisted" value={filteredData.totalShortlists} icon={Star} />
+                    <StatCard title="TI Requests" value={filteredData.totalTenantImprovements} icon={HardHat} />
+                    <StatCard title="Transaction Activities" value={filteredData.totalNegotiationUpdates} icon={Notebook} />
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -339,3 +373,6 @@ export default function CustomerAnalyticsPage() {
         </main>
     )
 }
+
+
+  
