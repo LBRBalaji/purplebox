@@ -297,7 +297,7 @@ export default function ListingDetailPage() {
         if (!user || !listing) return false;
         return registeredLeads.some(lead => 
             lead.customerId === user.email &&
-            lead.providers.some(p => p.properties.some(prop => prop.listingId === listing.listingId))
+            lead.providers?.some(p => p.properties?.some(prop => prop.listingId === listing.listingId))
         );
     }, [user, listing, registeredLeads]);
 
