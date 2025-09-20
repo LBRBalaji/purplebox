@@ -153,33 +153,7 @@ export default function LeadDetailPage() {
         description: "The new activity has been successfully saved.",
     });
   };
-
-  const handleAcknowledgeClick = (property: RegisteredLeadProperty) => {
-      setPropertyToAcknowledge(property);
-      // The button now opens the confirmation dialog first.
-      // The final form dialog is opened from the confirmation dialog's action.
-  }
-
-  const handleAcknowledgeSubmit = (details: AcknowledgmentDetails) => {
-    if (!lead || !user?.email || !propertyToAcknowledge) return;
-    updateRegisteredLeadStatus(lead.id, user.email, propertyToAcknowledge.listingId, 'Acknowledged', details);
-    toast({
-        title: 'Property Acknowledged!',
-        description: `Thank you for your confirmation.`,
-    });
-    setIsAcknowledgeDialogOpen(false);
-    setPropertyToAcknowledge(null);
-  }
   
-  const handleReject = (listingId: string) => {
-    if (!lead || !user?.email) return;
-    updateRegisteredLeadStatus(lead.id, user.email, listingId, 'Rejected');
-    toast({
-      title: 'Property Rejected',
-      description: `You have rejected the lead for this property.`,
-    });
-  }
-
   const handleProviderSelect = (provider: RegisteredLeadProvider, devListings: ListingSchema[]) => {
       setSelectedProvider(provider);
       setSelectedProviderListings(devListings);
@@ -237,7 +211,7 @@ export default function LeadDetailPage() {
                   <TabsContent value="activity" className="mt-6">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                           <div className="md:col-span-2 space-y-6">
-                              {(isO2O || isPremiumAgent) && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                              {(isO2O || isPremiumAgent || isCustomer) && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
                               <Card>
                                   <CardHeader>
                                       <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>
@@ -321,20 +295,12 @@ export default function LeadDetailPage() {
                                   <Card>
                                       <CardHeader>
                                           <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Linked Properties</CardTitle>
-                                          <CardDescription>Manage acknowledgment status for each property below.</CardDescription>
                                       </CardHeader>
                                       <CardContent className="space-y-4">
                                             {selectedProvider.properties.map((property, index) => {
                                                 const listing = listings.find(l => l.listingId === property.listingId);
                                                 if (!listing) return null;
                                                 
-                                                const statusConfig = {
-                                                    Pending: { text: 'Pending', icon: Clock, color: 'text-amber-600' },
-                                                    Acknowledged: { text: 'Acknowledged', icon: Check, color: 'text-green-600' },
-                                                    Rejected: { text: 'Rejected', icon: X, color: 'text-red-600' },
-                                                };
-                                                const status = statusConfig[property.status] || statusConfig.Pending;
-
                                                 return (
                                                   <React.Fragment key={property.listingId}>
                                                     {index > 0 && <Separator />}
@@ -342,47 +308,10 @@ export default function LeadDetailPage() {
                                                         <div className="flex-grow space-y-1">
                                                             <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-semibold hover:underline">{listing.name}</Link>
                                                             <p className="text-xs text-muted-foreground">{listing.location} &bull; {listing.sizeSqFt.toLocaleString()} sq. ft.</p>
-                                                            <Badge variant="outline" className={status.color}>
-                                                                <status.icon className="mr-1.5 h-3 w-3" />
-                                                                {property.status}
-                                                            </Badge>
                                                         </div>
-                                                        <div className="flex flex-col items-end gap-2 shrink-0">
-                                                          {isProvider && property.status === 'Pending' ? (
-                                                              <div className="flex gap-2">
-                                                                  <AlertDialog><AlertDialogTrigger asChild><Button variant="destructive" size="icon" className="h-8 w-8"><ThumbsDown className="h-4 w-4" /></Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone. This will permanently reject the lead for this property.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(listing.listingId)}>Confirm Rejection</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
-                                                                  
-                                                                  <AlertDialog>
-                                                                    <AlertDialogTrigger asChild>
-                                                                        <Button variant="default" size="icon" className="h-8 w-8" onClick={() => handleAcknowledgeClick(property)}><ThumbsUp className="h-4 w-4" /></Button>
-                                                                    </AlertDialogTrigger>
-                                                                    <AlertDialogContent>
-                                                                        <AlertDialogHeader>
-                                                                            <div className="flex justify-center mb-4">
-                                                                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                                                                    <ShieldCheck className="h-6 w-6 text-primary" />
-                                                                                </div>
-                                                                            </div>
-                                                                            <AlertDialogTitle className="text-center">Formal Acknowledgment</AlertDialogTitle>
-                                                                            <AlertDialogDescription className="text-center">
-                                                                                By proceeding, you formally acknowledge this lead from Lakshmi Balaji O2O. This is an important, non-revocable step to begin the collaboration process.
-                                                                            </AlertDialogDescription>
-                                                                        </AlertDialogHeader>
-                                                                        <AlertDialogFooter>
-                                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                            <AlertDialogAction onClick={() => setIsAcknowledgeDialogOpen(true)}>
-                                                                                Confirm & Proceed
-                                                                            </AlertDialogAction>
-                                                                        </AlertDialogFooter>
-                                                                    </AlertDialogContent>
-                                                                  </AlertDialog>
-                                                              </div>
-                                                          ) : (
-                                                              <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                                                                  <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
-                                                              </Button>
-                                                          )}
-                                                        </div>
+                                                        <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                                                            <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
+                                                        </Button>
                                                     </div>
                                                   </React.Fragment>
                                                 )
@@ -403,12 +332,6 @@ export default function LeadDetailPage() {
           )}
         </div>
       </main>
-      <AcknowledgeLeadDialog 
-          isOpen={isAcknowledgeDialogOpen}
-          onOpenChange={setIsAcknowledgeDialogOpen}
-          lead={lead}
-          onSubmit={handleAcknowledgeSubmit}
-      />
     </>
   );
 }

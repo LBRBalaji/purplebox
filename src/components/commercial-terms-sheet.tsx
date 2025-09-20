@@ -203,11 +203,11 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
     const { getCommercialTerms, updateCommercialTerms } = useData();
     
     const isCustomer = user?.role === 'User';
-    const isProvider = user?.role === 'SuperAdmin';
+    const isProvider = user?.role === 'Warehouse Developer';
     const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
     const isAgent = user?.role === 'Agent';
     const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
-    const canEdit = isO2O || isPremiumAgent;
+    const canEdit = isO2O || isPremiumAgent || isCustomer || isProvider;
 
     const form = useForm<CommercialTermsSchema>({
         resolver: zodResolver(commercialTermsSchema),
