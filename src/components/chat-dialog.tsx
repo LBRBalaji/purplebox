@@ -75,9 +75,8 @@ export function ChatDialog({
             if (user && lastMessage.senderEmail !== user.email) {
                 showNotification(lastMessage.text, lastMessage.senderName);
             }
-            return threadMessages;
         }
-        return prevMessages;
+        return threadMessages;
       });
 
     } catch (error) {
@@ -117,12 +116,21 @@ export function ChatDialog({
       timestamp: new Date().toISOString(),
     };
     
-    await addChatMessage(threadId, message);
+    // Optimistic UI update
+    setMessages(prev => [...prev, message]);
     setNewMessage('');
-    setIsSending(false);
-    
-    // Immediately fetch new messages to update the UI
-    fetchMessages();
+
+    try {
+      await addChatMessage(threadId, message);
+      // Optional: re-fetch messages to ensure sync with server, though polling should handle this.
+      // await fetchMessages();
+    } catch (error) {
+        console.error("Failed to send message:", error);
+        // Optional: Implement error handling, e.g., show an error icon next to the failed message
+        // and allow retrying. For now, we'll rely on polling to eventually sync up.
+    } finally {
+        setIsSending(false);
+    }
   };
 
   if (!submission?.listing) return null;
