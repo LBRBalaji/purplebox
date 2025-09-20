@@ -57,6 +57,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                         providerEmail: provider.providerEmail,
                         listing: listing,
                         customerName: customer?.userName || '',
+                        customerId: customer?.email || '',
                         customerCompany: customer?.companyName || '',
                         chatPartnerName,
                     },
@@ -121,7 +122,7 @@ export function GlobalChatWidget() {
         )
     }
 
-    const isCustomer = activeChat && user?.email === activeChat.customerName;
+    const isCustomer = activeChat && user?.email === activeChat.customerId;
 
     let title = "Conversations";
     let subtitle = null;
