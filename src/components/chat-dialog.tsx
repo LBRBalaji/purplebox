@@ -1,7 +1,7 @@
 
 'use client';
 
-import * as React from 'react';
+import React, { useCallback } from 'react';
 import {
   Collapsible,
   CollapsibleContent,
@@ -223,8 +223,8 @@ export function ChatPanel({
 
   return (
     <div className="h-96 flex flex-col p-0">
-        <ScrollArea className="flex-grow" scrollableViewportRef={scrollViewportRef}>
-            <div className="space-y-4 p-4 pr-6">
+        <ScrollArea className="flex-grow pr-4" scrollableViewportRef={scrollViewportRef}>
+            <div className="space-y-4 p-4">
                 {initialMessage && messages.length === 0 && (
                     <div className="text-center text-sm text-muted-foreground py-10 px-4 border border-dashed rounded-lg">
                         {initialMessage}
