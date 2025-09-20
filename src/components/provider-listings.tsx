@@ -34,8 +34,8 @@ function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { lis
   const statusConfig: Record<ListingStatus, { text: string; className: string, icon: React.ElementType }> = {
     approved: { text: "Approved", className: "bg-green-100 text-green-800", icon: CircleCheck },
     pending: { text: "Pending", className: "bg-amber-100 text-amber-800", icon: History },
-    rejected: { text: "Rejected", className: "bg-red-100 text-red-800", icon: Eye },
-    leased: { text: "Leased", className: "bg-blue-100 text-blue-800", icon: ClipboardList }
+    rejected: { text: "Rejected", className: "bg-red-100 text-red-800", icon: XCircle },
+    leased: { text: "Leased", className: "bg-blue-100 text-blue-800", icon: Archive }
   };
   const status = statusConfig[listing.status] || { text: 'Unknown', className: 'bg-gray-100 text-gray-800', icon: Eye };
   const StatusIcon = status.icon;
@@ -265,7 +265,7 @@ function StatCard({ title, value, icon: Icon }: { title: string, value: string, 
 
 export function ProviderListings() {
   const { user } = useAuth();
-  const { addListing, updateListing, updateListingStatus, listingAnalytics } = useData();
+  const { listings, addListing, updateListing, updateListingStatus, listingAnalytics } = useData();
   const [myListings, setMyListings] = React.useState<ListingSchema[]>([]);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
@@ -297,8 +297,13 @@ export function ProviderListings() {
       }
     }
 
-    fetchProviderListings();
-  }, [user, toast]);
+    if(user?.email && !isAdmin) {
+        fetchProviderListings();
+    } else if (isAdmin) {
+        setMyListings(listings);
+        setIsLoading(false);
+    }
+  }, [user, listings, toast, isAdmin]);
   
   const handleStatusChange = (listingId: string, status: ListingStatus) => {
     updateListingStatus(listingId, status, user?.email);
