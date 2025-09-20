@@ -327,27 +327,26 @@ export const createPropertySchema = (demand?: DemandSchema) => {
     return schema;
 };
 
-export type PropertySchema = z.infer<ReturnType<typeof createPropertySchema>>;
+export type PropertySchema = z.infer<typeof createPropertySchema>;
 
-const customTermSchema = z.object({
-    particulars: z.string().default(''),
-    details: z.string().optional().default(''),
+const negotiableFieldSchema = z.object({
+    id: z.string(),
+    label: z.string().default(''),
+    agreedTerms: z.string().optional().default(''),
     proposedBy: z.enum(['Customer', 'Provider']).optional(),
     status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
-    agreedTerms: z.string().optional().default(''),
-    isCostFactor: z.boolean().default(false).optional(),
-    cost: asOptionalField(z.coerce.number()),
+});
+
+const negotiationSectionSchema = z.object({
+    id: z.string(),
+    title: z.string(),
+    icon: z.string(),
+    fields: z.array(negotiableFieldSchema),
 });
 
 const attendeeSchema = z.object({
     name: z.string().optional().default(''),
     title: z.string().optional().default(''),
-});
-
-const createNegotiableTermSchema = () => z.object({
-    agreedTerms: z.string().optional().default(''),
-    proposedBy: z.enum(['Customer', 'Provider']).optional(),
-    status: z.enum(['Agreed', 'Reserved For Discussion', 'Not Applicable']).optional(),
 });
 
 const negotiationSessionSchema = z.object({
@@ -356,36 +355,8 @@ const negotiationSessionSchema = z.object({
     customerAttendees: z.array(attendeeSchema).optional().default([]),
     providerAttendees: z.array(attendeeSchema).optional().default([]),
     facilitatorAttendees: z.array(attendeeSchema).optional().default([]),
-    siteInfo: z.object({
-        listingId: createNegotiableTermSchema(),
-        postalAddress: createNegotiableTermSchema(),
-        buildingNumber: createNegotiableTermSchema(),
-        googleCoordinates: createNegotiableTermSchema(),
-        buildingStatus: createNegotiableTermSchema(),
-    }).optional(),
-    area: z.object({
-        plinthArea: createNegotiableTermSchema(),
-        mezzanineArea1: createNegotiableTermSchema(),
-        mezzanineArea2: createNegotiableTermSchema(),
-        canopyArea: createNegotiableTermSchema(),
-        driversRestRoom: createNegotiableTermSchema(),
-        totalChargeableArea: createNegotiableTermSchema(),
-    }).optional(),
-    leaseTerms: z.object({
-        leaseTenure: createNegotiableTermSchema(),
-        leaseLockIn: createNegotiableTermSchema(),
-        rentEscalation: createNegotiableTermSchema(),
-    }).optional(),
-    commercialTerms: z.object({
-        chargeableArea: createNegotiableTermSchema(),
-        buildingRentPerSft: createNegotiableTermSchema(),
-        totalRentPerMonth: createNegotiableTermSchema(),
-        camCharges: createNegotiableTermSchema(),
-        ifrsd: createNegotiableTermSchema(),
-        capexItems: z.array(customTermSchema).optional().default([]),
-    }).optional(),
+    sections: z.array(negotiationSectionSchema).optional().default([]),
 });
-
 
 const actionableItemSchema = z.object({
     item: z.string().optional().default(''),
@@ -396,6 +367,7 @@ const actionableItemSchema = z.object({
 });
 
 export const negotiationBoardSchema = z.object({
+    leadId: z.string(),
     sessions: z.array(negotiationSessionSchema),
     actionableItems: z.array(actionableItemSchema).optional().default([]),
     overallRemarks: z.string().optional().default(''),
