@@ -156,5 +156,27 @@
       "text": "welcome",
       "timestamp": "2025-09-20T12:41:00.601Z"
     }
+  ],
+  "chat-LDR-QUOTE-1758360477894-admin@kailashlogistics.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "hi",
+      "timestamp": "2025-09-20T16:25:33.098Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "is this facility available",
+      "timestamp": "2025-09-20T16:26:40.345Z"
+    }
+  ],
+  "chat-LDR-QUOTE-1758348790692-admin@welspun.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "can you lease part of the facility?",
+      "timestamp": "2025-09-20T16:27:57.011Z"
+    }
   ]
 }

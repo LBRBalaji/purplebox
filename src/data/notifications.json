@@ -2,6 +2,39 @@
   {
     "type": "new_chat_message",
     "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-QUOTE-1758348790692: \"can you lease part of the facility?...\"",
+    "href": "/dashboard/leads/LDR-QUOTE-1758348790692",
+    "recipientEmail": "admin@welspun.com",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "id": "notif-1758385677620",
+    "timestamp": "2025-09-20T16:27:57.620Z",
+    "isRead": false
+  },
+  {
+    "type": "new_chat_message",
+    "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-QUOTE-1758360477894: \"is this facility available...\"",
+    "href": "/dashboard/leads/LDR-QUOTE-1758360477894",
+    "recipientEmail": "admin@kailashlogistics.com",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "id": "notif-1758385600992",
+    "timestamp": "2025-09-20T16:26:40.992Z",
+    "isRead": false
+  },
+  {
+    "type": "new_chat_message",
+    "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-QUOTE-1758360477894: \"hi...\"",
+    "href": "/dashboard/leads/LDR-QUOTE-1758360477894",
+    "recipientEmail": "admin@kailashlogistics.com",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "id": "notif-1758385533548",
+    "timestamp": "2025-09-20T16:25:33.548Z",
+    "isRead": false
+  },
+  {
+    "type": "new_chat_message",
+    "title": "New message from Murugan",
     "message": "Regarding transaction LDR-QUOTE-1758359330575: \"welcome...\"",
     "href": "/dashboard/leads/LDR-QUOTE-1758359330575",
     "recipientEmail": "admin@ccidevelopers.com",
