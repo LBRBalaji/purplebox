@@ -6,7 +6,7 @@ import { useAuth, type User } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Users, List, Download, Eye, MapPin, Building, Activity, Clock, BarChart as BarChartIcon } from 'lucide-react';
+import { Users, List, Download, Eye, MapPin, Building, Activity, Clock, BarChart as BarChartIcon, Star, FileQuestion, MessageCircle, ClipboardList, PackagePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -40,6 +40,7 @@ function StatCard({ title, value, icon: Icon }: { title: string; value: string |
 }
 
 function groupAndSort<T>(items: T[], keyExtractor: (item: T) => string) {
+  if (!items) return [];
   const counts = items.reduce((acc, item) => {
     const key = keyExtractor(item);
     if(key) {
@@ -54,9 +55,17 @@ function groupAndSort<T>(items: T[], keyExtractor: (item: T) => string) {
     .slice(0, 5);
 }
 
+const activityIconMap: { [key: string]: React.ElementType } = {
+    'View': Eye,
+    'Download': Download,
+    'Quote Request': MessageCircle,
+    'New Demand': ClipboardList,
+    'Layout Request': FileQuestion,
+};
+
 export default function CustomerAnalyticsPage() {
     const { user: currentUser, users } = useAuth();
-    const { demands, viewHistory, downloadHistory, listings, isLoading: isDataLoading } = useData();
+    const { demands, viewHistory, downloadHistory, listings, isLoading: isDataLoading, registeredLeads, layoutRequests, generalShortlist } = useData();
     const router = useRouter();
 
     const [selectedUserId, setSelectedUserId] = React.useState<string>('all');
@@ -68,19 +77,21 @@ export default function CustomerAnalyticsPage() {
     const hasAccess = currentUser?.role === 'SuperAdmin' || currentUser?.role === 'O2O';
     
     React.useEffect(() => {
-        if (!hasAccess) {
+        if (!isDataLoading && !hasAccess) {
             router.push('/dashboard');
         }
-    }, [currentUser, hasAccess, router]);
+    }, [currentUser, hasAccess, router, isDataLoading]);
 
     const customers = React.useMemo(() => Object.values(users || {}).filter(u => u.role === 'User'), [users]);
 
     const filteredData = React.useMemo(() => {
-        if (!demands || !viewHistory || !downloadHistory || !listings || !users) {
+        if (isDataLoading || !demands || !viewHistory || !downloadHistory || !listings || !users || !registeredLeads || !layoutRequests) {
             return {
                 totalDemands: 0,
                 totalViews: 0,
                 totalDownloads: 0,
+                totalQuoteRequests: 0,
+                totalShortlists: 0,
                 topViewedLocations: [],
                 topViewedDevelopers: [],
                 recentActivities: [],
@@ -94,21 +105,22 @@ export default function CustomerAnalyticsPage() {
         const isUserSelected = selectedUserId && selectedUserId !== 'all';
         const selectedUser = users[selectedUserId];
 
-        const relevantDemands = isUserSelected 
-            ? demands.filter(d => d.userEmail === selectedUserId)
-            : demands;
+        const userFilter = (item: { customerId?: string, userEmail?: string, userId?: string }) => {
+            if (!isUserSelected) return true;
+            return item.customerId === selectedUserId || item.userEmail === selectedUserId || item.userId === selectedUserId;
+        }
 
-        const relevantViews = viewHistory.filter(v => {
-            const viewDate = new Date(v.timestamp);
-            const userMatch = isUserSelected ? v.userId === selectedUserId : true;
-            return viewDate >= from && viewDate <= to && userMatch;
-        });
+        const dateFilter = (timestamp: string | number) => {
+            const date = new Date(timestamp);
+            return date >= from && date <= to;
+        }
 
-        const relevantDownloads = downloadHistory.filter(d => {
-            const downloadDate = new Date(d.timestamp);
-            const userMatch = isUserSelected ? d.userId === selectedUserId : true;
-            return downloadDate >= from && downloadDate <= to && userMatch;
-        });
+        const relevantDemands = demands.filter(d => userFilter(d) && dateFilter(d.createdAt!));
+        const relevantViews = viewHistory.filter(v => userFilter(v) && dateFilter(v.timestamp));
+        const relevantDownloads = downloadHistory.filter(d => userFilter(d) && dateFilter(d.timestamp));
+        const relevantQuoteRequests = registeredLeads.filter(l => userFilter(l) && dateFilter(l.registeredAt));
+        const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userId: r.userName}) && dateFilter(r.requestedAt)); // Assuming userName is email for now
+        const relevantShortlists = isUserSelected ? generalShortlist.length : 0; // Shortlist is only per user, not global
 
         const topViewedLocations = groupAndSort(relevantViews, view => {
             const listing = listings.find(l => l.listingId === view.listingId);
@@ -121,30 +133,58 @@ export default function CustomerAnalyticsPage() {
             return developer?.companyName || 'Unknown';
         });
         
-        const recentActivities = [...relevantViews, ...relevantDownloads]
-            .sort((a,b) => b.timestamp - a.timestamp)
-            .slice(0, 10)
-            .map(item => {
-                const listing = listings.find(l => l.listingId === item.listingId);
-                return {
-                    type: 'userId' in item ? 'View' : 'Download',
-                    listingName: listing?.name || item.listingId,
-                    timestamp: new Date(item.timestamp).toLocaleString(),
-                    listingId: item.listingId
-                }
-            });
+        const viewActivities = relevantViews.map(item => ({
+            type: 'View' as const,
+            subject: listings.find(l => l.listingId === item.listingId)?.name || item.listingId,
+            timestamp: new Date(item.timestamp).toISOString(),
+            link: `/listings/${item.listingId}`,
+        }));
+        
+        const downloadActivities = relevantDownloads.map(item => ({
+            type: 'Download' as const,
+            subject: listings.find(l => l.listingId === item.listingId)?.name || item.listingId,
+            timestamp: new Date(item.timestamp).toISOString(),
+            link: `/listings/${item.listingId}`,
+        }));
+
+        const quoteActivities = relevantQuoteRequests.map(item => ({
+             type: 'Quote Request' as const,
+             subject: item.requirementsSummary,
+             timestamp: item.registeredAt,
+             link: `/dashboard/leads/${item.id}`
+        }));
+
+        const demandActivities = relevantDemands.map(item => ({
+             type: 'New Demand' as const,
+             subject: item.demandId,
+             timestamp: item.createdAt!,
+             link: `/dashboard?editDemandId=${item.demandId}`
+        }));
+        
+        const layoutRequestActivities = relevantLayoutRequests.map(item => ({
+             type: 'Layout Request' as const,
+             subject: item.listingName,
+             timestamp: item.requestedAt,
+             link: `/listings/${item.listingId}`
+        }));
+
+        const recentActivities = [...viewActivities, ...downloadActivities, ...quoteActivities, ...demandActivities, ...layoutRequestActivities]
+            .sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            .slice(0, 10);
 
         return {
             totalDemands: relevantDemands.length,
             totalViews: relevantViews.length,
             totalDownloads: relevantDownloads.length,
+            totalQuoteRequests: relevantQuoteRequests.length,
+            totalShortlists: relevantShortlists,
             topViewedLocations,
             topViewedDevelopers,
             recentActivities,
             selectedUser,
         }
 
-    }, [selectedUserId, dateRange, demands, viewHistory, downloadHistory, listings, users]);
+    }, [selectedUserId, dateRange, demands, viewHistory, downloadHistory, listings, users, registeredLeads, layoutRequests, generalShortlist, isDataLoading]);
 
     if (!hasAccess) return null;
     
@@ -153,7 +193,9 @@ export default function CustomerAnalyticsPage() {
              <div className="container mx-auto p-4 md:p-8 space-y-8">
                 <Skeleton className="h-12 w-1/3" />
                 <Skeleton className="h-32 w-full" />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
                     <Skeleton className="h-24 w-full" />
                     <Skeleton className="h-24 w-full" />
                     <Skeleton className="h-24 w-full" />
@@ -212,10 +254,12 @@ export default function CustomerAnalyticsPage() {
                     </CardContent>
                 </Card>
 
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
                     <StatCard title="Total Demands" value={filteredData.totalDemands} icon={List} />
                     <StatCard title="Listings Viewed" value={filteredData.totalViews} icon={Eye} />
                     <StatCard title="Listings Downloaded" value={filteredData.totalDownloads} icon={Download} />
+                    <StatCard title="Quote Requests" value={filteredData.totalQuoteRequests} icon={MessageCircle} />
+                    <StatCard title="Shortlisted" value={filteredData.totalShortlists} icon={Star} />
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -255,24 +299,32 @@ export default function CustomerAnalyticsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Activity className="text-primary"/> Recent Activity</CardTitle>
                          <CardDescription>
-                            Latest views and downloads by {filteredData.selectedUser ? filteredData.selectedUser.userName : 'all customers'}.
+                            Latest activities by {filteredData.selectedUser ? filteredData.selectedUser.userName : 'all customers'}.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                          <Table>
-                            <TableHeader><TableRow><TableHead>Activity</TableHead><TableHead>Listing</TableHead><TableHead className="text-right">Time</TableHead></TableRow></TableHeader>
+                            <TableHeader><TableRow><TableHead>Activity</TableHead><TableHead>Subject</TableHead><TableHead className="text-right">Time</TableHead></TableRow></TableHeader>
                             <TableBody>
-                                {filteredData.recentActivities.length > 0 ? filteredData.recentActivities.map((act, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell><Badge variant={act.type === 'View' ? 'outline' : 'secondary'}>{act.type}</Badge></TableCell>
-                                        <TableCell>
-                                            <a href={`/listings/${act.listingId}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                                                {act.listingName}
-                                            </a>
-                                        </TableCell>
-                                        <TableCell className="text-right text-xs text-muted-foreground">{act.timestamp}</TableCell>
-                                    </TableRow>
-                                )) : <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No recent activity for this period.</TableCell></TableRow>}
+                                {filteredData.recentActivities.length > 0 ? filteredData.recentActivities.map((act, index) => {
+                                    const Icon = activityIconMap[act.type] || Activity;
+                                    return (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <Badge variant={act.type === 'Download' || act.type === 'New Demand' ? 'secondary' : 'outline'} className="flex items-center gap-1.5 w-fit">
+                                                    <Icon className="h-3 w-3"/>
+                                                    {act.type}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <a href={act.link} target="_blank" rel="noopener noreferrer" className="hover:underline max-w-sm truncate block">
+                                                    {act.subject}
+                                                </a>
+                                            </TableCell>
+                                            <TableCell className="text-right text-xs text-muted-foreground">{new Date(act.timestamp).toLocaleString()}</TableCell>
+                                        </TableRow>
+                                    )
+                                }) : <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No recent activity for this period.</TableCell></TableRow>}
                             </TableBody>
                         </Table>
                     </CardContent>
