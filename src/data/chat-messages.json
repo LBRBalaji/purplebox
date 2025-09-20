@@ -17,6 +17,12 @@
       "senderName": "Ben Carter",
       "text": "can we connect",
       "timestamp": "2025-09-20T04:17:59.785Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "what time?",
+      "timestamp": "2025-09-20T04:19:38.259Z"
     }
   ]
 }

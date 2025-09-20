@@ -38,16 +38,17 @@ export function ChatDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const { user } = useAuth();
-  const { addChatMessage } = useData();
+  const { addChatMessage, typingStatus, updateTypingStatus, fetchTypingStatus } = useData();
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = React.useState('');
   const [isSending, setIsSending] = React.useState(false);
   const scrollViewportRef = React.useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const threadId = submission ? `${submission.demandId}-${submission.listingId}` : null;
+  const otherUserTyping = threadId ? typingStatus[threadId] : null;
   
   React.useEffect(() => {
-    // Request notification permission when component mounts and dialog is open
     if (isOpen && "Notification" in window && Notification.permission === "default") {
         Notification.requestPermission();
     }
@@ -57,7 +58,7 @@ export function ChatDialog({
       if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
           const notification = new Notification(`New Message from ${senderName}`, {
               body,
-              icon: '/logo.png' // Optional: add an icon
+              icon: '/logo.png'
           });
       }
   }
@@ -86,22 +87,48 @@ export function ChatDialog({
 
   React.useEffect(() => {
     if (isOpen && threadId) {
-      fetchMessages(); // Initial fetch
-      const intervalId = setInterval(fetchMessages, 3000); // Poll every 3 seconds
+      fetchMessages();
+      fetchTypingStatus(threadId);
+      const intervalId = setInterval(() => {
+        fetchMessages();
+        fetchTypingStatus(threadId);
+      }, 3000); 
 
       return () => {
-        clearInterval(intervalId); // Cleanup on close
+        clearInterval(intervalId);
       };
     } else {
-        setMessages([]); // Clear messages when dialog is closed
+        setMessages([]);
     }
-  }, [isOpen, threadId, fetchMessages]);
+  }, [isOpen, threadId, fetchMessages, fetchTypingStatus]);
 
   React.useEffect(() => {
     if (scrollViewportRef.current) {
         scrollViewportRef.current.scrollTo({ top: scrollViewportRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [messages]);
+
+  const handleTyping = () => {
+    if (!threadId || !user) return;
+    
+    updateTypingStatus(threadId, {
+      isTyping: true,
+      userEmail: user.email,
+      userName: user.userName,
+    });
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      updateTypingStatus(threadId, {
+        isTyping: false,
+        userEmail: user.email,
+        userName: user.userName,
+      });
+    }, 2000);
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,18 +143,16 @@ export function ChatDialog({
       timestamp: new Date().toISOString(),
     };
     
-    // Optimistic UI update
     setMessages(prev => [...prev, message]);
     setNewMessage('');
+    updateTypingStatus(threadId, { isTyping: false, userEmail: user.email, userName: user.userName });
+    if(typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
 
     try {
       await addChatMessage(threadId, message);
-      // Optional: re-fetch messages to ensure sync with server, though polling should handle this.
-      // await fetchMessages();
     } catch (error) {
         console.error("Failed to send message:", error);
-        // Optional: Implement error handling, e.g., show an error icon next to the failed message
-        // and allow retrying. For now, we'll rely on polling to eventually sync up.
     } finally {
         setIsSending(false);
     }
@@ -147,11 +172,11 @@ export function ChatDialog({
         return `Hi ${user?.userName}, this is the O2O Assistant. I see you're interested in property ${submission.listing?.listingId}. How can I help you?`;
     }
     
-    if (user?.email === submission.demandUserEmail) { // Customer is initiating
+    if (user?.email === submission.demandUserEmail) {
         return `Hi ${submission.chatPartnerName}, thank you for your interest in property ${submission.listing?.listingId}. I represent ${submission.customerCompany}. How can I assist you?`;
     }
 
-    if (user?.email === submission.providerEmail) { // Provider is initiating
+    if (user?.email === submission.providerEmail) {
         return `Hi ${submission.customerName}, thank you for your interest in our property ${submission.listing?.listingId}. I represent ${submission.chatPartnerName}. How can I assist you?`;
     }
 
@@ -218,12 +243,25 @@ export function ChatDialog({
             </div>
             </ScrollArea>
         </div>
+        <div className="h-6 px-6 text-xs text-muted-foreground">
+          {otherUserTyping && otherUserTyping.isTyping && otherUserTyping.userEmail !== user?.email && (
+            <div className="animate-pulse flex items-center gap-2">
+              <Avatar className="h-5 w-5">
+                <AvatarFallback className="text-xs">{otherUserTyping.userName?.[0]}</AvatarFallback>
+              </Avatar>
+              <span>{otherUserTyping.userName} is typing...</span>
+            </div>
+          )}
+        </div>
         <DialogFooter className="p-6 pt-2">
           <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
             <Textarea
               placeholder="Type your message..."
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={(e) => {
+                setNewMessage(e.target.value);
+                handleTyping();
+              }}
               className="min-h-0 h-12 resize-none"
               onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {

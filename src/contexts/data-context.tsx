@@ -146,6 +146,12 @@ export type ChatMessage = {
     timestamp: string;
 };
 
+export type TypingStatus = {
+    isTyping: boolean;
+    userEmail: string;
+    userName: string;
+};
+
 type DataContextType = {
   listings: ListingSchema[];
   addListing: (listing: ListingSchema, userEmail?: string) => void;
@@ -194,6 +200,9 @@ type DataContextType = {
   addLayoutRequest: (request: LayoutRequestData) => void;
   chatMessages: Record<string, ChatMessage[]>;
   addChatMessage: (threadId: string, message: ChatMessage) => Promise<void>;
+  typingStatus: Record<string, TypingStatus>;
+  updateTypingStatus: (threadId: string, status: TypingStatus) => Promise<void>;
+  fetchTypingStatus: (threadId: string) => Promise<void>;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -236,6 +245,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [downloadAcknowledgments, setDownloadAcknowledgments] = useState<AcknowledgmentRecord[]>([]);
   const [layoutRequests, setLayoutRequests] = useState<LayoutRequestRecord[]>([]);
   const [chatMessages, setChatMessages] = useState<Record<string, ChatMessage[]>>({});
+  const [typingStatus, setTypingStatus] = useState<Record<string, TypingStatus>>({});
 
    useEffect(() => {
     async function loadInitialData() {
@@ -375,6 +385,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), []);
   const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), []);
   const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), []);
+  const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), []);
+
 
   const addChatMessage = async (threadId: string, message: ChatMessage) => {
     const updatedMessages = { ...chatMessages };
@@ -384,6 +396,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
     updatedMessages[threadId].push(message);
     setChatMessages(updatedMessages);
     await persistChatMessages(updatedMessages);
+  };
+
+  const updateTypingStatus = async (threadId: string, status: TypingStatus) => {
+    const newStatus = { ...typingStatus, [threadId]: status };
+    setTypingStatus(newStatus);
+    await persistTypingStatus(newStatus);
+  };
+
+  const fetchTypingStatus = async (threadId: string) => {
+    try {
+      const response = await fetch('/api/typing-status');
+      if (response.ok) {
+        const allStatuses = await response.json();
+        setTypingStatus(allStatuses);
+      }
+    } catch (error) {
+      console.error('Failed to fetch typing status:', error);
+    }
   };
 
   const updateAboutUsContent = (newContent: AboutUsContent) => {
@@ -853,7 +883,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         layoutRequests,
         addLayoutRequest,
         chatMessages,
-        addChatMessage
+        addChatMessage,
+        typingStatus,
+        updateTypingStatus,
+        fetchTypingStatus,
         }}>
       {children}
     </DataContext.Provider>
