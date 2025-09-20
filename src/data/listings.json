@@ -60,7 +60,8 @@
       }
     ],
     "rentPerSft": "Get Quote",
-    "isAdmin": true
+    "isAdmin": true,
+    "plan": "Free"
   },
   {
     "status": "approved",

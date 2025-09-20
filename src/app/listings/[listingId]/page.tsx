@@ -433,7 +433,6 @@ export default function ListingDetailPage() {
     };
     
     const isPremiumListing = listing.plan === 'Paid_Premium';
-    const showQuoteButton = isPremiumListing || listing.rentPerSqFt === 'Get Quote';
 
     return (
         <>
@@ -445,7 +444,7 @@ export default function ListingDetailPage() {
                             <div className="flex items-center gap-4 mb-2">
                                 <Badge variant="secondary">{listing.listingId}</Badge>
                                 {listing.plan === 'Paid_Premium' && (
-                                    <Badge className="bg-amber-400 text-amber-900 shadow-lg border-amber-500">
+                                    <Badge className="bg-primary/80 backdrop-blur-sm text-primary-foreground shadow-lg border-primary/50">
                                         <Sparkles className="mr-1.5 h-3 w-3"/>
                                         Premium Listing
                                     </Badge>
@@ -578,29 +577,6 @@ export default function ListingDetailPage() {
                                 </CardContent>
                             </Card>
 
-                             {/* Final Actions */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Next Steps</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <Button
-                                            variant={isShortlisted ? 'default' : 'outline'}
-                                            className="w-full h-12"
-                                            onClick={handleShortlistClick}
-                                            disabled={isShortlistLoading}
-                                        >
-                                            <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
-                                            {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist this Property'}
-                                        </Button>
-                                         <Button className="w-full h-12" onClick={handleDownloadRequest}>
-                                            <Download className="mr-2 h-4 w-4" /> Download Details as CSV
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
                             {/* Documents */}
                              <Card>
                                 <CardHeader>
@@ -637,6 +613,29 @@ export default function ListingDetailPage() {
                                     )}
                                 </CardContent>
                             </Card>
+                            
+                             {/* Final Actions */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Save or Download</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <Button
+                                            variant={isShortlisted ? 'default' : 'outline'}
+                                            className="w-full h-12"
+                                            onClick={handleShortlistClick}
+                                            disabled={isShortlistLoading}
+                                        >
+                                            <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
+                                            {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist this Property'}
+                                        </Button>
+                                         <Button className="w-full h-12" onClick={handleDownloadRequest}>
+                                            <Download className="mr-2 h-4 w-4" /> Download Details as CSV
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </div>
                         
                         {/* Sticky Sidebar */}
@@ -663,7 +662,7 @@ export default function ListingDetailPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
-                                    {showQuoteButton ? (
+                                    {isPremiumListing ? (
                                         <>
                                             {hasRequestedQuote ? (
                                                 <div className="w-full text-center space-y-2">
@@ -688,7 +687,7 @@ export default function ListingDetailPage() {
                                             <Sparkles className="h-4 w-4" />
                                             <AlertTitle>Engage Directly!</AlertTitle>
                                             <AlertDescription>
-                                                Look for the <Badge className="bg-amber-400 text-amber-900">Premium</Badge> badge on listings to connect directly with providers.
+                                                Look for the <Badge className="bg-primary/80 backdrop-blur-sm text-primary-foreground">Premium</Badge> badge on listings to connect directly with providers.
                                             </AlertDescription>
                                         </Alert>
                                      )}
