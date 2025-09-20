@@ -9,7 +9,7 @@ import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase, FileSignature, DollarSign, Notebook } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase, FileSignature, DollarSign, Notebook, UserPlus } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -19,9 +19,7 @@ import { NegotiationBoard } from '@/components/negotiation-board';
 import { TenantImprovementsSheet } from '@/components/tenant-improvements-sheet';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { AcknowledgeLeadDialog } from '@/components/acknowledge-lead-dialog';
 import type { AcknowledgmentDetails } from '@/lib/schema';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -213,7 +211,7 @@ export default function LeadDetailPage() {
     const isO2O = user?.role === 'O2O';
     const isProviderForThisLead = foundLead.providers.some(p => p.providerEmail === user?.email);
     const isCustomerOfThisLead = foundLead.customerId === user?.email;
-    const isAgentOfThisLead = foundLead.registeredBy === user?.email;
+    const isAgentOfThisLead = foundLead.agentId === user?.email;
 
     if (isSuperAdmin || isO2O || isProviderForThisLead || isCustomerOfThisLead || isAgentOfThisLead) {
         setLead(foundLead);
@@ -298,17 +296,18 @@ export default function LeadDetailPage() {
 
   const customer = users[lead.customerId];
   const leadSourceUser = users[lead.registeredBy];
-  const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
-  const isCustomer = user?.email === lead.customerId;
-  const isAgent = user?.role === 'Agent';
-  const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
-  const isProvider = user?.role === 'Warehouse Developer';
-
-  const providerDetailsForUser = isProvider ? lead.providers.find(p => p.providerEmail === user?.email) : null;
-  
-  const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
+  const agentUser = lead.agentId ? users[lead.agentId] : null;
 
   const providerUser = selectedProvider ? users[selectedProvider.providerEmail] : null;
+  const isPremiumProvider = providerUser?.plan === 'Paid_Premium';
+  
+  const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
+  const isCustomer = user?.email === lead.customerId;
+  const isAgent = user?.email === lead.agentId;
+  const isProvider = user?.role === 'Warehouse Developer';
+
+  const canAddActivity = isO2O || (isPremiumProvider && (isCustomer || isProvider || isAgent));
+  const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
 
   return (
     <>
@@ -344,7 +343,7 @@ export default function LeadDetailPage() {
                   <TabsContent value="activity" className="mt-6">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                           <div className="md:col-span-2 space-y-6">
-                              {(isO2O || isPremiumAgent || isCustomer) && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                              {canAddActivity && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
                               <Card>
                                   <CardHeader>
                                       <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>
@@ -369,7 +368,7 @@ export default function LeadDetailPage() {
                                                               {activity.details.feedbackText && <p className="text-sm"><b>Feedback:</b> {activity.details.feedbackText}</p>}
                                                               {activity.details.improvementsText && <p className="text-sm"><b>Requirements:</b> {activity.details.improvementsText}</p>}
                                                               <TimelineDescription>
-                                                                  Logged by {activity.createdBy.replace('o2o@', 'O2O@')} on {new Date(activity.createdAt).toLocaleDateString()}
+                                                                  Logged by {users[activity.createdBy]?.userName || activity.createdBy} on {new Date(activity.createdAt).toLocaleDateString()}
                                                               </TimelineDescription>
                                                           </TimelineBody>
                                                       </TimelineItem>
@@ -392,49 +391,39 @@ export default function LeadDetailPage() {
                                   <CardContent>
                                     <Button onClick={handleChatClick} className="w-full">
                                         <MessageSquare className="mr-2 h-4 w-4" />
-                                        Chat with O2O Team
+                                        Chat about this Transaction
                                     </Button>
                                   </CardContent>
                                </Card>
-                              {!isCustomer && (
-                                  <Card>
-                                      <CardHeader>
-                                          <CardTitle className="flex items-center gap-2"><User className="h-5 w-5"/> Customer Info</CardTitle>
-                                      </CardHeader>
-                                      <CardContent className="space-y-3 text-sm">
-                                          <div className="font-semibold">{customer?.companyName || lead.leadName}</div>
-                                          <div>{customer?.userName || lead.leadContact}</div>
-                                          <a href={`mailto:${customer?.email || lead.leadEmail}`} className="text-primary hover:underline block">{customer?.email || lead.leadEmail}</a>
-                                          <a href={`tel:${customer?.phone || lead.leadPhone}`} className="text-primary hover:underline block">{customer?.phone || lead.leadPhone}</a>
-                                      </CardContent>
-                                  </Card>
-                              )}
-                              {providerUser && !isProvider && (
-                                  <Card>
-                                      <CardHeader>
-                                          <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Developer Info</CardTitle>
-                                      </CardHeader>
-                                      <CardContent className="space-y-3 text-sm">
-                                          <div className="font-semibold">{providerUser.companyName}</div>
-                                          <div>{providerUser.userName}</div>
-                                          <a href={`mailto:${providerUser.email}`} className="text-primary hover:underline block">{providerUser.email}</a>
-                                          <a href={`tel:${providerUser.phone}`} className="text-primary hover:underline block">{providerUser.phone}</a>
-                                      </CardContent>
-                                  </Card>
-                              )}
-                              {isProvider && leadSourceUser && (
-                                  <Card>
-                                      <CardHeader>
-                                          <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5"/> Lead Source</CardTitle>
-                                      </CardHeader>
-                                      <CardContent className="space-y-3 text-sm">
-                                          <p>This lead was registered by:</p>
-                                          <div className="font-semibold">{leadSourceUser.userName}</div>
-                                          <div>{leadSourceUser.companyName}</div>
-                                          <Badge variant={leadSourceUser.role === 'Agent' ? 'secondary' : 'default'}>{leadSourceUser.role}</Badge>
-                                      </CardContent>
-                                  </Card>
-                              )}
+                              <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5"/> Participants</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4 text-sm">
+                                    {customer && (
+                                        <div className="p-3 bg-secondary/50 rounded-md">
+                                            <p className="text-xs text-muted-foreground">Customer</p>
+                                            <p className="font-semibold">{customer.companyName}</p>
+                                            <p className="text-xs">{customer.userName}</p>
+                                        </div>
+                                    )}
+                                    {providerUser && (
+                                        <div className="p-3 bg-secondary/50 rounded-md">
+                                            <p className="text-xs text-muted-foreground">Provider</p>
+                                            <p className="font-semibold">{providerUser.companyName}</p>
+                                            <p className="text-xs">{providerUser.userName}</p>
+                                        </div>
+                                    )}
+                                    {agentUser && (
+                                        <div className="p-3 bg-secondary/50 rounded-md">
+                                            <p className="text-xs text-muted-foreground">Agent</p>
+                                            <p className="font-semibold">{agentUser.companyName}</p>
+                                            <p className="text-xs">{agentUser.userName}</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                              </Card>
+
                                {selectedProviderListings.length > 0 && (
                                   <Card>
                                       <CardHeader>
@@ -469,22 +458,18 @@ export default function LeadDetailPage() {
                                                          {isCustomer && (
                                                             <div className="p-3 bg-secondary/50 rounded-md">
                                                                 <p className="text-sm font-semibold mb-2 text-primary">Developer's Proposal</p>
-                                                                 {/* @ts-ignore */}
                                                                 {property.rentPerSft !== undefined ? (
                                                                      <div className="grid grid-cols-2 gap-4 text-sm">
                                                                         <div>
                                                                             <p className="text-muted-foreground">Quoted Rent</p>
-                                                                            {/* @ts-ignore */}
                                                                             <p className="font-medium">₹{property.rentPerSft}/sft</p>
                                                                         </div>
                                                                          <div>
                                                                             <p className="text-muted-foreground">Chargeable Area</p>
-                                                                             {/* @ts-ignore */}
                                                                             <p className="font-medium">{property.actualChargeableArea?.toLocaleString()} sft</p>
                                                                         </div>
                                                                         <div>
                                                                             <p className="text-muted-foreground">Security Deposit</p>
-                                                                             {/* @ts-ignore */}
                                                                             <p className="font-medium">{property.rentalSecurityDeposit} months</p>
                                                                         </div>
                                                                     </div>

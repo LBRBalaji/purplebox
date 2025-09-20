@@ -99,6 +99,7 @@ export type RegisteredLeadProvider = {
 export type RegisteredLead = {
   id: string; // Unique transaction ID
   customerId: string; // The User's email (ID)
+  agentId?: string; // Optional agent email
   leadName: string;
   leadContact: string;
   leadEmail: string;
