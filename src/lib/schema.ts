@@ -395,13 +395,13 @@ const actionableItemSchema = z.object({
     remarks: z.string().optional().default(''),
 });
 
-export const commercialTermsSchema = z.object({
+export const negotiationBoardSchema = z.object({
     sessions: z.array(negotiationSessionSchema),
     actionableItems: z.array(actionableItemSchema).optional().default([]),
     overallRemarks: z.string().optional().default(''),
 });
 
-export type CommercialTermsSchema = z.infer<typeof commercialTermsSchema>;
+export type NegotiationBoardSchema = z.infer<typeof negotiationBoardSchema>;
 
 // Tenant Improvements Schemas
 export const tenantImprovementItemSchema = z.object({

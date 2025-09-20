@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useForm, useFieldArray, Controller, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { commercialTermsSchema, type CommercialTermsSchema, type ListingSchema } from '@/lib/schema';
+import { negotiationBoardSchema, type NegotiationBoardSchema, type ListingSchema } from '@/lib/schema';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
@@ -69,7 +69,7 @@ const FormRow = ({ name, label, control, form, isTextarea, disabled }: { name: a
 
 
 const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: number, type: 'customer' | 'provider' | 'facilitator', disabled: boolean }) => {
-    const { control } = useFormContext<CommercialTermsSchema>();
+    const { control } = useFormContext<NegotiationBoardSchema>();
     const name = `sessions.${sessionIndex}.${type}Attendees` as const;
     const { fields, append, remove } = useFieldArray({ name, control });
 
@@ -96,7 +96,7 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 
 
 const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any }) => {
-    const { control, watch, setValue } = useFormContext<CommercialTermsSchema>();
+    const { control, watch, setValue } = useFormContext<NegotiationBoardSchema>();
     
     // Auto-calculation for Total Chargeable Area
     const areaFields = watch([
@@ -197,9 +197,9 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
     );
 }
 
-export function CommercialTermsSheet({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
+export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
     const { user } = useAuth();
-    const { getCommercialTerms, updateCommercialTerms } = useData();
+    const { getNegotiationBoard, updateNegotiationBoard } = useData();
     
     const isCustomer = user?.role === 'User';
     const isProvider = user?.role === 'Warehouse Developer';
@@ -208,8 +208,8 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
     const isPremiumAgent = isAgent && user?.plan === 'Paid_Premium';
     const canEdit = isO2O || isPremiumAgent || isCustomer || isProvider;
 
-    const form = useForm<CommercialTermsSchema>({
-        resolver: zodResolver(commercialTermsSchema),
+    const form = useForm<NegotiationBoardSchema>({
+        resolver: zodResolver(negotiationBoardSchema),
         defaultValues: {
             sessions: [],
             actionableItems: [],
@@ -223,7 +223,7 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
     
     // Load existing data
     React.useEffect(() => {
-        const existingData = getCommercialTerms(lead.id);
+        const existingData = getNegotiationBoard(lead.id);
         if (existingData && existingData.sessions.length > 0) {
             form.reset(existingData);
         } else {
@@ -254,10 +254,10 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
                 sessions: [defaultSession]
             });
         }
-    }, [lead.id, primaryListing, getCommercialTerms, form, lead.leadContact]);
+    }, [lead.id, primaryListing, getNegotiationBoard, form, lead.leadContact]);
 
-    const onSubmit = (data: CommercialTermsSchema) => {
-        updateCommercialTerms(lead.id, data);
+    const onSubmit = (data: NegotiationBoardSchema) => {
+        updateNegotiationBoard(lead.id, data);
     };
     
     const handleGenerateFollowUp = () => {

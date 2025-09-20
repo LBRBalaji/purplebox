@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type CommercialTermsSchema, type AcknowledgmentDetails, type LayoutRequestData } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type NegotiationBoardSchema, type AcknowledgmentDetails, type LayoutRequestData } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, startOfDay } from 'date-fns';
@@ -164,13 +164,13 @@ type DataContextType = {
   clearSelectedForDownload: () => void;
   registeredLeads: RegisteredLead[];
   addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => void;
-  updateRegisteredLeadStatus: (leadId: string, providerEmail: string, listingId: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => void;
+  updateRegisteredLead: (lead: RegisteredLead) => void;
   transactionActivities: TransactionActivity[];
   addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
   getTenantImprovements: (leadId: string) => TenantImprovementsSheet | null;
   updateTenantImprovements: (leadId: string, sheet: TenantImprovementsSheet) => void;
-  getCommercialTerms: (leadId: string) => CommercialTermsSchema | null;
-  updateCommercialTerms: (leadId: string, sheet: CommercialTermsSchema) => void;
+  getNegotiationBoard: (leadId: string) => NegotiationBoardSchema | null;
+  updateNegotiationBoard: (leadId: string, sheet: NegotiationBoardSchema) => void;
   generalShortlist: string[]; // Array of listingIds
   toggleGeneralShortlist: (listingId: string) => void;
   isShortlistLoading: boolean;
@@ -211,7 +211,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [registeredLeads, setRegisteredLeads] = useState<RegisteredLead[]>([]);
   const [transactionActivities, setTransactionActivities] = useState<TransactionActivity[]>([]);
   const [tenantImprovements, setTenantImprovements] = useState<TenantImprovementsSheet[]>([]);
-  const [commercialTerms, setCommercialTerms] = useState<CommercialTermsSchema[]>([]);
+  const [negotiationBoards, setNegotiationBoards] = useState<NegotiationBoardSchema[]>([]);
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [viewHistory, setViewHistory] = useState<ViewRecord[]>([]);
@@ -237,7 +237,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           registeredLeadsRes,
           activitiesRes,
           tenantImprovementsRes,
-          commercialTermsRes,
+          negotiationBoardsRes,
           aboutUsContentRes,
           locationCirclesRes,
           acknowledgmentsRes,
@@ -253,7 +253,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/registered-leads'),
           fetch('/api/transaction-activities'),
           fetch('/api/tenant-improvements'),
-          fetch('/api/commercial-terms'),
+          fetch('/api/negotiation-boards'),
           fetch('/api/about-us-content'),
           fetch('/api/location-circles'),
           fetch('/api/download-acknowledgments'),
@@ -270,7 +270,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setRegisteredLeads(await registeredLeadsRes.json());
         setTransactionActivities(await activitiesRes.json());
         setTenantImprovements(await tenantImprovementsRes.json());
-        setCommercialTerms(await commercialTermsRes.json());
+        setNegotiationBoards(await negotiationBoardsRes.json());
         setAboutUsContent(await aboutUsContentRes.json());
         setLocationCircles(await locationCirclesRes.json());
         setDownloadAcknowledgments(await acknowledgmentsRes.json());
@@ -351,7 +351,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistRegisteredLeads = useCallback((updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads'), []);
   const persistActivities = useCallback((updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities'), []);
   const persistTenantImprovements = useCallback((updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements'), []);
-  const persistCommercialTerms = useCallback((updatedSheets: CommercialTermsSchema[]) => persistData('commercial-terms', updatedSheets, 'commercial terms'), []);
+  const persistNegotiationBoards = useCallback((updatedSheets: NegotiationBoardSchema[]) => persistData('negotiation-boards', updatedSheets, 'negotiation boards'), []);
   const persistListingAnalytics = useCallback((updatedAnalytics: ListingAnalytics[]) => persistData('listing-analytics', updatedAnalytics, 'listing analytics'), []);
   const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), []);
   const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), []);
@@ -710,36 +710,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistRegisteredLeads]);
 
-  const updateRegisteredLeadStatus = useCallback((leadId: string, providerEmail: string, listingId: string, newStatus: RegisteredLeadStatus, details?: AcknowledgmentDetails) => {
-    setRegisteredLeads(prevLeads => {
-        const updatedLeads = prevLeads.map(lead => {
-          if (lead.id === leadId) {
-            return {
-              ...lead,
-              providers: lead.providers.map(provider => 
-                provider.providerEmail === providerEmail 
-                  ? { 
-                      ...provider, 
-                      properties: provider.properties.map(prop => 
-                        prop.listingId === listingId 
-                        ? {
-                            ...prop,
-                            status: newStatus,
-                            acknowledgedAt: newStatus === 'Acknowledged' ? new Date().toISOString() : undefined,
-                            acknowledgedBy: newStatus === 'Acknowledged' ? details : undefined,
-                        }
-                        : prop
-                      )
-                    } 
-                  : provider
-              )
-            };
-          }
-          return lead;
-        });
-        persistRegisteredLeads(updatedLeads);
-        return updatedLeads;
-    });
+  const updateRegisteredLead = useCallback((updatedLead: RegisteredLead) => {
+      setRegisteredLeads(prevLeads => {
+          const newLeads = prevLeads.map(lead => 
+              lead.id === updatedLead.id ? updatedLead : lead
+          );
+          persistRegisteredLeads(newLeads);
+          return newLeads;
+      });
   }, [persistRegisteredLeads]);
   
   const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
@@ -779,16 +757,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistTenantImprovements, toast]);
 
-  const getCommercialTerms = useCallback((leadId: string): CommercialTermsSchema | null => {
-    const result = commercialTerms.find((sheet: any) => sheet.leadId === leadId);
+  const getNegotiationBoard = useCallback((leadId: string): NegotiationBoardSchema | null => {
+    const result = negotiationBoards.find((sheet: any) => sheet.leadId === leadId);
     return result || null;
-  }, [commercialTerms]);
+  }, [negotiationBoards]);
 
-  const updateCommercialTerms = useCallback((leadId: string, sheetData: CommercialTermsSchema) => {
-      setCommercialTerms(prevSheets => {
+  const updateNegotiationBoard = useCallback((leadId: string, sheetData: NegotiationBoardSchema) => {
+      setNegotiationBoards(prevSheets => {
         const sheetWithId = { ...sheetData, leadId: leadId };
         const existingSheetIndex = prevSheets.findIndex((sheet: any) => sheet.leadId === leadId);
-        let updatedSheets: CommercialTermsSchema[];
+        let updatedSheets: NegotiationBoardSchema[];
 
         if (existingSheetIndex > -1) {
             updatedSheets = [...prevSheets];
@@ -797,14 +775,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
             updatedSheets = [...prevSheets, sheetWithId as any];
         }
         
-        persistCommercialTerms(updatedSheets);
+        persistNegotiationBoards(updatedSheets);
         toast({
-            title: "Commercial Terms Saved",
+            title: "Negotiation Board Saved",
             description: "Your changes have been saved successfully.",
         });
         return updatedSheets;
     });
-  }, [persistCommercialTerms, toast]);
+  }, [persistNegotiationBoards, toast]);
 
   const addLayoutRequest = useCallback((request: LayoutRequestData) => {
     setLayoutRequests(prev => {
@@ -830,13 +808,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
         clearSelectedForDownload,
         registeredLeads,
         addRegisteredLead,
-        updateRegisteredLeadStatus,
+        updateRegisteredLead,
         transactionActivities,
         addTransactionActivity,
         getTenantImprovements,
         updateTenantImprovements,
-        getCommercialTerms,
-        updateCommercialTerms,
+        getNegotiationBoard,
+        updateNegotiationBoard,
         generalShortlist,
         toggleGeneralShortlist,
         isShortlistLoading,

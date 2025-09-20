@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CommercialTermsSheet } from '@/components/commercial-terms-sheet';
+import { NegotiationBoard } from '@/components/negotiation-board';
 import { TenantImprovementsSheet } from '@/components/tenant-improvements-sheet';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
@@ -29,6 +29,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
@@ -98,7 +99,7 @@ function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingS
     const form = useForm<ProposalFormValues>({
         resolver: zodResolver(ProposalFormSchema),
         defaultValues: {
-            rentPerSft: listing.rentPerSqFt === 'Get Quote' ? undefined : listing.rentPerSqFt,
+            rentPerSft: listing.rentPerSqFt === 'Get Quote' ? undefined : Number(listing.rentPerSqFt),
             rentalSecurityDeposit: typeof listing.rentalSecurityDeposit === 'number' ? listing.rentalSecurityDeposit : undefined,
         }
     });
@@ -445,7 +446,7 @@ export default function LeadDetailPage() {
                       </div>
                   </TabsContent>
                   <TabsContent value="negotiation-board" className="mt-6">
-                      <CommercialTermsSheet lead={lead} primaryListing={selectedProviderListings[0] || null} />
+                      <NegotiationBoard lead={lead} primaryListing={selectedProviderListings[0] || null} />
                   </TabsContent>
                    <TabsContent value="improvements" className="mt-6">
                       <TenantImprovementsSheet leadId={lead.id} />

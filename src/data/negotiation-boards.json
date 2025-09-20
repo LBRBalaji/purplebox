@@ -1,9 +1,9 @@
+
 [
   {
     "sessions": [
       {
         "date": "2025-09-08T12:32:47.545Z",
-        "venue": "LBR Office, Chennai",
         "customerAttendees": [
           {
             "name": "Balaji",
@@ -16,12 +16,7 @@
             "title": "Director"
           }
         ],
-        "facilitatorAttendees": [
-          {
-            "name": "Balaji",
-            "title": "O2O Manager"
-          }
-        ]
+        "facilitatorAttendees": []
       }
     ],
     "siteInfo": {
@@ -144,7 +139,6 @@
     "sessions": [
       {
         "date": "2025-09-08T12:55:25.055Z",
-        "venue": "LBR Office, Chennai",
         "customerAttendees": [
           {
             "name": "Balaji",
@@ -157,12 +151,7 @@
             "title": "Director"
           }
         ],
-        "facilitatorAttendees": [
-          {
-            "name": "O2O Manager",
-            "title": "O2O Manager"
-          }
-        ]
+        "facilitatorAttendees": []
       },
       {
         "date": "2025-09-08T12:58:01.332Z",
