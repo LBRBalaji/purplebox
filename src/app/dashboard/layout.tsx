@@ -51,8 +51,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
-        // Transactions page is for O2O Managers and all Agents
-        if (pathname.startsWith('/dashboard/transactions') && !isO2OManager && !isAgent) {
+        // Transactions page is for Admins, O2O Managers and all Agents
+        if (pathname.startsWith('/dashboard/transactions') && !isSuperAdmin && !isO2OManager && !isAgent) {
             router.push('/dashboard');
         }
 
