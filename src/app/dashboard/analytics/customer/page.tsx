@@ -112,21 +112,24 @@ export default function CustomerAnalyticsPage() {
         const selectedUser = users[selectedUserId];
         const selectedUserEmail = selectedUser?.email;
 
+        // This is the corrected user filter
         const userFilter = (item: { customerId?: string, userEmail?: string, userId?: string, userName?: string }) => {
-            if (!isUserSelected) return true;
-            return item.customerId === selectedUserEmail || item.userEmail === selectedUserEmail || item.userId === selectedUserEmail || item.userName === selectedUserEmail;
-        }
+            if (!isUserSelected || !selectedUserEmail) return true;
+            return item.customerId === selectedUserEmail || 
+                   item.userEmail === selectedUserEmail || 
+                   item.userId === selectedUserEmail;
+        };
         
         const leadUserFilter = (leadId: string) => {
-          if (!isUserSelected) return true;
+          if (!isUserSelected || !selectedUserEmail) return true;
           const lead = registeredLeads.find(l => l.id === leadId);
           return lead?.customerId === selectedUserEmail;
-        }
+        };
 
         const dateFilter = (timestamp: string | number) => {
             const date = new Date(timestamp);
             return date >= from && date <= to;
-        }
+        };
         
         const relevantLeads = isUserSelected ? registeredLeads.filter(l => l.customerId === selectedUserEmail).map(l => l.id) : registeredLeads.map(l => l.id);
         const relevantLeadsSet = new Set(relevantLeads);
@@ -373,6 +376,3 @@ export default function CustomerAnalyticsPage() {
         </main>
     )
 }
-
-
-  
