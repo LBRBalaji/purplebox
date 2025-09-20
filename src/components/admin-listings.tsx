@@ -138,7 +138,7 @@ function AdminListingCard({ listing, analytics, providerName, onStatusChange, on
         <div className="mt-2 flex gap-2">
            <Badge className={status.className}>{status.text}</Badge>
            {listing.plan === 'Paid_Premium' && (
-             <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+             <Badge style={{ backgroundColor: '#FDD017', color: '#333' }} className="border-amber-400">
                 <Sparkles className="mr-1.5 h-3 w-3"/>
                 Premium Listing
              </Badge>

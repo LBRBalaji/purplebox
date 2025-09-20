@@ -148,7 +148,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
               )}
             </Carousel>
              {listing.plan === 'Paid_Premium' && (
-                <Badge className="absolute top-2 right-2 bg-amber-100 text-amber-800 border-amber-200">
+                <Badge style={{ backgroundColor: '#FDD017', color: '#333' }} className="absolute top-2 right-2 border-amber-400">
                     <Sparkles className="mr-1.5 h-3 w-3"/>
                     Premium Listing
                 </Badge>
@@ -767,4 +767,3 @@ const searchPlaceholders = [
     </>
   );
 }
-

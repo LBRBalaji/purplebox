@@ -441,7 +441,7 @@ export default function ListingDetailPage() {
                             <div className="flex items-center gap-4 mb-2">
                                 <Badge variant="secondary">{listing.listingId}</Badge>
                                 {isPremiumListing && (
-                                    <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+                                    <Badge style={{ backgroundColor: '#FDD017', color: '#333' }} className="border-amber-400">
                                         <Sparkles className="mr-1.5 h-3 w-3"/>
                                         Premium Listing
                                     </Badge>
@@ -680,7 +680,7 @@ export default function ListingDetailPage() {
                                             <Sparkles className="h-4 w-4" />
                                             <AlertTitle>Engage Directly!</AlertTitle>
                                             <AlertDescription className="text-xs">
-                                                Look for the <Badge className="bg-amber-100 text-amber-800 border-amber-200">Premium</Badge> badge on listings to connect directly with providers.
+                                                Look for the <Badge style={{ backgroundColor: '#FDD017', color: '#333' }} className="border-amber-400">Premium</Badge> badge on listings to connect directly with providers.
                                             </AlertDescription>
                                             <Button size="sm" className="w-full mt-4 h-auto py-2" onClick={() => handleGetQuote(true)}>
                                                 <div className="flex flex-col text-center">
