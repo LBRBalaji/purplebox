@@ -624,24 +624,22 @@ export default function ListingDetailPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
-                                     {listing.rentPerSqFt === 'Get Quote' && (
-                                        <>
-                                            {hasRequestedQuote ? (
-                                                <div className="w-full text-center space-y-2">
-                                                    <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
-                                                        <Check className="h-4 w-4" /> Commercials Requested
-                                                    </p>
-                                                    <Button variant="outline" className="w-full" onClick={handleLogDemandClick}>
-                                                        <NotepadText className="mr-2 h-4 w-4" /> Log Detailed Demand
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <Button onClick={handleGetQuote} className="w-full">
-                                                    Get Commercials Quote
+                                     {listing.rentPerSqFt === 'Get Quote' ? (
+                                        hasRequestedQuote ? (
+                                            <div className="w-full text-center space-y-2">
+                                                <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
+                                                    <Check className="h-4 w-4" /> Commercials Requested
+                                                </p>
+                                                <Button variant="outline" className="w-full" onClick={handleLogDemandClick}>
+                                                    <NotepadText className="mr-2 h-4 w-4" /> Log Detailed Demand
                                                 </Button>
-                                            )}
-                                        </>
-                                     )}
+                                            </div>
+                                        ) : (
+                                            <Button onClick={handleGetQuote} className="w-full">
+                                                Get Commercials Quote
+                                            </Button>
+                                        )
+                                     ) : null}
                                     <Button
                                         variant={isShortlisted ? 'default' : 'outline'}
                                         className="w-full"
@@ -698,5 +696,3 @@ export default function ListingDetailPage() {
     );
 
 }
-
-    
