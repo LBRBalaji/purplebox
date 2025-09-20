@@ -38,16 +38,16 @@ export function ChatDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const { user } = useAuth();
-  const { addChatMessage, chatMessages: allChatMessages } = useData();
+  const { addChatMessage } = useData();
+  const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = React.useState('');
   const [isSending, setIsSending] = React.useState(false);
   const scrollViewportRef = React.useRef<HTMLDivElement>(null);
 
   const threadId = submission ? `${submission.demandId}-${submission.listingId}` : null;
-  const messages = threadId ? allChatMessages[threadId] || [] : [];
   
-  // Request notification permission
   React.useEffect(() => {
+    // Request notification permission when component mounts and dialog is open
     if (isOpen && "Notification" in window && Notification.permission === "default") {
         Notification.requestPermission();
     }
@@ -57,26 +57,43 @@ export function ChatDialog({
       if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
           const notification = new Notification(`New Message from ${senderName}`, {
               body,
-              icon: '/logo.png' 
+              icon: '/logo.png' // Optional: add an icon
           });
       }
   }
-
-  // Effect to check for new messages and show notifications.
-  // This depends on the messages prop which is updated by the parent polling.
-  React.useEffect(() => {
-    if (isOpen && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (user && lastMessage.senderEmail !== user.email) {
-        // This logic will run every time messages update, so we need to be careful.
-        // A more robust solution would track seen messages. For now, this is a simple notification trigger.
-        // Let's assume parent polling handles the logic of "newness". 
-        // For now, we will notify for the last message if it's not from the current user.
-        // showNotification(lastMessage.text, lastMessage.senderName);
+  
+  const fetchMessages = React.useCallback(async () => {
+    if (!threadId) return;
+    try {
+      const response = await fetch('/api/chat-messages');
+      const allMessages: Record<string, ChatMessage[]> = await response.json();
+      const threadMessages = allMessages[threadId] || [];
+      
+      if (threadMessages.length > messages.length) {
+        setMessages(threadMessages);
+        
+        const lastMessage = threadMessages[threadMessages.length - 1];
+        if (user && lastMessage.senderEmail !== user.email) {
+            showNotification(lastMessage.text, lastMessage.senderName);
+        }
       }
+    } catch (error) {
+      console.error("Failed to fetch chat messages:", error);
     }
-  }, [messages, isOpen, user]);
+  }, [threadId, messages, user]);
 
+  React.useEffect(() => {
+    if (isOpen && threadId) {
+      fetchMessages(); // Initial fetch
+      const intervalId = setInterval(fetchMessages, 3000); // Poll every 3 seconds
+
+      return () => {
+        clearInterval(intervalId); // Cleanup on close
+      };
+    } else {
+        setMessages([]); // Clear messages when dialog is closed
+    }
+  }, [isOpen, threadId, fetchMessages]);
 
   React.useEffect(() => {
     if (scrollViewportRef.current) {
@@ -97,11 +114,12 @@ export function ChatDialog({
       timestamp: new Date().toISOString(),
     };
     
-    // The addChatMessage function will update the state and persist it.
     await addChatMessage(threadId, message);
-    
     setNewMessage('');
     setIsSending(false);
+    
+    // Immediately fetch new messages to update the UI
+    fetchMessages();
   };
 
   if (!submission?.listing) return null;
