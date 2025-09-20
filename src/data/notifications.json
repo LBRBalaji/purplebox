@@ -1,5 +1,27 @@
 [
   {
+    "type": "new_lead_for_provider",
+    "title": "New Lead: Alpha Logistics",
+    "message": "A new lead has been registered with you for 1 propert(y/ies). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "superadmin@o2o.com",
+    "triggeredBy": "customer1@o2o.com",
+    "id": "notif-1758391332315",
+    "timestamp": "2025-09-20T18:02:12.315Z",
+    "isRead": false
+  },
+  {
+    "type": "new_lead_for_provider",
+    "title": "New Lead: Alpha Logistics",
+    "message": "A new lead has been registered with you for 1 propert(y/ies). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "superadmin@o2o.com",
+    "triggeredBy": "customer1@o2o.com",
+    "id": "notif-1758391332312",
+    "timestamp": "2025-09-20T18:02:12.312Z",
+    "isRead": false
+  },
+  {
     "type": "new_chat_message",
     "title": "New message from Indospace",
     "message": "Regarding transaction LDR-QUOTE-1758347284148: \"hi...\"",

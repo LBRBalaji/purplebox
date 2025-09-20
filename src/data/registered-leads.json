@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758391332311",
+    "customerId": "customer1@o2o.com",
+    "leadName": "Alpha Logistics",
+    "leadContact": "Alex Ray",
+    "leadEmail": "customer1@o2o.com",
+    "leadPhone": "2345678901",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "customer1@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T18:02:12.313Z"
+  },
+  {
     "id": "LDR-QUOTE-1758360784201",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

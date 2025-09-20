@@ -78,9 +78,27 @@
     "timestamp": 1758390398641
   },
   {
-    "userId": "anonymous_anon_1758390516423_dh8oaq4",
+    "userId": "anonymous_anon_1758390386641_jlh414j",
     "companyName": "Anonymous",
-    "listingId": "LST-6BDQYG",
-    "timestamp": 1758390518587
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758391244819
+  },
+  {
+    "userId": "anonymous_anon_1758391306139_tqfswo6",
+    "companyName": "Anonymous",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758391309039
+  },
+  {
+    "userId": "customer1@o2o.com",
+    "companyName": "Alpha Logistics",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758391327126
+  },
+  {
+    "userId": "anonymous_anon_1758391428356_l0s1kaa",
+    "companyName": "Anonymous",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758391431057
   }
 ]

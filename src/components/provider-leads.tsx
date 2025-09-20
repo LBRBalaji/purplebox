@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2, Clock, HelpCircle } from 'lucide-react';
+import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2, Clock, HelpCircle, UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus, ListingSchema, RegisteredLeadProperty } from '@/contexts/data-context';
@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { AcknowledgeLeadDialog } from './acknowledge-lead-dialog';
 import { type AcknowledgmentDetails } from '@/lib/schema';
+import { useRouter } from 'next/navigation';
 import {
   Tooltip,
   TooltipContent,
@@ -42,6 +43,7 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
 export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'broking' }) {
   const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
   const { registeredLeads } = useData();
+  const router = useRouter();
   
   const isAgent = user?.role === 'Agent';
   const isAdminOrO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
@@ -66,6 +68,13 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
       lead.providers.some(p => p.providerEmail === user.email) && !lead.isO2OCollaborator
     );
   }, [registeredLeads, user, isAgent, isAdminOrO2O, allUsers, view]);
+  
+  const handleRegisterWithProvider = (lead: RegisteredLead) => {
+    const query = new URLSearchParams();
+    query.set('tab', 'register');
+    query.set('prefillFromLead', lead.id);
+    router.push(`/dashboard/transactions?${query.toString()}`);
+  };
 
 
   if (isAuthLoading) {
@@ -193,6 +202,11 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                                     View Activity <ArrowRight className="ml-2 h-4 w-4" />
                                                 </Link>
                                             </Button>
+                                            {isAdminOrO2O && lead.isO2OCollaborator && (
+                                                <Button size="sm" onClick={() => handleRegisterWithProvider(lead)}>
+                                                    <UserPlus className="mr-2 h-4 w-4" /> Register with Provider
+                                                </Button>
+                                            )}
                                             </div>
                                         </TableCell>
                                     </TableRow>

@@ -50,6 +50,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData } from '@/contexts/data-context';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 const providerSelectionSchema = z.object({
   providerEmail: z.string().email(),
@@ -74,10 +75,13 @@ type LeadRegistrationFormValues = z.infer<typeof leadRegistrationSchema>;
 
 function RegisterLeadForm() {
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { addRegisteredLead, listings } = useData();
+  const { addRegisteredLead, listings, registeredLeads } = useData();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [customerPopoverOpen, setCustomerPopoverOpen] = React.useState(false);
   const isAgent = user?.role === 'Agent';
+
+  const prefillLeadId = searchParams.get('prefillFromLead');
 
   const form = useForm<LeadRegistrationFormValues>({
     resolver: zodResolver(leadRegistrationSchema),
@@ -104,10 +108,26 @@ function RegisterLeadForm() {
   const locationValue = form.watch('location');
 
   React.useEffect(() => {
-    if (!form.getValues('id')) {
+    if (prefillLeadId) {
+        const leadToPrefill = registeredLeads.find(l => l.id === prefillLeadId);
+        if (leadToPrefill) {
+            form.reset({
+                ...form.getValues(),
+                id: `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+                customerId: leadToPrefill.customerId,
+                leadName: leadToPrefill.leadName,
+                leadContact: leadToPrefill.leadContact,
+                leadEmail: leadToPrefill.leadEmail,
+                leadPhone: leadToPrefill.leadPhone,
+                requirementsSummary: leadToPrefill.requirementsSummary,
+                // Do not prefill providers, as this is a new registration
+                providers: [], 
+            });
+        }
+    } else if (!form.getValues('id')) {
       form.setValue('id', `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`);
     }
-  }, [form]);
+  }, [form, prefillLeadId, registeredLeads]);
 
   const allProviders = React.useMemo(() =>
     Object.values(users).filter(u => u.role === 'Warehouse Developer'),
@@ -191,8 +211,8 @@ function RegisterLeadForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField control={form.control} name="id" render={({ field }) => ( <FormItem><FormLabel>Transaction ID</FormLabel><FormControl><Input {...field} disabled /></FormControl></FormItem>)} />
-                {isAgent ? (
-                     <FormField control={form.control} name="leadName" render={({ field }) => ( <FormItem><FormLabel>Lead / Company Name</FormLabel><FormControl><Input placeholder="Enter company name" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                {isAgent || prefillLeadId ? (
+                     <FormField control={form.control} name="leadName" render={({ field }) => ( <FormItem><FormLabel>Lead / Company Name</FormLabel><FormControl><Input placeholder="Enter company name" {...field} disabled={!!prefillLeadId} /></FormControl><FormMessage /></FormItem> )} />
                 ) : (
                     <FormField control={form.control} name="customerId" render={({ field }) => (
                         <FormItem className="flex flex-col"><FormLabel>Lead / Company Name</FormLabel>
@@ -214,10 +234,10 @@ function RegisterLeadForm() {
                 )}
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormField control={form.control} name="leadContact" render={({ field }) => ( <FormItem><FormLabel>Contact Person</FormLabel><FormControl><Input placeholder={isAgent ? "Enter contact name" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId')} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField control={form.control} name="leadPhone" render={({ field }) => ( <FormItem><FormLabel>Contact Phone</FormLabel><FormControl><Input placeholder={isAgent ? "Enter phone number" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId')} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="leadContact" render={({ field }) => ( <FormItem><FormLabel>Contact Person</FormLabel><FormControl><Input placeholder={isAgent ? "Enter contact name" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId') || !!prefillLeadId} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="leadPhone" render={({ field }) => ( <FormItem><FormLabel>Contact Phone</FormLabel><FormControl><Input placeholder={isAgent ? "Enter phone number" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId') || !!prefillLeadId} /></FormControl><FormMessage /></FormItem>)} />
              </div>
-             <FormField control={form.control} name="leadEmail" render={({ field }) => (<FormItem><FormLabel>Contact Email</FormLabel><FormControl><Input type="email" placeholder={isAgent ? "Enter email" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId')} /></FormControl><FormMessage /></FormItem> )} />
+             <FormField control={form.control} name="leadEmail" render={({ field }) => (<FormItem><FormLabel>Contact Email</FormLabel><FormControl><Input type="email" placeholder={isAgent ? "Enter email" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId') || !!prefillLeadId} /></FormControl><FormMessage /></FormItem> )} />
             <FormField control={form.control} name="requirementsSummary" render={({ field }) => ( <FormItem><FormLabel>Requirements Summary</FormLabel><FormControl><Textarea placeholder="Briefly describe the lead's requirements..." {...field} /></FormControl><FormMessage /></FormItem>)} />
             
             {isAgent && (
@@ -321,8 +341,14 @@ function RegisterLeadForm() {
 
 export function TransactionsPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const prefillFromLead = searchParams.get('prefillFromLead');
+
   const isAgent = user?.role === 'Agent';
   const isO2O = user?.role === 'O2O';
+  
+  // Determine the default tab. If we are pre-filling, default to the register tab.
+  const defaultTab = prefillFromLead ? 'register' : 'activity';
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -335,7 +361,7 @@ export function TransactionsPage() {
               }
             </p>
         </div>
-        <Tabs defaultValue="activity">
+        <Tabs defaultValue={defaultTab}>
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="activity">
                     {isAgent ? 'My Registered Leads' : isO2O ? 'All O2O Leads' : 'My Acknowledged Leads'}
@@ -352,4 +378,3 @@ export function TransactionsPage() {
       </div>
   );
 }
-

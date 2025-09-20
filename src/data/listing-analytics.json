@@ -450,7 +450,7 @@
   },
   {
     "listingId": "LST-91LUXK",
-    "views": 6,
+    "views": 14,
     "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
@@ -504,6 +504,54 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758390398641
+      },
+      {
+        "userId": "anonymous_anon_1758390386641_jlh414j",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391244819
+      },
+      {
+        "userId": "anonymous_anon_1758390386641_jlh414j",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391244819
+      },
+      {
+        "userId": "anonymous_anon_1758391306139_tqfswo6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391309039
+      },
+      {
+        "userId": "anonymous_anon_1758391306139_tqfswo6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391309039
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758391327126
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758391327126
+      },
+      {
+        "userId": "anonymous_anon_1758391428356_l0s1kaa",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391431057
+      },
+      {
+        "userId": "anonymous_anon_1758391428356_l0s1kaa",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391431057
       }
     ]
   },
@@ -807,7 +855,7 @@
   },
   {
     "listingId": "LST-6BDQYG",
-    "views": 2,
+    "views": 1,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -816,12 +864,6 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758352421756
-      },
-      {
-        "userId": "anonymous_anon_1758390516423_dh8oaq4",
-        "name": "Anonymous",
-        "company": "Anonymous",
-        "timestamp": 1758390518587
       }
     ]
   },
