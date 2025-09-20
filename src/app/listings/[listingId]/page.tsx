@@ -582,82 +582,82 @@ export default function ListingDetailPage() {
                         </div>
                         
                         {/* Sticky Sidebar */}
-                        <div className="lg:col-span-1 space-y-6">
-                           <div className="sticky top-24 space-y-6">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Commercials</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="space-y-4">
-                                            {typeof listing.rentPerSqFt === 'number' ? (
-                                                <div className="flex items-baseline justify-center text-center">
-                                                    <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
-                                                    <span className="text-sm text-muted-foreground">/sq.ft./month</span>
-                                                </div>
-                                            ) : (
-                                                <div className="text-center">
-                                                    <p className="text-lg font-semibold">Price on Request</p>
-                                                     <Button onClick={handleGetQuote} className="mt-2 w-full">
-                                                        <WhatsAppIcon className="mr-2 h-4 w-4"/> Get Quote
-                                                    </Button>
-                                                </div>
-                                            )}
-                                            <Separator/>
-                                            <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
-                                            <DetailRow label="Construction Progress" value={listing.constructionProgress} />
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="flex flex-col gap-2">
-                                        <Button
-                                            variant={isShortlisted ? 'default' : 'outline'}
-                                            className="w-full"
-                                            onClick={handleShortlistClick}
-                                            disabled={isShortlistLoading}
-                                        >
-                                            <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
-                                            {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist'}
-                                        </Button>
-                                        {user && user.role === 'User' && (
-                                            <Button className="w-full" onClick={handleDownloadRequest}>
-                                                <Download className="mr-2 h-4 w-4" /> Download Details as CSV
-                                            </Button>
+                        <div className="lg:col-span-1 space-y-6 sticky top-24">
+                           <Card>
+                                <CardHeader>
+                                    <CardTitle>Commercials</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-4">
+                                        {typeof listing.rentPerSqFt === 'number' ? (
+                                            <div className="flex items-baseline justify-center text-center">
+                                                <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
+                                                <span className="text-sm text-muted-foreground">/sq.ft./month</span>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center">
+                                                <p className="text-lg font-semibold">Price on Request</p>
+                                            </div>
                                         )}
-                                    </CardFooter>
-                                </Card>
-
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Certificates &amp; Approvals</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="space-y-1">
-                                            <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
-                                            <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
-                                            <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
-                                            <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
-                                            <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
-                                            <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                 <Card>
-                                    <CardHeader>
-                                        <CardTitle>Need Something Different?</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-sm text-muted-foreground">
-                                            For more tailored options, our demand specific warehouse sourcing service is always available.
-                                        </p>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <Button className="w-full" onClick={handleLogDemandClick}>
-                                            <ClipboardPlus className="mr-2 h-4 w-4" /> Log Demand
+                                        <Separator/>
+                                        <DetailRow label="Security Deposit" value={`${listing.rentalSecurityDeposit || 'N/A'} months`} />
+                                        <DetailRow label="Construction Progress" value={listing.constructionProgress} />
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="flex flex-col gap-2">
+                                     {listing.rentPerSqFt === 'Get Quote' && (
+                                        <Button onClick={handleGetQuote} className="w-full">
+                                            <WhatsAppIcon className="mr-2 h-4 w-4"/> Get Quote
                                         </Button>
-                                    </CardFooter>
-                                </Card>
-                            </div>
+                                     )}
+                                    <Button
+                                        variant={isShortlisted ? 'default' : 'outline'}
+                                        className="w-full"
+                                        onClick={handleShortlistClick}
+                                        disabled={isShortlistLoading}
+                                    >
+                                        <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
+                                        {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist'}
+                                    </Button>
+                                    {user && user.role === 'User' && (
+                                        <Button className="w-full" onClick={handleDownloadRequest}>
+                                            <Download className="mr-2 h-4 w-4" /> Download Details as CSV
+                                        </Button>
+                                    )}
+                                </CardFooter>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Certificates &amp; Approvals</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-1">
+                                        <DetailRow label="Park Approval" value={listing.certificatesAndApprovals.parkApproval} />
+                                        <DetailRow label="Building Approval" value={listing.certificatesAndApprovals.buildingApproval} />
+                                        <DetailRow label="Fire License" value={listing.certificatesAndApprovals.fireLicense} />
+                                        <DetailRow label="Fire NOC" value={listing.certificatesAndApprovals.fireNOC} />
+                                        <DetailRow label="Building Insurance" value={listing.certificatesAndApprovals.buildingInsurance} />
+                                        <DetailRow label="Property Tax Paid" value={listing.certificatesAndApprovals.propertyTax} />
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                             <Card>
+                                <CardHeader>
+                                    <CardTitle>Need Something Different?</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">
+                                        For more tailored options, our demand specific warehouse sourcing service is always available.
+                                    </p>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button className="w-full" onClick={handleLogDemandClick}>
+                                        <ClipboardPlus className="mr-2 h-4 w-4" /> Log Demand
+                                    </Button>
+                                </CardFooter>
+                            </Card>
                         </div>
                     </div>
                 </div>
@@ -666,5 +666,5 @@ export default function ListingDetailPage() {
             {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name || `Warehouse in ${listing.location}`} onSubmit={addLayoutRequest} />}
         </>
     );
-}
 
+    
