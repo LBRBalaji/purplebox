@@ -4,5 +4,23 @@
     "companyName": "XYZ Logistics",
     "listingId": "LST-XHJLWC",
     "timestamp": 1758359325502
+  },
+  {
+    "userId": "customer1@o2o.com",
+    "companyName": "Alpha Logistics",
+    "listingId": "LST-SYXJNY",
+    "timestamp": 1758359530256
+  },
+  {
+    "userId": "customer2@o2o.com",
+    "companyName": "Beta Retail",
+    "listingId": "LST-QM0CX2",
+    "timestamp": 1758359580862
+  },
+  {
+    "userId": "murugan@xyzlogistics.com",
+    "companyName": "XYZ Logistics",
+    "listingId": "LST-3RV9B9",
+    "timestamp": 1758359609439
   }
 ]

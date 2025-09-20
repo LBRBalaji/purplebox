@@ -633,7 +633,7 @@
   },
   {
     "listingId": "LST-QM0CX2",
-    "views": 1,
+    "views": 3,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -642,6 +642,18 @@
         "name": "Alex Ray",
         "company": "Alpha Logistics",
         "timestamp": 1758345908010
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758359580862
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758359580862
       }
     ]
   },
@@ -731,7 +743,7 @@
   },
   {
     "listingId": "LST-3RV9B9",
-    "views": 1,
+    "views": 3,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -740,6 +752,18 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758348788491
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758359609439
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758359609439
       }
     ]
   },
@@ -768,6 +792,20 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758352421756
+      }
+    ]
+  },
+  {
+    "listingId": "LST-SYXJNY",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758359530256
       }
     ]
   }

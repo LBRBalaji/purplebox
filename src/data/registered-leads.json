@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758359585116",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Kunnam B-200 ",
+    "registeredBy": "customer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-QM0CX2",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T09:13:05.116Z"
+  },
+  {
     "id": "LDR-QUOTE-1758359330575",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

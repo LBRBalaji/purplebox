@@ -104,10 +104,11 @@ export default function CustomerAnalyticsPage() {
 
         const isUserSelected = selectedUserId && selectedUserId !== 'all';
         const selectedUser = users[selectedUserId];
+        const selectedUserEmail = selectedUser?.email;
 
-        const userFilter = (item: { customerId?: string, userEmail?: string, userId?: string }) => {
+        const userFilter = (item: { customerId?: string, userEmail?: string, userId?: string, userName?: string }) => {
             if (!isUserSelected) return true;
-            return item.customerId === selectedUserId || item.userEmail === selectedUserId || item.userId === selectedUserId;
+            return item.customerId === selectedUserEmail || item.userEmail === selectedUserEmail || item.userId === selectedUserEmail || item.userName === selectedUserEmail;
         }
 
         const dateFilter = (timestamp: string | number) => {
@@ -115,11 +116,11 @@ export default function CustomerAnalyticsPage() {
             return date >= from && date <= to;
         }
 
-        const relevantDemands = demands.filter(d => userFilter(d) && dateFilter(d.createdAt!));
+        const relevantDemands = demands.filter(d => userFilter(d) && d.createdAt && dateFilter(d.createdAt));
         const relevantViews = viewHistory.filter(v => userFilter(v) && dateFilter(v.timestamp));
         const relevantDownloads = downloadHistory.filter(d => userFilter(d) && dateFilter(d.timestamp));
         const relevantQuoteRequests = registeredLeads.filter(l => userFilter(l) && dateFilter(l.registeredAt));
-        const relevantLayoutRequests = layoutRequests.filter(r => userFilter({userId: r.userName}) && dateFilter(r.requestedAt)); // Assuming userName is email for now
+        const relevantLayoutRequests = layoutRequests.filter(r => userFilter(r) && dateFilter(r.requestedAt)); 
         const relevantShortlists = isUserSelected ? generalShortlist.length : 0; // Shortlist is only per user, not global
 
         const topViewedLocations = groupAndSort(relevantViews, view => {
