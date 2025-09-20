@@ -29,6 +29,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChatSubmission } from '@/components/chat-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
