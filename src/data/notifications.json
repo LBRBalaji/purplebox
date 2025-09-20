@@ -8,7 +8,7 @@
     "triggeredBy": "customer1@o2o.com",
     "id": "notif-1758391332315",
     "timestamp": "2025-09-20T18:02:12.315Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_lead_for_provider",
@@ -19,7 +19,7 @@
     "triggeredBy": "customer1@o2o.com",
     "id": "notif-1758391332312",
     "timestamp": "2025-09-20T18:02:12.312Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_chat_message",

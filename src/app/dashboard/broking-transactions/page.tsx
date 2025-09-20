@@ -4,7 +4,6 @@
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
-import { ProviderLeads } from '@/components/provider-leads';
 
 // This page is being deprecated as its functionality is now integrated into the main dashboard.
 // Redirecting to the main dashboard with the correct tab.

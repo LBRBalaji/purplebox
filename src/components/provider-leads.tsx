@@ -72,7 +72,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
     const query = new URLSearchParams();
     query.set('tab', 'register');
     query.set('prefillFromLead', lead.id);
-    router.push(`/dashboard/transactions?${query.toString()}`);
+    router.push(`/dashboard?${query.toString()}`);
   };
 
 
