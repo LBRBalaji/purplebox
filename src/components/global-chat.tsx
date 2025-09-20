@@ -51,6 +51,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                 const threadId = `chat-${lead.id}-${provider.providerEmail}`;
                 const messages = chatMessages[threadId] || [];
                 const lastMessage = messages[messages.length - 1];
+                const isUnread = messages.some(m => m.isNew && m.senderEmail !== user.email);
 
                 return {
                     id: threadId,
@@ -69,6 +70,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                     partnerInitials: partnerInitials,
                     lastMessage: lastMessage ? `${lastMessage.senderName}: ${lastMessage.text?.substring(0, 30)}...` : `Re: ${listing?.name || lead.requirementsSummary}`,
                     timestamp: lastMessage ? new Date(lastMessage.timestamp) : new Date(lead.registeredAt),
+                    isUnread,
                 } as const;
             })
         ).sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime());
@@ -86,13 +88,21 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
         );
     }, [conversations, searchTerm]);
 
+    const unreadCount = React.useMemo(() => {
+        return conversations.filter(c => c.isUnread).length;
+    }, [conversations]);
+
     if(conversations.length === 0) {
         return <div className="p-8 text-center text-sm text-muted-foreground">No active conversations.</div>
     }
 
     return (
         <div className="flex flex-col h-full">
-            <div className="p-4 border-b shrink-0">
+            <div className="p-4 border-b shrink-0 space-y-3">
+                <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Conversations ({conversations.length})</h3>
+                    {unreadCount > 0 && <Badge variant="destructive">{unreadCount} Unread</Badge>}
+                </div>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
@@ -103,9 +113,9 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                     />
                 </div>
             </div>
-            <div className="flex-grow overflow-y-auto">
+            <div className="flex-grow overflow-hidden">
                 <ScrollArea className="h-full">
-                     <div className="p-2 space-y-2">
+                     <div className="p-2 space-y-1">
                         {filteredConversations.length > 0 ? filteredConversations.map(conv => (
                             <button key={conv.id} onClick={() => onSelectConversation(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors">
                                 <div className="flex items-center gap-3">
@@ -118,6 +128,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                                     </div>
                                     <p className="text-xs text-muted-foreground self-start shrink-0">{conv.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                 </div>
+                                {conv.isUnread && <div className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary" />}
                             </button>
                         )) : (
                             <div className="p-8 text-center text-sm text-muted-foreground">No conversations match your search.</div>
@@ -161,8 +172,9 @@ export function GlobalChatWidget() {
     let linkHref = null;
 
     if (activeChat) {
-        const listingInfo = activeChat.listing
-            ? `${activeChat.listing.location} | ${activeChat.listing.sizeSqFt.toLocaleString()} sq. ft.`
+        const listing = activeChat.listing;
+        const listingInfo = listing
+            ? `${listing.location} | ${listing.sizeSqFt.toLocaleString()} sq. ft.`
             : 'N/A';
         
         let headerTitle: string;
@@ -176,7 +188,7 @@ export function GlobalChatWidget() {
         title = headerTitle;
 
         const isDeveloper = user?.email === activeChat.providerEmail;
-        const listingIdentifier = isDeveloper ? activeChat.listing?.warehouseBoxId : activeChat.listingId;
+        const listingIdentifier = isDeveloper ? listing?.warehouseBoxId : listing?.listingId;
 
         subtitle = (
             <div className="text-xs text-muted-foreground space-y-1">
