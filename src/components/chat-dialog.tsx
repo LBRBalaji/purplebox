@@ -15,7 +15,7 @@ import { Send, MessageSquare, Paperclip, File as FileIcon, ExternalLink, Smile }
 import { cn } from '@/lib/utils';
 import { type Submission } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
-import type { ListingSchema } from '@/lib/schema';
+import type { ListingSchema, RegisteredLead } from '@/lib/schema';
 import { useData, type ChatMessage } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from './ui/progress';
@@ -47,9 +47,9 @@ export function ChatPanel({
 }: {
   submission: ChatSubmission | null;
 }) {
-  const { user } = useAuth();
+  const { user, users } = useAuth();
   const { toast } = useToast();
-  const { chatMessages, addChatMessage, typingStatus, updateTypingStatus, fetchTypingStatus } = useData();
+  const { chatMessages, addChatMessage, typingStatus, updateTypingStatus, fetchTypingStatus, registeredLeads } = useData();
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = React.useState('');
   const [isSending, setIsSending] = React.useState(false);
@@ -58,8 +58,9 @@ export function ChatPanel({
   const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const threadId = submission ? `${submission.demandId}-${submission.listingId}` : null;
+  const threadId = submission ? `chat-${submission.demandId}-${submission.providerEmail}` : null;
   const otherUserTyping = threadId ? typingStatus[threadId] : null;
+  const lead = registeredLeads.find(l => l.id === submission?.demandId);
   
   const fetchMessages = useCallback(async () => {
     if (!threadId) return;
@@ -126,7 +127,7 @@ export function ChatPanel({
   
    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !threadId || !user) return;
+    if (!file || !threadId || !user || !lead) return;
     
     setIsSending(true);
     setUploadProgress(0);
@@ -160,7 +161,7 @@ export function ChatPanel({
           }
         };
         setMessages(prev => [...prev, message]);
-        await addChatMessage(threadId, message);
+        await addChatMessage(threadId, message, { lead, partner: users[submission.providerEmail] });
       } else {
         toast({ variant: 'destructive', title: 'Upload Failed', description: 'Could not upload the file.' });
       }
@@ -178,7 +179,7 @@ export function ChatPanel({
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !threadId || !user) return;
+    if (!newMessage.trim() || !threadId || !user || !lead) return;
 
     setIsSending(true);
 
@@ -195,7 +196,7 @@ export function ChatPanel({
     if(typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
     try {
-      await addChatMessage(threadId, message);
+      await addChatMessage(threadId, message, { lead, partner: users[submission.providerEmail] });
     } catch (error) {
         console.error("Failed to send message:", error);
     } finally {
@@ -207,12 +208,12 @@ export function ChatPanel({
     setNewMessage(prev => prev + emoji);
   }
 
-  if (!submission?.listing) return null;
+  if (!submission?.listing || !lead) return null;
   
   const getInitialMessage = () => {
     if (messages.length > 0) return null;
 
-    if (user?.email === submission.demandUserEmail) { // Customer starting chat
+    if (user?.email === lead.customerId) { // Customer starting chat
       return `Hi ${submission.chatPartnerName}, I'm interested in property ${submission.listing?.listingId}.`;
     }
 

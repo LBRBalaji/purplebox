@@ -97,7 +97,7 @@ const AnalyticsDropdown = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
                 <DropdownMenuItem asChild><Link href="/dashboard/analytics/listings-performance">Listing Performance</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link href="/dashboard/analytics/demands">Demand Analytics</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/analytics/customer">Customer Engagement</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/dashboard/analytics/traffic">Platform Traffic</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
@@ -179,92 +179,23 @@ const ToolsDropdown = () => {
     );
 }
 
-const Notifications = () => {
+const NotificationsBell = () => {
     const { user } = useAuth();
-    const { submissions, agentLeads, registeredLeads } = useData();
+    const { notifications, unreadCount } = useData();
 
-    const notifications = React.useMemo(() => {
-        if (!user) return [];
-
-        const isSuperAdmin = user.role === 'SuperAdmin';
-        const isO2O = user.role === 'O2O';
-        const isProvider = user.role === 'Warehouse Developer';
-        const isCustomer = user.role === 'User';
-        const isAgent = user.role === 'Agent';
-        
-        let items: { text: string; href: string; icon: React.ElementType }[] = [];
-
-        if (isO2O || isSuperAdmin) {
-            const pendingSubmissions = submissions.filter(s => s.status === 'Pending').length;
-            if (pendingSubmissions > 0) {
-                items.push({ text: `${pendingSubmissions} new property submission(s) for approval`, href: '/dashboard?tab=approval-queue', icon: MailCheck });
-            }
-            const pendingAgents = agentLeads.filter(a => a.status === 'Pending').length;
-            if (pendingAgents > 0) {
-                items.push({ text: `${pendingAgents} new agent application(s)`, href: '/dashboard/manage-users', icon: UserPlus });
-            }
-        }
-        
-        if (isProvider) {
-            const pendingLeads = registeredLeads.filter(l => 
-                (l.providers || []).some(p => 
-                    p.providerEmail === user.email && (p.properties || []).some(prop => prop.status === 'Pending')
-                )
-            ).length;
-            if (pendingLeads > 0) {
-                items.push({ text: `${pendingLeads} new lead(s) require your acknowledgment`, href: '/dashboard?tab=registered-leads', icon: UserCheck });
-            }
-        }
-
-        if (isCustomer) {
-            const newSubmissionCount = submissions.filter(s => s.demandUserEmail === user.email && s.isNew).length;
-            if (newSubmissionCount > 0) {
-                items.push({ text: `You have ${newSubmissionCount} new approved match(es)`, href: '/dashboard?tab=my-demands', icon: FileCheck });
-            }
-        }
-        
-        if (isAgent) {
-             const pendingAcks = registeredLeads.filter(l => 
-                l.registeredBy === user.email && (l.providers || []).some(p => 
-                    (p.properties || []).some(prop => prop.status === 'Pending')
-                )
-            ).length;
-             if (pendingAcks > 0) {
-                 items.push({ text: `${pendingAcks} provider acknowledgment(s) are pending`, href: '/dashboard/transactions', icon: HardHat });
-             }
-        }
-        
-        return items;
-
-    }, [user, submissions, agentLeads, registeredLeads]);
-
-    if (!user || notifications.length === 0) {
-        return null;
-    }
+    if (!user) return null;
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="h-5 w-5" />
+        <Button asChild variant="ghost" size="icon" className="relative">
+            <Link href="/dashboard/notifications">
+                <Bell className="h-5 w-5" />
+                {unreadCount > 0 && (
                     <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 justify-center rounded-full p-0 text-xs">
-                        {notifications.length}
+                        {unreadCount}
                     </Badge>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel>Pending Tasks</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {notifications.map((item, index) => (
-                    <DropdownMenuItem key={index} asChild>
-                        <Link href={item.href} className="flex items-start gap-3">
-                             <item.icon className="h-4 w-4 mt-1 text-muted-foreground" />
-                             <span className="whitespace-normal">{item.text}</span>
-                        </Link>
-                    </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-        </DropdownMenu>
+                )}
+            </Link>
+        </Button>
     )
 }
 
@@ -327,7 +258,7 @@ export function Header() {
                 <Skeleton className="h-9 w-24" />
               ) : user ? (
                 <div className="flex items-center gap-2">
-                   <Notifications />
+                   <NotificationsBell />
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">{user.userName}</p>
                     <p className="text-xs text-muted-foreground">

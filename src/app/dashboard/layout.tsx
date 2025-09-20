@@ -56,6 +56,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
+        // Notifications page is for admins and agents
+        if (pathname.startsWith('/dashboard/notifications') && !isAdmin && !isAgent) {
+            router.push('/dashboard');
+        }
+
         // Allow Admins, O2O Managers, Customers, Providers AND Agents to access the leads detail pages
         if (pathname.startsWith('/dashboard/leads') && !isAdmin && !isCustomer && !isProvider && !isAgent) {
             router.push('/dashboard');

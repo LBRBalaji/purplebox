@@ -81,6 +81,18 @@ type DataEvent = {
   message?: string; // Optional message for the event
 };
 
+export type Notification = {
+    id: string;
+    type: 'new_demand' | 'new_submission' | 'new_lead_for_provider' | 'new_chat_message' | 'new_activity';
+    title: string;
+    message: string;
+    href: string;
+    timestamp: string;
+    isRead: boolean;
+    recipientEmail?: string; // For targeted notifications
+    triggeredBy: string;
+}
+
 export type RegisteredLeadProperty = {
   listingId: string;
   status: RegisteredLeadStatus;
@@ -205,7 +217,7 @@ type DataContextType = {
   layoutRequests: LayoutRequestRecord[];
   addLayoutRequest: (request: LayoutRequestData) => void;
   chatMessages: Record<string, ChatMessage[]>;
-  addChatMessage: (threadId: string, message: ChatMessage) => Promise<void>;
+  addChatMessage: (threadId: string, message: ChatMessage, context: { lead: RegisteredLead, partner: User | null }) => Promise<void>;
   typingStatus: Record<string, TypingStatus>;
   updateTypingStatus: (threadId: string, status: TypingStatus) => Promise<void>;
   fetchTypingStatus: (threadId: string) => Promise<void>;
@@ -213,6 +225,9 @@ type DataContextType = {
   openChat: (submission: ChatSubmission) => void;
   closeChat: () => void;
   reassignAnonymousViews: (anonymousId: string, user: User) => void;
+  notifications: Notification[];
+  unreadCount: number;
+  markNotificationsAsRead: () => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -232,7 +247,7 @@ export type AgentLead = {
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const { user: authUser, users: allUsers } = useAuth();
+  const { user: authUser, users } = useAuth();
   const [listings, setListings] = useState<ListingSchema[]>([]);
   const [listingAnalytics, setListingAnalytics] = useState<ListingAnalytics[]>([]);
   const [demands, setDemands] = useState<DemandSchema[]>([]);
@@ -257,6 +272,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [chatMessages, setChatMessages] = useState<Record<string, ChatMessage[]>>({});
   const [typingStatus, setTypingStatus] = useState<Record<string, TypingStatus>>({});
   const [activeChatSubmission, setActiveChatSubmission] = useState<ChatSubmission | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
    useEffect(() => {
     async function loadInitialData() {
@@ -279,6 +296,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           viewHistoryRes,
           layoutRequestsRes,
           chatMessagesRes,
+          notificationsRes,
         ] = await Promise.all([
           fetch('/api/listings'),
           fetch('/api/demands'),
@@ -296,8 +314,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/view-history'),
           fetch('/api/layout-requests'),
           fetch('/api/chat-messages'),
+          fetch('/api/notifications'),
         ]);
 
+        const notificationsData = await notificationsRes.json();
         setListings(await listingsRes.json());
         setDemands(await demandsRes.json());
         setSubmissions(await submissionsRes.json());
@@ -314,6 +334,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setViewHistory(await viewHistoryRes.json());
         setLayoutRequests(await layoutRequestsRes.json());
         setChatMessages(await chatMessagesRes.json());
+        setNotifications(notificationsData);
 
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
@@ -344,22 +365,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }, [authUser]);
 
-  const toggleGeneralShortlist = (listingId: string) => {
-    setGeneralShortlist(prev => {
-        const isShortlisted = prev.includes(listingId);
-        let updatedList: string[];
-        if (isShortlisted) {
-            updatedList = prev.filter(id => id !== listingId);
-            toast({ title: "Removed from Shortlist" });
-        } else {
-            updatedList = [...prev, listingId];
-            toast({ title: "Added to Shortlist" });
-        }
-        localStorage.setItem('general_shortlist', JSON.stringify(updatedList));
-        return updatedList;
-    });
-  };
-
+  useEffect(() => {
+    if (authUser) {
+      const count = notifications.filter(n => !n.isRead && n.recipientEmail === authUser.email).length;
+      setUnreadCount(count);
+    } else {
+      setUnreadCount(0);
+    }
+  }, [notifications, authUser]);
 
   const persistData = async (endpoint: string, data: any, entityName: string) => {
     try {
@@ -397,9 +410,36 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), []);
   const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), []);
   const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), []);
+  const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), []);
 
 
-  const addChatMessage = async (threadId: string, message: ChatMessage) => {
+  const addNotification = useCallback((notification: Omit<Notification, 'id' | 'timestamp' | 'isRead'>) => {
+    setNotifications(prev => {
+        const newNotification: Notification = {
+            ...notification,
+            id: `notif-${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            isRead: false
+        };
+        const updatedNotifications = [newNotification, ...prev];
+        persistNotifications(updatedNotifications);
+        return updatedNotifications;
+    });
+  }, [persistNotifications]);
+
+  const markNotificationsAsRead = useCallback(() => {
+    if (!authUser) return;
+    setNotifications(prev => {
+      const updated = prev.map(n => 
+        (n.recipientEmail === authUser.email && !n.isRead) ? { ...n, isRead: true } : n
+      );
+      persistNotifications(updated);
+      return updated;
+    });
+  }, [authUser, persistNotifications]);
+
+
+  const addChatMessage = async (threadId: string, message: ChatMessage, context: { lead: RegisteredLead, partner: User | null }) => {
     const updatedMessages = { ...chatMessages };
     if (!updatedMessages[threadId]) {
       updatedMessages[threadId] = [];
@@ -407,6 +447,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
     updatedMessages[threadId].push(message);
     setChatMessages(updatedMessages);
     await persistChatMessages(updatedMessages);
+
+    // Notify the other user in the chat
+    const recipient = context.lead.customerId === authUser?.email ? context.partner : users[context.lead.customerId];
+    if (recipient) {
+      addNotification({
+        type: 'new_chat_message',
+        title: `New message from ${authUser?.userName}`,
+        message: `Regarding transaction ${context.lead.id}: "${message.text?.substring(0, 50)}..."`,
+        href: `/dashboard/leads/${context.lead.id}`,
+        recipientEmail: recipient.email,
+        triggeredBy: authUser?.email || 'system',
+      });
+    }
   };
 
   const updateTypingStatus = async (threadId: string, status: TypingStatus) => {
@@ -507,15 +560,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const newDemand = { ...demand, createdAt: new Date().toISOString() };
         const newDemands = [newDemand, ...prevDemands];
         persistDemands(newDemands);
-        setLastEvent({
-          type: 'new_demand',
-          id: demand.demandId,
-          timestamp: new Date().toISOString(),
-          triggeredBy: userEmail,
+        addNotification({
+            type: 'new_demand',
+            title: `New Demand from ${demand.companyName}`,
+            message: `${demand.size.toLocaleString()} sq. ft. required in ${demand.locationName}`,
+            href: `/dashboard?tab=active-demands`,
+            triggeredBy: userEmail || 'system',
         });
         return newDemands;
     });
-  }, [persistDemands]);
+  }, [persistDemands, addNotification]);
 
   const updateDemand = useCallback((updatedDemand: DemandSchema) => {
     setDemands(prevDemands => {
@@ -539,18 +593,31 @@ export function DataProvider({ children }: { children: ReactNode }) {
         };
         const newSubmissions = [submissionWithDefaults, ...prevSubmissions];
         persistSubmissions(newSubmissions);
-        setLastEvent({
+        addNotification({
             type: 'new_submission',
-            id: submission.demandId,
-            timestamp: new Date().toISOString(),
-            triggeredBy: userEmail,
+            title: `New Submission for Demand ${submission.demandId}`,
+            message: `Property ${submission.listingId} submitted by ${userEmail}`,
+            href: `/dashboard?tab=approval-queue`,
+            triggeredBy: userEmail || 'system',
         });
         return newSubmissions;
     });
-  }, [demands, persistSubmissions]);
+  }, [demands, persistSubmissions, addNotification]);
 
   const updateSubmissionStatus = useCallback((submissionId: string, status: SubmissionStatus) => {
     setSubmissions(prevSubmissions => {
+        const submission = prevSubmissions.find(s => s.submissionId === submissionId);
+        if (submission && status === 'Approved') {
+            addNotification({
+                type: 'new_submission',
+                title: `Your match for Demand ${submission.demandId} was approved!`,
+                message: `Property ${submission.listingId} is now visible to the customer.`,
+                href: `/dashboard?tab=my-demands`,
+                recipientEmail: submission.demandUserEmail,
+                triggeredBy: authUser?.email || 'system'
+            });
+        }
+
         const newSubmissions = prevSubmissions.map(sub =>
             sub.submissionId === submissionId ? { ...sub, status, isNew: status === 'Approved' ? true : sub.isNew } : sub
         );
@@ -560,7 +627,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         return newSubmissions;
     });
-  }, [persistSubmissions]);
+  }, [persistSubmissions, addNotification, authUser]);
 
   const toggleShortlist = useCallback((submissionToToggle: Submission) => {
     if (submissionToToggle.status !== 'Approved') return;
@@ -803,20 +870,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
         persistRegisteredLeads(updatedLeads);
 
         newLead.providers.forEach(provider => {
-            provider.properties.forEach(property => {
-                setLastEvent({
-                    type: 'new_lead_for_provider',
-                    id: `${provider.providerEmail}|${newLead.id}|${property.listingId}`,
-                    timestamp: new Date().toISOString(),
-                    triggeredBy: userEmail,
-                    message: `New lead for listing ${property.listingId}`
-                });
+            addNotification({
+                type: 'new_lead_for_provider',
+                title: `New Lead: ${newLead.leadName}`,
+                message: `A new lead has been registered with you for ${provider.properties.length} propert(y/ies). Please acknowledge.`,
+                href: `/dashboard?tab=registered-leads`,
+                recipientEmail: provider.providerEmail,
+                triggeredBy: userEmail || 'system'
             });
         });
 
         return updatedLeads;
     });
-  }, [persistRegisteredLeads]);
+  }, [persistRegisteredLeads, addNotification]);
 
   const updateRegisteredLead = useCallback((updatedLead: RegisteredLead) => {
       setRegisteredLeads(prevLeads => {
@@ -912,6 +978,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const closeChat = useCallback(() => {
     setActiveChatSubmission(null);
   }, []);
+  
+  const toggleGeneralShortlist = useCallback((listingId: string) => {
+      setIsShortlistLoading(true);
+      const newShortlist = generalShortlist.includes(listingId)
+        ? generalShortlist.filter(id => id !== listingId)
+        : [...generalShortlist, listingId];
+      
+      setGeneralShortlist(newShortlist);
+      try {
+          localStorage.setItem('general_shortlist', JSON.stringify(newShortlist));
+      } catch (error) {
+          console.error("Could not write to localStorage", error);
+      }
+      setTimeout(() => setIsShortlistLoading(false), 300); // Simulate async save
+  }, [generalShortlist]);
 
   return (
     <DataContext.Provider value={{ 
@@ -949,7 +1030,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         activeChatSubmission,
         openChat,
         closeChat,
-        reassignAnonymousViews
+        reassignAnonymousViews,
+        notifications,
+        unreadCount,
+        markNotificationsAsRead,
         }}>
       {children}
     </DataContext.Provider>
@@ -963,3 +1047,5 @@ export function useData() {
   }
   return context;
 }
+
+    
