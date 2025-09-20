@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -230,10 +229,10 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
         } else {
              const defaultSession = {
                 date: new Date().toISOString(),
-                venue: 'LBR Office, Chennai',
+                venue: '',
                 customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
                 providerAttendees: [{ name: '', title: '' }],
-                facilitatorAttendees: [{ name: 'O2O Manager', title: 'O2O Manager' }],
+                facilitatorAttendees: [],
                 siteInfo: {
                     listingId: { agreedTerms: primaryListing?.listingId || '', status: 'Agreed' },
                     postalAddress: { agreedTerms: primaryListing?.location || '', status: 'Agreed' },
@@ -290,14 +289,14 @@ export function CommercialTermsSheet({ lead, primaryListing }: { lead: Registere
 
     return (
         <div className="printable-container">
-            <div className="print-header hidden">Commercial Terms Sheet</div>
+            <div className="print-header hidden">Negotiation Board</div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 printable-content">
                     <Card>
                         <CardHeader className="no-print">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <CardTitle>Commercial Terms Sheet</CardTitle>
+                                    <CardTitle>Negotiation Board</CardTitle>
                                     <CardDescription>
                                         Manage negotiation points for Transaction ID: {lead.id}.
                                         {primaryListing && <span className="block mt-1 text-xs">For Listing: <Link href={`/listings/${primaryListing.listingId}`} target="_blank" className="text-primary underline">{primaryListing.name}</Link></span>}

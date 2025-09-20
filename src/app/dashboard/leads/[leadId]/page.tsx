@@ -9,7 +9,7 @@ import type { ListingSchema } from '@/lib/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
-import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase } from 'lucide-react';
+import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase, FileSignature, DollarSign, Notebook } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -25,6 +25,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
@@ -33,6 +37,13 @@ const activityIcons: { [key in TransactionActivity['activityType']]: React.Eleme
   'Customer Feedback': MessageSquare,
   'Tenant Improvements': HardHat,
 };
+
+const ProposalFormSchema = z.object({
+  rentPerSft: z.coerce.number().positive("Rent must be a positive number."),
+  rentalSecurityDeposit: z.coerce.number().positive("Deposit must be positive."),
+});
+type ProposalFormValues = z.infer<typeof ProposalFormSchema>;
+
 
 function LeadDetailPageSkeleton() {
     return (
@@ -83,12 +94,77 @@ function DeveloperSelection({ lead, onSelect }: { lead: RegisteredLead, onSelect
     )
 }
 
+function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingSchema, lead: RegisteredLead, provider: RegisteredLeadProvider, onSubmit: (listingId: string, values: ProposalFormValues) => void }) {
+    const form = useForm<ProposalFormValues>({
+        resolver: zodResolver(ProposalFormSchema),
+        defaultValues: {
+            rentPerSft: listing.rentPerSqFt === 'Get Quote' ? undefined : listing.rentPerSqFt,
+            rentalSecurityDeposit: typeof listing.rentalSecurityDeposit === 'number' ? listing.rentalSecurityDeposit : undefined,
+        }
+    });
+
+    const propertyInLead = provider.properties.find(p => p.listingId === listing.listingId);
+    
+    // @ts-ignore
+    const submittedRent = propertyInLead?.rentPerSft;
+    // @ts-ignore
+    const submittedDeposit = propertyInLead?.rentalSecurityDeposit;
+
+    if (submittedRent !== undefined) {
+        return (
+            <div className="space-y-4">
+                <p className="font-semibold text-primary">Proposal Submitted</p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p className="text-muted-foreground">Quoted Rent</p>
+                        <p className="font-medium">₹{submittedRent}/sft</p>
+                    </div>
+                    <div>
+                        <p className="text-muted-foreground">Security Deposit</p>
+                        <p className="font-medium">{submittedDeposit} months</p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit((values) => onSubmit(listing.listingId, values))} className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="rentPerSft"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Quoted Rent per Sq. Ft.</FormLabel>
+                            <FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="rentalSecurityDeposit"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Security Deposit (in months)</FormLabel>
+                            <FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <Button type="submit" size="sm">Submit Proposal</Button>
+            </form>
+        </Form>
+    )
+}
+
 
 export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, listings, updateRegisteredLeadStatus, addTransactionActivity, isLoading: isDataLoading } = useData();
+  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading } = useData();
   const { toast } = useToast();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
@@ -97,9 +173,6 @@ export default function LeadDetailPage() {
   const [selectedProvider, setSelectedProvider] = React.useState<RegisteredLeadProvider | null>(null);
   const [selectedProviderListings, setSelectedProviderListings] = React.useState<ListingSchema[]>([]);
   
-  const [isAcknowledgeDialogOpen, setIsAcknowledgeDialogOpen] = React.useState(false);
-  const [propertyToAcknowledge, setPropertyToAcknowledge] = React.useState<RegisteredLeadProperty | null>(null);
-
 
   React.useEffect(() => {
     if (isDataLoading || isAuthLoading) return;
@@ -124,14 +197,12 @@ export default function LeadDetailPage() {
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setActivities(leadActivities);
         
-        // If there's only one provider, automatically select them
         if (foundLead.providers.length === 1) {
             const provider = foundLead.providers[0];
             const devListings = (provider.properties || []).map(p => listings.find(l => l.listingId === p.listingId)).filter((l): l is ListingSchema => !!l);
             setSelectedProvider(provider);
             setSelectedProviderListings(devListings);
         } else if (user?.role === 'Warehouse Developer') {
-            // If user is a developer and there are multiple, auto-select their view
             const provider = foundLead.providers.find(p => p.providerEmail === user.email);
             if (provider) {
                 const devListings = (provider.properties || []).map(p => listings.find(l => l.listingId === p.listingId)).filter((l): l is ListingSchema => !!l);
@@ -153,6 +224,25 @@ export default function LeadDetailPage() {
         description: "The new activity has been successfully saved.",
     });
   };
+
+  const handleProposalSubmit = (listingId: string, values: ProposalFormValues) => {
+    if (!lead || !selectedProvider) return;
+    
+    const updatedLead = { ...lead };
+    const providerIndex = updatedLead.providers.findIndex(p => p.providerEmail === selectedProvider.providerEmail);
+    if(providerIndex === -1) return;
+
+    const propertyIndex = updatedLead.providers[providerIndex].properties.findIndex(p => p.listingId === listingId);
+    if(propertyIndex === -1) return;
+
+    // @ts-ignore
+    updatedLead.providers[providerIndex].properties[propertyIndex].rentPerSft = values.rentPerSft;
+    // @ts-ignore
+    updatedLead.providers[providerIndex].properties[propertyIndex].rentalSecurityDeposit = values.rentalSecurityDeposit;
+    
+    updateRegisteredLead(updatedLead);
+    toast({ title: "Proposal Submitted", description: "The customer has been notified of your commercial proposal." });
+  }
   
   const handleProviderSelect = (provider: RegisteredLeadProvider, devListings: ListingSchema[]) => {
       setSelectedProvider(provider);
@@ -173,7 +263,7 @@ export default function LeadDetailPage() {
 
   const providerDetailsForUser = isProvider ? lead.providers.find(p => p.providerEmail === user?.email) : null;
   
-  const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=registered-leads' : '/dashboard/transactions';
+  const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
 
   const providerUser = selectedProvider ? users[selectedProvider.providerEmail] : null;
 
@@ -205,7 +295,7 @@ export default function LeadDetailPage() {
               <Tabs defaultValue="activity" className="w-full">
                   <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
-                      <TabsTrigger value="commercials"><HandCoins className="mr-2 h-4 w-4"/> Commercials</TabsTrigger>
+                      <TabsTrigger value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
                       <TabsTrigger value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
                   </TabsList>
                   <TabsContent value="activity" className="mt-6">
@@ -304,14 +394,46 @@ export default function LeadDetailPage() {
                                                 return (
                                                   <React.Fragment key={property.listingId}>
                                                     {index > 0 && <Separator />}
-                                                    <div className="flex items-start justify-between gap-4">
-                                                        <div className="flex-grow space-y-1">
-                                                            <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-semibold hover:underline">{listing.name}</Link>
-                                                            <p className="text-xs text-muted-foreground">{listing.location} &bull; {listing.sizeSqFt.toLocaleString()} sq. ft.</p>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-start justify-between gap-4">
+                                                            <div className="flex-grow space-y-1">
+                                                                <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-semibold hover:underline">{listing.name}</Link>
+                                                                <p className="text-xs text-muted-foreground">{listing.location} &bull; {listing.sizeSqFt.toLocaleString()} sq. ft.</p>
+                                                            </div>
+                                                            <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                                                                <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
+                                                            </Button>
                                                         </div>
-                                                        <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                                                            <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
-                                                        </Button>
+                                                         {isProvider && (
+                                                            <ProposalForm 
+                                                                listing={listing} 
+                                                                lead={lead} 
+                                                                provider={selectedProvider} 
+                                                                onSubmit={handleProposalSubmit} 
+                                                            />
+                                                        )}
+                                                         {isCustomer && (
+                                                            <div className="p-3 bg-secondary/50 rounded-md">
+                                                                <p className="text-sm font-semibold mb-2 text-primary">Developer's Proposal</p>
+                                                                 {/* @ts-ignore */}
+                                                                {property.rentPerSft !== undefined ? (
+                                                                     <div className="grid grid-cols-2 gap-4 text-sm">
+                                                                        <div>
+                                                                            <p className="text-muted-foreground">Quoted Rent</p>
+                                                                            {/* @ts-ignore */}
+                                                                            <p className="font-medium">₹{property.rentPerSft}/sft</p>
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="text-muted-foreground">Security Deposit</p>
+                                                                             {/* @ts-ignore */}
+                                                                            <p className="font-medium">{property.rentalSecurityDeposit} months</p>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <p className="text-sm text-muted-foreground">Waiting for developer to submit their proposal.</p>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                   </React.Fragment>
                                                 )
@@ -322,7 +444,7 @@ export default function LeadDetailPage() {
                           </div>
                       </div>
                   </TabsContent>
-                  <TabsContent value="commercials" className="mt-6">
+                  <TabsContent value="negotiation-board" className="mt-6">
                       <CommercialTermsSheet lead={lead} primaryListing={selectedProviderListings[0] || null} />
                   </TabsContent>
                    <TabsContent value="improvements" className="mt-6">
