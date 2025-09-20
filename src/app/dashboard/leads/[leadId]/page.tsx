@@ -183,7 +183,7 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading } = useData();
+  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead } = useData();
   const { toast } = useToast();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
@@ -297,12 +297,13 @@ export default function LeadDetailPage() {
   
   const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
   const isCustomer = user?.email === lead.customerId;
-  const isProvider = user?.role === 'Warehouse Developer';
+  const isProvider = user?.email === providerUser?.email;
   const isAgent = user?.email === lead.agentId;
-  const isPremiumUser = isCustomer && isPremiumProvider;
-
-  const canAddActivity = isO2O || isPremiumUser || (isProvider && isPremiumProvider);
+  
+  const canAddActivity = isO2O || (isPremiumProvider && (isCustomer || isProvider || isAgent));
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
+  
+  const chatPartner = isPremiumProvider ? (isCustomer ? 'Developer' : 'Customer') : 'O2O Team';
 
   return (
     <>
@@ -386,7 +387,7 @@ export default function LeadDetailPage() {
                                   <CardContent>
                                     <Button onClick={handleChatClick} className="w-full">
                                         <MessageSquare className="mr-2 h-4 w-4" />
-                                        Chat with O2O Team
+                                        Chat with {chatPartner}
                                     </Button>
                                   </CardContent>
                                </Card>
@@ -442,7 +443,7 @@ export default function LeadDetailPage() {
                                                                 <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
                                                             </Button>
                                                         </div>
-                                                         {isProvider && (
+                                                         {isProvider && isPremiumProvider && (
                                                             <ProposalForm 
                                                                 listing={listing} 
                                                                 lead={lead} 
@@ -450,7 +451,7 @@ export default function LeadDetailPage() {
                                                                 onSubmit={handleProposalSubmit} 
                                                             />
                                                         )}
-                                                         {isCustomer && (
+                                                         {(isCustomer || isAgent) && (
                                                             <div className="p-3 bg-secondary/50 rounded-md">
                                                                 <p className="text-sm font-semibold mb-2 text-primary">Developer's Proposal</p>
                                                                 {property.rentPerSft !== undefined ? (
@@ -501,5 +502,3 @@ export default function LeadDetailPage() {
     </>
   );
 }
-
-    
