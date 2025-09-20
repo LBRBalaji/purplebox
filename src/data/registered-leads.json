@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758347504657",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Block 4",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@pragati.com",
+        "properties": [
+          {
+            "listingId": "LST-80DJ0W",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:51:44.658Z"
+  },
+  {
     "id": "LDR-QUOTE-1758347284148",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

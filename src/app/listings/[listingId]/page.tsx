@@ -618,7 +618,7 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-center text-center">
-                                            {listing.rentPerSqFt === 'Get Quote' || isPremiumDeveloper ? (
+                                            {listing.rentPerSqFt === 'Get Quote' || (isPremiumDeveloper && !hasRequestedQuote) ? (
                                                 <span className="text-2xl font-bold">Price on Request</span>
                                             ) : (
                                                 <>
@@ -633,16 +633,16 @@ export default function ListingDetailPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
-                                     {showQuoteButton && (
+                                    {showQuoteButton && (
                                         <>
                                             {hasRequestedQuote ? (
                                                 <div className="w-full text-center space-y-2">
                                                     <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
                                                         <Check className="h-4 w-4" /> Commercials Requested
                                                     </p>
-                                                     <Button asChild variant="outline" className="w-full">
+                                                    <Button asChild variant="outline" className="w-full">
                                                         <Link href={`/dashboard/leads/${quoteRequestLead?.id}`}>
-                                                            <ArrowRight className="mr-2 h-4 w-4"/> Go to Transactions
+                                                            Go to Transactions <ArrowRight className="ml-2 h-4 w-4"/>
                                                         </Link>
                                                     </Button>
                                                     <p className="text-xs text-muted-foreground px-2">Your Interaction with Developer Begins Here.. Track all communication, site visits, and negotiations for this property on the Transactions page.</p>
@@ -710,3 +710,5 @@ export default function ListingDetailPage() {
     );
 
 }
+
+    
