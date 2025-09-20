@@ -285,13 +285,15 @@ export default function ListingDetailPage() {
         });
     };
 
-    const hasRequestedQuote = React.useMemo(() => {
-        if (!user || !listing) return false;
-        return registeredLeads.some(lead => 
+    const quoteRequestLead = React.useMemo(() => {
+        if (!user || !listing) return null;
+        return registeredLeads.find(lead => 
             lead.customerId === user.email &&
             lead.providers?.some(p => p.properties?.some(prop => prop.listingId === listing.listingId))
         );
     }, [user, listing, registeredLeads]);
+
+    const hasRequestedQuote = !!quoteRequestLead;
 
     const handleDownloadRequest = () => {
         if (!user) {
@@ -624,22 +626,20 @@ export default function ListingDetailPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
-                                     {listing.rentPerSqFt === 'Get Quote' && (
+                                     {listing.rentPerSqFt === 'Get Quote' ? (
                                         hasRequestedQuote ? (
                                             <div className="w-full text-center space-y-2">
                                                 <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
                                                     <Check className="h-4 w-4" /> Commercials Requested
                                                 </p>
-                                                <Button variant="outline" className="w-full" onClick={handleLogDemandClick}>
-                                                    <NotepadText className="mr-2 h-4 w-4" /> Log Detailed Demand
-                                                </Button>
+                                                {quoteRequestLead && <Button asChild variant="outline" className="w-full"><Link href={`/dashboard/leads/${quoteRequestLead.id}`}><ArrowRight className="mr-2 h-4 w-4"/> Go to Transactions</Link></Button>}
                                             </div>
                                         ) : (
                                             <Button onClick={handleGetQuote} className="w-full">
                                                 Get Commercials Quote
                                             </Button>
                                         )
-                                     )}
+                                     ) : null}
                                     <Button
                                         variant={isShortlisted ? 'default' : 'outline'}
                                         className="w-full"
