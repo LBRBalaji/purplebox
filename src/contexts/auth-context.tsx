@@ -9,7 +9,6 @@ export type User = {
   email: string;
   role: 'SuperAdmin' | 'User' | 'O2O' | 'Warehouse Developer' | 'Agent';
   isCompanyAdmin?: boolean;
-  plan: 'Free' | 'Paid_Basic' | 'Paid_Premium';
   companyName: string;
   userName: string;
   phone: string;
@@ -25,7 +24,7 @@ type AuthContextType = {
   signup: (details: NewUser) => void;
   logout: () => void;
   isLoading: boolean;
-  addUser: (details: NewUser) => void;
+  addUser: (details: User) => void;
   updateUser: (details: NewUser) => void;
   deleteUser: (email: string) => void;
 };
@@ -59,7 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: 'admin@example.com',
             role: 'SuperAdmin',
             isCompanyAdmin: true,
-            plan: 'Paid_Premium',
             companyName: 'Admin Corp',
             userName: 'Default Admin',
             phone: 'N/A',
@@ -160,7 +158,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     const newUser: User = { 
         ...details, 
-        plan: 'Free', 
         isCompanyAdmin: false,
         createdAt: new Date().toISOString() 
     };

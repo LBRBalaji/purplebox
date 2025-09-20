@@ -43,7 +43,6 @@ const userFormSchema = z.object({
     phone: z.string().min(1, 'Phone number is required.'),
     role: z.enum(['User', 'SuperAdmin', 'O2O', 'Warehouse Developer', 'Agent']),
     isCompanyAdmin: z.boolean().optional(),
-    plan: z.enum(['Free', 'Paid_Basic', 'Paid_Premium']),
 });
 
 type UserFormSchema = z.infer<typeof userFormSchema>;
@@ -73,7 +72,6 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
       phone: '',
       role: 'User',
       isCompanyAdmin: false,
-      plan: 'Free',
     },
   });
 
@@ -87,7 +85,6 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                 phone: user.phone,
                 role: user.role,
                 isCompanyAdmin: user.isCompanyAdmin || false,
-                plan: user.plan || 'Free',
             });
         } else {
             form.reset({
@@ -97,7 +94,6 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
               phone: '',
               role: 'User',
               isCompanyAdmin: false,
-              plan: 'Free',
             });
         }
     }
@@ -166,21 +162,6 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                           <SelectItem value="Agent">Agent</SelectItem>
                           <SelectItem value="O2O">O2O Platform Manager</SelectItem>
                           <SelectItem value="SuperAdmin">O2O Super Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField control={form.control} name="plan" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>User Plan Model</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          <SelectItem value="Free">Free</SelectItem>
-                          <SelectItem value="Paid_Basic">Paid_Basic</SelectItem>
-                          <SelectItem value="Paid_Premium">Paid_Premium</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
