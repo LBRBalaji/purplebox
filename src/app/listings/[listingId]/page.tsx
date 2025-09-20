@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus, Share, Linkedin, Twitter, Facebook, Mail, Star, Info } from 'lucide-react';
+import { Building2, Calendar, HardHat, MapPin, DollarSign, ShieldCheck, Download, Lock, FileText, Image as ImageIcon, Video, Layout, Scaling, ArrowLeft, ArrowRight, EyeOff, Construction, Building, Wind, Thermometer, ChevronsUp, Waves, ClipboardPlus, Share, Linkedin, Twitter, Facebook, Mail, Star, Info, MessageCircle, FileQuestion, HelpCircle, Check, NotepadText } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
@@ -203,7 +203,7 @@ export default function ListingDetailPage() {
     const router = useRouter();
     const { user, users, isLoading: isAuthLoading } = useAuth();
     const { toast } = useToast();
-    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest, addRegisteredLead } = useData();
+    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest, addRegisteredLead, registeredLeads } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
@@ -292,6 +292,14 @@ export default function ListingDetailPage() {
             description: `The developer has been notified of your interest in "${listing.warehouseBoxId || listing.listingId}".`,
         });
     };
+
+    const hasRequestedQuote = React.useMemo(() => {
+        if (!user || !listing) return false;
+        return registeredLeads.some(lead => 
+            lead.customerId === user.email &&
+            lead.providers.some(p => p.properties.some(prop => prop.listingId === listing.listingId))
+        );
+    }, [user, listing, registeredLeads]);
 
     if (isLoading || !listing) {
         return <DetailPageSkeleton />;
@@ -608,16 +616,14 @@ export default function ListingDetailPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-4">
-                                        {typeof listing.rentPerSqFt === 'number' ? (
-                                            <div className="flex items-baseline justify-center text-center">
-                                                <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
+                                        <div className="flex items-baseline justify-center text-center">
+                                            <span className="text-4xl font-bold">₹{listing.rentPerSqFt === 'Get Quote' ? '' : listing.rentPerSqFt}</span>
+                                            {listing.rentPerSqFt === 'Get Quote' ? (
+                                                <span className="text-2xl font-bold">Price on Request</span>
+                                            ) : (
                                                 <span className="text-sm text-muted-foreground">/sq.ft./month</span>
-                                            </div>
-                                        ) : (
-                                            <div className="text-center">
-                                                <p className="text-lg font-semibold">Price on Request</p>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                         <Separator/>
                                         <DetailRow label="Security Deposit" value={typeof listing.rentalSecurityDeposit === 'number' ? `${listing.rentalSecurityDeposit} months` : (listing.rentalSecurityDeposit || 'N/A')} />
                                         <DetailRow label="Construction Progress" value={listing.constructionProgress} />
@@ -625,9 +631,22 @@ export default function ListingDetailPage() {
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
                                      {listing.rentPerSqFt === 'Get Quote' && (
-                                        <Button onClick={handleGetQuote} className="w-full">
-                                            Get Commercials Quote
-                                        </Button>
+                                        <>
+                                            {hasRequestedQuote ? (
+                                                <div className="w-full text-center space-y-2">
+                                                    <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
+                                                        <Check className="h-4 w-4" /> Commercials Requested
+                                                    </p>
+                                                    <Button variant="outline" className="w-full" onClick={handleLogDemandClick}>
+                                                        <NotepadText className="mr-2 h-4 w-4" /> Log Detailed Demand
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <Button onClick={handleGetQuote} className="w-full">
+                                                    Get Commercials Quote
+                                                </Button>
+                                            )}
+                                        </>
                                      )}
                                     <Button
                                         variant={isShortlisted ? 'default' : 'outline'}

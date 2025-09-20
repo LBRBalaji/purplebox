@@ -376,7 +376,7 @@
   },
   {
     "listingId": "LST-TGAV6G",
-    "views": 0,
+    "views": 2,
     "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
@@ -388,6 +388,20 @@
           1758208934270,
           1758208934270
         ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758332008543
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758332008543
       }
     ]
   },

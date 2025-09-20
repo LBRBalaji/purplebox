@@ -10,5 +10,11 @@
     "companyName": "Kailash Logistics",
     "listingId": "LST-MMX3PE",
     "timestamp": 1758331404141
+  },
+  {
+    "userId": "customer2@o2o.com",
+    "companyName": "Beta Retail",
+    "listingId": "LST-TGAV6G",
+    "timestamp": 1758332008543
   }
 ]
