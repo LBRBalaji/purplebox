@@ -74,7 +74,7 @@
     "triggeredBy": "murugan@xyzlogistics.com",
     "id": "notif-1758372060985",
     "timestamp": "2025-09-20T12:41:00.985Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_chat_message",

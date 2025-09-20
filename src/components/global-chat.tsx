@@ -161,8 +161,6 @@ export function GlobalChatWidget() {
     let linkHref = null;
 
     if (activeChat) {
-        const demand = demands.find(d => d.demandId === activeChat.demandId);
-
         const listingInfo = activeChat.listing
             ? `${activeChat.listing.location} | ${activeChat.listing.sizeSqFt.toLocaleString()} sq. ft.`
             : 'N/A';
@@ -170,18 +168,20 @@ export function GlobalChatWidget() {
         let headerTitle: string;
         
         if (user?.email === activeChat.customerId) {
-            // Customer's view
             headerTitle = activeChat.chatPartnerName;
         } else {
-            // Developer or Admin's view
             headerTitle = activeChat.customerCompany || 'Customer';
         }
 
         title = headerTitle;
+
+        const isDeveloper = user?.email === activeChat.providerEmail;
+        const listingIdentifier = isDeveloper ? activeChat.listing?.warehouseBoxId : activeChat.listingId;
+
         subtitle = (
             <div className="text-xs text-muted-foreground space-y-1">
                 <p>
-                    <span className="font-semibold">Listing:</span> {activeChat.listingId} | {listingInfo}
+                    <span className="font-semibold">Listing:</span> {listingIdentifier || 'N/A'} | {listingInfo}
                 </p>
                  <p>
                     <span className="font-semibold">Demand:</span> {activeChat.demandId}
