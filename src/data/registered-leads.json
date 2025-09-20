@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758347284148",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Oragadam II B300C",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-U0L6J6",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:48:04.150Z"
+  },
+  {
     "id": "LDR-QUOTE-1758347061943",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",
