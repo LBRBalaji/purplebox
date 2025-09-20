@@ -141,6 +141,20 @@
       "senderName": "Kailash Logistics",
       "text": "🙏🙏",
       "timestamp": "2025-09-20T12:17:37.257Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "hey",
+      "timestamp": "2025-09-20T12:40:44.195Z"
+    }
+  ],
+  "chat-LDR-QUOTE-1758359330575-admin@ccidevelopers.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "welcome",
+      "timestamp": "2025-09-20T12:41:00.601Z"
     }
   ]
 }

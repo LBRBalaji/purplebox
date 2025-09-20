@@ -1,6 +1,28 @@
 [
   {
     "type": "new_chat_message",
+    "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-QUOTE-1758359330575: \"welcome...\"",
+    "href": "/dashboard/leads/LDR-QUOTE-1758359330575",
+    "recipientEmail": "admin@ccidevelopers.com",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "id": "notif-1758372060985",
+    "timestamp": "2025-09-20T12:41:00.985Z",
+    "isRead": false
+  },
+  {
+    "type": "new_chat_message",
+    "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-QUOTE-1758360784201: \"hey...\"",
+    "href": "/dashboard/leads/LDR-QUOTE-1758360784201",
+    "recipientEmail": "admin@kailashlogistics.com",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "id": "notif-1758372044632",
+    "timestamp": "2025-09-20T12:40:44.632Z",
+    "isRead": false
+  },
+  {
+    "type": "new_chat_message",
     "title": "New message from Kailash Logistics",
     "message": "Regarding transaction LDR-QUOTE-1758360784201: \"🙏🙏...\"",
     "href": "/dashboard/leads/LDR-QUOTE-1758360784201",

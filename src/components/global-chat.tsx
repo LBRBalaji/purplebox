@@ -110,9 +110,9 @@ export function GlobalChatWidget() {
     if (!isOpen) {
         return (
             <div className="fixed bottom-8 right-8 z-50">
-                <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full shadow-lg h-16 w-16">
-                    <MessageSquare className="h-8 w-8" />
-                    <span className="sr-only">Open Chat</span>
+                <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full shadow-lg h-14 pl-5 pr-6 flex items-center gap-3">
+                    <MessageSquare className="h-6 w-6" />
+                    <span className="text-lg font-medium">Chat</span>
                 </Button>
             </div>
         )
