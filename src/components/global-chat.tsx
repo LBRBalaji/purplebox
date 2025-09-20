@@ -5,51 +5,149 @@ import * as React from 'react';
 import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Minus, X } from 'lucide-react';
-import { ChatPanel } from './chat-dialog';
-import { cn } from '@/lib/utils';
+import { MessageSquare, Minus, X, ArrowLeft, Users } from 'lucide-react';
+import { ChatPanel, type ChatSubmission } from './chat-dialog';
 import { useAuth } from '@/contexts/auth-context';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { Badge } from './ui/badge';
+
+function ConversationList({ onSelectConversation }: { onSelectConversation: (chat: ChatSubmission) => void }) {
+    const { user, users } = useAuth();
+    const { registeredLeads, listings, chatMessages } = useData();
+
+    const conversations = React.useMemo(() => {
+        if (!user) return [];
+
+        const allUserLeads = registeredLeads.filter(lead => 
+            lead.customerId === user.email || 
+            lead.agentId === user.email ||
+            lead.providers.some(p => p.providerEmail === user.email)
+        );
+
+        return allUserLeads.flatMap(lead => 
+            lead.providers.map(provider => {
+                const listing = listings.find(l => l.listingId === provider.properties[0]?.listingId);
+                const customer = users[lead.customerId];
+                const developer = users[provider.providerEmail];
+
+                let chatPartnerName: string;
+                let partnerInitials: string;
+
+                if (user.email === customer?.email) {
+                    chatPartnerName = developer?.companyName || "Developer";
+                    partnerInitials = developer?.companyName?.[0] || 'D';
+                } else {
+                    chatPartnerName = customer?.companyName || "Customer";
+                    partnerInitials = customer?.companyName?.[0] || 'C';
+                }
+
+                const threadId = `chat-${lead.id}-${provider.providerEmail}`;
+                const messages = chatMessages[threadId] || [];
+                const lastMessage = messages[messages.length - 1];
+
+                return {
+                    id: threadId,
+                    submission: {
+                        submissionId: threadId,
+                        demandId: lead.id,
+                        listingId: listing?.listingId || '',
+                        providerEmail: provider.providerEmail,
+                        listing: listing,
+                        customerName: customer?.userName || '',
+                        customerCompany: customer?.companyName || '',
+                        chatPartnerName,
+                    },
+                    partnerName: chatPartnerName,
+                    partnerInitials: partnerInitials,
+                    lastMessage: lastMessage ? `${lastMessage.senderName}: ${lastMessage.text?.substring(0, 30)}...` : `Re: ${listing?.name || lead.requirementsSummary}`,
+                    timestamp: lastMessage ? new Date(lastMessage.timestamp) : new Date(lead.registeredAt),
+                } as const;
+            })
+        ).sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime());
+        
+    }, [user, registeredLeads, listings, users, chatMessages]);
+
+    if(conversations.length === 0) {
+        return <div className="p-8 text-center text-sm text-muted-foreground">No active conversations.</div>
+    }
+
+    return (
+        <div className="p-2 space-y-2">
+            {conversations.map(conv => (
+                <button key={conv.id} onClick={() => onSelectConversation(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors">
+                    <div className="flex items-center gap-3">
+                        <Avatar>
+                            <AvatarFallback>{conv.partnerInitials}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-grow">
+                            <p className="font-semibold">{conv.partnerName}</p>
+                            <p className="text-xs text-muted-foreground truncate">{conv.lastMessage}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground self-start">{conv.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                </button>
+            ))}
+        </div>
+    )
+}
+
 
 export function GlobalChatWidget() {
-    const { activeChatSubmission, closeChat } = useData();
     const { user } = useAuth();
-    const [isMinimized, setIsMinimized] = React.useState(false);
+    const { activeChat, setActiveChat } = useData();
+    const [isOpen, setIsOpen] = React.useState(false);
 
-    if (!activeChatSubmission) {
-        return null;
-    }
+    if (!user) return null;
+
+    const handleSelectConversation = (chat: ChatSubmission) => {
+        setActiveChat(chat);
+    };
+
+    const handleBackToList = () => {
+        setActiveChat(null);
+    };
     
-    const partnerName = activeChatSubmission.chatPartnerName || 'Chat';
-
-    if (isMinimized) {
+    if (!isOpen) {
         return (
-             <div className="fixed bottom-0 right-8 z-50">
-                <Button onClick={() => setIsMinimized(false)} className="rounded-b-none shadow-lg">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Chat with {partnerName}
+            <div className="fixed bottom-8 right-8 z-50">
+                <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full shadow-lg h-16 w-16">
+                    <MessageSquare className="h-8 w-8" />
+                    <span className="sr-only">Open Chat</span>
                 </Button>
             </div>
         )
     }
 
     return (
-        <div className="fixed bottom-0 right-8 z-50 w-full max-w-sm h-[500px]">
+        <div className="fixed bottom-0 right-8 z-50 w-full max-w-sm h-[600px]">
             <Card className="flex flex-col h-full shadow-2xl border-border">
                 <CardHeader className="flex flex-row items-center justify-between p-4 border-b bg-secondary/50 rounded-t-lg">
-                    <CardTitle className="text-base flex items-center gap-2">
-                       <MessageSquare className="h-4 w-4" /> Chat with {partnerName}
-                    </CardTitle>
-                    <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsMinimized(true)}>
-                            <Minus className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={closeChat}>
-                            <X className="h-4 w-4" />
-                        </Button>
+                    <div className="flex items-center gap-2">
+                        {activeChat && (
+                             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleBackToList}>
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        )}
+                        <CardTitle className="text-base flex items-center gap-2">
+                            {activeChat ? (
+                                <>
+                                 <Users className="h-4 w-4" /> {activeChat.chatPartnerName}
+                                </>
+                            ) : (
+                                "Conversations"
+                            )}
+                        </CardTitle>
                     </div>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsOpen(false)}>
+                        <X className="h-4 w-4" />
+                    </Button>
                 </CardHeader>
                 <CardContent className="p-0 flex-grow relative">
-                    <ChatPanel submission={activeChatSubmission} />
+                    {activeChat ? (
+                        <ChatPanel submission={activeChat} />
+                    ) : (
+                        <ConversationList onSelectConversation={handleSelectConversation} />
+                    )}
                 </CardContent>
             </Card>
         </div>

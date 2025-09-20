@@ -221,9 +221,8 @@ type DataContextType = {
   typingStatus: Record<string, TypingStatus>;
   updateTypingStatus: (threadId: string, status: TypingStatus) => Promise<void>;
   fetchTypingStatus: (threadId: string) => Promise<void>;
-  activeChatSubmission: ChatSubmission | null;
-  openChat: (submission: ChatSubmission) => void;
-  closeChat: () => void;
+  activeChat: ChatSubmission | null;
+  setActiveChat: (chat: ChatSubmission | null) => void;
   reassignAnonymousViews: (anonymousId: string, user: User) => void;
   notifications: Notification[];
   unreadCount: number;
@@ -271,7 +270,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [layoutRequests, setLayoutRequests] = useState<LayoutRequestRecord[]>([]);
   const [chatMessages, setChatMessages] = useState<Record<string, ChatMessage[]>>({});
   const [typingStatus, setTypingStatus] = useState<Record<string, TypingStatus>>({});
-  const [activeChatSubmission, setActiveChatSubmission] = useState<ChatSubmission | null>(null);
+  const [activeChat, setActiveChat] = useState<ChatSubmission | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -970,14 +969,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
       return updatedRequests;
     });
   }, [persistLayoutRequests]);
-
-  const openChat = useCallback((submission: ChatSubmission) => {
-    setActiveChatSubmission(submission);
-  }, []);
-
-  const closeChat = useCallback(() => {
-    setActiveChatSubmission(null);
-  }, []);
   
   const toggleGeneralShortlist = useCallback((listingId: string) => {
       setIsShortlistLoading(true);
@@ -1027,9 +1018,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         typingStatus,
         updateTypingStatus,
         fetchTypingStatus,
-        activeChatSubmission,
-        openChat,
-        closeChat,
+        activeChat,
+        setActiveChat,
         reassignAnonymousViews,
         notifications,
         unreadCount,

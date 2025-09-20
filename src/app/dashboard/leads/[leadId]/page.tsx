@@ -28,7 +28,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChatSubmission } from '@/components/chat-dialog';
+import { type ChatSubmission } from '@/components/chat-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
@@ -182,7 +182,7 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead, openChat } = useData();
+  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead, setActiveChat } = useData();
   const { toast } = useToast();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
@@ -302,7 +302,7 @@ export default function LeadDetailPage() {
       customerName: customer?.userName || 'Customer',
       customerCompany: customer?.companyName || 'Customer Company',
     };
-    openChat(submissionForChat);
+    setActiveChat(submissionForChat);
   };
 
    const handleAddAgent = (agentEmail: string) => {
