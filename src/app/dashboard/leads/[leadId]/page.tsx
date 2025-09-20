@@ -48,6 +48,8 @@ type ProposalFormValues = z.infer<typeof ProposalFormSchema>;
 type ChatSubmission = Submission & { 
     listing?: ListingSchema,
     chatPartnerName: string,
+    customerName: string,
+    customerCompany: string,
 };
 
 
@@ -278,19 +280,21 @@ export default function LeadDetailPage() {
 
   const isCustomer = user?.email === lead?.customerId;
   
-  let chatPartnerName = "O2O Team";
-  if (isPremiumProvider) {
-    if (isCustomer) {
-      chatPartnerName = providerUser?.companyName || "Developer";
-    } else { // For developer or agent on a premium deal
-      chatPartnerName = customer?.companyName || "Customer";
-    }
-  }
-
   const handleChatClick = () => {
     if (!lead || !selectedProvider) return;
+
     const listingId = selectedProvider.properties[0]?.listingId;
     const listing = listings.find(l => l.listingId === listingId);
+
+    // Determine the chat partner based on the plan
+    let chatPartnerName = "O2O Team";
+    if (isPremiumProvider) {
+        if (isCustomer) {
+            chatPartnerName = providerUser?.companyName || "Developer";
+        } else {
+            chatPartnerName = customer?.companyName || "Customer";
+        }
+    }
 
     const mockSubmission: ChatSubmission = {
       submissionId: `chat-${lead.id}-${selectedProvider.providerEmail}`,
@@ -299,7 +303,9 @@ export default function LeadDetailPage() {
       providerEmail: selectedProvider.providerEmail,
       status: 'Approved',
       listing: listing,
-      chatPartnerName,
+      chatPartnerName: chatPartnerName,
+      customerName: customer?.userName || 'Customer',
+      customerCompany: customer?.companyName || 'Customer Company',
     };
     setSelectedChat(mockSubmission);
   };
@@ -408,7 +414,7 @@ export default function LeadDetailPage() {
                                   <CardContent>
                                     <Button onClick={handleChatClick} className="w-full">
                                         <MessageSquare className="mr-2 h-4 w-4" />
-                                        Chat with {chatPartnerName}
+                                        Chat with {isPremiumProvider ? (isCustomer ? (providerUser?.companyName || 'Developer') : (customer?.companyName || 'Customer')) : 'O2O Team'}
                                     </Button>
                                   </CardContent>
                                </Card>

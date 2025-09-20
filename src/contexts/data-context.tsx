@@ -139,6 +139,13 @@ export type LocationCircle = {
   locations: string[];
 };
 
+export type ChatMessage = {
+    senderEmail: string;
+    senderName: string;
+    text: string;
+    timestamp: string;
+};
+
 type DataContextType = {
   listings: ListingSchema[];
   addListing: (listing: ListingSchema, userEmail?: string) => void;
@@ -185,6 +192,8 @@ type DataContextType = {
   viewHistory: ViewRecord[];
   layoutRequests: LayoutRequestRecord[];
   addLayoutRequest: (request: LayoutRequestData) => void;
+  chatMessages: Record<string, ChatMessage[]>;
+  addChatMessage: (threadId: string, message: ChatMessage) => Promise<void>;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -226,6 +235,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [locationCircles, setLocationCircles] = useState<LocationCircle[]>([]);
   const [downloadAcknowledgments, setDownloadAcknowledgments] = useState<AcknowledgmentRecord[]>([]);
   const [layoutRequests, setLayoutRequests] = useState<LayoutRequestRecord[]>([]);
+  const [chatMessages, setChatMessages] = useState<Record<string, ChatMessage[]>>({});
 
    useEffect(() => {
     async function loadInitialData() {
@@ -247,6 +257,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           downloadHistoryRes,
           viewHistoryRes,
           layoutRequestsRes,
+          chatMessagesRes,
         ] = await Promise.all([
           fetch('/api/listings'),
           fetch('/api/demands'),
@@ -263,6 +274,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           fetch('/api/download-history'),
           fetch('/api/view-history'),
           fetch('/api/layout-requests'),
+          fetch('/api/chat-messages'),
         ]);
 
         setListings(await listingsRes.json());
@@ -280,6 +292,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setDownloadHistory(await downloadHistoryRes.json());
         setViewHistory(await viewHistoryRes.json());
         setLayoutRequests(await layoutRequestsRes.json());
+        setChatMessages(await chatMessagesRes.json());
 
         const storedShortlist = localStorage.getItem('general_shortlist');
         if (storedShortlist) {
@@ -361,7 +374,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistDownloadHistory = useCallback((updatedHistory: DownloadRecord[]) => persistData('download-history', updatedHistory, 'download history'), []);
   const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), []);
   const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), []);
+  const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), []);
 
+  const addChatMessage = async (threadId: string, message: ChatMessage) => {
+    const updatedMessages = { ...chatMessages };
+    if (!updatedMessages[threadId]) {
+      updatedMessages[threadId] = [];
+    }
+    updatedMessages[threadId].push(message);
+    setChatMessages(updatedMessages);
+    await persistChatMessages(updatedMessages);
+  };
 
   const updateAboutUsContent = (newContent: AboutUsContent) => {
     setAboutUsContent(newContent);
@@ -829,6 +852,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         viewHistory,
         layoutRequests,
         addLayoutRequest,
+        chatMessages,
+        addChatMessage
         }}>
       {children}
     </DataContext.Provider>

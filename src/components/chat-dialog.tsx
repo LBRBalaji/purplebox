@@ -14,29 +14,18 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, Sparkles } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type Submission } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
-import { generateChatResponse } from '@/ai/flows/generate-chat-response';
+import { useData, type ChatMessage } from '@/contexts/data-context';
 
 type ChatSubmission = Submission & { 
     listing?: ListingSchema,
     chatPartnerName: string,
-};
-
-type Message = {
-  id: number;
-  sender: 'User' | 'Model';
-  text: string;
-  timestamp: string;
-};
-
-// Genkit compatible message format
-type ChatHistoryMessage = {
-  role: 'user' | 'model';
-  content: { text: string }[];
+    customerName: string,
+    customerCompany: string,
 };
 
 export function ChatDialog({
@@ -49,11 +38,14 @@ export function ChatDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const { user } = useAuth();
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const { chatMessages, addChatMessage } = useData();
   const [newMessage, setNewMessage] = React.useState('');
-  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [isSending, setIsSending] = React.useState(false);
   const scrollViewportRef = React.useRef<HTMLDivElement>(null);
   const audioRef = React.useRef<HTMLAudioElement>(null);
+
+  const threadId = submission ? `${submission.demandId}-${submission.listingId}` : null;
+  const messages = threadId ? chatMessages[threadId] || [] : [];
 
   // Request notification permission
   React.useEffect(() => {
@@ -62,46 +54,28 @@ export function ChatDialog({
     }
   }, [isOpen]);
 
-  const showNotification = (body: string) => {
-      if ("Notification" in window && Notification.permission === "granted") {
-          const notification = new Notification("New Message from O2O Assistant", {
+  const showNotification = (body: string, senderName: string) => {
+      if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
+          const notification = new Notification(`New Message from ${senderName}`, {
               body,
               icon: '/logo.png' 
           });
       }
   }
-
+  
+  // Effect to play sound on new message
   React.useEffect(() => {
-    if (isOpen && submission?.listing && submission.chatPartnerName && user) {
-        let initialMessageText: string;
-        const isCustomerView = user.email === submission.demandUserEmail;
-
-        if (submission.chatPartnerName === 'O2O Team') {
-            // Brokered Model
-            initialMessageText = `Hi ${user.userName || 'there'}, this is the O2O Assistant. I see you're interested in property ${submission.listing.listingId}. How can I help you?`;
-        } else {
-            // Direct Model (Paid_Premium)
-            if (isCustomerView) {
-                // Customer is viewing the chat. The initial message is from the Developer's perspective.
-                initialMessageText = `Hi ${user.userName}, thank you for your interest in property ${submission.listing.listingId}. I represent ${submission.chatPartnerName}. How can I assist you?`;
-            } else {
-                // Developer or Agent is viewing the chat. The initial message is from the Customer's perspective.
-                 initialMessageText = `Hi ${submission.chatPartnerName}, I am interested in property ${submission.listing.listingId}. I represent ${user.companyName}.`;
-            }
+    if (messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        if (user && lastMessage.senderEmail !== user.email) {
+            audioRef.current?.play();
+            showNotification(lastMessage.text, lastMessage.senderName);
         }
-
-      setMessages([
-        {
-          id: 1,
-          sender: 'Model',
-          text: initialMessageText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        },
-      ]);
-    } else {
-        setMessages([]);
     }
-  }, [submission, user, isOpen]);
+    // This dependency array intentionally ignores 'user' to only trigger on new messages.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
+
 
   React.useEffect(() => {
     if (scrollViewportRef.current) {
@@ -111,70 +85,27 @@ export function ChatDialog({
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !submission || !user) return;
+    if (!newMessage.trim() || !threadId || !user) return;
 
-    const userMessage: Message = {
-      id: Date.now(),
-      sender: 'User',
+    setIsSending(true);
+
+    const message: ChatMessage = {
+      senderEmail: user.email,
+      senderName: user.userName,
       text: newMessage,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
     };
-
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    
+    await addChatMessage(threadId, message);
+    
     setNewMessage('');
-    setIsGenerating(true);
-
-    try {
-        const history: ChatHistoryMessage[] = updatedMessages.map(msg => ({
-            role: msg.sender === 'User' ? 'user' : 'model',
-            content: [{ text: msg.text }]
-        }));
-
-        const aiResponse = await generateChatResponse({
-            history,
-            listingId: submission.listingId,
-            demandId: submission.demandId,
-            userName: user.userName,
-            chatPartnerName: submission.chatPartnerName,
-        });
-        
-        if (aiResponse.response) {
-            const adminResponse: Message = {
-                id: Date.now() + 1,
-                sender: 'Model',
-                text: aiResponse.response,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            };
-            setMessages(prev => [...prev, adminResponse]);
-            showNotification(aiResponse.response);
-            audioRef.current?.play();
-        }
-
-    } catch (error) {
-        console.error("Failed to get AI response", error);
-        const errorResponse: Message = {
-            id: Date.now() + 1,
-            sender: 'Model',
-            text: "Sorry, I'm having trouble connecting right now. Please try again in a moment.",
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-        setMessages(prev => [...prev, errorResponse]);
-    } finally {
-        setIsGenerating(false);
-    }
+    setIsSending(false);
   };
 
   if (!submission?.listing) return null;
   
-  const dialogTitle = submission.chatPartnerName === 'O2O Team' 
-    ? `Chat about Property: ${submission.listing.listingId}`
-    : `Chat with ${submission.chatPartnerName}`;
-    
-  const dialogDescription = submission.chatPartnerName === 'O2O Team'
-    ? 'Your messages will be sent to the O2O Assistant.'
-    : `This is a direct channel to ${submission.chatPartnerName}.`;
-
+  const dialogTitle = `Chat with ${submission.chatPartnerName}`;
+  const dialogDescription = `Conversation regarding Property ${submission.listing.listingId} and Demand ${submission.demandId}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -188,48 +119,49 @@ export function ChatDialog({
         <div className="flex-grow overflow-hidden px-6">
             <ScrollArea className="h-full -mx-6" scrollableViewportRef={scrollViewportRef}>
             <div className="space-y-4 px-6">
-                {messages.map((message) => (
-                <div
-                    key={message.id}
-                    className={cn(
-                    'flex items-end gap-2',
-                    message.sender === 'User' ? 'justify-end' : 'justify-start'
-                    )}
-                >
-                    {message.sender === 'Model' && (
-                        <Avatar className="h-8 w-8">
-                            <AvatarFallback>{submission.chatPartnerName[0]}</AvatarFallback>
-                        </Avatar>
-                    )}
+                {messages.map((message, index) => {
+                  const isUser = message.senderEmail === user?.email;
+                  const senderInitial = message.senderName ? message.senderName[0].toUpperCase() : '?';
+
+                  return (
                     <div
-                    className={cn(
-                        'rounded-lg p-3 max-w-xs md:max-w-sm',
-                        message.sender === 'User'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    )}
+                        key={index}
+                        className={cn(
+                        'flex items-end gap-2',
+                        isUser ? 'justify-end' : 'justify-start'
+                        )}
                     >
-                    <p className="text-sm">{message.text}</p>
-                    <p className="text-xs opacity-70 mt-1 text-right">{message.timestamp}</p>
-                    </div>
-                     {message.sender === 'User' && (
-                        <Avatar className="h-8 w-8">
-                            <AvatarFallback>{user?.userName?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
-                        </Avatar>
-                    )}
-                </div>
-                ))}
-                {isGenerating && (
-                    <div className="flex items-end gap-2 justify-start">
-                        <Avatar className="h-8 w-8">
-                           <AvatarFallback>{submission.chatPartnerName[0]}</AvatarFallback>
-                        </Avatar>
-                        <div className="rounded-lg p-3 max-w-xs md:max-w-sm bg-muted flex items-center gap-2">
-                            <Sparkles className="h-4 w-4 animate-spin"/>
-                            <span className="text-sm italic">Typing...</span>
+                        {!isUser && (
+                            <Avatar className="h-8 w-8">
+                                <AvatarFallback>{senderInitial}</AvatarFallback>
+                            </Avatar>
+                        )}
+                        <div
+                        className={cn(
+                            'rounded-lg p-3 max-w-xs md:max-w-sm',
+                            isUser
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted'
+                        )}
+                        >
+                        <p className="text-sm">{message.text}</p>
+                        <p className="text-xs opacity-70 mt-1 text-right">
+                          {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
                         </div>
+                        {isUser && (
+                            <Avatar className="h-8 w-8">
+                                <AvatarFallback>{senderInitial}</AvatarFallback>
+                            </Avatar>
+                        )}
                     </div>
-                )}
+                  )
+                })}
+                 {messages.length === 0 && (
+                    <div className="text-center text-sm text-muted-foreground py-10">
+                        No messages yet. Start the conversation!
+                    </div>
+                 )}
             </div>
             </ScrollArea>
         </div>
@@ -247,7 +179,7 @@ export function ChatDialog({
                   }
               }}
             />
-            <Button type="submit" size="icon" disabled={!newMessage.trim() || isGenerating}>
+            <Button type="submit" size="icon" disabled={!newMessage.trim() || isSending}>
               <Send className="h-4 w-4" />
               <span className="sr-only">Send</span>
             </Button>
