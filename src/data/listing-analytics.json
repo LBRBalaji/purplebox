@@ -606,5 +606,33 @@
         "timestamp": 1758345908010
       }
     ]
+  },
+  {
+    "listingId": "LST-YMLUBS",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758346633052
+      }
+    ]
+  },
+  {
+    "listingId": "LST-YLX4O7",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758346680727
+      }
+    ]
   }
 ]

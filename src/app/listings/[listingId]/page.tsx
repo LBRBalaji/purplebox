@@ -209,7 +209,8 @@ export default function ListingDetailPage() {
     const [isLayoutRequestOpen, setIsLayoutRequestOpen] = React.useState(false);
     const [navigationList, setNavigationList] = React.useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = React.useState(-1);
-    
+    const [justRequestedQuote, setJustRequestedQuote] = React.useState(false);
+
     const isLoading = isAuthLoading || isDataLoading;
 
     React.useEffect(() => {
@@ -224,6 +225,7 @@ export default function ListingDetailPage() {
         }
 
         setListing(foundListing);
+        setJustRequestedQuote(false); // Reset on new page load
         
         if (user) { // Only log view if a user is logged in
              logListingView(user, listingId);
@@ -279,6 +281,7 @@ export default function ListingDetailPage() {
         };
 
         addRegisteredLead(newLead, user.email);
+        setJustRequestedQuote(true); // Update local state immediately
         toast({
             title: 'Quote Request Sent!',
             description: `The developer has been notified of your interest in "${listing.warehouseBoxId || listing.listingId}".`,
@@ -293,7 +296,7 @@ export default function ListingDetailPage() {
         );
     }, [user, listing, registeredLeads]);
 
-    const hasRequestedQuote = !!quoteRequestLead;
+    const hasRequestedQuote = justRequestedQuote || !!quoteRequestLead;
 
     const handleDownloadRequest = () => {
         if (!user) {
@@ -615,7 +618,7 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-center text-center">
-                                            {listing.rentPerSqFt === 'Get Quote' ? (
+                                            {listing.rentPerSqFt === 'Get Quote' || isPremiumDeveloper ? (
                                                 <span className="text-2xl font-bold">Price on Request</span>
                                             ) : (
                                                 <>
@@ -637,13 +640,11 @@ export default function ListingDetailPage() {
                                                     <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
                                                         <Check className="h-4 w-4" /> Commercials Requested
                                                     </p>
-                                                    {quoteRequestLead && (
-                                                        <Button asChild variant="outline" className="w-full">
-                                                            <Link href={`/dashboard/leads/${quoteRequestLead.id}`}>
-                                                                <ArrowRight className="mr-2 h-4 w-4"/> Go to Transactions
-                                                            </Link>
-                                                        </Button>
-                                                    )}
+                                                     <Button asChild variant="outline" className="w-full">
+                                                        <Link href={`/dashboard/leads/${quoteRequestLead?.id}`}>
+                                                            <ArrowRight className="mr-2 h-4 w-4"/> Go to Transactions
+                                                        </Link>
+                                                    </Button>
                                                 </div>
                                             ) : (
                                                 <Button onClick={handleGetQuote} className="w-full">

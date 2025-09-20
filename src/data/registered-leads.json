@@ -1,5 +1,51 @@
 [
   {
+    "id": "LDR-QUOTE-1758346687709",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-01 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-YLX4O7",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:38:07.711Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758346642801",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Vishnuvakkam B 400",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-YMLUBS",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:37:22.804Z"
+  },
+  {
     "id": "LDR-QUOTE-1758333336097",
     "customerId": "customer2@o2o.com",
     "leadName": "Beta Retail",
