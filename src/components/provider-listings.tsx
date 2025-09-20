@@ -14,7 +14,7 @@ import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
-import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, BarChart2, Scaling } from 'lucide-react';
+import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, BarChart2, Scaling, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { ListingForm } from './listing-form';
@@ -26,6 +26,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { AdminListings } from './admin-listings';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { startOfDay, startOfWeek, startOfMonth, endOfDay } from 'date-fns';
+import { Input } from './ui/input';
 
 
 function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { listing: ListingSchema, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema) => void, isAdmin: boolean }) {
@@ -271,6 +272,7 @@ export function ProviderListings() {
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(true);
+  const [searchTerm, setSearchTerm] = React.useState('');
   
   const isAdmin = user?.role === 'SuperAdmin';
   
@@ -305,6 +307,17 @@ export function ProviderListings() {
     }
   }, [user, listings, toast, isAdmin]);
   
+  const filteredMyListings = React.useMemo(() => {
+    if (!searchTerm) return myListings;
+    const lowerCaseSearch = searchTerm.toLowerCase();
+    return myListings.filter(l => 
+        (l.warehouseBoxId || '').toLowerCase().includes(lowerCaseSearch) ||
+        (l.listingId || '').toLowerCase().includes(lowerCaseSearch) ||
+        (l.location || '').toLowerCase().includes(lowerCaseSearch)
+    );
+  }, [myListings, searchTerm]);
+
+
   const handleStatusChange = (listingId: string, status: ListingStatus) => {
     updateListingStatus(listingId, status, user?.email);
     toast({
@@ -339,12 +352,12 @@ export function ProviderListings() {
       return <AdminListings />;
   }
 
-  const activeListings = myListings.filter(l => l.status !== 'leased');
-  const archivedListings = myListings.filter(l => l.status === 'leased');
+  const activeListings = filteredMyListings.filter(l => l.status !== 'leased');
+  const archivedListings = filteredMyListings.filter(l => l.status === 'leased');
 
   const portfolioStats = React.useMemo(() => {
     const totalListings = activeListings.length;
-    const totalSize = activeListings.reduce((sum, l) => sum + l.sizeSqFt, 0);
+    const totalSize = activeListings.reduce((sum, l) => sum + (l.actualSizeSqFt || l.sizeSqFt), 0);
     const totalViews = activeListings.reduce((sum, l) => {
         const analytics = listingAnalytics.find(a => a.listingId === l.listingId);
         return sum + (analytics?.views || 0);
@@ -393,6 +406,18 @@ export function ProviderListings() {
                 </div>
             </CardContent>
         </Card>
+        
+        <div className="mb-4">
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                    placeholder="Search by Listing ID, Box ID, or Location..."
+                    className="pl-9"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                />
+            </div>
+        </div>
 
         <Tabs defaultValue="active">
             <TabsList className="grid w-full grid-cols-2">
