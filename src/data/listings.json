@@ -61,7 +61,7 @@
     ],
     "rentPerSft": "Get Quote",
     "isAdmin": true,
-    "plan": "Free"
+    "plan": "Paid_Premium"
   },
   {
     "status": "approved",

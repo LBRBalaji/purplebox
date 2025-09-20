@@ -614,13 +614,13 @@ export default function ListingDetailPage() {
                                 </CardContent>
                             </Card>
                             
-                             {/* Final Actions */}
+                            {/* Final Actions */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Save or Download</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <Button
                                             variant={isShortlisted ? 'default' : 'outline'}
                                             className="w-full h-12"
@@ -630,7 +630,7 @@ export default function ListingDetailPage() {
                                             <Star className={cn("mr-2 h-4 w-4", isShortlisted && "fill-amber-400 text-amber-500")} />
                                             {isShortlistLoading ? 'Loading...' : isShortlisted ? 'Shortlisted' : 'Shortlist this Property'}
                                         </Button>
-                                         <Button className="w-full h-12" onClick={handleDownloadRequest}>
+                                        <Button className="w-full h-12" onClick={handleDownloadRequest}>
                                             <Download className="mr-2 h-4 w-4" /> Download Details as CSV
                                         </Button>
                                     </div>
@@ -662,7 +662,7 @@ export default function ListingDetailPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-2">
-                                    {isPremiumListing ? (
+                                     {isPremiumListing ? (
                                         <>
                                             {hasRequestedQuote ? (
                                                 <div className="w-full text-center space-y-2">
@@ -683,12 +683,13 @@ export default function ListingDetailPage() {
                                             )}
                                         </>
                                      ) : (
-                                        <Alert variant="default" className="text-center">
+                                        <Alert variant="default" className="text-center p-4">
                                             <Sparkles className="h-4 w-4" />
                                             <AlertTitle>Engage Directly!</AlertTitle>
-                                            <AlertDescription>
-                                                Look for the <Badge className="bg-primary/80 backdrop-blur-sm text-primary-foreground">Premium</Badge> badge on listings to connect directly with providers.
+                                            <AlertDescription className="text-xs">
+                                                Look for the <Badge className="bg-primary text-primary-foreground">Premium</Badge> badge on listings to connect directly with providers.
                                             </AlertDescription>
+                                            <Button size="sm" className="w-full mt-4" onClick={handleLogDemandClick}>Available on Broking Model - Connect with O2O</Button>
                                         </Alert>
                                      )}
                                 </CardFooter>
