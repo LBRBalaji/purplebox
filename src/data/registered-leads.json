@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758359330575",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Box-18",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@ccidevelopers.com",
+        "properties": [
+          {
+            "listingId": "LST-XHJLWC",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T09:08:50.577Z"
+  },
+  {
     "id": "LDR-QUOTE-1758352425269",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

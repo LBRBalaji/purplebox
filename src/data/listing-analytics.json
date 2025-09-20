@@ -33,7 +33,7 @@
   },
   {
     "listingId": "LST-XHJLWC",
-    "views": 1,
+    "views": 3,
     "downloads": 10,
     "customerIndustries": {},
     "downloadedBy": [
@@ -70,6 +70,18 @@
         "name": "Alex Ray",
         "company": "Alpha Logistics",
         "timestamp": 1758216192471
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758359325502
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758359325502
       }
     ]
   },
