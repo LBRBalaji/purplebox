@@ -53,6 +53,8 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                 const lastMessage = messages[messages.length - 1];
                 const isUnread = messages.some(m => m.isNew && m.senderEmail !== user.email);
 
+                const listingIdentifier = user.role === 'Warehouse Developer' ? listing?.warehouseBoxId : listing?.listingId;
+
                 return {
                     id: threadId,
                     submission: {
@@ -68,7 +70,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                     },
                     partnerName: chatPartnerName,
                     partnerInitials: partnerInitials,
-                    lastMessage: lastMessage ? `${lastMessage.senderName}: ${lastMessage.text?.substring(0, 30)}...` : `Re: ${listing?.name || lead.requirementsSummary}`,
+                    lastMessage: lastMessage ? `${lastMessage.senderName}: ${lastMessage.text?.substring(0, 30)}...` : `Re: ${listingIdentifier || lead.requirementsSummary}`,
                     timestamp: lastMessage ? new Date(lastMessage.timestamp) : new Date(lead.registeredAt),
                     isUnread,
                 } as const;
@@ -84,6 +86,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
             conv.partnerName.toLowerCase().includes(lowerCaseSearch) ||
             conv.lastMessage.toLowerCase().includes(lowerCaseSearch) ||
             conv.submission.listing?.listingId.toLowerCase().includes(lowerCaseSearch) ||
+            conv.submission.listing?.warehouseBoxId?.toLowerCase().includes(lowerCaseSearch) ||
             conv.submission.demandId.toLowerCase().includes(lowerCaseSearch)
         );
     }, [conversations, searchTerm]);
@@ -113,11 +116,11 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                     />
                 </div>
             </div>
-            <div className="flex-grow overflow-hidden">
+            <div className="flex-grow overflow-y-auto">
                 <ScrollArea className="h-full">
                      <div className="p-2 space-y-1">
                         {filteredConversations.length > 0 ? filteredConversations.map(conv => (
-                            <button key={conv.id} onClick={() => onSelectConversation(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors">
+                            <button key={conv.id} onClick={() => onSelectConversation(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors relative">
                                 <div className="flex items-center gap-3">
                                     <Avatar>
                                         <AvatarFallback>{conv.partnerInitials}</AvatarFallback>
@@ -173,9 +176,6 @@ export function GlobalChatWidget() {
 
     if (activeChat) {
         const listing = activeChat.listing;
-        const listingInfo = listing
-            ? `${listing.location} | ${listing.sizeSqFt.toLocaleString()} sq. ft.`
-            : 'N/A';
         
         let headerTitle: string;
         
@@ -193,7 +193,7 @@ export function GlobalChatWidget() {
         subtitle = (
             <div className="text-xs text-muted-foreground space-y-1">
                 <p>
-                    <span className="font-semibold">Listing:</span> {listingIdentifier || 'N/A'} | {listingInfo}
+                    <span className="font-semibold">Listing:</span> {listingIdentifier || 'N/A'} | {listing?.location} | {listing?.sizeSqFt.toLocaleString()} sq. ft.
                 </p>
                  <p>
                     <span className="font-semibold">Demand:</span> {activeChat.demandId}
