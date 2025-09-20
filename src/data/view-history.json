@@ -64,5 +64,23 @@
     "companyName": "XYZ Logistics",
     "listingId": "LST-UC3IN5",
     "timestamp": 1758386095424
+  },
+  {
+    "userId": "anonymous_anon_1758390386641_jlh414j",
+    "companyName": "Anonymous",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758390388837
+  },
+  {
+    "userId": "murugan@xyzlogistics.com",
+    "companyName": "XYZ Logistics",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758390398641
+  },
+  {
+    "userId": "anonymous_anon_1758390516423_dh8oaq4",
+    "companyName": "Anonymous",
+    "listingId": "LST-6BDQYG",
+    "timestamp": 1758390518587
   }
 ]

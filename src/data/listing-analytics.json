@@ -450,7 +450,7 @@
   },
   {
     "listingId": "LST-91LUXK",
-    "views": 2,
+    "views": 6,
     "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
@@ -480,6 +480,30 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758347848950
+      },
+      {
+        "userId": "anonymous_anon_1758390386641_jlh414j",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758390388837
+      },
+      {
+        "userId": "anonymous_anon_1758390386641_jlh414j",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758390388837
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758390398641
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758390398641
       }
     ]
   },
@@ -783,7 +807,7 @@
   },
   {
     "listingId": "LST-6BDQYG",
-    "views": 1,
+    "views": 2,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -792,6 +816,12 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758352421756
+      },
+      {
+        "userId": "anonymous_anon_1758390516423_dh8oaq4",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758390518587
       }
     ]
   },

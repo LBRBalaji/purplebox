@@ -274,7 +274,7 @@ export default function ListingDetailPage() {
                 providerEmail: providerEmail,
                 properties: [{ listingId: listing.listingId, status: 'Pending' }]
             }],
-            isO2OCollaborator: true,
+            isO2OCollaborator: isBrokered,
         };
 
         addRegisteredLead(newLead, user.email);
@@ -414,7 +414,7 @@ export default function ListingDetailPage() {
         return <DetailPageSkeleton />;
     }
 
-    const isShortlisted = !!user && generalShortlist.includes(listing.listingId);
+    const isShortlisted = !!user && generalShortlist.includes(listing.id);
     
     const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
 
