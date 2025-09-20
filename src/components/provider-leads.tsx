@@ -51,14 +51,13 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
   const myLeads = React.useMemo(() => {
     if (!user) return [];
 
-    if (view === 'broking' && isAdminOrO2O) {
+    if (isAdminOrO2O) {
+      if (view === 'broking') {
         return registeredLeads.filter(lead => lead.isO2OCollaborator);
+      }
+      return registeredLeads.filter(lead => !lead.isO2OCollaborator);
     }
     
-    if (isAdminOrO2O) {
-        return registeredLeads.filter(lead => !lead.isO2OCollaborator);
-    }
-
     if (isAgent) {
         return registeredLeads.filter(lead => lead.registeredBy === user.email);
     }
@@ -86,10 +85,18 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
       <div className="mt-8">
         <Card className="text-center p-12">
             <CardTitle>
-                {isAgent ? 'You Have Not Registered Any Leads' : 'No Leads Found'}
+                {view === 'broking'
+                    ? 'No Broking Leads Found'
+                    : isAgent
+                    ? 'You Have Not Registered Any Leads'
+                    : 'No Leads Found'}
             </CardTitle>
             <CardDescription className="mt-2">
-                 {isAgent ? 'Use the "Register New Lead" tab to get started.' : 'When a new lead is registered, it will appear here.'}
+                 {view === 'broking'
+                    ? 'Leads from free listings will appear here.'
+                    : isAgent 
+                    ? 'Use the "Register New Lead" tab to get started.' 
+                    : 'When a new lead is registered, it will appear here.'}
             </CardDescription>
         </Card>
       </div>

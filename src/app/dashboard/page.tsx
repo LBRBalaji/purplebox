@@ -41,20 +41,11 @@ const MainDashboard = () => {
     const isCustomer = user?.role === 'User';
     const isAgent = user?.role === 'Agent';
 
-    // Set the initial default tab based on the user's role.
-    const getInitialTabForRole = () => {
-        if (isProvider) return 'registered-leads';
-        if (isCustomer) return 'my-transactions';
-        if (isO2OManager) return 'approval-queue';
-        if (isSuperAdmin) return 'all-listings';
-        if (isAgent) return 'transactions';
-        return ''; // Default fallback
-    };
-    
     const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'registered-leads');
     const [customerTab, setCustomerTab] = React.useState(defaultTabParam || 'my-transactions');
     const [adminTab, setAdminTab] = React.useState(defaultTabParam || 'approval-queue');
-    const [superAdminTab, setSuperAdminTab] = React.useState(defaultTabParam || 'all-listings');
+    const [superAdminTab, setSuperAdminTab] = React.useState(defaultTabParam || 'broking-desk');
+    const [oversightTab, setOversightTab] = React.useState('all-listings');
     const [agentTab, setAgentTab] = React.useState(defaultTabParam || 'transactions');
 
     const hasPendingSubmissions = React.useMemo(() => {
@@ -83,6 +74,7 @@ const MainDashboard = () => {
         // If no URL params are present, ensure the correct default is set on initial load
         if (isProvider) setProviderTab('registered-leads');
         if (isCustomer) setCustomerTab('my-transactions');
+        if (isSuperAdmin) setSuperAdminTab('broking-desk');
       }
     }, [logNewDemand, editDemandId, propertyMatchDemandId, defaultTabParam, isProvider, isCustomer, isO2OManager, isSuperAdmin, isAgent]);
 
@@ -168,26 +160,37 @@ const MainDashboard = () => {
     );
 
 
-    // Super Admin gets a super-view with all possible tabs
+    // Super Admin gets a re-organized, powerful view
     const renderMainAdminContent = () => (
        <Tabs value={superAdminTab} onValueChange={setSuperAdminTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all-listings">All Listings</TabsTrigger>
-            <TabsTrigger value="all-demands">All Demands</TabsTrigger>
-            <TabsTrigger value="all-submissions">All Submissions</TabsTrigger>
-            <TabsTrigger value="all-leads">All Leads</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="broking-desk">O2O Broking Desk</TabsTrigger>
+            <TabsTrigger value="platform-oversight">Platform Oversight Console</TabsTrigger>
         </TabsList>
-        <TabsContent value="all-listings">
-            {superAdminTab === 'all-listings' && <AdminListings />}
+        <TabsContent value="broking-desk">
+            <ProviderLeads view="broking" />
         </TabsContent>
-        <TabsContent value="all-demands">
-            {superAdminTab === 'all-demands' && <DemandList />}
-        </TabsContent>
-        <TabsContent value="all-submissions">
-            {superAdminTab === 'all-submissions' && <MySubmissions />}
-        </TabsContent>
-        <TabsContent value="all-leads">
-            {superAdminTab === 'all-leads' && <ProviderLeads />}
+        <TabsContent value="platform-oversight">
+             <Tabs value={oversightTab} onValueChange={setOversightTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="all-listings">All Listings</TabsTrigger>
+                    <TabsTrigger value="all-demands">All Demands</TabsTrigger>
+                    <TabsTrigger value="all-submissions">All Submissions</TabsTrigger>
+                    <TabsTrigger value="all-leads">All Direct Leads</TabsTrigger>
+                </TabsList>
+                <TabsContent value="all-listings">
+                    <AdminListings />
+                </TabsContent>
+                <TabsContent value="all-demands">
+                    <DemandList />
+                </TabsContent>
+                <TabsContent value="all-submissions">
+                    <MySubmissions />
+                </TabsContent>
+                <TabsContent value="all-leads">
+                    <ProviderLeads view="default" />
+                </TabsContent>
+             </Tabs>
         </TabsContent>
       </Tabs>
     );

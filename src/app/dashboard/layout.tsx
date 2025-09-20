@@ -55,6 +55,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (pathname.startsWith('/dashboard/transactions') && !isSuperAdmin && !isO2OManager && !isAgent) {
             router.push('/dashboard');
         }
+        
+        // Broking Transactions is an admin-only view now integrated into the dashboard
+        if (pathname.startsWith('/dashboard/broking-transactions') && !isAdmin) {
+            router.push('/dashboard');
+        }
 
         // Notifications page is for admins and agents
         if (pathname.startsWith('/dashboard/notifications') && !isAdmin && !isAgent) {
