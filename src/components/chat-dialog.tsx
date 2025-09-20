@@ -48,7 +48,7 @@ export function ChatPanel({
 }) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { addChatMessage, typingStatus, updateTypingStatus, fetchTypingStatus } = useData();
+  const { chatMessages, addChatMessage, typingStatus, updateTypingStatus, fetchTypingStatus } = useData();
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = React.useState('');
   const [isSending, setIsSending] = React.useState(false);
@@ -66,14 +66,14 @@ export function ChatPanel({
     }
   }, []);
 
-  const showNotification = (body: string, senderName: string) => {
+  const showNotification = React.useCallback((body: string, senderName: string) => {
       if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
           const notification = new Notification(`New Message from ${senderName}`, {
               body,
               icon: '/logo.png'
           });
       }
-  }
+  }, []);
   
   const fetchMessages = React.useCallback(async () => {
     if (!threadId) return;
@@ -82,20 +82,20 @@ export function ChatPanel({
       const allMessages: Record<string, ChatMessage[]> = await response.json();
       const threadMessages = allMessages[threadId] || [];
       
-      setMessages(prevMessages => {
-        if (threadMessages.length > prevMessages.length) {
-            const lastMessage = threadMessages[threadMessages.length - 1];
-            if (user && lastMessage.senderEmail !== user.email) {
-                showNotification(lastMessage.text || 'New Attachment', lastMessage.senderName);
-            }
-        }
-        return threadMessages;
+      setMessages(currentMessages => {
+          if(threadMessages.length > currentMessages.length) {
+              const lastMessage = threadMessages[threadMessages.length - 1];
+              if (user && lastMessage.senderEmail !== user.email) {
+                  showNotification(lastMessage.text || 'New Attachment', lastMessage.senderName);
+              }
+          }
+          return threadMessages;
       });
 
     } catch (error) {
       console.error("Failed to fetch chat messages:", error);
     }
-  }, [threadId, user]);
+  }, [threadId, user, showNotification]);
 
   React.useEffect(() => {
     if (threadId) {
@@ -177,8 +177,8 @@ export function ChatPanel({
             fileType: file.type
           }
         };
-        await addChatMessage(threadId, message);
         setMessages(prev => [...prev, message]);
+        await addChatMessage(threadId, message);
       } else {
         toast({ variant: 'destructive', title: 'Upload Failed', description: 'Could not upload the file.' });
       }
@@ -223,8 +223,6 @@ export function ChatPanel({
 
   if (!submission?.listing) return null;
   
-  const isPremiumProvider = submission.listing.developerId === user?.email || submission.demandUserEmail === user?.email;
-  
   const getInitialMessage = () => {
     if (messages.length > 0) return null;
 
@@ -245,8 +243,7 @@ export function ChatPanel({
   return (
     <>
         <div className="h-96 flex flex-col p-0">
-            <div className="flex-grow overflow-hidden px-1 -mx-1">
-                <ScrollArea className="h-full" scrollableViewportRef={scrollViewportRef}>
+            <ScrollArea className="flex-grow pr-4" scrollableViewportRef={scrollViewportRef}>
                 <div className="space-y-4 p-1">
                     {initialMessage && messages.length === 0 && (
                         <div className="text-center text-sm text-muted-foreground py-10 px-4 border border-dashed rounded-lg">
@@ -299,8 +296,7 @@ export function ChatPanel({
                     )
                     })}
                 </div>
-                </ScrollArea>
-            </div>
+            </ScrollArea>
             <div className="h-6 pt-2 text-xs text-muted-foreground">
             {otherUserTyping && otherUserTyping.isTyping && otherUserTyping.userEmail !== user?.email && (
                 <div className="animate-pulse flex items-center gap-2">
@@ -349,3 +345,4 @@ export function ChatPanel({
     </>
   );
 }
+
