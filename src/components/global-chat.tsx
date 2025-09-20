@@ -103,26 +103,28 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                     />
                 </div>
             </div>
-            <ScrollArea className="flex-grow">
-                 <div className="p-2 space-y-2">
-                    {filteredConversations.length > 0 ? filteredConversations.map(conv => (
-                        <button key={conv.id} onClick={() => onSelectConversation(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors">
-                            <div className="flex items-center gap-3">
-                                <Avatar>
-                                    <AvatarFallback>{conv.partnerInitials}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-grow overflow-hidden">
-                                    <p className="font-semibold truncate">{conv.partnerName}</p>
-                                    <p className="text-xs text-muted-foreground truncate">{conv.lastMessage}</p>
+            <div className="flex-grow overflow-y-auto">
+                <ScrollArea className="h-full">
+                     <div className="p-2 space-y-2">
+                        {filteredConversations.length > 0 ? filteredConversations.map(conv => (
+                            <button key={conv.id} onClick={() => onSelectConversation(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors">
+                                <div className="flex items-center gap-3">
+                                    <Avatar>
+                                        <AvatarFallback>{conv.partnerInitials}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-grow overflow-hidden">
+                                        <p className="font-semibold truncate">{conv.partnerName}</p>
+                                        <p className="text-xs text-muted-foreground truncate">{conv.lastMessage}</p>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground self-start shrink-0">{conv.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                 </div>
-                                <p className="text-xs text-muted-foreground self-start shrink-0">{conv.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                            </div>
-                        </button>
-                    )) : (
-                        <div className="p-8 text-center text-sm text-muted-foreground">No conversations match your search.</div>
-                    )}
-                </div>
-            </ScrollArea>
+                            </button>
+                        )) : (
+                            <div className="p-8 text-center text-sm text-muted-foreground">No conversations match your search.</div>
+                        )}
+                    </div>
+                </ScrollArea>
+            </div>
         </div>
     )
 }
@@ -161,24 +163,18 @@ export function GlobalChatWidget() {
     if (activeChat) {
         const demand = demands.find(d => d.demandId === activeChat.demandId);
 
-        const listingInfo = activeChat.listing 
+        const listingInfo = activeChat.listing
             ? `${activeChat.listing.location} | ${activeChat.listing.sizeSqFt.toLocaleString()} sq. ft.`
-            : 'N/A';
-        const requirementInfo = demand
-            ? `${demand.locationName || demand.location} | ${demand.size.toLocaleString()} sq. ft.`
             : 'N/A';
         
         let headerTitle: string;
-        let headerSubtitle: React.ReactNode;
-
+        
         if (user?.email === activeChat.customerId) {
             // Customer's view
             headerTitle = activeChat.chatPartnerName;
-            headerSubtitle = <p className="text-xs text-muted-foreground truncate">Re: {activeChat.listing?.name || activeChat.listingId}</p>;
         } else {
             // Developer or Admin's view
             headerTitle = activeChat.customerCompany || 'Customer';
-            headerSubtitle = <p className="text-xs text-muted-foreground truncate">Lead: {activeChat.demandId}</p>;
         }
 
         title = headerTitle;
@@ -187,8 +183,8 @@ export function GlobalChatWidget() {
                 <p>
                     <span className="font-semibold">Listing:</span> {activeChat.listingId} | {listingInfo}
                 </p>
-                <p>
-                    <span className="font-semibold">Demand:</span> {activeChat.demandId} | {requirementInfo}
+                 <p>
+                    <span className="font-semibold">Demand:</span> {activeChat.demandId}
                 </p>
             </div>
         );
