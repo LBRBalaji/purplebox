@@ -69,18 +69,21 @@ export function ChatDialog({
       const allMessages: Record<string, ChatMessage[]> = await response.json();
       const threadMessages = allMessages[threadId] || [];
       
-      if (threadMessages.length > messages.length) {
-        setMessages(threadMessages);
-        
-        const lastMessage = threadMessages[threadMessages.length - 1];
-        if (user && lastMessage.senderEmail !== user.email) {
-            showNotification(lastMessage.text, lastMessage.senderName);
+      setMessages(prevMessages => {
+        if (threadMessages.length > prevMessages.length) {
+            const lastMessage = threadMessages[threadMessages.length - 1];
+            if (user && lastMessage.senderEmail !== user.email) {
+                showNotification(lastMessage.text, lastMessage.senderName);
+            }
+            return threadMessages;
         }
-      }
+        return prevMessages;
+      });
+
     } catch (error) {
       console.error("Failed to fetch chat messages:", error);
     }
-  }, [threadId, messages, user]);
+  }, [threadId, user]);
 
   React.useEffect(() => {
     if (isOpen && threadId) {
@@ -137,11 +140,11 @@ export function ChatDialog({
     }
     
     if (user?.email === submission.demandUserEmail) { // Customer is initiating
-        return `Hi ${submission.chatPartnerName}, thank you for making property ${submission.listing?.listingId} available. I represent ${submission.customerCompany}. I'd like to discuss this further.`;
+        return `Hi ${submission.chatPartnerName}, thank you for your interest in property ${submission.listing?.listingId}. I represent ${submission.customerCompany}. How can I assist you?`;
     }
 
     if (user?.email === submission.providerEmail) { // Provider is initiating
-        return `Hi ${submission.customerName}, I represent ${submission.chatPartnerName}. Thank you for your interest in our property ${submission.listing?.listingId}. How can I assist you?`;
+        return `Hi ${submission.customerName}, thank you for your interest in our property ${submission.listing?.listingId}. I represent ${submission.chatPartnerName}. How can I assist you?`;
     }
 
     return "Welcome to the chat.";
