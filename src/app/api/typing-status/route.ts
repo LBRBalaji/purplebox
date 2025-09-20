@@ -17,7 +17,17 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
-  return NextResponse.json(typingStatus, { headers });
+  try {
+    const data = fs.readFileSync(dataFilePath, 'utf-8');
+    return NextResponse.json(JSON.parse(data), { headers });
+  } catch (error) {
+    // If the file doesn't exist or is empty, return an empty object
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return NextResponse.json({}, { headers });
+    }
+    console.error('Failed to read typing status data:', error);
+    return NextResponse.json({ message: 'Failed to read typing status' }, { status: 500, headers });
+  }
 }
 
 export async function POST(request: Request) {
