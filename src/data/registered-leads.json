@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758333336097",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Vishnuvakkam B 100",
+    "registeredBy": "customer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-KKGGMD",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T01:55:36.099Z"
+  },
+  {
     "id": "LDR-QUOTE-1758332020091",
     "customerId": "customer2@o2o.com",
     "leadName": "Beta Retail",

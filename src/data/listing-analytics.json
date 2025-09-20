@@ -564,5 +564,19 @@
         "timestamp": 1758331404141
       }
     ]
+  },
+  {
+    "listingId": "LST-KKGGMD",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758333332670
+      }
+    ]
   }
 ]

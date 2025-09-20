@@ -16,5 +16,11 @@
     "companyName": "Beta Retail",
     "listingId": "LST-TGAV6G",
     "timestamp": 1758332008543
+  },
+  {
+    "userId": "customer2@o2o.com",
+    "companyName": "Beta Retail",
+    "listingId": "LST-KKGGMD",
+    "timestamp": 1758333332670
   }
 ]
