@@ -429,7 +429,7 @@ export default function LeadDetailPage() {
                                         </div>
                                     )}
                                   </div>
-                                  {!isCustomer && (
+                                  {(isO2O || isAgent) && (
                                       <Button variant="outline" className="w-full mt-4" onClick={handleChatInit}>
                                           <MessageSquare className="mr-2 h-4 w-4" />
                                           Chat with {isPremiumListing ? (isCustomer ? (providerUser?.companyName || 'Developer') : (customer?.companyName || 'Customer')) : 'O2O Team'}
