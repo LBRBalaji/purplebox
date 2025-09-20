@@ -126,7 +126,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (onLoginSuccess) {
         onLoginSuccess();
       } else {
-        router.push('/dashboard');
+        let redirectPath = '/dashboard';
+        if (foundUser.role === 'User') {
+          redirectPath = '/dashboard?tab=my-transactions';
+        } else if (foundUser.role === 'Warehouse Developer') {
+          redirectPath = '/dashboard?tab=registered-leads';
+        }
+        router.push(redirectPath);
       }
     } else {
       toast({
