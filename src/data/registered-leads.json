@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758347061943",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Block-B5 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@welspun.com",
+        "properties": [
+          {
+            "listingId": "LST-XC7X0X",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:44:21.945Z"
+  },
+  {
     "id": "LDR-QUOTE-1758346687709",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

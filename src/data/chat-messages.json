@@ -82,5 +82,25 @@
       "text": "this the test message to check whether data crunch happens",
       "timestamp": "2025-09-20T05:08:57.632Z"
     }
+  ],
+  "LDR-QUOTE-1758346642801-LST-YMLUBS": [
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "hi",
+      "timestamp": "2025-09-20T05:40:28.491Z"
+    },
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "Add New Activity\nLog a new interaction or update for this lead.",
+      "timestamp": "2025-09-20T05:40:48.559Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "thanks man",
+      "timestamp": "2025-09-20T05:43:17.506Z"
+    }
   ]
 }
