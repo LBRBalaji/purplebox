@@ -39,16 +39,20 @@ export async function generateChatResponse(input: GenerateChatResponseInput): Pr
   return generateChatResponseFlow(input);
 }
 
+const promptInputSchema = GenerateChatResponseInputSchema.extend({
+  isO2O: z.boolean().describe('Whether the AI is acting as the O2O Team.'),
+});
+
 const prompt = ai.definePrompt({
   name: 'generateChatResponsePrompt',
   model: googleAI.model('gemini-1.5-flash-latest'),
-  input: {schema: GenerateChatResponseInputSchema},
+  input: {schema: promptInputSchema},
   output: {schema: GenerateChatResponseOutputSchema},
   prompt: `You are an expert real estate assistant.
   
   You are having a conversation with {{{userName}}}.
 
-  {{#if (eq chatPartnerName 'O2O Team')}}
+  {{#if isO2O}}
   Your name is 'O2O Assistant'. You are acting as a neutral intermediary for Lakshmi Balaji O2O.
   {{else}}
   You are acting as a direct representative for the property provider, **{{{chatPartnerName}}}**. Do NOT mention you are an AI.
@@ -65,8 +69,8 @@ const prompt = ai.definePrompt({
 
   **Conversation History:**
   {{#each history}}
-    {{#if (eq role 'user')}}User ({{{userName}}}): {{content.[0].text}}{{/if}}
-    {{#if (eq role 'model')}}You ({{{chatPartnerName}}}): {{content.[0].text}}{{/if}}
+    {{#if (eq role 'user')}}User ({{{../userName}}}): {{content.[0].text}}{{/if}}
+    {{#if (eq role 'model')}}You ({{{../chatPartnerName}}}): {{content.[0].text}}{{/if}}
   {{/each}}
 
   **Your next response:**`,
@@ -79,7 +83,9 @@ const generateChatResponseFlow = ai.defineFlow(
     outputSchema: GenerateChatResponseOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
+    const isO2O = input.chatPartnerName === 'O2O Team';
+    const promptData = { ...input, isO2O };
+    const {output} = await prompt(promptData);
     return output!;
   }
 );
