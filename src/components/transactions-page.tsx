@@ -148,12 +148,11 @@ function RegisterLeadForm() {
   );
 
   const handleCustomerSelect = (customer: User) => {
-    // When an Admin/Agent selects a customer, only set the company name and ID.
-    // The contact details should remain those of the Admin/Agent to maintain the brokering model.
     form.setValue('customerId', customer.email);
     form.setValue('leadName', customer.companyName);
-    
-    if (user) {
+
+    // CRITICAL FIX: The logged-in admin/agent is the point of contact in a brokered deal
+    if (user && (isAdmin || isAgent)) {
         form.setValue('leadContact', user.userName);
         form.setValue('leadEmail', user.email);
         form.setValue('leadPhone', user.phone);
@@ -240,8 +239,7 @@ function RegisterLeadForm() {
                                 </CommandItem>
                             ))}
                             </CommandGroup></CommandList></Command></PopoverContent></Popover>
-                            <FormDescription className="text-xs">Select an existing customer to pre-fill their details. The logged-in admin/agent will be the contact person.</FormDescription>
-                        
+                             <FormDescription className="text-xs">Select an existing customer to pre-fill their details. The logged-in admin/agent will be the contact person.</FormDescription>
                         </FormItem>
                     )}
                 )) : (
@@ -360,7 +358,7 @@ export function TransactionsPage() {
   const prefillFromLead = searchParams.get('prefillFromLead');
 
   const isAgent = user?.role === 'Agent';
-  const isSuperAdmin = user?.role === 'SuperAdmin';
+  const isSuperAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   
   const [activeTab, setActiveTab] = React.useState(prefillFromLead ? 'register' : 'activity');
   
@@ -400,3 +398,5 @@ export function TransactionsPage() {
       </div>
   );
 }
+
+    
