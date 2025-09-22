@@ -60,16 +60,16 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
       if (view === 'broking') {
         return registeredLeads.filter(lead => lead.isO2OCollaborator);
       }
-      return registeredLeads.filter(lead => !lead.isO2OCollaborator);
+      return registeredLeads; // Show all leads for default admin view
     }
     
     if (isAgent) {
         return registeredLeads.filter(lead => lead.registeredBy === user.email);
     }
     
-    // Default to provider view
+    // For providers, show direct leads AND brokered leads they are a part of.
     return registeredLeads.filter(lead => 
-      lead.providers.some(p => p.providerEmail === user.email) && !lead.isO2OCollaborator
+      lead.providers.some(p => p.providerEmail === user.email)
     );
   }, [registeredLeads, user, isAgent, isAdminOrO2O, view]);
   
@@ -118,7 +118,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                     ? 'Leads from free listings will appear here.'
                     : isAgent 
                     ? 'Use the "Register New Lead" tab to get started.' 
-                    : 'When a new lead is registered, it will appear here.'}
+                    : 'When a new lead is registered with you, it will appear here.'}
             </CardDescription>
         </Card>
       </div>
@@ -154,14 +154,20 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                             {myLeads.map(lead => {
                                 const providerInfoForCurrentUser = lead.providers.find(p => p.providerEmail === user?.email);
                                 const hasPending = isProvider && providerInfoForCurrentUser?.properties.some(p => p.status === 'Pending');
+                                
+                                // Determine whose contact info to show
+                                const registeredByO2O = users[lead.registeredBy];
+                                const contactToShow = (isProvider && lead.isO2OCollaborator && registeredByO2O)
+                                    ? { name: registeredByO2O.userName, email: registeredByO2O.email }
+                                    : { name: lead.leadContact, email: lead.leadEmail };
 
                                 return (
                                     <TableRow key={lead.id}>
-                                        <TableCell className="font-medium">{lead.leadName}</TableCell>
+                                        <TableCell className="font-medium">{lead.isO2OCollaborator && isProvider ? lead.id : lead.leadName}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col gap-1">
-                                                <span>{lead.leadContact}</span>
-                                                <span className="text-xs text-muted-foreground">{lead.leadEmail}</span>
+                                                <span>{contactToShow.name}</span>
+                                                <span className="text-xs text-muted-foreground">{contactToShow.email}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="max-w-xs truncate">{lead.requirementsSummary}</TableCell>
