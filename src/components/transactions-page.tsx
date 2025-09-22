@@ -352,17 +352,17 @@ export function TransactionsPage() {
   const [activeTab, setActiveTab] = React.useState(prefillFromLead ? 'register' : 'activity');
   
   React.useEffect(() => {
-    if (prefillFromLead) {
+    if (prefillFromLead && isSuperAdmin) {
         setActiveTab('register');
         // Clean the URL parameter after setting the tab
         router.replace('/dashboard/transactions', { scroll: false });
     }
-  }, [prefillFromLead, router]);
+  }, [prefillFromLead, router, isSuperAdmin]);
 
   return (
     <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-            <h2 className="text-3xl font-bold font-headline tracking-tight">Broking Transactions</h2>
+            <h2 className="text-3xl font-bold font-headline tracking-tight">Transactions</h2>
             <p className="text-muted-foreground mt-2">
               {isAgent
                 ? 'Register new business leads or manage the activity for existing ones.'
