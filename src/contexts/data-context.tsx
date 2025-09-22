@@ -282,9 +282,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-   useEffect(() => {
-    async function loadInitialData() {
-      setIsLoading(true);
+   const loadInitialData = useCallback(async () => {
       try {
         const [
           listingsRes,
@@ -359,10 +357,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setIsShortlistLoading(false);
         setIsLoading(false);
       }
-    }
-
+    }, [toast]);
+    
+   useEffect(() => {
     loadInitialData();
-  }, [toast]);
+    const interval = setInterval(loadInitialData, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [loadInitialData]);
   
   // Effect to clear shortlist on logout
   useEffect(() => {
@@ -970,13 +971,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistActivities, registeredLeads, addNotification, users]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
-    let wasAnyPropertyAcknowledged = false;
-    let leadToUpdate: RegisteredLead | undefined;
-
     setRegisteredLeads(prevLeads => {
-        leadToUpdate = prevLeads.find(lead => lead.id === leadId);
+        let leadToUpdate: RegisteredLead | undefined;
+        let wasAnyPropertyAcknowledged = false;
+        
         const newLeads = prevLeads.map(lead => {
             if (lead.id === leadId) {
+                leadToUpdate = lead;
                 const updatedProviders = lead.providers.map(p => {
                     if (p.providerEmail === providerEmail) {
                         const updatedProperties = p.properties.map(prop => {
@@ -999,35 +1000,37 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
             return lead;
         });
+
+        if (wasAnyPropertyAcknowledged && leadToUpdate) {
+            addTransactionActivity({
+                leadId: leadId,
+                activityType: 'Lead Acknowledged',
+                details: { acknowledgedBy: ackDetails },
+                createdBy: providerEmail,
+            });
+
+            const participants = new Set([leadToUpdate.customerId, ...(leadToUpdate.agentId ? [leadToUpdate.agentId] : [])]);
+            if (leadToUpdate.isO2OCollaborator) {
+                participants.add('superadmin@o2o.com');
+            }
+
+            participants.forEach(recipientEmail => {
+                addNotification({
+                    id: `notif-${Date.now()}-${leadId}-${providerEmail}`,
+                    type: 'new_activity',
+                    title: `Lead Acknowledged by ${ackDetails.name}`,
+                    message: `Provider has acknowledged the lead for transaction ${leadId}.`,
+                    href: `/dashboard/leads/${leadId}`,
+                    recipientEmail: recipientEmail,
+                    timestamp: new Date().toISOString(),
+                    triggeredBy: providerEmail
+                });
+            });
+        }
+        
         persistRegisteredLeads(newLeads);
         return newLeads;
     });
-
-    if (wasAnyPropertyAcknowledged && leadToUpdate) {
-        addTransactionActivity({
-            leadId: leadId,
-            activityType: 'Lead Acknowledged',
-            details: { acknowledgedBy: ackDetails },
-            createdBy: providerEmail,
-        });
-        const participants = new Set([leadToUpdate.customerId, ...(leadToUpdate.agentId ? [leadToUpdate.agentId] : [])]);
-        if (leadToUpdate.isO2OCollaborator) {
-            participants.add('superadmin@o2o.com');
-        }
-
-        participants.forEach(recipientEmail => {
-            addNotification({
-                id: `notif-${Date.now()}-${Math.random()}`,
-                type: 'new_activity',
-                title: `Lead Acknowledged by ${ackDetails.name}`,
-                message: `Provider has acknowledged the lead for transaction ${leadId}.`,
-                href: `/dashboard/leads/${leadId}`,
-                recipientEmail: recipientEmail,
-                timestamp: new Date().toISOString(),
-                triggeredBy: providerEmail
-            });
-        })
-    }
   }, [persistRegisteredLeads, addTransactionActivity, addNotification]);
 
   const addAgentToLead = useCallback((leadId: string, agentEmail: string) => {

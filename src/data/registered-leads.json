@@ -1,5 +1,35 @@
 [
   {
+    "id": "LDR-MFVGXVIQ8AELF",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:40:51.060Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "lion",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-22T18:38:08.064Z"
+  },
+  {
     "id": "LDR-MFVFO5W90IEBI",
     "customerId": "customer3@o2o.com",
     "leadName": "Gamma Goods",

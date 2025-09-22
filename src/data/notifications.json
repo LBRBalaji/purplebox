@@ -1,1 +1,101 @@
-[]
+[
+  {
+    "id": "notif-1758566515694-0.5514799419614091",
+    "type": "new_chat_message",
+    "title": "New message from Namasivayam",
+    "message": "Regarding transaction LDR-MFVGXVIQ8AELF: \"have you seen my warehouse?...\"",
+    "href": "/dashboard/leads/LDR-MFVGXVIQ8AELF",
+    "recipientEmail": "betacustomer2@o2o.com",
+    "timestamp": "2025-09-22T18:41:55.694Z",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758566505888-0.5187376149245391",
+    "type": "new_chat_message",
+    "title": "New message from Namasivayam",
+    "message": "Regarding transaction LDR-MFVGXVIQ8AELF: \"hello...\"",
+    "href": "/dashboard/leads/LDR-MFVGXVIQ8AELF",
+    "recipientEmail": "betacustomer2@o2o.com",
+    "timestamp": "2025-09-22T18:41:45.888Z",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758566451062-ACT-1758566451062",
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-MFVGXVIQ8AELF",
+    "message": "Namasivayam logged: Lead Acknowledged",
+    "href": "/dashboard/leads/LDR-MFVGXVIQ8AELF",
+    "recipientEmail": "superadmin@o2o.com",
+    "timestamp": "2025-09-22T18:40:51.062Z",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758566451062-ACT-1758566451062",
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-MFVGXVIQ8AELF",
+    "message": "Namasivayam logged: Lead Acknowledged",
+    "href": "/dashboard/leads/LDR-MFVGXVIQ8AELF",
+    "recipientEmail": "betacustomer2@o2o.com",
+    "timestamp": "2025-09-22T18:40:51.062Z",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758566451061-ACT-1758566451060",
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-MFVGXVIQ8AELF",
+    "message": "Namasivayam logged: Lead Acknowledged",
+    "href": "/dashboard/leads/LDR-MFVGXVIQ8AELF",
+    "recipientEmail": "superadmin@o2o.com",
+    "timestamp": "2025-09-22T18:40:51.061Z",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758566451061-ACT-1758566451060",
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-MFVGXVIQ8AELF",
+    "message": "Namasivayam logged: Lead Acknowledged",
+    "href": "/dashboard/leads/LDR-MFVGXVIQ8AELF",
+    "recipientEmail": "betacustomer2@o2o.com",
+    "timestamp": "2025-09-22T18:40:51.061Z",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758566451059-0.017235853245933797",
+    "type": "new_activity",
+    "title": "Lead Acknowledged by Namasivayam",
+    "message": "Provider has acknowledged the lead for transaction LDR-MFVGXVIQ8AELF.",
+    "href": "/dashboard/leads/LDR-MFVGXVIQ8AELF",
+    "recipientEmail": "superadmin@o2o.com",
+    "timestamp": "2025-09-22T18:40:51.059Z",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758566451059-0.003986769960448444",
+    "type": "new_activity",
+    "title": "Lead Acknowledged by Namasivayam",
+    "message": "Provider has acknowledged the lead for transaction LDR-MFVGXVIQ8AELF.",
+    "href": "/dashboard/leads/LDR-MFVGXVIQ8AELF",
+    "recipientEmail": "betacustomer2@o2o.com",
+    "timestamp": "2025-09-22T18:40:51.059Z",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758566288062-0.695477268482742",
+    "type": "new_lead_for_provider",
+    "title": "New Brokered Lead: Beta Retail",
+    "message": "A lead for a free listing requires O2O collaboration.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "namasivayam.lion@gmail.com",
+    "timestamp": "2025-09-22T18:38:08.062Z",
+    "triggeredBy": "superadmin@o2o.com",
+    "isRead": true
+  }
+]
