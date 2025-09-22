@@ -661,13 +661,13 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-center text-center">
-                                            {listing.rentPerSqFt === 'Get Quote' || isPremiumListing ? (
-                                                <span className="text-2xl font-bold">Price on Request</span>
-                                            ) : (
+                                            {typeof listing.rentPerSqFt === 'number' ? (
                                                 <>
                                                     <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
                                                     <span className="text-sm text-muted-foreground">/sq.ft./month</span>
                                                 </>
+                                            ) : (
+                                                <span className="text-2xl font-bold">Price on Request</span>
                                             )}
                                         </div>
                                         <Separator/>
@@ -693,19 +693,11 @@ export default function ListingDetailPage() {
                                             Get Commercials Quote
                                         </Button>
                                      ) : (
-                                        <Alert variant="default" className="text-center p-4">
-                                            <Sparkles className="h-4 w-4" />
-                                            <AlertTitle>Engage Directly!</AlertTitle>
-                                            <AlertDescription className="text-xs">
-                                                Look for the <Badge style={{ backgroundColor: '#FDD017', color: '#333' }} className="border-amber-400">Premium</Badge> badge on listings to connect directly with providers.
-                                            </AlertDescription>
-                                            <Button size="sm" className="w-full mt-4 h-auto py-2" onClick={() => handleGetQuote(true)}>
-                                                <div className="flex flex-col text-center">
-                                                    <span>Available on Broking Model</span>
-                                                    <span className="font-normal text-xs">- Connect with O2O -</span>
-                                                </div>
-                                            </Button>
-                                        </Alert>
+                                        <Button className="w-full" onClick={() => handleGetQuote(true)}>
+                                            <div className="flex flex-col text-center">
+                                                <span>Get Quote (via O2O Broking)</span>
+                                            </div>
+                                        </Button>
                                      )}
                                 </CardFooter>
                             </Card>
