@@ -310,7 +310,14 @@ export default function LeadDetailPage() {
 
   const canAddActivity = isO2O || isAgent || (!isBrokeredDeal && (isCustomer || isProvider));
   
-  const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
+  const getBackLink = () => {
+    if (isCustomer) return '/dashboard?tab=my-transactions';
+    if (isProvider) return '/dashboard?tab=registered-leads';
+    if (isAgent || isO2O || user?.role === 'SuperAdmin') return '/dashboard/transactions';
+    return '/dashboard'; // Fallback
+  };
+
+  const backLink = getBackLink();
   
   return (
     <main className="container mx-auto p-4 md:p-8">
@@ -409,7 +416,7 @@ export default function LeadDetailPage() {
                                     {customer && (
                                         <div className="p-3 bg-secondary/50 rounded-md">
                                             <p className="text-xs text-muted-foreground">Customer</p>
-                                            <p className="font-semibold">{isBrokeredDeal && (isProvider || isAgent) ? 'Customer' : customer.companyName}</p>
+                                            <p className="font-semibold">{isBrokeredDeal && (isProvider || isAgent) ? customer.companyName : customer.companyName}</p>
                                             <p className="text-xs">{isBrokeredDeal && (isProvider || isAgent) ? 'Details Private' : customer.userName}</p>
                                         </div>
                                     )}
