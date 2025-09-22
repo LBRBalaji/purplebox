@@ -1,5 +1,138 @@
 [
   {
+    "leadId": "LDR-MFV84SJ9CTKXB",
+    "activityType": "Proposal Submitted",
+    "details": {
+      "listingId": "LST-91LUXK",
+      "rentPerSft": 20,
+      "rentalSecurityDeposit": 6,
+      "actualChargeableArea": 31000
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564983613",
+    "createdAt": "2025-09-22T18:16:23.613Z"
+  },
+  {
+    "leadId": "LDR-MFV84SJ9CTKXB",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "director",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564901966",
+    "createdAt": "2025-09-22T18:15:01.966Z"
+  },
+  {
+    "leadId": "LDR-MFV84SJ9CTKXB",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "director",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564901964",
+    "createdAt": "2025-09-22T18:15:01.964Z"
+  },
+  {
+    "leadId": "LDR-MFV1TH74OXSH8",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "owner",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564863887",
+    "createdAt": "2025-09-22T18:14:23.887Z"
+  },
+  {
+    "leadId": "LDR-MFV1TH74OXSH8",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "owner",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564863886",
+    "createdAt": "2025-09-22T18:14:23.886Z"
+  },
+  {
+    "leadId": "LDR-QUOTE-1758347851492",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "owner",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564837581",
+    "createdAt": "2025-09-22T18:13:57.581Z"
+  },
+  {
+    "leadId": "LDR-QUOTE-1758347851492",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "owner",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564837580",
+    "createdAt": "2025-09-22T18:13:57.580Z"
+  },
+  {
+    "leadId": "LDR-MFV93YLORIJ8X",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "test",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564810245",
+    "createdAt": "2025-09-22T18:13:30.245Z"
+  },
+  {
+    "leadId": "LDR-MFV93YLORIJ8X",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "test",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758564810244",
+    "createdAt": "2025-09-22T18:13:30.244Z"
+  },
+  {
     "leadId": "LDR-MFVEWH6KGC3XS",
     "activityType": "Lead Acknowledged",
     "details": {

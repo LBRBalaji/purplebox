@@ -153,7 +153,14 @@
         "properties": [
           {
             "listingId": "LST-8KQX5D",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:13:30.240Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "test",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
           }
         ]
       }
@@ -268,7 +275,17 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:15:01.961Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "director",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
           }
         ]
       }
@@ -357,7 +374,14 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:14:23.883Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
           }
         ]
       }
@@ -623,7 +647,14 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:13:57.578Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
           }
         ]
       }

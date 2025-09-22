@@ -964,9 +964,47 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistActivities, registeredLeads, addNotification, users]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
-      setRegisteredLeads(prevLeads => {
-          const leadToUpdate = prevLeads.find(lead => lead.id === leadId);
-          if (leadToUpdate) {
+    let wasAnyPropertyAcknowledged = false;
+    const leadToUpdate = registeredLeads.find(lead => lead.id === leadId);
+
+    setRegisteredLeads(prevLeads => {
+        const newLeads = prevLeads.map(lead => {
+            if (lead.id === leadId) {
+                const updatedProviders = lead.providers.map(p => {
+                    if (p.providerEmail === providerEmail) {
+                        const updatedProperties = p.properties.map(prop => {
+                            if (prop.status === 'Pending') {
+                                wasAnyPropertyAcknowledged = true;
+                                return {
+                                    ...prop,
+                                    status: 'Acknowledged' as RegisteredLeadStatus,
+                                    acknowledgedAt: new Date().toISOString(),
+                                    acknowledgedBy: ackDetails,
+                                };
+                            }
+                            return prop;
+                        });
+                        return { ...p, properties: updatedProperties };
+                    }
+                    return p;
+                });
+                return { ...lead, providers: updatedProviders };
+            }
+            return lead;
+        });
+        persistRegisteredLeads(newLeads);
+        return newLeads;
+    });
+
+    if (wasAnyPropertyAcknowledged) {
+        addTransactionActivity({
+            leadId: leadId,
+            activityType: 'Lead Acknowledged',
+            details: { acknowledgedBy: ackDetails },
+            createdBy: providerEmail,
+        });
+
+        if (leadToUpdate) {
             addNotification({
                 type: 'new_activity',
                 title: `Lead Acknowledged by ${ackDetails.name}`,
@@ -985,47 +1023,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
                     triggeredBy: providerEmail
                 });
             }
-          }
-          
-          let wasAnyPropertyAcknowledged = false;
-          const newLeads = prevLeads.map(lead => {
-              if (lead.id === leadId) {
-                  const updatedProviders = lead.providers.map(p => {
-                      if (p.providerEmail === providerEmail) {
-                          const updatedProperties = p.properties.map(prop => {
-                              if (prop.status === 'Pending') {
-                                  wasAnyPropertyAcknowledged = true;
-                                  return {
-                                      ...prop,
-                                      status: 'Acknowledged' as RegisteredLeadStatus,
-                                      acknowledgedAt: new Date().toISOString(),
-                                      acknowledgedBy: ackDetails,
-                                  };
-                              }
-                              return prop;
-                          });
-                          return { ...p, properties: updatedProperties };
-                      }
-                      return p;
-                  });
-                   if (wasAnyPropertyAcknowledged) {
-                        addTransactionActivity({
-                            leadId: leadId,
-                            activityType: 'Lead Acknowledged',
-                            details: {
-                                acknowledgedBy: ackDetails
-                            },
-                            createdBy: providerEmail,
-                        });
-                   }
-                  return { ...lead, providers: updatedProviders };
-              }
-              return lead;
-          });
-          persistRegisteredLeads(newLeads);
-          return newLeads;
-      });
-  }, [persistRegisteredLeads, addTransactionActivity, addNotification]);
+        }
+    }
+  }, [registeredLeads, persistRegisteredLeads, addTransactionActivity, addNotification]);
 
   const addAgentToLead = useCallback((leadId: string, agentEmail: string) => {
     setRegisteredLeads(prev => {
