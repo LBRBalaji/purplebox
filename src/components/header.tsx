@@ -128,7 +128,7 @@ const ManageDropdown = ({ isSuperAdmin }: { isSuperAdmin: boolean }) => {
                 <DropdownMenuItem asChild><Link href="/dashboard/manage-users"><Users className="mr-2 h-4 w-4" /> Manage Users</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/dashboard/settings"><Settings className="mr-2 h-4 w-4" /> Platform Settings</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Link href="/dashboard/transactions?tab=register"><UserCheck className="mr-2 h-4 w-4" /> Lead Registration</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/transactions"><Briefcase className="mr-2 h-4 w-4" /> Broking Transactions</Link></DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
@@ -218,6 +218,11 @@ export function Header() {
                         {user && !isSuperAdmin && (
                             <NavLink href="/dashboard">
                                 <LayoutDashboard className="h-4 w-4" /> Dashboard
+                            </NavLink>
+                        )}
+                        {user && isSuperAdmin && (
+                            <NavLink href="/dashboard">
+                                <LayoutDashboard className="h-4 w-4" /> Platform Oversight
                             </NavLink>
                         )}
                         <ListingsDropdown />
