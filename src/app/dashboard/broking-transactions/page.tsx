@@ -1,4 +1,3 @@
-
 // src/app/dashboard/broking-transactions/page.tsx
 'use client';
 
@@ -16,12 +15,8 @@ export default function BrokingTransactionsPage() {
 
     React.useEffect(() => {
         if (!isAuthLoading) {
-            if (hasAccess) {
-                // Redirect to the new primary broking desk view
-                router.replace('/dashboard?tab=broking-desk');
-            } else {
-                router.replace('/dashboard');
-            }
+            // Redirect all relevant users to the new primary broking desk view
+            router.replace('/dashboard?tab=broking-desk');
         }
     }, [user, isAuthLoading, hasAccess, router]);
 
