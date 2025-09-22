@@ -1,5 +1,49 @@
 [
   {
+    "type": "new_chat_message",
+    "title": "New message from Namasivayam",
+    "message": "Regarding transaction LDR-MFV8R753E1NY8: \"when do you intent to visit the site...\"",
+    "href": "/dashboard/leads/LDR-MFV8R753E1NY8",
+    "recipientEmail": "customer2@o2o.com",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "id": "notif-1758565298978",
+    "timestamp": "2025-09-22T18:21:38.978Z",
+    "isRead": false
+  },
+  {
+    "type": "new_chat_message",
+    "title": "New message from Namasivayam",
+    "message": "Regarding transaction LDR-MFV8R753E1NY8: \"hey...\"",
+    "href": "/dashboard/leads/LDR-MFV8R753E1NY8",
+    "recipientEmail": "customer2@o2o.com",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "id": "notif-1758565290759",
+    "timestamp": "2025-09-22T18:21:30.759Z",
+    "isRead": false
+  },
+  {
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-MFV8R753E1NY8",
+    "message": "Namasivayam logged: Site Visit Request",
+    "href": "/dashboard/leads/LDR-MFV8R753E1NY8",
+    "recipientEmail": "customer2@o2o.com",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "id": "notif-1758565254048",
+    "timestamp": "2025-09-22T18:20:54.048Z",
+    "isRead": false
+  },
+  {
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-MFV8R753E1NY8",
+    "message": "Namasivayam logged: Site Visit Request",
+    "href": "/dashboard/leads/LDR-MFV8R753E1NY8",
+    "recipientEmail": "customer2@o2o.com",
+    "triggeredBy": "namasivayam.lion@gmail.com",
+    "id": "notif-1758565254044",
+    "timestamp": "2025-09-22T18:20:54.044Z",
+    "isRead": false
+  },
+  {
     "type": "new_activity",
     "title": "Update on Transaction: LDR-MFV8R753E1NY8",
     "message": "Namasivayam logged: Proposal Submitted",
@@ -338,7 +382,7 @@
     "triggeredBy": "namasivayam.lion@gmail.com",
     "id": "notif-1758564837592",
     "timestamp": "2025-09-22T18:13:57.592Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_activity",
@@ -360,7 +404,7 @@
     "triggeredBy": "namasivayam.lion@gmail.com",
     "id": "notif-1758564837590",
     "timestamp": "2025-09-22T18:13:57.590Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_activity",
@@ -382,7 +426,7 @@
     "triggeredBy": "namasivayam.lion@gmail.com",
     "id": "notif-1758564837588",
     "timestamp": "2025-09-22T18:13:57.588Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_activity",
@@ -404,7 +448,7 @@
     "triggeredBy": "namasivayam.lion@gmail.com",
     "id": "notif-1758564837585",
     "timestamp": "2025-09-22T18:13:57.585Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_activity",
@@ -580,7 +624,7 @@
     "triggeredBy": "namasivayam.lion@gmail.com",
     "id": "notif-1758564192169",
     "timestamp": "2025-09-22T18:03:12.169Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_activity",
@@ -602,7 +646,7 @@
     "triggeredBy": "namasivayam.lion@gmail.com",
     "id": "notif-1758564192168",
     "timestamp": "2025-09-22T18:03:12.168Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_activity",
@@ -624,7 +668,7 @@
     "triggeredBy": "namasivayam.lion@gmail.com",
     "id": "notif-1758564192166",
     "timestamp": "2025-09-22T18:03:12.166Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_activity",
@@ -646,7 +690,7 @@
     "triggeredBy": "namasivayam.lion@gmail.com",
     "id": "notif-1758564192162",
     "timestamp": "2025-09-22T18:03:12.162Z",
-    "isRead": false
+    "isRead": true
   },
   {
     "type": "new_activity",

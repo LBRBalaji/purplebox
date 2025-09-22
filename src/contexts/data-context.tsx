@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
@@ -953,7 +952,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
               participants.forEach(participantEmail => {
                   if(participantEmail !== newActivity.createdBy) {
                       addNotification({
-                          id: `notif-${Date.now()}-${Math.random()}`,
+                          id: `notif-${Date.now()}-${newActivity.activityId}`,
                           type: 'new_activity',
                           title: `Update on Transaction: ${lead.id}`,
                           message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
@@ -971,10 +970,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistActivities, registeredLeads, addNotification, users]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
-    const leadToUpdate = registeredLeads.find(lead => lead.id === leadId);
     let wasAnyPropertyAcknowledged = false;
+    let leadToUpdate: RegisteredLead | undefined;
 
     setRegisteredLeads(prevLeads => {
+        leadToUpdate = prevLeads.find(lead => lead.id === leadId);
         const newLeads = prevLeads.map(lead => {
             if (lead.id === leadId) {
                 const updatedProviders = lead.providers.map(p => {
@@ -1003,40 +1003,32 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return newLeads;
     });
 
-    if (wasAnyPropertyAcknowledged) {
+    if (wasAnyPropertyAcknowledged && leadToUpdate) {
         addTransactionActivity({
             leadId: leadId,
             activityType: 'Lead Acknowledged',
             details: { acknowledgedBy: ackDetails },
             createdBy: providerEmail,
         });
+        const participants = new Set([leadToUpdate.customerId, ...(leadToUpdate.agentId ? [leadToUpdate.agentId] : [])]);
+        if (leadToUpdate.isO2OCollaborator) {
+            participants.add('superadmin@o2o.com');
+        }
 
-        if (leadToUpdate) {
+        participants.forEach(recipientEmail => {
             addNotification({
                 id: `notif-${Date.now()}-${Math.random()}`,
                 type: 'new_activity',
                 title: `Lead Acknowledged by ${ackDetails.name}`,
                 message: `Provider has acknowledged the lead for transaction ${leadId}.`,
                 href: `/dashboard/leads/${leadId}`,
-                recipientEmail: leadToUpdate.customerId,
+                recipientEmail: recipientEmail,
                 timestamp: new Date().toISOString(),
                 triggeredBy: providerEmail
             });
-            if (leadToUpdate.agentId) {
-                addNotification({
-                    id: `notif-${Date.now()}-${Math.random()}`,
-                    type: 'new_activity',
-                    title: `Lead Acknowledged by ${ackDetails.name}`,
-                    message: `Provider has acknowledged the lead for transaction ${leadId}.`,
-                    href: `/dashboard/leads/${leadId}`,
-                    recipientEmail: leadToUpdate.agentId,
-                    timestamp: new Date().toISOString(),
-                    triggeredBy: providerEmail
-                });
-            }
-        }
+        })
     }
-  }, [registeredLeads, persistRegisteredLeads, addTransactionActivity, addNotification]);
+  }, [persistRegisteredLeads, addTransactionActivity, addNotification]);
 
   const addAgentToLead = useCallback((leadId: string, agentEmail: string) => {
     setRegisteredLeads(prev => {
@@ -1185,4 +1177,3 @@ export function useData() {
   }
   return context;
 }
-
