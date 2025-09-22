@@ -421,14 +421,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), []);
 
 
-  const addNotification = useCallback((notification: Omit<Notification, 'id' | 'timestamp' | 'isRead'>) => {
+  const addNotification = useCallback((notification: Omit<Notification, 'isRead'>) => {
     setNotifications(prev => {
-        const newNotification: Notification = {
-            ...notification,
-            id: `notif-${Date.now()}`,
-            timestamp: new Date().toISOString(),
-            isRead: false
-        };
+        const newNotification = { ...notification, isRead: false };
         const updatedNotifications = [newNotification, ...prev];
         persistNotifications(updatedNotifications);
         return updatedNotifications;
@@ -468,11 +463,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const recipient = context.lead.customerId === authUser?.email ? context.partner : users[context.lead.customerId];
     if (recipient) {
       addNotification({
+        id: `notif-${Date.now()}-${Math.random()}`,
         type: 'new_chat_message',
         title: `New message from ${authUser?.userName}`,
         message: `Regarding transaction ${context.lead.id}: "${message.text?.substring(0, 50)}..."`,
         href: `/dashboard/leads/${context.lead.id}`,
         recipientEmail: recipient.email,
+        timestamp: new Date().toISOString(),
         triggeredBy: authUser?.email || 'system',
       });
     }
@@ -577,10 +574,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const newDemands = [newDemand, ...prevDemands];
         persistDemands(newDemands);
         addNotification({
+            id: `notif-${Date.now()}-${Math.random()}`,
             type: 'new_demand',
             title: `New Demand from ${demand.companyName}`,
             message: `${demand.size.toLocaleString()} sq. ft. required in ${demand.locationName}`,
             href: `/dashboard?tab=active-demands`,
+            timestamp: new Date().toISOString(),
             triggeredBy: userEmail || 'system',
         });
         return newDemands;
@@ -610,10 +609,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const newSubmissions = [submissionWithDefaults, ...prevSubmissions];
         persistSubmissions(newSubmissions);
         addNotification({
+            id: `notif-${Date.now()}-${Math.random()}`,
             type: 'new_submission',
             title: `New Submission for Demand ${submission.demandId}`,
             message: `Property ${submission.listingId} submitted by ${userEmail}`,
             href: `/dashboard?tab=approval-queue`,
+            timestamp: new Date().toISOString(),
             triggeredBy: userEmail || 'system',
         });
         return newSubmissions;
@@ -625,11 +626,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const submission = prevSubmissions.find(s => s.submissionId === submissionId);
         if (submission && status === 'Approved') {
             addNotification({
+                id: `notif-${Date.now()}-${Math.random()}`,
                 type: 'new_submission',
                 title: `Your match for Demand ${submission.demandId} was approved!`,
                 message: `Property ${submission.listingId} is now visible to the customer.`,
                 href: `/dashboard?tab=my-demands`,
                 recipientEmail: submission.demandUserEmail,
+                timestamp: new Date().toISOString(),
                 triggeredBy: authUser?.email || 'system'
             });
         }
@@ -905,11 +908,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
 
             addNotification({
+                id: `notif-${Date.now()}-${Math.random()}`,
                 type: 'new_lead_for_provider',
                 title: title,
                 message: message,
                 href: `/dashboard?tab=registered-leads`,
                 recipientEmail: provider.providerEmail,
+                timestamp: new Date().toISOString(),
                 triggeredBy: userEmail || 'system'
             });
         });
@@ -948,11 +953,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
               participants.forEach(participantEmail => {
                   if(participantEmail !== newActivity.createdBy) {
                       addNotification({
+                          id: `notif-${Date.now()}-${Math.random()}`,
                           type: 'new_activity',
                           title: `Update on Transaction: ${lead.id}`,
                           message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
                           href: `/dashboard/leads/${lead.id}`,
                           recipientEmail: participantEmail,
+                          timestamp: new Date().toISOString(),
                           triggeredBy: newActivity.createdBy
                       });
                   }
@@ -964,8 +971,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistActivities, registeredLeads, addNotification, users]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
-    let wasAnyPropertyAcknowledged = false;
     const leadToUpdate = registeredLeads.find(lead => lead.id === leadId);
+    let wasAnyPropertyAcknowledged = false;
 
     setRegisteredLeads(prevLeads => {
         const newLeads = prevLeads.map(lead => {
@@ -1006,20 +1013,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         if (leadToUpdate) {
             addNotification({
+                id: `notif-${Date.now()}-${Math.random()}`,
                 type: 'new_activity',
                 title: `Lead Acknowledged by ${ackDetails.name}`,
                 message: `Provider has acknowledged the lead for transaction ${leadId}.`,
                 href: `/dashboard/leads/${leadId}`,
                 recipientEmail: leadToUpdate.customerId,
+                timestamp: new Date().toISOString(),
                 triggeredBy: providerEmail
             });
             if (leadToUpdate.agentId) {
                 addNotification({
+                    id: `notif-${Date.now()}-${Math.random()}`,
                     type: 'new_activity',
                     title: `Lead Acknowledged by ${ackDetails.name}`,
                     message: `Provider has acknowledged the lead for transaction ${leadId}.`,
                     href: `/dashboard/leads/${leadId}`,
                     recipientEmail: leadToUpdate.agentId,
+                    timestamp: new Date().toISOString(),
                     triggeredBy: providerEmail
                 });
             }
@@ -1174,3 +1185,4 @@ export function useData() {
   }
   return context;
 }
+

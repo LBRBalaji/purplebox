@@ -183,7 +183,17 @@
         "properties": [
           {
             "listingId": "LST-8KQX5D",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:19:09.795Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "t",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 92000
           }
         ]
       }
@@ -206,7 +216,17 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:19:44.764Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "n",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
           }
         ]
       }

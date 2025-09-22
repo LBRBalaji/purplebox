@@ -1,5 +1,91 @@
 [
   {
+    "leadId": "LDR-MFV8R753E1NY8",
+    "activityType": "Proposal Submitted",
+    "details": {
+      "listingId": "LST-91LUXK",
+      "rentPerSft": 20,
+      "rentalSecurityDeposit": 6,
+      "actualChargeableArea": 31000
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758565198396",
+    "createdAt": "2025-09-22T18:19:58.396Z"
+  },
+  {
+    "leadId": "LDR-MFV8R753E1NY8",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "n",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758565184768",
+    "createdAt": "2025-09-22T18:19:44.768Z"
+  },
+  {
+    "leadId": "LDR-MFV8R753E1NY8",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "n",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758565184767",
+    "createdAt": "2025-09-22T18:19:44.767Z"
+  },
+  {
+    "leadId": "LDR-MFV8T9M8ELE5P",
+    "activityType": "Proposal Submitted",
+    "details": {
+      "listingId": "LST-8KQX5D",
+      "rentPerSft": 20,
+      "rentalSecurityDeposit": 6,
+      "actualChargeableArea": 92000
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758565166241",
+    "createdAt": "2025-09-22T18:19:26.241Z"
+  },
+  {
+    "leadId": "LDR-MFV8T9M8ELE5P",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "t",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758565149799",
+    "createdAt": "2025-09-22T18:19:09.799Z"
+  },
+  {
+    "leadId": "LDR-MFV8T9M8ELE5P",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "t",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758565149797",
+    "createdAt": "2025-09-22T18:19:09.797Z"
+  },
+  {
     "leadId": "LDR-MFV84SJ9CTKXB",
     "activityType": "Proposal Submitted",
     "details": {
@@ -9,8 +95,8 @@
       "actualChargeableArea": 31000
     },
     "createdBy": "namasivayam.lion@gmail.com",
-    "activityId": "ACT-1758564983613",
-    "createdAt": "2025-09-22T18:16:23.613Z"
+    "activityId": "ACT-1758564983598",
+    "createdAt": "2025-09-22T18:16:23.598Z"
   },
   {
     "leadId": "LDR-MFV84SJ9CTKXB",
