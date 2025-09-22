@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { ScrollArea } from './ui/scroll-area';
 import { Input } from './ui/input';
 import { type DemandSchema } from '@/lib/schema';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 function ConversationList({ onSelectConversation }: { onSelectConversation: (chat: ChatSubmission) => void }) {
     const { user, users } = useAuth();
@@ -34,7 +34,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
 
         return allUserLeads.flatMap(lead => {
              const providerForLead = lead.providers.find(p => p.providerEmail !== 'superadmin@o2o.com') || lead.providers[0];
-             if (!providerForLead) return [];
+             if (!providerForLead || !providerForLead.properties || providerForLead.properties.length === 0) return [];
              
              const listing = listings.find(l => l.listingId === providerForLead.properties[0]?.listingId);
              const customer = users[lead.customerId];
