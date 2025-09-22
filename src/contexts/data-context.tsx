@@ -127,7 +127,7 @@ export type RegisteredLead = {
 export type TransactionActivity = {
     activityId: string;
     leadId: string; // RegisteredLead ID
-    activityType: 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements';
+    activityType: 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted';
     details: {
         visitDateTime?: string;
         message?: string;
@@ -135,6 +135,10 @@ export type TransactionActivity = {
         notes?: string;
         feedbackText?: string;
         improvementsText?: string;
+        listingId?: string;
+        rentPerSft?: number;
+        rentalSecurityDeposit?: number;
+        actualChargeableArea?: number;
     };
     createdAt: string;
     createdBy: string; // O2O/Admin user email

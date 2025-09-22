@@ -44,7 +44,17 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T12:37:57.986Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
           }
         ]
       }

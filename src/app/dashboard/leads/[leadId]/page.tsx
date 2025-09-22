@@ -37,6 +37,7 @@ const activityIcons: { [key in TransactionActivity['activityType']]: React.Eleme
   'Site Visit Update': CalendarIcon,
   'Customer Feedback': MessageSquare,
   'Tenant Improvements': HardHat,
+  'Proposal Submitted': FileSpreadsheet,
 };
 
 const ProposalFormSchema = z.object({
@@ -245,7 +246,7 @@ export default function LeadDetailPage() {
   };
 
   const handleProposalSubmit = (listingId: string, values: ProposalFormValues) => {
-    if (!lead || !selectedProvider) return;
+    if (!lead || !selectedProvider || !user) return;
     
     const updatedLead = { ...lead };
     const providerIndex = updatedLead.providers.findIndex(p => p.providerEmail === selectedProvider.providerEmail);
@@ -257,6 +258,18 @@ export default function LeadDetailPage() {
     updatedLead.providers[providerIndex].properties[propertyIndex].rentPerSft = values.rentPerSft;
     updatedLead.providers[providerIndex].properties[propertyIndex].rentalSecurityDeposit = values.rentalSecurityDeposit;
     updatedLead.providers[providerIndex].properties[propertyIndex].actualChargeableArea = values.actualChargeableArea;
+    
+    addTransactionActivity({
+        leadId: lead.id,
+        activityType: 'Proposal Submitted',
+        createdBy: user.email,
+        details: {
+            listingId,
+            rentPerSft: values.rentPerSft,
+            rentalSecurityDeposit: values.rentalSecurityDeposit,
+            actualChargeableArea: values.actualChargeableArea,
+        }
+    });
     
     updateRegisteredLead(updatedLead);
     toast({ title: "Proposal Submitted", description: "The customer has been notified of your commercial proposal." });
@@ -355,6 +368,14 @@ export default function LeadDetailPage() {
                                                             {activity.details.notes && <p className="text-sm"><b>O2O Notes:</b> {activity.details.notes}</p>}
                                                             {activity.details.feedbackText && <p className="text-sm"><b>Feedback:</b> {activity.details.feedbackText}</p>}
                                                             {activity.details.improvementsText && <p className="text-sm"><b>Requirements:</b> {activity.details.improvementsText}</p>}
+                                                            {activity.activityType === 'Proposal Submitted' && activity.details.listingId && (
+                                                                <div className="text-sm space-y-1">
+                                                                    <p><b>For Listing:</b> {activity.details.listingId}</p>
+                                                                    <p><b>Rent:</b> ₹{activity.details.rentPerSft}/sft</p>
+                                                                    <p><b>Deposit:</b> {activity.details.rentalSecurityDeposit} months</p>
+                                                                    <p><b>Area:</b> {activity.details.actualChargeableArea?.toLocaleString()} sft</p>
+                                                                </div>
+                                                            )}
                                                             <TimelineDescription>
                                                                 Logged by {users[activity.createdBy]?.userName || activity.createdBy} on {new Date(activity.createdAt).toLocaleDateString()}
                                                             </TimelineDescription>
