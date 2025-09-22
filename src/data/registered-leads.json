@@ -1,6 +1,6 @@
 [
   {
-    "id": "LDR-MFV2R6SLTJ84B",
+    "id": "LDR-MFV33FU44BSSY",
     "customerId": "customer2@o2o.com",
     "leadName": "Beta Retail",
     "leadContact": "Ben Carter",
@@ -15,13 +15,39 @@
           {
             "listingId": "LST-91LUXK",
             "status": "Acknowledged",
-            "acknowledgedAt": "2025-09-22T12:10:26.342Z",
+            "acknowledgedAt": "2025-09-22T13:09:02.577Z",
             "acknowledgedBy": {
               "name": "Namasivayam",
               "title": "owner",
               "mobile": "+91 9841098170",
               "email": "namasivayam.lion@gmail.com"
-            }
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T13:08:36.908Z"
+  },
+  {
+    "id": "LDR-MFV2R6SLTJ84B",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
           }
         ]
       }
@@ -44,17 +70,7 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Acknowledged",
-            "acknowledgedAt": "2025-09-22T12:37:57.986Z",
-            "acknowledgedBy": {
-              "name": "Namasivayam",
-              "title": "owner",
-              "mobile": "+91 9841098170",
-              "email": "namasivayam.lion@gmail.com"
-            },
-            "rentPerSft": 20,
-            "rentalSecurityDeposit": 6,
-            "actualChargeableArea": 31000
+            "status": "Pending"
           }
         ]
       }

@@ -127,7 +127,7 @@ export type RegisteredLead = {
 export type TransactionActivity = {
     activityId: string;
     leadId: string; // RegisteredLead ID
-    activityType: 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted';
+    activityType: 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted' | 'Lead Acknowledged';
     details: {
         visitDateTime?: string;
         message?: string;
@@ -139,6 +139,7 @@ export type TransactionActivity = {
         rentPerSft?: number;
         rentalSecurityDeposit?: number;
         actualChargeableArea?: number;
+        acknowledgedBy?: AcknowledgmentDetails;
     };
     createdAt: string;
     createdBy: string; // O2O/Admin user email
@@ -920,6 +921,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
                       }
                       return p;
                   });
+                   addTransactionActivity({
+                        leadId: leadId,
+                        activityType: 'Lead Acknowledged',
+                        details: {
+                            acknowledgedBy: ackDetails
+                        },
+                        createdBy: providerEmail,
+                    });
                   return { ...lead, providers: updatedProviders };
               }
               return lead;

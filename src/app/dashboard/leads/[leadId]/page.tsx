@@ -38,6 +38,7 @@ const activityIcons: { [key in TransactionActivity['activityType']]: React.Eleme
   'Customer Feedback': MessageSquare,
   'Tenant Improvements': HardHat,
   'Proposal Submitted': FileSpreadsheet,
+  'Lead Acknowledged': UserCheck,
 };
 
 const ProposalFormSchema = z.object({
@@ -354,6 +355,7 @@ export default function LeadDetailPage() {
                                         <Timeline>
                                             {activities.map((activity) => {
                                                 const Icon = activityIcons[activity.activityType] || Mic;
+                                                const acknowledgedByDetails = activity.details.acknowledgedBy;
                                                 return(
                                                     <TimelineItem key={activity.activityId}>
                                                         <TimelineConnector />
@@ -374,6 +376,11 @@ export default function LeadDetailPage() {
                                                                     <p><b>Rent:</b> ₹{activity.details.rentPerSft}/sft</p>
                                                                     <p><b>Deposit:</b> {activity.details.rentalSecurityDeposit} months</p>
                                                                     <p><b>Area:</b> {activity.details.actualChargeableArea?.toLocaleString()} sft</p>
+                                                                </div>
+                                                            )}
+                                                            {activity.activityType === 'Lead Acknowledged' && acknowledgedByDetails && (
+                                                                <div className="text-sm space-y-1">
+                                                                    <p>Lead formally acknowledged by <b>{acknowledgedByDetails.name}</b> ({acknowledgedByDetails.title}) from the provider's side.</p>
                                                                 </div>
                                                             )}
                                                             <TimelineDescription>
