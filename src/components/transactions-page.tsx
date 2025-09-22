@@ -80,6 +80,7 @@ function RegisterLeadForm() {
   const searchParams = useSearchParams();
   const [customerPopoverOpen, setCustomerPopoverOpen] = React.useState(false);
   const isAgent = user?.role === 'Agent';
+  const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
 
   const prefillLeadId = searchParams.get('prefillFromLead');
 
@@ -114,11 +115,11 @@ function RegisterLeadForm() {
             form.reset({
                 ...form.getValues(),
                 id: `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
-                // Prefill company name and requirements, but NOT personal contact details.
+                // Prefill impersonal lead details
                 customerId: leadToPrefill.customerId,
                 leadName: leadToPrefill.leadName,
                 requirementsSummary: leadToPrefill.requirementsSummary,
-                // Use the logged-in ADMIN's contact details as the point of contact for the provider.
+                // Use the logged-in ADMIN/AGENT's contact details as the point of contact for the provider.
                 leadContact: user.userName,
                 leadEmail: user.email,
                 leadPhone: user.phone,
@@ -147,11 +148,17 @@ function RegisterLeadForm() {
   );
 
   const handleCustomerSelect = (customer: User) => {
+    // When an Admin/Agent selects a customer, only set the company name and ID.
+    // The contact details should remain those of the Admin/Agent to maintain the brokering model.
     form.setValue('customerId', customer.email);
     form.setValue('leadName', customer.companyName);
-    form.setValue('leadContact', customer.userName);
-    form.setValue('leadEmail', customer.email);
-    form.setValue('leadPhone', customer.phone);
+    
+    if (user) {
+        form.setValue('leadContact', user.userName);
+        form.setValue('leadEmail', user.email);
+        form.setValue('leadPhone', user.phone);
+    }
+    
     setCustomerPopoverOpen(false);
   };
 
@@ -173,7 +180,8 @@ function RegisterLeadForm() {
       requirementsSummary: data.requirementsSummary,
       registeredBy: user.email,
       providers: leadProviders,
-      isO2OCollaborator: false, // This is a direct registration, so it's not brokered by default
+      // For SuperAdmin/O2O, if the lead was prefilled, it's a brokered deal.
+      isO2OCollaborator: (isAdmin && !!prefillLeadId), 
     };
 
     addRegisteredLead(newLead, user?.email);
@@ -213,11 +221,12 @@ function RegisterLeadForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField control={form.control} name="id" render={({ field }) => ( <FormItem><FormLabel>Transaction ID</FormLabel><FormControl><Input {...field} disabled /></FormControl></FormItem>)} />
-                {isAgent || prefillLeadId ? (
-                     <FormField control={form.control} name="leadName" render={({ field }) => ( <FormItem><FormLabel>Lead / Company Name</FormLabel><FormControl><Input placeholder="Enter company name" {...field} disabled={!!prefillLeadId} /></FormControl><FormMessage /></FormItem> )} />
-                ) : (
-                    <FormField control={form.control} name="customerId" render={({ field }) => (
-                        <FormItem className="flex flex-col"><FormLabel>Lead / Company Name</FormLabel>
+                {isAdmin || isAgent ? (
+                    prefillLeadId ? (
+                         <FormField control={form.control} name="leadName" render={({ field }) => ( <FormItem><FormLabel>Lead / Company Name</FormLabel><FormControl><Input placeholder="Enter company name" {...field} disabled /></FormControl><FormMessage /></FormItem> )} />
+                    ) : (
+                         <FormField control={form.control} name="customerId" render={({ field }) => (
+                        <FormItem className="flex flex-col"><FormLabel>Lead / Company Name (Select Existing Customer)</FormLabel>
                         <Popover open={customerPopoverOpen} onOpenChange={setCustomerPopoverOpen}><PopoverTrigger asChild><FormControl>
                             <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
                             {field.value ? customers.find(c => c.email === field.value)?.companyName : "Select a customer"}
@@ -230,19 +239,23 @@ function RegisterLeadForm() {
                                     <div><p>{customer.companyName}</p><p className="text-xs text-muted-foreground">{customer.userName}</p></div>
                                 </CommandItem>
                             ))}
-                            </CommandGroup></CommandList></Command></PopoverContent></Popover><FormMessage />
+                            </CommandGroup></CommandList></Command></PopoverContent></Popover>
+                            <FormDescription className="text-xs">Select an existing customer to pre-fill their details. The logged-in admin/agent will be the contact person.</FormDescription>
+                        <FormMessage />
                         </FormItem>
-                    )} />
+                    )}
+                )) : (
+                     <FormField control={form.control} name="leadName" render={({ field }) => ( <FormItem><FormLabel>Lead / Company Name</FormLabel><FormControl><Input placeholder="Enter company name" {...field} /></FormControl><FormMessage /></FormItem> )} />
                 )}
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormField control={form.control} name="leadContact" render={({ field }) => ( <FormItem><FormLabel>Contact Person</FormLabel><FormControl><Input placeholder={isAgent ? "Enter contact name" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId') || !!prefillLeadId} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField control={form.control} name="leadPhone" render={({ field }) => ( <FormItem><FormLabel>Contact Phone</FormLabel><FormControl><Input placeholder={isAgent ? "Enter phone number" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId') || !!prefillLeadId} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="leadContact" render={({ field }) => ( <FormItem><FormLabel>Contact Person</FormLabel><FormControl><Input placeholder={"Your Name (as contact)"} {...field} disabled={isAdmin || isAgent} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="leadPhone" render={({ field }) => ( <FormItem><FormLabel>Contact Phone</FormLabel><FormControl><Input placeholder={"Your Phone (as contact)"} {...field} disabled={isAdmin || isAgent} /></FormControl><FormMessage /></FormItem>)} />
              </div>
-             <FormField control={form.control} name="leadEmail" render={({ field }) => (<FormItem><FormLabel>Contact Email</FormLabel><FormControl><Input type="email" placeholder={isAgent ? "Enter email" : "Auto-filled"} {...field} disabled={!isAgent && !!form.watch('customerId') || !!prefillLeadId} /></FormControl><FormMessage /></FormItem> )} />
+             <FormField control={form.control} name="leadEmail" render={({ field }) => (<FormItem><FormLabel>Contact Email</FormLabel><FormControl><Input type="email" placeholder={"Your Email (as contact)"} {...field} disabled={isAdmin || isAgent} /></FormControl><FormMessage /></FormItem> )} />
             <FormField control={form.control} name="requirementsSummary" render={({ field }) => ( <FormItem><FormLabel>Requirements Summary</FormLabel><FormControl><Textarea placeholder="Briefly describe the lead's requirements..." {...field} /></FormControl><FormMessage /></FormItem>)} />
             
-            {isAgent && (
+            {(isAgent || isAdmin) && (
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                      <FormField control={form.control} name="location" render={({ field }) => ( <FormItem><FormLabel>Location</FormLabel><FormControl><Input placeholder="e.g. Oragadam, Chennai" {...field} /></FormControl><FormMessage /></FormItem>)} />
                      <FormField control={form.control} name="size" render={({ field }) => ( <FormItem><FormLabel>Size (Sq. Ft.)</FormLabel><FormControl><Input type="number" placeholder="e.g. 50000" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>)} />
@@ -251,7 +264,7 @@ function RegisterLeadForm() {
                         <SelectItem value="within 45 days">Within 45 days</SelectItem>
                         <SelectItem value="3 months">3 months</SelectItem>
                         <SelectItem value="BTS">BTS</SelectItem>
-                     </SelectContent></Select><FormMessage /></FormItem>)} />
+                     </SelectContent></Select></FormItem>)} />
                  </div>
             )}
 
@@ -387,5 +400,3 @@ export function TransactionsPage() {
       </div>
   );
 }
-
-    
