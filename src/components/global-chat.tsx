@@ -29,32 +29,31 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
             lead.customerId === user.email || 
             lead.agentId === user.email ||
             lead.providers.some(p => p.providerEmail === user.email) ||
-            (lead.isO2OCollaborator && (user.role === 'SuperAdmin' || user.role === 'O2O'))
+            (user.role === 'SuperAdmin' || user.role === 'O2O')
         );
 
         return allUserLeads.flatMap(lead => {
-             const provider = lead.isO2OCollaborator ? { providerEmail: 'superadmin@o2o.com', properties: lead.providers.flatMap(p => p.properties) } : lead.providers.find(p => p.providerEmail !== 'superadmin@o2o.com');
-             if (!provider) return [];
+             const providerForLead = lead.providers.find(p => p.providerEmail !== 'superadmin@o2o.com') || lead.providers[0];
+             if (!providerForLead) return [];
              
-             const listing = listings.find(l => l.listingId === provider.properties[0]?.listingId);
+             const listing = listings.find(l => l.listingId === providerForLead.properties[0]?.listingId);
              const customer = users[lead.customerId];
-             const developer = users[provider.providerEmail];
+             const developer = users[providerForLead.providerEmail];
 
              let chatPartnerName: string;
              let partnerInitials: string;
+             const isBrokeredDeal = lead.isO2OCollaborator;
 
-             if (lead.isO2OCollaborator && (user.email === customer?.email || user.email === developer?.email || user.email === lead.agentId)) {
-                 chatPartnerName = "O2O Team";
-                 partnerInitials = "O2O";
-             } else if (user.email === customer?.email) {
-                 chatPartnerName = developer?.companyName || "Developer";
-                 partnerInitials = developer?.companyName?.[0] || 'D';
-             } else {
-                 chatPartnerName = customer?.companyName || "Customer";
+             if (user.email === customer?.email) {
+                 chatPartnerName = isBrokeredDeal ? "O2O Team" : (developer?.companyName || "Developer");
+                 partnerInitials = isBrokeredDeal ? "O2O" : (developer?.companyName?.[0] || 'D');
+             } else { // For Provider, Agent, or Admin
+                 const customerCompany = customer?.companyName || "Customer";
+                 chatPartnerName = isBrokeredDeal ? `For-${customerCompany}` : customerCompany;
                  partnerInitials = customer?.companyName?.[0] || 'C';
              }
              
-             const threadId = `chat-${lead.id}-${provider.providerEmail}`;
+             const threadId = `chat-${lead.id}-${providerForLead.providerEmail}`;
              const messages = chatMessages[threadId] || [];
              const lastMessage = messages[messages.length - 1];
              const isUnread = messages.some(m => m.isNew && m.senderEmail !== user.email);
@@ -67,7 +66,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                      submissionId: threadId,
                      demandId: lead.id,
                      listingId: listing?.listingId || '',
-                     providerEmail: provider.providerEmail,
+                     providerEmail: providerForLead.providerEmail,
                      listing: listing,
                      customerName: customer?.userName || '',
                      customerId: customer?.email || '',
@@ -83,7 +82,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
         }).filter(Boolean)
         .sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime());
         
-    }, [user, registeredLeads, listings, users, chatMessages]);
+    }, [user, users, registeredLeads, listings, chatMessages]);
 
     const filteredConversations = React.useMemo(() => {
         let results = conversations;
@@ -171,7 +170,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
 
 export function GlobalChatWidget() {
     const { user } = useAuth();
-    const { activeChat, setActiveChat, demands } = useData();
+    const { activeChat, setActiveChat, demands, registeredLeads } = useData();
     const [isOpen, setIsOpen] = React.useState(false);
 
     if (!user) return null;
@@ -201,13 +200,15 @@ export function GlobalChatWidget() {
 
     if (activeChat) {
         const listing = activeChat.listing;
+        const lead = registeredLeads.find(l => l.id === activeChat.demandId);
         
         let headerTitle: string;
         
         if (user?.email === activeChat.customerId) {
             headerTitle = activeChat.chatPartnerName;
         } else {
-            headerTitle = activeChat.customerCompany || 'Customer';
+            const customerCompany = activeChat.customerCompany || 'Customer';
+            headerTitle = lead?.isO2OCollaborator ? `For-${customerCompany}` : customerCompany;
         }
 
         title = headerTitle;
