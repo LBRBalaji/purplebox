@@ -167,6 +167,7 @@ export type ChatMessage = {
       fileUrl: string;
       fileType: string;
     };
+    isNew?: boolean;
 };
 
 export type TypingStatus = {
@@ -373,7 +374,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (authUser) {
-      const count = notifications.filter(n => !n.isRead && n.recipientEmail === authUser.email).length;
+      const count = notifications.filter(n => !n.isRead && (n.recipientEmail === authUser.email || (n.type === 'new_demand' && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O')) || (n.type === 'new_submission' && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O')) )).length;
       setUnreadCount(count);
     } else {
       setUnreadCount(0);
@@ -436,9 +437,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const markNotificationsAsRead = useCallback(() => {
     if (!authUser) return;
     setNotifications(prev => {
-      const updated = prev.map(n => 
-        (n.recipientEmail === authUser.email && !n.isRead) ? { ...n, isRead: true } : n
-      );
+      const updated = prev.map(n => {
+        const isRecipient = n.recipientEmail === authUser.email;
+        const isAdminForDemand = (n.type === 'new_demand' && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O'));
+        const isAdminForSubmission = (n.type === 'new_submission' && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O'));
+        
+        if (!n.isRead && (isRecipient || isAdminForDemand || isAdminForSubmission)) {
+          return { ...n, isRead: true };
+        }
+        return n;
+      });
       persistNotifications(updated);
       return updated;
     });
@@ -450,7 +458,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     if (!updatedMessages[threadId]) {
       updatedMessages[threadId] = [];
     }
-    updatedMessages[threadId].push(message);
+    const messageWithReadStatus = { ...message, isNew: true };
+    updatedMessages[threadId].push(messageWithReadStatus);
     setChatMessages(updatedMessages);
     await persistChatMessages(updatedMessages);
 
@@ -875,16 +884,29 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const updatedLeads = [newLead, ...prevLeads];
         persistRegisteredLeads(updatedLeads);
 
-        newLead.providers.forEach(provider => {
-            addNotification({
+        if (newLead.isO2OCollaborator) {
+            // Brokered deal: Notify the super admin
+             addNotification({
                 type: 'new_lead_for_provider',
-                title: `New Lead: ${newLead.leadName}`,
-                message: `A new lead has been registered with you for ${provider.properties.length} propert(y/ies). Please acknowledge.`,
-                href: `/dashboard?tab=registered-leads`,
-                recipientEmail: provider.providerEmail,
+                title: `New Brokering Lead: ${newLead.leadName}`,
+                message: `A brokered lead has been created and requires O2O team action.`,
+                href: `/dashboard/transactions`,
+                recipientEmail: 'superadmin@o2o.com',
                 triggeredBy: userEmail || 'system'
             });
-        });
+        } else {
+            // Direct deal: Notify each provider
+            newLead.providers.forEach(provider => {
+                addNotification({
+                    type: 'new_lead_for_provider',
+                    title: `New Lead: ${newLead.leadName}`,
+                    message: `A new lead has been registered with you for ${provider.properties.length} propert(y/ies). Please acknowledge.`,
+                    href: `/dashboard?tab=registered-leads`,
+                    recipientEmail: provider.providerEmail,
+                    triggeredBy: userEmail || 'system'
+                });
+            });
+        }
 
         return updatedLeads;
     });
@@ -899,6 +921,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
           return newLeads;
       });
   }, [persistRegisteredLeads]);
+  
+  const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
+      setTransactionActivities(prevActivities => {
+          const newActivity: TransactionActivity = {
+              ...activityData,
+              activityId: `ACT-${Date.now()}`,
+              createdAt: new Date().toISOString(),
+          };
+          const updatedActivities = [newActivity, ...prevActivities];
+          persistActivities(updatedActivities);
+          return updatedActivities;
+      });
+  }, [persistActivities]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
       setRegisteredLeads(prevLeads => {
@@ -936,7 +971,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           persistRegisteredLeads(newLeads);
           return newLeads;
       });
-  }, [persistRegisteredLeads]);
+  }, [persistRegisteredLeads, addTransactionActivity]);
 
   const addAgentToLead = useCallback((leadId: string, agentEmail: string) => {
     setRegisteredLeads(prev => {
@@ -951,18 +986,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistRegisteredLeads]);
 
-  const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
-      setTransactionActivities(prevActivities => {
-          const newActivity: TransactionActivity = {
-              ...activityData,
-              activityId: `ACT-${Date.now()}`,
-              createdAt: new Date().toISOString(),
-          };
-          const updatedActivities = [newActivity, ...prevActivities];
-          persistActivities(updatedActivities);
-          return updatedActivities;
-      });
-  }, [persistActivities]);
   
   const getTenantImprovements = useCallback((leadId: string): TenantImprovementsSheet | null => {
     return tenantImprovements.find(sheet => sheet.leadId === leadId) || null;
