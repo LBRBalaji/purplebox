@@ -182,7 +182,7 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead, setActiveChat } = useData();
+  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead } = useData();
   const { toast } = useToast();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
@@ -276,36 +276,6 @@ export default function LeadDetailPage() {
   const isAgent = user?.email === lead?.agentId;
 
   const isBrokeredDeal = lead?.isO2OCollaborator;
-  
-  const handleChatInit = () => {
-    if (!lead || !selectedProvider) return;
-
-    const listingId = selectedProvider.properties[0]?.listingId;
-    const listing = listings.find(l => l.listingId === listingId);
-
-    // Determine the chat partner based on the plan
-    let chatPartnerName = "O2O Team";
-    if (!isBrokeredDeal) {
-        if (isCustomer) {
-            chatPartnerName = providerUser?.companyName || "Developer";
-        } else {
-            chatPartnerName = customer?.companyName || "Customer";
-        }
-    }
-
-    const submissionForChat: ChatSubmission = {
-      submissionId: `chat-${lead.id}-${selectedProvider.providerEmail}`,
-      listingId: listingId || '',
-      demandId: lead.id,
-      providerEmail: selectedProvider.providerEmail,
-      listing: listing,
-      customerName: customer?.userName || 'Customer',
-      customerCompany: customer?.companyName || 'Customer Company',
-      chatPartnerName: chatPartnerName,
-      status: 'Approved'
-    };
-    setActiveChat(submissionForChat);
-  };
 
    const handleAddAgent = (agentEmail: string) => {
     if (lead) {
@@ -325,8 +295,7 @@ export default function LeadDetailPage() {
   const primaryListingForTransaction = selectedProviderListings.length > 0 ? selectedProviderListings[0] : null;
 
   const canAddActivity = isO2O || isAgent || (!isBrokeredDeal && (isCustomer || isProvider));
-  const canChat = isO2O || isAgent || !isBrokeredDeal;
-
+  
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
   
   return (
@@ -405,7 +374,7 @@ export default function LeadDetailPage() {
                         <div className="space-y-6 sticky top-24">
                              <Card>
                                 <CardHeader>
-                                  <CardTitle>Participants &amp; Chat</CardTitle>
+                                  <CardTitle>Participants</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                   <div className="space-y-4 text-sm">
@@ -431,12 +400,6 @@ export default function LeadDetailPage() {
                                         </div>
                                     )}
                                   </div>
-                                  {canChat && (
-                                      <Button variant="outline" className="w-full mt-4" onClick={handleChatInit}>
-                                          <MessageSquare className="mr-2 h-4 w-4" />
-                                          Chat with Participants
-                                      </Button>
-                                  )}
                                 </CardContent>
                              </Card>
                              { (isO2O || isAgent) && (
