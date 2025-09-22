@@ -885,22 +885,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
         persistRegisteredLeads(updatedLeads);
 
         if (newLead.isO2OCollaborator) {
-            // Brokered deal: Notify the super admin
+            // Brokered deal (e.g. Free listing quote request): Notify the super admin
              addNotification({
                 type: 'new_lead_for_provider',
                 title: `New Brokering Lead: ${newLead.leadName}`,
-                message: `A brokered lead has been created and requires O2O team action.`,
-                href: `/dashboard/transactions`,
+                message: `A quote was requested for a free listing, creating a brokered lead.`,
+                href: `/dashboard?tab=broking-desk`, // Or a more specific broking view
                 recipientEmail: 'superadmin@o2o.com',
                 triggeredBy: userEmail || 'system'
             });
         } else {
-            // Direct deal: Notify each provider
+            // Direct deal (e.g. Premium listing quote request): Notify each provider
             newLead.providers.forEach(provider => {
                 addNotification({
                     type: 'new_lead_for_provider',
-                    title: `New Lead: ${newLead.leadName}`,
-                    message: `A new lead has been registered with you for ${provider.properties.length} propert(y/ies). Please acknowledge.`,
+                    title: `New Direct Lead: ${newLead.leadName}`,
+                    message: `A customer requested a quote for your premium listing(s). Please acknowledge.`,
                     href: `/dashboard?tab=registered-leads`,
                     recipientEmail: provider.providerEmail,
                     triggeredBy: userEmail || 'system'

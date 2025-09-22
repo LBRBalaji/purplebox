@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-MFVEWH6KGC3XS",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T17:41:21.119Z"
+  },
+  {
     "id": "LDR-QUOTE-1758555971632",
     "customerId": "betacustomer2@o2o.com",
     "leadName": "Beta Retail",

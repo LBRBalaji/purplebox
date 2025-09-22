@@ -259,7 +259,7 @@ export default function ListingDetailPage() {
     const executeQuoteRequest = () => {
         if (!user || !listing) return;
         
-        const isBrokered = listing.plan === 'Free';
+        const isBrokered = listing.plan !== 'Paid_Premium';
         const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
 
         const newLead: Omit<RegisteredLead, 'registeredAt'> = {
@@ -281,7 +281,7 @@ export default function ListingDetailPage() {
         addRegisteredLead(newLead, user.email);
         setJustRequestedQuote(true);
         
-        const partnerName = isBrokered ? "the O2O team" : "the developer";
+        const partnerName = isBrokered ? "the O2O team" : (users[listing.developerId]?.companyName || "the developer");
         
         toast({
             title: 'Quote Request Sent!',
@@ -692,7 +692,7 @@ export default function ListingDetailPage() {
                                 </CardFooter>
                             </Card>
 
-                            {!isPremiumListing && (
+                             {!isPremiumListing && (
                                 <Alert variant="default" className="bg-primary/5 border-primary/20">
                                     <Sparkles className="h-4 w-4 text-primary" />
                                     <AlertTitle className="font-semibold text-primary/90">Note for Customers</AlertTitle>
@@ -743,7 +743,3 @@ export default function ListingDetailPage() {
     );
 
 }
-
-    
-
-    
