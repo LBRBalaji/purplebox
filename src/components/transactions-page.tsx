@@ -239,7 +239,7 @@ function RegisterLeadForm() {
                                 </CommandItem>
                             ))}
                             </CommandGroup></CommandList></Command></PopoverContent></Popover>
-                             <FormDescription className="text-xs">Select an existing customer to pre-fill their details. The logged-in admin/agent will be the contact person.</FormDescription>
+                        <FormDescription className="text-xs">Select an existing customer to pre-fill their details. The logged-in admin/agent will be the contact person.</FormDescription>
                         </FormItem>
                     )}
                 )) : (
@@ -398,5 +398,3 @@ export function TransactionsPage() {
       </div>
   );
 }
-
-    
