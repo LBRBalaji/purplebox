@@ -308,7 +308,7 @@ function RegisterLeadForm() {
                                                                 disabled={!canSelectMore && !field.value?.includes(listing.listingId)}
                                                             />
                                                             <label htmlFor={`${field.name}-${listing.listingId}`} className={cn("text-sm font-medium leading-none cursor-pointer", !canSelectMore && !field.value?.includes(listing.listingId) && "text-muted-foreground")}>
-                                                                {listing.name} <span className="text-muted-foreground">({listing.location} - {listing.sizeSqFt.toLocaleString()} sq. ft.)</span>
+                                                                {listing.listingId} - {listing.name} <span className="text-muted-foreground">({listing.location} - {listing.sizeSqFt.toLocaleString()} sq. ft.)</span>
                                                             </label>
                                                         </div>
                                                         <Button asChild variant="ghost" size="icon">
