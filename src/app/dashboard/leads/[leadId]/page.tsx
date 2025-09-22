@@ -309,7 +309,7 @@ export default function LeadDetailPage() {
   
   const primaryListingForTransaction = selectedProviderListings.length > 0 ? selectedProviderListings[0] : null;
 
-  const canAddActivity = isO2O || isAgent || (!isBrokeredDeal && (isCustomer || isProvider));
+  const canAddActivity = isO2O || isAgent || isCustomer;
   
   const getBackLink = () => {
     // This function determines where the 'Back' button navigates to.
