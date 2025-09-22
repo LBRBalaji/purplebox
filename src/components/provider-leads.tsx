@@ -179,7 +179,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                                 <span className="text-xs text-muted-foreground">{contactToShow.email}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="max-w-xs truncate">{lead.requirementsSummary}</TableCell>
+                                        <TableCell className="max-w-sm truncate">{lead.requirementsSummary}</TableCell>
                                         
                                         {isAgent || isAdminOrO2O ? (
                                           <>

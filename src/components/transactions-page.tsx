@@ -112,22 +112,33 @@ function RegisterLeadForm() {
     if (prefillLeadId && user) {
         const leadToPrefill = registeredLeads.find(l => l.id === prefillLeadId);
         if (leadToPrefill) {
+            const originalListing = listings.find(l => leadToPrefill.providers[0]?.properties[0]?.listingId === l.listingId);
+            
             form.reset({
                 ...form.getValues(),
                 id: `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
                 customerId: leadToPrefill.customerId,
-                leadName: leadToPrefill.leadName,
+                leadName: leadToPrefill.leadName, // This is the company name
                 requirementsSummary: leadToPrefill.requirementsSummary,
+                // Contact person is the logged-in admin/agent
                 leadContact: user.userName,
                 leadEmail: user.email,
                 leadPhone: user.phone,
-                providers: [], 
+                // Pre-fill from original listing
+                location: originalListing?.location || '',
+                size: originalListing?.sizeSqFt || undefined,
+                possession: originalListing?.availabilityDate || 'Immediate',
+                // Pre-load the provider and their listing
+                providers: originalListing ? [{
+                    providerEmail: originalListing.developerId,
+                    listingIds: [originalListing.listingId],
+                }] : [],
             });
         }
     } else if (!form.getValues('id')) {
       form.setValue('id', `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`);
     }
-  }, [form, prefillLeadId, registeredLeads, user]);
+  }, [form, prefillLeadId, registeredLeads, user, listings]);
 
 
   const allProviders = React.useMemo(() =>
@@ -423,6 +434,3 @@ export function TransactionsPage() {
       </div>
   );
 }
-
-    
-
