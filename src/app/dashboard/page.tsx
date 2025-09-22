@@ -126,7 +126,7 @@ const MainDashboard = () => {
                 {hasPendingSubmissions && <span className="ml-2 h-2 w-2 rounded-full bg-destructive animate-ping"></span>}
             </TabsTrigger>
             <TabsTrigger value="active-demands">Active Demands</TabsTrigger>
-            <TabsTrigger value="registered-leads">Registered Leads</TabsTrigger>
+            <TabsTrigger value="registered-leads">All Leads</TabsTrigger>
             <TabsTrigger value="my-shortlist">My Shortlist</TabsTrigger>
         </TabsList>
         <TabsContent value="approval-queue">

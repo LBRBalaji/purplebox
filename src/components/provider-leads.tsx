@@ -41,7 +41,7 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
 };
 
 export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'broking' }) {
-  const { user, users: allUsers, isLoading: isAuthLoading } = useAuth();
+  const { user, users, isLoading: isAuthLoading } = useAuth();
   const { registeredLeads, addRegisteredLead } = useData();
   const router = useRouter();
   
