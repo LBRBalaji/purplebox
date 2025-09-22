@@ -692,6 +692,16 @@ export default function ListingDetailPage() {
                                 </CardFooter>
                             </Card>
 
+                            {!isPremiumListing && (
+                                <Alert variant="default" className="bg-primary/5 border-primary/20">
+                                    <Sparkles className="h-4 w-4 text-primary" />
+                                    <AlertTitle className="font-semibold text-primary/90">Note for Customers</AlertTitle>
+                                    <AlertDescription className="text-primary/80">
+                                        Always look for Premium Listings to engage directly with property developers.
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Certificates & Approvals</CardTitle>
@@ -733,3 +743,5 @@ export default function ListingDetailPage() {
     );
 
 }
+
+    
