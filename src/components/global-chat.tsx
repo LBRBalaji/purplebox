@@ -26,7 +26,8 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
         const allUserLeads = registeredLeads.filter(lead => 
             lead.customerId === user.email || 
             lead.agentId === user.email ||
-            lead.providers.some(p => p.providerEmail === user.email)
+            lead.providers.some(p => p.providerEmail === user.email) ||
+            (lead.isO2OCollaborator && (user.role === 'SuperAdmin' || user.role === 'O2O'))
         );
 
         return allUserLeads.flatMap(lead => 
@@ -40,7 +41,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                 let chatPartnerName: string;
                 let partnerInitials: string;
 
-                if (lead.isO2OCollaborator && (user.email === customer?.email || user.email === developer?.email)) {
+                if (lead.isO2OCollaborator && (user.email === customer?.email || user.email === developer?.email || user.email === lead.agentId)) {
                     chatPartnerName = "O2O Team";
                     partnerInitials = "O2O";
                 } else if (user.email === customer?.email) {

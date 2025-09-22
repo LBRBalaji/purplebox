@@ -112,5 +112,11 @@
     "companyName": "Beta Retail",
     "listingId": "LST-91LUXK",
     "timestamp": 1758540312347
+  },
+  {
+    "userId": "customer2@o2o.com",
+    "companyName": "Beta Retail",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758551512436
   }
 ]

@@ -1,5 +1,61 @@
 [
   {
+    "leadId": "LDR-MFV2R6SLTJ84B",
+    "activityType": "Proposal Submitted",
+    "createdBy": "namasivayam.lion@gmail.com",
+    "details": {
+      "listingId": "LST-91LUXK",
+      "rentPerSft": 20,
+      "rentalSecurityDeposit": 6,
+      "actualChargeableArea": 31000
+    },
+    "activityId": "ACT-1758547276278",
+    "createdAt": "2025-09-22T13:21:16.278Z"
+  },
+  {
+    "leadId": "LDR-MFV2R6SLTJ84B",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "incharge",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758547241153",
+    "createdAt": "2025-09-22T13:20:41.153Z"
+  },
+  {
+    "leadId": "LDR-MFV2R6SLTJ84B",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Namasivayam",
+        "title": "incharge",
+        "mobile": "+91 9841098170",
+        "email": "namasivayam.lion@gmail.com"
+      }
+    },
+    "createdBy": "namasivayam.lion@gmail.com",
+    "activityId": "ACT-1758547241148",
+    "createdAt": "2025-09-22T13:20:41.148Z"
+  },
+  {
+    "leadId": "LDR-MFV1SYQLWI12A",
+    "activityType": "Proposal Submitted",
+    "createdBy": "namasivayam.lion@gmail.com",
+    "details": {
+      "listingId": "LST-91LUXK",
+      "rentPerSft": 20,
+      "rentalSecurityDeposit": 6,
+      "actualChargeableArea": 31000
+    },
+    "activityId": "ACT-1758547191033",
+    "createdAt": "2025-09-22T13:19:51.033Z"
+  },
+  {
     "leadId": "LDR-MFV33FU44BSSY",
     "activityType": "Proposal Submitted",
     "createdBy": "namasivayam.lion@gmail.com",
@@ -9,8 +65,8 @@
       "rentalSecurityDeposit": 6,
       "actualChargeableArea": 31000
     },
-    "activityId": "ACT-1758546566922",
-    "createdAt": "2025-09-22T13:09:26.922Z"
+    "activityId": "ACT-1758546566919",
+    "createdAt": "2025-09-22T13:09:26.919Z"
   },
   {
     "leadId": "LDR-MFC5GLK38WELH",

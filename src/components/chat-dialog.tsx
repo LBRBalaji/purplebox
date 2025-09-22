@@ -58,9 +58,9 @@ export function ChatPanel({
   const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const threadId = submission ? `chat-${submission.demandId}-${submission.providerEmail}` : null;
-  const otherUserTyping = threadId ? typingStatus[threadId] : null;
   const lead = registeredLeads.find(l => l.id === submission?.demandId);
+  const threadId = lead && submission ? `chat-${lead.id}-${submission.providerEmail}` : null;
+  const otherUserTyping = threadId ? typingStatus[threadId] : null;
   
   const fetchMessages = useCallback(async () => {
     if (!threadId) return;
@@ -161,7 +161,8 @@ export function ChatPanel({
           }
         };
         setMessages(prev => [...prev, message]);
-        await addChatMessage(threadId, message, { lead, partner: users[submission.providerEmail] });
+        const partner = lead.isO2OCollaborator ? users['superadmin@o2o.com'] : users[submission.providerEmail];
+        await addChatMessage(threadId, message, { lead, partner });
       } else {
         toast({ variant: 'destructive', title: 'Upload Failed', description: 'Could not upload the file.' });
       }
@@ -179,7 +180,7 @@ export function ChatPanel({
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !threadId || !user || !lead) return;
+    if (!newMessage.trim() || !threadId || !user || !lead || !submission) return;
 
     setIsSending(true);
 
@@ -196,7 +197,16 @@ export function ChatPanel({
     if(typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
     try {
-      await addChatMessage(threadId, message, { lead, partner: users[submission.providerEmail] });
+      let partner = null;
+      if (lead.isO2OCollaborator) {
+        // In a brokered deal, all communication goes to the O2O Super Admin
+        partner = users['superadmin@o2o.com'];
+      } else {
+        // In a direct deal, find the other party
+        partner = user.email === lead.customerId ? users[submission.providerEmail] : users[lead.customerId];
+      }
+
+      await addChatMessage(threadId, message, { lead, partner });
     } catch (error) {
         console.error("Failed to send message:", error);
     } finally {
@@ -214,11 +224,13 @@ export function ChatPanel({
     if (messages.length > 0) return null;
 
     if (user?.email === lead.customerId) { // Customer starting chat
-      return `Hi ${submission.chatPartnerName}, I'm interested in property ${submission.listing?.listingId}.`;
+      const partnerName = lead.isO2OCollaborator ? 'the O2O Team' : submission.chatPartnerName;
+      return `Hi ${partnerName}, I'm interested in property ${submission.listing?.listingId}.`;
     }
 
     if (user?.email === submission.providerEmail) { // Provider starting chat
-      return `Hi ${submission.customerName}, I see you're interested in our property ${submission.listing?.listingId}. How can I help?`;
+       const partnerName = lead.isO2OCollaborator ? 'the O2O Team' : submission.customerName;
+      return `Hi ${partnerName}, I see you're interested in our property ${submission.listing?.listingId}. How can I help?`;
     }
 
     // Default for O2O
