@@ -159,7 +159,7 @@ WareHouse Origin
     <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>{demand.demandId}</CardTitle>
-        <CardDescription>
+        <div className="text-sm text-muted-foreground">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="secondary" className="flex items-center gap-1.5">
               {demand.operationType === 'Manufacturing' ? <Factory className="h-3 w-3" /> : <Building className="h-3 w-3" />}
@@ -168,7 +168,7 @@ WareHouse Origin
             {demand.buildingType && <Badge variant="outline" className="flex items-center gap-1.5"><Building className="h-3 w-3" />{demand.buildingType}</Badge>}
             {demand.optionals?.crane?.required && <Badge variant="outline" className="flex items-center gap-1.5"><Construction className="h-3 w-3" />Crane</Badge>}
           </div>
-        </CardDescription>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4 flex-grow">
         <div className="text-sm">
