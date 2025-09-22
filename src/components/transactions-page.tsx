@@ -50,7 +50,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData } from '@/contexts/data-context';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const providerSelectionSchema = z.object({
   providerEmail: z.string().email(),
@@ -108,25 +108,28 @@ function RegisterLeadForm() {
   const locationValue = form.watch('location');
 
   React.useEffect(() => {
-    if (prefillLeadId) {
+    if (prefillLeadId && user) {
         const leadToPrefill = registeredLeads.find(l => l.id === prefillLeadId);
         if (leadToPrefill) {
             form.reset({
                 ...form.getValues(),
                 id: `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+                // Prefill company name and requirements, but NOT personal contact details.
                 customerId: leadToPrefill.customerId,
                 leadName: leadToPrefill.leadName,
-                leadContact: leadToPrefill.leadContact,
-                leadEmail: leadToPrefill.leadEmail,
-                leadPhone: leadToPrefill.leadPhone,
                 requirementsSummary: leadToPrefill.requirementsSummary,
+                // Use the logged-in ADMIN's contact details as the point of contact for the provider.
+                leadContact: user.userName,
+                leadEmail: user.email,
+                leadPhone: user.phone,
                 providers: [], 
             });
         }
     } else if (!form.getValues('id')) {
       form.setValue('id', `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`);
     }
-  }, [form, prefillLeadId, registeredLeads]);
+  }, [form, prefillLeadId, registeredLeads, user]);
+
 
   const allProviders = React.useMemo(() =>
     Object.values(users).filter(u => u.role === 'Warehouse Developer'),
@@ -170,7 +173,7 @@ function RegisterLeadForm() {
       requirementsSummary: data.requirementsSummary,
       registeredBy: user.email,
       providers: leadProviders,
-      isO2OCollaborator: false,
+      isO2OCollaborator: false, // This is a direct registration, so it's not brokered by default
     };
 
     addRegisteredLead(newLead, user?.email);
@@ -340,6 +343,7 @@ function RegisterLeadForm() {
 export function TransactionsPage() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const prefillFromLead = searchParams.get('prefillFromLead');
 
   const isAgent = user?.role === 'Agent';
@@ -350,17 +354,19 @@ export function TransactionsPage() {
   React.useEffect(() => {
     if (prefillFromLead) {
         setActiveTab('register');
+        // Clean the URL parameter after setting the tab
+        router.replace('/dashboard/transactions', { scroll: false });
     }
-  }, [prefillFromLead]);
+  }, [prefillFromLead, router]);
 
   return (
     <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-            <h2 className="text-3xl font-bold font-headline tracking-tight">Transactions</h2>
+            <h2 className="text-3xl font-bold font-headline tracking-tight">Broking Transactions</h2>
             <p className="text-muted-foreground mt-2">
               {isAgent
                 ? 'Register new business leads or manage the activity for existing ones.'
-                : 'Manage ongoing transactions and register new business leads.'
+                : 'Manage ongoing brokered transactions and register new business leads.'
               }
             </p>
         </div>
@@ -381,3 +387,5 @@ export function TransactionsPage() {
       </div>
   );
 }
+
+    
