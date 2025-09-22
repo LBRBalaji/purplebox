@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Handshake, UserCheck } from 'lucide-react';
+import { Handshake, UserCheck, AlertTriangle } from 'lucide-react';
 
 type AcknowledgeLeadDialogProps = {
   isOpen: boolean;
@@ -63,13 +63,22 @@ export function AcknowledgeLeadDialog({ isOpen, onOpenChange, lead, onSubmit }: 
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Alert variant="default" className="bg-secondary/50">
-                <UserCheck className="h-4 w-4" />
-                <AlertTitle className="font-semibold">Formal Acknowledgment</AlertTitle>
-                <AlertDescription className="text-xs">
-                    I/We hereby acknowledge that Customer ID <strong>{lead.customerId}</strong> is a customer of Lakshmi Balaji O2O.
-                </AlertDescription>
-            </Alert>
+            <div className="space-y-3">
+                <Alert variant="default" className="bg-secondary/50">
+                    <UserCheck className="h-4 w-4" />
+                    <AlertTitle className="font-semibold">Formal Acknowledgment</AlertTitle>
+                    <AlertDescription className="text-xs">
+                        I/We hereby acknowledge that Customer ID <strong>{lead.customerId}</strong> is a customer of Lakshmi Balaji O2O.
+                    </AlertDescription>
+                </Alert>
+                 <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle className="font-semibold">Financial Commitment</AlertTitle>
+                    <AlertDescription className="text-xs">
+                        By acknowledging this lead, you agree that this is a brokered transaction. Upon successful conversion of this lead, you are contractually bound to pay the agreed-upon brokerage fees to Lakshmi Balaji O2O.
+                    </AlertDescription>
+                </Alert>
+            </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <FormField

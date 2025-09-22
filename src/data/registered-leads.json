@@ -1,5 +1,58 @@
 [
   {
+    "id": "LDR-MFV2R6SLTJ84B",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T12:10:26.342Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T12:09:55.917Z"
+  },
+  {
+    "id": "LDR-MFV1TH74OXSH8",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T12:00:24.310Z"
+  },
+  {
     "id": "LDR-MFV1SYQLWI12A",
     "customerId": "customer2@o2o.com",
     "leadName": "Beta Retail",
@@ -14,10 +67,7 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Pending",
-            "rentPerSft": 20,
-            "rentalSecurityDeposit": 6,
-            "actualChargeableArea": 31000
+            "status": "Pending"
           }
         ]
       }
