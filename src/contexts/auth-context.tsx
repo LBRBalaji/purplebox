@@ -48,6 +48,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
+  const persistUsers = async (updatedUsers: { [email: string]: User }) => {
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUsers),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to persist users');
+      }
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error('Error saving users:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Save Failed',
+        description: 'Could not save user data to the server.',
+      });
+    }
+  };
+
   const fetchUsers = useCallback(async () => {
     try {
       const response = await fetch('/api/users');
@@ -67,7 +88,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
         const initialUsers = { [defaultAdmin.email]: defaultAdmin };
         await persistUsers(initialUsers);
-        setUsers(initialUsers);
       } else {
         setUsers(data);
       }
@@ -96,27 +116,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sessionStorage.removeItem('user');
     }
   }, [fetchUsers]);
-
-  const persistUsers = async (updatedUsers: { [email: string]: User }) => {
-    try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedUsers),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to persist users');
-      }
-      setUsers(updatedUsers);
-    } catch (error) {
-      console.error('Error saving users:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Save Failed',
-        description: 'Could not save user data to the server.',
-      });
-    }
-  }
 
   const login = (email: string, onLoginSuccess?: () => void) => {
     const foundUser = users[email.toLowerCase()];
