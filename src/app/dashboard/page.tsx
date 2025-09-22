@@ -163,7 +163,7 @@ const MainDashboard = () => {
 
     // Super Admin gets a re-organized, powerful view
     const renderMainAdminContent = () => (
-       <Tabs value={superAdminTab} onValueChange={setSuperAdminTab} className="w-full">
+       <Tabs value={superAdminTab} onValueChange={(tab) => router.push(`/dashboard?tab=${tab}`)} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="broking-desk">O2O Broking Desk</TabsTrigger>
             <TabsTrigger value="platform-oversight">Platform Oversight Console</TabsTrigger>

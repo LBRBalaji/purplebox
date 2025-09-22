@@ -66,7 +66,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
     return registeredLeads.filter(lead => 
       lead.providers.some(p => p.providerEmail === user.email) && !lead.isO2OCollaborator
     );
-  }, [registeredLeads, user, isAgent, isAdminOrO2O, users, view]);
+  }, [registeredLeads, user, isAgent, isAdminOrO2O, view]);
   
   const handleRegisterWithProvider = (lead: RegisteredLead) => {
     const query = new URLSearchParams();
