@@ -159,7 +159,7 @@ WareHouse Origin
     <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>{demand.demandId}</CardTitle>
-        <CardDescription asChild>
+        <CardDescription>
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="secondary" className="flex items-center gap-1.5">
               {demand.operationType === 'Manufacturing' ? <Factory className="h-3 w-3" /> : <Building className="h-3 w-3" />}
@@ -260,5 +260,3 @@ export function DemandList() {
     </div>
   );
 }
-
-    

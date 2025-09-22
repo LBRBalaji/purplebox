@@ -148,5 +148,29 @@
     "companyName": "Beta Retail",
     "listingId": "LST-91LUXK",
     "timestamp": 1758553730007
+  },
+  {
+    "userId": "customer1@o2o.com",
+    "companyName": "Alpha Logistics",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758554325025
+  },
+  {
+    "userId": "anonymous_anon_1758553638117_9n1vlyf",
+    "companyName": "Anonymous",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758554328164
+  },
+  {
+    "userId": "anonymous_anon_1758554418584_wd5e0q2",
+    "companyName": "Anonymous",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758554420562
+  },
+  {
+    "userId": "murugan@xyzlogistics.com",
+    "companyName": "XYZ Logistics",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758554432241
   }
 ]
