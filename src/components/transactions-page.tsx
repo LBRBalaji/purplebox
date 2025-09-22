@@ -373,7 +373,7 @@ export function TransactionsPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="activity">
-                    {isAgent ? 'My Registered Leads' : (isSuperAdmin ? 'All Brokering Leads' : 'My Acknowledged Leads')}
+                    {isAgent ? 'My Registered Leads' : (isSuperAdmin ? 'Transactions on Broking' : 'My Acknowledged Leads')}
                 </TabsTrigger>
                 <TabsTrigger value="register">Register New Lead</TabsTrigger>
             </TabsList>
