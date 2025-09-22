@@ -256,9 +256,10 @@ export default function ListingDetailPage() {
     const prevListingId = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
     const nextListingId = currentIndex < navigationList.length - 1 ? navigationList[currentIndex + 1] : null;
 
-    const executeQuoteRequest = (isBrokered = false) => {
+    const executeQuoteRequest = () => {
         if (!user || !listing) return;
-
+        
+        const isBrokered = listing.plan === 'Free';
         const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
 
         const newLead: Omit<RegisteredLead, 'registeredAt'> = {
@@ -288,8 +289,8 @@ export default function ListingDetailPage() {
         });
     };
 
-    const handleGetQuote = (isBrokered = false) => {
-        const action = () => executeQuoteRequest(isBrokered);
+    const handleGetQuote = () => {
+        const action = () => executeQuoteRequest();
         if (!user) {
             setPendingAction(() => action);
             setIsLoginDialogOpen(true);
@@ -680,14 +681,11 @@ export default function ListingDetailPage() {
                                             </Button>
                                             <p className="text-xs text-muted-foreground px-2">Your interaction begins here. Track all communication, site visits, and negotiations for this property on the 'My Transactions' page.</p>
                                         </div>
-                                     ) : isPremiumListing ? (
-                                        <Button onClick={() => handleGetQuote(false)} className="w-full">
-                                            Get Commercials Quote
-                                        </Button>
                                      ) : (
-                                        <Button className="w-full" onClick={() => handleGetQuote(true)}>
+                                        <Button className="w-full" onClick={() => handleGetQuote()}>
                                             <div className="flex flex-col text-center">
-                                                <span>Get Quote (via O2O Broking)</span>
+                                                <span>Get Commercials Quote</span>
+                                                <span className="text-xs font-normal opacity-80">({isPremiumListing ? "Direct from Developer" : "via O2O Broking"})</span>
                                             </div>
                                         </Button>
                                      )}
@@ -720,7 +718,7 @@ export default function ListingDetailPage() {
                                     </p>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button className="w-full" onClick={() => handleGetQuote(true)}>
+                                    <Button className="w-full" onClick={() => handleGetQuote()}>
                                         <ClipboardPlus className="mr-2 h-4 w-4" /> Log Demand
                                     </Button>
                                 </CardFooter>

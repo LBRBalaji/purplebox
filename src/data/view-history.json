@@ -124,5 +124,29 @@
     "companyName": "Anonymous",
     "listingId": "LST-91LUXK",
     "timestamp": 1758552592107
+  },
+  {
+    "userId": "anonymous_anon_1758553638117_9n1vlyf",
+    "companyName": "Anonymous",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758553639819
+  },
+  {
+    "userId": "customer1@o2o.com",
+    "companyName": "Alpha Logistics",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758553648926
+  },
+  {
+    "userId": "anonymous_anon_1758553711619_id66lrz",
+    "companyName": "Anonymous",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758553713495
+  },
+  {
+    "userId": "customer2@o2o.com",
+    "companyName": "Beta Retail",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758553730007
   }
 ]

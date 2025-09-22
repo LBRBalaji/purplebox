@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -154,11 +155,14 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                 const providerInfoForCurrentUser = lead.providers.find(p => p.providerEmail === user?.email);
                                 const hasPending = isProvider && providerInfoForCurrentUser?.properties.some(p => p.status === 'Pending');
                                 
-                                const registeredByO2O = users[lead.registeredBy];
+                                const registeredByUser = users[lead.registeredBy];
 
-                                let contactToShow = { name: lead.leadContact, email: lead.leadEmail };
-                                if (isProvider && lead.isO2OCollaborator && registeredByO2O) {
-                                    contactToShow = { name: registeredByO2O.userName, email: registeredByO2O.email };
+                                let contactToShow: { name: string; email: string; };
+
+                                if (isProvider && lead.isO2OCollaborator && registeredByUser) {
+                                    contactToShow = { name: registeredByUser.userName, email: registeredByUser.email };
+                                } else {
+                                    contactToShow = { name: lead.leadContact, email: lead.leadEmail };
                                 }
 
 
