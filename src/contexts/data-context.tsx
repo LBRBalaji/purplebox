@@ -884,33 +884,38 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const updatedLeads = [newLead, ...prevLeads];
         persistRegisteredLeads(updatedLeads);
 
-        if (newLead.isO2OCollaborator) {
-            // Brokered deal (e.g. Free listing quote request): Notify the super admin
-             addNotification({
+        // Notify relevant parties
+        const registeredByUser = users[newLead.registeredBy];
+        const isRegisteredByAdminOrAgent = registeredByUser?.role === 'SuperAdmin' || registeredByUser?.role === 'O2O' || registeredByUser?.role === 'Agent';
+
+        newLead.providers.forEach(provider => {
+            const providerUser = users[provider.providerEmail];
+            let title: string;
+            let message: string;
+
+            if (isRegisteredByAdminOrAgent && !newLead.isO2OCollaborator) {
+                // Admin/Agent registering a direct lead to a provider
+                title = `New Lead from O2O: ${newLead.leadName}`;
+                message = `${registeredByUser.userName} from ${registeredByUser.companyName} has registered a new lead for you.`;
+            } else {
+                // Customer directly requesting a quote OR admin creating brokered lead
+                title = newLead.isO2OCollaborator ? `New Brokered Lead: ${newLead.leadName}` : `New Direct Lead: ${newLead.leadName}`;
+                message = newLead.isO2OCollaborator ? `A lead for a free listing requires O2O collaboration.` : `A customer has requested a quote for your premium listing(s). Please acknowledge.`;
+            }
+
+            addNotification({
                 type: 'new_lead_for_provider',
-                title: `New Brokering Lead: ${newLead.leadName}`,
-                message: `A quote was requested for a free listing, creating a brokered lead.`,
-                href: `/dashboard?tab=broking-desk`, // Or a more specific broking view
-                recipientEmail: 'superadmin@o2o.com',
+                title: title,
+                message: message,
+                href: `/dashboard?tab=registered-leads`,
+                recipientEmail: provider.providerEmail,
                 triggeredBy: userEmail || 'system'
             });
-        } else {
-            // Direct deal (e.g. Premium listing quote request): Notify each provider
-            newLead.providers.forEach(provider => {
-                addNotification({
-                    type: 'new_lead_for_provider',
-                    title: `New Direct Lead: ${newLead.leadName}`,
-                    message: `A customer requested a quote for your premium listing(s). Please acknowledge.`,
-                    href: `/dashboard?tab=registered-leads`,
-                    recipientEmail: provider.providerEmail,
-                    triggeredBy: userEmail || 'system'
-                });
-            });
-        }
+        });
 
         return updatedLeads;
     });
-  }, [persistRegisteredLeads, addNotification]);
+  }, [persistRegisteredLeads, addNotification, users]);
 
   const updateRegisteredLead = useCallback((updatedLead: RegisteredLead) => {
       setRegisteredLeads(prevLeads => {
@@ -931,12 +936,56 @@ export function DataProvider({ children }: { children: ReactNode }) {
           };
           const updatedActivities = [newActivity, ...prevActivities];
           persistActivities(updatedActivities);
+          
+          const lead = registeredLeads.find(l => l.id === newActivity.leadId);
+          if (lead) {
+              const participants = new Set([lead.customerId, ...(lead.agentId ? [lead.agentId] : []), ...lead.providers.map(p => p.providerEmail)]);
+              if (lead.isO2OCollaborator) {
+                  participants.add('superadmin@o2o.com');
+              }
+              
+              participants.forEach(participantEmail => {
+                  if(participantEmail !== newActivity.createdBy) {
+                      addNotification({
+                          type: 'new_activity',
+                          title: `Update on Transaction: ${lead.id}`,
+                          message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
+                          href: `/dashboard/leads/${lead.id}`,
+                          recipientEmail: participantEmail,
+                          triggeredBy: newActivity.createdBy
+                      });
+                  }
+              });
+          }
+
           return updatedActivities;
       });
-  }, [persistActivities]);
+  }, [persistActivities, registeredLeads, addNotification, users]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
       setRegisteredLeads(prevLeads => {
+          const leadToUpdate = prevLeads.find(lead => lead.id === leadId);
+          if (leadToUpdate) {
+            addNotification({
+                type: 'new_activity',
+                title: `Lead Acknowledged by ${ackDetails.name}`,
+                message: `Provider has acknowledged the lead for transaction ${leadId}.`,
+                href: `/dashboard/leads/${leadId}`,
+                recipientEmail: leadToUpdate.customerId,
+                triggeredBy: providerEmail
+            });
+            if (leadToUpdate.agentId) {
+                addNotification({
+                    type: 'new_activity',
+                    title: `Lead Acknowledged by ${ackDetails.name}`,
+                    message: `Provider has acknowledged the lead for transaction ${leadId}.`,
+                    href: `/dashboard/leads/${leadId}`,
+                    recipientEmail: leadToUpdate.agentId,
+                    triggeredBy: providerEmail
+                });
+            }
+          }
+          
           const newLeads = prevLeads.map(lead => {
               if (lead.id === leadId) {
                   const updatedProviders = lead.providers.map(p => {
@@ -971,7 +1020,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           persistRegisteredLeads(newLeads);
           return newLeads;
       });
-  }, [persistRegisteredLeads, addTransactionActivity]);
+  }, [persistRegisteredLeads, addTransactionActivity, addNotification]);
 
   const addAgentToLead = useCallback((leadId: string, agentEmail: string) => {
     setRegisteredLeads(prev => {
