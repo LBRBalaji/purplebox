@@ -199,6 +199,7 @@ type DataContextType = {
   registeredLeads: RegisteredLead[];
   addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => void;
   updateRegisteredLead: (lead: RegisteredLead) => void;
+  acknowledgeLeadProperties: (leadId: string, providerEmail: string, details: AcknowledgmentDetails) => void;
   transactionActivities: TransactionActivity[];
   addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
   getTenantImprovements: (leadId: string) => TenantImprovementsSheet | null;
@@ -227,6 +228,7 @@ type DataContextType = {
   notifications: Notification[];
   unreadCount: number;
   markNotificationsAsRead: () => void;
+  addAgentToLead: (leadId: string, agentEmail: string) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -893,6 +895,49 @@ export function DataProvider({ children }: { children: ReactNode }) {
       });
   }, [persistRegisteredLeads]);
   
+  const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
+      setRegisteredLeads(prevLeads => {
+          const newLeads = prevLeads.map(lead => {
+              if (lead.id === leadId) {
+                  const updatedProviders = lead.providers.map(p => {
+                      if (p.providerEmail === providerEmail) {
+                          const updatedProperties = p.properties.map(prop => {
+                              if (prop.status === 'Pending') {
+                                  return {
+                                      ...prop,
+                                      status: 'Acknowledged' as RegisteredLeadStatus,
+                                      acknowledgedAt: new Date().toISOString(),
+                                      acknowledgedBy: ackDetails,
+                                  };
+                              }
+                              return prop;
+                          });
+                          return { ...p, properties: updatedProperties };
+                      }
+                      return p;
+                  });
+                  return { ...lead, providers: updatedProviders };
+              }
+              return lead;
+          });
+          persistRegisteredLeads(newLeads);
+          return newLeads;
+      });
+  }, [persistRegisteredLeads]);
+
+  const addAgentToLead = useCallback((leadId: string, agentEmail: string) => {
+    setRegisteredLeads(prev => {
+      const newLeads = prev.map(lead => {
+        if (lead.id === leadId) {
+          return { ...lead, agentId: agentEmail };
+        }
+        return lead;
+      });
+      persistRegisteredLeads(newLeads);
+      return newLeads;
+    });
+  }, [persistRegisteredLeads]);
+
   const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
       setTransactionActivities(prevActivities => {
           const newActivity: TransactionActivity = {
@@ -996,6 +1041,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         registeredLeads,
         addRegisteredLead,
         updateRegisteredLead,
+        acknowledgeLeadProperties,
         transactionActivities,
         addTransactionActivity,
         getTenantImprovements,
@@ -1024,6 +1070,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         notifications,
         unreadCount,
         markNotificationsAsRead,
+        addAgentToLead
         }}>
       {children}
     </DataContext.Provider>

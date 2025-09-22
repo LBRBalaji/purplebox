@@ -42,11 +42,16 @@ const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: stri
 
 export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'broking' }) {
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, addRegisteredLead } = useData();
+  const { registeredLeads, acknowledgeLeadProperties } = useData();
   const router = useRouter();
+  const { toast } = useToast();
+
+  const [leadToAcknowledge, setLeadToAcknowledge] = React.useState<RegisteredLead | null>(null);
+  const [isAcknowledgeDialogOpen, setIsAcknowledgeDialogOpen] = React.useState(false);
   
   const isAgent = user?.role === 'Agent';
   const isAdminOrO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
+  const isProvider = user?.role === 'Warehouse Developer';
 
   const myLeads = React.useMemo(() => {
     if (!user) return [];
@@ -74,6 +79,23 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
     query.set('prefillFromLead', lead.id);
     router.push(`/dashboard/transactions?${query.toString()}`);
   };
+
+  const handleAcknowledgeClick = (lead: RegisteredLead) => {
+    setLeadToAcknowledge(lead);
+    setIsAcknowledgeDialogOpen(true);
+  };
+  
+  const handleAcknowledgeSubmit = (details: AcknowledgmentDetails) => {
+    if (leadToAcknowledge && user?.email) {
+      acknowledgeLeadProperties(leadToAcknowledge.id, user.email, details);
+      toast({
+        title: "Lead Acknowledged",
+        description: `You have successfully acknowledged lead ${leadToAcknowledge.id}.`
+      });
+    }
+    setIsAcknowledgeDialogOpen(false);
+    setLeadToAcknowledge(null);
+  }
 
 
   if (isAuthLoading) {
@@ -131,7 +153,8 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                         <TableBody>
                             {myLeads.map(lead => {
                                 const providerInfoForCurrentUser = lead.providers.find(p => p.providerEmail === user?.email);
-                                
+                                const hasPending = isProvider && providerInfoForCurrentUser?.properties.some(p => p.status === 'Pending');
+
                                 return (
                                     <TableRow key={lead.id}>
                                         <TableCell className="font-medium">{lead.leadName}</TableCell>
@@ -204,11 +227,17 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
 
                                         <TableCell className="text-right">
                                             <div className="flex flex-col gap-2 items-end">
-                                             <Button asChild variant="outline" size="sm">
-                                                <Link href={`/dashboard/leads/${lead.id}`}>
-                                                    View Activity <ArrowRight className="ml-2 h-4 w-4" />
-                                                </Link>
-                                            </Button>
+                                              {hasPending ? (
+                                                  <Button size="sm" onClick={() => handleAcknowledgeClick(lead)}>
+                                                      <Handshake className="mr-2 h-4 w-4" /> Acknowledge Lead
+                                                  </Button>
+                                              ) : (
+                                                  <Button asChild variant="outline" size="sm">
+                                                      <Link href={`/dashboard/leads/${lead.id}`}>
+                                                          View Activity <ArrowRight className="ml-2 h-4 w-4" />
+                                                      </Link>
+                                                  </Button>
+                                              )}
                                             {isAdminOrO2O && lead.isO2OCollaborator && (
                                                 <Button size="sm" onClick={() => handleRegisterWithProvider(lead)}>
                                                     <UserPlus className="mr-2 h-4 w-4" /> Register with Provider
@@ -224,6 +253,12 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                 </CardContent>
             </Card>
         </div>
+        <AcknowledgeLeadDialog 
+            isOpen={isAcknowledgeDialogOpen}
+            onOpenChange={setIsAcknowledgeDialogOpen}
+            lead={leadToAcknowledge}
+            onSubmit={handleAcknowledgeSubmit}
+        />
     </>
   )
 }

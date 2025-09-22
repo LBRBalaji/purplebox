@@ -14,7 +14,10 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Pending"
+            "status": "Pending",
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
           }
         ]
       }
