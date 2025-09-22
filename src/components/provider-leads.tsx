@@ -66,7 +66,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
     return registeredLeads.filter(lead => 
       lead.providers.some(p => p.providerEmail === user.email) && !lead.isO2OCollaborator
     );
-  }, [registeredLeads, user, isAgent, isAdminOrO2O, allUsers, view]);
+  }, [registeredLeads, user, isAgent, isAdminOrO2O, users, view]);
   
   const handleRegisterWithProvider = (lead: RegisteredLead) => {
     const query = new URLSearchParams();
@@ -149,7 +149,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                               <div className="flex flex-col gap-2">
                                                 {lead.providers.map(p => {
                                                   if (isAuthLoading) return null;
-                                                  const providerDetails = allUsers[p.providerEmail];
+                                                  const providerDetails = users[p.providerEmail];
                                                   return <div key={p.providerEmail} className="text-sm">{providerDetails?.companyName || p.providerEmail}</div>
                                                 })}
                                               </div>
@@ -185,7 +185,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                           </>
                                         ) : (
                                           <>
-                                            <TableCell>{allUsers[lead.registeredBy]?.companyName || lead.registeredBy}</TableCell>
+                                            <TableCell>{users[lead.registeredBy]?.companyName || lead.registeredBy}</TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex flex-col gap-2 items-center">
                                                 {(providerInfoForCurrentUser?.properties || []).map(prop => {
