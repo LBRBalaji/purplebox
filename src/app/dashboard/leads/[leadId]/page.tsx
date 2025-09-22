@@ -270,10 +270,12 @@ export default function LeadDetailPage() {
   const customer = lead ? users[lead.customerId] : null;
   const providerUser = selectedProvider ? users[selectedProvider.providerEmail] : null;
 
-  const primaryListingForTransaction = selectedProviderListings.length > 0 ? selectedProviderListings[0] : null;
-  const isPremiumListing = primaryListingForTransaction?.plan === 'Paid_Premium';
-
+  const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
+  const isProvider = user?.email === providerUser?.email;
   const isCustomer = user?.email === lead?.customerId;
+  const isAgent = user?.email === lead?.agentId;
+
+  const isBrokeredDeal = lead?.isO2OCollaborator;
   
   const handleChatInit = () => {
     if (!lead || !selectedProvider) return;
@@ -283,7 +285,7 @@ export default function LeadDetailPage() {
 
     // Determine the chat partner based on the plan
     let chatPartnerName = "O2O Team";
-    if (isPremiumListing) {
+    if (!isBrokeredDeal) {
         if (isCustomer) {
             chatPartnerName = providerUser?.companyName || "Developer";
         } else {
@@ -296,11 +298,11 @@ export default function LeadDetailPage() {
       listingId: listingId || '',
       demandId: lead.id,
       providerEmail: selectedProvider.providerEmail,
-      status: 'Approved',
       listing: listing,
-      chatPartnerName: chatPartnerName,
       customerName: customer?.userName || 'Customer',
       customerCompany: customer?.companyName || 'Customer Company',
+      chatPartnerName: chatPartnerName,
+      status: 'Approved'
     };
     setActiveChat(submissionForChat);
   };
@@ -320,11 +322,11 @@ export default function LeadDetailPage() {
   const agentUser = lead.agentId ? users[lead.agentId] : null;
   const allAgents = Object.values(users).filter(u => u.role === 'Agent');
   
-  const isO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
-  const isProvider = user?.email === providerUser?.email;
-  const isAgent = user?.email === lead.agentId;
-  
-  const canAddActivity = isO2O || isAgent || (isPremiumListing && (isCustomer || isProvider));
+  const primaryListingForTransaction = selectedProviderListings.length > 0 ? selectedProviderListings[0] : null;
+
+  const canAddActivity = isO2O || isAgent || (!isBrokeredDeal && (isCustomer || isProvider));
+  const canChat = isO2O || isAgent || !isBrokeredDeal;
+
   const backLink = isCustomer ? '/dashboard?tab=my-transactions' : isProvider ? '/dashboard?tab=my-proposals' : '/dashboard/transactions';
   
   return (
@@ -410,15 +412,15 @@ export default function LeadDetailPage() {
                                     {customer && (
                                         <div className="p-3 bg-secondary/50 rounded-md">
                                             <p className="text-xs text-muted-foreground">Customer</p>
-                                            <p className="font-semibold">{customer.companyName}</p>
-                                            <p className="text-xs">{customer.userName}</p>
+                                            <p className="font-semibold">{isBrokeredDeal && (isProvider || isAgent) ? 'Customer' : customer.companyName}</p>
+                                            <p className="text-xs">{isBrokeredDeal && (isProvider || isAgent) ? 'Details Private' : customer.userName}</p>
                                         </div>
                                     )}
                                     {providerUser && (
                                         <div className="p-3 bg-secondary/50 rounded-md">
                                             <p className="text-xs text-muted-foreground">Provider</p>
-                                            <p className="font-semibold">{providerUser.companyName}</p>
-                                            <p className="text-xs">{providerUser.userName}</p>
+                                            <p className="font-semibold">{isBrokeredDeal && isCustomer ? 'Developer' : providerUser.companyName}</p>
+                                            <p className="text-xs">{isBrokeredDeal && isCustomer ? 'Details Private' : providerUser.userName}</p>
                                         </div>
                                     )}
                                     {agentUser && (
@@ -429,7 +431,7 @@ export default function LeadDetailPage() {
                                         </div>
                                     )}
                                   </div>
-                                  {(isO2O || isAgent) && (
+                                  {canChat && (
                                       <Button variant="outline" className="w-full mt-4" onClick={handleChatInit}>
                                           <MessageSquare className="mr-2 h-4 w-4" />
                                           Chat with Participants
@@ -489,7 +491,7 @@ export default function LeadDetailPage() {
                                                               <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
                                                           </Button>
                                                       </div>
-                                                       {isProvider && isPremiumListing && (
+                                                       {isProvider && !isBrokeredDeal && (
                                                           <ProposalForm 
                                                               listing={listing} 
                                                               lead={lead} 

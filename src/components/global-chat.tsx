@@ -40,7 +40,10 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                 let chatPartnerName: string;
                 let partnerInitials: string;
 
-                if (user.email === customer?.email) {
+                if (lead.isO2OCollaborator && (user.email === customer?.email || user.email === developer?.email)) {
+                    chatPartnerName = "O2O Team";
+                    partnerInitials = "O2O";
+                } else if (user.email === customer?.email) {
                     chatPartnerName = developer?.companyName || "Developer";
                     partnerInitials = developer?.companyName?.[0] || 'D';
                 } else {
