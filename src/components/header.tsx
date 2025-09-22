@@ -111,35 +111,25 @@ const AnalyticsDropdown = () => {
     )
 }
 
-const ManageDropdown = ({ isSuperAdmin, isO2O }: { isSuperAdmin: boolean, isO2O: boolean }) => {
-    const pathname = usePathname();
-    const isActive = pathname.startsWith('/dashboard');
-    
-    if (!isSuperAdmin && !isO2O) return null;
+const ManageDropdown = ({ isSuperAdmin }: { isSuperAdmin: boolean }) => {
+    if (!isSuperAdmin) return null;
 
     return (
          <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button className={cn(
-                    "text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2",
-                     isActive && "text-primary"
+                    "text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                 )}>
                     <Settings className="h-4 w-4" /> Manage <ChevronDown className="h-4 w-4" />
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-                 {isSuperAdmin && (
-                    <>
-                        <DropdownMenuItem asChild><Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" /> Main Dashboard</Link></DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild><Link href="/dashboard/search-console"><SearchIcon className="mr-2 h-4 w-4" /> Search Console</Link></DropdownMenuItem>
-                        <DropdownMenuItem asChild><Link href="/dashboard/manage-users"><Users className="mr-2 h-4 w-4" /> Manage Users</Link></DropdownMenuItem>
-                        <DropdownMenuItem asChild><Link href="/dashboard/settings"><Settings className="mr-2 h-4 w-4" /> Platform Settings</Link></DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                    </>
-                 )}
-                 <DropdownMenuItem asChild><Link href="/dashboard/transactions"><UserCheck className="mr-2 h-4 w-4" /> Lead Registration</Link></DropdownMenuItem>
-                 <DropdownMenuItem asChild><Link href="/dashboard?tab=broking-desk"><Briefcase className="mr-2 h-4 w-4" /> Broking Transactions</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/search-console"><SearchIcon className="mr-2 h-4 w-4" /> Search Console</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/manage-users"><Users className="mr-2 h-4 w-4" /> Manage Users</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/settings"><Settings className="mr-2 h-4 w-4" /> Platform Settings</Link></DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild><Link href="/dashboard/transactions?tab=register"><UserCheck className="mr-2 h-4 w-4" /> Lead Registration</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard?tab=broking-desk"><Briefcase className="mr-2 h-4 w-4" /> Broking Transactions</Link></DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
@@ -236,12 +226,8 @@ export function Header() {
                         <NavLink href="/about-us">
                             <Info className="h-4 w-4" /> About Us
                         </NavLink>
-                         {(isSuperAdmin || isO2O) && (
-                            <>
-                                <AnalyticsDropdown />
-                                <ManageDropdown isSuperAdmin={isSuperAdmin || false} isO2O={isO2O || false} />
-                            </>
-                         )}
+                         {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
+                         {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
                     </>
                 )}
           </nav>

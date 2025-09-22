@@ -120,7 +120,6 @@ function RegisterLeadForm() {
                 leadEmail: leadToPrefill.leadEmail,
                 leadPhone: leadToPrefill.leadPhone,
                 requirementsSummary: leadToPrefill.requirementsSummary,
-                // Do not prefill providers, as this is a new registration
                 providers: [], 
             });
         }
@@ -271,7 +270,6 @@ function RegisterLeadForm() {
                                     <FormItem className="flex-grow"><FormLabel>Provider</FormLabel>
                                     <Select onValueChange={(value) => {
                                         field.onChange(value);
-                                        // Reset selected listings when provider changes
                                         form.setValue(`providers.${index}.listingIds`, []);
                                     }} value={field.value}><FormControl><SelectTrigger>
                                         <SelectValue placeholder="Select a provider" />
@@ -347,8 +345,13 @@ export function TransactionsPage() {
   const isAgent = user?.role === 'Agent';
   const isSuperAdmin = user?.role === 'SuperAdmin';
   
-  // Determine the default tab. If we are pre-filling, default to the register tab.
-  const defaultTab = prefillFromLead ? 'register' : 'activity';
+  const [activeTab, setActiveTab] = React.useState(prefillFromLead ? 'register' : 'activity');
+  
+  React.useEffect(() => {
+    if (prefillFromLead) {
+        setActiveTab('register');
+    }
+  }, [prefillFromLead]);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -361,7 +364,7 @@ export function TransactionsPage() {
               }
             </p>
         </div>
-        <Tabs defaultValue={defaultTab} key={defaultTab}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="activity">
                     {isAgent ? 'My Registered Leads' : (isSuperAdmin ? 'All Brokering Leads' : 'My Acknowledged Leads')}
