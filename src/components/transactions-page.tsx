@@ -241,7 +241,7 @@ function RegisterLeadForm() {
                             </CommandGroup></CommandList></Command></PopoverContent></Popover>
                         <FormDescription className="text-xs">Select an existing customer to pre-fill their details. The logged-in admin/agent will be the contact person.</FormDescription>
                         </FormItem>
-                    )}
+                    )} />
                 )) : (
                      <FormField control={form.control} name="leadName" render={({ field }) => ( <FormItem><FormLabel>Lead / Company Name</FormLabel><FormControl><Input placeholder="Enter company name" {...field} /></FormControl><FormMessage /></FormItem> )} />
                 )}
@@ -398,3 +398,5 @@ export function TransactionsPage() {
       </div>
   );
 }
+
+    
