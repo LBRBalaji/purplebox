@@ -46,6 +46,8 @@ export function AcknowledgeLeadDialog({ isOpen, onOpenChange, lead, onSubmit }: 
   }, [user, isOpen, form]);
 
   if (!lead) return null;
+  
+  const customerIdentifier = lead.isO2OCollaborator ? lead.leadName : lead.customerId;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -68,7 +70,7 @@ export function AcknowledgeLeadDialog({ isOpen, onOpenChange, lead, onSubmit }: 
                     <UserCheck className="h-4 w-4" />
                     <AlertTitle className="font-semibold">Formal Acknowledgment</AlertTitle>
                     <AlertDescription className="text-xs">
-                        I/We hereby acknowledge that Customer ID <strong>{lead.customerId}</strong> is a customer of Lakshmi Balaji O2O.
+                        I/We hereby acknowledge that the lead for <strong>{customerIdentifier}</strong> is a customer of Lakshmi Balaji O2O.
                     </AlertDescription>
                 </Alert>
                  <Alert variant="destructive">
