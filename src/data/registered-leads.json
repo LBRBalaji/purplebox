@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758540315500",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "customer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-22T11:25:15.504Z"
+  },
+  {
     "id": "LDR-QUOTE-1758391332311",
     "customerId": "customer1@o2o.com",
     "leadName": "Alpha Logistics",

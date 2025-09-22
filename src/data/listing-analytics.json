@@ -450,7 +450,7 @@
   },
   {
     "listingId": "LST-91LUXK",
-    "views": 16,
+    "views": 18,
     "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
@@ -564,6 +564,18 @@
         "name": "Anonymous",
         "company": "Anonymous",
         "timestamp": 1758540009536
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758540312347
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758540312347
       }
     ]
   },

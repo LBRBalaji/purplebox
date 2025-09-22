@@ -1,6 +1,17 @@
 [
   {
     "type": "new_lead_for_provider",
+    "title": "New Lead: Beta Retail",
+    "message": "A new lead has been registered with you for 1 propert(y/ies). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "superadmin@o2o.com",
+    "triggeredBy": "customer2@o2o.com",
+    "id": "notif-1758540315505",
+    "timestamp": "2025-09-22T11:25:15.505Z",
+    "isRead": false
+  },
+  {
+    "type": "new_lead_for_provider",
     "title": "New Lead: Alpha Logistics",
     "message": "A new lead has been registered with you for 1 propert(y/ies). Please acknowledge.",
     "href": "/dashboard?tab=registered-leads",

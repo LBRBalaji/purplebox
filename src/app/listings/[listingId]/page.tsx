@@ -661,17 +661,9 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-center text-center">
-                                            {typeof listing.rentPerSqFt === 'number' ? (
-                                                <>
-                                                    <span className="text-4xl font-bold">₹{listing.rentPerSqFt}</span>
-                                                    <span className="text-sm text-muted-foreground">/sq.ft./month</span>
-                                                </>
-                                            ) : (
-                                                <span className="text-2xl font-bold">Price on Request</span>
-                                            )}
+                                            <span className="text-2xl font-bold">Price on Request</span>
                                         </div>
                                         <Separator/>
-                                        <DetailRow label="Security Deposit" value={typeof listing.rentalSecurityDeposit === 'number' ? `${listing.rentalSecurityDeposit} months` : (listing.rentalSecurityDeposit || 'N/A')} />
                                         <DetailRow label="Construction Progress" value={listing.constructionProgress} />
                                     </div>
                                 </CardContent>
