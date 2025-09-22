@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { useData, type TransactionActivity, type RegisteredLead, type RegisteredLeadProvider, type RegisteredLeadProperty, type Submission } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
@@ -186,6 +186,7 @@ export default function LeadDetailPage() {
   const { user, users, isLoading: isAuthLoading } = useAuth();
   const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead } = useData();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
   const [activities, setActivities] = React.useState<TransactionActivity[]>([]);
@@ -311,13 +312,19 @@ export default function LeadDetailPage() {
   const canAddActivity = isO2O || isAgent || (!isBrokeredDeal && (isCustomer || isProvider));
   
   const getBackLink = () => {
+    // This function determines where the 'Back' button navigates to.
+    const isSuperAdmin = user?.role === 'SuperAdmin';
+    
     if (isCustomer) return '/dashboard?tab=my-transactions';
     if (isProvider) return '/dashboard?tab=registered-leads';
-    if (isAgent || isO2O || user?.role === 'SuperAdmin') return '/dashboard/transactions';
-    return '/dashboard'; // Fallback
-  };
+    if (isAgent || isO2O || isSuperAdmin) return '/dashboard/transactions';
 
+    // Fallback for any other case
+    return '/dashboard'; 
+  };
+  
   const backLink = getBackLink();
+  const defaultTab = searchParams.get('tab') || 'activity';
   
   return (
     <main className="container mx-auto p-4 md:p-8">
@@ -343,7 +350,7 @@ export default function LeadDetailPage() {
         {!selectedProvider ? (
             <DeveloperSelection lead={lead} onSelect={handleProviderSelect} />
         ) : (
-            <Tabs defaultValue="activity" className="w-full">
+            <Tabs defaultValue={defaultTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
                     <TabsTrigger value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
