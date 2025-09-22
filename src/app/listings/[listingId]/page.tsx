@@ -697,7 +697,7 @@ export default function ListingDetailPage() {
                                     <Sparkles className="h-4 w-4 text-primary" />
                                     <AlertTitle className="font-semibold text-primary/90">Note for Customers</AlertTitle>
                                     <AlertDescription className="text-primary/80">
-                                        Always look for Premium Listings to engage directly with property developers.
+                                        Always look for <strong style={{ color: '#FDD017' }}>Premium Listings</strong> to engage directly with property developers.
                                     </AlertDescription>
                                 </Alert>
                             )}
@@ -743,5 +743,7 @@ export default function ListingDetailPage() {
     );
 
 }
+
+    
 
     
