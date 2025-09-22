@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
@@ -986,12 +987,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
           }
           
+          let wasAnyPropertyAcknowledged = false;
           const newLeads = prevLeads.map(lead => {
               if (lead.id === leadId) {
                   const updatedProviders = lead.providers.map(p => {
                       if (p.providerEmail === providerEmail) {
                           const updatedProperties = p.properties.map(prop => {
                               if (prop.status === 'Pending') {
+                                  wasAnyPropertyAcknowledged = true;
                                   return {
                                       ...prop,
                                       status: 'Acknowledged' as RegisteredLeadStatus,
@@ -1005,14 +1008,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
                       }
                       return p;
                   });
-                   addTransactionActivity({
-                        leadId: leadId,
-                        activityType: 'Lead Acknowledged',
-                        details: {
-                            acknowledgedBy: ackDetails
-                        },
-                        createdBy: providerEmail,
-                    });
+                   if (wasAnyPropertyAcknowledged) {
+                        addTransactionActivity({
+                            leadId: leadId,
+                            activityType: 'Lead Acknowledged',
+                            details: {
+                                acknowledgedBy: ackDetails
+                            },
+                            createdBy: providerEmail,
+                        });
+                   }
                   return { ...lead, providers: updatedProviders };
               }
               return lead;

@@ -15,7 +15,7 @@
           {
             "listingId": "LST-91LUXK",
             "status": "Acknowledged",
-            "acknowledgedAt": "2025-09-22T18:03:12.156Z",
+            "acknowledgedAt": "2025-09-22T18:03:12.155Z",
             "acknowledgedBy": {
               "name": "Namasivayam",
               "title": "owner",
@@ -44,7 +44,14 @@
         "properties": [
           {
             "listingId": "LST-91LUXK",
-            "status": "Pending"
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:08:47.348Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "head",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
           }
         ]
       }
