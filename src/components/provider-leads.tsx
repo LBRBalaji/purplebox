@@ -155,11 +155,12 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                 const providerInfoForCurrentUser = lead.providers.find(p => p.providerEmail === user?.email);
                                 const hasPending = isProvider && providerInfoForCurrentUser?.properties.some(p => p.status === 'Pending');
                                 
-                                // Determine whose contact info to show
                                 const registeredByO2O = users[lead.registeredBy];
-                                const contactToShow = (isProvider && lead.isO2OCollaborator && registeredByO2O)
-                                    ? { name: registeredByO2O.userName, email: registeredByO2O.email }
-                                    : { name: lead.leadContact, email: lead.leadEmail };
+                                let contactToShow = { name: lead.leadContact, email: lead.leadEmail };
+                                if (isProvider && lead.isO2OCollaborator && registeredByO2O) {
+                                    contactToShow = { name: registeredByO2O.userName, email: registeredByO2O.email };
+                                }
+
 
                                 return (
                                     <TableRow key={lead.id}>

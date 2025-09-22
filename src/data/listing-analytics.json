@@ -450,7 +450,7 @@
   },
   {
     "listingId": "LST-91LUXK",
-    "views": 20,
+    "views": 21,
     "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
@@ -588,6 +588,12 @@
         "name": "Ben Carter",
         "company": "Beta Retail",
         "timestamp": 1758551512436
+      },
+      {
+        "userId": "anonymous_anon_1758552589598_y08ju91",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758552592107
       }
     ]
   },

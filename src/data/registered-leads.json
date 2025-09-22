@@ -1,5 +1,51 @@
 [
   {
+    "id": "LDR-MFV8R753E1NY8",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T14:49:59.000Z"
+  },
+  {
+    "id": "LDR-MFV8IGQ9GZA3V",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T14:48:22.474Z"
+  },
+  {
     "id": "LDR-MFV8CVTB6PU2Y",
     "customerId": "customer2@o2o.com",
     "leadName": "Beta Retail",
@@ -20,7 +66,7 @@
       }
     ],
     "isO2OCollaborator": false,
-    "registeredAt": "2025-09-22T14:41:35.002Z"
+    "registeredAt": "2025-09-22T14:41:35.000Z"
   },
   {
     "id": "LDR-MFV84SJ9CTKXB",
