@@ -159,9 +159,12 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
 
                                 let contactToShow: { name: string; email: string; };
 
+                                // CRITICAL FIX: Determine who the developer should contact.
                                 if (isProvider && lead.isO2OCollaborator && registeredByUser) {
+                                    // Brokered Deal: Developer sees the O2O agent as the contact.
                                     contactToShow = { name: registeredByUser.userName, email: registeredByUser.email };
                                 } else {
+                                    // Direct Deal or Admin/Agent view: Show the actual customer contact.
                                     contactToShow = { name: lead.leadContact, email: lead.leadEmail };
                                 }
 

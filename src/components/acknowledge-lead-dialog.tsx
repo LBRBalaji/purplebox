@@ -47,7 +47,8 @@ export function AcknowledgeLeadDialog({ isOpen, onOpenChange, lead, onSubmit }: 
 
   if (!lead) return null;
   
-  const customerIdentifier = lead.isO2OCollaborator ? lead.leadName : lead.customerId;
+  // CRITICAL FIX: Determine customer identifier based on deal type
+  const customerIdentifier = lead.isO2OCollaborator ? lead.leadName : lead.customerCompany;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

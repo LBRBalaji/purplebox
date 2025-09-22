@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "type": "new_lead_for_provider",
+    "title": "New Lead: Gamma Goods",
+    "message": "A new lead has been registered with you for 1 propert(y/ies). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "namasivayam.lion@gmail.com",
+    "triggeredBy": "superadmin@o2o.com",
+    "id": "notif-1758555401720",
+    "timestamp": "2025-09-22T15:36:41.720Z",
+    "isRead": true
+  },
+  {
+    "type": "new_lead_for_provider",
+    "title": "New Lead: Gamma Goods",
+    "message": "A new lead has been registered with you for 1 propert(y/ies). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "namasivayam.lion@gmail.com",
+    "triggeredBy": "superadmin@o2o.com",
+    "id": "notif-1758555401717",
+    "timestamp": "2025-09-22T15:36:41.717Z",
+    "isRead": true
+  }
+]

@@ -172,5 +172,17 @@
     "companyName": "XYZ Logistics",
     "listingId": "LST-91LUXK",
     "timestamp": 1758554432241
+  },
+  {
+    "userId": "anonymous_anon_1758555306423_rghyq1m",
+    "companyName": "Anonymous",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758555308494
+  },
+  {
+    "userId": "customer3@o2o.com",
+    "companyName": "Gamma Goods",
+    "listingId": "LST-91LUXK",
+    "timestamp": 1758555329844
   }
 ]
