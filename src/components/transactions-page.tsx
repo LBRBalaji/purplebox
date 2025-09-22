@@ -345,7 +345,7 @@ export function TransactionsPage() {
   const prefillFromLead = searchParams.get('prefillFromLead');
 
   const isAgent = user?.role === 'Agent';
-  const isO2O = user?.role === 'O2O';
+  const isSuperAdmin = user?.role === 'SuperAdmin';
   
   // Determine the default tab. If we are pre-filling, default to the register tab.
   const defaultTab = prefillFromLead ? 'register' : 'activity';
@@ -361,15 +361,15 @@ export function TransactionsPage() {
               }
             </p>
         </div>
-        <Tabs defaultValue={defaultTab}>
+        <Tabs defaultValue={defaultTab} key={defaultTab}>
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="activity">
-                    {isAgent ? 'My Registered Leads' : isO2O ? 'All O2O Leads' : 'My Acknowledged Leads'}
+                    {isAgent ? 'My Registered Leads' : (isSuperAdmin ? 'All Brokering Leads' : 'My Acknowledged Leads')}
                 </TabsTrigger>
                 <TabsTrigger value="register">Register New Lead</TabsTrigger>
             </TabsList>
             <TabsContent value="activity" className="mt-6">
-                <ProviderLeads />
+                <ProviderLeads view={isSuperAdmin ? 'broking' : 'default'} />
             </TabsContent>
             <TabsContent value="register" className="mt-6">
                 <RegisterLeadForm />
