@@ -263,13 +263,13 @@ export default function LeadDetailPage() {
     addTransactionActivity({
         leadId: lead.id,
         activityType: 'Proposal Submitted',
-        createdBy: user.email,
         details: {
             listingId,
             rentPerSft: values.rentPerSft,
             rentalSecurityDeposit: values.rentalSecurityDeposit,
             actualChargeableArea: values.actualChargeableArea,
-        }
+        },
+        createdBy: user.email,
     });
     
     updateRegisteredLead(updatedLead);
@@ -313,8 +313,7 @@ export default function LeadDetailPage() {
   const getBackLink = () => {
     if (isCustomer) return '/dashboard?tab=my-transactions';
     if (isProvider) return '/dashboard?tab=registered-leads';
-    if (isAgent) return '/dashboard/transactions';
-    if (isO2O || user?.role === 'SuperAdmin') return '/dashboard/transactions';
+    if (isAgent || isO2O || user?.role === 'SuperAdmin') return '/dashboard/transactions';
     return '/dashboard'; // Fallback
   };
 
