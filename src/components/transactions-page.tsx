@@ -115,11 +115,9 @@ function RegisterLeadForm() {
             form.reset({
                 ...form.getValues(),
                 id: `LDR-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
-                // Prefill impersonal lead details
                 customerId: leadToPrefill.customerId,
                 leadName: leadToPrefill.leadName,
                 requirementsSummary: leadToPrefill.requirementsSummary,
-                // Use the logged-in ADMIN/AGENT's contact details as the point of contact for the provider.
                 leadContact: user.userName,
                 leadEmail: user.email,
                 leadPhone: user.phone,
@@ -221,28 +219,47 @@ function RegisterLeadForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField control={form.control} name="id" render={({ field }) => ( <FormItem><FormLabel>Transaction ID</FormLabel><FormControl><Input {...field} disabled /></FormControl></FormItem>)} />
                 {isAdmin || isAgent ? (
-                    prefillLeadId ? (
-                         <FormField control={form.control} name="leadName" render={({ field }) => ( <FormItem><FormLabel>Lead / Company Name</FormLabel><FormControl><Input placeholder="Enter company name" {...field} disabled /></FormControl><FormMessage /></FormItem> )} />
-                    ) : (
-                         <FormField control={form.control} name="customerId" render={({ field }) => (
-                        <FormItem className="flex flex-col"><FormLabel>Lead / Company Name (Select Existing Customer)</FormLabel>
-                        <Popover open={customerPopoverOpen} onOpenChange={setCustomerPopoverOpen}><PopoverTrigger asChild><FormControl>
-                            <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
-                            {field.value ? customers.find(c => c.email === field.value)?.companyName : "Select a customer"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button>
-                        </FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command>
-                            <CommandInput placeholder="Search customers..." /><CommandList><CommandEmpty>No customers found.</CommandEmpty><CommandGroup>
-                            {customers.map((customer) => (
-                                <CommandItem value={`${customer.companyName} ${customer.userName} ${customer.email}`} key={customer.email} onSelect={() => handleCustomerSelect(customer)}>
-                                    <Check className={cn("mr-2 h-4 w-4", field.value === customer.email ? "opacity-100" : "opacity-0")} />
-                                    <div><p>{customer.companyName}</p><p className="text-xs text-muted-foreground">{customer.userName}</p></div>
-                                </CommandItem>
-                            ))}
-                            </CommandGroup></CommandList></Command></PopoverContent></Popover>
-                        <FormDescription className="text-xs">Select an existing customer to pre-fill their details. The logged-in admin/agent will be the contact person.</FormDescription>
-                        </FormItem>
-                    )} />
-                )) : (
+                  <FormField
+                    control={form.control}
+                    name="customerId"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Lead / Company Name (Select Existing Customer)</FormLabel>
+                        {prefillLeadId ? (
+                           <Input value={form.getValues('leadName')} disabled />
+                        ) : (
+                          <Popover open={customerPopoverOpen} onOpenChange={setCustomerPopoverOpen}>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
+                                  {field.value ? customers.find(c => c.email === field.value)?.companyName : "Select a customer"}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                              <Command>
+                                <CommandInput placeholder="Search customers..." />
+                                <CommandList>
+                                  <CommandEmpty>No customers found.</CommandEmpty>
+                                  <CommandGroup>
+                                    {customers.map((customer) => (
+                                      <CommandItem value={`${customer.companyName} ${customer.userName} ${customer.email}`} key={customer.email} onSelect={() => handleCustomerSelect(customer)}>
+                                        <Check className={cn("mr-2 h-4 w-4", field.value === customer.email ? "opacity-100" : "opacity-0")} />
+                                        <div><p>{customer.companyName}</p><p className="text-xs text-muted-foreground">{customer.userName}</p></div>
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                        <FormDescription className="text-xs">The logged-in admin/agent will be the point of contact.</FormDescription>
+                      </FormItem>
+                    )}
+                  />
+                ) : (
                      <FormField control={form.control} name="leadName" render={({ field }) => ( <FormItem><FormLabel>Lead / Company Name</FormLabel><FormControl><Input placeholder="Enter company name" {...field} /></FormControl><FormMessage /></FormItem> )} />
                 )}
             </div>
@@ -360,15 +377,23 @@ export function TransactionsPage() {
   const isAgent = user?.role === 'Agent';
   const isSuperAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   
-  const [activeTab, setActiveTab] = React.useState(prefillFromLead ? 'register' : 'activity');
+  const defaultTab = prefillFromLead && isSuperAdmin ? 'register' : 'activity';
+  const [activeTab, setActiveTab] = React.useState(defaultTab);
   
   React.useEffect(() => {
+    // This effect ensures that if the URL param is present, the tab is switched.
     if (prefillFromLead && isSuperAdmin) {
         setActiveTab('register');
-        // Clean the URL parameter after setting the tab
-        router.replace('/dashboard/transactions', { scroll: false });
     }
-  }, [prefillFromLead, router, isSuperAdmin]);
+  }, [prefillFromLead, isSuperAdmin]);
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // If we switch away from the register tab, clean up the URL.
+    if (value !== 'register' && prefillFromLead) {
+       router.replace('/dashboard/transactions', { scroll: false });
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -381,7 +406,7 @@ export function TransactionsPage() {
               }
             </p>
         </div>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="activity">
                     {isAgent ? 'My Registered Leads' : (isSuperAdmin ? 'Transactions on Broking' : 'My Acknowledged Leads')}
@@ -400,3 +425,4 @@ export function TransactionsPage() {
 }
 
     
+
