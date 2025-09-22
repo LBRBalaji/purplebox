@@ -315,13 +315,15 @@ export default function LeadDetailPage() {
     // This function determines where the 'Back' button navigates to.
     const isSuperAdmin = user?.role === 'SuperAdmin';
     const isO2OManager = user?.role === 'O2O';
+    const isAgent = user?.role === 'Agent';
+    const isCustomer = user?.role === 'User';
 
     if (isCustomer) return '/dashboard?tab=my-transactions';
-    if (isProvider) return '/dashboard?tab=registered-leads';
-    if (isAgent || isO2OManager || isSuperAdmin) return '/dashboard/transactions';
+    
+    if (isSuperAdmin || isO2OManager || isAgent) return '/dashboard/transactions';
 
-    // Fallback for any other case
-    return '/dashboard';
+    // Fallback for any other case, including Provider
+    return '/dashboard/transactions';
   };
   
   const backLink = getBackLink();
