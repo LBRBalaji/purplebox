@@ -225,6 +225,7 @@ type DataContextType = {
   addLayoutRequest: (request: LayoutRequestData) => void;
   chatMessages: Record<string, ChatMessage[]>;
   addChatMessage: (threadId: string, message: ChatMessage, context: { lead: RegisteredLead, partner: User | null }) => Promise<void>;
+  clearNewMessages: (threadId: string) => void;
   typingStatus: Record<string, TypingStatus>;
   updateTypingStatus: (threadId: string, status: TypingStatus) => Promise<void>;
   fetchTypingStatus: (threadId: string) => Promise<void>;
@@ -474,6 +475,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
       });
     }
   };
+
+  const clearNewMessages = useCallback((threadId: string) => {
+    setChatMessages(prev => {
+      if (!prev[threadId]) return prev;
+      
+      const newThreadMessages = prev[threadId].map(msg => ({ ...msg, isNew: false }));
+      const updatedMessages = { ...prev, [threadId]: newThreadMessages };
+
+      persistChatMessages(updatedMessages);
+      return updatedMessages;
+    });
+  }, [persistChatMessages]);
+
 
   const updateTypingStatus = async (threadId: string, status: TypingStatus) => {
     const newStatus = { ...typingStatus, [threadId]: status };
@@ -1157,6 +1171,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         addLayoutRequest,
         chatMessages,
         addChatMessage,
+        clearNewMessages,
         typingStatus,
         updateTypingStatus,
         fetchTypingStatus,

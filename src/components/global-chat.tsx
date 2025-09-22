@@ -14,11 +14,13 @@ import Link from 'next/link';
 import { ScrollArea } from './ui/scroll-area';
 import { Input } from './ui/input';
 import { type DemandSchema } from '@/lib/schema';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 function ConversationList({ onSelectConversation }: { onSelectConversation: (chat: ChatSubmission) => void }) {
     const { user, users } = useAuth();
-    const { registeredLeads, listings, chatMessages } = useData();
+    const { registeredLeads, listings, chatMessages, clearNewMessages } = useData();
     const [searchTerm, setSearchTerm] = React.useState('');
+    const [filter, setFilter] = React.useState('all');
 
     const conversations = React.useMemo(() => {
         if (!user) return [];
@@ -30,74 +32,87 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
             (lead.isO2OCollaborator && (user.role === 'SuperAdmin' || user.role === 'O2O'))
         );
 
-        return allUserLeads.flatMap(lead => 
-            lead.providers
-              .filter(provider => provider.properties && provider.properties.length > 0)
-              .map(provider => {
-                const listing = listings.find(l => l.listingId === provider.properties[0]?.listingId);
-                const customer = users[lead.customerId];
-                const developer = users[provider.providerEmail];
+        return allUserLeads.flatMap(lead => {
+             const provider = lead.isO2OCollaborator ? { providerEmail: 'superadmin@o2o.com', properties: lead.providers.flatMap(p => p.properties) } : lead.providers.find(p => p.providerEmail !== 'superadmin@o2o.com');
+             if (!provider) return [];
+             
+             const listing = listings.find(l => l.listingId === provider.properties[0]?.listingId);
+             const customer = users[lead.customerId];
+             const developer = users[provider.providerEmail];
 
-                let chatPartnerName: string;
-                let partnerInitials: string;
+             let chatPartnerName: string;
+             let partnerInitials: string;
 
-                if (lead.isO2OCollaborator && (user.email === customer?.email || user.email === developer?.email || user.email === lead.agentId)) {
-                    chatPartnerName = "O2O Team";
-                    partnerInitials = "O2O";
-                } else if (user.email === customer?.email) {
-                    chatPartnerName = developer?.companyName || "Developer";
-                    partnerInitials = developer?.companyName?.[0] || 'D';
-                } else {
-                    chatPartnerName = customer?.companyName || "Customer";
-                    partnerInitials = customer?.companyName?.[0] || 'C';
-                }
+             if (lead.isO2OCollaborator && (user.email === customer?.email || user.email === developer?.email || user.email === lead.agentId)) {
+                 chatPartnerName = "O2O Team";
+                 partnerInitials = "O2O";
+             } else if (user.email === customer?.email) {
+                 chatPartnerName = developer?.companyName || "Developer";
+                 partnerInitials = developer?.companyName?.[0] || 'D';
+             } else {
+                 chatPartnerName = customer?.companyName || "Customer";
+                 partnerInitials = customer?.companyName?.[0] || 'C';
+             }
+             
+             const threadId = `chat-${lead.id}-${provider.providerEmail}`;
+             const messages = chatMessages[threadId] || [];
+             const lastMessage = messages[messages.length - 1];
+             const isUnread = messages.some(m => m.isNew && m.senderEmail !== user.email);
 
-                const threadId = `chat-${lead.id}-${provider.providerEmail}`;
-                const messages = chatMessages[threadId] || [];
-                const lastMessage = messages[messages.length - 1];
-                const isUnread = messages.some(m => m.isNew && m.senderEmail !== user.email);
+             const listingIdentifier = user.role === 'Warehouse Developer' ? listing?.warehouseBoxId : listing?.listingId;
 
-                const listingIdentifier = user.role === 'Warehouse Developer' ? listing?.warehouseBoxId : listing?.listingId;
-
-                return {
-                    id: threadId,
-                    submission: {
-                        submissionId: threadId,
-                        demandId: lead.id,
-                        listingId: listing?.listingId || '',
-                        providerEmail: provider.providerEmail,
-                        listing: listing,
-                        customerName: customer?.userName || '',
-                        customerId: customer?.email || '',
-                        customerCompany: customer?.companyName || '',
-                        chatPartnerName,
-                    },
-                    partnerName: chatPartnerName,
-                    partnerInitials: partnerInitials,
-                    lastMessage: lastMessage ? `${lastMessage.senderName}: ${lastMessage.text?.substring(0, 30)}...` : `Re: ${listingIdentifier || lead.requirementsSummary}`,
-                    timestamp: lastMessage ? new Date(lastMessage.timestamp) : new Date(lead.registeredAt),
-                    isUnread,
-                } as const;
-            })
-        ).sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime());
+             return {
+                 id: threadId,
+                 submission: {
+                     submissionId: threadId,
+                     demandId: lead.id,
+                     listingId: listing?.listingId || '',
+                     providerEmail: provider.providerEmail,
+                     listing: listing,
+                     customerName: customer?.userName || '',
+                     customerId: customer?.email || '',
+                     customerCompany: customer?.companyName || '',
+                     chatPartnerName,
+                 },
+                 partnerName: chatPartnerName,
+                 partnerInitials: partnerInitials,
+                 lastMessage: lastMessage ? `${lastMessage.senderName}: ${lastMessage.text?.substring(0, 30)}...` : `Re: ${listingIdentifier || lead.requirementsSummary}`,
+                 timestamp: lastMessage ? new Date(lastMessage.timestamp) : new Date(lead.registeredAt),
+                 isUnread,
+             } as const;
+        }).filter(Boolean)
+        .sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime());
         
     }, [user, registeredLeads, listings, users, chatMessages]);
 
     const filteredConversations = React.useMemo(() => {
-        if (!searchTerm) return conversations;
-        const lowerCaseSearch = searchTerm.toLowerCase();
-        return conversations.filter(conv => 
-            conv.partnerName.toLowerCase().includes(lowerCaseSearch) ||
-            conv.lastMessage.toLowerCase().includes(lowerCaseSearch) ||
-            conv.submission.listing?.listingId.toLowerCase().includes(lowerCaseSearch) ||
-            conv.submission.listing?.warehouseBoxId?.toLowerCase().includes(lowerCaseSearch) ||
-            conv.submission.demandId.toLowerCase().includes(lowerCaseSearch)
-        );
-    }, [conversations, searchTerm]);
+        let results = conversations;
+
+        if (filter === 'unread') {
+            results = results.filter(c => c.isUnread);
+        }
+
+        if (searchTerm) {
+            const lowerCaseSearch = searchTerm.toLowerCase();
+            return results.filter(conv => 
+                conv.partnerName.toLowerCase().includes(lowerCaseSearch) ||
+                conv.lastMessage.toLowerCase().includes(lowerCaseSearch) ||
+                conv.submission.listing?.listingId.toLowerCase().includes(lowerCaseSearch) ||
+                conv.submission.listing?.warehouseBoxId?.toLowerCase().includes(lowerCaseSearch) ||
+                conv.submission.demandId.toLowerCase().includes(lowerCaseSearch)
+            );
+        }
+        return results;
+    }, [conversations, searchTerm, filter]);
 
     const unreadCount = React.useMemo(() => {
         return conversations.filter(c => c.isUnread).length;
     }, [conversations]);
+    
+    const handleSelect = (chat: ChatSubmission) => {
+        clearNewMessages(chat.submissionId);
+        onSelectConversation(chat);
+    }
 
     if(conversations.length === 0) {
         return <div className="p-8 text-center text-sm text-muted-foreground">No active conversations.</div>
@@ -106,10 +121,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
     return (
         <div className="flex flex-col h-full">
             <div className="p-4 border-b shrink-0 space-y-3">
-                <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">Conversations ({conversations.length})</h3>
-                    {unreadCount > 0 && <Badge variant="destructive">{unreadCount} Unread</Badge>}
-                </div>
+                <h3 className="font-semibold">Conversations</h3>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
@@ -120,11 +132,20 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                     />
                 </div>
             </div>
+             <Tabs value={filter} onValueChange={setFilter} className="w-full shrink-0">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="unread">
+                        Unread
+                        {unreadCount > 0 && <Badge variant="destructive" className="ml-2">{unreadCount}</Badge>}
+                    </TabsTrigger>
+                </TabsList>
+            </Tabs>
             <div className="flex-grow overflow-y-auto">
                 <ScrollArea className="h-full">
                      <div className="p-2 space-y-1">
                         {filteredConversations.length > 0 ? filteredConversations.map(conv => (
-                            <button key={conv.id} onClick={() => onSelectConversation(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors relative">
+                            <button key={conv.id} onClick={() => handleSelect(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors relative">
                                 <div className="flex items-center gap-3">
                                     <Avatar>
                                         <AvatarFallback>{conv.partnerInitials}</AvatarFallback>
@@ -135,10 +156,10 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                                     </div>
                                     <p className="text-xs text-muted-foreground self-start shrink-0">{conv.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                 </div>
-                                {conv.isUnread && <div className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary" />}
+                                {conv.isUnread && <div className="absolute right-3 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-primary" />}
                             </button>
                         )) : (
-                            <div className="p-8 text-center text-sm text-muted-foreground">No conversations match your search.</div>
+                            <div className="p-8 text-center text-sm text-muted-foreground">No {filter === 'unread' ? 'unread' : ''} conversations match your search.</div>
                         )}
                     </div>
                 </ScrollArea>
