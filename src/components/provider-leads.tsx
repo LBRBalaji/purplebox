@@ -154,6 +154,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                             {myLeads.map(lead => {
                                 const providerInfoForCurrentUser = lead.providers.find(p => p.providerEmail === user?.email);
                                 const hasPending = isProvider && providerInfoForCurrentUser?.properties.some(p => p.status === 'Pending');
+                                const isAlreadyRegisteredWithProvider = lead.providers.some(p => p.providerEmail !== 'superadmin@o2o.com');
                                 
                                 const registeredByUser = users[lead.registeredBy];
 
@@ -253,8 +254,9 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                                   </Button>
                                               )}
                                             {isAdminOrO2O && lead.isO2OCollaborator && (
-                                                <Button size="sm" onClick={() => handleRegisterWithProvider(lead)}>
-                                                    <UserPlus className="mr-2 h-4 w-4" /> Register with Provider
+                                                <Button size="sm" onClick={() => handleRegisterWithProvider(lead)} disabled={isAlreadyRegisteredWithProvider}>
+                                                    <UserPlus className="mr-2 h-4 w-4" /> 
+                                                    {isAlreadyRegisteredWithProvider ? 'Provider Assigned' : 'Assign to Provider'}
                                                 </Button>
                                             )}
                                             </div>
