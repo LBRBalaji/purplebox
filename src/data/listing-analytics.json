@@ -1017,7 +1017,7 @@
   },
   {
     "listingId": "LST-X635SS",
-    "views": 5,
+    "views": 6,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -1050,6 +1050,12 @@
         "name": "Murugan",
         "company": "Beta Retail",
         "timestamp": 1758613352538
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758614181881
       }
     ]
   },

@@ -100,21 +100,23 @@ function DeveloperSelection({ lead, onSelect }: { lead: RegisteredLead, onSelect
 }
 
 function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingSchema, lead: RegisteredLead, provider: RegisteredLeadProvider, onSubmit: (listingId: string, values: ProposalFormValues) => void }) {
-    const form = useForm<ProposalFormValues>({
-        resolver: zodResolver(ProposalFormSchema),
-        defaultValues: {
-            rentPerSft: typeof listing.rentPerSqFt === 'number' ? listing.rentPerSqFt : undefined,
-            rentalSecurityDeposit: typeof listing.rentalSecurityDeposit === 'number' ? listing.rentalSecurityDeposit : undefined,
-            actualChargeableArea: listing.sizeSqFt,
-        }
-    });
-
+    const { user } = useAuth();
+    const isBrokeredDeal = lead.isO2OCollaborator;
+    
     const propertyInLead = provider.properties.find(p => p.listingId === listing.listingId);
     
     const submittedRent = propertyInLead?.rentPerSft;
     const submittedDeposit = propertyInLead?.rentalSecurityDeposit;
     const submittedArea = propertyInLead?.actualChargeableArea;
 
+    const form = useForm<ProposalFormValues>({
+        resolver: zodResolver(ProposalFormSchema),
+        defaultValues: {
+            rentPerSft: typeof submittedRent === 'number' ? submittedRent : (typeof listing.rentPerSqFt === 'number' ? listing.rentPerSqFt : undefined),
+            rentalSecurityDeposit: typeof submittedDeposit === 'number' ? submittedDeposit : (typeof listing.rentalSecurityDeposit === 'number' ? listing.rentalSecurityDeposit : undefined),
+            actualChargeableArea: typeof submittedArea === 'number' ? submittedArea : listing.sizeSqFt,
+        }
+    });
 
     if (submittedRent !== undefined) {
         return (
@@ -214,11 +216,19 @@ export default function LeadDetailPage() {
     const isAgentOfThisLead = foundLead.agentId === user?.email;
 
     if (isSuperAdmin || isO2O || isProviderForThisLead || isCustomerOfThisLead || isAgentOfThisLead) {
-        setLead(foundLead);
+        // Only update state if the found lead is different from the current one
+        if (JSON.stringify(foundLead) !== JSON.stringify(lead)) {
+            setLead(foundLead);
+        }
+
         const leadActivities = transactionActivities
             .filter(a => a.leadId === leadId)
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        setActivities(leadActivities);
+        
+        // Only update activities state if it has changed
+        if (JSON.stringify(leadActivities) !== JSON.stringify(activities)) {
+            setActivities(leadActivities);
+        }
         
         if (foundLead.providers.length === 1) {
             const provider = foundLead.providers[0];
@@ -237,7 +247,7 @@ export default function LeadDetailPage() {
     } else {
         router.push('/dashboard');
     }
-  }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading, isAuthLoading, listings]);
+  }, [leadId, registeredLeads, transactionActivities, user, router, isDataLoading, isAuthLoading, listings, lead, activities]);
 
 
   const handleAddActivity = (data: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
@@ -382,7 +392,7 @@ export default function LeadDetailPage() {
                                                             <TimelineTitle>{activity.activityType}</TimelineTitle>
                                                         </TimelineHeader>
                                                         <TimelineBody className="space-y-2">
-                                                            {activity.activityType === 'Lead Registered' && <p className="text-sm">Lead registered by <b>{users[activity.createdBy]?.userName}</b>.</p>}
+                                                            {activity.activityType === 'Lead Registered' && <p className="text-sm">Lead registered by <b>{users[activity.createdBy]?.userName || activity.createdBy}</b>.</p>}
                                                             {activity.details.visitDateTime && <p className="text-sm"><b>Date & Time:</b> {new Date(activity.details.visitDateTime).toLocaleString()}</p>}
                                                             {activity.details.status && <p className="text-sm"><b>Status:</b> <span className="font-semibold text-primary">{activity.details.status}</span></p>}
                                                             {activity.details.message && <p className="text-sm"><b>Message:</b> {activity.details.message}</p>}
