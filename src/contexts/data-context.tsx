@@ -404,16 +404,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
 
   const addChatMessage = useCallback(async (threadId: string, message: ChatMessage, context: { lead: RegisteredLead, partner: User | null }) => {
-    const updatedMessages = { ...chatMessages };
-    if (!updatedMessages[threadId]) {
-      updatedMessages[threadId] = [];
-    }
-    const messageWithReadStatus = { ...message, isNew: true };
-    updatedMessages[threadId].push(messageWithReadStatus);
-    setChatMessages(updatedMessages);
-    await persistChatMessages(updatedMessages);
+    setChatMessages(prev => {
+        const updatedMessages = { ...prev };
+        if (!updatedMessages[threadId]) {
+            updatedMessages[threadId] = [];
+        }
+        const messageWithReadStatus = { ...message, isNew: true };
+        updatedMessages[threadId].push(messageWithReadStatus);
+        persistChatMessages(updatedMessages);
+        return updatedMessages;
+    });
 
-    // Notify the other user in the chat
     const recipient = context.lead.customerId === authUser?.email ? context.partner : users[context.lead.customerId];
     if (recipient) {
       addNotification({
@@ -427,7 +428,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         triggeredBy: authUser?.email || 'system',
       });
     }
-  }, [chatMessages, persistChatMessages, addNotification, authUser, users]);
+  }, [addNotification, authUser, users, persistChatMessages]);
 
   const clearNewMessages = useCallback((threadId: string) => {
     setChatMessages(prev => {
@@ -867,7 +868,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const isRegisteredByAdminOrAgent = registeredByUser?.role === 'SuperAdmin' || registeredByUser?.role === 'O2O' || registeredByUser?.role === 'Agent';
             const isBrokered = newLead.isO2OCollaborator || !providerUser || providerUser.plan !== 'Paid_Premium';
 
-            const recipientIsAdmin = providerUser?.role === 'SuperAdmin' || providerUser?.role === 'O2O';
             
             if (isBrokered) {
                 href = '/dashboard/transactions'; // Admins/O2O go to the broking desk
