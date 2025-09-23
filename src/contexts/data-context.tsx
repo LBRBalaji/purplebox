@@ -283,58 +283,56 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const responses = await Promise.all([
-                fetch('/api/listings'), fetch('/api/demands'), fetch('/api/submissions'),
-                fetch('/api/agent-leads'), fetch('/api/listing-analytics'), fetch('/api/registered-leads'),
-                fetch('/api/transaction-activities'), fetch('/api/tenant-improvements'), fetch('/api/negotiation-boards'),
-                fetch('/api/about-us-content'), fetch('/api/location-circles'), fetch('/api/download-acknowledgments'),
-                fetch('/api/download-history'), fetch('/api/view-history'), fetch('/api/layout-requests'),
-                fetch('/api/chat-messages'), fetch('/api/notifications')
-            ]);
-            
-            const data = await Promise.all(responses.map(res => res.json()));
+  const fetchData = useCallback(async () => {
+    try {
+        const responses = await Promise.all([
+            fetch('/api/listings'), fetch('/api/demands'), fetch('/api/submissions'),
+            fetch('/api/agent-leads'), fetch('/api/listing-analytics'), fetch('/api/registered-leads'),
+            fetch('/api/transaction-activities'), fetch('/api/tenant-improvements'), fetch('/api/negotiation-boards'),
+            fetch('/api/about-us-content'), fetch('/api/location-circles'), fetch('/api/download-acknowledgments'),
+            fetch('/api/download-history'), fetch('/api/view-history'), fetch('/api/layout-requests'),
+            fetch('/api/chat-messages'), fetch('/api/notifications')
+        ]);
+        
+        const data = await Promise.all(responses.map(res => res.json()));
+        
+        if (JSON.stringify(data[0]) !== JSON.stringify(listings)) setListings(data[0]);
+        if (JSON.stringify(data[1]) !== JSON.stringify(demands)) setDemands(data[1]);
+        if (JSON.stringify(data[2]) !== JSON.stringify(submissions)) setSubmissions(data[2]);
+        if (JSON.stringify(data[3]) !== JSON.stringify(agentLeads)) setAgentLeads(data[3]);
+        if (JSON.stringify(data[4]) !== JSON.stringify(listingAnalytics)) setListingAnalytics(data[4]);
+        if (JSON.stringify(data[5]) !== JSON.stringify(registeredLeads)) setRegisteredLeads(data[5]);
+        if (JSON.stringify(data[6]) !== JSON.stringify(transactionActivities)) setTransactionActivities(data[6]);
+        if (JSON.stringify(data[7]) !== JSON.stringify(tenantImprovements)) setTenantImprovements(data[7]);
+        if (JSON.stringify(data[8]) !== JSON.stringify(negotiationBoards)) setNegotiationBoards(data[8]);
+        if (JSON.stringify(data[9]) !== JSON.stringify(aboutUsContent)) setAboutUsContent(data[9]);
+        if (JSON.stringify(data[10]) !== JSON.stringify(locationCircles)) setLocationCircles(data[10]);
+        if (JSON.stringify(data[11]) !== JSON.stringify(downloadAcknowledgments)) setDownloadAcknowledgments(data[11]);
+        if (JSON.stringify(data[12]) !== JSON.stringify(downloadHistory)) setDownloadHistory(data[12]);
+        if (JSON.stringify(data[13]) !== JSON.stringify(viewHistory)) setViewHistory(data[13]);
+        if (JSON.stringify(data[14]) !== JSON.stringify(layoutRequests)) setLayoutRequests(data[14]);
+        if (JSON.stringify(data[15]) !== JSON.stringify(chatMessages)) setChatMessages(data[15]);
+        if (JSON.stringify(data[16]) !== JSON.stringify(notifications)) setNotifications(data[16]);
 
-            if (JSON.stringify(data[0]) !== JSON.stringify(listings)) setListings(data[0]);
-            if (JSON.stringify(data[1]) !== JSON.stringify(demands)) setDemands(data[1]);
-            if (JSON.stringify(data[2]) !== JSON.stringify(submissions)) setSubmissions(data[2]);
-            if (JSON.stringify(data[3]) !== JSON.stringify(agentLeads)) setAgentLeads(data[3]);
-            if (JSON.stringify(data[4]) !== JSON.stringify(listingAnalytics)) setListingAnalytics(data[4]);
-            if (JSON.stringify(data[5]) !== JSON.stringify(registeredLeads)) setRegisteredLeads(data[5]);
-            if (JSON.stringify(data[6]) !== JSON.stringify(transactionActivities)) setTransactionActivities(data[6]);
-            if (JSON.stringify(data[7]) !== JSON.stringify(tenantImprovements)) setTenantImprovements(data[7]);
-            if (JSON.stringify(data[8]) !== JSON.stringify(negotiationBoards)) setNegotiationBoards(data[8]);
-            if (JSON.stringify(data[9]) !== JSON.stringify(aboutUsContent)) setAboutUsContent(data[9]);
-            if (JSON.stringify(data[10]) !== JSON.stringify(locationCircles)) setLocationCircles(data[10]);
-            if (JSON.stringify(data[11]) !== JSON.stringify(downloadAcknowledgments)) setDownloadAcknowledgments(data[11]);
-            if (JSON.stringify(data[12]) !== JSON.stringify(downloadHistory)) setDownloadHistory(data[12]);
-            if (JSON.stringify(data[13]) !== JSON.stringify(viewHistory)) setViewHistory(data[13]);
-            if (JSON.stringify(data[14]) !== JSON.stringify(layoutRequests)) setLayoutRequests(data[14]);
-            if (JSON.stringify(data[15]) !== JSON.stringify(chatMessages)) setChatMessages(data[15]);
-            if (JSON.stringify(data[16]) !== JSON.stringify(notifications)) setNotifications(data[16]);
-
-            if (isLoading) {
-                const storedShortlist = localStorage.getItem('general_shortlist');
-                if (storedShortlist) {
-                    setGeneralShortlist(JSON.parse(storedShortlist));
-                }
-                setIsShortlistLoading(false);
-                setIsLoading(false);
+        if (isLoading) {
+            const storedShortlist = localStorage.getItem('general_shortlist');
+            if (storedShortlist) {
+                setGeneralShortlist(JSON.parse(storedShortlist));
             }
-
-        } catch (error) {
-            console.error("Failed to load initial data", error);
-            if (isLoading) setIsLoading(false);
+            setIsShortlistLoading(false);
+            setIsLoading(false);
         }
-    };
-    
-    fetchData(); // Initial fetch
-    const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
-    return () => clearInterval(interval); // Cleanup on unmount
+
+    } catch (error) {
+        console.error("Failed to load initial data", error);
+        if (isLoading) setIsLoading(false);
+    }
   }, [listings, demands, submissions, agentLeads, listingAnalytics, registeredLeads, transactionActivities, tenantImprovements, negotiationBoards, aboutUsContent, locationCircles, downloadAcknowledgments, downloadHistory, viewHistory, layoutRequests, chatMessages, notifications, isLoading]);
 
+  useEffect(() => {
+    const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [fetchData]);
   
   // Effect to clear shortlist on logout
   useEffect(() => {
@@ -353,7 +351,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }, [notifications, authUser]);
 
-  const persistData = async (endpoint: string, data: any, entityName: string) => {
+  const persistData = useCallback(async (endpoint: string, data: any, entityName: string) => {
     try {
         const response = await fetch(`/api/${endpoint}`, {
             method: 'POST',
@@ -371,25 +369,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
             description: `Could not save ${entityName} changes to the server.`
         });
     }
-  }
+  }, [toast]);
 
-  const persistListings = useCallback((updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings'), [toast]);
-  const persistDemands = useCallback((updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands'), [toast]);
-  const persistSubmissions = useCallback((updatedSubmissions: Submission[]) => persistData('submissions', updatedSubmissions, 'submissions'), [toast]);
-  const persistAgentLeads = useCallback((updatedLeads: AgentLead[]) => persistData('agent-leads', updatedLeads, 'agent leads'), [toast]);
-  const persistRegisteredLeads = useCallback((updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads'), [toast]);
-  const persistActivities = useCallback((updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities'), [toast]);
-  const persistTenantImprovements = useCallback((updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements'), [toast]);
-  const persistNegotiationBoards = useCallback((updatedSheets: NegotiationBoardSchema[]) => persistData('negotiation-boards', updatedSheets, 'negotiation boards'), [toast]);
-  const persistListingAnalytics = useCallback((updatedAnalytics: ListingAnalytics[]) => persistData('listing-analytics', updatedAnalytics, 'listing analytics'), [toast]);
-  const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), [toast]);
-  const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), [toast]);
-  const persistDownloadHistory = useCallback((updatedHistory: DownloadRecord[]) => persistData('download-history', updatedHistory, 'download history'), [toast]);
-  const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), [toast]);
-  const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), [toast]);
-  const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), [toast]);
-  const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), [toast]);
-  const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), [toast]);
+  const persistListings = useCallback((updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings'), [persistData]);
+  const persistDemands = useCallback((updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands'), [persistData]);
+  const persistSubmissions = useCallback((updatedSubmissions: Submission[]) => persistData('submissions', updatedSubmissions, 'submissions'), [persistData]);
+  const persistAgentLeads = useCallback((updatedLeads: AgentLead[]) => persistData('agent-leads', updatedLeads, 'agent leads'), [persistData]);
+  const persistRegisteredLeads = useCallback((updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads'), [persistData]);
+  const persistActivities = useCallback((updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities'), [persistData]);
+  const persistTenantImprovements = useCallback((updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements'), [persistData]);
+  const persistNegotiationBoards = useCallback((updatedSheets: NegotiationBoardSchema[]) => persistData('negotiation-boards', updatedSheets, 'negotiation boards'), [persistData]);
+  const persistListingAnalytics = useCallback((updatedAnalytics: ListingAnalytics[]) => persistData('listing-analytics', updatedAnalytics, 'listing analytics'), [persistData]);
+  const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), [persistData]);
+  const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), [persistData]);
+  const persistDownloadHistory = useCallback((updatedHistory: DownloadRecord[]) => persistData('download-history', updatedHistory, 'download history'), [persistData]);
+  const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), [persistData]);
+  const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), [persistData]);
+  const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), [persistData]);
+  const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), [persistData]);
+  const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), [persistData]);
 
 
   const addNotification = useCallback((notification: Omit<Notification, 'isRead'>) => {
@@ -746,7 +744,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
 
     return { success: true, limitReached: false, message: "Download successful." };
-  }, [downloadHistory, getCompanyDownloadCounts, toast, persistListingAnalytics, persistDownloadHistory]);
+  }, [getCompanyDownloadCounts, persistDownloadHistory, persistListingAnalytics, toast]);
 
   const logListingView = useCallback((user: User | null, listingId: string) => {
       const now = Date.now();
@@ -937,7 +935,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
               participants.forEach(participantEmail => {
                   if(participantEmail !== newActivity.createdBy) {
                       addNotification({
-                          id: `notif-${Date.now()}-${newActivity.activityId}-${participantEmail}`, // Make ID unique per recipient
+                          id: `notif-${newActivity.activityId}-${participantEmail}`,
                           type: 'new_activity',
                           title: `Update on Transaction: ${lead.id}`,
                           message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
@@ -955,13 +953,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistActivities, registeredLeads, addNotification, users]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
+    let wasAnyPropertyAcknowledged = false;
+
     setRegisteredLeads(prevLeads => {
-        let leadToUpdate: RegisteredLead | undefined;
-        let wasAnyPropertyAcknowledged = false;
-        
         const newLeads = prevLeads.map(lead => {
             if (lead.id === leadId) {
-                leadToUpdate = lead;
                 const updatedProviders = lead.providers.map(p => {
                     if (p.providerEmail === providerEmail) {
                         const updatedProperties = p.properties.map(prop => {
@@ -984,19 +980,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
             return lead;
         });
-
-        if (wasAnyPropertyAcknowledged && leadToUpdate) {
-            addTransactionActivity({
-                leadId: leadId,
-                activityType: 'Lead Acknowledged',
-                details: { acknowledgedBy: ackDetails },
-                createdBy: providerEmail,
-            });
-        }
         
         persistRegisteredLeads(newLeads);
         return newLeads;
     });
+
+    if (wasAnyPropertyAcknowledged) {
+        addTransactionActivity({
+            leadId: leadId,
+            activityType: 'Lead Acknowledged',
+            details: { acknowledgedBy: ackDetails },
+            createdBy: providerEmail,
+        });
+    }
   }, [persistRegisteredLeads, addTransactionActivity]);
 
   const addAgentToLead = useCallback((leadId: string, agentEmail: string) => {
