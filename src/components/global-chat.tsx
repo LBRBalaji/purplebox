@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 function ConversationList({ onSelectConversation }: { onSelectConversation: (chat: ChatSubmission) => void }) {
     const { user, users } = useAuth();
-    const { registeredLeads, listings, chatMessages, clearNewMessages } = useData();
+    const { registeredLeads, listings, chatMessages, clearNewMessages, unreadChatCount } = useData();
     const [searchTerm, setSearchTerm] = React.useState('');
     const [filter, setFilter] = React.useState('all');
 
@@ -43,13 +43,18 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
              let chatPartnerName: string;
              let partnerInitials: string;
              const isBrokeredDeal = lead.isO2OCollaborator;
+             const isProvider = user.email === developer?.email;
 
              if (user.email === customer?.email) {
                  chatPartnerName = isBrokeredDeal ? "O2O Team" : (developer?.companyName || "Developer");
                  partnerInitials = isBrokeredDeal ? "O2O" : (developer?.companyName?.[0] || 'D');
-             } else { // For Provider, Agent, or Admin
+             } else { 
                  const customerCompany = customer?.companyName || "Customer";
-                 chatPartnerName = isBrokeredDeal ? `For-${customerCompany}` : customerCompany;
+                 if (isProvider) {
+                     chatPartnerName = isBrokeredDeal ? `For-${customerCompany}` : customerCompany;
+                 } else { // Admin or Agent view
+                     chatPartnerName = customerCompany;
+                 }
                  partnerInitials = customer?.companyName?.[0] || 'C';
              }
              
@@ -79,7 +84,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                  timestamp: lastMessage ? new Date(lastMessage.timestamp) : new Date(lead.registeredAt),
                  isUnread,
              } as const;
-        }).filter(Boolean)
+        }).filter((c): c is NonNullable<typeof c> => !!c)
         .sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime());
         
     }, [user, users, registeredLeads, listings, chatMessages]);
@@ -103,10 +108,6 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
         }
         return results;
     }, [conversations, searchTerm, filter]);
-
-    const unreadCount = React.useMemo(() => {
-        return conversations.filter(c => c.isUnread).length;
-    }, [conversations]);
     
     const handleSelect = (chat: ChatSubmission) => {
         clearNewMessages(chat.submissionId);
@@ -136,7 +137,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
                     <TabsTrigger value="all">All</TabsTrigger>
                     <TabsTrigger value="unread">
                         Unread
-                        {unreadCount > 0 && <Badge variant="destructive" className="ml-2">{unreadCount}</Badge>}
+                        {unreadChatCount > 0 && <Badge variant="destructive" className="ml-2">{unreadChatCount}</Badge>}
                     </TabsTrigger>
                 </TabsList>
             </Tabs>
@@ -170,7 +171,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
 
 export function GlobalChatWidget() {
     const { user } = useAuth();
-    const { activeChat, setActiveChat, demands, registeredLeads } = useData();
+    const { activeChat, setActiveChat, demands, registeredLeads, unreadChatCount } = useData();
     const [isOpen, setIsOpen] = React.useState(false);
 
     if (!user) return null;
@@ -186,9 +187,14 @@ export function GlobalChatWidget() {
     if (!isOpen) {
         return (
             <div className="fixed bottom-8 right-8 z-50">
-                <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full shadow-lg h-14 pl-5 pr-6 flex items-center gap-3">
+                <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full shadow-lg h-14 pl-5 pr-6 flex items-center gap-3 relative">
                     <MessageSquare className="h-6 w-6" />
                     <span className="text-lg font-medium">Chat</span>
+                    {unreadChatCount > 0 && (
+                        <Badge variant="destructive" className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center rounded-full">
+                            {unreadChatCount}
+                        </Badge>
+                    )}
                 </Button>
             </div>
         )
@@ -208,7 +214,12 @@ export function GlobalChatWidget() {
             headerTitle = activeChat.chatPartnerName;
         } else {
             const customerCompany = activeChat.customerCompany || 'Customer';
-            headerTitle = lead?.isO2OCollaborator ? `For-${customerCompany}` : customerCompany;
+            const isProvider = user?.email === activeChat.providerEmail;
+            if (isProvider) {
+                 headerTitle = lead?.isO2OCollaborator ? `For-${customerCompany}` : customerCompany;
+            } else {
+                 headerTitle = customerCompany;
+            }
         }
 
         title = headerTitle;

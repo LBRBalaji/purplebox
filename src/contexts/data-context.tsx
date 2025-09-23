@@ -234,6 +234,7 @@ type DataContextType = {
   reassignAnonymousViews: (anonymousId: string, user: User) => void;
   notifications: Notification[];
   unreadCount: number;
+  unreadChatCount: number;
   markNotificationsAsRead: () => void;
   addAgentToLead: (leadId: string, agentEmail: string) => void;
 };
@@ -282,6 +283,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [activeChat, setActiveChat] = useState<ChatSubmission | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
 
   const persistData = useCallback(async (endpoint: string, data: any, entityName: string) => {
     try {
@@ -368,10 +370,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
     if (authUser) {
       const count = notifications.filter(n => !n.isRead && (n.recipientEmail === authUser.email || (n.type === 'new_demand' && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O')) || (n.type === 'new_submission' && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O')) )).length;
       setUnreadCount(count);
+
+      const chatCount = Object.values(chatMessages).reduce((acc, messages) => {
+        const hasUnread = messages.some(m => m.isNew && m.senderEmail !== authUser.email);
+        return acc + (hasUnread ? 1 : 0);
+      }, 0);
+      setUnreadChatCount(chatCount);
+
     } else {
       setUnreadCount(0);
+      setUnreadChatCount(0);
     }
-  }, [notifications, authUser]);
+  }, [notifications, chatMessages, authUser]);
 
   const persistListings = useCallback((updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings'), [persistData]);
   const persistDemands = useCallback((updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands'), [persistData]);
@@ -942,22 +952,28 @@ export function DataProvider({ children }: { children: ReactNode }) {
               if (lead.agentId) participants.add(lead.agentId);
               lead.providers.forEach(p => participants.add(p.providerEmail));
               if (lead.isO2OCollaborator) {
-                  participants.add('superadmin@o2o.com');
+                  // Ensure admin is only added if they are part of the broking
+                  Object.values(users).forEach(u => {
+                      if(u.role === 'SuperAdmin' || u.role === 'O2O') {
+                          participants.add(u.email);
+                      }
+                  });
               }
               
+              // Ensure we don't notify the person who made the change.
+              participants.delete(newActivity.createdBy);
+
               participants.forEach(participantEmail => {
-                  if(participantEmail !== newActivity.createdBy) {
-                      addNotification({
-                          id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
-                          type: 'new_activity',
-                          title: `Update on Transaction: ${lead.id}`,
-                          message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
-                          href: `/dashboard/leads/${lead.id}`,
-                          recipientEmail: participantEmail,
-                          timestamp: newActivity.createdAt,
-                          triggeredBy: newActivity.createdBy
-                      });
-                  }
+                  addNotification({
+                      id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
+                      type: 'new_activity',
+                      title: `Update on Transaction: ${lead.id}`,
+                      message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
+                      href: `/dashboard/leads/${lead.id}`,
+                      recipientEmail: participantEmail,
+                      timestamp: newActivity.createdAt,
+                      triggeredBy: newActivity.createdBy
+                  });
               });
           }
 
@@ -1105,6 +1121,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setTimeout(() => setIsShortlistLoading(false), 300); // Simulate async save
   }, [generalShortlist]);
 
+  const openChat = (chat: ChatSubmission) => {
+      const threadId = `chat-${chat.demandId}-${chat.providerEmail}`;
+      clearNewMessages(threadId);
+      setActiveChat(chat);
+  }
+
   return (
     <DataContext.Provider value={{ 
         listings, addListing, updateListing, updateListingStatus, listingAnalytics, logListingView,
@@ -1141,10 +1163,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
         updateTypingStatus,
         fetchTypingStatus,
         activeChat,
-        setActiveChat,
+        setActiveChat: (chat) => {
+            if (chat) {
+                const threadId = `chat-${chat.demandId}-${chat.providerEmail}`;
+                clearNewMessages(threadId);
+            }
+            setActiveChat(chat);
+        },
         reassignAnonymousViews,
         notifications,
         unreadCount,
+        unreadChatCount,
         markNotificationsAsRead,
         addAgentToLead
         }}>

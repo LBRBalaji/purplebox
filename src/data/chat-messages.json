@@ -213,14 +213,14 @@
       "senderName": "Namasivayam",
       "text": "hey",
       "timestamp": "2025-09-22T18:21:30.441Z",
-      "isNew": true
+      "isNew": false
     },
     {
       "senderEmail": "namasivayam.lion@gmail.com",
       "senderName": "Namasivayam",
       "text": "when do you intent to visit the site",
       "timestamp": "2025-09-22T18:21:38.588Z",
-      "isNew": true
+      "isNew": false
     }
   ],
   "chat-LDR-MFVGXVIQ8AELF-namasivayam.lion@gmail.com": [
@@ -229,13 +229,22 @@
       "senderName": "Namasivayam",
       "text": "hello",
       "timestamp": "2025-09-22T18:41:45.530Z",
-      "isNew": true
+      "isNew": false
     },
     {
       "senderEmail": "namasivayam.lion@gmail.com",
       "senderName": "Namasivayam",
       "text": "have you seen my warehouse?",
       "timestamp": "2025-09-22T18:41:55.244Z",
+      "isNew": false
+    }
+  ],
+  "chat-LDR-MFW7FQT2F88ME-admin@kailashlogistics.com": [
+    {
+      "senderEmail": "superadmin@o2o.com",
+      "senderName": "O2O Super Admin",
+      "text": "thank you for confirming, send me the quote pls",
+      "timestamp": "2025-09-23T07:04:02.400Z",
       "isNew": true
     }
   ]
