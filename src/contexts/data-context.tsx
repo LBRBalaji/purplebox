@@ -127,7 +127,7 @@ export type RegisteredLead = {
 export type TransactionActivity = {
     activityId: string;
     leadId: string; // RegisteredLead ID
-    activityType: 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted' | 'Lead Acknowledged';
+    activityType: 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted' | 'Lead Acknowledged' | 'Lead Registered';
     details: {
         visitDateTime?: string;
         message?: string;
@@ -846,70 +846,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setSelectedForDownload([]);
   }, []);
 
-  const addRegisteredLead = useCallback((leadData: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => {
-    setRegisteredLeads(prevLeads => {
-        const newLead: RegisteredLead = {
-          ...leadData,
-          registeredAt: new Date().toISOString(),
-        };
-        const updatedLeads = [newLead, ...prevLeads];
-        persistRegisteredLeads(updatedLeads);
-
-        const registeredByUser = users[newLead.registeredBy];
-        const uniqueProviders = new Set(newLead.providers.map(p => p.providerEmail));
-
-        uniqueProviders.forEach(providerEmail => {
-            const providerUser = users[providerEmail];
-            let title: string;
-            let message: string;
-            let href: string;
-
-            const isRegisteredByAdminOrAgent = registeredByUser?.role === 'SuperAdmin' || registeredByUser?.role === 'O2O' || registeredByUser?.role === 'Agent';
-            const isBrokered = newLead.isO2OCollaborator || !providerUser || providerUser.plan !== 'Paid_Premium';
-
-            
-            if (isBrokered) {
-                href = '/dashboard/transactions'; // Admins/O2O go to the broking desk
-            } else {
-                href = '/dashboard?tab=registered-leads'; // Providers go to their leads tab
-            }
-
-            if (isBrokered) {
-                title = `New Brokered Lead: ${newLead.leadName}`;
-                message = isRegisteredByAdminOrAgent
-                    ? `${registeredByUser.userName} from ${registeredByUser.companyName} has registered a new lead for you.`
-                    : `A customer has requested a quote via O2O Broking. Please acknowledge.`;
-            } else {
-                title = `New Direct Lead: ${newLead.leadName}`;
-                message = `A customer has requested a quote for your premium listing(s). Please acknowledge.`;
-            }
-            
-            addNotification({
-                id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
-                type: 'new_lead_for_provider',
-                title: title,
-                message: message,
-                href: href,
-                recipientEmail: providerEmail,
-                timestamp: new Date().toISOString(),
-                triggeredBy: userEmail || 'system'
-            });
-        });
-
-        return updatedLeads;
-    });
-  }, [persistRegisteredLeads, addNotification, users]);
-
-  const updateRegisteredLead = useCallback((updatedLead: RegisteredLead) => {
-      setRegisteredLeads(prevLeads => {
-          const newLeads = prevLeads.map(lead => 
-              lead.id === updatedLead.id ? updatedLead : lead
-          );
-          persistRegisteredLeads(newLeads);
-          return newLeads;
-      });
-  }, [persistRegisteredLeads]);
-  
   const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
     setTransactionActivities(prevActivities => {
         const newActivity: TransactionActivity = {
@@ -936,7 +872,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 });
             }
             
-            participants.forEach(participantEmail => {
+            const uniqueParticipants = Array.from(participants);
+
+            uniqueParticipants.forEach(participantEmail => {
                 if (participantEmail !== newActivity.createdBy) {
                     addNotification({
                         id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
@@ -953,7 +891,73 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         return updatedActivities;
     });
-}, [persistActivities, registeredLeads, addNotification, users]);
+  }, [persistActivities, registeredLeads, addNotification, users]);
+
+  const addRegisteredLead = useCallback((leadData: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => {
+    const newLead: RegisteredLead = {
+        ...leadData,
+        registeredAt: new Date().toISOString(),
+    };
+
+    setRegisteredLeads(prevLeads => {
+        const updatedLeads = [newLead, ...prevLeads];
+        persistRegisteredLeads(updatedLeads);
+        return updatedLeads;
+    });
+    
+    // Log the initial "Lead Registered" activity
+    addTransactionActivity({
+        leadId: newLead.id,
+        activityType: 'Lead Registered',
+        details: {},
+        createdBy: userEmail || 'system',
+    });
+
+    const registeredByUser = users[newLead.registeredBy];
+    const uniqueProviders = new Set(newLead.providers.map(p => p.providerEmail));
+
+    uniqueProviders.forEach(providerEmail => {
+        const isRegisteredByAdminOrAgent = registeredByUser?.role === 'SuperAdmin' || registeredByUser?.role === 'O2O' || registeredByUser?.role === 'Agent';
+
+        // For brokered deals, the main recipient is the SuperAdmin/O2O team
+        if (newLead.isO2OCollaborator) {
+            const adminRecipient = Object.values(users).find(u => u.role === 'SuperAdmin' || u.role === 'O2O');
+            if (adminRecipient) {
+                addNotification({
+                    id: `notif-${Date.now()}-${adminRecipient.email}-${Math.random()}`,
+                    type: 'new_lead_for_provider',
+                    title: `New Broking Lead: ${newLead.leadName}`,
+                    message: `Registered by ${registeredByUser?.userName || userEmail}. Needs assignment to a provider.`,
+                    href: `/dashboard/transactions`,
+                    recipientEmail: adminRecipient.email,
+                    timestamp: new Date().toISOString(),
+                    triggeredBy: userEmail || 'system'
+                });
+            }
+        } else { // For direct/premium deals
+            addNotification({
+                id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
+                type: 'new_lead_for_provider',
+                title: `New Direct Lead: ${newLead.leadName}`,
+                message: `A customer has requested a quote for your premium listing(s). Please acknowledge.`,
+                href: '/dashboard?tab=registered-leads',
+                recipientEmail: providerEmail,
+                timestamp: new Date().toISOString(),
+                triggeredBy: userEmail || 'system'
+            });
+        }
+    });
+  }, [persistRegisteredLeads, addTransactionActivity, addNotification, users]);
+  
+  const updateRegisteredLead = useCallback((updatedLead: RegisteredLead) => {
+      setRegisteredLeads(prevLeads => {
+          const newLeads = prevLeads.map(lead => 
+              lead.id === updatedLead.id ? updatedLead : lead
+          );
+          persistRegisteredLeads(newLeads);
+          return newLeads;
+      });
+  }, [persistRegisteredLeads]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
     let wasAnyPropertyAcknowledged = false;

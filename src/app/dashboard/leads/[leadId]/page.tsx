@@ -39,6 +39,7 @@ const activityIcons: { [key in TransactionActivity['activityType']]: React.Eleme
   'Tenant Improvements': HardHat,
   'Proposal Submitted': FileSpreadsheet,
   'Lead Acknowledged': UserCheck,
+  'Lead Registered': UserPlus,
 };
 
 const ProposalFormSchema = z.object({
@@ -381,6 +382,7 @@ export default function LeadDetailPage() {
                                                             <TimelineTitle>{activity.activityType}</TimelineTitle>
                                                         </TimelineHeader>
                                                         <TimelineBody className="space-y-2">
+                                                            {activity.activityType === 'Lead Registered' && <p className="text-sm">Lead registered by <b>{users[activity.createdBy]?.userName}</b>.</p>}
                                                             {activity.details.visitDateTime && <p className="text-sm"><b>Date & Time:</b> {new Date(activity.details.visitDateTime).toLocaleString()}</p>}
                                                             {activity.details.status && <p className="text-sm"><b>Status:</b> <span className="font-semibold text-primary">{activity.details.status}</span></p>}
                                                             {activity.details.message && <p className="text-sm"><b>Message:</b> {activity.details.message}</p>}
@@ -401,7 +403,7 @@ export default function LeadDetailPage() {
                                                                 </div>
                                                             )}
                                                             <TimelineDescription>
-                                                                Logged by {users[activity.createdBy]?.userName || activity.createdBy} on {new Date(activity.createdAt).toLocaleDateString()}
+                                                                Logged by {users[activity.createdBy]?.userName || activity.createdBy} on {new Date(activity.createdAt).toLocaleString()}
                                                             </TimelineDescription>
                                                         </TimelineBody>
                                                     </TimelineItem>
