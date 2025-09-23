@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-QUOTE-1758607761813",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-23T06:09:21.815Z"
+  },
+  {
     "id": "LDR-MFVI4057LTJVI",
     "customerId": "betacustomer2@o2o.com",
     "leadName": "Beta Retail",

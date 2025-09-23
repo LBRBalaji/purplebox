@@ -168,6 +168,10 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                     // Direct Deal or Admin/Agent view: Show the actual customer contact.
                                     contactToShow = { name: lead.leadContact, email: lead.leadEmail };
                                 }
+                                
+                                const requirementsSummary = view === 'broking'
+                                    ? lead.requirementsSummary
+                                    : lead.requirementsSummary;
 
 
                                 return (
@@ -179,7 +183,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                                 <span className="text-xs text-muted-foreground">{contactToShow.email}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="max-w-sm truncate">{lead.requirementsSummary}</TableCell>
+                                        <TableCell className="max-w-sm truncate">{requirementsSummary}</TableCell>
                                         
                                         {isAgent || isAdminOrO2O ? (
                                           <>

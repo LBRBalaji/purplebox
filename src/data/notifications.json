@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "notif-1758607761816-0.6236675268116366",
+    "type": "new_lead_for_provider",
+    "title": "New Brokered Lead: XYZ Logistics",
+    "message": "A lead for a free listing requires O2O collaboration.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "superadmin@o2o.com",
+    "timestamp": "2025-09-23T06:09:21.816Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": true
+  },
+  {
+    "id": "notif-1758607761814-0.6024537433028287",
+    "type": "new_lead_for_provider",
+    "title": "New Brokered Lead: XYZ Logistics",
+    "message": "A lead for a free listing requires O2O collaboration.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "superadmin@o2o.com",
+    "timestamp": "2025-09-23T06:09:21.814Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": true
+  }
+]

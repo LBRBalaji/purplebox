@@ -330,6 +330,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [listings, demands, submissions, agentLeads, listingAnalytics, registeredLeads, transactionActivities, tenantImprovements, negotiationBoards, aboutUsContent, locationCircles, downloadAcknowledgments, downloadHistory, viewHistory, layoutRequests, chatMessages, notifications, isLoading]);
 
   useEffect(() => {
+    fetchData(); // Initial fetch
     const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
     return () => clearInterval(interval); // Cleanup on unmount
   }, [fetchData]);
@@ -878,23 +879,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const providerUser = users[provider.providerEmail];
             let title: string;
             let message: string;
+            let href: string;
 
             if (isRegisteredByAdminOrAgent && !newLead.isO2OCollaborator) {
-                // Admin/Agent registering a direct lead to a provider
                 title = `New Lead from O2O: ${newLead.leadName}`;
                 message = `${registeredByUser.userName} from ${registeredByUser.companyName} has registered a new lead for you.`;
+                href = `/dashboard?tab=registered-leads`;
             } else {
-                // Customer directly requesting a quote OR admin creating brokered lead
                 title = newLead.isO2OCollaborator ? `New Brokered Lead: ${newLead.leadName}` : `New Direct Lead: ${newLead.leadName}`;
                 message = newLead.isO2OCollaborator ? `A lead for a free listing requires O2O collaboration.` : `A customer has requested a quote for your premium listing(s). Please acknowledge.`;
+                const recipientIsAdmin = providerUser?.role === 'SuperAdmin' || providerUser?.role === 'O2O';
+                href = recipientIsAdmin ? '/dashboard/transactions' : '/dashboard?tab=registered-leads';
             }
 
             addNotification({
-                id: `notif-${Date.now()}-${Math.random()}`,
+                id: `notif-${Date.now()}-${provider.providerEmail}-${Math.random()}`,
                 type: 'new_lead_for_provider',
                 title: title,
                 message: message,
-                href: `/dashboard?tab=registered-leads`,
+                href: href,
                 recipientEmail: provider.providerEmail,
                 timestamp: new Date().toISOString(),
                 triggeredBy: userEmail || 'system'
@@ -935,7 +938,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
               participants.forEach(participantEmail => {
                   if(participantEmail !== newActivity.createdBy) {
                       addNotification({
-                          id: `notif-${newActivity.activityId}-${participantEmail}`,
+                          id: `notif-${newActivity.activityId}-${participantEmail}-${Math.random()}`,
                           type: 'new_activity',
                           title: `Update on Transaction: ${lead.id}`,
                           message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
@@ -954,10 +957,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
     let wasAnyPropertyAcknowledged = false;
+    let acknowledgedLead: RegisteredLead | undefined;
 
     setRegisteredLeads(prevLeads => {
         const newLeads = prevLeads.map(lead => {
             if (lead.id === leadId) {
+                acknowledgedLead = lead;
                 const updatedProviders = lead.providers.map(p => {
                     if (p.providerEmail === providerEmail) {
                         const updatedProperties = p.properties.map(prop => {
@@ -981,11 +986,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
             return lead;
         });
         
-        persistRegisteredLeads(newLeads);
+        if (wasAnyPropertyAcknowledged) {
+            persistRegisteredLeads(newLeads);
+        }
         return newLeads;
     });
 
-    if (wasAnyPropertyAcknowledged) {
+    if (wasAnyPropertyAcknowledged && acknowledgedLead) {
         addTransactionActivity({
             leadId: leadId,
             activityType: 'Lead Acknowledged',
