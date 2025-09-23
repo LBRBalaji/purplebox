@@ -1183,7 +1183,7 @@
   },
   {
     "listingId": "LST-EDCYH9",
-    "views": 3,
+    "views": 11,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -1204,6 +1204,54 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758607758073
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758609856409
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758609856409
+      },
+      {
+        "userId": "anonymous_anon_1758607739773_dsfg3k6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758610134599
+      },
+      {
+        "userId": "anonymous_anon_1758607739773_dsfg3k6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758610134599
+      },
+      {
+        "userId": "anonymous_anon_1758610191820_ebn32hn",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758610195102
+      },
+      {
+        "userId": "anonymous_anon_1758610191820_ebn32hn",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758610195102
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758610202947
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758610202947
       }
     ]
   }

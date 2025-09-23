@@ -283,6 +283,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const persistData = useCallback(async (endpoint: string, data: any, entityName: string) => {
+    try {
+        const response = await fetch(`/api/${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to save ${entityName} to the server.`);
+        }
+    } catch (error) {
+        console.error(`Error persisting ${entityName}:`, error);
+        toast({
+            variant: "destructive",
+            title: "Data Sync Error",
+            description: `Could not save ${entityName} changes to the server.`
+        });
+    }
+  }, [toast]);
+
   const fetchData = useCallback(async () => {
     try {
         const responses = await Promise.all([
@@ -327,7 +347,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         console.error("Failed to load initial data", error);
         if (isLoading) setIsLoading(false);
     }
-  }, [listings, demands, submissions, agentLeads, listingAnalytics, registeredLeads, transactionActivities, tenantImprovements, negotiationBoards, aboutUsContent, locationCircles, downloadAcknowledgments, downloadHistory, viewHistory, layoutRequests, chatMessages, notifications, isLoading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchData(); // Initial fetch
@@ -351,26 +372,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setUnreadCount(0);
     }
   }, [notifications, authUser]);
-
-  const persistData = useCallback(async (endpoint: string, data: any, entityName: string) => {
-    try {
-        const response = await fetch(`/api/${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to save ${entityName} to the server.`);
-        }
-    } catch (error) {
-        console.error(`Error persisting ${entityName}:`, error);
-        toast({
-            variant: "destructive",
-            title: "Data Sync Error",
-            description: `Could not save ${entityName} changes to the server.`
-        });
-    }
-  }, [toast]);
 
   const persistListings = useCallback((updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings'), [persistData]);
   const persistDemands = useCallback((updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands'), [persistData]);
@@ -433,7 +434,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const recipient = context.lead.customerId === authUser?.email ? context.partner : users[context.lead.customerId];
     if (recipient) {
       addNotification({
-        id: `notif-${Date.now()}-${Math.random()}`,
+        id: `notif-${Date.now()}-${recipient.email}-${Math.random()}`,
         type: 'new_chat_message',
         title: `New message from ${authUser?.userName}`,
         message: `Regarding transaction ${context.lead.id}: "${message.text?.substring(0, 50)}..."`,
@@ -609,7 +610,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const submission = prevSubmissions.find(s => s.submissionId === submissionId);
         if (submission && status === 'Approved') {
             addNotification({
-                id: `notif-${Date.now()}-${Math.random()}`,
+                id: `notif-${Date.now()}-${submission.listingId}-${Math.random()}`,
                 type: 'new_submission',
                 title: `Your match for Demand ${submission.demandId} was approved!`,
                 message: `Property ${submission.listingId} is now visible to the customer.`,
@@ -873,13 +874,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         // Notify relevant parties
         const registeredByUser = users[newLead.registeredBy];
-        const isRegisteredByAdminOrAgent = registeredByUser?.role === 'SuperAdmin' || registeredByUser?.role === 'O2O' || registeredByUser?.role === 'Agent';
+        const uniqueProviders = new Set(newLead.providers.map(p => p.providerEmail));
 
-        newLead.providers.forEach(provider => {
-            const providerUser = users[provider.providerEmail];
+        uniqueProviders.forEach(providerEmail => {
+            const providerUser = users[providerEmail];
             let title: string;
             let message: string;
             let href: string;
+
+            const isRegisteredByAdminOrAgent = registeredByUser?.role === 'SuperAdmin' || registeredByUser?.role === 'O2O' || registeredByUser?.role === 'Agent';
 
             if (isRegisteredByAdminOrAgent && !newLead.isO2OCollaborator) {
                 title = `New Lead from O2O: ${newLead.leadName}`;
@@ -893,12 +896,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
 
             addNotification({
-                id: `notif-${Date.now()}-${provider.providerEmail}-${Math.random()}`,
+                id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
                 type: 'new_lead_for_provider',
                 title: title,
                 message: message,
                 href: href,
-                recipientEmail: provider.providerEmail,
+                recipientEmail: providerEmail,
                 timestamp: new Date().toISOString(),
                 triggeredBy: userEmail || 'system'
             });
@@ -935,16 +938,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
                   participants.add('superadmin@o2o.com');
               }
               
-              participants.forEach(participantEmail => {
+              const uniqueParticipants = Array.from(participants);
+
+              uniqueParticipants.forEach(participantEmail => {
                   if(participantEmail !== newActivity.createdBy) {
                       addNotification({
-                          id: `notif-${newActivity.activityId}-${participantEmail}-${Math.random()}`,
+                          id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
                           type: 'new_activity',
                           title: `Update on Transaction: ${lead.id}`,
                           message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
                           href: `/dashboard/leads/${lead.id}`,
                           recipientEmail: participantEmail,
-                          timestamp: new Date().toISOString(),
+                          timestamp: newActivity.createdAt,
                           triggeredBy: newActivity.createdBy
                       });
                   }
@@ -1150,3 +1155,4 @@ export function useData() {
   }
   return context;
 }
+

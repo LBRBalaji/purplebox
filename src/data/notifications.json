@@ -1,24 +1,13 @@
 [
   {
-    "id": "notif-1758607761816-0.6236675268116366",
+    "id": "notif-1758610208252-superadmin@o2o.com-0.8228242703840585",
     "type": "new_lead_for_provider",
-    "title": "New Brokered Lead: XYZ Logistics",
+    "title": "New Brokered Lead: Alpha Logistics",
     "message": "A lead for a free listing requires O2O collaboration.",
-    "href": "/dashboard?tab=registered-leads",
+    "href": "/dashboard/transactions",
     "recipientEmail": "superadmin@o2o.com",
-    "timestamp": "2025-09-23T06:09:21.816Z",
-    "triggeredBy": "murugan@xyzlogistics.com",
-    "isRead": true
-  },
-  {
-    "id": "notif-1758607761814-0.6024537433028287",
-    "type": "new_lead_for_provider",
-    "title": "New Brokered Lead: XYZ Logistics",
-    "message": "A lead for a free listing requires O2O collaboration.",
-    "href": "/dashboard?tab=registered-leads",
-    "recipientEmail": "superadmin@o2o.com",
-    "timestamp": "2025-09-23T06:09:21.814Z",
-    "triggeredBy": "murugan@xyzlogistics.com",
+    "timestamp": "2025-09-23T06:50:08.252Z",
+    "triggeredBy": "customer1@o2o.com",
     "isRead": true
   }
 ]
