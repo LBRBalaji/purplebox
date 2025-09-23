@@ -297,7 +297,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
             
             const data = await Promise.all(responses.map(res => res.json()));
 
-            // Use stringify to compare objects/arrays for changes before setting state
             if (JSON.stringify(data[0]) !== JSON.stringify(listings)) setListings(data[0]);
             if (JSON.stringify(data[1]) !== JSON.stringify(demands)) setDemands(data[1]);
             if (JSON.stringify(data[2]) !== JSON.stringify(submissions)) setSubmissions(data[2]);
@@ -334,7 +333,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchData(); // Initial fetch
     const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
     return () => clearInterval(interval); // Cleanup on unmount
-  }, []); // Empty dependency array ensures this effect runs only once on mount
+  }, [listings, demands, submissions, agentLeads, listingAnalytics, registeredLeads, transactionActivities, tenantImprovements, negotiationBoards, aboutUsContent, locationCircles, downloadAcknowledgments, downloadHistory, viewHistory, layoutRequests, chatMessages, notifications, isLoading]);
 
   
   // Effect to clear shortlist on logout
@@ -374,23 +373,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const persistListings = useCallback((updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings'), []);
-  const persistDemands = useCallback((updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands'), []);
-  const persistSubmissions = useCallback((updatedSubmissions: Submission[]) => persistData('submissions', updatedSubmissions, 'submissions'), []);
-  const persistAgentLeads = useCallback((updatedLeads: AgentLead[]) => persistData('agent-leads', updatedLeads, 'agent leads'), []);
-  const persistRegisteredLeads = useCallback((updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads'), []);
-  const persistActivities = useCallback((updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities'), []);
-  const persistTenantImprovements = useCallback((updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements'), []);
-  const persistNegotiationBoards = useCallback((updatedSheets: NegotiationBoardSchema[]) => persistData('negotiation-boards', updatedSheets, 'negotiation boards'), []);
-  const persistListingAnalytics = useCallback((updatedAnalytics: ListingAnalytics[]) => persistData('listing-analytics', updatedAnalytics, 'listing analytics'), []);
-  const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), []);
-  const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), []);
-  const persistDownloadHistory = useCallback((updatedHistory: DownloadRecord[]) => persistData('download-history', updatedHistory, 'download history'), []);
-  const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), []);
-  const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), []);
-  const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), []);
-  const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), []);
-  const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), []);
+  const persistListings = useCallback((updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings'), [toast]);
+  const persistDemands = useCallback((updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands'), [toast]);
+  const persistSubmissions = useCallback((updatedSubmissions: Submission[]) => persistData('submissions', updatedSubmissions, 'submissions'), [toast]);
+  const persistAgentLeads = useCallback((updatedLeads: AgentLead[]) => persistData('agent-leads', updatedLeads, 'agent leads'), [toast]);
+  const persistRegisteredLeads = useCallback((updatedLeads: RegisteredLead[]) => persistData('registered-leads', updatedLeads, 'registered leads'), [toast]);
+  const persistActivities = useCallback((updatedActivities: TransactionActivity[]) => persistData('transaction-activities', updatedActivities, 'transaction activities'), [toast]);
+  const persistTenantImprovements = useCallback((updatedSheets: TenantImprovementsSheet[]) => persistData('tenant-improvements', updatedSheets, 'tenant improvements'), [toast]);
+  const persistNegotiationBoards = useCallback((updatedSheets: NegotiationBoardSchema[]) => persistData('negotiation-boards', updatedSheets, 'negotiation boards'), [toast]);
+  const persistListingAnalytics = useCallback((updatedAnalytics: ListingAnalytics[]) => persistData('listing-analytics', updatedAnalytics, 'listing analytics'), [toast]);
+  const persistAboutUsContent = useCallback((updatedContent: AboutUsContent) => persistData('about-us-content', updatedContent, 'about us content'), [toast]);
+  const persistDownloadAcknowledgments = useCallback((updatedAcks: AcknowledgmentRecord[]) => persistData('download-acknowledgments', updatedAcks, 'download acknowledgments'), [toast]);
+  const persistDownloadHistory = useCallback((updatedHistory: DownloadRecord[]) => persistData('download-history', updatedHistory, 'download history'), [toast]);
+  const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), [toast]);
+  const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), [toast]);
+  const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), [toast]);
+  const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), [toast]);
+  const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), [toast]);
 
 
   const addNotification = useCallback((notification: Omit<Notification, 'isRead'>) => {
@@ -421,7 +420,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [authUser, persistNotifications]);
 
 
-  const addChatMessage = async (threadId: string, message: ChatMessage, context: { lead: RegisteredLead, partner: User | null }) => {
+  const addChatMessage = useCallback(async (threadId: string, message: ChatMessage, context: { lead: RegisteredLead, partner: User | null }) => {
     const updatedMessages = { ...chatMessages };
     if (!updatedMessages[threadId]) {
       updatedMessages[threadId] = [];
@@ -445,7 +444,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         triggeredBy: authUser?.email || 'system',
       });
     }
-  };
+  }, [chatMessages, persistChatMessages, addNotification, authUser, users]);
 
   const clearNewMessages = useCallback((threadId: string) => {
     setChatMessages(prev => {
@@ -460,13 +459,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistChatMessages]);
 
 
-  const updateTypingStatus = async (threadId: string, status: TypingStatus) => {
+  const updateTypingStatus = useCallback(async (threadId: string, status: TypingStatus) => {
     const newStatus = { ...typingStatus, [threadId]: status };
     setTypingStatus(newStatus);
     await persistTypingStatus(newStatus);
-  };
+  }, [typingStatus, persistTypingStatus]);
 
-  const fetchTypingStatus = async (threadId: string) => {
+  const fetchTypingStatus = useCallback(async (threadId: string) => {
     try {
       const response = await fetch('/api/typing-status');
       if (response.ok) {
@@ -476,12 +475,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Failed to fetch typing status:', error);
     }
-  };
+  }, []);
 
-  const updateAboutUsContent = (newContent: AboutUsContent) => {
+  const updateAboutUsContent = useCallback((newContent: AboutUsContent) => {
     setAboutUsContent(newContent);
     persistAboutUsContent(newContent);
-  };
+  }, [persistAboutUsContent]);
 
 
   const addListing = useCallback((listing: ListingSchema, userEmail?: string) => {
@@ -938,7 +937,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
               participants.forEach(participantEmail => {
                   if(participantEmail !== newActivity.createdBy) {
                       addNotification({
-                          id: `notif-${Date.now()}-${newActivity.activityId}`,
+                          id: `notif-${Date.now()}-${newActivity.activityId}-${participantEmail}`, // Make ID unique per recipient
                           type: 'new_activity',
                           title: `Update on Transaction: ${lead.id}`,
                           message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
