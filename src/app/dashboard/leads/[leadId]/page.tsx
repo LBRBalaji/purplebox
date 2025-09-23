@@ -499,7 +499,7 @@ export default function LeadDetailPage() {
                                                               <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
                                                           </Button>
                                                       </div>
-                                                       {isProvider && !isBrokeredDeal && (
+                                                       {isProvider && (
                                                           <ProposalForm 
                                                               listing={listing} 
                                                               lead={lead} 
