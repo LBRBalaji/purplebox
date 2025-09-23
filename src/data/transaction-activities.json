@@ -1,5 +1,18 @@
 [
   {
+    "leadId": "LDR-QUOTE-1758613355481",
+    "activityType": "Proposal Submitted",
+    "details": {
+      "listingId": "LST-X635SS",
+      "rentPerSft": 28,
+      "rentalSecurityDeposit": 8,
+      "actualChargeableArea": 53000
+    },
+    "createdBy": "admin@kailashlogistics.com",
+    "activityId": "ACT-1758613401995",
+    "createdAt": "2025-09-23T07:43:21.995Z"
+  },
+  {
     "leadId": "LDR-MFW7FQT2F88ME",
     "activityType": "Lead Acknowledged",
     "details": {

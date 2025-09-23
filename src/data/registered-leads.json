@@ -1,5 +1,31 @@
 [
   {
+    "id": "LDR-QUOTE-1758613355481",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Murugan",
+    "leadEmail": "betacustomer2@o2o.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Seemavaram Part-A",
+    "registeredBy": "betacustomer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-X635SS",
+            "status": "Pending",
+            "rentPerSft": 28,
+            "rentalSecurityDeposit": 8,
+            "actualChargeableArea": 53000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-23T07:42:35.484Z"
+  },
+  {
     "id": "LDR-MFW7FQT2F88ME",
     "customerId": "customer1@o2o.com",
     "leadName": "Alpha Logistics",

@@ -307,48 +307,47 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            const endpoints = [
-                'listings', 'demands', 'submissions', 'agent-leads', 'listing-analytics',
-                'registered-leads', 'transaction-activities', 'tenant-improvements',
-                'negotiation-boards', 'about-us-content', 'location-circles',
-                'download-acknowledgments', 'download-history', 'view-history',
-                'layout-requests', 'chat-messages', 'notifications'
-            ];
-            const responses = await Promise.all(endpoints.map(ep => fetch(`/api/${ep}`)));
-            const data = await Promise.all(responses.map(res => res.json()));
+      try {
+        const endpoints = [
+          'listings', 'demands', 'submissions', 'agent-leads', 'listing-analytics',
+          'registered-leads', 'transaction-activities', 'tenant-improvements',
+          'negotiation-boards', 'about-us-content', 'location-circles',
+          'download-acknowledgments', 'download-history', 'view-history',
+          'layout-requests', 'chat-messages', 'notifications'
+        ];
+        const responses = await Promise.all(endpoints.map(ep => fetch(`/api/${ep}`)));
+        const data = await Promise.all(responses.map(res => res.json()));
 
-            setListings(prev => JSON.stringify(prev) !== JSON.stringify(data[0]) ? data[0] : prev);
-            setDemands(prev => JSON.stringify(prev) !== JSON.stringify(data[1]) ? data[1] : prev);
-            setSubmissions(prev => JSON.stringify(prev) !== JSON.stringify(data[2]) ? data[2] : prev);
-            setAgentLeads(prev => JSON.stringify(prev) !== JSON.stringify(data[3]) ? data[3] : prev);
-            setListingAnalytics(prev => JSON.stringify(prev) !== JSON.stringify(data[4]) ? data[4] : prev);
-            setRegisteredLeads(prev => JSON.stringify(prev) !== JSON.stringify(data[5]) ? data[5] : prev);
-            setTransactionActivities(prev => JSON.stringify(prev) !== JSON.stringify(data[6]) ? data[6] : prev);
-            setTenantImprovements(prev => JSON.stringify(prev) !== JSON.stringify(data[7]) ? data[7] : prev);
-            setNegotiationBoards(prev => JSON.stringify(prev) !== JSON.stringify(data[8]) ? data[8] : prev);
-            setAboutUsContent(prev => JSON.stringify(prev) !== JSON.stringify(data[9]) ? data[9] : prev);
-            setLocationCircles(prev => JSON.stringify(prev) !== JSON.stringify(data[10]) ? data[10] : prev);
-            setDownloadAcknowledgments(prev => JSON.stringify(prev) !== JSON.stringify(data[11]) ? data[11] : prev);
-            setDownloadHistory(prev => JSON.stringify(prev) !== JSON.stringify(data[12]) ? data[12] : prev);
-            setViewHistory(prev => JSON.stringify(prev) !== JSON.stringify(data[13]) ? data[13] : prev);
-            setLayoutRequests(prev => JSON.stringify(prev) !== JSON.stringify(data[14]) ? data[14] : prev);
-            setChatMessages(prev => JSON.stringify(prev) !== JSON.stringify(data[15]) ? data[15] : prev);
-            setNotifications(prev => JSON.stringify(prev) !== JSON.stringify(data[16]) ? data[16] : prev);
-            
-            if (isLoading) {
-              const storedShortlist = localStorage.getItem('general_shortlist');
-              if (storedShortlist) {
-                setGeneralShortlist(JSON.parse(storedShortlist));
-              }
-              setIsShortlistLoading(false);
-              setIsLoading(false);
-            }
-
-        } catch (error) {
-            console.error("Failed to load initial data", error);
-            if (isLoading) setIsLoading(false);
+        setListings(prev => JSON.stringify(prev) !== JSON.stringify(data[0]) ? data[0] : prev);
+        setDemands(prev => JSON.stringify(prev) !== JSON.stringify(data[1]) ? data[1] : prev);
+        setSubmissions(prev => JSON.stringify(prev) !== JSON.stringify(data[2]) ? data[2] : prev);
+        setAgentLeads(prev => JSON.stringify(prev) !== JSON.stringify(data[3]) ? data[3] : prev);
+        setListingAnalytics(prev => JSON.stringify(prev) !== JSON.stringify(data[4]) ? data[4] : prev);
+        setRegisteredLeads(prev => JSON.stringify(prev) !== JSON.stringify(data[5]) ? data[5] : prev);
+        setTransactionActivities(prev => JSON.stringify(prev) !== JSON.stringify(data[6]) ? data[6] : prev);
+        setTenantImprovements(prev => JSON.stringify(prev) !== JSON.stringify(data[7]) ? data[7] : prev);
+        setNegotiationBoards(prev => JSON.stringify(prev) !== JSON.stringify(data[8]) ? data[8] : prev);
+        setAboutUsContent(prev => JSON.stringify(prev) !== JSON.stringify(data[9]) ? data[9] : prev);
+        setLocationCircles(prev => JSON.stringify(prev) !== JSON.stringify(data[10]) ? data[10] : prev);
+        setDownloadAcknowledgments(prev => JSON.stringify(prev) !== JSON.stringify(data[11]) ? data[11] : prev);
+        setDownloadHistory(prev => JSON.stringify(prev) !== JSON.stringify(data[12]) ? data[12] : prev);
+        setViewHistory(prev => JSON.stringify(prev) !== JSON.stringify(data[13]) ? data[13] : prev);
+        setLayoutRequests(prev => JSON.stringify(prev) !== JSON.stringify(data[14]) ? data[14] : prev);
+        setChatMessages(prev => JSON.stringify(prev) !== JSON.stringify(data[15]) ? data[15] : prev);
+        setNotifications(prev => JSON.stringify(prev) !== JSON.stringify(data[16]) ? data[16] : prev);
+        
+        if (isLoading) {
+          const storedShortlist = localStorage.getItem('general_shortlist');
+          if (storedShortlist) {
+            setGeneralShortlist(JSON.parse(storedShortlist));
+          }
+          setIsShortlistLoading(false);
+          setIsLoading(false);
         }
+      } catch (error) {
+        console.error("Failed to load initial data", error);
+        if (isLoading) setIsLoading(false);
+      }
     };
     
     fetchData(); // Initial fetch
@@ -913,49 +912,48 @@ export function DataProvider({ children }: { children: ReactNode }) {
   
   const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
     setTransactionActivities(prevActivities => {
-      const newActivity: TransactionActivity = {
-        ...activityData,
-        activityId: `ACT-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-      };
-      const updatedActivities = [newActivity, ...prevActivities];
-      persistActivities(updatedActivities);
-      
-      const lead = registeredLeads.find(l => l.id === newActivity.leadId);
-      if (lead) {
-        const participants = new Set<string>();
-        participants.add(lead.customerId);
-        if (lead.agentId) participants.add(lead.agentId);
-        lead.providers.forEach(p => participants.add(p.providerEmail));
+        const newActivity: TransactionActivity = {
+            ...activityData,
+            activityId: `ACT-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+        };
+        const updatedActivities = [newActivity, ...prevActivities];
+        persistActivities(updatedActivities);
         
-        if (lead.isO2OCollaborator) {
-          Object.values(users).forEach(u => {
-            if (u.role === 'SuperAdmin' || u.role === 'O2O') {
-              participants.add(u.email);
+        const lead = registeredLeads.find(l => l.id === newActivity.leadId);
+        if (lead) {
+            const participants = new Set<string>();
+            participants.add(lead.customerId);
+            if (lead.agentId) participants.add(lead.agentId);
+            lead.providers.forEach(p => participants.add(p.providerEmail));
+            
+            // For brokered deals, always notify admins
+            if (lead.isO2OCollaborator) {
+                Object.values(users).forEach(u => {
+                    if (u.role === 'SuperAdmin' || u.role === 'O2O') {
+                        participants.add(u.email);
+                    }
+                });
             }
-          });
-        }
-        
-        const uniqueParticipants = Array.from(participants);
-  
-        uniqueParticipants.forEach(participantEmail => {
-          if (participantEmail !== newActivity.createdBy) {
-            addNotification({
-              id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
-              type: 'new_activity',
-              title: `Update on Transaction: ${lead.id}`,
-              message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
-              href: `/dashboard/leads/${lead.id}`,
-              recipientEmail: participantEmail,
-              timestamp: newActivity.createdAt,
-              triggeredBy: newActivity.createdBy
+            
+            participants.forEach(participantEmail => {
+                if (participantEmail !== newActivity.createdBy) {
+                    addNotification({
+                        id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
+                        type: 'new_activity',
+                        title: `Update on Transaction: ${lead.id}`,
+                        message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
+                        href: `/dashboard/leads/${lead.id}`,
+                        recipientEmail: participantEmail,
+                        timestamp: newActivity.createdAt,
+                        triggeredBy: newActivity.createdBy
+                    });
+                }
             });
-          }
-        });
-      }
-      return updatedActivities;
+        }
+        return updatedActivities;
     });
-  }, [persistActivities, registeredLeads, addNotification, users]);
+}, [persistActivities, registeredLeads, addNotification, users]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
     let wasAnyPropertyAcknowledged = false;

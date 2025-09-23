@@ -1017,7 +1017,7 @@
   },
   {
     "listingId": "LST-X635SS",
-    "views": 1,
+    "views": 5,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -1026,6 +1026,30 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758347915488
+      },
+      {
+        "userId": "anonymous_anon_1758613307313_auoiu1a",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758613324296
+      },
+      {
+        "userId": "anonymous_anon_1758613307313_auoiu1a",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758613324296
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758613352538
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758613352538
       }
     ]
   },
