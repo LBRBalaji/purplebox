@@ -283,88 +283,59 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-   const loadInitialData = useCallback(async () => {
-      try {
-        const [
-          listingsRes,
-          demandsRes,
-          submissionsRes,
-          agentLeadsRes,
-          analyticsRes,
-          registeredLeadsRes,
-          activitiesRes,
-          tenantImprovementsRes,
-          negotiationBoardsRes,
-          aboutUsContentRes,
-          locationCirclesRes,
-          acknowledgmentsRes,
-          downloadHistoryRes,
-          viewHistoryRes,
-          layoutRequestsRes,
-          chatMessagesRes,
-          notificationsRes,
-        ] = await Promise.all([
-          fetch('/api/listings'),
-          fetch('/api/demands'),
-          fetch('/api/submissions'),
-          fetch('/api/agent-leads'),
-          fetch('/api/listing-analytics'),
-          fetch('/api/registered-leads'),
-          fetch('/api/transaction-activities'),
-          fetch('/api/tenant-improvements'),
-          fetch('/api/negotiation-boards'),
-          fetch('/api/about-us-content'),
-          fetch('/api/location-circles'),
-          fetch('/api/download-acknowledgments'),
-          fetch('/api/download-history'),
-          fetch('/api/view-history'),
-          fetch('/api/layout-requests'),
-          fetch('/api/chat-messages'),
-          fetch('/api/notifications'),
-        ]);
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const responses = await Promise.all([
+                fetch('/api/listings'), fetch('/api/demands'), fetch('/api/submissions'),
+                fetch('/api/agent-leads'), fetch('/api/listing-analytics'), fetch('/api/registered-leads'),
+                fetch('/api/transaction-activities'), fetch('/api/tenant-improvements'), fetch('/api/negotiation-boards'),
+                fetch('/api/about-us-content'), fetch('/api/location-circles'), fetch('/api/download-acknowledgments'),
+                fetch('/api/download-history'), fetch('/api/view-history'), fetch('/api/layout-requests'),
+                fetch('/api/chat-messages'), fetch('/api/notifications')
+            ]);
+            
+            const data = await Promise.all(responses.map(res => res.json()));
 
-        const notificationsData = await notificationsRes.json();
-        setListings(await listingsRes.json());
-        setDemands(await demandsRes.json());
-        setSubmissions(await submissionsRes.json());
-        setAgentLeads(await agentLeadsRes.json());
-        setListingAnalytics(await analyticsRes.json());
-        setRegisteredLeads(await registeredLeadsRes.json());
-        setTransactionActivities(await activitiesRes.json());
-        setTenantImprovements(await tenantImprovementsRes.json());
-        setNegotiationBoards(await negotiationBoardsRes.json());
-        setAboutUsContent(await aboutUsContentRes.json());
-        setLocationCircles(await locationCirclesRes.json());
-        setDownloadAcknowledgments(await acknowledgmentsRes.json());
-        setDownloadHistory(await downloadHistoryRes.json());
-        setViewHistory(await viewHistoryRes.json());
-        setLayoutRequests(await layoutRequestsRes.json());
-        setChatMessages(await chatMessagesRes.json());
-        setNotifications(notificationsData);
+            // Use stringify to compare objects/arrays for changes before setting state
+            if (JSON.stringify(data[0]) !== JSON.stringify(listings)) setListings(data[0]);
+            if (JSON.stringify(data[1]) !== JSON.stringify(demands)) setDemands(data[1]);
+            if (JSON.stringify(data[2]) !== JSON.stringify(submissions)) setSubmissions(data[2]);
+            if (JSON.stringify(data[3]) !== JSON.stringify(agentLeads)) setAgentLeads(data[3]);
+            if (JSON.stringify(data[4]) !== JSON.stringify(listingAnalytics)) setListingAnalytics(data[4]);
+            if (JSON.stringify(data[5]) !== JSON.stringify(registeredLeads)) setRegisteredLeads(data[5]);
+            if (JSON.stringify(data[6]) !== JSON.stringify(transactionActivities)) setTransactionActivities(data[6]);
+            if (JSON.stringify(data[7]) !== JSON.stringify(tenantImprovements)) setTenantImprovements(data[7]);
+            if (JSON.stringify(data[8]) !== JSON.stringify(negotiationBoards)) setNegotiationBoards(data[8]);
+            if (JSON.stringify(data[9]) !== JSON.stringify(aboutUsContent)) setAboutUsContent(data[9]);
+            if (JSON.stringify(data[10]) !== JSON.stringify(locationCircles)) setLocationCircles(data[10]);
+            if (JSON.stringify(data[11]) !== JSON.stringify(downloadAcknowledgments)) setDownloadAcknowledgments(data[11]);
+            if (JSON.stringify(data[12]) !== JSON.stringify(downloadHistory)) setDownloadHistory(data[12]);
+            if (JSON.stringify(data[13]) !== JSON.stringify(viewHistory)) setViewHistory(data[13]);
+            if (JSON.stringify(data[14]) !== JSON.stringify(layoutRequests)) setLayoutRequests(data[14]);
+            if (JSON.stringify(data[15]) !== JSON.stringify(chatMessages)) setChatMessages(data[15]);
+            if (JSON.stringify(data[16]) !== JSON.stringify(notifications)) setNotifications(data[16]);
 
-        const storedShortlist = localStorage.getItem('general_shortlist');
-        if (storedShortlist) {
-            setGeneralShortlist(JSON.parse(storedShortlist));
+            if (isLoading) {
+                const storedShortlist = localStorage.getItem('general_shortlist');
+                if (storedShortlist) {
+                    setGeneralShortlist(JSON.parse(storedShortlist));
+                }
+                setIsShortlistLoading(false);
+                setIsLoading(false);
+            }
+
+        } catch (error) {
+            console.error("Failed to load initial data", error);
+            if (isLoading) setIsLoading(false);
         }
-
-      } catch (error) {
-        console.error("Failed to load initial data", error);
-        toast({
-          variant: "destructive",
-          title: "Data Loading Error",
-          description: "Could not load application data from the server."
-        });
-      } finally {
-        setIsShortlistLoading(false);
-        setIsLoading(false);
-      }
-    }, [toast]);
+    };
     
-   useEffect(() => {
-    loadInitialData();
-    const interval = setInterval(loadInitialData, 5000); // Poll every 5 seconds
+    fetchData(); // Initial fetch
+    const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
     return () => clearInterval(interval); // Cleanup on unmount
-  }, [loadInitialData]);
+  }, []); // Empty dependency array ensures this effect runs only once on mount
+
   
   // Effect to clear shortlist on logout
   useEffect(() => {
@@ -1022,30 +993,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 details: { acknowledgedBy: ackDetails },
                 createdBy: providerEmail,
             });
-
-            const participants = new Set([leadToUpdate.customerId, ...(leadToUpdate.agentId ? [leadToUpdate.agentId] : [])]);
-            if (leadToUpdate.isO2OCollaborator) {
-                participants.add('superadmin@o2o.com');
-            }
-
-            participants.forEach(recipientEmail => {
-                addNotification({
-                    id: `notif-${Date.now()}-${leadId}-${providerEmail}`,
-                    type: 'new_activity',
-                    title: `Lead Acknowledged by ${ackDetails.name}`,
-                    message: `Provider has acknowledged the lead for transaction ${leadId}.`,
-                    href: `/dashboard/leads/${leadId}`,
-                    recipientEmail: recipientEmail,
-                    timestamp: new Date().toISOString(),
-                    triggeredBy: providerEmail
-                });
-            });
         }
         
         persistRegisteredLeads(newLeads);
         return newLeads;
     });
-  }, [persistRegisteredLeads, addTransactionActivity, addNotification]);
+  }, [persistRegisteredLeads, addTransactionActivity]);
 
   const addAgentToLead = useCallback((leadId: string, agentEmail: string) => {
     setRegisteredLeads(prev => {
