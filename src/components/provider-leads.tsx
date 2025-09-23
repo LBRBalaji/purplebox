@@ -154,13 +154,14 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                             {myLeads.map(lead => {
                                 const providerInfoForCurrentUser = lead.providers.find(p => p.providerEmail === user?.email);
                                 const hasPending = isProvider && providerInfoForCurrentUser?.properties.some(p => p.status === 'Pending');
+                                // Acknowledge button should only show for brokered deals that have pending items.
+                                const shouldShowAcknowledgeButton = hasPending && lead.isO2OCollaborator;
                                 const isAlreadyRegisteredWithProvider = lead.providers.some(p => p.providerEmail !== 'superadmin@o2o.com');
                                 
                                 const registeredByUser = users[lead.registeredBy];
 
                                 let contactToShow: { name: string; email: string; };
 
-                                // CRITICAL FIX: Determine who the developer should contact.
                                 if (isProvider && lead.isO2OCollaborator && registeredByUser) {
                                     // Brokered Deal: Developer sees the O2O agent as the contact.
                                     contactToShow = { name: registeredByUser.userName, email: registeredByUser.email };
@@ -246,7 +247,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
 
                                         <TableCell className="text-right">
                                             <div className="flex flex-col gap-2 items-end">
-                                              {hasPending ? (
+                                              {shouldShowAcknowledgeButton ? (
                                                   <Button size="sm" onClick={() => handleAcknowledgeClick(lead)}>
                                                       <Handshake className="mr-2 h-4 w-4" /> Acknowledge Lead
                                                   </Button>
