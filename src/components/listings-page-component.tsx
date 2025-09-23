@@ -351,6 +351,18 @@ export function ListingsPage() {
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
 
+  const searchPlaceholders = [
+    'e.g., search "12m eve height"',
+    'e.g., search "crane available"',
+    'e.g., search "3PL operated warehouse"',
+    'e.g., search "RCC building"',
+    'e.g., search "fire NOC approved"',
+    'e.g., search "FM2 grade flooring"',
+    'e.g., search "Galvalume roof"',
+    'e.g., search "Insulated roof"',
+    'e.g., search "Turbo ventilation"',
+  ];
+
   const approvedListings = useMemo(() => {
     // Fisher-Yates shuffle algorithm
     const shuffle = (array: ListingSchema[]) => {
@@ -390,19 +402,8 @@ export function ListingsPage() {
     }, 3000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [searchPlaceholders.length]);
 
-const searchPlaceholders = [
-    'e.g., search "12m eve height"',
-    'e.g., search "crane available"',
-    'e.g., search "3PL operated warehouse"',
-    'e.g., search "RCC building"',
-    'e.g., search "fire NOC approved"',
-    'e.g., search "FM2 grade flooring"',
-    'e.g., search "Galvalume roof"',
-    'e.g., search "Insulated roof"',
-    'e.g., search "Turbo ventilation"',
-];
 
  useEffect(() => {
     let results = approvedListings;
@@ -547,11 +548,11 @@ const searchPlaceholders = [
   };
 
   const handleLoginSuccess = () => {
-    setIsLoginOpen(false);
-    toast({
-        title: "Logged In Successfully",
-        description: "You can now select properties to download."
-    });
+      setIsLoginOpen(false);
+      toast({
+          title: "Logged In Successfully",
+          description: "You can now select properties to download."
+      });
   }
 
   const renderContent = () => {
