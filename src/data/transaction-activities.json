@@ -1,5 +1,20 @@
 [
   {
+    "leadId": "LDR-MFW7FQT2F88ME",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Kailash Logistics",
+        "title": "obo",
+        "mobile": "+91 9841098170",
+        "email": "admin@kailashlogistics.com"
+      }
+    },
+    "createdBy": "admin@kailashlogistics.com",
+    "activityId": "ACT-1758610964458",
+    "createdAt": "2025-09-23T07:02:44.458Z"
+  },
+  {
     "leadId": "LDR-MFVI4057LTJVI",
     "activityType": "Lead Acknowledged",
     "details": {

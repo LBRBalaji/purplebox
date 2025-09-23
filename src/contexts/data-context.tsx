@@ -303,58 +303,58 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }, [toast]);
 
-  const fetchData = useCallback(async () => {
-    try {
-        const responses = await Promise.all([
-            fetch('/api/listings'), fetch('/api/demands'), fetch('/api/submissions'),
-            fetch('/api/agent-leads'), fetch('/api/listing-analytics'), fetch('/api/registered-leads'),
-            fetch('/api/transaction-activities'), fetch('/api/tenant-improvements'), fetch('/api/negotiation-boards'),
-            fetch('/api/about-us-content'), fetch('/api/location-circles'), fetch('/api/download-acknowledgments'),
-            fetch('/api/download-history'), fetch('/api/view-history'), fetch('/api/layout-requests'),
-            fetch('/api/chat-messages'), fetch('/api/notifications')
-        ]);
-        
-        const data = await Promise.all(responses.map(res => res.json()));
-        
-        if (JSON.stringify(data[0]) !== JSON.stringify(listings)) setListings(data[0]);
-        if (JSON.stringify(data[1]) !== JSON.stringify(demands)) setDemands(data[1]);
-        if (JSON.stringify(data[2]) !== JSON.stringify(submissions)) setSubmissions(data[2]);
-        if (JSON.stringify(data[3]) !== JSON.stringify(agentLeads)) setAgentLeads(data[3]);
-        if (JSON.stringify(data[4]) !== JSON.stringify(listingAnalytics)) setListingAnalytics(data[4]);
-        if (JSON.stringify(data[5]) !== JSON.stringify(registeredLeads)) setRegisteredLeads(data[5]);
-        if (JSON.stringify(data[6]) !== JSON.stringify(transactionActivities)) setTransactionActivities(data[6]);
-        if (JSON.stringify(data[7]) !== JSON.stringify(tenantImprovements)) setTenantImprovements(data[7]);
-        if (JSON.stringify(data[8]) !== JSON.stringify(negotiationBoards)) setNegotiationBoards(data[8]);
-        if (JSON.stringify(data[9]) !== JSON.stringify(aboutUsContent)) setAboutUsContent(data[9]);
-        if (JSON.stringify(data[10]) !== JSON.stringify(locationCircles)) setLocationCircles(data[10]);
-        if (JSON.stringify(data[11]) !== JSON.stringify(downloadAcknowledgments)) setDownloadAcknowledgments(data[11]);
-        if (JSON.stringify(data[12]) !== JSON.stringify(downloadHistory)) setDownloadHistory(data[12]);
-        if (JSON.stringify(data[13]) !== JSON.stringify(viewHistory)) setViewHistory(data[13]);
-        if (JSON.stringify(data[14]) !== JSON.stringify(layoutRequests)) setLayoutRequests(data[14]);
-        if (JSON.stringify(data[15]) !== JSON.stringify(chatMessages)) setChatMessages(data[15]);
-        if (JSON.stringify(data[16]) !== JSON.stringify(notifications)) setNotifications(data[16]);
-
-        if (isLoading) {
-            const storedShortlist = localStorage.getItem('general_shortlist');
-            if (storedShortlist) {
-                setGeneralShortlist(JSON.parse(storedShortlist));
-            }
-            setIsShortlistLoading(false);
-            setIsLoading(false);
-        }
-
-    } catch (error) {
-        console.error("Failed to load initial data", error);
-        if (isLoading) setIsLoading(false);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const responses = await Promise.all([
+                fetch('/api/listings'), fetch('/api/demands'), fetch('/api/submissions'),
+                fetch('/api/agent-leads'), fetch('/api/listing-analytics'), fetch('/api/registered-leads'),
+                fetch('/api/transaction-activities'), fetch('/api/tenant-improvements'), fetch('/api/negotiation-boards'),
+                fetch('/api/about-us-content'), fetch('/api/location-circles'), fetch('/api/download-acknowledgments'),
+                fetch('/api/download-history'), fetch('/api/view-history'), fetch('/api/layout-requests'),
+                fetch('/api/chat-messages'), fetch('/api/notifications')
+            ]);
+            
+            const data = await Promise.all(responses.map(res => res.json()));
+            
+            if (JSON.stringify(data[0]) !== JSON.stringify(listings)) setListings(data[0]);
+            if (JSON.stringify(data[1]) !== JSON.stringify(demands)) setDemands(data[1]);
+            if (JSON.stringify(data[2]) !== JSON.stringify(submissions)) setSubmissions(data[2]);
+            if (JSON.stringify(data[3]) !== JSON.stringify(agentLeads)) setAgentLeads(data[3]);
+            if (JSON.stringify(data[4]) !== JSON.stringify(listingAnalytics)) setListingAnalytics(data[4]);
+            if (JSON.stringify(data[5]) !== JSON.stringify(registeredLeads)) setRegisteredLeads(data[5]);
+            if (JSON.stringify(data[6]) !== JSON.stringify(transactionActivities)) setTransactionActivities(data[6]);
+            if (JSON.stringify(data[7]) !== JSON.stringify(tenantImprovements)) setTenantImprovements(data[7]);
+            if (JSON.stringify(data[8]) !== JSON.stringify(negotiationBoards)) setNegotiationBoards(data[8]);
+            if (JSON.stringify(data[9]) !== JSON.stringify(aboutUsContent)) setAboutUsContent(data[9]);
+            if (JSON.stringify(data[10]) !== JSON.stringify(locationCircles)) setLocationCircles(data[10]);
+            if (JSON.stringify(data[11]) !== JSON.stringify(downloadAcknowledgments)) setDownloadAcknowledgments(data[11]);
+            if (JSON.stringify(data[12]) !== JSON.stringify(downloadHistory)) setDownloadHistory(data[12]);
+            if (JSON.stringify(data[13]) !== JSON.stringify(viewHistory)) setViewHistory(data[13]);
+            if (JSON.stringify(data[14]) !== JSON.stringify(layoutRequests)) setLayoutRequests(data[14]);
+            if (JSON.stringify(data[15]) !== JSON.stringify(chatMessages)) setChatMessages(data[15]);
+            if (JSON.stringify(data[16]) !== JSON.stringify(notifications)) setNotifications(data[16]);
+    
+            if (isLoading) {
+                const storedShortlist = localStorage.getItem('general_shortlist');
+                if (storedShortlist) {
+                    setGeneralShortlist(JSON.parse(storedShortlist));
+                }
+                setIsShortlistLoading(false);
+                setIsLoading(false);
+            }
+    
+        } catch (error) {
+            console.error("Failed to load initial data", error);
+            if (isLoading) setIsLoading(false);
+        }
+    };
+    
     fetchData(); // Initial fetch
     const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
     return () => clearInterval(interval); // Cleanup on unmount
-  }, [fetchData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Effect to clear shortlist on logout
   useEffect(() => {
@@ -883,18 +883,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
             let href: string;
 
             const isRegisteredByAdminOrAgent = registeredByUser?.role === 'SuperAdmin' || registeredByUser?.role === 'O2O' || registeredByUser?.role === 'Agent';
+            const isBrokered = newLead.isO2OCollaborator || !providerUser || providerUser.plan !== 'Paid_Premium';
 
-            if (isRegisteredByAdminOrAgent && !newLead.isO2OCollaborator) {
-                title = `New Lead from O2O: ${newLead.leadName}`;
-                message = `${registeredByUser.userName} from ${registeredByUser.companyName} has registered a new lead for you.`;
-                href = `/dashboard?tab=registered-leads`;
+            // Determine if the destination is admin-like
+            const recipientIsAdmin = providerUser?.role === 'SuperAdmin' || providerUser?.role === 'O2O';
+            href = recipientIsAdmin ? '/dashboard/transactions' : '/dashboard?tab=registered-leads';
+
+            if (isBrokered) {
+                title = `New Brokered Lead: ${newLead.leadName}`;
+                message = isRegisteredByAdminOrAgent
+                    ? `${registeredByUser.userName} from ${registeredByUser.companyName} has registered a new lead for you.`
+                    : `A customer has requested a quote via O2O Broking. Please acknowledge.`;
             } else {
-                title = newLead.isO2OCollaborator ? `New Brokered Lead: ${newLead.leadName}` : `New Direct Lead: ${newLead.leadName}`;
-                message = newLead.isO2OCollaborator ? `A lead for a free listing requires O2O collaboration.` : `A customer has requested a quote for your premium listing(s). Please acknowledge.`;
-                const recipientIsAdmin = providerUser?.role === 'SuperAdmin' || providerUser?.role === 'O2O';
-                href = recipientIsAdmin ? '/dashboard/transactions' : '/dashboard?tab=registered-leads';
+                title = `New Direct Lead: ${newLead.leadName}`;
+                message = `A customer has requested a quote for your premium listing(s). Please acknowledge.`;
             }
-
+            
             addNotification({
                 id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
                 type: 'new_lead_for_provider',
@@ -933,14 +937,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
           
           const lead = registeredLeads.find(l => l.id === newActivity.leadId);
           if (lead) {
-              const participants = new Set([lead.customerId, ...(lead.agentId ? [lead.agentId] : []), ...lead.providers.map(p => p.providerEmail)]);
+              const participants = new Set<string>();
+              participants.add(lead.customerId);
+              if (lead.agentId) participants.add(lead.agentId);
+              lead.providers.forEach(p => participants.add(p.providerEmail));
               if (lead.isO2OCollaborator) {
                   participants.add('superadmin@o2o.com');
               }
               
-              const uniqueParticipants = Array.from(participants);
-
-              uniqueParticipants.forEach(participantEmail => {
+              participants.forEach(participantEmail => {
                   if(participantEmail !== newActivity.createdBy) {
                       addNotification({
                           id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
@@ -1155,4 +1160,3 @@ export function useData() {
   }
   return context;
 }
-

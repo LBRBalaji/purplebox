@@ -1,5 +1,49 @@
 [
   {
+    "id": "notif-2025-09-23T07:02:44.458Z-superadmin@o2o.com-0.6005573088217123",
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-MFW7FQT2F88ME",
+    "message": "Kailash Logistics logged: Lead Acknowledged",
+    "href": "/dashboard/leads/LDR-MFW7FQT2F88ME",
+    "recipientEmail": "superadmin@o2o.com",
+    "timestamp": "2025-09-23T07:02:44.458Z",
+    "triggeredBy": "admin@kailashlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-2025-09-23T07:02:44.458Z-customer1@o2o.com-0.8852781910836748",
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-MFW7FQT2F88ME",
+    "message": "Kailash Logistics logged: Lead Acknowledged",
+    "href": "/dashboard/leads/LDR-MFW7FQT2F88ME",
+    "recipientEmail": "customer1@o2o.com",
+    "timestamp": "2025-09-23T07:02:44.458Z",
+    "triggeredBy": "admin@kailashlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758610765188-admin@kailashlogistics.com-0.5126587426842196",
+    "type": "new_lead_for_provider",
+    "title": "New Brokered Lead: Alpha Logistics",
+    "message": "A lead for a free listing requires O2O collaboration.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@kailashlogistics.com",
+    "timestamp": "2025-09-23T06:59:25.188Z",
+    "triggeredBy": "superadmin@o2o.com",
+    "isRead": true
+  },
+  {
+    "id": "notif-1758610765186-admin@kailashlogistics.com-0.06313806397270583",
+    "type": "new_lead_for_provider",
+    "title": "New Brokered Lead: Alpha Logistics",
+    "message": "A lead for a free listing requires O2O collaboration.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@kailashlogistics.com",
+    "timestamp": "2025-09-23T06:59:25.186Z",
+    "triggeredBy": "superadmin@o2o.com",
+    "isRead": true
+  },
+  {
     "id": "notif-1758610208252-superadmin@o2o.com-0.8228242703840585",
     "type": "new_lead_for_provider",
     "title": "New Brokered Lead: Alpha Logistics",
