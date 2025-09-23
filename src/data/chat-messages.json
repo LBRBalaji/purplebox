@@ -245,7 +245,14 @@
       "senderName": "O2O Super Admin",
       "text": "thank you for confirming, send me the quote pls",
       "timestamp": "2025-09-23T07:04:02.400Z",
-      "isNew": true
+      "isNew": false
+    },
+    {
+      "senderEmail": "superadmin@o2o.com",
+      "senderName": "O2O Super Admin",
+      "text": "i am waiting to hear from you",
+      "timestamp": "2025-09-23T07:17:31.868Z",
+      "isNew": false
     }
   ]
 }

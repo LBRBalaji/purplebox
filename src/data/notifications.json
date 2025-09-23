@@ -1,5 +1,16 @@
 [
   {
+    "id": "notif-1758611853563-0.44452638694915714",
+    "type": "new_chat_message",
+    "title": "New message from O2O Super Admin",
+    "message": "Regarding transaction LDR-MFW7FQT2F88ME: \"i am waiting to hear from you...\"",
+    "href": "/dashboard/leads/LDR-MFW7FQT2F88ME",
+    "recipientEmail": "customer1@o2o.com",
+    "timestamp": "2025-09-23T07:17:33.563Z",
+    "triggeredBy": "superadmin@o2o.com",
+    "isRead": false
+  },
+  {
     "id": "notif-1758611046127-0.1659352465363112",
     "type": "new_chat_message",
     "title": "New message from O2O Super Admin",

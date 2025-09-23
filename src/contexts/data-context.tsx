@@ -308,44 +308,43 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const responses = await Promise.all([
-                fetch('/api/listings'), fetch('/api/demands'), fetch('/api/submissions'),
-                fetch('/api/agent-leads'), fetch('/api/listing-analytics'), fetch('/api/registered-leads'),
-                fetch('/api/transaction-activities'), fetch('/api/tenant-improvements'), fetch('/api/negotiation-boards'),
-                fetch('/api/about-us-content'), fetch('/api/location-circles'), fetch('/api/download-acknowledgments'),
-                fetch('/api/download-history'), fetch('/api/view-history'), fetch('/api/layout-requests'),
-                fetch('/api/chat-messages'), fetch('/api/notifications')
-            ]);
-            
+            const endpoints = [
+                'listings', 'demands', 'submissions', 'agent-leads', 'listing-analytics',
+                'registered-leads', 'transaction-activities', 'tenant-improvements',
+                'negotiation-boards', 'about-us-content', 'location-circles',
+                'download-acknowledgments', 'download-history', 'view-history',
+                'layout-requests', 'chat-messages', 'notifications'
+            ];
+            const responses = await Promise.all(endpoints.map(ep => fetch(`/api/${ep}`)));
             const data = await Promise.all(responses.map(res => res.json()));
+
+            setListings(prev => JSON.stringify(prev) !== JSON.stringify(data[0]) ? data[0] : prev);
+            setDemands(prev => JSON.stringify(prev) !== JSON.stringify(data[1]) ? data[1] : prev);
+            setSubmissions(prev => JSON.stringify(prev) !== JSON.stringify(data[2]) ? data[2] : prev);
+            setAgentLeads(prev => JSON.stringify(prev) !== JSON.stringify(data[3]) ? data[3] : prev);
+            setListingAnalytics(prev => JSON.stringify(prev) !== JSON.stringify(data[4]) ? data[4] : prev);
+            setRegisteredLeads(prev => JSON.stringify(prev) !== JSON.stringify(data[5]) ? data[5] : prev);
+            setTransactionActivities(prev => JSON.stringify(prev) !== JSON.stringify(data[6]) ? data[6] : prev);
+            setTenantImprovements(prev => JSON.stringify(prev) !== JSON.stringify(data[7]) ? data[7] : prev);
+            setNegotiationBoards(prev => JSON.stringify(prev) !== JSON.stringify(data[8]) ? data[8] : prev);
+            setAboutUsContent(prev => JSON.stringify(prev) !== JSON.stringify(data[9]) ? data[9] : prev);
+            setLocationCircles(prev => JSON.stringify(prev) !== JSON.stringify(data[10]) ? data[10] : prev);
+            setDownloadAcknowledgments(prev => JSON.stringify(prev) !== JSON.stringify(data[11]) ? data[11] : prev);
+            setDownloadHistory(prev => JSON.stringify(prev) !== JSON.stringify(data[12]) ? data[12] : prev);
+            setViewHistory(prev => JSON.stringify(prev) !== JSON.stringify(data[13]) ? data[13] : prev);
+            setLayoutRequests(prev => JSON.stringify(prev) !== JSON.stringify(data[14]) ? data[14] : prev);
+            setChatMessages(prev => JSON.stringify(prev) !== JSON.stringify(data[15]) ? data[15] : prev);
+            setNotifications(prev => JSON.stringify(prev) !== JSON.stringify(data[16]) ? data[16] : prev);
             
-            if (JSON.stringify(data[0]) !== JSON.stringify(listings)) setListings(data[0]);
-            if (JSON.stringify(data[1]) !== JSON.stringify(demands)) setDemands(data[1]);
-            if (JSON.stringify(data[2]) !== JSON.stringify(submissions)) setSubmissions(data[2]);
-            if (JSON.stringify(data[3]) !== JSON.stringify(agentLeads)) setAgentLeads(data[3]);
-            if (JSON.stringify(data[4]) !== JSON.stringify(listingAnalytics)) setListingAnalytics(data[4]);
-            if (JSON.stringify(data[5]) !== JSON.stringify(registeredLeads)) setRegisteredLeads(data[5]);
-            if (JSON.stringify(data[6]) !== JSON.stringify(transactionActivities)) setTransactionActivities(data[6]);
-            if (JSON.stringify(data[7]) !== JSON.stringify(tenantImprovements)) setTenantImprovements(data[7]);
-            if (JSON.stringify(data[8]) !== JSON.stringify(negotiationBoards)) setNegotiationBoards(data[8]);
-            if (JSON.stringify(data[9]) !== JSON.stringify(aboutUsContent)) setAboutUsContent(data[9]);
-            if (JSON.stringify(data[10]) !== JSON.stringify(locationCircles)) setLocationCircles(data[10]);
-            if (JSON.stringify(data[11]) !== JSON.stringify(downloadAcknowledgments)) setDownloadAcknowledgments(data[11]);
-            if (JSON.stringify(data[12]) !== JSON.stringify(downloadHistory)) setDownloadHistory(data[12]);
-            if (JSON.stringify(data[13]) !== JSON.stringify(viewHistory)) setViewHistory(data[13]);
-            if (JSON.stringify(data[14]) !== JSON.stringify(layoutRequests)) setLayoutRequests(data[14]);
-            if (JSON.stringify(data[15]) !== JSON.stringify(chatMessages)) setChatMessages(data[15]);
-            if (JSON.stringify(data[16]) !== JSON.stringify(notifications)) setNotifications(data[16]);
-    
             if (isLoading) {
-                const storedShortlist = localStorage.getItem('general_shortlist');
-                if (storedShortlist) {
-                    setGeneralShortlist(JSON.parse(storedShortlist));
-                }
-                setIsShortlistLoading(false);
-                setIsLoading(false);
+              const storedShortlist = localStorage.getItem('general_shortlist');
+              if (storedShortlist) {
+                setGeneralShortlist(JSON.parse(storedShortlist));
+              }
+              setIsShortlistLoading(false);
+              setIsLoading(false);
             }
-    
+
         } catch (error) {
             console.error("Failed to load initial data", error);
             if (isLoading) setIsLoading(false);
@@ -355,33 +354,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchData(); // Initial fetch
     const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
     return () => clearInterval(interval); // Cleanup on unmount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
-  // Effect to clear shortlist on logout
-  useEffect(() => {
-    if (!authUser) {
-        setGeneralShortlist([]);
-        // No need to write to localStorage on logout, it's a per-session preference for logged-in users.
-    }
-  }, [authUser]);
-
-  useEffect(() => {
-    if (authUser) {
-      const count = notifications.filter(n => !n.isRead && (n.recipientEmail === authUser.email || (n.type === 'new_demand' && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O')) || (n.type === 'new_submission' && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O')) )).length;
-      setUnreadCount(count);
-
-      const chatCount = Object.values(chatMessages).reduce((acc, messages) => {
-        const hasUnread = messages.some(m => m.isNew && m.senderEmail !== authUser.email);
-        return acc + (hasUnread ? 1 : 0);
-      }, 0);
-      setUnreadChatCount(chatCount);
-
-    } else {
-      setUnreadCount(0);
-      setUnreadChatCount(0);
-    }
-  }, [notifications, chatMessages, authUser]);
+  }, [isLoading]);
 
   const persistListings = useCallback((updatedListings: ListingSchema[]) => persistData('listings', updatedListings, 'listings'), [persistData]);
   const persistDemands = useCallback((updatedDemands: DemandSchema[]) => persistData('demands', updatedDemands, 'demands'), [persistData]);
@@ -882,7 +855,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const updatedLeads = [newLead, ...prevLeads];
         persistRegisteredLeads(updatedLeads);
 
-        // Notify relevant parties
         const registeredByUser = users[newLead.registeredBy];
         const uniqueProviders = new Set(newLead.providers.map(p => p.providerEmail));
 
@@ -895,9 +867,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const isRegisteredByAdminOrAgent = registeredByUser?.role === 'SuperAdmin' || registeredByUser?.role === 'O2O' || registeredByUser?.role === 'Agent';
             const isBrokered = newLead.isO2OCollaborator || !providerUser || providerUser.plan !== 'Paid_Premium';
 
-            // Determine if the destination is admin-like
             const recipientIsAdmin = providerUser?.role === 'SuperAdmin' || providerUser?.role === 'O2O';
-            href = recipientIsAdmin ? '/dashboard/transactions' : '/dashboard?tab=registered-leads';
+            
+            if (isBrokered) {
+                href = '/dashboard/transactions'; // Admins/O2O go to the broking desk
+            } else {
+                href = '/dashboard?tab=registered-leads'; // Providers go to their leads tab
+            }
 
             if (isBrokered) {
                 title = `New Brokered Lead: ${newLead.leadName}`;
@@ -936,49 +912,49 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistRegisteredLeads]);
   
   const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
-      setTransactionActivities(prevActivities => {
-          const newActivity: TransactionActivity = {
-              ...activityData,
-              activityId: `ACT-${Date.now()}`,
-              createdAt: new Date().toISOString(),
-          };
-          const updatedActivities = [newActivity, ...prevActivities];
-          persistActivities(updatedActivities);
-          
-          const lead = registeredLeads.find(l => l.id === newActivity.leadId);
-          if (lead) {
-              const participants = new Set<string>();
-              participants.add(lead.customerId);
-              if (lead.agentId) participants.add(lead.agentId);
-              lead.providers.forEach(p => participants.add(p.providerEmail));
-              if (lead.isO2OCollaborator) {
-                  // Ensure admin is only added if they are part of the broking
-                  Object.values(users).forEach(u => {
-                      if(u.role === 'SuperAdmin' || u.role === 'O2O') {
-                          participants.add(u.email);
-                      }
-                  });
-              }
-              
-              // Ensure we don't notify the person who made the change.
-              participants.delete(newActivity.createdBy);
-
-              participants.forEach(participantEmail => {
-                  addNotification({
-                      id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
-                      type: 'new_activity',
-                      title: `Update on Transaction: ${lead.id}`,
-                      message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
-                      href: `/dashboard/leads/${lead.id}`,
-                      recipientEmail: participantEmail,
-                      timestamp: newActivity.createdAt,
-                      triggeredBy: newActivity.createdBy
-                  });
-              });
+    setTransactionActivities(prevActivities => {
+      const newActivity: TransactionActivity = {
+        ...activityData,
+        activityId: `ACT-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+      };
+      const updatedActivities = [newActivity, ...prevActivities];
+      persistActivities(updatedActivities);
+      
+      const lead = registeredLeads.find(l => l.id === newActivity.leadId);
+      if (lead) {
+        const participants = new Set<string>();
+        participants.add(lead.customerId);
+        if (lead.agentId) participants.add(lead.agentId);
+        lead.providers.forEach(p => participants.add(p.providerEmail));
+        
+        if (lead.isO2OCollaborator) {
+          Object.values(users).forEach(u => {
+            if (u.role === 'SuperAdmin' || u.role === 'O2O') {
+              participants.add(u.email);
+            }
+          });
+        }
+        
+        const uniqueParticipants = Array.from(participants);
+  
+        uniqueParticipants.forEach(participantEmail => {
+          if (participantEmail !== newActivity.createdBy) {
+            addNotification({
+              id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
+              type: 'new_activity',
+              title: `Update on Transaction: ${lead.id}`,
+              message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
+              href: `/dashboard/leads/${lead.id}`,
+              recipientEmail: participantEmail,
+              timestamp: newActivity.createdAt,
+              triggeredBy: newActivity.createdBy
+            });
           }
-
-          return updatedActivities;
-      });
+        });
+      }
+      return updatedActivities;
+    });
   }, [persistActivities, registeredLeads, addNotification, users]);
   
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
@@ -1126,6 +1102,38 @@ export function DataProvider({ children }: { children: ReactNode }) {
       clearNewMessages(threadId);
       setActiveChat(chat);
   }
+  
+  useEffect(() => {
+    if (authUser) {
+      const count = notifications.filter(n => !n.isRead && (n.recipientEmail === authUser.email || ((n.type === 'new_demand' || n.type === 'new_submission') && (authUser.role === 'SuperAdmin' || authUser.role === 'O2O')))).length;
+      setUnreadCount(count);
+
+      const chatCount = Object.entries(chatMessages).reduce((acc, [threadId, messages]) => {
+          const leadId = threadId.split('-')[1];
+          const lead = registeredLeads.find(l => l.id === leadId);
+
+          if (lead) {
+              const isParticipant =
+                  lead.customerId === authUser.email ||
+                  lead.agentId === authUser.email ||
+                  lead.providers.some(p => p.providerEmail === authUser.email) ||
+                  ((authUser.role === 'SuperAdmin' || authUser.role === 'O2O') && lead.isO2OCollaborator);
+
+              if (isParticipant) {
+                  const hasUnread = messages.some(m => m.isNew && m.senderEmail !== authUser.email);
+                  if (hasUnread) {
+                      return acc + 1;
+                  }
+              }
+          }
+          return acc;
+      }, 0);
+      setUnreadChatCount(chatCount);
+    } else {
+      setUnreadCount(0);
+      setUnreadChatCount(0);
+    }
+  }, [notifications, chatMessages, authUser, registeredLeads]);
 
   return (
     <DataContext.Provider value={{ 
