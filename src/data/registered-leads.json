@@ -1,5 +1,61 @@
 [
   {
+    "id": "LDR-MFWDF7WSMSDFZ",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-23T09:48:14.763Z",
+            "acknowledgedBy": {
+              "name": "Kailash Logistics",
+              "title": "manager",
+              "mobile": "+91 9841098170",
+              "email": "admin@kailashlogistics.com"
+            },
+            "rentPerSft": 45,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 135000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-23T09:46:54.303Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758620424207",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Murugan",
+    "leadEmail": "betacustomer2@o2o.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "betacustomer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-23T09:40:24.208Z"
+  },
+  {
     "id": "LDR-QUOTE-1758613355481",
     "customerId": "betacustomer2@o2o.com",
     "leadName": "Beta Retail",

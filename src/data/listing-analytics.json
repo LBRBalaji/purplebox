@@ -1243,7 +1243,7 @@
   },
   {
     "listingId": "LST-EDCYH9",
-    "views": 17,
+    "views": 19,
     "downloads": 0,
     "customerIndustries": {},
     "viewedBy": [
@@ -1348,6 +1348,18 @@
         "name": "Anonymous",
         "company": "Anonymous",
         "timestamp": 1758620409368
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758620436633
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758620436633
       }
     ]
   }

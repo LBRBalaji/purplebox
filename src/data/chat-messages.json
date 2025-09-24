@@ -254,5 +254,14 @@
       "timestamp": "2025-09-23T07:17:31.868Z",
       "isNew": false
     }
+  ],
+  "chat-LDR-MFWDF7WSMSDFZ-admin@kailashlogistics.com": [
+    {
+      "senderEmail": "admin@kailashlogistics.com",
+      "senderName": "Kailash Logistics",
+      "text": "Hi what is this the purpose of use by this company?",
+      "timestamp": "2025-09-23T09:50:10.300Z",
+      "isNew": true
+    }
   ]
 }

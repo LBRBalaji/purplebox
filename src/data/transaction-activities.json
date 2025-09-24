@@ -1,5 +1,49 @@
 [
   {
+    "leadId": "LDR-MFWDF7WSMSDFZ",
+    "activityType": "Proposal Submitted",
+    "details": {
+      "listingId": "LST-EDCYH9",
+      "rentPerSft": 45,
+      "rentalSecurityDeposit": 6,
+      "actualChargeableArea": 135000
+    },
+    "createdBy": "admin@kailashlogistics.com",
+    "activityId": "ACT-1758620927436",
+    "createdAt": "2025-09-23T09:48:47.436Z"
+  },
+  {
+    "leadId": "LDR-MFWDF7WSMSDFZ",
+    "activityType": "Lead Acknowledged",
+    "details": {
+      "acknowledgedBy": {
+        "name": "Kailash Logistics",
+        "title": "manager",
+        "mobile": "+91 9841098170",
+        "email": "admin@kailashlogistics.com"
+      }
+    },
+    "createdBy": "admin@kailashlogistics.com",
+    "activityId": "ACT-1758620894764",
+    "createdAt": "2025-09-23T09:48:14.764Z"
+  },
+  {
+    "leadId": "LDR-MFWDF7WSMSDFZ",
+    "activityType": "Lead Registered",
+    "details": {},
+    "createdBy": "superadmin@o2o.com",
+    "activityId": "ACT-1758620814379",
+    "createdAt": "2025-09-23T09:46:54.379Z"
+  },
+  {
+    "leadId": "LDR-QUOTE-1758620424207",
+    "activityType": "Lead Registered",
+    "details": {},
+    "createdBy": "betacustomer2@o2o.com",
+    "activityId": "ACT-1758620424212",
+    "createdAt": "2025-09-23T09:40:24.212Z"
+  },
+  {
     "leadId": "LDR-QUOTE-1758613355481",
     "activityType": "Proposal Submitted",
     "details": {

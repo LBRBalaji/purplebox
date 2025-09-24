@@ -296,26 +296,31 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const responses = await Promise.all(endpoints.map(ep => fetch(`/api/${ep}`)));
-            const data = await Promise.all(responses.map(res => res.json()));
+            const fetchPromises = endpoints.map(ep => fetch(`/api/${ep}`));
+            const responses = await Promise.allSettled(fetchPromises);
 
-            setListings(prev => JSON.stringify(prev) !== JSON.stringify(data[0]) ? data[0] : prev);
-            setDemands(prev => JSON.stringify(prev) !== JSON.stringify(data[1]) ? data[1] : prev);
-            setSubmissions(prev => JSON.stringify(prev) !== JSON.stringify(data[2]) ? data[2] : prev);
-            setAgentLeads(prev => JSON.stringify(prev) !== JSON.stringify(data[3]) ? data[3] : prev);
-            setListingAnalytics(prev => JSON.stringify(prev) !== JSON.stringify(data[4]) ? data[4] : prev);
-            setRegisteredLeads(prev => JSON.stringify(prev) !== JSON.stringify(data[5]) ? data[5] : prev);
-            setTransactionActivities(prev => JSON.stringify(prev) !== JSON.stringify(data[6]) ? data[6] : prev);
-            setTenantImprovements(prev => JSON.stringify(prev) !== JSON.stringify(data[7]) ? data[7] : prev);
-            setNegotiationBoards(prev => JSON.stringify(prev) !== JSON.stringify(data[8]) ? data[8] : prev);
-            setAboutUsContent(prev => JSON.stringify(prev) !== JSON.stringify(data[9]) ? data[9] : prev);
-            setLocationCircles(prev => JSON.stringify(prev) !== JSON.stringify(data[10]) ? data[10] : prev);
-            setDownloadAcknowledgments(prev => JSON.stringify(prev) !== JSON.stringify(data[11]) ? data[11] : prev);
-            setDownloadHistory(prev => JSON.stringify(prev) !== JSON.stringify(data[12]) ? data[12] : prev);
-            setViewHistory(prev => JSON.stringify(prev) !== JSON.stringify(data[13]) ? data[13] : prev);
-            setLayoutRequests(prev => JSON.stringify(prev) !== JSON.stringify(data[14]) ? data[14] : prev);
-            setChatMessages(prev => JSON.stringify(prev) !== JSON.stringify(data[15]) ? data[15] : prev);
-            setNotifications(prev => JSON.stringify(prev) !== JSON.stringify(data[16]) ? data[16] : prev);
+            const data = await Promise.all(responses.map(async (res, index) => {
+                if (res.status === 'fulfilled' && res.value.ok) {
+                    return res.value.json();
+                } else {
+                    console.error(`Failed to fetch ${endpoints[index]}:`, res.status === 'rejected' ? res.reason : `Status ${res.value.status}`);
+                    return null; // Return null for failed fetches
+                }
+            }));
+            
+            const stateSetters = [
+                setListings, setDemands, setSubmissions, setAgentLeads, setListingAnalytics,
+                setRegisteredLeads, setTransactionActivities, setTenantImprovements,
+                setNegotiationBoards, setAboutUsContent, setLocationCircles,
+                setDownloadAcknowledgments, setDownloadHistory, setViewHistory,
+                setLayoutRequests, setChatMessages, setNotifications
+            ];
+
+            data.forEach((d, i) => {
+                if (d !== null) {
+                    stateSetters[i](prev => JSON.stringify(prev) !== JSON.stringify(d) ? d : prev);
+                }
+            });
             
             if (isLoading) {
               const storedShortlist = localStorage.getItem('general_shortlist');
@@ -326,13 +331,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
               setIsLoading(false);
             }
         } catch (error) {
-            console.error("Failed to load initial data", error);
+            console.error("A critical error occurred during data polling", error);
             if (isLoading) setIsLoading(false);
         }
     };
     
-    fetchData(); // Initial fetch
     const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
+    fetchData(); // Initial fetch
     return () => clearInterval(interval); // Cleanup on unmount
 }, [isLoading]);
 
@@ -872,21 +877,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 });
             }
             
-            const uniqueParticipants = Array.from(participants);
+            const uniqueParticipants = Array.from(participants).filter(p => p !== newActivity.createdBy);
 
             uniqueParticipants.forEach(participantEmail => {
-                if (participantEmail !== newActivity.createdBy) {
-                    addNotification({
-                        id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
-                        type: 'new_activity',
-                        title: `Update on Transaction: ${lead.id}`,
-                        message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
-                        href: `/dashboard/leads/${lead.id}`,
-                        recipientEmail: participantEmail,
-                        timestamp: newActivity.createdAt,
-                        triggeredBy: newActivity.createdBy
-                    });
-                }
+                addNotification({
+                    id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
+                    type: 'new_activity',
+                    title: `Update on Transaction: ${lead.id}`,
+                    message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
+                    href: `/dashboard/leads/${lead.id}`,
+                    recipientEmail: participantEmail,
+                    timestamp: newActivity.createdAt,
+                    triggeredBy: newActivity.createdBy
+                });
             });
         }
         return updatedActivities;
@@ -914,23 +917,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     const uniqueProviders = Array.from(new Set(newLead.providers.map(p => p.providerEmail)));
 
-    uniqueProviders.forEach(providerEmail => {
-        // For brokered deals, the main recipient is the SuperAdmin/O2O team
-        if (newLead.isO2OCollaborator) {
-            const adminRecipients = Object.values(users).filter(u => u.role === 'SuperAdmin' || u.role === 'O2O');
-            adminRecipients.forEach(admin => {
-                 addNotification({
-                    id: `notif-${Date.now()}-${admin.email}-${Math.random()}`,
-                    type: 'new_lead_for_provider',
-                    title: `New Broking Lead: ${newLead.leadName}`,
-                    message: `Registered by ${users[newLead.registeredBy]?.userName || userEmail}. Needs provider assignment.`,
-                    href: `/dashboard/transactions`,
-                    recipientEmail: admin.email,
-                    timestamp: new Date().toISOString(),
-                    triggeredBy: userEmail || 'system'
-                });
+    if (newLead.isO2OCollaborator) {
+        const adminRecipients = Object.values(users).filter(u => u.role === 'SuperAdmin' || u.role === 'O2O');
+        adminRecipients.forEach(admin => {
+             addNotification({
+                id: `notif-${Date.now()}-${admin.email}-${Math.random()}`,
+                type: 'new_lead_for_provider',
+                title: `New Broking Lead: ${newLead.leadName}`,
+                message: `Registered by ${users[newLead.registeredBy]?.userName || userEmail}. Needs provider assignment.`,
+                href: `/dashboard/transactions`,
+                recipientEmail: admin.email,
+                timestamp: new Date().toISOString(),
+                triggeredBy: userEmail || 'system'
             });
-        } else { // For direct/premium deals
+        });
+    } else {
+        uniqueProviders.forEach(providerEmail => {
             addNotification({
                 id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
                 type: 'new_lead_for_provider',
@@ -941,8 +943,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 timestamp: new Date().toISOString(),
                 triggeredBy: userEmail || 'system'
             });
-        }
-    });
+        });
+    }
   }, [persistRegisteredLeads, addTransactionActivity, addNotification, users]);
   
   const updateRegisteredLead = useCallback((updatedLead: RegisteredLead) => {
