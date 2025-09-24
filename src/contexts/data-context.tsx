@@ -127,7 +127,7 @@ export type RegisteredLead = {
 export type TransactionActivity = {
     activityId: string;
     leadId: string; // RegisteredLead ID
-    activityType: 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted' | 'Lead Acknowledged' | 'Lead Registered';
+    activityType: 'Lead Registered' | 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted' | 'Lead Acknowledged';
     details: {
         visitDateTime?: string;
         message?: string;
@@ -290,7 +290,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     'registered-leads', 'transaction-activities', 'tenant-improvements',
     'negotiation-boards', 'about-us-content', 'location-circles',
     'download-acknowledgments', 'download-history', 'view-history',
-    'layout-requests', 'chat-messages', 'notifications'
+    'layout-requests', 'chat-messages', 'notifications', 'typing-status'
   ];
 
   useEffect(() => {
@@ -299,33 +299,44 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const fetchPromises = endpoints.map(ep => fetch(`/api/${ep}`));
             const responses = await Promise.allSettled(fetchPromises);
 
-            const data = await Promise.all(responses.map(async (res, index) => {
-                if (res.status === 'fulfilled' && res.value.ok) {
-                    return res.value.json();
-                } else {
-                    console.error(`Failed to fetch ${endpoints[index]}:`, res.status === 'rejected' ? res.reason : `Status ${res.value.status}`);
-                    return null; // Return null for failed fetches
+            const dataPromises = responses.map(async (res, index) => {
+              if (res.status === 'fulfilled' && res.value.ok) {
+                try {
+                  return await res.value.json();
+                } catch (e) {
+                  console.error(`Failed to parse JSON for ${endpoints[index]}:`, e);
+                  return null; // Return null if JSON parsing fails
                 }
-            }));
+              } else {
+                console.error(`Failed to fetch ${endpoints[index]}:`, res.status === 'rejected' ? res.reason : `Status ${res.value.status}`);
+                return null; // Return null for failed fetches
+              }
+            });
+
+            const data = await Promise.all(dataPromises);
             
-            const stateSetters = [
+            const stateSetters: any[] = [
                 setListings, setDemands, setSubmissions, setAgentLeads, setListingAnalytics,
                 setRegisteredLeads, setTransactionActivities, setTenantImprovements,
                 setNegotiationBoards, setAboutUsContent, setLocationCircles,
                 setDownloadAcknowledgments, setDownloadHistory, setViewHistory,
-                setLayoutRequests, setChatMessages, setNotifications
+                setLayoutRequests, setChatMessages, setNotifications, setTypingStatus
             ];
 
             data.forEach((d, i) => {
                 if (d !== null) {
-                    stateSetters[i](prev => JSON.stringify(prev) !== JSON.stringify(d) ? d : prev);
+                    stateSetters[i]((prev: any) => JSON.stringify(prev) !== JSON.stringify(d) ? d : prev);
                 }
             });
             
             if (isLoading) {
-              const storedShortlist = localStorage.getItem('general_shortlist');
-              if (storedShortlist) {
-                setGeneralShortlist(JSON.parse(storedShortlist));
+              try {
+                const storedShortlist = localStorage.getItem('general_shortlist');
+                if (storedShortlist) {
+                  setGeneralShortlist(JSON.parse(storedShortlist));
+                }
+              } catch (e) {
+                 console.error("Failed to read shortlist from local storage:", e);
               }
               setIsShortlistLoading(false);
               setIsLoading(false);
@@ -336,10 +347,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     };
     
-    const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
-    fetchData(); // Initial fetch
-    return () => clearInterval(interval); // Cleanup on unmount
-}, [isLoading]);
+    const interval = setInterval(fetchData, 5000);
+    fetchData();
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const persistData = useCallback(async (endpoint: string, data: any, entityName: string) => {
     try {
@@ -449,10 +461,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
 
   const updateTypingStatus = useCallback(async (threadId: string, status: TypingStatus) => {
-    const newStatus = { ...typingStatus, [threadId]: status };
-    setTypingStatus(newStatus);
-    await persistTypingStatus(newStatus);
-  }, [typingStatus, persistTypingStatus]);
+    setTypingStatus(prev => {
+      const newStatus = { ...prev, [threadId]: status };
+      persistTypingStatus(newStatus);
+      return newStatus;
+    });
+  }, [persistTypingStatus]);
 
   const fetchTypingStatus = useCallback(async (threadId: string) => {
     try {
