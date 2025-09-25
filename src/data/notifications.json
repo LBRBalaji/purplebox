@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "notif-1758798154415-murugan@xyzlogistics.com-0.02437517555198998",
+    "type": "new_chat_message",
+    "title": "New message from Indospace",
+    "message": "Regarding transaction LDR-DL-1758762152087: \"have you got my message...\"",
+    "href": "/dashboard/leads/LDR-DL-1758762152087",
+    "recipientEmail": "murugan@xyzlogistics.com",
+    "timestamp": "2025-09-25T11:02:34.415Z",
+    "triggeredBy": "admin@indospace.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758798138816-admin@indospace.com-0.3543769636199414",
+    "type": "new_chat_message",
+    "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-DL-1758762152087: \"Hi ...\"",
+    "href": "/dashboard/leads/LDR-DL-1758762152087",
+    "recipientEmail": "admin@indospace.com",
+    "timestamp": "2025-09-25T11:02:18.816Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  }
+]

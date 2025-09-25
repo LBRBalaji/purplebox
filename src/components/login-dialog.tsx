@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building, Sparkles, LogIn, UserCog, User as UserIcon, Briefcase, UserPlus, Handshake } from 'lucide-react';
+import { Building, Sparkles, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -20,10 +20,11 @@ import {
 export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: boolean, onOpenChange: (open: boolean) => void, onLoginSuccess?: () => void }) {
   const { login } = useAuth();
   const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, () => {
+    login(email, password, () => {
         onOpenChange(false);
         if (onLoginSuccess) {
             onLoginSuccess();
@@ -32,7 +33,7 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
   };
   
   const handleTestUserLogin = (testEmail: string) => {
-    login(testEmail, () => {
+    login(testEmail, "password", () => {
         onOpenChange(false);
         if (onLoginSuccess) {
             onLoginSuccess();
@@ -53,7 +54,7 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                   <DialogTitle className="text-xl font-bold font-headline">
                       Login to <span className="text-primary">Lakshmi Balaji O2O</span>
                   </DialogTitle>
-                  <DialogDescription>Enter your email to sign in.</DialogDescription>
+                  <DialogDescription>Enter your email and password to sign in.</DialogDescription>
               </div>
           </div>
         </DialogHeader>
@@ -70,8 +71,18 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
             <Button type="submit" className="w-full">
-              <LogIn className="mr-2 h-4 w-4" /> Sign In with Email
+              <LogIn className="mr-2 h-4 w-4" /> Sign In
             </Button>
           </div>
         </form>

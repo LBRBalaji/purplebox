@@ -15,14 +15,17 @@ export type User = {
   userName: string;
   phone: string;
   createdAt: string; 
+  password?: string; // Made optional for existing users
 };
 
-export type NewUser = Omit<User, 'createdAt'>;
+export type NewUser = Omit<User, 'createdAt'> & {
+  password: string;
+};
 
 type AuthContextType = {
   user: User | null;
   users: { [email: string]: User };
-  login: (email: string, onLoginSuccess?: () => void) => void;
+  login: (email: string, password?: string, onLoginSuccess?: () => void) => void;
   signup: (details: NewUser) => void;
   logout: () => void;
   isLoading: boolean;
@@ -79,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (Object.keys(data).length === 0) {
         const defaultAdmin: User = {
             email: 'admin@example.com',
+            password: 'password', // Default password for initial admin
             role: 'SuperAdmin',
             isCompanyAdmin: true,
             companyName: 'Admin Corp',
@@ -117,9 +121,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [fetchUsers]);
 
-  const login = (email: string, onLoginSuccess?: () => void) => {
+  const login = (email: string, password?: string, onLoginSuccess?: () => void) => {
     const foundUser = users[email.toLowerCase()];
-    if (foundUser) {
+    
+    if (foundUser && (!foundUser.password || foundUser.password === password)) {
       setUser(foundUser);
       sessionStorage.setItem('user', JSON.stringify(foundUser));
       if (onLoginSuccess) {
@@ -137,7 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "This email is not registered. Please sign up.",
+        description: "Invalid email or password. Please try again.",
       })
     }
   };

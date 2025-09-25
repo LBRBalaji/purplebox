@@ -154,7 +154,8 @@
       "senderEmail": "murugan@xyzlogistics.com",
       "senderName": "Murugan",
       "text": "welcome",
-      "timestamp": "2025-09-20T12:41:00.601Z"
+      "timestamp": "2025-09-20T12:41:00.601Z",
+      "isNew": false
     }
   ],
   "chat-LDR-QUOTE-1758360477894-admin@kailashlogistics.com": [
@@ -261,6 +262,22 @@
       "senderName": "Kailash Logistics",
       "text": "Hi what is this the purpose of use by this company?",
       "timestamp": "2025-09-23T09:50:10.300Z",
+      "isNew": true
+    }
+  ],
+  "chat-LDR-DL-1758762152087-admin@indospace.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "Hi ",
+      "timestamp": "2025-09-25T11:02:18.815Z",
+      "isNew": true
+    },
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "have you got my message",
+      "timestamp": "2025-09-25T11:02:34.414Z",
       "isNew": true
     }
   ]

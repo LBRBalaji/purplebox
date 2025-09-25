@@ -17,16 +17,20 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Building, Sparkles, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SignupPage() {
   const { signup } = useAuth();
-  const [formData, setFormData] = React.useState<NewUser>({
+  const { toast } = useToast();
+  const [formData, setFormData] = React.useState<Omit<NewUser, 'createdAt'>>({
     email: '',
     companyName: '',
     userName: '',
     phone: '',
     role: 'User',
+    password: ''
   });
+  const [confirmPassword, setConfirmPassword] = React.useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -38,6 +42,14 @@ export default function SignupPage() {
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Passwords do not match",
+        description: "Please re-enter your passwords.",
+      });
+      return;
+    }
     signup(formData);
   };
 
@@ -111,6 +123,14 @@ export default function SignupPage() {
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
               <Input id="phone" type="tel" placeholder="+1 234 567 890" required onChange={handleChange} value={formData.phone} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input id="confirmPassword" type="password" required onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
