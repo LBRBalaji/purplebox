@@ -647,10 +647,10 @@ export function ListingsPage() {
                 <div className="md:col-span-8">
                     <AlertTitle className="font-bold text-primary/90 text-xl flex items-center gap-3">
                         <Info className="h-6 w-6 text-primary/80" />
-                        Download up to 5 listings at once!
+                         Download up to 5 listings at once!
                     </AlertTitle>
                      <AlertDescription className="text-primary/80 mt-2 space-y-3">
-                        <p>Select your favourite listings to instantly <strong className="font-bold">download</strong> their key details and <strong className="font-bold">Get Commercials</strong> Directly from Developer on your dashboard. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
+                        <p>Select your favorite listings to instantly <strong className="font-bold">download</strong> their key details and <strong className="font-bold">Get Commercials</strong> Directly from Developer on your dashboard. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
                         <Button onClick={handleLogDemandClick}>
                             <ClipboardPlus className="mr-2 h-4 w-4" /> Log Your Demand
                         </Button>
@@ -678,7 +678,7 @@ export function ListingsPage() {
                 <div className="w-full">
                     <h2 className="text-2xl font-bold font-headline tracking-tight">Filter Listings</h2>
                     <p className="text-muted-foreground mt-1">
-                        Use our advanced filters to find the perfect Warehouse, 3PL Operated Warehouse and Industrial Buildings for your needs.
+                       Use our advanced filters to find the perfect Warehouse, Temperature Controlled Warehouses, 3PL Operated Warehouse and Industrial Buildings for your needs.
                     </p>
                 </div>
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
