@@ -1,5 +1,16 @@
 [
   {
+    "id": "notif-1758762152092-admin@indospace.com-0.8232929852743419",
+    "type": "new_lead_for_provider",
+    "title": "New Direct Lead: XYZ Logistics",
+    "message": "A customer has requested a quote for your premium listing(s). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@indospace.com",
+    "timestamp": "2025-09-25T01:02:32.092Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
     "id": "notif-1758761150518-admin@indospace.com-0.33571697950125967",
     "type": "new_lead_for_provider",
     "title": "New Direct Lead: XYZ Logistics",

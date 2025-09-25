@@ -344,22 +344,20 @@ export default function ListingDetailPage() {
                 'Total Area (Sq. Ft.)': listing.sizeSqFt,
                 'Building Type': Array.isArray(listing.buildingSpecifications.buildingType) ? listing.buildingSpecifications.buildingType.join(', ') : listing.buildingSpecifications.buildingType,
                 'Availability': listing.availabilityDate,
-                'Rent (per Sq. Ft.)': listing.rentPerSqFt || 'Contact for details',
-                'Security Deposit (Months)': listing.rentalSecurityDeposit || 'Contact for details',
+                'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
                 'Shop Floor Dimension': listing.buildingSpecifications.shopFloorLevelDimension,
-                'Internal Lighting': listing.buildingSpecifications.internalLighting,
-                'Mezzanine Details': listing.buildingSpecifications.mezzanineFloorLevelHeightAndDimension,
-                'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
-                'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
-                'Warehouse Layout Available': listing.buildingSpecifications.warehouseLayoutAvailable ? 'Yes' : 'No',
+                'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
                 'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
                 'Access Road': listing.siteSpecifications.typeOfRoad,
+                'Rent (per Sq. Ft.)': listing.rentPerSqFt || 'Contact for details',
+                'Security Deposit (Months)': listing.rentalSecurityDeposit || 'Contact for details',
+                'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
+                'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
                 'Roof Type': listing.buildingSpecifications.roofType,
                 'Eve Height (M)': listing.buildingSpecifications.eveHeightMeters,
                 'Roof Insulation': listing.buildingSpecifications.roofInsulation,
                 'Ventilation': listing.buildingSpecifications.ventilation,
                 'Louvers': listing.buildingSpecifications.louvers ? 'Yes' : 'No',
-                'Docks': listing.buildingSpecifications.numberOfDocksAndShutters,
                 'Park Approval': listing.certificatesAndApprovals.parkApproval ? 'Yes' : 'No',
                 'Building Approval': listing.certificatesAndApprovals.buildingApproval ? 'Yes' : 'No',
                 'Fire License': listing.certificatesAndApprovals.fireLicense ? 'Yes' : 'No',
@@ -744,3 +742,5 @@ export default function ListingDetailPage() {
     );
 
 }
+
+    

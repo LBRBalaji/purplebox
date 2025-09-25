@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-DL-1758762152087",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for Property ID: Ulavur B700",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-TGAV6G",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-25T01:02:32.087Z"
+  },
+  {
     "id": "LDR-DL-1758761150518",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",
