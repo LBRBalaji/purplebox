@@ -266,7 +266,7 @@
   {
     "listingId": "LST-9M05SY",
     "views": 0,
-    "downloads": 9,
+    "downloads": 11,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -283,7 +283,9 @@
           1758208336205,
           1758208336205,
           1758208725273,
-          1758208725273
+          1758208725273,
+          1758761150512,
+          1758761150512
         ]
       },
       {
@@ -1192,7 +1194,7 @@
   {
     "listingId": "LST-90DWHQ",
     "views": 3,
-    "downloads": 0,
+    "downloads": 2,
     "customerIndustries": {},
     "viewedBy": [
       {
@@ -1212,6 +1214,16 @@
         "name": "Murugan",
         "company": "XYZ Logistics",
         "timestamp": 1758361241638
+      }
+    ],
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758761150512,
+          1758761150512
+        ]
       }
     ]
   },
@@ -1244,7 +1256,7 @@
   {
     "listingId": "LST-EDCYH9",
     "views": 19,
-    "downloads": 0,
+    "downloads": 2,
     "customerIndustries": {},
     "viewedBy": [
       {
@@ -1361,6 +1373,16 @@
         "company": "Beta Retail",
         "timestamp": 1758620436633
       }
+    ],
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758761150512,
+          1758761150512
+        ]
+      }
     ]
   },
   {
@@ -1374,6 +1396,36 @@
         "name": "Anonymous",
         "company": "Anonymous",
         "timestamp": 1758695999200
+      }
+    ]
+  },
+  {
+    "listingId": "LST-FSHLEB",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758761150512
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-KC5RZI",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758761150512
+        ]
       }
     ]
   }

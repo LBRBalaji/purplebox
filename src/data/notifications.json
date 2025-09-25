@@ -1,5 +1,82 @@
 [
   {
+    "id": "notif-1758761150518-admin@indospace.com-0.33571697950125967",
+    "type": "new_lead_for_provider",
+    "title": "New Direct Lead: XYZ Logistics",
+    "message": "A customer has requested a quote for your premium listing(s). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@indospace.com",
+    "timestamp": "2025-09-25T00:45:50.518Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": true
+  },
+  {
+    "id": "notif-1758761150518-admin@indospace.com-0.5949931339446214",
+    "type": "new_lead_for_provider",
+    "title": "New Direct Lead: XYZ Logistics",
+    "message": "A customer has requested a quote for your premium listing(s). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@indospace.com",
+    "timestamp": "2025-09-25T00:45:50.518Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": true
+  },
+  {
+    "id": "notif-1758761150518-admin@welspun.com-0.9314796507490469",
+    "type": "new_lead_for_provider",
+    "title": "New Direct Lead: XYZ Logistics",
+    "message": "A customer has requested a quote for your premium listing(s). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@welspun.com",
+    "timestamp": "2025-09-25T00:45:50.518Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758761150517-namasivayam.lion@gmail.com-0.3748348131965856",
+    "type": "new_lead_for_provider",
+    "title": "New Direct Lead: XYZ Logistics",
+    "message": "A customer has requested a quote for your premium listing(s). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "namasivayam.lion@gmail.com",
+    "timestamp": "2025-09-25T00:45:50.517Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758761150517-manager@o2o.com-0.09347325761266889",
+    "type": "new_lead_for_provider",
+    "title": "New Broking Lead: XYZ Logistics",
+    "message": "Registered by Murugan. Needs provider assignment.",
+    "href": "/dashboard/transactions",
+    "recipientEmail": "manager@o2o.com",
+    "timestamp": "2025-09-25T00:45:50.517Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758761150517-superadmin@o2o.com-0.09403254561764884",
+    "type": "new_lead_for_provider",
+    "title": "New Broking Lead: XYZ Logistics",
+    "message": "Registered by Murugan. Needs provider assignment.",
+    "href": "/dashboard/transactions",
+    "recipientEmail": "superadmin@o2o.com",
+    "timestamp": "2025-09-25T00:45:50.517Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": true
+  },
+  {
+    "id": "notif-1758761150517-admin@example.com-0.5459068495135158",
+    "type": "new_lead_for_provider",
+    "title": "New Broking Lead: XYZ Logistics",
+    "message": "Registered by Murugan. Needs provider assignment.",
+    "href": "/dashboard/transactions",
+    "recipientEmail": "admin@example.com",
+    "timestamp": "2025-09-25T00:45:50.517Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
     "id": "notif-1758621010301-betacustomer2@o2o.com-0.8678232497401704",
     "type": "new_chat_message",
     "title": "New message from Kailash Logistics",
