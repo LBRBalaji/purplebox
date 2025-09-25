@@ -272,7 +272,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
-    "warehouseModel": "Non-Temperature Controlled",
+    "warehouseModel": "3PL Operated Warehouse",
     "locationCircle": "Sriperumbudur Circle",
     "area": {
       "plinthArea": 60000,
@@ -758,7 +758,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Ready for Occupancy",
     "constructionProgress": "",
-    "warehouseModel": "Non-Temperature Controlled",
+    "warehouseModel": "3PL Operated Warehouse",
     "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 52000,
@@ -1746,7 +1746,7 @@
     "rentalSecurityDeposit": "Get Quote",
     "availabilityDate": "Under Construction",
     "constructionProgress": "",
-    "warehouseModel": "Temp & Non-Temp Controlled",
+    "warehouseModel": "3PL Operated Warehouse",
     "locationCircle": "Karanodai Circle",
     "area": {
       "plinthArea": 270000,

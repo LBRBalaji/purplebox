@@ -293,65 +293,70 @@ export function DataProvider({ children }: { children: ReactNode }) {
     'layout-requests', 'chat-messages', 'notifications', 'typing-status'
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const fetchPromises = endpoints.map(ep => fetch(`/api/${ep}`));
-            const responses = await Promise.allSettled(fetchPromises);
+  const fetchData = useCallback(async () => {
+    try {
+        const fetchPromises = endpoints.map(ep => fetch(`/api/${ep}`));
+        const responses = await Promise.allSettled(fetchPromises);
 
-            const dataPromises = responses.map(async (res, index) => {
-              if (res.status === 'fulfilled' && res.value.ok) {
+        const data = await Promise.all(responses.map(async (res, index) => {
+            if (res.status === 'fulfilled' && res.value.ok) {
                 try {
-                  return await res.value.json();
+                    return await res.value.json();
                 } catch (e) {
-                  console.error(`Failed to parse JSON for ${endpoints[index]}:`, e);
-                  return null; // Return null if JSON parsing fails
+                    console.error(`Failed to parse JSON for ${endpoints[index]}:`, e);
+                    return null;
                 }
-              } else {
-                console.error(`Failed to fetch ${endpoints[index]}:`, res.status === 'rejected' ? res.reason : `Status ${res.value.status}`);
-                return null; // Return null for failed fetches
-              }
-            });
-
-            const data = await Promise.all(dataPromises);
-            
-            const stateSetters: any[] = [
-                setListings, setDemands, setSubmissions, setAgentLeads, setListingAnalytics,
-                setRegisteredLeads, setTransactionActivities, setTenantImprovements,
-                setNegotiationBoards, setAboutUsContent, setLocationCircles,
-                setDownloadAcknowledgments, setDownloadHistory, setViewHistory,
-                setLayoutRequests, setChatMessages, setNotifications, setTypingStatus
-            ];
-
-            data.forEach((d, i) => {
-                if (d !== null) {
-                    stateSetters[i]((prev: any) => JSON.stringify(prev) !== JSON.stringify(d) ? d : prev);
+            } else if (res.status === 'rejected') {
+                console.error(`Fetch failed for ${endpoints[index]}:`, res.reason);
+            } else if (res.status === 'fulfilled' && !res.value.ok) {
+                 try {
+                    const errorBody = await res.value.text();
+                    console.error(`API error for ${endpoints[index]} (Status: ${res.value.status}):`, errorBody.substring(0, 500));
+                } catch {
+                    console.error(`API error for ${endpoints[index]} (Status: ${res.value.status})`);
                 }
-            });
-            
-            if (isLoading) {
-              try {
-                const storedShortlist = localStorage.getItem('general_shortlist');
-                if (storedShortlist) {
-                  setGeneralShortlist(JSON.parse(storedShortlist));
-                }
-              } catch (e) {
-                 console.error("Failed to read shortlist from local storage:", e);
-              }
-              setIsShortlistLoading(false);
-              setIsLoading(false);
             }
-        } catch (error) {
-            console.error("A critical error occurred during data polling", error);
-            if (isLoading) setIsLoading(false);
+            return null;
+        }));
+        
+        const stateSetters: any[] = [
+            setListings, setDemands, setSubmissions, setAgentLeads, setListingAnalytics,
+            setRegisteredLeads, setTransactionActivities, setTenantImprovements,
+            setNegotiationBoards, setAboutUsContent, setLocationCircles,
+            setDownloadAcknowledgments, setDownloadHistory, setViewHistory,
+            setLayoutRequests, setChatMessages, setNotifications, setTypingStatus
+        ];
+
+        data.forEach((d, i) => {
+            if (d !== null) {
+                stateSetters[i]((prev: any) => JSON.stringify(prev) !== JSON.stringify(d) ? d : prev);
+            }
+        });
+        
+        if (isLoading) {
+          try {
+            const storedShortlist = localStorage.getItem('general_shortlist');
+            if (storedShortlist) {
+              setGeneralShortlist(JSON.parse(storedShortlist));
+            }
+          } catch (e) {
+             console.error("Failed to read shortlist from local storage:", e);
+          }
+          setIsShortlistLoading(false);
+          setIsLoading(false);
         }
-    };
-    
-    const interval = setInterval(fetchData, 5000);
-    fetchData();
-    return () => clearInterval(interval);
+    } catch (error) {
+        console.error("A critical error occurred during data polling", error);
+        if (isLoading) setIsLoading(false);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(fetchData, 5000);
+    fetchData(); // Initial fetch
+    return () => clearInterval(interval);
+  }, [fetchData]);
 
   const persistData = useCallback(async (endpoint: string, data: any, entityName: string) => {
     try {
@@ -554,6 +559,102 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return updatedLeads;
     });
   }, [persistAgentLeads]);
+  
+  const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
+    const newActivity: TransactionActivity = {
+        ...activityData,
+        activityId: `ACT-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+    };
+
+    setTransactionActivities(prevActivities => {
+        const updatedActivities = [newActivity, ...prevActivities];
+        persistActivities(updatedActivities);
+        return updatedActivities;
+    });
+    
+    const lead = registeredLeads.find(l => l.id === newActivity.leadId);
+    if (lead) {
+        const participants = new Set<string>();
+        participants.add(lead.customerId);
+        if (lead.agentId) participants.add(lead.agentId);
+        lead.providers.forEach(p => participants.add(p.providerEmail));
+        
+        if (lead.isO2OCollaborator) {
+            Object.values(users).forEach(u => {
+                if (u.role === 'SuperAdmin' || u.role === 'O2O') {
+                    participants.add(u.email);
+                }
+            });
+        }
+        
+        const uniqueParticipants = Array.from(participants).filter(p => p !== newActivity.createdBy);
+
+        uniqueParticipants.forEach(participantEmail => {
+            addNotification({
+                id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
+                type: 'new_activity',
+                title: `Update on Transaction: ${lead.id}`,
+                message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
+                href: `/dashboard/leads/${lead.id}`,
+                recipientEmail: participantEmail,
+                timestamp: newActivity.createdAt,
+                triggeredBy: newActivity.createdBy
+            });
+        });
+    }
+  }, [persistActivities, registeredLeads, addNotification, users]);
+
+  const addRegisteredLead = useCallback((leadData: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => {
+    const newLead: RegisteredLead = {
+        ...leadData,
+        registeredAt: new Date().toISOString(),
+    };
+
+    setRegisteredLeads(prevLeads => {
+        const updatedLeads = [newLead, ...prevLeads];
+        persistRegisteredLeads(updatedLeads);
+        return updatedLeads;
+    });
+    
+    addTransactionActivity({
+        leadId: newLead.id,
+        activityType: 'Lead Registered',
+        details: {},
+        createdBy: userEmail || 'system',
+    });
+
+    const uniqueProviders = Array.from(new Set(newLead.providers.map(p => p.providerEmail)));
+
+    if (newLead.isO2OCollaborator) {
+        const adminRecipients = Object.values(users).filter(u => u.role === 'SuperAdmin' || u.role === 'O2O');
+        adminRecipients.forEach(admin => {
+             addNotification({
+                id: `notif-${Date.now()}-${admin.email}-${Math.random()}`,
+                type: 'new_lead_for_provider',
+                title: `New Broking Lead: ${newLead.leadName}`,
+                message: `Registered by ${users[newLead.registeredBy]?.userName || userEmail}. Needs provider assignment.`,
+                href: `/dashboard/transactions`,
+                recipientEmail: admin.email,
+                timestamp: new Date().toISOString(),
+                triggeredBy: userEmail || 'system'
+            });
+        });
+    } else {
+        uniqueProviders.forEach(providerEmail => {
+            addNotification({
+                id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
+                type: 'new_lead_for_provider',
+                title: `New Direct Lead: ${newLead.leadName}`,
+                message: `A customer has requested a quote for your premium listing(s). Please acknowledge.`,
+                href: '/dashboard?tab=registered-leads',
+                recipientEmail: providerEmail,
+                timestamp: new Date().toISOString(),
+                triggeredBy: userEmail || 'system'
+            });
+        });
+    }
+  }, [persistRegisteredLeads, addTransactionActivity, addNotification, users]);
 
   const addDemand = useCallback((demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => {
     setDemands(prevDemands => {
@@ -711,12 +812,40 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const now = new Date().getTime();
     const newDownloadRecords: DownloadRecord[] = [];
     
+    listingsToDownload.forEach(listing => {
+        const isBrokered = listing.plan !== 'Paid_Premium';
+        const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
+
+        const newLead: Omit<RegisteredLead, 'registeredAt'> = {
+            id: `LDR-DL-${Date.now()}`,
+            customerId: user.email,
+            leadName: user.companyName,
+            leadContact: user.userName,
+            leadEmail: user.email,
+            leadPhone: user.phone,
+            requirementsSummary: `Quote requested via download for Property ID: ${listing.warehouseBoxId || listing.listingId}`,
+            registeredBy: user.email,
+            providers: [{
+                providerEmail: providerEmail,
+                properties: [{ listingId: listing.listingId, status: 'Pending' }]
+            }],
+            isO2OCollaborator: isBrokered,
+        };
+        addRegisteredLead(newLead, user.email);
+
+        const record: DownloadRecord = { userId: user.email, companyName: user.companyName, listingId: listing.listingId, location: listing.location, timestamp: now };
+        newDownloadRecords.push(record);
+    });
+
+    setDownloadHistory(prev => {
+        const updatedHistory = [...prev, ...newDownloadRecords];
+        persistDownloadHistory(updatedHistory);
+        return updatedHistory;
+    });
+
     setListingAnalytics(prevAnalytics => {
         const newAnalytics = [...prevAnalytics];
         listingsToDownload.forEach(listing => {
-            const record: DownloadRecord = { userId: user.email, companyName: user.companyName, listingId: listing.listingId, location: listing.location, timestamp: now };
-            newDownloadRecords.push(record);
-
             let analytic = newAnalytics.find(a => a.listingId === listing.listingId);
             if (!analytic) {
                 analytic = { listingId: listing.listingId, views: 0, downloads: 0, customerIndustries: {}, downloadedBy: [] };
@@ -742,14 +871,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return newAnalytics;
     });
 
-    setDownloadHistory(prev => {
-        const updatedHistory = [...prev, ...newDownloadRecords];
-        persistDownloadHistory(updatedHistory);
-        return updatedHistory;
-    });
-
     return { success: true, limitReached: false, message: "Download successful." };
-  }, [getCompanyDownloadCounts, persistDownloadHistory, persistListingAnalytics, toast]);
+  }, [getCompanyDownloadCounts, persistDownloadHistory, persistListingAnalytics, toast, addRegisteredLead]);
 
   const logListingView = useCallback((user: User | null, listingId: string) => {
       const now = Date.now();
@@ -865,101 +988,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const clearSelectedForDownload = useCallback(() => {
     setSelectedForDownload([]);
   }, []);
-
-  const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
-    setTransactionActivities(prevActivities => {
-        const newActivity: TransactionActivity = {
-            ...activityData,
-            activityId: `ACT-${Date.now()}`,
-            createdAt: new Date().toISOString(),
-        };
-        const updatedActivities = [newActivity, ...prevActivities];
-        persistActivities(updatedActivities);
-        
-        const lead = registeredLeads.find(l => l.id === newActivity.leadId);
-        if (lead) {
-            const participants = new Set<string>();
-            participants.add(lead.customerId);
-            if (lead.agentId) participants.add(lead.agentId);
-            lead.providers.forEach(p => participants.add(p.providerEmail));
-            
-            if (lead.isO2OCollaborator) {
-                Object.values(users).forEach(u => {
-                    if (u.role === 'SuperAdmin' || u.role === 'O2O') {
-                        participants.add(u.email);
-                    }
-                });
-            }
-            
-            const uniqueParticipants = Array.from(participants).filter(p => p !== newActivity.createdBy);
-
-            uniqueParticipants.forEach(participantEmail => {
-                addNotification({
-                    id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
-                    type: 'new_activity',
-                    title: `Update on Transaction: ${lead.id}`,
-                    message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
-                    href: `/dashboard/leads/${lead.id}`,
-                    recipientEmail: participantEmail,
-                    timestamp: newActivity.createdAt,
-                    triggeredBy: newActivity.createdBy
-                });
-            });
-        }
-        return updatedActivities;
-    });
-  }, [persistActivities, registeredLeads, addNotification, users]);
-
-  const addRegisteredLead = useCallback((leadData: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => {
-    const newLead: RegisteredLead = {
-        ...leadData,
-        registeredAt: new Date().toISOString(),
-    };
-
-    setRegisteredLeads(prevLeads => {
-        const updatedLeads = [newLead, ...prevLeads];
-        persistRegisteredLeads(updatedLeads);
-        return updatedLeads;
-    });
-    
-    addTransactionActivity({
-        leadId: newLead.id,
-        activityType: 'Lead Registered',
-        details: {},
-        createdBy: userEmail || 'system',
-    });
-
-    const uniqueProviders = Array.from(new Set(newLead.providers.map(p => p.providerEmail)));
-
-    if (newLead.isO2OCollaborator) {
-        const adminRecipients = Object.values(users).filter(u => u.role === 'SuperAdmin' || u.role === 'O2O');
-        adminRecipients.forEach(admin => {
-             addNotification({
-                id: `notif-${Date.now()}-${admin.email}-${Math.random()}`,
-                type: 'new_lead_for_provider',
-                title: `New Broking Lead: ${newLead.leadName}`,
-                message: `Registered by ${users[newLead.registeredBy]?.userName || userEmail}. Needs provider assignment.`,
-                href: `/dashboard/transactions`,
-                recipientEmail: admin.email,
-                timestamp: new Date().toISOString(),
-                triggeredBy: userEmail || 'system'
-            });
-        });
-    } else {
-        uniqueProviders.forEach(providerEmail => {
-            addNotification({
-                id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
-                type: 'new_lead_for_provider',
-                title: `New Direct Lead: ${newLead.leadName}`,
-                message: `A customer has requested a quote for your premium listing(s). Please acknowledge.`,
-                href: '/dashboard?tab=registered-leads',
-                recipientEmail: providerEmail,
-                timestamp: new Date().toISOString(),
-                triggeredBy: userEmail || 'system'
-            });
-        });
-    }
-  }, [persistRegisteredLeads, addTransactionActivity, addNotification, users]);
   
   const updateRegisteredLead = useCallback((updatedLead: RegisteredLead) => {
       setRegisteredLeads(prevLeads => {
@@ -1211,3 +1239,5 @@ export function useData() {
   }
   return context;
 }
+
+    

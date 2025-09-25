@@ -1,4 +1,3 @@
-
 {
   "admin@example.com": {
     "email": "admin@example.com",
@@ -353,5 +352,14 @@
     "isCompanyAdmin": true,
     "plan": "Paid_Premium",
     "createdAt": "2025-09-19T05:13:08.081Z"
+  },
+  "balachandar@geodis.com": {
+    "email": "balachandar@geodis.com",
+    "companyName": "Geodis",
+    "userName": "Balachandar",
+    "phone": "+91 9841098170",
+    "role": "User",
+    "plan": "Paid_Premium",
+    "isCompanyAdmin": true
   }
 }
