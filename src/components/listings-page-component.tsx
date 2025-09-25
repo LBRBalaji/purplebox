@@ -334,6 +334,18 @@ function DownloadBar() {
     )
 }
 
+const searchPlaceholders = [
+    'e.g., search "12m eve height"',
+    'e.g., search "crane available"',
+    'e.g., search "3PL operated warehouse"',
+    'e.g., search "RCC building"',
+    'e.g., search "fire NOC approved"',
+    'e.g., search "FM2 grade flooring"',
+    'e.g., search "Galvalume roof"',
+    'e.g., search "Insulated roof"',
+    'e.g., search "Turbo ventilation"',
+];
+
 export function ListingsPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
@@ -349,18 +361,6 @@ export function ListingsPage() {
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
-
-  const searchPlaceholders = [
-    'e.g., search "12m eve height"',
-    'e.g., search "crane available"',
-    'e.g., search "3PL operated warehouse"',
-    'e.g., search "RCC building"',
-    'e.g., search "fire NOC approved"',
-    'e.g., search "FM2 grade flooring"',
-    'e.g., search "Galvalume roof"',
-    'e.g., search "Insulated roof"',
-    'e.g., search "Turbo ventilation"',
-  ];
 
   const approvedListings = useMemo(() => {
     // Fisher-Yates shuffle algorithm
@@ -401,7 +401,7 @@ export function ListingsPage() {
     }, 3000);
 
     return () => clearInterval(intervalId);
-  }, [searchPlaceholders.length]);
+  }, []);
 
 
  useEffect(() => {
@@ -676,10 +676,7 @@ export function ListingsPage() {
             </Alert>
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
                 <div className="w-full">
-                    <h2 className="text-2xl font-bold font-headline tracking-tight">Filter Listings</h2>
-                    <p className="text-muted-foreground mt-1">
-                       Use our advanced filters to find the perfect Warehouse, Temperature Controlled Warehouses, 3PL Operated Warehouse and Industrial Buildings for your needs.
-                    </p>
+                    <h2 className="text-2xl font-bold font-headline tracking-tight">Use our advanced filters to find the perfect Warehouse, Temperature Controlled Warehouses, 3PL Operated Warehouse and Industrial Buildings for your needs.</h2>
                 </div>
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
                     <div className="lg:col-span-2 space-y-2">
