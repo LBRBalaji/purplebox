@@ -820,30 +820,38 @@ export function DataProvider({ children }: { children: ReactNode }) {
     
     const newDownloadRecords: DownloadRecord[] = [];
     
+    const providerToListingsMap: { [providerEmail: string]: string[] } = {};
+
     listingsToDownload.forEach(listing => {
-        const now = Date.now();
         const isBrokered = listing.plan !== 'Paid_Premium';
         const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
+        
+        if (!providerToListingsMap[providerEmail]) {
+            providerToListingsMap[providerEmail] = [];
+        }
+        providerToListingsMap[providerEmail].push(listing.listingId);
 
+        const record: DownloadRecord = { userId: user.email, companyName: user.companyName, listingId: listing.listingId, location: listing.location, timestamp: Date.now() };
+        newDownloadRecords.push(record);
+    });
+
+    Object.entries(providerToListingsMap).forEach(([providerEmail, listingIds]) => {
         const newLead: Omit<RegisteredLead, 'registeredAt'> = {
-            id: `LDR-DL-${listing.listingId}-${now}-${Math.random()}`,
+            id: `LDR-DL-${Date.now()}-${Math.random()}`,
             customerId: user.email,
             leadName: user.companyName,
             leadContact: user.userName,
             leadEmail: user.email,
             leadPhone: user.phone,
-            requirementsSummary: `Quote requested via download for Property ID: ${listing.warehouseBoxId || listing.listingId}`,
+            requirementsSummary: `Quote requested via download for ${listingIds.length} properties.`,
             registeredBy: user.email,
             providers: [{
                 providerEmail: providerEmail,
-                properties: [{ listingId: listing.listingId, status: 'Pending' }]
+                properties: listingIds.map(id => ({ listingId: id, status: 'Pending' }))
             }],
-            isO2OCollaborator: isBrokered,
+            isO2OCollaborator: providerEmail === 'superadmin@o2o.com',
         };
         addRegisteredLead(newLead, user.email);
-
-        const record: DownloadRecord = { userId: user.email, companyName: user.companyName, listingId: listing.listingId, location: listing.location, timestamp: now };
-        newDownloadRecords.push(record);
     });
 
     setDownloadHistory(prev => {
@@ -1248,5 +1256,3 @@ export function useData() {
   }
   return context;
 }
-
-  
