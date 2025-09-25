@@ -302,7 +302,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const data = await Promise.all(responses.map(async (res, index) => {
                 if (res.status === 'fulfilled' && res.value.ok) {
                     try {
-                        return await res.value.json();
+                        const text = await res.value.text();
+                        return text ? JSON.parse(text) : null;
                     } catch (e) {
                         console.error(`Failed to parse JSON for ${endpoints[index]}:`, e);
                         return null;
@@ -330,7 +331,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
             stateSetters.forEach((setter, i) => {
               if (data[i] !== null) {
-                  setter((prev: any) => JSON.stringify(prev) !== JSON.stringify(data[i]) ? data[i] : prev);
+                  setter((prev: any) => {
+                    const stringifiedPrev = JSON.stringify(prev);
+                    const stringifiedNew = JSON.stringify(data[i]);
+                    if (stringifiedPrev !== stringifiedNew) {
+                      return data[i];
+                    }
+                    return prev;
+                  });
               }
             });
             
@@ -564,7 +572,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
     const newActivity: TransactionActivity = {
         ...activityData,
-        activityId: `ACT-${activityData.leadId}-${Date.now()}`,
+        activityId: `ACT-${activityData.leadId}-${Date.now()}-${Math.random()}`,
         createdAt: new Date().toISOString(),
     };
 
@@ -810,15 +818,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     }
     
-    const now = new Date().getTime();
     const newDownloadRecords: DownloadRecord[] = [];
     
     listingsToDownload.forEach(listing => {
+        const now = Date.now();
         const isBrokered = listing.plan !== 'Paid_Premium';
         const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
 
         const newLead: Omit<RegisteredLead, 'registeredAt'> = {
-            id: `LDR-DL-${now}-${listing.listingId}`,
+            id: `LDR-DL-${listing.listingId}-${now}-${Math.random()}`,
             customerId: user.email,
             leadName: user.companyName,
             leadContact: user.userName,
@@ -858,12 +866,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
               analytic.downloadedBy = analytic.downloadedBy || [];
               let customerRecord = analytic.downloadedBy.find(c => c.company === user.companyName);
               if (customerRecord) {
-                customerRecord.timestamps.push(now);
+                customerRecord.timestamps.push(Date.now());
               } else {
                 analytic.downloadedBy.push({
                     name: user.userName,
                     company: user.companyName,
-                    timestamps: [now],
+                    timestamps: [Date.now()],
                 });
               }
             }
