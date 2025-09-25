@@ -293,63 +293,65 @@ export function DataProvider({ children }: { children: ReactNode }) {
     'layout-requests', 'chat-messages', 'notifications', 'typing-status'
   ];
 
-  const fetchData = useCallback(async () => {
-    try {
-        const fetchPromises = endpoints.map(ep => fetch(`/api/${ep}`));
-        const responses = await Promise.allSettled(fetchPromises);
+  const fetchData = useCallback(() => {
+    (async () => {
+        try {
+            const fetchPromises = endpoints.map(ep => fetch(`/api/${ep}`));
+            const responses = await Promise.allSettled(fetchPromises);
 
-        const data = await Promise.all(responses.map(async (res, index) => {
-            if (res.status === 'fulfilled' && res.value.ok) {
-                try {
-                    return await res.value.json();
-                } catch (e) {
-                    console.error(`Failed to parse JSON for ${endpoints[index]}:`, e);
-                    return null;
+            const data = await Promise.all(responses.map(async (res, index) => {
+                if (res.status === 'fulfilled' && res.value.ok) {
+                    try {
+                        return await res.value.json();
+                    } catch (e) {
+                        console.error(`Failed to parse JSON for ${endpoints[index]}:`, e);
+                        return null;
+                    }
+                } else if (res.status === 'rejected') {
+                    console.error(`Fetch failed for ${endpoints[index]}:`, res.reason);
+                } else if (res.status === 'fulfilled' && !res.value.ok) {
+                     try {
+                        const errorBody = await res.value.text();
+                        console.error(`API error for ${endpoints[index]} (Status: ${res.value.status}):`, errorBody.substring(0, 500));
+                    } catch {
+                        console.error(`API error for ${endpoints[index]} (Status: ${res.value.status})`);
+                    }
                 }
-            } else if (res.status === 'rejected') {
-                console.error(`Fetch failed for ${endpoints[index]}:`, res.reason);
-            } else if (res.status === 'fulfilled' && !res.value.ok) {
-                 try {
-                    const errorBody = await res.value.text();
-                    console.error(`API error for ${endpoints[index]} (Status: ${res.value.status}):`, errorBody.substring(0, 500));
-                } catch {
-                    console.error(`API error for ${endpoints[index]} (Status: ${res.value.status})`);
-                }
-            }
-            return null;
-        }));
-        
-        const stateSetters: any[] = [
-            setListings, setDemands, setSubmissions, setAgentLeads, setListingAnalytics,
-            setRegisteredLeads, setTransactionActivities, setTenantImprovements,
-            setNegotiationBoards, setAboutUsContent, setLocationCircles,
-            setDownloadAcknowledgments, setDownloadHistory, setViewHistory,
-            setLayoutRequests, setChatMessages, setNotifications, setTypingStatus
-        ];
+                return null;
+            }));
+            
+            const stateSetters: any[] = [
+                setListings, setDemands, setSubmissions, setAgentLeads, setListingAnalytics,
+                setRegisteredLeads, setTransactionActivities, setTenantImprovements,
+                setNegotiationBoards, setAboutUsContent, setLocationCircles,
+                setDownloadAcknowledgments, setDownloadHistory, setViewHistory,
+                setLayoutRequests, setChatMessages, setNotifications, setTypingStatus
+            ];
 
-        data.forEach((d, i) => {
-            if (d !== null) {
-                stateSetters[i]((prev: any) => JSON.stringify(prev) !== JSON.stringify(d) ? d : prev);
+            stateSetters.forEach((setter, i) => {
+              if (data[i] !== null) {
+                  setter((prev: any) => JSON.stringify(prev) !== JSON.stringify(data[i]) ? data[i] : prev);
+              }
+            });
+            
+            if (isLoading) {
+              try {
+                const storedShortlist = localStorage.getItem('general_shortlist');
+                if (storedShortlist) {
+                  setGeneralShortlist(JSON.parse(storedShortlist));
+                }
+              } catch (e) {
+                 console.error("Failed to read shortlist from local storage:", e);
+              }
+              setIsShortlistLoading(false);
+              setIsLoading(false);
             }
-        });
-        
-        if (isLoading) {
-          try {
-            const storedShortlist = localStorage.getItem('general_shortlist');
-            if (storedShortlist) {
-              setGeneralShortlist(JSON.parse(storedShortlist));
-            }
-          } catch (e) {
-             console.error("Failed to read shortlist from local storage:", e);
-          }
-          setIsShortlistLoading(false);
-          setIsLoading(false);
+        } catch (error) {
+            console.error("A critical error occurred during data polling", error);
+            if (isLoading) setIsLoading(false);
         }
-    } catch (error) {
-        console.error("A critical error occurred during data polling", error);
-        if (isLoading) setIsLoading(false);
-    }
-  }, []);
+    })();
+  }, [isLoading]);
 
   useEffect(() => {
     fetchData(); // Initial fetch
@@ -562,7 +564,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
     const newActivity: TransactionActivity = {
         ...activityData,
-        activityId: `ACT-${Date.now()}`,
+        activityId: `ACT-${Date.now()}-${Math.random()}`,
         createdAt: new Date().toISOString(),
     };
 
