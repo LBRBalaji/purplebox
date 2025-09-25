@@ -1,3 +1,4 @@
+
 'use client';
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -121,11 +122,12 @@ export function UserList() {
     setIsFormOpen(true);
   }
 
-  const handleFormSubmit = (data: NewUser, isEditing: boolean) => {
+  const handleFormSubmit = (data: Partial<NewUser> & { email: string }, isEditing: boolean) => {
     if (isEditing) {
       updateUser(data);
     } else {
-      addUser(data);
+      // The 'password' field is guaranteed to be present for new users by the form validation
+      addUser(data as NewUser);
     }
 
     toast({

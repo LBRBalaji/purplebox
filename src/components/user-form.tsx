@@ -35,6 +35,7 @@ import { type NewUser, type User } from "@/contexts/auth-context";
 import { z } from "zod";
 import { useAuth } from "@/contexts/auth-context";
 import { Switch } from "./ui/switch";
+import { Separator } from "./ui/separator";
 
 const userFormSchema = z.object({
     email: z.string().email('Invalid email address.'),
@@ -44,6 +45,8 @@ const userFormSchema = z.object({
     role: z.enum(['User', 'SuperAdmin', 'O2O', 'Warehouse Developer', 'Agent']),
     plan: z.enum(['Free', 'Paid_Premium']).optional(),
     isCompanyAdmin: z.boolean().optional(),
+    password: z.string().optional(),
+    confirmPassword: z.string().optional(),
 });
 
 type UserFormSchema = z.infer<typeof userFormSchema>;
@@ -52,7 +55,7 @@ type UserFormProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   user: User | null;
-  onSubmit: (data: NewUser, isEditing: boolean) => void;
+  onSubmit: (data: Partial<NewUser> & { email: string }, isEditing: boolean) => void;
 };
 
 export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps) {
@@ -63,9 +66,30 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
     const companyNames = new Set(Object.values(users).map(u => u.companyName));
     return Array.from(companyNames);
   }, [users]);
+  
+  const formSchema = userFormSchema.refine(data => {
+    // In create mode, password is required
+    if (!isEditMode) {
+      return data.password && data.password.length > 0;
+    }
+    return true;
+  }, {
+    message: "Password is required for new users.",
+    path: ["password"],
+  }).refine(data => {
+    // If password is provided, confirmPassword must match
+    if (data.password) {
+      return data.password === data.confirmPassword;
+    }
+    return true;
+  }, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
 
   const form = useForm<UserFormSchema>({
-    resolver: zodResolver(userFormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       companyName: '',
@@ -74,6 +98,8 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
       role: 'User',
       plan: 'Free',
       isCompanyAdmin: false,
+      password: '',
+      confirmPassword: '',
     },
   });
 
@@ -88,6 +114,8 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                 role: user.role,
                 plan: user.plan || 'Free',
                 isCompanyAdmin: user.isCompanyAdmin || false,
+                password: '',
+                confirmPassword: '',
             });
         } else {
             form.reset({
@@ -98,13 +126,21 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
               role: 'User',
               plan: 'Free',
               isCompanyAdmin: false,
+              password: '',
+              confirmPassword: '',
             });
         }
     }
   }, [isOpen, isEditMode, user, form]);
 
   const handleSubmit = (data: UserFormSchema) => {
-    onSubmit(data, isEditMode);
+    // Don't submit password fields if they are empty during edit
+    const submissionData: Partial<NewUser> & { email: string } = { ...data };
+    if (isEditMode && !data.password) {
+      delete submissionData.password;
+    }
+
+    onSubmit(submissionData, isEditMode);
     onOpenChange(false);
   };
 
@@ -207,6 +243,26 @@ export function UserForm({ isOpen, onOpenChange, user, onSubmit }: UserFormProps
                   </FormItem>
                 )}
               />
+              <Separator />
+               <div className="space-y-4">
+                  <FormLabel>{isEditMode ? 'Set New Password (Optional)' : 'Set Password'}</FormLabel>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="password" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl><Input type="password" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                     <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Confirm Password</FormLabel>
+                            <FormControl><Input type="password" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                  </div>
+              </div>
             <DialogFooter className="pt-4">
                 <DialogClose asChild>
                     <Button type="button" variant="outline">Cancel</Button>

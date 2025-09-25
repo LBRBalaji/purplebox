@@ -29,8 +29,8 @@ type AuthContextType = {
   signup: (details: NewUser) => void;
   logout: () => void;
   isLoading: boolean;
-  addUser: (details: User) => void;
-  updateUser: (details: NewUser) => void;
+  addUser: (details: NewUser) => void;
+  updateUser: (details: Partial<NewUser> & { email: string }) => void;
   deleteUser: (email: string) => void;
 };
 
@@ -194,7 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/');
   };
 
-  const addUser = async (details: User) => {
+  const addUser = async (details: NewUser) => {
     if (users[details.email.toLowerCase()]) {
       toast({
         variant: "destructive",
@@ -203,12 +203,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       return;
     }
-    const newUsers = { ...users, [details.email.toLowerCase()]: details };
+    const newUser: User = {
+        ...details,
+        createdAt: new Date().toISOString()
+    };
+    const newUsers = { ...users, [details.email.toLowerCase()]: newUser };
     await persistUsers(newUsers);
   };
   
-  const updateUser = async (details: NewUser) => {
-    const existingUser = users[details.email.toLowerCase()];
+  const updateUser = async (details: Partial<NewUser> & { email: string }) => {
+    const emailLower = details.email.toLowerCase();
+    const existingUser = users[emailLower];
     if (!existingUser) {
       toast({
         variant: "destructive",
@@ -217,11 +222,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       return;
     }
-    const updatedUser: User = { ...existingUser, ...details };
-    const newUsers = { ...users, [details.email.toLowerCase()]: updatedUser };
+
+    // Create a new object for the updated user
+    const updatedUser: User = {
+      ...existingUser,
+      ...details,
+    };
+
+    // If a new password is not provided, keep the old one
+    if (!details.password) {
+      updatedUser.password = existingUser.password;
+    }
+
+    const newUsers = { ...users, [emailLower]: updatedUser };
     await persistUsers(newUsers);
 
-    if (user?.email === details.email) {
+    if (user?.email === emailLower) {
       setUser(updatedUser);
       sessionStorage.setItem('user', JSON.stringify(updatedUser));
     }
