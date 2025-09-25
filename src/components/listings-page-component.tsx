@@ -227,7 +227,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
 function DownloadBar() {
     const { user } = useAuth();
     const { toast } = useToast();
-    const { selectedForDownload, logDownload, clearSelectedForDownload, logAcknowledgment, downloadAcknowledgments } = useData();
+    const { selectedForDownload, logDownload, clearSelectedForDownload, downloadAcknowledgments } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isTermsOpen, setIsTermsOpen] = useState(false);
 
@@ -244,7 +244,6 @@ function DownloadBar() {
     }
     
     const onTermsAccept = () => {
-        if(user?.email) logAcknowledgment(user.email);
         setIsTermsOpen(false);
         proceedWithDownload();
     };
@@ -402,7 +401,7 @@ export function ListingsPage() {
     }, 3000);
 
     return () => clearInterval(intervalId);
-  }, [searchPlaceholders.length]);
+  }, []);
 
 
  useEffect(() => {
@@ -651,7 +650,7 @@ export function ListingsPage() {
                         Download up to 5 listings at once!
                     </AlertTitle>
                     <AlertDescription className="text-primary/80 mt-2 space-y-3">
-                        <p>Select your favorite listings to instantly <strong className="text-primary">download</strong> their key details. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
+                        <p>Select your favorite listings to instantly download their key details. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
                         <Button onClick={handleLogDemandClick}>
                             <ClipboardPlus className="mr-2 h-4 w-4" /> Log Your Demand
                         </Button>

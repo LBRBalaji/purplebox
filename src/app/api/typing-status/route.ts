@@ -1,6 +1,5 @@
 
 import { NextResponse } from 'next/server';
-import typingStatus from '@/data/typing-status.json';
 import fs from 'fs';
 import path from 'path';
 
@@ -10,6 +9,7 @@ const headers = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json',
 };
 
 export async function OPTIONS() {
@@ -18,15 +18,21 @@ export async function OPTIONS() {
 
 export async function GET() {
   try {
-    const data = fs.readFileSync(dataFilePath, 'utf-8');
-    return NextResponse.json(JSON.parse(data), { headers });
-  } catch (error) {
-    // If the file doesn't exist or is empty, return an empty object
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      return NextResponse.json({}, { headers });
+    if (!fs.existsSync(dataFilePath)) {
+      return new NextResponse('{}', { status: 200, headers });
     }
-    console.error('Failed to read typing status data:', error);
-    return NextResponse.json({ message: 'Failed to read typing status' }, { status: 500, headers });
+    const readStream = fs.createReadStream(dataFilePath, { encoding: 'utf8' });
+    const webStream = new ReadableStream({
+      start(controller) {
+        readStream.on('data', (chunk) => controller.enqueue(chunk));
+        readStream.on('end', () => controller.close());
+        readStream.on('error', (err) => controller.error(err));
+      },
+    });
+    return new NextResponse(webStream, { status: 200, headers });
+  } catch (error) {
+     console.error('Failed to read typing status data:', error);
+     return NextResponse.json({ message: 'Failed to read typing status' }, { status: 500, headers });
   }
 }
 
