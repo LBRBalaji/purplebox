@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown, AlertTriangle, History, Info, Edit } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown, AlertTriangle, History, Info, Edit, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, TableFooter } from './ui/table';
 import { Textarea } from './ui/textarea';
@@ -158,15 +158,15 @@ const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; contr
 };
 
 
-const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: number, type: 'customer' | 'provider' | 'facilitator', disabled: boolean }) => {
+const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: number, type: 'customer' | 'provider', disabled: boolean }) => {
     const { control } = useFormContext<NegotiationBoardSchema>();
-    const name = `sessions.${sessionIndex}.${type}Attendees` as const;
-    const { fields, append, remove } = useFieldArray({ name, control });
+    const name = `${type}Attendees` as 'customerAttendees' | 'providerAttendees';
+    const path = `sessions.${sessionIndex}.${name}`;
+    const { fields, append, remove } = useFieldArray({ name: path, control });
 
     const titleMap = {
         customer: 'Customer Represented By',
         provider: 'Provider Represented By',
-        facilitator: 'Transaction Facilitated By'
     };
 
     return (
@@ -174,8 +174,8 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
             <FormLabel>{titleMap[type]}</FormLabel>
             {fields.map((item, index) => (
                 <div key={item.id} className="flex items-center gap-2">
-                    <FormField control={control} name={`${name}.${index}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={disabled}/>} />
-                    <FormField control={control} name={`${name}.${index}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={disabled}/>} />
+                    <FormField control={control} name={`${path}.${index}.name`} render={({field}) => <Input placeholder="Name" {...field} value={field.value ?? ''} disabled={disabled}/>} />
+                    <FormField control={control} name={`${path}.${index}.title`} render={({field}) => <Input placeholder="Title" {...field} value={field.value ?? ''} disabled={disabled}/>} />
                     <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} disabled={disabled} className="no-print"><Trash2 className="w-4 h-4 text-destructive"/></Button>
                 </div>
             ))}
@@ -185,9 +185,11 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 };
 
 
-const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any }) => {
+const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any, lead: RegisteredLead }) => {
     const { control, watch, setValue, getValues } = useFormContext<NegotiationBoardSchema>();
-    const { user } = useAuth();
+    const { user, users } = useAuth();
+    const { addAgentToLead } = useData();
+
     const sessionPath = `sessions.${sessionIndex}`;
     const { fields, append, remove } = useFieldArray({ name: `${sessionPath}.sections`, control });
 
@@ -219,6 +221,9 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
         setValue(`${sessionPath}.sections`, sections);
     }
     
+    const allAgents = Object.values(users).filter(u => u.role === 'Agent');
+    const agentUser = lead.agentId ? users[lead.agentId] : null;
+
     return (
         <Card className="bg-secondary/30">
             <Collapsible defaultOpen={sessionIndex === watch('sessions').length - 1}>
@@ -240,7 +245,31 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form }: { session
                             
                             <AttendeeSection sessionIndex={sessionIndex} type="customer" disabled={!canEdit} />
                             <AttendeeSection sessionIndex={sessionIndex} type="provider" disabled={!canEdit} />
-                            <AttendeeSection sessionIndex={sessionIndex} type="facilitator" disabled={!canEdit} />
+
+                            <div className="space-y-2">
+                                <FormLabel>Transaction Facilitated By</FormLabel>
+                                {agentUser ? (
+                                    <div className="p-3 bg-muted rounded-md text-sm">
+                                        <p className="font-semibold">{agentUser.userName}</p>
+                                        <p className="text-xs text-muted-foreground">{agentUser.companyName}</p>
+                                    </div>
+                                ) : (
+                                    <Select onValueChange={(agentEmail) => addAgentToLead(lead.id, agentEmail)} disabled={!canEdit}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select an agent to facilitate..." />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {allAgents.map(agent => (
+                                                <SelectItem key={agent.email} value={agent.email}>
+                                                    {agent.userName} ({agent.companyName})
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                            </div>
                         </div>
 
                          <div className="space-y-6">
@@ -323,11 +352,10 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                 customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
                 providerAttendees: [],
                 facilitatorAttendees: [],
-                sections: defaultSections,
              };
              form.reset({
                 ...form.getValues(),
-                sessions: [defaultSession]
+                sessions: [defaultSession] as any
             });
         }
     }, [lead.id, primaryListing, getNegotiationBoard, form, lead.leadContact]);
@@ -388,7 +416,7 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                                 <FileSymlink className="mr-2 h-4 w-4" />
                                                 Generate Follow-up
                                             </Button>
-                                            <Button type="button" onClick={() => appendSession({ date: new Date().toISOString() })}>
+                                            <Button type="button" onClick={() => appendSession({ date: new Date().toISOString(), customerAttendees:[], providerAttendees:[], facilitatorAttendees:[], sections:[] })}>
                                                 <Calendar className="mr-2 h-4 w-4"/>
                                                 Add Session
                                             </Button>
@@ -405,6 +433,7 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                     onRemove={() => removeSession(index)}
                                     canEdit={canEdit}
                                     form={form}
+                                    lead={lead}
                                 />
                             ))}
                         </CardContent>

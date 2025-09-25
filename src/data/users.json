@@ -75,15 +75,6 @@
     "phone": "7890123456",
     "createdAt": "2025-09-08T10:07:00.000Z"
   },
-  "mlakshmibalaji@gmail.com": {
-    "email": "mlakshmibalaji@gmail.com",
-    "companyName": "Lakshmi Balaji Realty Private Limited",
-    "userName": "Subbulakshmi",
-    "phone": "9363598170",
-    "role": "Agent",
-    "plan": "Paid_Premium",
-    "createdAt": "2025-09-08T08:14:26.605Z"
-  },
   "betacustomer2@o2o.com": {
     "email": "betacustomer2@o2o.com",
     "companyName": "Beta Retail",
@@ -359,6 +350,15 @@
     "userName": "Balachandar",
     "phone": "+91 9841098170",
     "role": "User",
+    "plan": "Paid_Premium",
+    "isCompanyAdmin": true
+  },
+  "balaji@lakshmibalajirealty.com": {
+    "email": "balaji@lakshmibalajirealty.com",
+    "companyName": "Lakshmi Balaji Realty Private Limited",
+    "userName": "Balaji ARAM VALARTHA SUNDARAM",
+    "phone": "+91 9841098170",
+    "role": "Agent",
     "plan": "Paid_Premium",
     "isCompanyAdmin": true
   }
