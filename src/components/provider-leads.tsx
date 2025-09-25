@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -6,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2, Clock, HelpCircle, UserPlus } from 'lucide-react';
+import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2, Clock, HelpCircle, UserPlus, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus, ListingSchema, RegisteredLeadProperty } from '@/contexts/data-context';
@@ -33,12 +32,65 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const statusConfig: { [key in RegisteredLeadStatus]: { text: string; color: string, icon: React.ElementType } } = {
   Pending: { text: 'Pending', color: 'text-amber-600', icon: Clock },
   Acknowledged: { text: 'Acknowledged', color: 'text-green-600', icon: Check },
   Rejected: { text: 'Rejected', color: 'text-red-600', icon: X },
 };
+
+function AdvancedSearch({ allProviders, allCustomers, onFilterChange }: { allProviders: User[], allCustomers: User[], onFilterChange: (filters: any) => void }) {
+    const [keyword, setKeyword] = React.useState('');
+    const [provider, setProvider] = React.useState('all');
+    const [customer, setCustomer] = React.useState('all');
+    const [status, setStatus] = React.useState<RegisteredLeadStatus | 'all'>('all');
+
+    const handleFilter = () => {
+        onFilterChange({ keyword, provider, customer, status });
+    };
+
+    return (
+        <Card className="mb-6">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Search className="h-5 w-5" /> Advanced Search</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <Input 
+                    placeholder="Search Lead ID, Name, Summary..."
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                    className="lg:col-span-2"
+                />
+                 <Select value={provider} onValueChange={setProvider}>
+                    <SelectTrigger><SelectValue placeholder="Filter by Provider..." /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Providers</SelectItem>
+                        {allProviders.map(p => <SelectItem key={p.email} value={p.email}>{p.companyName}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+                <Select value={customer} onValueChange={setCustomer}>
+                    <SelectTrigger><SelectValue placeholder="Filter by Customer..." /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Customers</SelectItem>
+                        {allCustomers.map(c => <SelectItem key={c.email} value={c.email}>{c.companyName}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+                 <Select value={status} onValueChange={(v) => setStatus(v as any)}>
+                    <SelectTrigger><SelectValue placeholder="Filter by Status..." /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Acknowledged">Acknowledged</SelectItem>
+                        <SelectItem value="Rejected">Rejected</SelectItem>
+                    </SelectContent>
+                </Select>
+                 <Button onClick={handleFilter} className="w-full">Apply Filters</Button>
+            </CardContent>
+        </Card>
+    )
+}
 
 export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'broking' }) {
   const { user, users, isLoading: isAuthLoading } = useAuth();
@@ -48,6 +100,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
 
   const [leadToAcknowledge, setLeadToAcknowledge] = React.useState<RegisteredLead | null>(null);
   const [isAcknowledgeDialogOpen, setIsAcknowledgeDialogOpen] = React.useState(false);
+  const [filters, setFilters] = React.useState<any>({});
   
   const isAgent = user?.role === 'Agent';
   const isAdminOrO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
@@ -56,22 +109,45 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
   const myLeads = React.useMemo(() => {
     if (!user) return [];
 
+    let baseLeads: RegisteredLead[] = [];
+
     if (isAdminOrO2O) {
       if (view === 'broking') {
-        return registeredLeads.filter(lead => lead.isO2OCollaborator);
+        baseLeads = registeredLeads.filter(lead => lead.isO2OCollaborator);
+      } else {
+        baseLeads = registeredLeads; 
       }
-      return registeredLeads; // Show all leads for default admin view
+    } else if (isAgent) {
+      baseLeads = registeredLeads.filter(lead => lead.registeredBy === user.email);
+    } else {
+      baseLeads = registeredLeads.filter(lead => 
+        lead.providers.some(p => p.providerEmail === user.email)
+      );
     }
     
-    if (isAgent) {
-        return registeredLeads.filter(lead => lead.registeredBy === user.email);
+    if (Object.keys(filters).length === 0) {
+        return baseLeads;
     }
     
-    // For providers, show direct leads AND brokered leads they are a part of.
-    return registeredLeads.filter(lead => 
-      lead.providers.some(p => p.providerEmail === user.email)
-    );
-  }, [registeredLeads, user, isAgent, isAdminOrO2O, view]);
+    return baseLeads.filter(lead => {
+        if (filters.keyword) {
+            const lowerKeyword = filters.keyword.toLowerCase();
+            const toSearch = [lead.id, lead.leadName, lead.requirementsSummary].join(' ').toLowerCase();
+            if (!toSearch.includes(lowerKeyword)) return false;
+        }
+        if (filters.provider && filters.provider !== 'all' && !lead.providers.some(p => p.providerEmail === filters.provider)) {
+            return false;
+        }
+        if (filters.customer && filters.customer !== 'all' && lead.customerId !== filters.customer) {
+            return false;
+        }
+        if (filters.status && filters.status !== 'all' && !lead.providers.some(p => p.properties.some(prop => prop.status === filters.status))) {
+            return false;
+        }
+        return true;
+    });
+
+  }, [registeredLeads, user, isAgent, isAdminOrO2O, view, filters]);
   
   const handleRegisterWithProvider = (lead: RegisteredLead) => {
     const query = new URLSearchParams();
@@ -96,13 +172,16 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
     setIsAcknowledgeDialogOpen(false);
     setLeadToAcknowledge(null);
   }
+  
+  const allProviders = Object.values(users).filter(u => u.role === 'Warehouse Developer');
+  const allCustomers = Object.values(users).filter(u => u.role === 'User');
 
 
   if (isAuthLoading) {
     return null; // Don't render until auth data is loaded
   }
 
-  if (myLeads.length === 0) {
+  if (myLeads.length === 0 && Object.keys(filters).length === 0) {
     return (
       <div className="mt-8">
         <Card className="text-center p-12">
@@ -128,6 +207,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
   return (
     <>
         <div className="mt-8">
+             {isAdminOrO2O && <AdvancedSearch allProviders={allProviders} allCustomers={allCustomers} onFilterChange={setFilters} />}
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -271,6 +351,11 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                             })}
                         </TableBody>
                     </Table>
+                    {myLeads.length === 0 && (
+                        <div className="text-center p-12 text-muted-foreground">
+                            <p>No leads found matching your search criteria.</p>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>
