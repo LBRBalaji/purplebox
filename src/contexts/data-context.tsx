@@ -564,7 +564,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
     const newActivity: TransactionActivity = {
         ...activityData,
-        activityId: `ACT-${Date.now()}-${Math.random()}`,
+        activityId: `ACT-${activityData.leadId}-${Date.now()}`,
         createdAt: new Date().toISOString(),
     };
 
@@ -1240,3 +1240,5 @@ export function useData() {
   }
   return context;
 }
+
+  
