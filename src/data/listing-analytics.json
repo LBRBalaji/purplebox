@@ -1028,7 +1028,7 @@
   {
     "listingId": "LST-X635SS",
     "views": 11,
-    "downloads": 0,
+    "downloads": 1,
     "customerIndustries": {},
     "viewedBy": [
       {
@@ -1096,6 +1096,15 @@
         "name": "Anonymous",
         "company": "Anonymous",
         "timestamp": 1758620356084
+      }
+    ],
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1758762699648
+        ]
       }
     ]
   },

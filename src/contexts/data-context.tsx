@@ -349,12 +349,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
         console.error("A critical error occurred during data polling", error);
         if (isLoading) setIsLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(fetchData, 5000);
     fetchData(); // Initial fetch
+    const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, [fetchData]);
 
@@ -817,7 +816,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
 
         const newLead: Omit<RegisteredLead, 'registeredAt'> = {
-            id: `LDR-DL-${Date.now()}`,
+            id: `LDR-DL-${now}-${listing.listingId}`,
             customerId: user.email,
             leadName: user.companyName,
             leadContact: user.userName,
@@ -1239,5 +1238,3 @@ export function useData() {
   }
   return context;
 }
-
-    

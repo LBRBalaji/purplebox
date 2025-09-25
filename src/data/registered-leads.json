@@ -1,5 +1,28 @@
 [
   {
+    "id": "LDR-DL-1758762699648",
+    "customerId": "customer1@o2o.com",
+    "leadName": "Alpha Logistics",
+    "leadContact": "Alex Ray",
+    "leadEmail": "customer1@o2o.com",
+    "leadPhone": "2345678901",
+    "requirementsSummary": "Quote requested via download for Property ID: Seemavaram Part-A",
+    "registeredBy": "customer1@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-X635SS",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-25T01:11:39.648Z"
+  },
+  {
     "id": "LDR-DL-1758762152087",
     "customerId": "murugan@xyzlogistics.com",
     "leadName": "XYZ Logistics",

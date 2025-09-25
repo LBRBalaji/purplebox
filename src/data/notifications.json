@@ -1,5 +1,16 @@
 [
   {
+    "id": "notif-1758762699656-admin@kailashlogistics.com-0.579985945713759",
+    "type": "new_lead_for_provider",
+    "title": "New Direct Lead: Alpha Logistics",
+    "message": "A customer has requested a quote for your premium listing(s). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@kailashlogistics.com",
+    "timestamp": "2025-09-25T01:11:39.656Z",
+    "triggeredBy": "customer1@o2o.com",
+    "isRead": false
+  },
+  {
     "id": "notif-1758762152092-admin@indospace.com-0.8232929852743419",
     "type": "new_lead_for_provider",
     "title": "New Direct Lead: XYZ Logistics",
@@ -492,7 +503,7 @@
     "recipientEmail": "customer1@o2o.com",
     "timestamp": "2025-09-23T07:17:33.563Z",
     "triggeredBy": "superadmin@o2o.com",
-    "isRead": false
+    "isRead": true
   },
   {
     "id": "notif-1758611046127-0.1659352465363112",
@@ -503,7 +514,7 @@
     "recipientEmail": "customer1@o2o.com",
     "timestamp": "2025-09-23T07:04:06.127Z",
     "triggeredBy": "superadmin@o2o.com",
-    "isRead": false
+    "isRead": true
   },
   {
     "id": "notif-2025-09-23T07:02:44.458Z-superadmin@o2o.com-0.6005573088217123",
@@ -525,7 +536,7 @@
     "recipientEmail": "customer1@o2o.com",
     "timestamp": "2025-09-23T07:02:44.458Z",
     "triggeredBy": "admin@kailashlogistics.com",
-    "isRead": false
+    "isRead": true
   },
   {
     "id": "notif-1758610765188-admin@kailashlogistics.com-0.5126587426842196",
