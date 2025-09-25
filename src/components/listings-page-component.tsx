@@ -401,7 +401,7 @@ export function ListingsPage() {
     }, 3000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [searchPlaceholders.length]);
 
 
  useEffect(() => {
@@ -649,8 +649,8 @@ export function ListingsPage() {
                         <Info className="h-6 w-6 text-primary/80" />
                         Download up to 5 listings at once!
                     </AlertTitle>
-                    <AlertDescription className="text-primary/80 mt-2 space-y-3">
-                        <p>Select your favorite listings to instantly download their key details. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
+                     <AlertDescription className="text-primary/80 mt-2 space-y-3">
+                        <p>Select your favourite listings to instantly <strong className="font-bold">download</strong> their key details and <strong className="font-bold">Get Commercials</strong> Directly from Developer on your dashboard. For more tailored options, our demand specific warehouse sourcing service is always available.</p>
                         <Button onClick={handleLogDemandClick}>
                             <ClipboardPlus className="mr-2 h-4 w-4" /> Log Your Demand
                         </Button>
