@@ -84,7 +84,7 @@ export default function CommunityAnalyticsPage() {
         const shares = shareHistory || [];
 
         const totalPosts = posts.length;
-        const totalComments = posts.reduce((sum, post) => sum + post.comments.length, 0);
+        const totalComments = posts.reduce((sum, post) => sum + (post.comments?.length || 0), 0);
         const totalShares = shares.length;
 
         const postActivity = groupDataByDay(posts, (post) => new Date(post.createdAt));
@@ -100,8 +100,8 @@ export default function CommunityAnalyticsPage() {
         }));
         
         const topPosts = [...posts].sort((a, b) => {
-            const scoreA = (a.comments.length * 2) + shares.filter(s => s.postId === a.id).length;
-            const scoreB = (b.comments.length * 2) + shares.filter(s => s.postId === b.id).length;
+            const scoreA = (a.comments?.length || 0) * 2 + (shares.filter(s => s.postId === a.id).length || 0);
+            const scoreB = (b.comments?.length || 0) * 2 + (shares.filter(s => s.postId === b.id).length || 0);
             return scoreB - scoreA;
         }).slice(0, 5);
 
@@ -210,7 +210,7 @@ export default function CommunityAnalyticsPage() {
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="text-center">{post.comments.length}</TableCell>
-                                                <TableCell className="text-center">{shareHistory.filter(s => s.postId === post.id).length}</TableCell>
+                                                <TableCell className="text-center">{(shareHistory || []).filter(s => s.postId === post.id).length}</TableCell>
                                             </TableRow>
                                         )
                                     })}
