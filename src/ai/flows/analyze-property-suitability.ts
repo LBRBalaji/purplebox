@@ -1,3 +1,4 @@
+
 // src/ai/flows/analyze-property-suitability.ts
 'use server';
 
@@ -10,6 +11,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
 
 const AnalyzePropertySuitabilityInputSchema = z.object({
@@ -50,6 +52,7 @@ export async function analyzePropertySuitability(
 
 const prompt = ai.definePrompt({
   name: 'analyzePropertySuitabilityPrompt',
+  model: googleAI.model('gemini-1.5-flash:latest'),
   input: {schema: AnalyzePropertySuitabilityInputSchema},
   output: {schema: AnalyzePropertySuitabilityOutputSchema},
   prompt: `You are an AI assistant that analyzes property features against demand criteria.

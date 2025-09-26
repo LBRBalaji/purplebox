@@ -27,7 +27,7 @@ export async function generateListingDescription(input: GenerateListingDescripti
 
 const prompt = ai.definePrompt({
   name: 'generateListingDescriptionPrompt',
-  model: googleAI.model('gemini-1.0-pro'),
+  model: googleAI.model('gemini-1.5-flash:latest'),
   input: {schema: GenerateListingDescriptionInputSchema},
   output: {schema: GenerateListingDescriptionOutputSchema},
   prompt: `You are an expert real estate copywriter specializing in industrial and warehouse properties.
