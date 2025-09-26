@@ -52,49 +52,59 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   
   const isEditMode = !!postToEdit;
   const editorRef = React.useRef<HTMLDivElement>(null);
-  const [editorContent, setEditorContent] = React.useState('');
-
+  
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
     defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
-  
+
   const applyFormat = (command: 'bold' | 'formatBlock' | 'insertHTML', value?: string) => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+
     if (command === 'insertHTML' && value === '<!--more-->') {
         const visualBreak = `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`;
         document.execCommand('insertHTML', false, visualBreak);
-        return;
+    } else {
+        document.execCommand(command, false, value);
     }
-    document.execCommand(command, false, value);
+    // After executing a command, update the form state
+    form.setValue('text', editorRef.current.innerHTML, { shouldValidate: true, shouldDirty: true });
   };
-
+  
   React.useEffect(() => {
-    form.setValue('text', editorContent, { shouldValidate: true });
-  }, [editorContent, form]);
-
-
-  React.useEffect(() => {
-    const initialText = postToEdit?.text || '';
-    const visualText = initialText.replace(/<!--more-->/g, `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`);
-    
-    setEditorContent(visualText);
-    
-    form.reset({
-      id: postToEdit?.id,
-      text: initialText,
-      videoUrl: postToEdit?.videoUrl || '',
-      category: postToEdit?.category || 'Stories',
-    });
-    
-    if (editorRef.current) {
-      editorRef.current.innerHTML = visualText;
+    if (postToEdit) {
+      const initialText = postToEdit.text || '';
+      const visualText = initialText.replace(/<!--more-->/g, `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`);
+      
+      form.reset({
+        id: postToEdit.id,
+        text: initialText,
+        videoUrl: postToEdit.videoUrl || '',
+        category: postToEdit.category || 'Stories',
+      });
+      
+      if (editorRef.current) {
+        editorRef.current.innerHTML = visualText;
+      }
+    } else {
+      form.reset({ text: '', videoUrl: '', category: 'Stories' });
+      if(editorRef.current) editorRef.current.innerHTML = '';
     }
   }, [postToEdit, form]);
+  
+  const handleEditorInput = (e: React.FormEvent<HTMLDivElement>) => {
+      const currentContent = e.currentTarget.innerHTML;
+      // Convert the visual break back to the comment for storing in the form state
+      const machineReadableContent = currentContent.replace(/<div class="page-break.*?<\/div>/g, '<!--more-->');
+      form.setValue('text', machineReadableContent, { shouldValidate: true, shouldDirty: true });
+  };
 
   const onSubmit = (data: CreatePostValues) => {
     if (!user) return;
-
-    const finalContent = editorContent.replace(/<div class="page-break.*?<\/div>/g, '<!--more-->');
+    
+    // The text from the form already has the correct format thanks to handleEditorInput
+    const finalContent = data.text;
     
     if (isEditMode && data.id) {
         const updatedPost: CommunityPost = {
@@ -118,7 +128,6 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
     }
     
     form.reset();
-    setEditorContent('');
     if (editorRef.current) editorRef.current.innerHTML = '';
     onFinished();
   };
@@ -139,7 +148,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
             <FormField
               control={form.control}
               name="text"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                    <div className="flex items-center gap-2 p-2 border-b">
                         <FormatButton onClick={() => applyFormat('bold')}><Bold className="h-4 w-4" /></FormatButton>
@@ -153,9 +162,9 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                     <div
                       ref={editorRef}
                       contentEditable
-                      onInput={e => setEditorContent(e.currentTarget.innerHTML)}
+                      onInput={handleEditorInput}
                       className="prose dark:prose-invert max-w-none min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      dangerouslySetInnerHTML={{ __html: editorContent }}
+                      dangerouslySetInnerHTML={{ __html: postToEdit?.text.replace(/<!--more-->/g, `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`) || '' }}
                     />
                   </FormControl>
                 </FormItem>
@@ -179,7 +188,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
               render={({ field }) => (
                 <FormItem>
                    <FormLabel>Category</FormLabel>
-                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a category" />
@@ -578,3 +587,5 @@ export default function CommunityPage() {
         </div>
     )
 }
+
+    
