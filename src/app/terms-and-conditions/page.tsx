@@ -73,7 +73,21 @@ export default function TermsAndConditionsPage() {
                 </ul>
             </Section>
 
-            <Section title="7. Limitation of Liability">
+            <Section title="7. Community Hub Conduct">
+                <p>The Community Hub is provided as a forum for professional discussion related to real estate, logistics, and platform features. By participating in the Community Hub, you agree to the following:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong className="font-semibold text-foreground">Stay on Topic:</strong> All posts and comments should be relevant to the professional nature of the platform. Do not post content regarding personal matters.</li>
+                    <li><strong className="font-semibold text-foreground">Be Respectful:</strong> Do not post content that is obscene, defamatory, hateful, harassing, discriminatory, or threatening.</li>
+                    <li><strong className="font-semibold text-foreground">No Solicitation:</strong> Do not post spam, advertisements, or solicitations for external services.</li>
+                    <li><strong className="font-semibold text-foreground">Intellectual Property:</strong> Respect copyright and intellectual property laws. Only share content that you have the right to share.</li>
+                </ul>
+            </Section>
+            
+            <Section title="8. Right to Moderate and Block Users">
+                <p>The Company reserves the right, at its sole discretion, to review, moderate, or remove any content posted on the platform, including in the Community Hub, that it deems to be in violation of these Terms. Furthermore, we reserve the right to suspend, restrict, or permanently block any user's access to the Service for any violation of these Terms and Conditions, without prior notice.</p>
+            </Section>
+
+            <Section title="9. Limitation of Liability">
                 <p className="font-semibold uppercase text-foreground">TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL LAKSHMI BALAJI REALTY, LAKSHMI BALAJI ORS, LAKSHMI BALAJI O2O, OR ANY OF ITS ALLIED ENTITIES, PROMOTERS, DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES (COLLECTIVELY, "THE COMPANY PARTIES") BE LIABLE FOR ANY INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE LOSSES, THAT RESULT FROM THE USE OF, OR INABILITY TO USE, THIS SERVICE.</p>
                 <p>UNDER NO CIRCUMSTANCES WILL THE COMPANY PARTIES BE RESPONSIBLE FOR ANY DAMAGE, LOSS, OR INJURY RESULTING FROM:</p>
                 <ul className="list-disc pl-5 space-y-1">
@@ -87,20 +101,20 @@ export default function TermsAndConditionsPage() {
                 <p>THIS LIMITATION OF LIABILITY SECTION APPLIES WHETHER THE ALLEGED LIABILITY IS BASED ON CONTRACT, TORT, NEGLIGENCE, STRICT LIABILITY, OR ANY OTHER BASIS, EVEN IF THE COMPANY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
             </Section>
 
-            <Section title="8. Intellectual Property">
+            <Section title="10. Intellectual Property">
                 <p>The Service and its original content, features, and functionality are and will remain the exclusive property of LAKSHMI BALAJI O2O and its licensors. The Service is protected by copyright, trademark, and other laws of both India and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of LAKSHMI BALAJI O2O.</p>
             </Section>
 
-            <Section title="9. Governing Law">
+            <Section title="11. Governing Law">
                 <p>These Terms shall be governed and construed in accordance with the laws of India, without regard to its conflict of law provisions. The courts in Chennai, Tamil Nadu, shall have exclusive jurisdiction over any dispute arising out of or in connection with these Terms.</p>
             </Section>
 
-            <Section title="10. Changes to Terms">
+            <Section title="12. Changes to Terms">
                 <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days’ notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.</p>
                 <p>By continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms.</p>
             </Section>
 
-            <Section title="11. Contact Us">
+            <Section title="13. Contact Us">
                  <p>If you have any questions about these Terms, please contact us at balaji@lakshmibalajio2o.com</p>
             </Section>
           </CardContent>
@@ -109,4 +123,3 @@ export default function TermsAndConditionsPage() {
     </main>
   );
 }
-
