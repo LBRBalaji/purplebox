@@ -32,7 +32,6 @@ import { useSearchParams } from 'next/navigation';
 import { useEditor, EditorContent, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Heading from '@tiptap/extension-heading'
-import { findRelevantPosts } from '@/ai/flows/find-relevant-posts';
 import { useDebounce } from 'use-debounce';
 
 
@@ -420,17 +419,14 @@ const EditableImage = ({ src, onImageChange, alt, hint, isAdmin, className = 'w-
 export default function CommunityPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading, deleteCommunityPost } = useData();
-    const { toast } = useToast();
     const searchParams = useSearchParams();
 
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
     const [editingPost, setEditingPost] = React.useState<CommunityPost | null>(null);
     const [isFormVisible, setIsFormVisible] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState('');
-    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
     const [activeTab, setActiveTab] = React.useState(searchParams.get('tab') || 'home');
-    const [isSearching, setIsSearching] = React.useState(false);
-    const [searchResults, setSearchResults] = React.useState<CommunityPost[] | null>(null);
 
     const isLoading = isAuthLoading || isDataLoading;
     const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
@@ -441,36 +437,6 @@ export default function CommunityPage() {
             setActiveTab(tab);
         }
     }, [searchParams]);
-    
-    React.useEffect(() => {
-      const performSearch = async () => {
-        if (debouncedSearchTerm.trim().length > 2) {
-          setIsSearching(true);
-          try {
-            const result = await findRelevantPosts({
-              query: debouncedSearchTerm,
-              posts: communityPosts,
-            });
-            setSearchResults(result.relevantPosts || []);
-          } catch (error) {
-            console.error("AI search failed:", error);
-            toast({
-              variant: 'destructive',
-              title: 'Search Error',
-              description: 'Could not perform AI-powered search.',
-            });
-            setSearchResults(null); // Fallback to keyword search could be implemented here
-          } finally {
-            setIsSearching(false);
-          }
-        } else {
-          setSearchResults(null);
-        }
-      };
-
-      performSearch();
-    }, [debouncedSearchTerm, communityPosts, toast]);
-
 
     const handleImageChange = (key: keyof typeof aboutUsContent) => (newSrc: string) => {
         if (aboutUsContent) {
@@ -486,7 +452,6 @@ export default function CommunityPage() {
     
     const handleDeletePost = (postId: string) => {
       deleteCommunityPost(postId);
-      toast({ title: "Post Deleted", description: "The post has been permanently removed." });
     };
 
     const handleFormFinished = () => {
@@ -503,14 +468,23 @@ export default function CommunityPage() {
     }, [communityPosts]);
     
     const displayedPosts = React.useMemo(() => {
-        if (searchResults) {
-            const stories = searchResults.filter(p => p.category === 'Stories');
-            const learn = searchResults.filter(p => p.category === 'Learn');
-            const events = searchResults.filter(p => p.category === 'Events');
-            return { stories, learn, events };
+        if (!debouncedSearchTerm.trim()) {
+            return categorizedPosts;
         }
-        return categorizedPosts;
-    }, [searchResults, categorizedPosts]);
+        
+        const lowerCaseSearch = debouncedSearchTerm.toLowerCase();
+        
+        const filterPosts = (posts: CommunityPost[]) => posts.filter(post => 
+            post.text.toLowerCase().includes(lowerCaseSearch) ||
+            post.authorName.toLowerCase().includes(lowerCaseSearch)
+        );
+
+        return {
+            stories: filterPosts(categorizedPosts.stories),
+            learn: filterPosts(categorizedPosts.learn),
+            events: filterPosts(categorizedPosts.events),
+        };
+    }, [debouncedSearchTerm, categorizedPosts]);
 
 
     if (isLoading) {
@@ -532,15 +506,14 @@ export default function CommunityPage() {
     }
 
     const renderPostGrid = (posts: CommunityPost[], emptyTitle: string, emptyDescription: string) => {
-        const showNoResults = (searchTerm && !isSearching && posts.length === 0);
+        const showNoResults = (searchTerm && posts.length === 0);
         
         return (
             <div className="space-y-6">
                 <div className="relative max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    {isSearching && <Sparkles className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary animate-pulse" />}
                     <Input 
-                        placeholder="Ask a question or search posts..."
+                        placeholder="Search by keyword or author..."
                         className="pl-9"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -553,7 +526,7 @@ export default function CommunityPage() {
                 ) : (
                     <Card className="text-center p-12">
                         <CardTitle>{showNoResults ? 'No Results Found' : emptyTitle}</CardTitle>
-                        <CardDescription>{showNoResults ? `Your search for "${searchTerm}" did not return any relevant posts.` : emptyDescription}</CardDescription>
+                        <CardDescription>{showNoResults ? `Your search for "${searchTerm}" did not return any posts.` : emptyDescription}</CardDescription>
                     </Card>
                 )}
             </div>
@@ -676,6 +649,3 @@ export default function CommunityPage() {
         </>
     )
 }
-
-
-    

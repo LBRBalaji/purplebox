@@ -8,9 +8,7 @@
  * - FindRelevantPostsOutput - The return type for the findRelevantPosts function.
  */
 
-import {ai} from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/googleai';
-import {z} from 'genkit';
+import {z} from 'zod';
 import { communityPostSchema } from '@/lib/schema';
 import type { CommunityPost } from '@/lib/schema';
 
@@ -29,41 +27,40 @@ export type FindRelevantPostsOutput = z.infer<typeof FindRelevantPostsOutputSche
 
 
 export async function findRelevantPosts(input: FindRelevantPostsInput): Promise<FindRelevantPostsOutput> {
-  return findRelevantPostsFlow(input);
+  const { query, posts } = input;
+  const lowerCaseQuery = query.toLowerCase();
+
+  const scoredPosts = posts.map(post => {
+    let score = 0;
+    const postText = (post.text || '').toLowerCase();
+    const authorName = (post.authorName || '').toLowerCase();
+    
+    if (postText.includes(lowerCaseQuery)) {
+      score += 10;
+    }
+    if (authorName.includes(lowerCaseQuery)) {
+      score += 5;
+    }
+
+    const queryWords = new Set(lowerCaseQuery.split(/\s+/).filter(w => w.length > 2));
+    const postWords = new Set(postText.split(/\s+/));
+    
+    let keywordMatches = 0;
+    queryWords.forEach(word => {
+        if (postWords.has(word)) {
+            keywordMatches++;
+        }
+    });
+
+    score += keywordMatches;
+    
+    return { post, score };
+  });
+
+  const relevantPosts = scoredPosts
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.post);
+    
+  return { relevantPosts };
 }
-
-
-const prompt = ai.definePrompt({
-  name: 'findRelevantPostsPrompt',
-  model: googleAI.model('gemini-1.0-pro'),
-  input: {schema: FindRelevantPostsInputSchema},
-  output: {schema: FindRelevantPostsOutputSchema},
-  prompt: `You are an intelligent search assistant for a real estate platform's community hub.
-  Your task is to analyze a user's search query and a list of community posts, and then return the posts that are most relevant to the query.
-  The query might be a direct question or keywords. Your goal is to understand the user's *intent* and find the post(s) that best answer or address it.
-
-  User Query:
-  "{{{query}}}"
-
-  Available Posts (JSON format):
-  {{{json posts}}}
-
-  Instructions:
-  1.  Read the user's query carefully to understand what they are looking for.
-  2.  Analyze the content of each post (the 'text' field is most important).
-  3.  Determine which posts are the most relevant to the user's query.
-  4.  Return an array of the relevant post objects, sorted from most relevant to least relevant. If no posts are relevant, return an empty array.
-  `,
-});
-
-const findRelevantPostsFlow = ai.defineFlow(
-  {
-    name: 'findRelevantPostsFlow',
-    inputSchema: FindRelevantPostsInputSchema,
-    outputSchema: FindRelevantPostsOutputSchema,
-  },
-  async (input) => {
-    const {output} = await prompt(input);
-    return output!;
-  }
-);

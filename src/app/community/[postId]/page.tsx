@@ -21,7 +21,6 @@ import { LoginDialog } from '@/components/login-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { CommunityPost } from '@/lib/schema';
-import { findRelevantPosts } from '@/ai/flows/find-relevant-posts';
 
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -132,7 +131,6 @@ export default function CommunityPostPage() {
     const [comment, setComment] = React.useState('');
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
     const [relevantPosts, setRelevantPosts] = React.useState<CommunityPost[]>([]);
-    const [isFetchingRelevant, setIsFetchingRelevant] = React.useState(false);
 
     const post = React.useMemo(() => {
         return communityPosts.find(p => p.id === postId);
@@ -140,28 +138,30 @@ export default function CommunityPostPage() {
     
     const isLoading = isAuthLoading || isDataLoading;
 
-    const fetchRelevant = React.useCallback(async () => {
-      if (post && communityPosts.length > 1) {
-        setIsFetchingRelevant(true);
-        try {
-          const otherPosts = communityPosts.filter((p) => p.id !== post.id);
-          const result = await findRelevantPosts({
-            query: post.text.substring(0, 500), // Use first 500 chars as query
-            posts: otherPosts,
-          });
-          // Take top 3 results
-          setRelevantPosts(result.relevantPosts.slice(0, 3));
-        } catch (error) {
-          console.error('Failed to fetch relevant posts:', error);
-        } finally {
-          setIsFetchingRelevant(false);
+    const findRelevant = React.useCallback(() => {
+        if (post && communityPosts.length > 1) {
+            const otherPosts = communityPosts.filter(p => p.id !== post.id);
+            const postKeywords = post.text.toLowerCase().split(/\s+/).slice(0, 20); // Get first 20 words as keywords
+
+            const scoredPosts = otherPosts.map(otherPost => {
+                let score = 0;
+                const otherPostText = otherPost.text.toLowerCase();
+                postKeywords.forEach(keyword => {
+                    if (otherPostText.includes(keyword)) {
+                        score++;
+                    }
+                });
+                return { post: otherPost, score };
+            });
+
+            const sortedPosts = scoredPosts.sort((a, b) => b.score - a.score);
+            setRelevantPosts(sortedPosts.slice(0, 3).map(p => p.post));
         }
-      }
     }, [post, communityPosts]);
 
-     React.useEffect(() => {
-        fetchRelevant();
-    }, [fetchRelevant]);
+    React.useEffect(() => {
+        findRelevant();
+    }, [findRelevant]);
 
     if (isLoading) {
         return (
