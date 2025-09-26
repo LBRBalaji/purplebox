@@ -67,6 +67,22 @@ export default function AnalyticsHubPage() {
                             </CardHeader>
                         </Card>
                     </Link>
+                     <Link href="/dashboard/analytics/community" className="group">
+                        <Card className="h-full hover:border-primary transition-colors">
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Users className="text-primary" />
+                                        Community Analytics
+                                    </CardTitle>
+                                    <CardDescription className="mt-2">
+                                        Monitor community engagement, top posts, and user contributions.
+                                    </CardDescription>
+                                </div>
+                                 <ArrowRight className="text-muted-foreground group-hover:translate-x-1 transition-transform"/>
+                            </CardHeader>
+                        </Card>
+                    </Link>
                      <Link href="/dashboard/analytics/predictive" className="group">
                         <Card className="h-full hover:border-primary transition-colors bg-primary/5">
                             <CardHeader className="flex flex-row items-center justify-between">

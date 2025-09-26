@@ -99,6 +99,7 @@ const AnalyticsDropdown = () => {
                 <DropdownMenuItem asChild><Link href="/dashboard/analytics/listings-performance">Listing Performance</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/dashboard/analytics/customer">Customer Engagement</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/dashboard/analytics/traffic">Platform Traffic</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/analytics/community">Community Analytics</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link href="/dashboard/analytics/predictive">
@@ -129,6 +130,7 @@ const ManageDropdown = ({ isSuperAdmin }: { isSuperAdmin: boolean }) => {
                 <DropdownMenuItem asChild><Link href="/dashboard/settings"><Settings className="mr-2 h-4 w-4" /> Platform Settings</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link href="/dashboard/transactions"><Briefcase className="mr-2 h-4 w-4" /> Broking Transactions</Link></DropdownMenuItem>
+                 <DropdownMenuItem asChild><Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" /> Platform Oversight</Link></DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
@@ -216,10 +218,10 @@ export function Header() {
                     </div>
                 ) : (
                     <>
-                        {user && (
+                        {user && !isSuperAdmin && (
                             <NavLink href="/dashboard">
                                 <LayoutDashboard className="h-4 w-4" /> 
-                                {isSuperAdmin ? 'Platform Oversight' : 'Dashboard'}
+                                Dashboard
                             </NavLink>
                         )}
                         <ListingsDropdown />
