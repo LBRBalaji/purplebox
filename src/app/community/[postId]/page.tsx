@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn, Lock, Headphones, Share, Mail, Linkedin, Twitter, Facebook } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn, Lock, Headphones, Share, Mail, Linkedin, Twitter, Facebook, Sparkles, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -21,6 +21,7 @@ import { LoginDialog } from '@/components/login-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { CommunityPost } from '@/lib/schema';
+import { findRelevantPosts } from '@/ai/flows/find-relevant-posts';
 
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -103,6 +104,25 @@ function ShareDropdown({ post }: { post: CommunityPost }) {
     );
 }
 
+const RelevantPostCard = ({ post }: { post: CommunityPost }) => {
+    const summary = post.text.replace(/<[^>]+>/g, '').substring(0, 80) + '...';
+    return (
+        <Card className="flex flex-col">
+            <CardHeader>
+                <CardTitle className="text-base line-clamp-2">{post.text.match(/<h[1-6]>(.*?)<\/h[1-6]>/)?.[1] || summary}</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-grow">
+                 <p className="text-xs text-muted-foreground">{summary}</p>
+            </CardContent>
+            <CardFooter>
+                 <Button asChild variant="secondary" size="sm" className="w-full">
+                    <Link href={`/community/${post.id}`}>Read Post <ArrowRight className="ml-2 h-4 w-4"/></Link>
+                </Button>
+            </CardFooter>
+        </Card>
+    )
+}
+
 export default function CommunityPostPage() {
     const { postId } = useParams();
     const router = useRouter();
@@ -111,12 +131,36 @@ export default function CommunityPostPage() {
     const { toast } = useToast();
     const [comment, setComment] = React.useState('');
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
+    const [relevantPosts, setRelevantPosts] = React.useState<CommunityPost[]>([]);
+    const [isFetchingRelevant, setIsFetchingRelevant] = React.useState(false);
 
     const post = React.useMemo(() => {
         return communityPosts.find(p => p.id === postId);
     }, [communityPosts, postId]);
     
     const isLoading = isAuthLoading || isDataLoading;
+
+     React.useEffect(() => {
+        if (post && communityPosts.length > 1) {
+            const fetchRelevant = async () => {
+                setIsFetchingRelevant(true);
+                try {
+                    const otherPosts = communityPosts.filter(p => p.id !== post.id);
+                    const result = await findRelevantPosts({
+                        query: post.text.substring(0, 500), // Use first 500 chars as query
+                        posts: otherPosts,
+                    });
+                    // Take top 3 results
+                    setRelevantPosts(result.relevantPosts.slice(0, 3));
+                } catch (error) {
+                    console.error("Failed to fetch relevant posts:", error);
+                } finally {
+                    setIsFetchingRelevant(false);
+                }
+            };
+            fetchRelevant();
+        }
+    }, [post, communityPosts]);
 
     if (isLoading) {
         return (
@@ -180,7 +224,7 @@ export default function CommunityPostPage() {
 
     return (
         <>
-        <main className="container mx-auto p-4 md:p-8 max-w-4xl">
+        <main className="container mx-auto p-4 md:p-8 max-w-4xl space-y-8">
              <Button asChild variant="ghost" className="mb-6">
                 <Link href={backLink}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
@@ -298,6 +342,20 @@ export default function CommunityPostPage() {
                         </CardFooter>
                 </Card>
             )}
+
+            {relevantPosts.length > 0 && (
+                <section>
+                    <h2 className="text-2xl font-bold font-headline tracking-tight mb-6 flex items-center gap-2">
+                        <Sparkles className="h-6 w-6 text-primary" /> You Might Also Like
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {relevantPosts.map(p => (
+                            <RelevantPostCard key={p.id} post={p} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
         </main>
         <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
         </>
