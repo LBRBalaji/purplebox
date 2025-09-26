@@ -44,17 +44,22 @@ export default function TermsAndConditionsPage() {
                 </ul>
                 <p>You are responsible for safeguarding your account information and for all activities that occur under your account. You agree to provide accurate, current, and complete information during the registration process.</p>
             </Section>
+            
+            <Section title="3. Platform Plans and Feature Availability">
+                <p>The Service may offer different tiers of access and functionality, which may be categorized into plans such as "Standard" (Free) and "Premium" (Paid). The features, tools, and level of access available to you may depend on your subscribed plan.</p>
+                <p>The Company reserves the right, at its sole discretion, to modify, re-categorize, or move any item, feature, or function of the Service between different plans at any time, with or without notice. This includes, but is not limited to, making a previously free feature a part of a paid plan, or vice versa. Your continued use of the Service after any such changes constitutes your acceptance of the new terms and feature distribution.</p>
+            </Section>
 
-            <Section title="3. Data Accuracy and Information Disclaimer">
+            <Section title="4. Data Accuracy and Information Disclaimer">
                 <p>The information provided on the Lakshmi Balaji O2O platform, including but not limited to property listings, specifications, and availability, is provided by third-party Providers. While we strive to ensure the information is current, we do not independently verify the complete accuracy of all data.</p>
                 <p>All users are encouraged to conduct their own due diligence and verify all information independently before entering into any transaction or agreement.</p>
             </Section>
 
-            <Section title="4. Brokerage and Fees">
+            <Section title="5. Brokerage and Fees">
                 <p>By using this Service, you acknowledge and agree that Lakshmi Balaji O2O operates as a real estate brokerage. Standard brokerage fees are applicable for services rendered to both Customers (tenants) and Providers (developers/owners). The specific amount and percentage of brokerage will be determined for each transaction, and users agree to confirm these terms directly with Lakshmi Balaji O2O.</p>
             </Section>
 
-            <Section title="5. Confidentiality and Privacy">
+            <Section title="6. Confidentiality and Privacy">
                 <p>We take the confidentiality of our users' data seriously. As part of our service, we implement measures to protect sensitive information. This includes, but is not limited to:</p>
                  <ul className="list-disc pl-5 space-y-1">
                     <li>Not displaying the exact street address or GPS coordinates of listed properties on public maps. Locations are generalized for privacy.</li>
@@ -63,7 +68,7 @@ export default function TermsAndConditionsPage() {
                 <p>Users agree not to misuse any information obtained from the Service, including attempting to circumvent our confidentiality measures or contacting other users for purposes outside the scope of the Service.</p>
             </Section>
 
-            <Section title="6. User Conduct">
+            <Section title="7. User Conduct">
                 <p>You agree not to use the Service to:</p>
                 <ul className="list-disc pl-5 space-y-1">
                     <li>Post any information that is false, misleading, or inaccurate.</li>
@@ -73,7 +78,7 @@ export default function TermsAndConditionsPage() {
                 </ul>
             </Section>
 
-            <Section title="7. Community Hub Conduct">
+            <Section title="8. Community Hub Conduct">
                 <p>The Community Hub is provided as a forum for professional discussion related to real estate, logistics, and platform features. By participating in the Community Hub, you agree to the following:</p>
                 <ul className="list-disc pl-5 space-y-1">
                     <li><strong className="font-semibold text-foreground">Stay on Topic:</strong> All posts and comments should be relevant to the professional nature of the platform. Do not post content regarding personal matters.</li>
@@ -83,11 +88,11 @@ export default function TermsAndConditionsPage() {
                 </ul>
             </Section>
             
-            <Section title="8. Right to Moderate and Block Users">
+            <Section title="9. Right to Moderate and Block Users">
                 <p>The Company reserves the right, at its sole discretion, to review, moderate, or remove any content posted on the platform, including in the Community Hub, that it deems to be in violation of these Terms. Furthermore, we reserve the right to suspend, restrict, or permanently block any user's access to the Service for any violation of these Terms and Conditions, without prior notice.</p>
             </Section>
 
-            <Section title="9. Limitation of Liability">
+            <Section title="10. Limitation of Liability">
                 <p className="font-semibold uppercase text-foreground">TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL LAKSHMI BALAJI REALTY, LAKSHMI BALAJI ORS, LAKSHMI BALAJI O2O, OR ANY OF ITS ALLIED ENTITIES, PROMOTERS, DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES (COLLECTIVELY, "THE COMPANY PARTIES") BE LIABLE FOR ANY INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE LOSSES, THAT RESULT FROM THE USE OF, OR INABILITY TO USE, THIS SERVICE.</p>
                 <p>UNDER NO CIRCUMSTANCES WILL THE COMPANY PARTIES BE RESPONSIBLE FOR ANY DAMAGE, LOSS, OR INJURY RESULTING FROM:</p>
                 <ul className="list-disc pl-5 space-y-1">
@@ -101,20 +106,20 @@ export default function TermsAndConditionsPage() {
                 <p>THIS LIMITATION OF LIABILITY SECTION APPLIES WHETHER THE ALLEGED LIABILITY IS BASED ON CONTRACT, TORT, NEGLIGENCE, STRICT LIABILITY, OR ANY OTHER BASIS, EVEN IF THE COMPANY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
             </Section>
 
-            <Section title="10. Intellectual Property">
+            <Section title="11. Intellectual Property">
                 <p>The Service and its original content, features, and functionality are and will remain the exclusive property of LAKSHMI BALAJI O2O and its licensors. The Service is protected by copyright, trademark, and other laws of both India and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of LAKSHMI BALAJI O2O.</p>
             </Section>
 
-            <Section title="11. Governing Law">
+            <Section title="12. Governing Law">
                 <p>These Terms shall be governed and construed in accordance with the laws of India, without regard to its conflict of law provisions. The courts in Chennai, Tamil Nadu, shall have exclusive jurisdiction over any dispute arising out of or in connection with these Terms.</p>
             </Section>
 
-            <Section title="12. Changes to Terms">
+            <Section title="13. Changes to Terms">
                 <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days’ notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.</p>
                 <p>By continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms.</p>
             </Section>
 
-            <Section title="13. Contact Us">
+            <Section title="14. Contact Us">
                  <p>If you have any questions about these Terms, please contact us at balaji@lakshmibalajio2o.com</p>
             </Section>
           </CardContent>

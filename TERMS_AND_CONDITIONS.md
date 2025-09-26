@@ -25,17 +25,23 @@ In addition to this platform, our services include, but are not limited to:
 
 You are responsible for safeguarding your account information and for all activities that occur under your account. You agree to provide accurate, current, and complete information during the registration process.
 
-### 3. Data Accuracy and Information Disclaimer
+### 3. Platform Plans and Feature Availability
+
+The Service may offer different tiers of access and functionality, which may be categorized into plans such as "Standard" (Free) and "Premium" (Paid). The features, tools, and level of access available to you may depend on your subscribed plan.
+
+The Company reserves the right, at its sole discretion, to modify, re-categorize, or move any item, feature, or function of the Service between different plans at any time, with or without notice. This includes, but is not limited to, making a previously free feature a part of a paid plan, or vice versa. Your continued use of the Service after any such changes constitutes your acceptance of the new terms and feature distribution.
+
+### 4. Data Accuracy and Information Disclaimer
 
 The information provided on the Lakshmi Balaji O2O platform, including but not limited to property listings, specifications, and availability, is provided by third-party Providers. While we strive to ensure the information is current, we do not independently verify the complete accuracy of all data.
 
 All users are encouraged to conduct their own due diligence and verify all information independently before entering into any transaction or agreement.
 
-### 4. Brokerage and Fees
+### 5. Brokerage and Fees
 
 By using this Service, you acknowledge and agree that Lakshmi Balaji O2O operates as a real estate brokerage. Standard brokerage fees are applicable for services rendered to both Customers (tenants) and Providers (developers/owners). The specific amount and percentage of brokerage will be determined for each transaction, and users agree to confirm these terms directly with Lakshmi Balaji O2O.
 
-### 5. Confidentiality and Privacy
+### 6. Confidentiality and Privacy
 
 We take the confidentiality of our users' data seriously. As part of our service, we implement measures to protect sensitive information. This includes, but is not limited to:
 - Not displaying the exact street address or GPS coordinates of listed properties on public maps. Locations are generalized for privacy.
@@ -43,7 +49,7 @@ We take the confidentiality of our users' data seriously. As part of our service
 
 Users agree not to misuse any information obtained from the Service, including attempting to circumvent our confidentiality measures or contacting other users for purposes outside the scope of the Service.
 
-### 6. User Conduct
+### 7. User Conduct
 
 You agree not to use the Service to:
 - Post any information that is false, misleading, or inaccurate.
@@ -51,7 +57,7 @@ You agree not to use the Service to:
 - Violate any applicable law, statute, ordinance, or regulation.
 - Engage in any activity that is defamatory, trade libelous, unlawfully threatening, or unlawfully harassing.
 
-### 7. Limitation of Liability
+### 8. Limitation of Liability
 
 TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL LAKSHMI BALAJI REALTY, LAKSHMI BALAJI ORS, LAKSHMI BALAJI O2O, OR ANY OF ITS ALLIED ENTITIES, PROMOTERS, DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES (COLLECTIVELY, "THE COMPANY PARTIES") BE LIABLE FOR ANY INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE LOSSES, THAT RESULT FROM THE USE OF, OR INABILITY TO USE, THIS SERVICE.
 
@@ -65,20 +71,20 @@ UNDER NO CIRCUMSTANCES WILL THE COMPANY PARTIES BE RESPONSIBLE FOR ANY DAMAGE, L
 
 THIS LIMITATION OF LIABILITY SECTION APPLIES WHETHER THE ALLEGED LIABILITY IS BASED ON CONTRACT, TORT, NEGLIGENCE, STRICT LIABILITY, OR ANY OTHER BASIS, EVEN IF THE COMPANY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### 8. Intellectual Property
+### 9. Intellectual Property
 
 The Service and its original content, features, and functionality are and will remain the exclusive property of LAKSHMI BALAJI O2O and its licensors. The Service is protected by copyright, trademark, and other laws of both India and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of LAKSHMI BALAJI O2O.
 
-### 9. Governing Law
+### 10. Governing Law
 
 These Terms shall be governed and construed in accordance with the laws of India, without regard to its conflict of law provisions. The courts in Chennai, Tamil Nadu, shall have exclusive jurisdiction over any dispute arising out of or in connection with these Terms.
 
-### 10. Changes to Terms
+### 11. Changes to Terms
 
-We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.
+We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days’ notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.
 
 By continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms.
 
-### 11. Contact Us
+### 12. Contact Us
 
 If you have any questions about these Terms, please contact us at balaji@lakshmibalajio2o.com
