@@ -1,5 +1,34 @@
 [
   {
+    "leadId": "LDR-DL-1758879893271-0.4572376849623483",
+    "activityType": "Proposal Submitted",
+    "details": {
+      "listingId": "LST-8NGG6W",
+      "rentPerSft": 26,
+      "rentalSecurityDeposit": 6,
+      "actualChargeableArea": 210000
+    },
+    "createdBy": "admin@ccidevelopers.com",
+    "activityId": "ACT-LDR-DL-1758879893271-0.4572376849623483-1758880124864-0.9438554519885948",
+    "createdAt": "2025-09-26T09:48:44.864Z"
+  },
+  {
+    "leadId": "LDR-DL-1758879893285-0.9151866550747662",
+    "activityType": "Lead Registered",
+    "details": {},
+    "createdBy": "murugan@xyzlogistics.com",
+    "activityId": "ACT-LDR-DL-1758879893285-0.9151866550747662-1758879893285-0.19960854871543243",
+    "createdAt": "2025-09-26T09:44:53.285Z"
+  },
+  {
+    "leadId": "LDR-DL-1758879893271-0.4572376849623483",
+    "activityType": "Lead Registered",
+    "details": {},
+    "createdBy": "murugan@xyzlogistics.com",
+    "activityId": "ACT-LDR-DL-1758879893271-0.4572376849623483-1758879893285-0.9605041871987674",
+    "createdAt": "2025-09-26T09:44:53.285Z"
+  },
+  {
     "leadId": "LDR-DL-1758762699648",
     "activityType": "Lead Registered",
     "details": {},

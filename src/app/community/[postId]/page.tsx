@@ -140,27 +140,28 @@ export default function CommunityPostPage() {
     
     const isLoading = isAuthLoading || isDataLoading;
 
-     React.useEffect(() => {
-        if (post && communityPosts.length > 1) {
-            const fetchRelevant = async () => {
-                setIsFetchingRelevant(true);
-                try {
-                    const otherPosts = communityPosts.filter(p => p.id !== post.id);
-                    const result = await findRelevantPosts({
-                        query: post.text.substring(0, 500), // Use first 500 chars as query
-                        posts: otherPosts,
-                    });
-                    // Take top 3 results
-                    setRelevantPosts(result.relevantPosts.slice(0, 3));
-                } catch (error) {
-                    console.error("Failed to fetch relevant posts:", error);
-                } finally {
-                    setIsFetchingRelevant(false);
-                }
-            };
-            fetchRelevant();
+    const fetchRelevant = React.useCallback(async () => {
+      if (post && communityPosts.length > 1) {
+        setIsFetchingRelevant(true);
+        try {
+          const otherPosts = communityPosts.filter((p) => p.id !== post.id);
+          const result = await findRelevantPosts({
+            query: post.text.substring(0, 500), // Use first 500 chars as query
+            posts: otherPosts,
+          });
+          // Take top 3 results
+          setRelevantPosts(result.relevantPosts.slice(0, 3));
+        } catch (error) {
+          console.error('Failed to fetch relevant posts:', error);
+        } finally {
+          setIsFetchingRelevant(false);
         }
+      }
     }, [post, communityPosts]);
+
+     React.useEffect(() => {
+        fetchRelevant();
+    }, [fetchRelevant]);
 
     if (isLoading) {
         return (

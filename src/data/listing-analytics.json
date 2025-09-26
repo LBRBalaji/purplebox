@@ -143,7 +143,7 @@
   {
     "listingId": "LST-8NGG6W",
     "views": 1,
-    "downloads": 5,
+    "downloads": 7,
     "customerIndustries": {},
     "downloadedBy": [
       {
@@ -159,6 +159,14 @@
         "timestamps": [
           1758211370639,
           1758211370639
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758879893303,
+          1758879893304
         ]
       }
     ],
@@ -852,12 +860,20 @@
   {
     "listingId": "LST-8KQX5D",
     "views": 0,
-    "downloads": 1,
+    "downloads": 3,
     "customerIndustries": {},
     "downloadedBy": [
       {
         "timestamps": [
           1758211370639
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758879893303,
+          1758879893304
         ]
       }
     ]
