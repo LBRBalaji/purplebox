@@ -76,14 +76,15 @@ export default function CommunityPostPage() {
         }
     }
     
-     const categoryConfig: { [key: string]: { icon: React.ElementType, color: string, label: string } } = {
-        Learn: { icon: BookOpen, color: 'text-blue-600', label: 'Learn' },
-        Events: { icon: Calendar, color: 'text-purple-600', label: 'Event' },
-        Stories: { icon: Briefcase, color: 'text-green-600', label: 'Market Story' },
+     const categoryConfig: { [key: string]: { icon: React.ElementType, color: string, label: string, tab: string } } = {
+        Learn: { icon: BookOpen, color: 'text-blue-600', label: 'Learn', tab: 'learn' },
+        Events: { icon: Calendar, color: 'text-purple-600', label: 'Event', tab: 'events' },
+        Stories: { icon: Briefcase, color: 'text-green-600', label: 'Market Story', tab: 'home' },
     };
-    const categoryInfo = categoryConfig[post.category] || { icon: FileText, color: 'text-gray-600', label: 'Post' };
+    const categoryInfo = categoryConfig[post.category] || { icon: FileText, color: 'text-gray-600', label: 'Post', tab: 'home' };
     const CategoryIcon = categoryInfo.icon;
     const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
+    const backLink = `/community?tab=${categoryInfo.tab}`;
 
     // Remove the page break for full view
     const fullPostText = post.text.replace(/<!--more-->/g, '');
@@ -91,7 +92,7 @@ export default function CommunityPostPage() {
     return (
         <main className="container mx-auto p-4 md:p-8 max-w-4xl">
              <Button asChild variant="ghost" className="mb-6">
-                <Link href="/community">
+                <Link href={backLink}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to Community
                 </Link>
@@ -119,13 +120,13 @@ export default function CommunityPostPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {videoEmbedUrl && (
-                        <div className="aspect-video relative overflow-hidden">
+                         <div className="aspect-video w-full">
                             <iframe
                                 src={videoEmbedUrl}
                                 title="Community Video Post"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
-                                className="absolute inset-0 w-full h-full"
+                                className="w-full h-full"
                             ></iframe>
                         </div>
                     )}
