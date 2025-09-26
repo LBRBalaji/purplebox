@@ -29,6 +29,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useEditor, EditorContent, type Editor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Heading from '@tiptap/extension-heading'
 
 const createPostSchema = z.object({
   id: z.string().optional(),
@@ -39,63 +42,95 @@ const createPostSchema = z.object({
 
 type CreatePostValues = z.infer<typeof createPostSchema>;
 
-const FormatButton = ({ onClick, children }: { onClick: () => void, children: React.ReactNode }) => (
-    <Button type="button" variant="outline" size="sm" className="h-8 px-2" onMouseDown={(e) => e.preventDefault()} onClick={onClick}>
+const FormatButton = ({ onClick, children, isActive }: { onClick: () => void, children: React.ReactNode, isActive?: boolean }) => (
+    <Button 
+        type="button" 
+        variant={isActive ? 'secondary': 'outline'} 
+        size="sm" 
+        className="h-8 px-2" 
+        onMouseDown={(e) => e.preventDefault()} 
+        onClick={onClick}
+    >
         {children}
     </Button>
 );
+
+const EditorToolbar = ({ editor }: { editor: Editor | null }) => {
+    if (!editor) return null;
+
+    return (
+        <div className="flex items-center gap-2 p-2 border-b">
+            <FormatButton 
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                isActive={editor.isActive('bold')}
+            >
+                <Bold className="h-4 w-4" />
+            </FormatButton>
+            <FormatButton 
+                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                isActive={editor.isActive('heading', { level: 1 })}
+            >
+                <Heading1 className="h-4 w-4" />
+            </FormatButton>
+            <FormatButton 
+                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                 isActive={editor.isActive('heading', { level: 2 })}
+            >
+                <Heading2 className="h-4 w-4" />
+            </FormatButton>
+            <FormatButton 
+                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                 isActive={editor.isActive('heading', { level: 3 })}
+            >
+                <Heading3 className="h-4 w-4" />
+            </FormatButton>
+        </div>
+    )
+}
 
 function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost | null, onFinished: () => void }) {
   const { user } = useAuth();
   const { addCommunityPost, updateCommunityPost } = useData();
   const { toast } = useToast();
-  
   const isEditMode = !!postToEdit;
-  const editorRef = React.useRef<HTMLDivElement>(null);
-  const [editorContent, setEditorContent] = React.useState('');
 
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
     defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
 
-  const applyFormat = (command: 'bold' | 'formatBlock' | 'insertHTML', value?: string) => {
-    if (!editorRef.current) return;
-    editorRef.current.focus();
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Heading.configure({
+        levels: [1, 2, 3],
+      }),
+    ],
+    content: '',
+    editorProps: {
+        attributes: {
+            class: 'prose dark:prose-invert max-w-none min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+        }
+    },
+    onUpdate({ editor }) {
+      form.setValue('text', editor.getHTML(), { shouldValidate: true, shouldDirty: true });
+    },
+  });
 
-    if (command === 'insertHTML' && value === '<!--more-->') {
-        const visualBreak = `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`;
-        document.execCommand('insertHTML', false, visualBreak);
-    } else {
-        document.execCommand(command, false, value);
-    }
-    // After executing a command, update the form state
-    const newContent = editorRef.current.innerHTML;
-    setEditorContent(newContent);
-    form.setValue('text', newContent.replace(/<div class="page-break.*?<\/div>/g, '<!--more-->'), { shouldValidate: true, shouldDirty: true });
-  };
-  
   React.useEffect(() => {
     const initialText = postToEdit?.text || '';
-    const visualText = initialText.replace(/<!--more-->/g, `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`);
-    
     form.reset({
       id: postToEdit?.id,
       text: initialText,
       videoUrl: postToEdit?.videoUrl || '',
       category: postToEdit?.category || 'Stories',
     });
-    setEditorContent(visualText);
+    // Set editor content only after it has been initialized
+    if(editor) {
+        editor.commands.setContent(initialText, false);
+    }
+  }, [postToEdit, form, editor]);
 
-  }, [postToEdit, form]);
-  
-  const handleEditorInput = (e: React.FormEvent<HTMLDivElement>) => {
-      const currentContent = e.currentTarget.innerHTML;
-      const machineReadableContent = currentContent.replace(/<div class="page-break.*?<\/div>/g, '<!--more-->');
-      
-      setEditorContent(currentContent);
-      form.setValue('text', machineReadableContent, { shouldValidate: true, shouldDirty: true });
-  };
 
   const onSubmit = (data: CreatePostValues) => {
     if (!user) return;
@@ -122,7 +157,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
     }
     
     form.reset();
-    setEditorContent('');
+    editor?.commands.clearContent();
     onFinished();
   };
 
@@ -141,25 +176,10 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
             <FormField
               control={form.control}
               name="text"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
-                   <div className="flex items-center gap-2 p-2 border-b">
-                        <FormatButton onClick={() => applyFormat('bold')}><Bold className="h-4 w-4" /></FormatButton>
-                        <FormatButton onClick={() => applyFormat('formatBlock', '<h1>')}><Heading1 className="h-4 w-4" /></FormatButton>
-                        <FormatButton onClick={() => applyFormat('formatBlock', '<h2>')}><Heading2 className="h-4 w-4" /></FormatButton>
-                        <FormatButton onClick={() => applyFormat('formatBlock', '<h3>')}><Heading3 className="h-4 w-4" /></FormatButton>
-                        <Separator orientation="vertical" className="h-6" />
-                        <FormatButton onClick={() => applyFormat('insertHTML', '<!--more-->')}><UnfoldHorizontal className="h-4 w-4" /></FormatButton>
-                    </div>
-                  <FormControl>
-                    <div
-                      ref={editorRef}
-                      contentEditable
-                      onInput={handleEditorInput}
-                      className="prose dark:prose-invert max-w-none min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      dangerouslySetInnerHTML={{ __html: editorContent }}
-                    />
-                  </FormControl>
+                   <EditorToolbar editor={editor}/>
+                   <EditorContent editor={editor} />
                 </FormItem>
               )}
             />
@@ -205,7 +225,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
           </CardContent>
           <CardFooter className="justify-end gap-2">
             <Button type="button" variant="outline" onClick={onFinished}>Cancel</Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Button type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid}>
               <Send className="mr-2 h-4 w-4" /> {isEditMode ? "Save Changes" : "Post"}
             </Button>
           </CardFooter>
@@ -230,8 +250,8 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
   const CategoryIcon = categoryInfo.icon;
   const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
   
-  const readMoreSplit = post.text.split('<!--more-->');
-  const summary = readMoreSplit.length > 1 ? readMoreSplit[0] : (post.text.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...');
+  // Use a regex to create a summary, ignoring HTML tags
+  const summary = post.text.replace(/<[^>]+>/g, '').substring(0, 150) + (post.text.length > 150 ? '...' : '');
   
   return (
     <Card className="flex flex-col">
@@ -287,7 +307,7 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
         </Badge>
       </CardHeader>
       <CardContent className="flex-grow">
-        <div className="text-sm text-muted-foreground prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: summary }} />
+        <p className="text-sm text-muted-foreground">{summary}</p>
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full">

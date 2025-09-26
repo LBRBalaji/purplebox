@@ -86,9 +86,6 @@ export default function CommunityPostPage() {
     const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
     const backLink = `/community?tab=${categoryInfo.tab}`;
 
-    // Remove the page break for full view
-    const fullPostText = post.text.replace(/<!--more-->/g, '');
-
     return (
         <main className="container mx-auto p-4 md:p-8 max-w-4xl">
              <Button asChild variant="ghost" className="mb-6">
@@ -131,7 +128,7 @@ export default function CommunityPostPage() {
                                 ></iframe>
                             </div>
                         )}
-                        <div dangerouslySetInnerHTML={{ __html: fullPostText }} />
+                        <div dangerouslySetInnerHTML={{ __html: post.text }} />
                     </div>
                 </CardContent>
                 {user && (
