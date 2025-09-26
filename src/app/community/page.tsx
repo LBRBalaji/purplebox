@@ -58,7 +58,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   
   const applyFormat = (command: 'bold' | 'formatBlock' | 'insertHTML', value?: string) => {
     if (command === 'insertHTML' && value === '<!--more-->') {
-        const visualBreak = `<div class="page-break my-4"><hr><p class="text-center text-xs text-muted-foreground">---- Read More ----</p><hr></div>`;
+        const visualBreak = `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`;
         document.execCommand('insertHTML', false, visualBreak);
         return;
     }
@@ -141,8 +141,8 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                       contentEditable
                       onInput={e => field.onChange(e.currentTarget.innerHTML)}
                       onBlur={field.onBlur}
-                      dangerouslySetInnerHTML={{ __html: field.value.replace(/<!--more-->/g, `<div class="page-break my-4"><hr><p class="text-center text-xs text-muted-foreground">---- Read More ----</p><hr></div>`) }}
-                      className="prose prose-sm dark:prose-invert max-w-none min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      dangerouslySetInnerHTML={{ __html: field.value.replace(/<!--more-->/g, `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`) }}
+                      className="prose dark:prose-invert max-w-none min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </FormControl>
                 </FormItem>
@@ -423,7 +423,7 @@ export default function CommunityPage() {
     const renderPostGrid = (posts: CommunityPost[], emptyTitle: string, emptyDescription: string) => {
         return (
             <div className="space-y-6">
-                <div className="relative">
+                <div className="relative max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
                         placeholder="Search posts..."
