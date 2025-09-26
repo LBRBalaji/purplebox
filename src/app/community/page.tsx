@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, MessageSquare, ThumbsUp, Repeat, Info } from 'lucide-react';
+import { Send, Users, Video, MessageSquare, ThumbsUp, Repeat, Info, LogIn } from 'lucide-react';
 import { useForm, useController } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,6 +17,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { LoginDialog } from '@/components/login-dialog';
 
 const createPostSchema = z.object({
   text: z.string().min(1, 'Post content cannot be empty.').max(5000),
@@ -193,7 +194,50 @@ function CommunityPostCard({ post }: { post: any }) {
 
 
 export default function CommunityPage() {
-    const { communityPosts, isLoading } = useData();
+    const { user, isLoading: isAuthLoading } = useAuth();
+    const { communityPosts, isLoading: isDataLoading } = useData();
+    const [isLoginOpen, setIsLoginOpen] = React.useState(false);
+
+    const isLoading = isAuthLoading || isDataLoading;
+
+    if (isLoading) {
+        return (
+             <main className="container mx-auto p-4 md:p-8">
+                <div className="max-w-3xl mx-auto space-y-8">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-64 w-full" />
+                </div>
+            </main>
+        )
+    }
+
+    if (!user) {
+        return (
+            <>
+                <main className="container mx-auto p-4 md:p-8 flex-grow flex items-center justify-center">
+                    <Card className="max-w-md text-center">
+                        <CardHeader>
+                            <div className="mx-auto bg-primary/10 h-12 w-12 rounded-full flex items-center justify-center mb-4">
+                                <Users className="h-6 w-6 text-primary" />
+                            </div>
+                            <CardTitle>Join the Community Hub</CardTitle>
+                            <CardDescription>
+                                To view discussions and connect with other users, please log in or create an account.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardFooter>
+                            <Button className="w-full" onClick={() => setIsLoginOpen(true)}>
+                                <LogIn className="mr-2 h-4 w-4"/>
+                                Log In / Sign Up
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </main>
+                <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
+            </>
+        )
+    }
 
     return (
         <main className="container mx-auto p-4 md:p-8">
@@ -220,12 +264,7 @@ export default function CommunityPage() {
                 <Separator />
                 
                 <div className="space-y-6">
-                    {isLoading ? (
-                        <>
-                            <Skeleton className="h-64 w-full" />
-                            <Skeleton className="h-48 w-full" />
-                        </>
-                    ) : communityPosts.length > 0 ? (
+                    {communityPosts.length > 0 ? (
                         communityPosts.map(post => <CommunityPostCard key={post.id} post={post} />)
                     ) : (
                         <Card className="text-center p-12">
