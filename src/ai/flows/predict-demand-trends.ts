@@ -31,7 +31,7 @@ export async function predictDemandTrends(input: PredictDemandTrendsInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'predictDemandTrendsPrompt',
-  model: googleAI.model('gemini-1.5-flash-latest'),
+  model: googleAI.model('gemini-1.5-flash'),
   input: {schema: z.object({
     timeHorizon: z.string(),
     location: z.string().optional(),

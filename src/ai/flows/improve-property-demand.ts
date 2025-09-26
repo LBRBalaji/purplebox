@@ -36,7 +36,7 @@ const prompt = ai.definePrompt({
   name: 'improvePropertyDemandDescriptionPrompt',
   input: {schema: ImprovePropertyDemandDescriptionInputSchema},
   output: {schema: ImprovePropertyDemandDescriptionOutputSchema},
-  model: googleAI.model('gemini-1.5-flash-latest'),
+  model: googleAI.model('gemini-1.5-flash'),
   prompt: `You are an expert real estate agent specializing in writing clear and professional property DEMAND requests on behalf of a client.
   Your tone should be that of a company seeking a property, not advertising one.
   You MUST use the provided **Location Name** and MUST NOT use coordinates in your response.
