@@ -204,8 +204,9 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
   const CategoryIcon = categoryInfo.icon;
   const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
   
-  const summary = post.text.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...';
-
+  const readMoreSplit = post.text.split('<!--more-->');
+  const summary = readMoreSplit.length > 1 ? readMoreSplit[0] : (post.text.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...');
+  
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -543,3 +544,5 @@ export default function CommunityPage() {
         </div>
     )
 }
+
+    
