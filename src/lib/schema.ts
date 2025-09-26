@@ -491,7 +491,10 @@ export const communityPostSchema = z.object({
   text: z.string(),
   videoUrl: z.string().url().optional(),
   createdAt: z.string().datetime(),
+  category: z.enum(['Learn', 'Events', 'Stories']).default('Learn'),
   comments: z.array(communityCommentSchema),
 });
 
 export type CommunityPost = z.infer<typeof communityPostSchema>;
+
+    

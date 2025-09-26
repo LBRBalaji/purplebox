@@ -8,20 +8,24 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, MessageSquare, ThumbsUp, Repeat, Info, LogIn } from 'lucide-react';
+import { Send, Users, Video, MessageSquare, ThumbsUp, Repeat, Info, LogIn, BookOpen, Calendar, Rss } from 'lucide-react';
 import { useForm, useController } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { LoginDialog } from '@/components/login-dialog';
+import type { CommunityPost } from '@/lib/schema';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const createPostSchema = z.object({
   text: z.string().min(1, 'Post content cannot be empty.').max(5000),
   videoUrl: z.string().url().optional().or(z.literal('')),
+  category: z.enum(['Learn', 'Events', 'Stories']),
 });
 
 type CreatePostValues = z.infer<typeof createPostSchema>;
@@ -33,7 +37,7 @@ function CreatePostForm() {
   
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
-    defaultValues: { text: '', videoUrl: '' },
+    defaultValues: { text: '', videoUrl: '', category: 'Learn' },
   });
 
   const onSubmit = (data: CreatePostValues) => {
@@ -44,6 +48,7 @@ function CreatePostForm() {
       authorCompanyName: user.companyName,
       text: data.text,
       videoUrl: data.videoUrl || undefined,
+      category: data.category,
     });
     form.reset();
     toast({ title: "Post Created", description: "Your post is now live in the community." });
@@ -70,20 +75,44 @@ function CreatePostForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="videoUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="flex items-center gap-2">
-                        <Video className="h-4 w-4 text-muted-foreground" />
-                        <input {...field} placeholder="Optional: Paste a video URL (e.g., YouTube, Vimeo)" className="w-full text-sm bg-transparent outline-none" />
-                    </div>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="videoUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="sr-only">Video URL</FormLabel>
+                      <FormControl>
+                        <div className="flex items-center gap-2 border rounded-md px-3 h-10">
+                            <Video className="h-4 w-4 text-muted-foreground" />
+                            <input {...field} placeholder="Optional: Paste a video URL" className="w-full text-sm bg-transparent outline-none" />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                       <FormLabel className="sr-only">Category</FormLabel>
+                       <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="Learn">Learn</SelectItem>
+                            <SelectItem value="Events">Events</SelectItem>
+                            <SelectItem value="Stories">Stories</SelectItem>
+                        </SelectContent>
+                       </Select>
+                    </FormItem>
+                  )}
+                />
+            </div>
           </CardContent>
           <CardFooter className="justify-end">
             <Button type="submit" disabled={form.formState.isSubmitting}>
@@ -96,7 +125,7 @@ function CreatePostForm() {
   );
 }
 
-function CommunityPostCard({ post }: { post: any }) {
+function CommunityPostCard({ post }: { post: CommunityPost }) {
   const { user, users } = useAuth();
   const { addCommunityComment } = useData();
   const { toast } = useToast();
@@ -200,6 +229,15 @@ export default function CommunityPage() {
 
     const isLoading = isAuthLoading || isDataLoading;
 
+    const categorizedPosts = React.useMemo(() => {
+        const posts = {
+            learn: communityPosts.filter(p => p.category === 'Learn'),
+            events: communityPosts.filter(p => p.category === 'Events'),
+            stories: communityPosts.filter(p => p.category === 'Stories'),
+        };
+        return posts;
+    }, [communityPosts]);
+
     if (isLoading) {
         return (
              <main className="container mx-auto p-4 md:p-8">
@@ -247,33 +285,52 @@ export default function CommunityPage() {
                         <Users /> Community Hub
                     </h1>
                     <p className="mt-2 text-muted-foreground">
-                        Connect with peers, ask questions, and get updates from the O2O team.
+                        Connect with peers, share your stories, and get updates from the O2O team.
                     </p>
                 </div>
-                
-                <Alert>
-                    <Info className="h-4 w-4"/>
-                    <AlertTitle>Welcome!</AlertTitle>
-                    <AlertDescription>
-                        This is a shared space for all users. Please be respectful and professional in all your interactions.
-                    </AlertDescription>
-                </Alert>
 
                 <CreatePostForm />
 
-                <Separator />
-                
-                <div className="space-y-6">
-                    {communityPosts.length > 0 ? (
-                        communityPosts.map(post => <CommunityPostCard key={post.id} post={post} />)
-                    ) : (
-                        <Card className="text-center p-12">
-                            <CardTitle>No Posts Yet</CardTitle>
-                            <CardDescription>Be the first to start a conversation!</CardDescription>
-                        </Card>
-                    )}
-                </div>
+                <Tabs defaultValue="learn" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="learn"><BookOpen className="mr-2 h-4 w-4" /> Learn</TabsTrigger>
+                        <TabsTrigger value="events"><Calendar className="mr-2 h-4 w-4"/> Events</TabsTrigger>
+                        <TabsTrigger value="stories"><Rss className="mr-2 h-4 w-4" /> Stories</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="learn" className="mt-6 space-y-6">
+                        {categorizedPosts.learn.length > 0 ? (
+                            categorizedPosts.learn.map(post => <CommunityPostCard key={post.id} post={post} />)
+                        ) : (
+                            <Card className="text-center p-12">
+                                <CardTitle>No Learning Posts Yet</CardTitle>
+                                <CardDescription>Be the first to share a question or an insight!</CardDescription>
+                            </Card>
+                        )}
+                    </TabsContent>
+                    <TabsContent value="events" className="mt-6 space-y-6">
+                         {categorizedPosts.events.length > 0 ? (
+                            categorizedPosts.events.map(post => <CommunityPostCard key={post.id} post={post} />)
+                        ) : (
+                            <Card className="text-center p-12">
+                                <CardTitle>No Events Posted Yet</CardTitle>
+                                <CardDescription>Check back soon for upcoming community events.</CardDescription>
+                            </Card>
+                        )}
+                    </TabsContent>
+                    <TabsContent value="stories" className="mt-6 space-y-6">
+                         {categorizedPosts.stories.length > 0 ? (
+                            categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} />)
+                        ) : (
+                            <Card className="text-center p-12">
+                                <CardTitle>No Stories Shared Yet</CardTitle>
+                                <CardDescription>Have a success story? Share it with the community!</CardDescription>
+                            </Card>
+                        )}
+                    </TabsContent>
+                </Tabs>
             </div>
         </main>
     )
 }
+
+    
