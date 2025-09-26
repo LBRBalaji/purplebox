@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, MessageSquare, ThumbsUp, Repeat, Info, LogIn, BookOpen, Calendar, Rss } from 'lucide-react';
-import { useForm, useController } from 'react-hook-form';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
@@ -19,8 +19,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { LoginDialog } from '@/components/login-dialog';
 import type { CommunityPost } from '@/lib/schema';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Image from 'next/image';
 
 const createPostSchema = z.object({
   text: z.string().min(1, 'Post content cannot be empty.').max(5000),
@@ -37,7 +37,7 @@ function CreatePostForm() {
   
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
-    defaultValues: { text: '', videoUrl: '', category: 'Learn' },
+    defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
 
   const onSubmit = (data: CreatePostValues) => {
@@ -55,13 +55,16 @@ function CreatePostForm() {
   };
 
   if (!user) return null;
+  const isAdminOrDeveloper = user.role === 'SuperAdmin' || user.role === 'O2O' || user.role === 'Warehouse Developer';
+
 
   return (
-    <Card>
+    <Card className="mt-12">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
             <CardTitle>Create a New Post</CardTitle>
+             <CardDescription>Share an update, tutorial, or story with the community.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -85,7 +88,7 @@ function CreatePostForm() {
                       <FormControl>
                         <div className="flex items-center gap-2 border rounded-md px-3 h-10">
                             <Video className="h-4 w-4 text-muted-foreground" />
-                            <input {...field} placeholder="Optional: Paste a video URL" className="w-full text-sm bg-transparent outline-none" />
+                            <input {...field} placeholder="Optional: Paste a YouTube/Vimeo URL" className="w-full text-sm bg-transparent outline-none" />
                         </div>
                       </FormControl>
                     </FormItem>
@@ -104,15 +107,21 @@ function CreatePostForm() {
                             </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="Learn">Learn</SelectItem>
-                            <SelectItem value="Events">Events</SelectItem>
-                            <SelectItem value="Stories">Stories</SelectItem>
+                            <SelectItem value="Stories">Latest Developments & Markets</SelectItem>
+                            <SelectItem value="Learn">Videos & Tutorials</SelectItem>
+                            <SelectItem value="Events">Events & Announcements</SelectItem>
                         </SelectContent>
                        </Select>
                     </FormItem>
                   )}
                 />
             </div>
+             {!isAdminOrDeveloper && form.watch('category') === 'Stories' && (
+                <Alert variant="default" className="bg-amber-50 border-amber-200 text-amber-800">
+                    <AlertTitle>Note</AlertTitle>
+                    <AlertDescription>The "Latest Developments" section is primarily for developers and industry experts. Your post may be reviewed by an admin.</AlertDescription>
+                </Alert>
+            )}
           </CardContent>
           <CardFooter className="justify-end">
             <Button type="submit" disabled={form.formState.isSubmitting}>
@@ -148,65 +157,82 @@ function CommunityPostCard({ post }: { post: CommunityPost }) {
   let videoEmbedUrl = '';
 
   if (isYouTube) {
-    const videoId = post.videoUrl.split('v=')[1]?.split('&')[0] || post.videoUrl.split('/').pop();
+    const videoIdMatch = post.videoUrl.match(/(?:v=|\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+    const videoId = videoIdMatch && videoIdMatch[1];
     if (videoId) {
       videoEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
     }
   }
 
+  const categoryConfig: { [key: string]: { icon: React.ElementType, color: string, label: string } } = {
+    Learn: { icon: Video, color: 'text-blue-600', label: 'Video/Tutorial' },
+    Events: { icon: Calendar, color: 'text-purple-600', label: 'Event' },
+    Stories: { icon: Briefcase, color: 'text-green-600', label: 'Market Development' },
+  }
+  const categoryInfo = categoryConfig[post.category] || { icon: FileText, color: 'text-gray-600', label: 'Post' };
+  const CategoryIcon = categoryInfo.icon;
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarFallback>{author.userName.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-semibold">{author.userName}</p>
-            <p className="text-xs text-muted-foreground">{author.companyName}</p>
-          </div>
-          <p className="text-xs text-muted-foreground ml-auto">{new Date(post.createdAt).toLocaleString()}</p>
+    <Card className="overflow-hidden">
+      {videoEmbedUrl && (
+        <div className="aspect-video relative">
+          <iframe
+            src={videoEmbedUrl}
+            title="Community Video Post"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full"
+          ></iframe>
         </div>
+      )}
+      <CardHeader>
+        <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <AvatarFallback>{author.userName.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-semibold">{author.userName}</p>
+                <p className="text-xs text-muted-foreground">{author.companyName}</p>
+              </div>
+            </div>
+             <p className="text-xs text-muted-foreground ml-auto shrink-0">{new Date(post.createdAt).toLocaleString()}</p>
+        </div>
+        <Badge variant="outline" className={cn("mt-4", categoryInfo.color, `border-${categoryInfo.color?.replace('text-', '')}/20`)}>
+            <CategoryIcon className="mr-1.5 h-3 w-3"/>
+            {categoryInfo.label}
+        </Badge>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="whitespace-pre-wrap">{post.text}</p>
-        {videoEmbedUrl && (
-          <div className="aspect-video relative">
-            <iframe
-              src={videoEmbedUrl}
-              title="Community Video Post"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full rounded-md"
-            ></iframe>
-          </div>
-        )}
       </CardContent>
-      <Separator />
-      <CardContent className="py-4 space-y-4">
-        <h4 className="font-semibold text-sm">Comments ({post.comments.length})</h4>
-        <div className="space-y-4">
-            {post.comments.map((comment: any) => {
-                const commentAuthor = users[comment.authorEmail] || { userName: comment.authorName };
-                return (
-                     <div key={comment.id} className="flex items-start gap-3">
-                        <Avatar className="h-8 w-8">
-                            <AvatarFallback>{commentAuthor.userName.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-grow bg-secondary/50 p-3 rounded-lg">
-                            <div className="flex items-center justify-between text-xs">
-                                <p className="font-semibold">{commentAuthor.userName}</p>
-                                <p className="text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</p>
+       {user && (
+         <>
+          <Separator />
+          <CardContent className="py-4 space-y-4">
+            <h4 className="font-semibold text-sm">Comments ({post.comments.length})</h4>
+            {post.comments.length > 0 && (
+                <div className="space-y-4 max-h-60 overflow-y-auto pr-2">
+                    {post.comments.map((comment: any) => {
+                        const commentAuthor = users[comment.authorEmail] || { userName: comment.authorName };
+                        return (
+                             <div key={comment.id} className="flex items-start gap-3">
+                                <Avatar className="h-8 w-8">
+                                    <AvatarFallback>{commentAuthor.userName.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-grow bg-secondary/50 p-3 rounded-lg">
+                                    <div className="flex items-center justify-between text-xs">
+                                        <p className="font-semibold">{commentAuthor.userName}</p>
+                                        <p className="text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</p>
+                                    </div>
+                                    <p className="text-sm mt-1">{comment.text}</p>
+                                </div>
                             </div>
-                            <p className="text-sm mt-1">{comment.text}</p>
-                        </div>
-                    </div>
-                )
-            })}
-        </div>
-         {user && (
-            <div className="flex items-start gap-2 pt-4">
+                        )
+                    })}
+                </div>
+            )}
+            <div className="flex items-start gap-2 pt-4 border-t">
               <Avatar className="h-9 w-9">
                 <AvatarFallback>{user.userName.charAt(0)}</AvatarFallback>
               </Avatar>
@@ -215,37 +241,80 @@ function CommunityPostCard({ post }: { post: CommunityPost }) {
                 <Button onClick={handleAddComment} size="sm" className="mt-2">Add Comment</Button>
               </div>
             </div>
-          )}
-      </CardContent>
+          </CardContent>
+         </>
+      )}
     </Card>
   );
 }
 
+const EditableImage = ({ src, onImageChange, alt, hint, isAdmin }: { src: string, onImageChange: (newSrc: string) => void, alt: string, hint: string, isAdmin: boolean }) => {
+    const { toast } = useToast();
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        toast({ title: "Uploading...", description: "Your new image is being uploaded." });
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+            const response = await fetch('/api/upload', { method: 'POST', body: formData });
+            if (!response.ok) throw new Error((await response.json()).error || 'Upload failed');
+            const result = await response.json();
+            onImageChange(result.url);
+            toast({ title: "Image updated successfully!" });
+        } catch (error) {
+            const e = error as Error;
+            toast({ variant: 'destructive', title: "Upload Failed", description: e.message });
+        }
+    };
+    
+    return (
+        <div className="relative group rounded-xl overflow-hidden shadow-lg">
+            <Image src={src} alt={alt} width={1200} height={500} className="w-full h-full object-cover" data-ai-hint={hint} />
+            {isAdmin && (
+                <>
+                    <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                    <Button variant="secondary" size="sm" className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => fileInputRef.current?.click()}>
+                        <Edit className="mr-2 h-4 w-4" /> Change Image
+                    </Button>
+                </>
+            )}
+        </div>
+    );
+};
+
 
 export default function CommunityPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
-    const { communityPosts, isLoading: isDataLoading } = useData();
+    const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading } = useData();
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
 
     const isLoading = isAuthLoading || isDataLoading;
+    const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+
+    const handleImageChange = (key: keyof typeof aboutUsContent) => (newSrc: string) => {
+        if (aboutUsContent) {
+            updateAboutUsContent({ ...aboutUsContent, [key]: newSrc });
+        }
+    };
+
 
     const categorizedPosts = React.useMemo(() => {
-        const posts = {
-            learn: communityPosts.filter(p => p.category === 'Learn'),
-            events: communityPosts.filter(p => p.category === 'Events'),
-            stories: communityPosts.filter(p => p.category === 'Stories'),
-        };
-        return posts;
+        const stories = communityPosts.filter(p => p.category === 'Stories').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const tutorials = communityPosts.filter(p => p.category === 'Learn' || p.category === 'Events').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        return { stories, tutorials };
     }, [communityPosts]);
 
     if (isLoading) {
         return (
-             <main className="container mx-auto p-4 md:p-8">
-                <div className="max-w-3xl mx-auto space-y-8">
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-48 w-full" />
-                    <Skeleton className="h-64 w-full" />
-                </div>
+             <main className="container mx-auto p-4 md:p-8 space-y-12">
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-96 w-full" />
+                <Skeleton className="h-96 w-full" />
             </main>
         )
     }
@@ -276,61 +345,79 @@ export default function CommunityPage() {
             </>
         )
     }
+    
+    if (!aboutUsContent) {
+      return (
+        <div className="container mx-auto p-4 md:p-8 flex items-center justify-center">
+          <p>Community content is loading...</p>
+        </div>
+      );
+    }
 
     return (
-        <main className="container mx-auto p-4 md:p-8">
-            <div className="max-w-3xl mx-auto space-y-8">
-                <div className="text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tight text-primary flex items-center justify-center gap-3">
-                        <Users /> Community Hub
-                    </h1>
-                    <p className="mt-2 text-muted-foreground">
-                        Connect with peers, share your stories, and get updates from the O2O team.
-                    </p>
+        <div className="flex-grow bg-secondary/30">
+            {/* Hero Section */}
+            <section className="relative py-20 md:py-28 text-center bg-background">
+                 <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom_1px_center"></div>
+                 <div className="container mx-auto relative">
+                    <div className="max-w-3xl mx-auto">
+                        <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-primary">
+                           Engage with the Community
+                        </h1>
+                        <p className="mt-6 text-lg text-foreground max-w-2xl mx-auto">
+                           Connect with peers, share your stories, and get updates from the O2O team.
+                        </p>
+                    </div>
                 </div>
+            </section>
+
+            <main className="container mx-auto p-4 md:p-8 space-y-16">
+                 {/* Latest Developments */}
+                <section>
+                    <div className="mb-8 text-center">
+                        <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Latest Developments & Markets</h2>
+                        <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+                           Insights from developers on upcoming projects and analysis from industry experts.
+                        </p>
+                    </div>
+                    {categorizedPosts.stories.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} />)}
+                        </div>
+                    ) : (
+                        <Card className="text-center p-12">
+                            <CardTitle>No Market Developments Posted Yet</CardTitle>
+                            <CardDescription>Check back soon for updates from developers and industry experts.</CardDescription>
+                        </Card>
+                    )}
+                </section>
+                
+                <Separator />
+                
+                {/* Videos & Tutorials */}
+                <section>
+                     <div className="mb-8 text-center">
+                        <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Videos & Tutorials</h2>
+                        <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+                           Learn how to use the platform and get tips from our team and other users.
+                        </p>
+                    </div>
+                     <EditableImage 
+                        src={aboutUsContent.feature1}
+                        onImageChange={handleImageChange('feature1')}
+                        alt="Video Tutorials"
+                        hint="man watching tutorial video"
+                        isAdmin={isAdmin}
+                    />
+                    {categorizedPosts.tutorials.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+                            {categorizedPosts.tutorials.map(post => <CommunityPostCard key={post.id} post={post} />)}
+                        </div>
+                    )}
+                </section>
 
                 <CreatePostForm />
-
-                <Tabs defaultValue="learn" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="learn"><BookOpen className="mr-2 h-4 w-4" /> Learn</TabsTrigger>
-                        <TabsTrigger value="events"><Calendar className="mr-2 h-4 w-4"/> Events</TabsTrigger>
-                        <TabsTrigger value="stories"><Rss className="mr-2 h-4 w-4" /> Stories</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="learn" className="mt-6 space-y-6">
-                        {categorizedPosts.learn.length > 0 ? (
-                            categorizedPosts.learn.map(post => <CommunityPostCard key={post.id} post={post} />)
-                        ) : (
-                            <Card className="text-center p-12">
-                                <CardTitle>No Learning Posts Yet</CardTitle>
-                                <CardDescription>Be the first to share a question or an insight!</CardDescription>
-                            </Card>
-                        )}
-                    </TabsContent>
-                    <TabsContent value="events" className="mt-6 space-y-6">
-                         {categorizedPosts.events.length > 0 ? (
-                            categorizedPosts.events.map(post => <CommunityPostCard key={post.id} post={post} />)
-                        ) : (
-                            <Card className="text-center p-12">
-                                <CardTitle>No Events Posted Yet</CardTitle>
-                                <CardDescription>Check back soon for upcoming community events.</CardDescription>
-                            </Card>
-                        )}
-                    </TabsContent>
-                    <TabsContent value="stories" className="mt-6 space-y-6">
-                         {categorizedPosts.stories.length > 0 ? (
-                            categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} />)
-                        ) : (
-                            <Card className="text-center p-12">
-                                <CardTitle>No Stories Shared Yet</CardTitle>
-                                <CardDescription>Have a success story? Share it with the community!</CardDescription>
-                            </Card>
-                        )}
-                    </TabsContent>
-                </Tabs>
-            </div>
-        </main>
+            </main>
+        </div>
     )
 }
-
-    
