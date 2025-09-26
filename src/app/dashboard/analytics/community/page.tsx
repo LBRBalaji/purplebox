@@ -80,13 +80,16 @@ export default function CommunityAnalyticsPage() {
     }, [currentUser, hasAccess, router, isDataLoading]);
 
     const communityStats = React.useMemo(() => {
-        const totalPosts = communityPosts.length;
-        const totalComments = communityPosts.reduce((sum, post) => sum + post.comments.length, 0);
-        const totalShares = shareHistory.length;
+        const posts = communityPosts || [];
+        const shares = shareHistory || [];
 
-        const postActivity = groupDataByDay(communityPosts, (post) => new Date(post.createdAt));
+        const totalPosts = posts.length;
+        const totalComments = posts.reduce((sum, post) => sum + post.comments.length, 0);
+        const totalShares = shares.length;
 
-        const topCategories = communityPosts.reduce((acc, post) => {
+        const postActivity = groupDataByDay(posts, (post) => new Date(post.createdAt));
+
+        const topCategories = posts.reduce((acc, post) => {
             acc[post.category] = (acc[post.category] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
@@ -96,13 +99,13 @@ export default function CommunityAnalyticsPage() {
             name, value, fill: COLORS[index % COLORS.length]
         }));
         
-        const topPosts = [...communityPosts].sort((a, b) => {
-            const scoreA = (a.comments.length * 2) + shareHistory.filter(s => s.postId === a.id).length;
-            const scoreB = (b.comments.length * 2) + shareHistory.filter(s => s.postId === b.id).length;
+        const topPosts = [...posts].sort((a, b) => {
+            const scoreA = (a.comments.length * 2) + shares.filter(s => s.postId === a.id).length;
+            const scoreB = (b.comments.length * 2) + shares.filter(s => s.postId === b.id).length;
             return scoreB - scoreA;
         }).slice(0, 5);
 
-        const topSharers = shareHistory.reduce((acc, share) => {
+        const topSharers = shares.reduce((acc, share) => {
             if (!acc[share.sharedByEmail]) {
                 acc[share.sharedByEmail] = { count: 0, name: share.sharedByName, company: users[share.sharedByEmail]?.companyName || 'N/A' };
             }
