@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const createPostSchema = z.object({
   text: z.string().min(1, 'Post content cannot be empty.').max(5000),
@@ -109,8 +110,8 @@ function CreatePostForm() {
                             </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="Stories">Latest Developments & Markets</SelectItem>
-                            <SelectItem value="Learn">Videos & Tutorials</SelectItem>
+                            <SelectItem value="Stories">Stories (Developments/Markets)</SelectItem>
+                            <SelectItem value="Learn">Learn (Videos/Tutorials)</SelectItem>
                             <SelectItem value="Events">Events & Announcements</SelectItem>
                         </SelectContent>
                        </Select>
@@ -252,7 +253,7 @@ function CommunityPostCard({ post }: { post: CommunityPost }) {
   );
 }
 
-const EditableImage = ({ src, onImageChange, alt, hint, isAdmin }: { src: string, onImageChange: (newSrc: string) => void, alt: string, hint: string, isAdmin: boolean }) => {
+const EditableImage = ({ src, onImageChange, alt, hint, isAdmin, className = 'w-full h-full object-cover' }: { src: string, onImageChange: (newSrc: string) => void, alt: string, hint: string, isAdmin: boolean, className?: string }) => {
     const { toast } = useToast();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -278,7 +279,7 @@ const EditableImage = ({ src, onImageChange, alt, hint, isAdmin }: { src: string
     
     return (
         <div className="relative group rounded-xl overflow-hidden shadow-lg">
-            <Image src={src} alt={alt} width={1200} height={500} className="w-full h-full object-cover" data-ai-hint={hint} />
+            <Image src={src} alt={alt} width={1200} height={500} className={className} data-ai-hint={hint} />
             {isAdmin && (
                 <>
                     <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
@@ -309,8 +310,9 @@ export default function CommunityPage() {
 
     const categorizedPosts = React.useMemo(() => {
         const stories = communityPosts.filter(p => p.category === 'Stories').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        const tutorials = communityPosts.filter(p => p.category === 'Learn' || p.category === 'Events').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        return { stories, tutorials };
+        const learn = communityPosts.filter(p => p.category === 'Learn').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const events = communityPosts.filter(p => p.category === 'Events').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        return { stories, learn, events };
     }, [communityPosts]);
 
     if (isLoading) {
@@ -375,50 +377,90 @@ export default function CommunityPage() {
                 </div>
             </section>
 
-            <main className="container mx-auto p-4 md:p-8 space-y-16">
-                 {/* Latest Developments */}
-                <section>
-                    <div className="mb-8 text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Latest Developments & Markets</h2>
-                        <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-                           Insights from developers on upcoming projects and analysis from industry experts.
-                        </p>
-                    </div>
-                    {categorizedPosts.stories.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} />)}
-                        </div>
-                    ) : (
-                        <Card className="text-center p-12">
-                            <CardTitle>No Market Developments Posted Yet</CardTitle>
-                            <CardDescription>Check back soon for updates from developers and industry experts.</CardDescription>
-                        </Card>
-                    )}
-                </section>
-                
-                <Separator />
-                
-                {/* Videos & Tutorials */}
-                <section>
-                     <div className="mb-8 text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Videos & Tutorials</h2>
-                        <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-                           Learn how to use the platform and get tips from our team and other users.
-                        </p>
-                    </div>
-                     <EditableImage 
-                        src={aboutUsContent.feature1}
-                        onImageChange={handleImageChange('feature1')}
-                        alt="Video Tutorials"
-                        hint="man watching tutorial video"
-                        isAdmin={isAdmin}
-                    />
-                    {categorizedPosts.tutorials.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-                            {categorizedPosts.tutorials.map(post => <CommunityPostCard key={post.id} post={post} />)}
-                        </div>
-                    )}
-                </section>
+             <main className="container mx-auto p-4 md:p-8">
+                 <Tabs defaultValue="home">
+                    <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="home"><Home className="mr-2 h-4 w-4"/> Home</TabsTrigger>
+                        <TabsTrigger value="learn"><BookOpen className="mr-2 h-4 w-4"/> Learn</TabsTrigger>
+                        <TabsTrigger value="events"><Calendar className="mr-2 h-4 w-4"/> Events</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="home" className="mt-8">
+                        <section>
+                            <div className="mb-8 text-center">
+                                <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Latest Developments & Markets</h2>
+                                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+                                   Insights from developers on upcoming projects and analysis from industry experts.
+                                </p>
+                            </div>
+                            {categorizedPosts.stories.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} />)}
+                                </div>
+                            ) : (
+                                <Card className="text-center p-12">
+                                    <CardTitle>No Market Developments Posted Yet</CardTitle>
+                                    <CardDescription>Check back soon for updates from developers and industry experts.</CardDescription>
+                                </Card>
+                            )}
+                        </section>
+                    </TabsContent>
+                    <TabsContent value="learn" className="mt-8">
+                         <section>
+                             <div className="mb-8 text-center">
+                                <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Learn & Grow</h2>
+                                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+                                   Learn how to best take advantage of O2O features and functionality.
+                                </p>
+                            </div>
+                            <EditableImage 
+                                src={aboutUsContent.feature2}
+                                onImageChange={handleImageChange('feature2')}
+                                alt="Learning"
+                                hint="person using laptop learning"
+                                isAdmin={isAdmin}
+                                className="w-full h-[400px] object-cover"
+                            />
+                            {categorizedPosts.learn.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                                    {categorizedPosts.learn.map(post => <CommunityPostCard key={post.id} post={post} />)}
+                                </div>
+                             ) : (
+                                <Card className="text-center p-12 mt-8">
+                                    <CardTitle>No Tutorials Posted Yet</CardTitle>
+                                    <CardDescription>Check back soon for guides and tips.</CardDescription>
+                                </Card>
+                            )}
+                        </section>
+                    </TabsContent>
+                    <TabsContent value="events" className="mt-8">
+                         <section>
+                             <div className="mb-8 text-center">
+                                <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Events & Announcements</h2>
+                                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+                                   Stay updated with our upcoming webinars, meetups, and platform announcements.
+                                </p>
+                            </div>
+                            <EditableImage 
+                                src={aboutUsContent.feature3}
+                                onImageChange={handleImageChange('feature3')}
+                                alt="Events"
+                                hint="community event networking"
+                                isAdmin={isAdmin}
+                                className="w-full h-[400px] object-cover"
+                            />
+                             {categorizedPosts.events.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                                    {categorizedPosts.events.map(post => <CommunityPostCard key={post.id} post={post} />)}
+                                </div>
+                            ) : (
+                                <Card className="text-center p-12 mt-8">
+                                    <CardTitle>No Events Posted Yet</CardTitle>
+                                    <CardDescription>Check back soon for upcoming events.</CardDescription>
+                                </Card>
+                            )}
+                        </section>
+                    </TabsContent>
+                </Tabs>
 
                 <CreatePostForm />
             </main>
