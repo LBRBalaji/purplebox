@@ -204,9 +204,9 @@ export default function CommunityPostPage() {
                                 <p className="text-xs text-muted-foreground">{author.companyName}</p>
                             </div>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                 <ShareDropdown post={post} />
-                                <Badge variant="outline" className={cn("mt-4 w-fit", categoryInfo.color, badgeBorderColor)}>
+                                <Badge variant="outline" className={cn("w-fit", categoryInfo.color, badgeBorderColor)}>
                                     <CategoryIcon className="mr-1.5 h-3 w-3"/>
                                     {categoryInfo.label}
                                 </Badge>
