@@ -21,6 +21,8 @@ import { LoginDialog } from '@/components/login-dialog';
 import type { CommunityPost } from '@/lib/schema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 const createPostSchema = z.object({
   text: z.string().min(1, 'Post content cannot be empty.').max(5000),
@@ -171,6 +173,8 @@ function CommunityPostCard({ post }: { post: CommunityPost }) {
   }
   const categoryInfo = categoryConfig[post.category] || { icon: FileText, color: 'text-gray-600', label: 'Post' };
   const CategoryIcon = categoryInfo.icon;
+  const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
+
 
   return (
     <Card className="overflow-hidden">
@@ -198,7 +202,7 @@ function CommunityPostCard({ post }: { post: CommunityPost }) {
             </div>
              <p className="text-xs text-muted-foreground ml-auto shrink-0">{new Date(post.createdAt).toLocaleString()}</p>
         </div>
-        <Badge variant="outline" className={cn("mt-4", categoryInfo.color, `border-${categoryInfo.color?.replace('text-', '')}/20`)}>
+        <Badge variant="outline" className={cn("mt-4", categoryInfo.color, badgeBorderColor)}>
             <CategoryIcon className="mr-1.5 h-3 w-3"/>
             {categoryInfo.label}
         </Badge>
