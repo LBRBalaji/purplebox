@@ -8,7 +8,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3, UnfoldHorizontal, Sparkles, Headphones, UploadCloud } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3, UnfoldHorizontal, Sparkles, Headphones, UploadCloud, Image as ImageIcon } from 'lucide-react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -40,6 +40,7 @@ const createPostSchema = z.object({
   text: z.string().min(1, 'Post content cannot be empty.').max(10000),
   videoUrl: z.string().url().optional().or(z.literal('')),
   audioUrl: z.string().url().optional().or(z.literal('')),
+  imageUrl: z.string().url().optional().or(z.literal('')),
   category: z.enum(['Learn', 'Events', 'Stories']),
 });
 
@@ -97,11 +98,12 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   const { toast } = useToast();
   const isEditMode = !!postToEdit;
   const audioInputRef = React.useRef<HTMLInputElement>(null);
-  const [isUploadingAudio, setIsUploadingAudio] = React.useState(false);
+  const imageInputRef = React.useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
 
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
-    defaultValues: { text: '', videoUrl: '', audioUrl: '', category: 'Stories' },
+    defaultValues: { text: '', videoUrl: '', audioUrl: '', imageUrl: '', category: 'Stories' },
   });
 
   const editor = useEditor({
@@ -129,6 +131,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
       text: initialText,
       videoUrl: postToEdit?.videoUrl || '',
       audioUrl: postToEdit?.audioUrl || '',
+      imageUrl: postToEdit?.imageUrl || '',
       category: postToEdit?.category || 'Stories',
     });
     if(editor && editor.isEditable) {
@@ -137,12 +140,12 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   }, [postToEdit, form, editor]);
 
 
-  const handleAudioUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, fileType: 'audio' | 'image') => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploadingAudio(true);
-    toast({ title: "Uploading audio..." });
+    setIsUploading(true);
+    toast({ title: `Uploading ${fileType}...` });
 
     const formData = new FormData();
     formData.append('file', file);
@@ -151,13 +154,14 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
       const response = await fetch('/api/upload', { method: 'POST', body: formData });
       if (!response.ok) throw new Error((await response.json()).error || 'Upload failed');
       const result = await response.json();
-      form.setValue('audioUrl', result.url, { shouldValidate: true });
-      toast({ title: "Audio uploaded successfully!" });
+      const fieldName = fileType === 'audio' ? 'audioUrl' : 'imageUrl';
+      form.setValue(fieldName, result.url, { shouldValidate: true });
+      toast({ title: `${fileType.charAt(0).toUpperCase() + fileType.slice(1)} uploaded successfully!` });
     } catch (error) {
       const e = error as Error;
       toast({ variant: 'destructive', title: "Upload Failed", description: e.message });
     } finally {
-      setIsUploadingAudio(false);
+      setIsUploading(false);
     }
   };
 
@@ -171,6 +175,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
             text: data.text,
             videoUrl: data.videoUrl || undefined,
             audioUrl: data.audioUrl || undefined,
+            imageUrl: data.imageUrl || undefined,
             category: data.category,
         };
         updateCommunityPost(updatedPost);
@@ -183,6 +188,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
             text: data.text,
             videoUrl: data.videoUrl || undefined,
             audioUrl: data.audioUrl || undefined,
+            imageUrl: data.imageUrl || undefined,
             category: data.category,
         });
         toast({ title: "Post Created", description: "Your post is now live in the community." });
@@ -227,25 +233,46 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="audioUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Audio Podcast</FormLabel>
-                   <div className="flex items-center gap-2">
-                     <FormControl>
-                        <Input {...field} placeholder="Optional: Upload an audio file or paste a URL" />
-                     </FormControl>
-                     <Button type="button" variant="outline" onClick={() => audioInputRef.current?.click()} disabled={isUploadingAudio}>
-                       <UploadCloud className="mr-2 h-4 w-4" />
-                       {isUploadingAudio ? 'Uploading...' : 'Upload'}
-                     </Button>
-                     <input type="file" ref={audioInputRef} onChange={handleAudioUpload} accept="audio/mpeg,audio/wav,audio/ogg" className="hidden" />
-                   </div>
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="audioUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Audio Podcast</FormLabel>
+                       <div className="flex items-center gap-2">
+                         <FormControl>
+                            <Input {...field} placeholder="Optional: Upload an audio file or paste a URL" />
+                         </FormControl>
+                         <Button type="button" variant="outline" onClick={() => audioInputRef.current?.click()} disabled={isUploading}>
+                           <UploadCloud className="mr-2 h-4 w-4" />
+                           {isUploading ? 'Uploading...' : 'Upload'}
+                         </Button>
+                         <input type="file" ref={audioInputRef} onChange={(e) => handleFileUpload(e, 'audio')} accept="audio/mpeg,audio/wav,audio/ogg" className="hidden" />
+                       </div>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cover Image</FormLabel>
+                       <div className="flex items-center gap-2">
+                         <FormControl>
+                            <Input {...field} placeholder="Optional: Upload an image or paste a URL" />
+                         </FormControl>
+                         <Button type="button" variant="outline" onClick={() => imageInputRef.current?.click()} disabled={isUploading}>
+                           <UploadCloud className="mr-2 h-4 w-4" />
+                           {isUploading ? 'Uploading...' : 'Upload'}
+                         </Button>
+                         <input type="file" ref={imageInputRef} onChange={(e) => handleFileUpload(e, 'image')} accept="image/*" className="hidden" />
+                       </div>
+                    </FormItem>
+                  )}
+                />
+            </div>
             <FormField
               control={form.control}
               name="category"
@@ -305,6 +332,11 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
   
   return (
     <Card className="flex flex-col">
+       {post.imageUrl && (
+            <div className="aspect-video relative rounded-t-lg overflow-hidden">
+                <Image src={post.imageUrl} alt={post.text.substring(0, 50)} fill className="object-cover" />
+            </div>
+        )}
       <CardHeader>
         <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
@@ -360,6 +392,12 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
                  <Badge variant="outline" className="w-fit border-purple-200 text-purple-600">
                     <Headphones className="mr-1.5 h-3 w-3"/>
                     Audio
+                </Badge>
+            )}
+             {post.videoUrl && (
+                 <Badge variant="outline" className="w-fit border-red-200 text-red-600">
+                    <Video className="mr-1.5 h-3 w-3"/>
+                    Video
                 </Badge>
             )}
         </div>

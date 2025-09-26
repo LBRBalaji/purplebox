@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn, Lock, Headphones, Share, Mail, Linkedin, Twitter, Facebook, Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn, Lock, Headphones, Share, Mail, Linkedin, Twitter, Facebook, Sparkles, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -21,6 +21,7 @@ import { LoginDialog } from '@/components/login-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { CommunityPost } from '@/lib/schema';
+import Image from 'next/image';
 
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -274,6 +275,11 @@ export default function CommunityPostPage() {
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                         {post.imageUrl && (
+                            <div className="aspect-video w-full relative rounded-lg overflow-hidden">
+                                <Image src={post.imageUrl} alt={post.text.substring(0,50)} fill className="object-cover" />
+                            </div>
+                         )}
                         <div className="prose dark:prose-invert max-w-none">
                             {post.audioUrl && (
                                 <div className="not-prose mb-8">

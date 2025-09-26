@@ -491,6 +491,7 @@ export const communityPostSchema = z.object({
   text: z.string(),
   videoUrl: z.string().url().optional(),
   audioUrl: z.string().url().optional(),
+  imageUrl: z.string().url().optional(),
   createdAt: z.string().datetime(),
   category: z.enum(['Learn', 'Events', 'Stories']).default('Learn'),
   comments: z.array(communityCommentSchema),
