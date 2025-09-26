@@ -35,7 +35,7 @@ export async function findRelevantPosts(input: FindRelevantPostsInput): Promise<
 
 const prompt = ai.definePrompt({
   name: 'findRelevantPostsPrompt',
-  model: googleAI.model('gemini-pro'),
+  model: googleAI.model('gemini-1.0-pro'),
   input: {schema: FindRelevantPostsInputSchema},
   output: {schema: FindRelevantPostsOutputSchema},
   prompt: `You are an intelligent search assistant for a real estate platform's community hub.
