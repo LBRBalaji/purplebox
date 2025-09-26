@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -7,7 +8,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3 } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3, UnfoldHorizontal } from 'lucide-react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -55,7 +56,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
     defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
   
-  const applyFormat = (command: 'bold' | 'formatBlock', value?: string) => {
+  const applyFormat = (command: 'bold' | 'formatBlock' | 'insertHTML', value?: string) => {
     document.execCommand(command, false, value);
   };
 
@@ -124,6 +125,8 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                         <FormatButton onClick={() => applyFormat('formatBlock', '<h1>')}><Heading1 className="h-4 w-4" /></FormatButton>
                         <FormatButton onClick={() => applyFormat('formatBlock', '<h2>')}><Heading2 className="h-4 w-4" /></FormatButton>
                         <FormatButton onClick={() => applyFormat('formatBlock', '<h3>')}><Heading3 className="h-4 w-4" /></FormatButton>
+                        <Separator orientation="vertical" className="h-6" />
+                        <FormatButton onClick={() => applyFormat('insertHTML', '<!--more-->')}><UnfoldHorizontal className="h-4 w-4" /></FormatButton>
                     </div>
                   <FormControl>
                     <div
@@ -544,5 +547,3 @@ export default function CommunityPage() {
         </div>
     )
 }
-
-    
