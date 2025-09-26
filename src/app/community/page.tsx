@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -23,9 +23,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
 
 const createPostSchema = z.object({
+  id: z.string().optional(),
   text: z.string().min(1, 'Post content cannot be empty.').max(5000),
   videoUrl: z.string().url().optional().or(z.literal('')),
   category: z.enum(['Learn', 'Events', 'Stories']),
@@ -33,28 +37,57 @@ const createPostSchema = z.object({
 
 type CreatePostValues = z.infer<typeof createPostSchema>;
 
-function CreatePostForm() {
+function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost | null, onFinished: () => void }) {
   const { user } = useAuth();
-  const { addCommunityPost } = useData();
+  const { addCommunityPost, updateCommunityPost } = useData();
   const { toast } = useToast();
   
+  const isEditMode = !!postToEdit;
+
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
     defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
 
+  React.useEffect(() => {
+    if (postToEdit) {
+      form.reset({
+        id: postToEdit.id,
+        text: postToEdit.text,
+        videoUrl: postToEdit.videoUrl || '',
+        category: postToEdit.category,
+      });
+    } else {
+        form.reset({ text: '', videoUrl: '', category: 'Stories', id: undefined });
+    }
+  }, [postToEdit, form]);
+
   const onSubmit = (data: CreatePostValues) => {
     if (!user) return;
-    addCommunityPost({
-      authorEmail: user.email,
-      authorName: user.userName,
-      authorCompanyName: user.companyName,
-      text: data.text,
-      videoUrl: data.videoUrl || undefined,
-      category: data.category,
-    });
+    
+    if (isEditMode && data.id) {
+        const updatedPost: CommunityPost = {
+            ...postToEdit!,
+            text: data.text,
+            videoUrl: data.videoUrl || undefined,
+            category: data.category,
+        };
+        updateCommunityPost(updatedPost);
+        toast({ title: "Post Updated", description: "Your post has been successfully updated." });
+    } else {
+        addCommunityPost({
+            authorEmail: user.email,
+            authorName: user.userName,
+            authorCompanyName: user.companyName,
+            text: data.text,
+            videoUrl: data.videoUrl || undefined,
+            category: data.category,
+        });
+        toast({ title: "Post Created", description: "Your post is now live in the community." });
+    }
+    
     form.reset();
-    toast({ title: "Post Created", description: "Your post is now live in the community." });
+    onFinished();
   };
 
   if (!user) return null;
@@ -66,8 +99,8 @@ function CreatePostForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
-            <CardTitle>Create a New Post</CardTitle>
-             <CardDescription>Share an update, tutorial, or story with the community.</CardDescription>
+            <CardTitle>{isEditMode ? "Edit Post" : "Create a New Post"}</CardTitle>
+             <CardDescription>{isEditMode ? "Modify your post details below." : "Share an update, tutorial, or story with the community."}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -81,44 +114,39 @@ function CreatePostForm() {
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="videoUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="sr-only">Video URL</FormLabel>
-                      <FormControl>
-                        <div className="flex items-center gap-2 border rounded-md px-3 h-10">
-                            <Video className="h-4 w-4 text-muted-foreground" />
-                            <input {...field} placeholder="Optional: Paste a YouTube/Vimeo URL" className="w-full text-sm bg-transparent outline-none" />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                       <FormLabel className="sr-only">Category</FormLabel>
-                       <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a category" />
-                            </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                            <SelectItem value="Stories">Stories (Developments/Markets)</SelectItem>
-                            <SelectItem value="Learn">Learn (Videos/Tutorials)</SelectItem>
-                            <SelectItem value="Events">Events & Announcements</SelectItem>
-                        </SelectContent>
-                       </Select>
-                    </FormItem>
-                  )}
-                />
-            </div>
+             <FormField
+              control={form.control}
+              name="videoUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Video URL</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Optional: Paste a YouTube/Vimeo URL" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                   <FormLabel>Category</FormLabel>
+                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <SelectItem value="Stories">Stories (Developments/Markets)</SelectItem>
+                        <SelectItem value="Learn">Learn (Videos/Tutorials)</SelectItem>
+                        <SelectItem value="Events">Events & Announcements</SelectItem>
+                    </SelectContent>
+                   </Select>
+                </FormItem>
+              )}
+            />
              {!isAdminOrDeveloper && form.watch('category') === 'Stories' && (
                 <Alert variant="default" className="bg-amber-50 border-amber-200 text-amber-800">
                     <AlertTitle>Note</AlertTitle>
@@ -126,9 +154,10 @@ function CreatePostForm() {
                 </Alert>
             )}
           </CardContent>
-          <CardFooter className="justify-end">
+          <CardFooter className="justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onFinished}>Cancel</Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>
-              <Send className="mr-2 h-4 w-4" /> Post
+              <Send className="mr-2 h-4 w-4" /> {isEditMode ? "Save Changes" : "Post"}
             </Button>
           </CardFooter>
         </form>
@@ -137,13 +166,15 @@ function CreatePostForm() {
   );
 }
 
-function CommunityPostCard({ post }: { post: CommunityPost }) {
+function CommunityPostCard({ post, onEdit }: { post: CommunityPost; onEdit: (post: CommunityPost) => void; }) {
   const { user, users } = useAuth();
-  const { addCommunityComment } = useData();
+  const { addCommunityComment, deleteCommunityPost } = useData();
   const { toast } = useToast();
   const [comment, setComment] = React.useState('');
 
   const author = users[post.authorEmail] || { userName: post.authorName, companyName: post.authorCompanyName };
+  
+  const canModify = user?.email === post.authorEmail || user?.role === 'SuperAdmin' || user?.role === 'O2O';
 
   const handleAddComment = () => {
     if (!user || !comment.trim()) return;
@@ -155,11 +186,16 @@ function CommunityPostCard({ post }: { post: CommunityPost }) {
     setComment('');
     toast({ title: 'Comment Added' });
   };
+  
+  const handleDelete = () => {
+    deleteCommunityPost(post.id);
+    toast({ title: "Post Deleted", description: "The post has been permanently removed." });
+  }
 
   const isYouTube = post.videoUrl?.includes('youtube.com') || post.videoUrl?.includes('youtu.be');
   let videoEmbedUrl = '';
 
-  if (isYouTube) {
+  if (post.videoUrl && isYouTube) {
     const videoIdMatch = post.videoUrl.match(/(?:v=|\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
     const videoId = videoIdMatch && videoIdMatch[1];
     if (videoId) {
@@ -201,7 +237,40 @@ function CommunityPostCard({ post }: { post: CommunityPost }) {
                 <p className="text-xs text-muted-foreground">{author.companyName}</p>
               </div>
             </div>
-             <p className="text-xs text-muted-foreground ml-auto shrink-0">{new Date(post.createdAt).toLocaleString()}</p>
+             <div className="flex items-center gap-1">
+                 <p className="text-xs text-muted-foreground ml-auto shrink-0">{new Date(post.createdAt).toLocaleString()}</p>
+                {canModify && (
+                     <AlertDialog>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-7 w-7"><MoreHorizontal className="h-4 w-4" /></Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => onEdit(post)}>
+                                    <Edit className="mr-2 h-4 w-4"/> Edit
+                                </DropdownMenuItem>
+                                <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem className="text-destructive">
+                                        <Trash2 className="mr-2 h-4 w-4"/> Delete
+                                    </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete this post and all its comments.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
+             </div>
         </div>
         <Badge variant="outline" className={cn("mt-4", categoryInfo.color, badgeBorderColor)}>
             <CategoryIcon className="mr-1.5 h-3 w-3"/>
@@ -297,6 +366,8 @@ export default function CommunityPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading } = useData();
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
+    const [editingPost, setEditingPost] = React.useState<CommunityPost | null>(null);
+    const [isFormVisible, setIsFormVisible] = React.useState(false);
 
     const isLoading = isAuthLoading || isDataLoading;
     const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
@@ -306,6 +377,17 @@ export default function CommunityPage() {
             updateAboutUsContent({ ...aboutUsContent, [key]: newSrc });
         }
     };
+    
+    const handleEditPost = (post: CommunityPost) => {
+        setEditingPost(post);
+        setIsFormVisible(true);
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    const handleFormFinished = () => {
+        setIsFormVisible(false);
+        setEditingPost(null);
+    }
 
 
     const categorizedPosts = React.useMemo(() => {
@@ -394,7 +476,7 @@ export default function CommunityPage() {
                             </div>
                             {categorizedPosts.stories.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} />)}
+                                    {categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} />)}
                                 </div>
                             ) : (
                                 <Card className="text-center p-12">
@@ -422,7 +504,7 @@ export default function CommunityPage() {
                             />
                             {categorizedPosts.learn.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                                    {categorizedPosts.learn.map(post => <CommunityPostCard key={post.id} post={post} />)}
+                                    {categorizedPosts.learn.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} />)}
                                 </div>
                              ) : (
                                 <Card className="text-center p-12 mt-8">
@@ -450,7 +532,7 @@ export default function CommunityPage() {
                             />
                              {categorizedPosts.events.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                                    {categorizedPosts.events.map(post => <CommunityPostCard key={post.id} post={post} />)}
+                                    {categorizedPosts.events.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} />)}
                                 </div>
                             ) : (
                                 <Card className="text-center p-12 mt-8">
@@ -461,8 +543,21 @@ export default function CommunityPage() {
                         </section>
                     </TabsContent>
                 </Tabs>
-
-                <CreatePostForm />
+                
+                {isFormVisible && (
+                     <CreatePostForm postToEdit={editingPost} onFinished={handleFormFinished} />
+                )}
+               
+                {!isFormVisible && (
+                    <div className="text-center mt-12">
+                        <Button size="lg" onClick={() => {
+                            setEditingPost(null);
+                            setIsFormVisible(true);
+                        }}>
+                           <Send className="mr-2 h-4 w-4" /> Create a New Post
+                        </Button>
+                    </div>
+                )}
             </main>
         </div>
     )

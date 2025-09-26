@@ -239,6 +239,8 @@ type DataContextType = {
   addAgentToLead: (leadId: string, agentEmail: string) => void;
   communityPosts: CommunityPost[];
   addCommunityPost: (post: Omit<CommunityPost, 'id' | 'createdAt' | 'comments'>) => void;
+  updateCommunityPost: (post: CommunityPost) => void;
+  deleteCommunityPost: (postId: string) => void;
   addCommunityComment: (postId: string, comment: Omit<CommunityPost['comments'][0], 'id' | 'createdAt'>) => void;
 };
 
@@ -1183,6 +1185,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistCommunityPosts]);
 
+  const updateCommunityPost = useCallback((updatedPost: CommunityPost) => {
+      setCommunityPosts(prevPosts => {
+          const newPosts = prevPosts.map(p => p.id === updatedPost.id ? updatedPost : p);
+          persistCommunityPosts(newPosts);
+          return newPosts;
+      });
+  }, [persistCommunityPosts]);
+
+  const deleteCommunityPost = useCallback((postId: string) => {
+      setCommunityPosts(prevPosts => {
+          const newPosts = prevPosts.filter(p => p.id !== postId);
+          persistCommunityPosts(newPosts);
+          return newPosts;
+      });
+  }, [persistCommunityPosts]);
+
   const addCommunityComment = useCallback((postId: string, commentData: Omit<CommunityPost['comments'][0], 'id' | 'createdAt'>) => {
     setCommunityPosts(prevPosts => {
       const updatedPosts = prevPosts.map(post => {
@@ -1287,6 +1305,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         addAgentToLead,
         communityPosts,
         addCommunityPost,
+        updateCommunityPost,
+        deleteCommunityPost,
         addCommunityComment
         }}>
       {children}
