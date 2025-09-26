@@ -109,7 +109,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Textarea {...field} placeholder={`What's on your mind, ${user.userName}?`} className="min-h-[100px]" />
+                    <Textarea {...field} placeholder={`What's on your mind, ${user.userName}? You can use HTML tags like <h3> or <strong> for formatting.`} className="min-h-[100px]" />
                   </FormControl>
                 </FormItem>
               )}
@@ -278,7 +278,7 @@ function CommunityPostCard({ post, onEdit }: { post: CommunityPost; onEdit: (pos
         </Badge>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="whitespace-pre-wrap">{post.text}</p>
+        <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.text }} />
       </CardContent>
        {user && (
          <>
