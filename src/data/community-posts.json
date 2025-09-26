@@ -28,6 +28,17 @@
     "createdAt": "2024-09-26T14:30:00.000Z",
     "category": "Stories",
     "comments": []
+  },
+  {
+    "id": "post-3",
+    "authorEmail": "superadmin@o2o.com",
+    "authorName": "O2O Super Admin",
+    "authorCompanyName": "Lakshmi Balaji O2O",
+    "text": "Welcome to one of the most powerful features on the O2O platform! The 'Search-Select-Download' workflow is designed to give you instant access to the data you need, transforming a traditionally slow process into your competitive advantage.\n\n### What is it?\n\nIt’s a simple, three-step process to quickly gather and compare property data for your internal decision-making. It's the fastest way to build a winning proposal.\n\n### How It Works:\n\n1.  **Search & Filter:** Start on the main listings page. Use the search bar and advanced filters to find a set of properties that match your requirements.\n\n2.  **Select:** As you browse, click the checkbox on each property card you're interested in. You can select up to 5 properties at a time to create a comparison list.\n\n3.  **Download & Auto-Register:** A 'Download' bar will appear at the bottom. When you click it:\n    *   **Terms Agreement:** First-time users will see a 'Terms of Download' pop-up. This clarifies the brokerage relationship and our commitment to a transparent process.\n    *   **Instant CSV:** A clean, structured CSV file containing all key technical and commercial data for your selected properties is instantly downloaded.\n    *   **Automatic Lead Registration:** This action automatically registers your interest as a formal lead, connecting you with the property provider (or our O2O team) and initiating the transaction on your dashboard. No extra forms needed!\n\nThis workflow is all about empowering you with speed and data, so you can make faster, more informed decisions.",
+    "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "createdAt": "2024-10-01T09:00:00.000Z",
+    "category": "Learn",
+    "comments": []
   }
 ]
 
