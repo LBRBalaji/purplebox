@@ -38,7 +38,7 @@ import { useDebounce } from 'use-debounce';
 
 const createPostSchema = z.object({
   id: z.string().optional(),
-  text: z.string().min(1, 'Post content cannot be empty.').max(5000),
+  text: z.string().min(1, 'Post content cannot be empty.').max(10000),
   videoUrl: z.string().url().optional().or(z.literal('')),
   audioUrl: z.string().url().optional().or(z.literal('')),
   category: z.enum(['Learn', 'Events', 'Stories']),
@@ -677,3 +677,5 @@ export default function CommunityPage() {
     )
 }
 
+
+    
