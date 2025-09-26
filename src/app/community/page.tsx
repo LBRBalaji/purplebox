@@ -291,7 +291,7 @@ const EditableImage = ({ src, onImageChange, alt, hint, isAdmin, className = 'w-
 
 
 export default function CommunityPage() {
-    const { user, isLoading: isAuthLoading } = useAuth();
+    const { user, users, isLoading: isAuthLoading } = useAuth();
     const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading, deleteCommunityPost } = useData();
     const { toast } = useToast();
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
