@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading3, Pilcrow } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3 } from 'lucide-react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -57,8 +57,8 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
     resolver: zodResolver(createPostSchema),
     defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
-
-  const applyFormat = (formatType: 'bold') => {
+  
+  const applyFormat = (formatType: 'bold' | 'h1' | 'h2' | 'h3') => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
@@ -66,13 +66,25 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
     const end = textarea.selectionEnd;
     const currentValue = form.getValues('text');
     const selectedText = currentValue.substring(start, end);
-    
+
     let formattedText;
     let newCursorPos;
 
     switch (formatType) {
         case 'bold':
             formattedText = `<strong>${selectedText}</strong>`;
+            newCursorPos = start + formattedText.length;
+            break;
+        case 'h1':
+            formattedText = `<h1>${selectedText}</h1>`;
+            newCursorPos = start + formattedText.length;
+            break;
+        case 'h2':
+            formattedText = `<h2>${selectedText}</h2>`;
+            newCursorPos = start + formattedText.length;
+            break;
+        case 'h3':
+            formattedText = `<h3>${selectedText}</h3>`;
             newCursorPos = start + formattedText.length;
             break;
     }
@@ -148,6 +160,9 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                 <FormItem>
                    <div className="flex items-center gap-2 p-2 border-b">
                         <FormatButton onClick={() => applyFormat('bold')}><Bold className="h-4 w-4" /></FormatButton>
+                        <FormatButton onClick={() => applyFormat('h1')}><Heading1 className="h-4 w-4" /></FormatButton>
+                        <FormatButton onClick={() => applyFormat('h2')}><Heading2 className="h-4 w-4" /></FormatButton>
+                        <FormatButton onClick={() => applyFormat('h3')}><Heading3 className="h-4 w-4" /></FormatButton>
                     </div>
                   <FormControl>
                     <Textarea 
