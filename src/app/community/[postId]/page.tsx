@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn, Lock, Headphones } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn, Lock, Headphones, Share, Mail, Linkedin, Twitter, Facebook } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -19,6 +19,76 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { LoginDialog } from '@/components/login-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import type { CommunityPost } from '@/lib/schema';
+
+
+const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.919 6.066l-1.285 4.685 4.758-1.241z"
+      />
+    </svg>
+);
+
+function ShareDropdown({ post }: { post: CommunityPost }) {
+    const [currentUrl, setCurrentUrl] = React.useState('');
+
+    React.useEffect(() => {
+        setCurrentUrl(window.location.href);
+    }, []);
+
+    if (!currentUrl) return null;
+    
+    const postTitle = post.text.replace(/<[^>]+>/g, '').substring(0, 100);
+    const text = encodeURIComponent(`Check out this post on Lakshmi Balaji O2O: ${postTitle}...`);
+    const emailSubject = encodeURIComponent(`Interesting Post from Lakshmi Balaji O2O`);
+    const emailBody = encodeURIComponent(`I thought you might be interested in this post: "${postTitle}..."\n\nRead more here: ${currentUrl}`);
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                    <Share className="mr-2 h-4 w-4" /> Share
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                 <DropdownMenuItem asChild>
+                    <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} target="_blank" rel="noopener noreferrer">
+                        <Mail className="mr-2 h-4 w-4" /> Email
+                    </a>
+                 </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                    <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${text}`} target="_blank" rel="noopener noreferrer">
+                        <Linkedin className="mr-2 h-4 w-4" /> LinkedIn
+                    </a>
+                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${text}`} target="_blank" rel="noopener noreferrer">
+                        <Twitter className="mr-2 h-4 w-4" /> X / Twitter
+                    </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer">
+                        <Facebook className="mr-2 h-4 w-4" /> Facebook
+                    </a>
+                </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                    <a href={`https://api.whatsapp.com/send?text=${text}%20${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer">
+                        <WhatsAppIcon className="mr-2 h-4 w-4" /> WhatsApp
+                    </a>
+                 </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
 
 export default function CommunityPostPage() {
     const { postId } = useParams();
@@ -135,6 +205,7 @@ export default function CommunityPostPage() {
                             </div>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <ShareDropdown post={post} />
                                 <Badge variant="outline" className={cn("mt-4 w-fit", categoryInfo.color, badgeBorderColor)}>
                                     <CategoryIcon className="mr-1.5 h-3 w-3"/>
                                     {categoryInfo.label}
