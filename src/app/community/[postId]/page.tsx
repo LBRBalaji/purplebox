@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -128,7 +129,7 @@ export default function CommunityPostPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="prose prose-lg dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: fullPostText }} />
+                    <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: fullPostText }} />
                 </CardContent>
                 {user && (
                     <>

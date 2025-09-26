@@ -142,7 +142,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                       onInput={e => field.onChange(e.currentTarget.innerHTML)}
                       onBlur={field.onBlur}
                       dangerouslySetInnerHTML={{ __html: field.value.replace(/<!--more-->/g, `<div class="py-2"><hr><p class="text-center text-xs text-muted-foreground">---- Read More ----</p><hr></div>`) }}
-                      className="min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="prose prose-sm dark:prose-invert max-w-none min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </FormControl>
                 </FormItem>
