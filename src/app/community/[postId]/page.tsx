@@ -119,18 +119,20 @@ export default function CommunityPostPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    {videoEmbedUrl && (
-                         <div className="aspect-video w-full">
-                            <iframe
-                                src={videoEmbedUrl}
-                                title="Community Video Post"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                className="w-full h-full"
-                            ></iframe>
-                        </div>
-                    )}
-                    <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: fullPostText }} />
+                    <div className="prose dark:prose-invert max-w-none">
+                        {videoEmbedUrl && (
+                            <div className="aspect-video w-full not-prose mb-8">
+                                <iframe
+                                    src={videoEmbedUrl}
+                                    title="Community Video Post"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    className="w-full h-full"
+                                ></iframe>
+                            </div>
+                        )}
+                        <div dangerouslySetInnerHTML={{ __html: fullPostText }} />
+                    </div>
                 </CardContent>
                 {user && (
                     <>
