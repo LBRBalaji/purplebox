@@ -28,6 +28,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 const createPostSchema = z.object({
   id: z.string().optional(),
@@ -327,13 +328,23 @@ export default function CommunityPage() {
     const { user, users, isLoading: isAuthLoading } = useAuth();
     const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading, deleteCommunityPost } = useData();
     const { toast } = useToast();
+    const searchParams = useSearchParams();
+
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
     const [editingPost, setEditingPost] = React.useState<CommunityPost | null>(null);
     const [isFormVisible, setIsFormVisible] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState('');
+    const [activeTab, setActiveTab] = React.useState(searchParams.get('tab') || 'home');
 
     const isLoading = isAuthLoading || isDataLoading;
     const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+
+    React.useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
 
     const handleImageChange = (key: keyof typeof aboutUsContent) => (newSrc: string) => {
         if (aboutUsContent) {
@@ -464,7 +475,7 @@ export default function CommunityPage() {
             </section>
 
              <main className="container mx-auto p-4 md:p-8">
-                 <Tabs defaultValue="home" className="w-full">
+                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="home"><Home className="mr-2 h-4 w-4"/> Home</TabsTrigger>
                         <TabsTrigger value="learn"><BookOpen className="mr-2 h-4 w-4"/> Learn</TabsTrigger>
