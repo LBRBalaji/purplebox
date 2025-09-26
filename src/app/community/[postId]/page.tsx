@@ -97,17 +97,6 @@ export default function CommunityPostPage() {
                 </Link>
             </Button>
             <Card>
-                {videoEmbedUrl && (
-                    <div className="aspect-video relative rounded-t-lg overflow-hidden">
-                        <iframe
-                            src={videoEmbedUrl}
-                            title="Community Video Post"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="absolute inset-0 w-full h-full"
-                        ></iframe>
-                    </div>
-                )}
                 <CardHeader>
                      <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
@@ -128,7 +117,18 @@ export default function CommunityPostPage() {
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
+                    {videoEmbedUrl && (
+                        <div className="aspect-video relative overflow-hidden">
+                            <iframe
+                                src={videoEmbedUrl}
+                                title="Community Video Post"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="absolute inset-0 w-full h-full"
+                            ></iframe>
+                        </div>
+                    )}
                     <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: fullPostText }} />
                 </CardContent>
                 {user && (
