@@ -15,7 +15,9 @@
     "phone": "1234567890",
     "createdAt": "2025-09-08T10:00:00.000Z",
     "plan": "Paid_Premium",
-    "isCompanyAdmin": true
+    "isCompanyAdmin": true,
+    "password": "9841098170",
+    "confirmPassword": "9841098170"
   },
   "manager@o2o.com": {
     "email": "manager@o2o.com",

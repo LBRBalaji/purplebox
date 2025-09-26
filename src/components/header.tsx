@@ -226,6 +226,9 @@ export function Header() {
                         <NavLink href="/about-us">
                             <Info className="h-4 w-4" /> About Us
                         </NavLink>
+                        <NavLink href="/community">
+                            <Users className="h-4 w-4" /> Community
+                        </NavLink>
                          {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
                          {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
                     </>

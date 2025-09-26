@@ -473,3 +473,25 @@ export const acknowledgmentSchema = z.object({
   email: z.string().email(),
 });
 export type AcknowledgmentDetails = z.infer<typeof acknowledgmentSchema>;
+
+
+export const communityCommentSchema = z.object({
+  id: z.string(),
+  authorEmail: z.string(),
+  authorName: z.string(),
+  text: z.string(),
+  createdAt: z.string().datetime(),
+});
+
+export const communityPostSchema = z.object({
+  id: z.string(),
+  authorEmail: z.string(),
+  authorName: z.string(),
+  authorCompanyName: z.string(),
+  text: z.string(),
+  videoUrl: z.string().url().optional(),
+  createdAt: z.string().datetime(),
+  comments: z.array(communityCommentSchema),
+});
+
+export type CommunityPost = z.infer<typeof communityPostSchema>;

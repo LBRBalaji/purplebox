@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type NegotiationBoardSchema, type AcknowledgmentDetails, type LayoutRequestData } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type NegotiationBoardSchema, type AcknowledgmentDetails, type LayoutRequestData, type CommunityPost } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, startOfDay } from 'date-fns';
@@ -237,6 +237,9 @@ type DataContextType = {
   unreadChatCount: number;
   markNotificationsAsRead: () => void;
   addAgentToLead: (leadId: string, agentEmail: string) => void;
+  communityPosts: CommunityPost[];
+  addCommunityPost: (post: Omit<CommunityPost, 'id' | 'createdAt' | 'comments'>) => void;
+  addCommunityComment: (postId: string, comment: Omit<CommunityPost['comments'][0], 'id' | 'createdAt'>) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -284,13 +287,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
   
   const endpoints = [
     'listings', 'demands', 'submissions', 'agent-leads', 'listing-analytics',
     'registered-leads', 'transaction-activities', 'tenant-improvements',
     'negotiation-boards', 'about-us-content', 'location-circles',
     'download-acknowledgments', 'download-history', 'view-history',
-    'layout-requests', 'chat-messages', 'notifications', 'typing-status'
+    'layout-requests', 'chat-messages', 'notifications', 'typing-status',
+    'community-posts'
   ];
 
   const fetchData = useCallback(() => {
@@ -326,7 +331,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 setRegisteredLeads, setTransactionActivities, setTenantImprovements,
                 setNegotiationBoards, setAboutUsContent, setLocationCircles,
                 setDownloadAcknowledgments, setDownloadHistory, setViewHistory,
-                setLayoutRequests, setChatMessages, setNotifications, setTypingStatus
+                setLayoutRequests, setChatMessages, setNotifications, setTypingStatus,
+                setCommunityPosts
             ];
 
             stateSetters.forEach((setter, i) => {
@@ -404,6 +410,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), [persistData]);
   const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), [persistData]);
   const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), [persistData]);
+  const persistCommunityPosts = useCallback((updatedPosts: CommunityPost[]) => persistData('community-posts', updatedPosts, 'community posts'), [persistData]);
 
 
   const addNotification = useCallback((notification: Omit<Notification, 'isRead'>) => {
@@ -1161,6 +1168,41 @@ export function DataProvider({ children }: { children: ReactNode }) {
       clearNewMessages(threadId);
       setActiveChat(chat);
   }
+
+  const addCommunityPost = useCallback((postData: Omit<CommunityPost, 'id' | 'createdAt' | 'comments'>) => {
+    setCommunityPosts(prevPosts => {
+      const newPost: CommunityPost = {
+        ...postData,
+        id: `post-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        comments: [],
+      };
+      const updatedPosts = [newPost, ...prevPosts];
+      persistCommunityPosts(updatedPosts);
+      return updatedPosts;
+    });
+  }, [persistCommunityPosts]);
+
+  const addCommunityComment = useCallback((postId: string, commentData: Omit<CommunityPost['comments'][0], 'id' | 'createdAt'>) => {
+    setCommunityPosts(prevPosts => {
+      const updatedPosts = prevPosts.map(post => {
+        if (post.id === postId) {
+          const newComment = {
+            ...commentData,
+            id: `comment-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+          };
+          return {
+            ...post,
+            comments: [...post.comments, newComment],
+          };
+        }
+        return post;
+      });
+      persistCommunityPosts(updatedPosts);
+      return updatedPosts;
+    });
+  }, [persistCommunityPosts]);
   
   useEffect(() => {
     if (authUser) {
@@ -1242,7 +1284,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         unreadCount,
         unreadChatCount,
         markNotificationsAsRead,
-        addAgentToLead
+        addAgentToLead,
+        communityPosts,
+        addCommunityPost,
+        addCommunityComment
         }}>
       {children}
     </DataContext.Provider>
