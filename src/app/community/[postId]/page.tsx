@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn, Lock } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn, Lock, Headphones } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -145,6 +145,13 @@ export default function CommunityPostPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="prose dark:prose-invert max-w-none">
+                            {post.audioUrl && (
+                                <div className="not-prose mb-8">
+                                    <audio controls src={post.audioUrl} className="w-full">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </div>
+                            )}
                             {videoEmbedUrl && (
                                 <div className="aspect-video w-full not-prose mb-8">
                                     <iframe

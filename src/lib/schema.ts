@@ -262,9 +262,9 @@ export const createPropertySchema = (demand?: DemandSchema) => {
         userType: z.enum(['Developer', 'Owner']),
         userName: z.string(),
         userCompanyName: z.string(),
+        o2oDealDemandId: z.string().optional(),
         userPhoneNumber: z.string(),
         userEmail: z.string().email(),
-        o2oDealDemandId: z.string().optional(),
         approvalStatus: z.enum(['Obtained', 'Applied For', 'To Apply', 'Un-Approved']),
         approvalAuthority: z.enum(['DTCP', 'CMDA', 'BDA']).optional(),
         availablePower: z.coerce.number().optional(),
@@ -490,11 +490,10 @@ export const communityPostSchema = z.object({
   authorCompanyName: z.string(),
   text: z.string(),
   videoUrl: z.string().url().optional(),
+  audioUrl: z.string().url().optional(),
   createdAt: z.string().datetime(),
   category: z.enum(['Learn', 'Events', 'Stories']).default('Learn'),
   comments: z.array(communityCommentSchema),
 });
 
 export type CommunityPost = z.infer<typeof communityPostSchema>;
-
-    

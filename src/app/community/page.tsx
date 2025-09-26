@@ -8,7 +8,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3, UnfoldHorizontal, Sparkles } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3, UnfoldHorizontal, Sparkles, Headphones, UploadCloud } from 'lucide-react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -40,6 +40,7 @@ const createPostSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Post content cannot be empty.').max(5000),
   videoUrl: z.string().url().optional().or(z.literal('')),
+  audioUrl: z.string().url().optional().or(z.literal('')),
   category: z.enum(['Learn', 'Events', 'Stories']),
 });
 
@@ -96,10 +97,12 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   const { addCommunityPost, updateCommunityPost } = useData();
   const { toast } = useToast();
   const isEditMode = !!postToEdit;
+  const audioInputRef = React.useRef<HTMLInputElement>(null);
+  const [isUploadingAudio, setIsUploadingAudio] = React.useState(false);
 
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
-    defaultValues: { text: '', videoUrl: '', category: 'Stories' },
+    defaultValues: { text: '', videoUrl: '', audioUrl: '', category: 'Stories' },
   });
 
   const editor = useEditor({
@@ -126,12 +129,38 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
       id: postToEdit?.id,
       text: initialText,
       videoUrl: postToEdit?.videoUrl || '',
+      audioUrl: postToEdit?.audioUrl || '',
       category: postToEdit?.category || 'Stories',
     });
     if(editor && editor.isEditable) {
         editor.commands.setContent(initialText, false);
     }
   }, [postToEdit, form, editor]);
+
+
+  const handleAudioUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingAudio(true);
+    toast({ title: "Uploading audio..." });
+
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!response.ok) throw new Error((await response.json()).error || 'Upload failed');
+      const result = await response.json();
+      form.setValue('audioUrl', result.url, { shouldValidate: true });
+      toast({ title: "Audio uploaded successfully!" });
+    } catch (error) {
+      const e = error as Error;
+      toast({ variant: 'destructive', title: "Upload Failed", description: e.message });
+    } finally {
+      setIsUploadingAudio(false);
+    }
+  };
 
 
   const onSubmit = (data: CreatePostValues) => {
@@ -142,6 +171,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
             ...postToEdit!,
             text: data.text,
             videoUrl: data.videoUrl || undefined,
+            audioUrl: data.audioUrl || undefined,
             category: data.category,
         };
         updateCommunityPost(updatedPost);
@@ -153,6 +183,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
             authorCompanyName: user.companyName,
             text: data.text,
             videoUrl: data.videoUrl || undefined,
+            audioUrl: data.audioUrl || undefined,
             category: data.category,
         });
         toast({ title: "Post Created", description: "Your post is now live in the community." });
@@ -190,10 +221,29 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
               name="videoUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Video URL</FormLabel>
+                  <FormLabel>Video URL (YouTube/Vimeo)</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Optional: Paste a YouTube/Vimeo URL" />
+                    <Input {...field} placeholder="Optional: Paste a video URL" />
                   </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="audioUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Audio Podcast</FormLabel>
+                   <div className="flex items-center gap-2">
+                     <FormControl>
+                        <Input {...field} placeholder="Optional: Upload an audio file or paste a URL" />
+                     </FormControl>
+                     <Button type="button" variant="outline" onClick={() => audioInputRef.current?.click()} disabled={isUploadingAudio}>
+                       <UploadCloud className="mr-2 h-4 w-4" />
+                       {isUploadingAudio ? 'Uploading...' : 'Upload'}
+                     </Button>
+                     <input type="file" ref={audioInputRef} onChange={handleAudioUpload} accept="audio/mpeg,audio/wav,audio/ogg" className="hidden" />
+                   </div>
                 </FormItem>
               )}
             />
@@ -302,10 +352,18 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
                 )}
              </div>
         </div>
-        <Badge variant="outline" className={cn("mt-4 w-fit", categoryInfo.color, badgeBorderColor)}>
-            <CategoryIcon className="mr-1.5 h-3 w-3"/>
-            {categoryInfo.label}
-        </Badge>
+        <div className="flex items-center gap-2 mt-4">
+            <Badge variant="outline" className={cn("w-fit", categoryInfo.color, badgeBorderColor)}>
+                <CategoryIcon className="mr-1.5 h-3 w-3"/>
+                {categoryInfo.label}
+            </Badge>
+            {post.audioUrl && (
+                 <Badge variant="outline" className="w-fit border-purple-200 text-purple-600">
+                    <Headphones className="mr-1.5 h-3 w-3"/>
+                    Audio
+                </Badge>
+            )}
+        </div>
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-sm text-muted-foreground">{summary}</p>
