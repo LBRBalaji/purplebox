@@ -97,8 +97,8 @@ function CreatePostForm() {
 }
 
 function CommunityPostCard({ post }: { post: any }) {
-  const { user } = useAuth();
-  const { users, addCommunityComment } = useData();
+  const { user, users } = useAuth();
+  const { addCommunityComment } = useData();
   const { toast } = useToast();
   const [comment, setComment] = React.useState('');
 
