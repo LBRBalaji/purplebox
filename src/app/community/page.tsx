@@ -51,6 +51,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   const { toast } = useToast();
   
   const isEditMode = !!postToEdit;
+  const editorRef = React.useRef<HTMLDivElement>(null);
 
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
@@ -68,15 +69,15 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
 
 
   React.useEffect(() => {
-    if (postToEdit) {
-      form.reset({
-        id: postToEdit.id,
-        text: postToEdit.text,
-        videoUrl: postToEdit.videoUrl || '',
-        category: postToEdit.category,
-      });
-    } else {
-        form.reset({ text: '', videoUrl: '', category: 'Stories', id: undefined });
+    const initialText = postToEdit?.text || '';
+    form.reset({
+      id: postToEdit?.id,
+      text: initialText,
+      videoUrl: postToEdit?.videoUrl || '',
+      category: postToEdit?.category || 'Stories',
+    });
+    if (editorRef.current) {
+        editorRef.current.innerHTML = initialText.replace(/<!--more-->/g, `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`);
     }
   }, [postToEdit, form]);
 
@@ -108,6 +109,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
     }
     
     form.reset();
+    if (editorRef.current) editorRef.current.innerHTML = '';
     onFinished();
   };
 
@@ -139,10 +141,10 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                     </div>
                   <FormControl>
                     <div
+                      ref={editorRef}
                       contentEditable
                       onInput={e => field.onChange(e.currentTarget.innerHTML)}
                       onBlur={field.onBlur}
-                      dangerouslySetInnerHTML={{ __html: field.value.replace(/<!--more-->/g, `<div class="page-break my-4 border-t border-dashed relative text-center"><span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-card px-2 text-xs text-muted-foreground">Read More</span></div>`) }}
                       className="prose dark:prose-invert max-w-none min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </FormControl>
