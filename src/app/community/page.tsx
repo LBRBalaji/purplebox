@@ -57,6 +57,11 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   });
   
   const applyFormat = (command: 'bold' | 'formatBlock' | 'insertHTML', value?: string) => {
+    if (command === 'insertHTML' && value === '<!--more-->') {
+        const visualBreak = `<div class="py-2"><hr><p class="text-center text-xs text-muted-foreground">---- Read More ----</p><hr></div>`;
+        document.execCommand('insertHTML', false, visualBreak);
+        return;
+    }
     document.execCommand(command, false, value);
   };
 
@@ -76,11 +81,14 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
 
   const onSubmit = (data: CreatePostValues) => {
     if (!user) return;
+
+    // Convert visual page break back to the comment tag before saving
+    const finalContent = data.text.replace(/<div class="py-2"><hr><p class="text-center text-xs text-muted-foreground">---- Read More ----<\/p><hr><\/div>/g, '<!--more-->');
     
     if (isEditMode && data.id) {
         const updatedPost: CommunityPost = {
             ...postToEdit!,
-            text: data.text,
+            text: finalContent,
             videoUrl: data.videoUrl || undefined,
             category: data.category,
         };
@@ -91,7 +99,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
             authorEmail: user.email,
             authorName: user.userName,
             authorCompanyName: user.companyName,
-            text: data.text,
+            text: finalContent,
             videoUrl: data.videoUrl || undefined,
             category: data.category,
         });
@@ -133,7 +141,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                       contentEditable
                       onInput={e => field.onChange(e.currentTarget.innerHTML)}
                       onBlur={field.onBlur}
-                      dangerouslySetInnerHTML={{ __html: field.value }}
+                      dangerouslySetInnerHTML={{ __html: field.value.replace(/<!--more-->/g, `<div class="py-2"><hr><p class="text-center text-xs text-muted-foreground">---- Read More ----</p><hr></div>`) }}
                       className="min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </FormControl>

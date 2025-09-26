@@ -84,6 +84,8 @@ export default function CommunityPostPage() {
     const CategoryIcon = categoryInfo.icon;
     const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
 
+    // Remove the page break for full view
+    const fullPostText = post.text.replace(/<!--more-->/g, '');
 
     return (
         <main className="container mx-auto p-4 md:p-8 max-w-4xl">
@@ -126,7 +128,7 @@ export default function CommunityPostPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="prose prose-lg dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.text }} />
+                    <div className="prose prose-lg dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: fullPostText }} />
                 </CardContent>
                 {user && (
                     <>
