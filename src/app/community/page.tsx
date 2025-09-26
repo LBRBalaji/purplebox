@@ -7,7 +7,6 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Textarea } from '@/components/ui/textarea';
 import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3 } from 'lucide-react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -50,52 +49,14 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   const { toast } = useToast();
   
   const isEditMode = !!postToEdit;
-  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
-
 
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
     defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
   
-  const applyFormat = (formatType: 'bold' | 'h1' | 'h2' | 'h3') => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const currentValue = form.getValues('text');
-    const selectedText = currentValue.substring(start, end);
-
-    let formattedText;
-    let newCursorPos;
-
-    switch (formatType) {
-        case 'bold':
-            formattedText = `<strong>${selectedText}</strong>`;
-            newCursorPos = start + formattedText.length;
-            break;
-        case 'h1':
-            formattedText = `<h1>${selectedText}</h1>`;
-            newCursorPos = start + formattedText.length;
-            break;
-        case 'h2':
-            formattedText = `<h2>${selectedText}</h2>`;
-            newCursorPos = start + formattedText.length;
-            break;
-        case 'h3':
-            formattedText = `<h3>${selectedText}</h3>`;
-            newCursorPos = start + formattedText.length;
-            break;
-    }
-
-    const newValue = currentValue.substring(0, start) + formattedText + currentValue.substring(end);
-    form.setValue('text', newValue, { shouldValidate: true });
-
-    setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
+  const applyFormat = (command: 'bold' | 'formatBlock', value?: string) => {
+    document.execCommand(command, false, value);
   };
 
 
@@ -160,19 +121,18 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                 <FormItem>
                    <div className="flex items-center gap-2 p-2 border-b">
                         <FormatButton onClick={() => applyFormat('bold')}><Bold className="h-4 w-4" /></FormatButton>
-                        <FormatButton onClick={() => applyFormat('h1')}><Heading1 className="h-4 w-4" /></FormatButton>
-                        <FormatButton onClick={() => applyFormat('h2')}><Heading2 className="h-4 w-4" /></FormatButton>
-                        <FormatButton onClick={() => applyFormat('h3')}><Heading3 className="h-4 w-4" /></FormatButton>
+                        <FormatButton onClick={() => applyFormat('formatBlock', '<h1>')}><Heading1 className="h-4 w-4" /></FormatButton>
+                        <FormatButton onClick={() => applyFormat('formatBlock', '<h2>')}><Heading2 className="h-4 w-4" /></FormatButton>
+                        <FormatButton onClick={() => applyFormat('formatBlock', '<h3>')}><Heading3 className="h-4 w-4" /></FormatButton>
                     </div>
                   <FormControl>
-                    <Textarea 
-                      {...field}
-                      ref={(e) => {
-                        field.ref(e);
-                        textareaRef.current = e;
-                      }}
-                      placeholder={`What's on your mind, ${user.userName}? You can use HTML tags like <h3> or <strong> for formatting.`} 
-                      className="min-h-[120px] rounded-t-none border-t-0 focus-visible:ring-0" />
+                    <div
+                      contentEditable
+                      onInput={e => field.onChange(e.currentTarget.innerHTML)}
+                      onBlur={field.onBlur}
+                      dangerouslySetInnerHTML={{ __html: field.value }}
+                      className="min-h-[120px] rounded-md rounded-t-none border border-input border-t-0 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
                   </FormControl>
                 </FormItem>
               )}
