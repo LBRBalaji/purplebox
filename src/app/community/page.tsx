@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
+import Link from 'next/link';
 
 const createPostSchema = z.object({
   id: z.string().optional(),
@@ -166,66 +167,26 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
   );
 }
 
-function CommunityPostCard({ post, onEdit }: { post: CommunityPost; onEdit: (post: CommunityPost) => void; }) {
+function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; onEdit: (post: CommunityPost) => void; onDelete: (postId: string) => void; }) {
   const { user, users } = useAuth();
-  const { addCommunityComment, deleteCommunityPost } = useData();
-  const { toast } = useToast();
-  const [comment, setComment] = React.useState('');
-
+  
   const author = users[post.authorEmail] || { userName: post.authorName, companyName: post.authorCompanyName };
-  
   const canModify = user?.email === post.authorEmail || user?.role === 'SuperAdmin' || user?.role === 'O2O';
-
-  const handleAddComment = () => {
-    if (!user || !comment.trim()) return;
-    addCommunityComment(post.id, {
-      authorEmail: user.email,
-      authorName: user.userName,
-      text: comment,
-    });
-    setComment('');
-    toast({ title: 'Comment Added' });
-  };
   
-  const handleDelete = () => {
-    deleteCommunityPost(post.id);
-    toast({ title: "Post Deleted", description: "The post has been permanently removed." });
-  }
-
-  const isYouTube = post.videoUrl?.includes('youtube.com') || post.videoUrl?.includes('youtu.be');
-  let videoEmbedUrl = '';
-
-  if (post.videoUrl && isYouTube) {
-    const videoIdMatch = post.videoUrl.match(/(?:v=|\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-    const videoId = videoIdMatch && videoIdMatch[1];
-    if (videoId) {
-      videoEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
-    }
-  }
-
   const categoryConfig: { [key: string]: { icon: React.ElementType, color: string, label: string } } = {
-    Learn: { icon: Video, color: 'text-blue-600', label: 'Video/Tutorial' },
+    Learn: { icon: BookOpen, color: 'text-blue-600', label: 'Learn' },
     Events: { icon: Calendar, color: 'text-purple-600', label: 'Event' },
-    Stories: { icon: Briefcase, color: 'text-green-600', label: 'Market Development' },
-  }
+    Stories: { icon: Briefcase, color: 'text-green-600', label: 'Market Story' },
+  };
   const categoryInfo = categoryConfig[post.category] || { icon: FileText, color: 'text-gray-600', label: 'Post' };
   const CategoryIcon = categoryInfo.icon;
   const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
-
+  
+  // Create a summary by stripping HTML and truncating
+  const summary = post.text.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...';
 
   return (
-    <Card className="overflow-hidden">
-      {videoEmbedUrl && (
-        <div className="aspect-video relative">
-          <iframe
-            src={videoEmbedUrl}
-            title="Community Video Post"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="absolute inset-0 w-full h-full"
-          ></iframe>
-        </div>
-      )}
+    <Card className="flex flex-col">
       <CardHeader>
         <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
@@ -238,7 +199,7 @@ function CommunityPostCard({ post, onEdit }: { post: CommunityPost; onEdit: (pos
               </div>
             </div>
              <div className="flex items-center gap-1">
-                 <p className="text-xs text-muted-foreground ml-auto shrink-0">{new Date(post.createdAt).toLocaleString()}</p>
+                 <p className="text-xs text-muted-foreground ml-auto shrink-0">{new Date(post.createdAt).toLocaleDateString()}</p>
                 {canModify && (
                      <AlertDialog>
                         <DropdownMenu>
@@ -265,59 +226,26 @@ function CommunityPostCard({ post, onEdit }: { post: CommunityPost; onEdit: (pos
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                                <AlertDialogAction onClick={() => onDelete(post.id)}>Delete</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                 )}
              </div>
         </div>
-        <Badge variant="outline" className={cn("mt-4", categoryInfo.color, badgeBorderColor)}>
+        <Badge variant="outline" className={cn("mt-4 w-fit", categoryInfo.color, badgeBorderColor)}>
             <CategoryIcon className="mr-1.5 h-3 w-3"/>
             {categoryInfo.label}
         </Badge>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.text }} />
+      <CardContent className="flex-grow">
+        <p className="text-sm text-muted-foreground">{summary}</p>
       </CardContent>
-       {user && (
-         <>
-          <Separator />
-          <CardContent className="py-4 space-y-4">
-            <h4 className="font-semibold text-sm">Comments ({post.comments.length})</h4>
-            {post.comments.length > 0 && (
-                <div className="space-y-4 max-h-60 overflow-y-auto pr-2">
-                    {post.comments.map((comment: any) => {
-                        const commentAuthor = users[comment.authorEmail] || { userName: comment.authorName };
-                        return (
-                             <div key={comment.id} className="flex items-start gap-3">
-                                <Avatar className="h-8 w-8">
-                                    <AvatarFallback>{commentAuthor.userName.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-grow bg-secondary/50 p-3 rounded-lg">
-                                    <div className="flex items-center justify-between text-xs">
-                                        <p className="font-semibold">{commentAuthor.userName}</p>
-                                        <p className="text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</p>
-                                    </div>
-                                    <p className="text-sm mt-1">{comment.text}</p>
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
-            )}
-            <div className="flex items-start gap-2 pt-4 border-t">
-              <Avatar className="h-9 w-9">
-                <AvatarFallback>{user.userName.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="flex-grow">
-                <Textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Write a comment..." />
-                <Button onClick={handleAddComment} size="sm" className="mt-2">Add Comment</Button>
-              </div>
-            </div>
-          </CardContent>
-         </>
-      )}
+      <CardFooter>
+        <Button asChild className="w-full">
+            <Link href={`/community/${post.id}`}>Read More <ArrowRight className="ml-2 h-4 w-4"/></Link>
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
@@ -364,7 +292,8 @@ const EditableImage = ({ src, onImageChange, alt, hint, isAdmin, className = 'w-
 
 export default function CommunityPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
-    const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading } = useData();
+    const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading, deleteCommunityPost } = useData();
+    const { toast } = useToast();
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
     const [editingPost, setEditingPost] = React.useState<CommunityPost | null>(null);
     const [isFormVisible, setIsFormVisible] = React.useState(false);
@@ -383,6 +312,11 @@ export default function CommunityPage() {
         setIsFormVisible(true);
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
+    
+    const handleDeletePost = (postId: string) => {
+      deleteCommunityPost(postId);
+      toast({ title: "Post Deleted", description: "The post has been permanently removed." });
+    };
 
     const handleFormFinished = () => {
         setIsFormVisible(false);
@@ -460,7 +394,7 @@ export default function CommunityPage() {
             </section>
 
              <main className="container mx-auto p-4 md:p-8">
-                 <Tabs defaultValue="home">
+                 <Tabs defaultValue="home" className="w-full">
                     <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="home"><Home className="mr-2 h-4 w-4"/> Home</TabsTrigger>
                         <TabsTrigger value="learn"><BookOpen className="mr-2 h-4 w-4"/> Learn</TabsTrigger>
@@ -476,7 +410,7 @@ export default function CommunityPage() {
                             </div>
                             {categorizedPosts.stories.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} />)}
+                                    {categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} onDelete={handleDeletePost} />)}
                                 </div>
                             ) : (
                                 <Card className="text-center p-12">
@@ -504,7 +438,7 @@ export default function CommunityPage() {
                             />
                             {categorizedPosts.learn.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                                    {categorizedPosts.learn.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} />)}
+                                    {categorizedPosts.learn.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} onDelete={handleDeletePost} />)}
                                 </div>
                              ) : (
                                 <Card className="text-center p-12 mt-8">
@@ -532,7 +466,7 @@ export default function CommunityPage() {
                             />
                              {categorizedPosts.events.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                                    {categorizedPosts.events.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} />)}
+                                    {categorizedPosts.events.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} onDelete={handleDeletePost} />)}
                                 </div>
                             ) : (
                                 <Card className="text-center p-12 mt-8">
