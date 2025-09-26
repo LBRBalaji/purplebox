@@ -195,23 +195,24 @@ export default function CommunityPostPage() {
                 <Card>
                     <CardHeader>
                         <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-3">
-                            <Avatar>
-                                <AvatarFallback>{author.userName.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="font-semibold">{author.userName}</p>
-                                <p className="text-xs text-muted-foreground">{author.companyName}</p>
+                            <div className="flex items-center gap-4">
+                                <Avatar>
+                                    <AvatarFallback>{author.userName.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-semibold">{author.userName}</p>
+                                    <p className="text-xs text-muted-foreground -mt-0.5">{author.companyName}</p>
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+                                        <Badge variant="outline" className={cn("w-fit", categoryInfo.color, badgeBorderColor)}>
+                                            <CategoryIcon className="mr-1.5 h-3 w-3"/>
+                                            {categoryInfo.label}
+                                        </Badge>
+                                        <span>&bull;</span>
+                                        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
                             </div>
-                            </div>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                <ShareDropdown post={post} />
-                                <Badge variant="outline" className={cn("w-fit", categoryInfo.color, badgeBorderColor)}>
-                                    <CategoryIcon className="mr-1.5 h-3 w-3"/>
-                                    {categoryInfo.label}
-                                </Badge>
-                                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                            </div>
+                            <ShareDropdown post={post} />
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-6">
