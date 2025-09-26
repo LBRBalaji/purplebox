@@ -58,7 +58,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
     defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
 
-  const applyFormat = (formatType: 'bold' | 'h3' | 'p') => {
+  const applyFormat = (formatType: 'bold') => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
@@ -73,14 +73,6 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
     switch (formatType) {
         case 'bold':
             formattedText = `<strong>${selectedText}</strong>`;
-            newCursorPos = start + formattedText.length;
-            break;
-        case 'h3':
-            formattedText = `<h3>${selectedText}</h3>`;
-            newCursorPos = start + formattedText.length;
-            break;
-        case 'p':
-            formattedText = `<p>${selectedText}</p>`;
             newCursorPos = start + formattedText.length;
             break;
     }
@@ -156,8 +148,6 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
                 <FormItem>
                    <div className="flex items-center gap-2 p-2 border-b">
                         <FormatButton onClick={() => applyFormat('bold')}><Bold className="h-4 w-4" /></FormatButton>
-                        <FormatButton onClick={() => applyFormat('h3')}><Heading3 className="h-4 w-4" /></FormatButton>
-                        <FormatButton onClick={() => applyFormat('p')}><Pilcrow className="h-4 w-4" /></FormatButton>
                     </div>
                   <FormControl>
                     <Textarea 
