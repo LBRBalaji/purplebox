@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading3, Pilcrow } from 'lucide-react';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
@@ -38,17 +38,62 @@ const createPostSchema = z.object({
 
 type CreatePostValues = z.infer<typeof createPostSchema>;
 
+const FormatButton = ({ onClick, children }: { onClick: () => void, children: React.ReactNode }) => (
+    <Button type="button" variant="outline" size="sm" className="h-8 px-2" onMouseDown={(e) => e.preventDefault()} onClick={onClick}>
+        {children}
+    </Button>
+);
+
 function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost | null, onFinished: () => void }) {
   const { user } = useAuth();
   const { addCommunityPost, updateCommunityPost } = useData();
   const { toast } = useToast();
   
   const isEditMode = !!postToEdit;
+  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
+
 
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
     defaultValues: { text: '', videoUrl: '', category: 'Stories' },
   });
+
+  const applyFormat = (formatType: 'bold' | 'h3' | 'p') => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const currentValue = form.getValues('text');
+    const selectedText = currentValue.substring(start, end);
+    
+    let formattedText;
+    let newCursorPos;
+
+    switch (formatType) {
+        case 'bold':
+            formattedText = `<strong>${selectedText}</strong>`;
+            newCursorPos = start + formattedText.length;
+            break;
+        case 'h3':
+            formattedText = `<h3>${selectedText}</h3>`;
+            newCursorPos = start + formattedText.length;
+            break;
+        case 'p':
+            formattedText = `<p>${selectedText}</p>`;
+            newCursorPos = start + formattedText.length;
+            break;
+    }
+
+    const newValue = currentValue.substring(0, start) + formattedText + currentValue.substring(end);
+    form.setValue('text', newValue, { shouldValidate: true });
+
+    setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
 
   React.useEffect(() => {
     if (postToEdit) {
@@ -109,8 +154,20 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
               name="text"
               render={({ field }) => (
                 <FormItem>
+                   <div className="flex items-center gap-2 p-2 border-b">
+                        <FormatButton onClick={() => applyFormat('bold')}><Bold className="h-4 w-4" /></FormatButton>
+                        <FormatButton onClick={() => applyFormat('h3')}><Heading3 className="h-4 w-4" /></FormatButton>
+                        <FormatButton onClick={() => applyFormat('p')}><Pilcrow className="h-4 w-4" /></FormatButton>
+                    </div>
                   <FormControl>
-                    <Textarea {...field} placeholder={`What's on your mind, ${user.userName}? You can use HTML tags like <h3> or <strong> for formatting.`} className="min-h-[100px]" />
+                    <Textarea 
+                      {...field}
+                      ref={(e) => {
+                        field.ref(e);
+                        textareaRef.current = e;
+                      }}
+                      placeholder={`What's on your mind, ${user.userName}? You can use HTML tags like <h3> or <strong> for formatting.`} 
+                      className="min-h-[120px] rounded-t-none border-t-0 focus-visible:ring-0" />
                   </FormControl>
                 </FormItem>
               )}
@@ -182,8 +239,7 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
   const CategoryIcon = categoryInfo.icon;
   const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
   
-  // Create a summary by stripping HTML and truncating
-  const summary = post.text.substring(0, 150) + '...';
+  const summary = post.text.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...';
 
   return (
     <Card className="flex flex-col">
