@@ -183,7 +183,7 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
   const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
   
   // Create a summary by stripping HTML and truncating
-  const summary = post.text.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...';
+  const summary = post.text.substring(0, 150) + '...';
 
   return (
     <Card className="flex flex-col">
@@ -239,7 +239,7 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
         </Badge>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="text-sm text-muted-foreground">{summary}</p>
+        <div className="text-sm text-muted-foreground prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: summary }} />
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full">
