@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -297,6 +297,7 @@ export default function CommunityPage() {
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
     const [editingPost, setEditingPost] = React.useState<CommunityPost | null>(null);
     const [isFormVisible, setIsFormVisible] = React.useState(false);
+    const [searchTerm, setSearchTerm] = React.useState('');
 
     const isLoading = isAuthLoading || isDataLoading;
     const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
@@ -324,12 +325,22 @@ export default function CommunityPage() {
     }
 
 
-    const categorizedPosts = React.useMemo(() => {
-        const stories = communityPosts.filter(p => p.category === 'Stories').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        const learn = communityPosts.filter(p => p.category === 'Learn').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        const events = communityPosts.filter(p => p.category === 'Events').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const filteredCategorizedPosts = React.useMemo(() => {
+        let filteredPosts = communityPosts;
+
+        if (searchTerm) {
+            const lowerCaseSearch = searchTerm.toLowerCase();
+            filteredPosts = communityPosts.filter(post => 
+                post.text.toLowerCase().includes(lowerCaseSearch) ||
+                (users[post.authorEmail]?.userName.toLowerCase().includes(lowerCaseSearch))
+            );
+        }
+
+        const stories = filteredPosts.filter(p => p.category === 'Stories').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const learn = filteredPosts.filter(p => p.category === 'Learn').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const events = filteredPosts.filter(p => p.category === 'Events').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         return { stories, learn, events };
-    }, [communityPosts]);
+    }, [communityPosts, searchTerm, users]);
 
     if (isLoading) {
         return (
@@ -376,6 +387,32 @@ export default function CommunityPage() {
       );
     }
 
+    const renderPostGrid = (posts: CommunityPost[], emptyTitle: string, emptyDescription: string) => {
+        return (
+            <div className="space-y-6">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                        placeholder="Search posts..."
+                        className="pl-9"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                {posts.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {posts.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} onDelete={handleDeletePost} />)}
+                    </div>
+                ) : (
+                    <Card className="text-center p-12">
+                        <CardTitle>{emptyTitle}</CardTitle>
+                        <CardDescription>{emptyDescription}</CardDescription>
+                    </Card>
+                )}
+            </div>
+        )
+    }
+
     return (
         <div className="flex-grow bg-secondary/30">
             {/* Hero Section */}
@@ -408,15 +445,10 @@ export default function CommunityPage() {
                                    Insights from developers on upcoming projects and analysis from industry experts.
                                 </p>
                             </div>
-                            {categorizedPosts.stories.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {categorizedPosts.stories.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} onDelete={handleDeletePost} />)}
-                                </div>
-                            ) : (
-                                <Card className="text-center p-12">
-                                    <CardTitle>No Market Developments Posted Yet</CardTitle>
-                                    <CardDescription>Check back soon for updates from developers and industry experts.</CardDescription>
-                                </Card>
+                            {renderPostGrid(
+                                filteredCategorizedPosts.stories,
+                                "No Market Developments Posted Yet",
+                                "Check back soon for updates from developers and industry experts."
                             )}
                         </section>
                     </TabsContent>
@@ -436,16 +468,13 @@ export default function CommunityPage() {
                                 isAdmin={isAdmin}
                                 className="w-full h-[400px] object-cover"
                             />
-                            {categorizedPosts.learn.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                                    {categorizedPosts.learn.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} onDelete={handleDeletePost} />)}
-                                </div>
-                             ) : (
-                                <Card className="text-center p-12 mt-8">
-                                    <CardTitle>No Tutorials Posted Yet</CardTitle>
-                                    <CardDescription>Check back soon for guides and tips.</CardDescription>
-                                </Card>
-                            )}
+                            <div className="mt-8">
+                                {renderPostGrid(
+                                    filteredCategorizedPosts.learn,
+                                    "No Tutorials Posted Yet",
+                                    "Check back soon for guides and tips."
+                                )}
+                            </div>
                         </section>
                     </TabsContent>
                     <TabsContent value="events" className="mt-8">
@@ -464,16 +493,13 @@ export default function CommunityPage() {
                                 isAdmin={isAdmin}
                                 className="w-full h-[400px] object-cover"
                             />
-                             {categorizedPosts.events.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                                    {categorizedPosts.events.map(post => <CommunityPostCard key={post.id} post={post} onEdit={handleEditPost} onDelete={handleDeletePost} />)}
-                                </div>
-                            ) : (
-                                <Card className="text-center p-12 mt-8">
-                                    <CardTitle>No Events Posted Yet</CardTitle>
-                                    <CardDescription>Check back soon for upcoming events.</CardDescription>
-                                </Card>
-                            )}
+                             <div className="mt-8">
+                                {renderPostGrid(
+                                    filteredCategorizedPosts.events,
+                                    "No Events Posted Yet",
+                                    "Check back soon for upcoming events."
+                                )}
+                            </div>
                         </section>
                     </TabsContent>
                 </Tabs>
