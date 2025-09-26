@@ -10,13 +10,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Briefcase, FileText, LogIn } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { LoginDialog } from '@/components/login-dialog';
 
 export default function CommunityPostPage() {
     const { postId } = useParams();
@@ -25,6 +26,7 @@ export default function CommunityPostPage() {
     const { communityPosts, addCommunityComment, isLoading } = useData();
     const { toast } = useToast();
     const [comment, setComment] = React.useState('');
+    const [isLoginOpen, setIsLoginOpen] = React.useState(false);
 
     const post = React.useMemo(() => {
         return communityPosts.find(p => p.id === postId);
@@ -45,7 +47,6 @@ export default function CommunityPostPage() {
     }
     
     if (!post) {
-        // This can happen briefly on first load or if the post ID is invalid
         if (!isLoading) {
             router.push('/community');
         }
@@ -55,7 +56,12 @@ export default function CommunityPostPage() {
     const author = users[post.authorEmail] || { userName: post.authorName, companyName: post.authorCompanyName };
     
     const handleAddComment = () => {
-        if (!user || !comment.trim()) return;
+        if (!user) {
+            setIsLoginOpen(true);
+            return;
+        }
+        if (!comment.trim()) return;
+
         addCommunityComment(post.id, {
             authorEmail: user.email,
             authorName: user.userName,
@@ -87,6 +93,7 @@ export default function CommunityPostPage() {
     const backLink = `/community?tab=${categoryInfo.tab}`;
 
     return (
+        <>
         <main className="container mx-auto p-4 md:p-8 max-w-4xl">
              <Button asChild variant="ghost" className="mb-6">
                 <Link href={backLink}>
@@ -131,12 +138,11 @@ export default function CommunityPostPage() {
                         <div dangerouslySetInnerHTML={{ __html: post.text }} />
                     </div>
                 </CardContent>
-                {user && (
-                    <>
+                
                     <Separator />
                     <CardFooter className="flex-col items-start p-6 space-y-6">
                         <h4 className="font-semibold text-lg">Comments ({post.comments.length})</h4>
-                        {post.comments.length > 0 && (
+                        {post.comments.length > 0 ? (
                             <div className="space-y-4 w-full max-h-96 overflow-y-auto pr-2">
                                 {post.comments.map((comment: any) => {
                                     const commentAuthor = users[comment.authorEmail] || { userName: comment.authorName };
@@ -156,20 +162,30 @@ export default function CommunityPostPage() {
                                     )
                                 })}
                             </div>
+                        ) : <p className="text-sm text-muted-foreground">No comments yet. Be the first to reply!</p>}
+
+                        {user ? (
+                            <div className="flex items-start gap-2 pt-6 border-t w-full">
+                                <Avatar className="h-9 w-9">
+                                    <AvatarFallback>{user.userName.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-grow">
+                                    <Textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Write a comment..." />
+                                    <Button onClick={handleAddComment} size="sm" className="mt-2">Add Comment</Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="w-full pt-6 border-t text-center">
+                                <Button onClick={() => setIsLoginOpen(true)}>
+                                    <LogIn className="mr-2 h-4 w-4" />
+                                    Log In to Comment
+                                </Button>
+                            </div>
                         )}
-                        <div className="flex items-start gap-2 pt-6 border-t w-full">
-                        <Avatar className="h-9 w-9">
-                            <AvatarFallback>{user.userName.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-grow">
-                            <Textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Write a comment..." />
-                            <Button onClick={handleAddComment} size="sm" className="mt-2">Add Comment</Button>
-                        </div>
-                        </div>
                     </CardFooter>
-                    </>
-                )}
             </Card>
         </main>
+        <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
+        </>
     );
 }

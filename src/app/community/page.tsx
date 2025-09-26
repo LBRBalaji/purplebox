@@ -125,8 +125,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
       videoUrl: postToEdit?.videoUrl || '',
       category: postToEdit?.category || 'Stories',
     });
-    // Set editor content only after it has been initialized
-    if(editor) {
+    if(editor && editor.isEditable) {
         editor.commands.setContent(initialText, false);
     }
   }, [postToEdit, form, editor]);
@@ -250,7 +249,6 @@ function CommunityPostCard({ post, onEdit, onDelete }: { post: CommunityPost; on
   const CategoryIcon = categoryInfo.icon;
   const badgeBorderColor = `border-${categoryInfo.color.replace('text-', '')}/20`;
   
-  // Use a regex to create a summary, ignoring HTML tags
   const summary = post.text.replace(/<[^>]+>/g, '').substring(0, 150) + (post.text.length > 150 ? '...' : '');
   
   return (
@@ -429,33 +427,6 @@ export default function CommunityPage() {
             </main>
         )
     }
-
-    if (!user) {
-        return (
-            <>
-                <main className="container mx-auto p-4 md:p-8 flex-grow flex items-center justify-center">
-                    <Card className="max-w-md text-center">
-                        <CardHeader>
-                            <div className="mx-auto bg-primary/10 h-12 w-12 rounded-full flex items-center justify-center mb-4">
-                                <Users className="h-6 w-6 text-primary" />
-                            </div>
-                            <CardTitle>Join the Community Hub</CardTitle>
-                            <CardDescription>
-                                To view discussions and connect with other users, please log in or create an account.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardFooter>
-                            <Button className="w-full" onClick={() => setIsLoginOpen(true)}>
-                                <LogIn className="mr-2 h-4 w-4"/>
-                                Log In / Sign Up
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                </main>
-                <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
-            </>
-        )
-    }
     
     if (!aboutUsContent) {
       return (
@@ -491,112 +462,119 @@ export default function CommunityPage() {
         )
     }
 
-    return (
-        <div className="flex-grow bg-secondary/30">
-            {/* Hero Section */}
-            <section className="relative py-20 md:py-28 text-center bg-background">
-                 <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom_1px_center"></div>
-                 <div className="container mx-auto relative">
-                    <div className="max-w-3xl mx-auto">
-                        <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-primary">
-                           Engage with the Community
-                        </h1>
-                        <p className="mt-6 text-lg text-foreground max-w-2xl mx-auto">
-                           Connect with peers, share your stories, and get updates from the O2O team.
-                        </p>
-                    </div>
-                </div>
-            </section>
+    const handleCreatePostClick = () => {
+        if (!user) {
+            setIsLoginOpen(true);
+        } else {
+            setEditingPost(null);
+            setIsFormVisible(true);
+        }
+    };
 
-             <main className="container mx-auto p-4 md:p-8">
-                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="home"><Home className="mr-2 h-4 w-4"/> Home</TabsTrigger>
-                        <TabsTrigger value="learn"><BookOpen className="mr-2 h-4 w-4"/> Learn</TabsTrigger>
-                        <TabsTrigger value="events"><Calendar className="mr-2 h-4 w-4"/> Events</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="home" className="mt-8">
-                        <section>
-                            <div className="mb-8 text-center">
-                                <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Latest Developments & Markets</h2>
-                                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-                                   Insights from developers on upcoming projects and analysis from industry experts.
-                                </p>
-                            </div>
-                            {renderPostGrid(
-                                filteredCategorizedPosts.stories,
-                                "No Market Developments Posted Yet",
-                                "Check back soon for updates from developers and industry experts."
-                            )}
-                        </section>
-                    </TabsContent>
-                    <TabsContent value="learn" className="mt-8">
-                         <section>
-                             <div className="mb-8 text-center">
-                                <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Learn & Grow</h2>
-                                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-                                   Learn how to best take advantage of O2O features and functionality.
-                                </p>
-                            </div>
-                            <EditableImage 
-                                src={aboutUsContent.feature2}
-                                onImageChange={handleImageChange('feature2')}
-                                alt="Learning"
-                                hint="person using laptop learning"
-                                isAdmin={isAdmin}
-                                className="w-full h-[400px] object-cover"
-                            />
-                            <div className="mt-8">
-                                {renderPostGrid(
-                                    filteredCategorizedPosts.learn,
-                                    "No Tutorials Posted Yet",
-                                    "Check back soon for guides and tips."
-                                )}
-                            </div>
-                        </section>
-                    </TabsContent>
-                    <TabsContent value="events" className="mt-8">
-                         <section>
-                             <div className="mb-8 text-center">
-                                <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Events & Announcements</h2>
-                                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-                                   Stay updated with our upcoming webinars, meetups, and platform announcements.
-                                </p>
-                            </div>
-                            <EditableImage 
-                                src={aboutUsContent.feature3}
-                                onImageChange={handleImageChange('feature3')}
-                                alt="Events"
-                                hint="community event networking"
-                                isAdmin={isAdmin}
-                                className="w-full h-[400px] object-cover"
-                            />
-                             <div className="mt-8">
-                                {renderPostGrid(
-                                    filteredCategorizedPosts.events,
-                                    "No Events Posted Yet",
-                                    "Check back soon for upcoming events."
-                                )}
-                            </div>
-                        </section>
-                    </TabsContent>
-                </Tabs>
-                
-                {isFormVisible && (
-                     <CreatePostForm postToEdit={editingPost} onFinished={handleFormFinished} />
-                )}
-               
-                {!isFormVisible && (
-                    <div className="text-center mt-12">
-                        <Button size="lg" onClick={() => {
-                            setEditingPost(null);
-                            setIsFormVisible(true);
-                        }}>
-                           <Send className="mr-2 h-4 w-4" /> Create a New Post
-                        </Button>
+    return (
+        <>
+            <div className="flex-grow bg-secondary/30">
+                {/* Hero Section */}
+                <section className="relative py-20 md:py-28 text-center bg-background">
+                     <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom_1px_center"></div>
+                     <div className="container mx-auto relative">
+                        <div className="max-w-3xl mx-auto">
+                            <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-primary">
+                               Engage with the Community
+                            </h1>
+                            <p className="mt-6 text-lg text-foreground max-w-2xl mx-auto">
+                               Connect with peers, share your stories, and get updates from the O2O team.
+                            </p>
+                        </div>
                     </div>
-                )}
-            </main>
-        </div>
+                </section>
+
+                 <main className="container mx-auto p-4 md:p-8">
+                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                        <TabsList className="grid w-full grid-cols-3">
+                            <TabsTrigger value="home"><Home className="mr-2 h-4 w-4"/> Home</TabsTrigger>
+                            <TabsTrigger value="learn"><BookOpen className="mr-2 h-4 w-4"/> Learn</TabsTrigger>
+                            <TabsTrigger value="events"><Calendar className="mr-2 h-4 w-4"/> Events</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="home" className="mt-8">
+                            <section>
+                                <div className="mb-8 text-center">
+                                    <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Latest Developments & Markets</h2>
+                                    <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+                                       Insights from developers on upcoming projects and analysis from industry experts.
+                                    </p>
+                                </div>
+                                {renderPostGrid(
+                                    filteredCategorizedPosts.stories,
+                                    "No Market Developments Posted Yet",
+                                    "Check back soon for updates from developers and industry experts."
+                                )}
+                            </section>
+                        </TabsContent>
+                        <TabsContent value="learn" className="mt-8">
+                             <section>
+                                 <div className="mb-8 text-center">
+                                    <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Learn & Grow</h2>
+                                    <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+                                       Learn how to best take advantage of O2O features and functionality.
+                                    </p>
+                                </div>
+                                <EditableImage 
+                                    src={aboutUsContent.feature2}
+                                    onImageChange={handleImageChange('feature2')}
+                                    alt="Learning"
+                                    hint="person using laptop learning"
+                                    isAdmin={isAdmin}
+                                    className="w-full h-[400px] object-cover"
+                                />
+                                <div className="mt-8">
+                                    {renderPostGrid(
+                                        filteredCategorizedPosts.learn,
+                                        "No Tutorials Posted Yet",
+                                        "Check back soon for guides and tips."
+                                    )}
+                                </div>
+                            </section>
+                        </TabsContent>
+                        <TabsContent value="events" className="mt-8">
+                             <section>
+                                 <div className="mb-8 text-center">
+                                    <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Events & Announcements</h2>
+                                    <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+                                       Stay updated with our upcoming webinars, meetups, and platform announcements.
+                                    </p>
+                                </div>
+                                <EditableImage 
+                                    src={aboutUsContent.feature3}
+                                    onImageChange={handleImageChange('feature3')}
+                                    alt="Events"
+                                    hint="community event networking"
+                                    isAdmin={isAdmin}
+                                    className="w-full h-[400px] object-cover"
+                                />
+                                 <div className="mt-8">
+                                    {renderPostGrid(
+                                        filteredCategorizedPosts.events,
+                                        "No Events Posted Yet",
+                                        "Check back soon for upcoming events."
+                                    )}
+                                </div>
+                            </section>
+                        </TabsContent>
+                    </Tabs>
+                    
+                    {isFormVisible ? (
+                         <CreatePostForm postToEdit={editingPost} onFinished={handleFormFinished} />
+                    ) : (
+                        <div className="text-center mt-12">
+                            <Button size="lg" onClick={handleCreatePostClick}>
+                               <Send className="mr-2 h-4 w-4" /> Create a New Post
+                            </Button>
+                        </div>
+                    )}
+                </main>
+            </div>
+            <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
+        </>
     )
 }
