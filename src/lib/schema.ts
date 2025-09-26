@@ -497,3 +497,14 @@ export const communityPostSchema = z.object({
 });
 
 export type CommunityPost = z.infer<typeof communityPostSchema>;
+
+export const shareHistoryEntrySchema = z.object({
+  id: z.string(),
+  postId: z.string(),
+  postTitle: z.string(),
+  sharedByEmail: z.string(),
+  sharedByName: z.string(),
+  platform: z.enum(['Email', 'LinkedIn', 'Twitter', 'Facebook', 'WhatsApp']),
+  timestamp: z.string().datetime(),
+});
+export type ShareHistoryEntry = z.infer<typeof shareHistoryEntrySchema>;

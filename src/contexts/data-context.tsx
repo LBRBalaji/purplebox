@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type NegotiationBoardSchema, type AcknowledgmentDetails, type LayoutRequestData, type CommunityPost } from '@/lib/schema';
+import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type NegotiationBoardSchema, type AcknowledgmentDetails, type LayoutRequestData, type CommunityPost, type ShareHistoryEntry } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, startOfDay } from 'date-fns';
@@ -242,6 +242,7 @@ type DataContextType = {
   updateCommunityPost: (post: CommunityPost) => void;
   deleteCommunityPost: (postId: string) => void;
   addCommunityComment: (postId: string, comment: Omit<CommunityPost['comments'][0], 'id' | 'createdAt'>) => void;
+  logShareActivity: (shareData: Omit<ShareHistoryEntry, 'id' | 'timestamp'>) => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -290,6 +291,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadChatCount, setUnreadChatCount] = useState(0);
   const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
+  const [shareHistory, setShareHistory] = useState<ShareHistoryEntry[]>([]);
   
   const endpoints = [
     'listings', 'demands', 'submissions', 'agent-leads', 'listing-analytics',
@@ -297,7 +299,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     'negotiation-boards', 'about-us-content', 'location-circles',
     'download-acknowledgments', 'download-history', 'view-history',
     'layout-requests', 'chat-messages', 'notifications', 'typing-status',
-    'community-posts'
+    'community-posts', 'share-history'
   ];
 
   const fetchData = useCallback(() => {
@@ -334,7 +336,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 setNegotiationBoards, setAboutUsContent, setLocationCircles,
                 setDownloadAcknowledgments, setDownloadHistory, setViewHistory,
                 setLayoutRequests, setChatMessages, setNotifications, setTypingStatus,
-                setCommunityPosts
+                setCommunityPosts, setShareHistory
             ];
 
             stateSetters.forEach((setter, i) => {
@@ -413,6 +415,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), [persistData]);
   const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), [persistData]);
   const persistCommunityPosts = useCallback((updatedPosts: CommunityPost[]) => persistData('community-posts', updatedPosts, 'community posts'), [persistData]);
+  const persistShareHistory = useCallback((updatedHistory: ShareHistoryEntry[]) => persistData('share-history', updatedHistory, 'share history'), [persistData]);
 
 
   const addNotification = useCallback((notification: Omit<Notification, 'isRead'>) => {
@@ -1221,6 +1224,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
       return updatedPosts;
     });
   }, [persistCommunityPosts]);
+
+  const logShareActivity = useCallback((shareData: Omit<ShareHistoryEntry, 'id' | 'timestamp'>) => {
+      setShareHistory(prev => {
+          const newEntry: ShareHistoryEntry = {
+              ...shareData,
+              id: `share-${Date.now()}`,
+              timestamp: new Date().toISOString(),
+          };
+          const updatedHistory = [newEntry, ...prev];
+          persistShareHistory(updatedHistory);
+          return updatedHistory;
+      });
+  }, [persistShareHistory]);
   
   useEffect(() => {
     if (authUser) {
@@ -1307,7 +1323,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         addCommunityPost,
         updateCommunityPost,
         deleteCommunityPost,
-        addCommunityComment
+        addCommunityComment,
+        logShareActivity,
         }}>
       {children}
     </DataContext.Provider>

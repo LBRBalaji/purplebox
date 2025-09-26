@@ -39,11 +39,24 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 function ShareDropdown({ post }: { post: CommunityPost }) {
+    const { user } = useAuth();
+    const { logShareActivity } = useData();
     const [currentUrl, setCurrentUrl] = React.useState('');
 
     React.useEffect(() => {
         setCurrentUrl(window.location.href);
     }, []);
+
+    const handleShare = (platform: 'Email' | 'LinkedIn' | 'Twitter' | 'Facebook' | 'WhatsApp') => {
+        if (!user) return;
+        logShareActivity({
+            postId: post.id,
+            postTitle: post.text.substring(0, 100),
+            sharedByEmail: user.email,
+            sharedByName: user.userName,
+            platform,
+        });
+    };
 
     if (!currentUrl) return null;
     
@@ -61,27 +74,27 @@ function ShareDropdown({ post }: { post: CommunityPost }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                  <DropdownMenuItem asChild>
-                    <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} target="_blank" rel="noopener noreferrer" onClick={() => handleShare('Email')}>
                         <Mail className="mr-2 h-4 w-4" /> Email
                     </a>
                  </DropdownMenuItem>
                  <DropdownMenuItem asChild>
-                    <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${text}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${text}`} target="_blank" rel="noopener noreferrer" onClick={() => handleShare('LinkedIn')}>
                         <Linkedin className="mr-2 h-4 w-4" /> LinkedIn
                     </a>
                  </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${text}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${text}`} target="_blank" rel="noopener noreferrer" onClick={() => handleShare('Twitter')}>
                         <Twitter className="mr-2 h-4 w-4" /> X / Twitter
                     </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer" onClick={() => handleShare('Facebook')}>
                         <Facebook className="mr-2 h-4 w-4" /> Facebook
                     </a>
                 </DropdownMenuItem>
                  <DropdownMenuItem asChild>
-                    <a href={`https://api.whatsapp.com/send?text=${text}%20${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`https://api.whatsapp.com/send?text=${text}%20${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer" onClick={() => handleShare('WhatsApp')}>
                         <WhatsAppIcon className="mr-2 h-4 w-4" /> WhatsApp
                     </a>
                  </DropdownMenuItem>
