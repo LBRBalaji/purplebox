@@ -3,29 +3,21 @@
     "authorEmail": "superadmin@o2o.com",
     "authorName": "O2O Super Admin",
     "authorCompanyName": "O2O Platform",
+    "text": "<h3><b>Find Your Perfect Match with Advanced Filters</b></h3><p></p><p>Tired of sifting through endless listings that don't quite fit your needs? Our platform's advanced filters are designed to help you go beyond a simple search and zero in on the exact properties that meet your unique requirements. This powerful tool puts you in control, allowing you to quickly find your ideal warehouse and save valuable time.</p><p><span style=\"background-color: rgb(252, 252, 253); color: rgb(93, 77, 128); font-size: 0.75rem; text-align: center;\"><br></span></p><h3><b>How It Works:</b> Refine Your Search with Precision&nbsp;</h3><h3><span style=\"background-color: rgb(252, 252, 253); color: rgb(93, 77, 128); font-size: 0.75rem; text-align: center;\">Read More</span></h3><div><br></div><p></p><p><b>1. Keyword Search: Get Specific</b>\nLooking for a warehouse with a specific feature? Use our keyword search to find exactly what you need. Enter terms like \"12m eve height,\" \"crane available,\" or \"3PL operated\" to instantly find listings with those specific characteristics.</p><p><br></p><p><b>2. Location Focus: Pinpoint Your Area</b>\nNeed a property in a specific area? Easily narrow down your search to a particular city or industrial park. Whether you're targeting \"Oragadam\" or \"Thiruvallur,\" our location filter helps you focus on the markets that matter most to your business.</p><p><br></p><p><b>3. Possession Readiness: Plan for the Future</b>\nWhether you need to move in immediately or are planning ahead, our filters have you covered. Select \"Ready for Occupancy\" to find properties you can move into right away, or filter for \"Under Construction\" to plan your future expansion.</p><p><br></p><p><b>4. Size Range: Find Your Fit</b>\nEvery business has unique space requirements. Use our size slider to define the exact square footage you need, from a small-scale operation to a massive distribution center.</p><p><br></p><p><b>5. Premium Listings: Connect with Developers</b>\nWant to engage directly with developers? Use the \"Show Premium Listings Only\" filter to isolate properties offered directly from the source.</p><p><br></p><p>By combining these filters, you can move from a broad search to a highly qualified shortlist in minutes. Spend less time searching and more time making the right decisions for your business.</p>",
+    "category": "Learn",
+    "id": "post-1758852498692",
+    "createdAt": "2025-09-26T02:08:18.692Z",
+    "comments": []
+  },
+  {
+    "authorEmail": "superadmin@o2o.com",
+    "authorName": "O2O Super Admin",
+    "authorCompanyName": "O2O Platform",
     "text": "<h1>Your Fastest Path to the Perfect Warehouse</h1><p></p><p>Ready to find your next warehouse in record time? Our <b>Search-Select-Download</b> feature is designed to put you in the driver’s seat. Instead of sifting through countless listings and filling out forms, you can now get the data you need in just a few clicks. It's the quickest way to get a head start on your property search and kick off your transaction process.</p><!--more--><h1>How it Works: A Simple 3-Step Workflow</h1><div><br></div><p></p><p></p><h4><b>1. Search &amp; Filter: Find Exactly What You Need</b></h4><p></p><p>Start on our main listings page. Use the search bar to look for specific locations, building types, or keywords. Need something more specific? Our advanced filters let you narrow down your options by size, availability, and more. This step helps you quickly find a relevant set of properties from our extensive inventory.</p><p><br></p><p></p><h4><b>2. Select: Build Your Shortlist</b></h4><p></p><p>As you browse, simply click the checkbox on any property card that catches your eye. This adds the listing to a temporary selection list. You can add up to 5 of your favorite properties at a time, making it easy to create a focused shortlist for comparison.</p><p><br></p><p></p><h4><b>3. Download &amp; Go: Instant Data, Automated Engagement</b></h4><p></p><p>Once you have your selections, a <b>Download</b> bar will appear. Click it, and you’ll get instant value with a seamless transition into a formal engagement.</p><ul><li><p><b>Agree to Terms:</b> If it's your first time downloading, you'll be prompted to agree to our \"Terms of Download.\" This agreement outlines our zero-brokerage commitment for startups and logistics companies and ensures all transactions are handled smoothly through our platform.</p></li><li><p><br></p></li><li><p><b>Get Your CSV:</b> The system instantly generates a clean, structured CSV file with all the key technical, commercial, and compliance details for your selected properties. The file is ready to be used in your internal reports or presentations.</p></li><li><p><br></p></li><li><p><b>Automatic Lead Registration:</b> Here’s the best part: this action automatically creates a lead in the background. Without needing to fill out a separate form, you are now formally connected with the property providers, and the transaction process begins on your \"My Transactions\" dashboard.</p></li></ul><p></p><h3><br></h3><h3><b>The Bottom Line</b></h3><div><b style=\"font-size: 0.875rem; color: rgb(23, 19, 32);\">Search-Select-Download</b><span style=\"font-size: 0.875rem; color: rgb(23, 19, 32);\"> is more than just a tool—it's your fastest way to get the data you need while simultaneously initiating a formal engagement on the platform. It saves you time, streamlines your process, and helps you make faster, more informed decisions for your business.</span></div><p>Ready to give it a try? Start your search now and experience the power of instant data and seamless transactions.</p>",
     "category": "Learn",
     "id": "post-1758850983166",
     "createdAt": "2025-09-26T01:43:03.166Z",
     "comments": []
-  },
-  {
-    "id": "post-1",
-    "authorEmail": "superadmin@o2o.com",
-    "authorName": "O2O Super Admin",
-    "authorCompanyName": "Lakshmi Balaji O2O",
-    "text": "Welcome to the Community Forum! This is a place to ask questions, share insights, and connect with other users and the O2O team. We're excited to have you here.",
-    "createdAt": "2024-09-25T10:00:00.000Z",
-    "category": "Learn",
-    "comments": [
-      {
-        "id": "comment-1-1",
-        "authorEmail": "customer1@o2o.com",
-        "authorName": "Alex Ray",
-        "text": "This is great! Looking forward to connecting with everyone.",
-        "createdAt": "2024-09-25T10:05:00.000Z"
-      }
-    ]
   },
   {
     "id": "post-2",
