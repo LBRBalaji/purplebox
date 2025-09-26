@@ -9,3 +9,5 @@ import '@/ai/“/flows/get-property-match-score.ts';
 import '@/ai/flows/get-warehouses.ts';
 import '@/ai/flows/generate-listing-description.ts';
 import '@/ai/flows/predict-demand-trends.ts';
+import '@/ai/flows/find-relevant-posts.ts';
+

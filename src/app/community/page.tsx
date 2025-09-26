@@ -8,7 +8,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3, UnfoldHorizontal } from 'lucide-react';
+import { Send, Users, Video, BookOpen, Calendar, Rss, LogIn, Edit, FileText, Briefcase, Home, Trash2, MoreHorizontal, ArrowRight, Search, Bold, Heading1, Heading2, Heading3, UnfoldHorizontal, Sparkles } from 'lucide-react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,6 +32,9 @@ import { useSearchParams } from 'next/navigation';
 import { useEditor, EditorContent, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Heading from '@tiptap/extension-heading'
+import { findRelevantPosts } from '@/ai/flows/find-relevant-posts';
+import { useDebounce } from 'use-debounce';
+
 
 const createPostSchema = z.object({
   id: z.string().optional(),
@@ -357,7 +360,7 @@ const EditableImage = ({ src, onImageChange, alt, hint, isAdmin, className = 'w-
 
 
 export default function CommunityPage() {
-    const { user, users, isLoading: isAuthLoading } = useAuth();
+    const { user, isLoading: isAuthLoading } = useAuth();
     const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading, deleteCommunityPost } = useData();
     const { toast } = useToast();
     const searchParams = useSearchParams();
@@ -366,7 +369,10 @@ export default function CommunityPage() {
     const [editingPost, setEditingPost] = React.useState<CommunityPost | null>(null);
     const [isFormVisible, setIsFormVisible] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState('');
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [activeTab, setActiveTab] = React.useState(searchParams.get('tab') || 'home');
+    const [isSearching, setIsSearching] = React.useState(false);
+    const [searchResults, setSearchResults] = React.useState<CommunityPost[] | null>(null);
 
     const isLoading = isAuthLoading || isDataLoading;
     const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
@@ -377,6 +383,36 @@ export default function CommunityPage() {
             setActiveTab(tab);
         }
     }, [searchParams]);
+    
+    React.useEffect(() => {
+      const performSearch = async () => {
+        if (debouncedSearchTerm.trim().length > 2) {
+          setIsSearching(true);
+          try {
+            const result = await findRelevantPosts({
+              query: debouncedSearchTerm,
+              posts: communityPosts,
+            });
+            setSearchResults(result.relevantPosts || []);
+          } catch (error) {
+            console.error("AI search failed:", error);
+            toast({
+              variant: 'destructive',
+              title: 'Search Error',
+              description: 'Could not perform AI-powered search.',
+            });
+            setSearchResults(null); // Fallback to keyword search could be implemented here
+          } finally {
+            setIsSearching(false);
+          }
+        } else {
+          setSearchResults(null);
+        }
+      };
+
+      performSearch();
+    }, [debouncedSearchTerm, communityPosts, toast]);
+
 
     const handleImageChange = (key: keyof typeof aboutUsContent) => (newSrc: string) => {
         if (aboutUsContent) {
@@ -401,22 +437,23 @@ export default function CommunityPage() {
     }
 
 
-    const filteredCategorizedPosts = React.useMemo(() => {
-        let filteredPosts = communityPosts;
-
-        if (searchTerm) {
-            const lowerCaseSearch = searchTerm.toLowerCase();
-            filteredPosts = communityPosts.filter(post => 
-                post.text.toLowerCase().includes(lowerCaseSearch) ||
-                (users[post.authorEmail]?.userName.toLowerCase().includes(lowerCaseSearch))
-            );
-        }
-
-        const stories = filteredPosts.filter(p => p.category === 'Stories').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        const learn = filteredPosts.filter(p => p.category === 'Learn').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        const events = filteredPosts.filter(p => p.category === 'Events').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const categorizedPosts = React.useMemo(() => {
+        const stories = communityPosts.filter(p => p.category === 'Stories').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const learn = communityPosts.filter(p => p.category === 'Learn').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const events = communityPosts.filter(p => p.category === 'Events').sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         return { stories, learn, events };
-    }, [communityPosts, searchTerm, users]);
+    }, [communityPosts]);
+    
+    const displayedPosts = React.useMemo(() => {
+        if (searchResults) {
+            const stories = searchResults.filter(p => p.category === 'Stories');
+            const learn = searchResults.filter(p => p.category === 'Learn');
+            const events = searchResults.filter(p => p.category === 'Events');
+            return { stories, learn, events };
+        }
+        return categorizedPosts;
+    }, [searchResults, categorizedPosts]);
+
 
     if (isLoading) {
         return (
@@ -437,12 +474,15 @@ export default function CommunityPage() {
     }
 
     const renderPostGrid = (posts: CommunityPost[], emptyTitle: string, emptyDescription: string) => {
+        const showNoResults = (searchTerm && !isSearching && posts.length === 0);
+        
         return (
             <div className="space-y-6">
                 <div className="relative max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    {isSearching && <Sparkles className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary animate-pulse" />}
                     <Input 
-                        placeholder="Search posts..."
+                        placeholder="Ask a question or search posts..."
                         className="pl-9"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -454,8 +494,8 @@ export default function CommunityPage() {
                     </div>
                 ) : (
                     <Card className="text-center p-12">
-                        <CardTitle>{emptyTitle}</CardTitle>
-                        <CardDescription>{emptyDescription}</CardDescription>
+                        <CardTitle>{showNoResults ? 'No Results Found' : emptyTitle}</CardTitle>
+                        <CardDescription>{showNoResults ? `Your search for "${searchTerm}" did not return any relevant posts.` : emptyDescription}</CardDescription>
                     </Card>
                 )}
             </div>
@@ -505,7 +545,7 @@ export default function CommunityPage() {
                                     </p>
                                 </div>
                                 {renderPostGrid(
-                                    filteredCategorizedPosts.stories,
+                                    displayedPosts.stories,
                                     "No Market Developments Posted Yet",
                                     "Check back soon for updates from developers and industry experts."
                                 )}
@@ -529,7 +569,7 @@ export default function CommunityPage() {
                                 />
                                 <div className="mt-8">
                                     {renderPostGrid(
-                                        filteredCategorizedPosts.learn,
+                                        displayedPosts.learn,
                                         "No Tutorials Posted Yet",
                                         "Check back soon for guides and tips."
                                     )}
@@ -554,7 +594,7 @@ export default function CommunityPage() {
                                 />
                                  <div className="mt-8">
                                     {renderPostGrid(
-                                        filteredCategorizedPosts.events,
+                                        displayedPosts.events,
                                         "No Events Posted Yet",
                                         "Check back soon for upcoming events."
                                     )}
@@ -578,3 +618,4 @@ export default function CommunityPage() {
         </>
     )
 }
+
