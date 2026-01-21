@@ -1,5 +1,16 @@
 [
   {
+    "id": "notif-1759388406106-namasivayam.lion@gmail.com-0.6053875427992131",
+    "type": "new_chat_message",
+    "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-DL-1758879893285-0.9151866550747662: \"Is this warehouse still available?...\"",
+    "href": "/dashboard/leads/LDR-DL-1758879893285-0.9151866550747662",
+    "recipientEmail": "namasivayam.lion@gmail.com",
+    "timestamp": "2025-10-02T07:00:06.106Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
     "id": "notif-2025-09-26T10:32:43.205Z-admin@ccidevelopers.com-0.14152800261141318",
     "type": "new_activity",
     "title": "Update on Transaction: LDR-DL-1758879893271-0.4572376849623483",
@@ -19,7 +30,7 @@
     "recipientEmail": "murugan@xyzlogistics.com",
     "timestamp": "2025-09-26T09:48:44.864Z",
     "triggeredBy": "admin@ccidevelopers.com",
-    "isRead": false
+    "isRead": true
   },
   {
     "id": "notif-1758879893285-namasivayam.lion@gmail.com-0.8995656068903296",
@@ -52,7 +63,7 @@
     "recipientEmail": "murugan@xyzlogistics.com",
     "timestamp": "2025-09-25T11:02:34.415Z",
     "triggeredBy": "admin@indospace.com",
-    "isRead": false
+    "isRead": true
   },
   {
     "id": "notif-1758798138816-admin@indospace.com-0.3543769636199414",
