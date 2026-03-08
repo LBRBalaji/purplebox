@@ -454,7 +454,7 @@ const EditableImage = ({ src, onImageChange, alt, hint, isAdmin, className = 'w-
 };
 
 
-export default function CommunityPage() {
+function CommunityPageInner() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const { communityPosts, aboutUsContent, updateAboutUsContent, isLoading: isDataLoading, deleteCommunityPost } = useData();
     const searchParams = useSearchParams();
@@ -686,4 +686,13 @@ export default function CommunityPage() {
             <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
         </>
     )
+}
+
+
+export default function CommunityPage() {
+  return (
+    <React.Suspense fallback={<div>Loading</div>}>
+      <CommunityPageInner />
+    </React.Suspense>
+  );
 }
