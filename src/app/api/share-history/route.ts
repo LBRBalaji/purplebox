@@ -1,9 +1,6 @@
-
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const dataFilePath = path.join(process.cwd(), 'src/data/share-history.json');
+import { db } from '@/lib/firebase';
+import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -18,31 +15,39 @@ export async function OPTIONS() {
 
 export async function GET() {
   try {
-    if (!fs.existsSync(dataFilePath)) {
-      return new NextResponse('[]', { status: 200, headers });
+    const snapshot = await getDocs(collection(db, ''));
+    if (isArray) {
+      const data = snapshot.docs
+        .sort((a, b) => Number(a.id) - Number(b.id))
+        .map(d => d.data());
+      return NextResponse.json(data, { headers });
+    } else {
+      const data: Record<string, any> = {};
+      snapshot.forEach(d => { data[d.id] = d.data(); });
+      return NextResponse.json(data, { headers });
     }
-    const readStream = fs.createReadStream(dataFilePath, { encoding: 'utf8' });
-    const webStream = new ReadableStream({
-      start(controller) {
-        readStream.on('data', (chunk) => controller.enqueue(chunk));
-        readStream.on('end', () => controller.close());
-        readStream.on('error', (err) => controller.error(err));
-      },
-    });
-    return new NextResponse(webStream, { status: 200, headers });
   } catch (error) {
-     console.error('Failed to read share history data:', error);
-     return NextResponse.json({ message: 'Failed to read share history' }, { status: 500, headers });
+    console.error('Failed to read :', error);
+    return NextResponse.json({ message: 'Failed to read data' }, { status: 500, headers });
   }
 }
 
 export async function POST(request: Request) {
-    try {
-        const newData = await request.json();
-        fs.writeFileSync(dataFilePath, JSON.stringify(newData, null, 2));
-        return NextResponse.json({ message: 'Share history updated successfully' }, { headers });
-    } catch (error) {
-        console.error('Failed to write share history data:', error);
-        return NextResponse.json({ message: 'Failed to update share history' }, { status: 500, headers });
+  try {
+    const newData = await request.json();
+    const colRef = collection(db, '');
+    const snapshot = await getDocs(colRef);
+    await Promise.all(snapshot.docs.map(d => deleteDoc(d.ref)));
+    if (Array.isArray(newData)) {
+      await Promise.all(newData.map((item, i) => setDoc(doc(db, '', String(i)), item)));
+    } else {
+      await Promise.all(Object.entries(newData).map(([key, value]) =>
+        setDoc(doc(db, '', key), typeof value === 'object' ? value as any : { value })
+      ));
     }
+    return NextResponse.json({ message: ' updated successfully' }, { headers });
+  } catch (error) {
+    console.error('Failed to write :', error);
+    return NextResponse.json({ message: 'Failed to update data' }, { status: 500, headers });
+  }
 }
