@@ -1,8 +1,21 @@
-import { NextResponse } from 'next/server';
+const fs = require('fs');
+const path = require('path');
+
+const routes = [
+  'about-us-content', 'agent-leads', 'chat-messages', 'community-posts',
+  'demands', 'download-acknowledgments', 'download-history', 'layout-requests',
+  'listing-analytics', 'listings', 'location-circles', 'negotiation-boards',
+  'notifications', 'registered-leads', 'share-history', 'submissions',
+  'tenant-improvements', 'transaction-activities', 'typing-status',
+  'users', 'view-history'
+];
+
+routes.forEach(route => {
+  const content = `import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 
-const COLLECTION = 'chat-messages';
+const COLLECTION = '${route}';
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -53,4 +66,10 @@ export async function POST(request) {
     console.error('Failed to write ' + COLLECTION + ':', error);
     return NextResponse.json({ message: 'Failed to update data' }, { status: 500, headers });
   }
-}
+}`;
+
+  const routePath = path.join('src/app/api', route, 'route.ts');
+  fs.writeFileSync(routePath, content);
+  console.log('Fixed: ' + route);
+});
+console.log('All routes fixed!');
