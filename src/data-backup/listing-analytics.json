@@ -1,0 +1,1465 @@
+[
+  {
+    "listingId": "LST-0RMXOY",
+    "views": 1,
+    "downloads": 8,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1757589118571,
+          1757516830770
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758208336205,
+          1758208336205
+        ]
+      },
+      {
+        "timestamps": [
+          1758210663897,
+          1758210663897,
+          1758211431099,
+          1758211431099
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-XHJLWC",
+    "views": 3,
+    "downloads": 10,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1757589118571,
+          1757516830770
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706,
+          1758209364190,
+          1758209364190
+        ]
+      },
+      {
+        "timestamps": [
+          1758210663897,
+          1758210663897,
+          1758211370639,
+          1758211370639
+        ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758216192471
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758359325502
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758359325502
+      }
+    ]
+  },
+  {
+    "listingId": "LST-J9L9NS",
+    "views": 0,
+    "downloads": 6,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1757589118571,
+          1757516830770
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706,
+          1758209364190,
+          1758209364190
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-I4S3EK",
+    "views": 0,
+    "downloads": 5,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1757516830770
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758209364190,
+          1758209364190
+        ]
+      },
+      {
+        "timestamps": [
+          1758211431099,
+          1758211431099
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-8NGG6W",
+    "views": 1,
+    "downloads": 7,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1758206985167,
+          1758206985167,
+          1757516830770
+        ]
+      },
+      {
+        "timestamps": [
+          1758211370639,
+          1758211370639
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758879893303,
+          1758879893304
+        ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758216002962
+      }
+    ]
+  },
+  {
+    "listingId": "LST-ZCKK92",
+    "views": 3,
+    "downloads": 2,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706
+        ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758345226603
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758345226603
+      }
+    ]
+  },
+  {
+    "listingId": "LST-Z75P47",
+    "views": 0,
+    "downloads": 5,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1757589118571
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758208725273,
+          1758208725273
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-IQOMX9",
+    "views": 0,
+    "downloads": 5,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1757589118571
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758207777706,
+          1758207777706
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758208336205,
+          1758208336205
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-9M05SY",
+    "views": 0,
+    "downloads": 11,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1758206985167
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758208336205,
+          1758208336205,
+          1758208725273,
+          1758208725273,
+          1758761150512,
+          1758761150512
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208934270,
+          1758208934270
+        ]
+      },
+      {
+        "timestamps": [
+          1758211431099,
+          1758211431099
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-3PL001",
+    "views": 0,
+    "downloads": 3,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1758206985167
+        ]
+      },
+      {
+        "timestamps": [
+          1758211431099,
+          1758211431099
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-RD962F",
+    "views": 0,
+    "downloads": 3,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1758206985167
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758208336205,
+          1758208336205
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-SKFITH",
+    "views": 0,
+    "downloads": 7,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1758206985167
+        ]
+      },
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208040575,
+          1758208040575,
+          1758209364190,
+          1758209364190
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758208725273,
+          1758208725273
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-L4WAS7",
+    "views": 0,
+    "downloads": 3,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208040575
+        ]
+      },
+      {
+        "timestamps": [
+          1758211370639,
+          1758211370639
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-TGAV6G",
+    "views": 2,
+    "downloads": 5,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208040575,
+          1758208934270,
+          1758208934270
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758762152087,
+          1758762152087
+        ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758332008543
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758332008543
+      }
+    ]
+  },
+  {
+    "listingId": "LST-ZNHZYG",
+    "views": 0,
+    "downloads": 3,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758208336205,
+          1758208725273,
+          1758208725273
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-91LUXK",
+    "views": 50,
+    "downloads": 3,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758208725273
+        ]
+      },
+      {
+        "timestamps": [
+          1758210663897,
+          1758210663897
+        ]
+      }
+    ],
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347848950
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347848950
+      },
+      {
+        "userId": "anonymous_anon_1758390386641_jlh414j",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758390388837
+      },
+      {
+        "userId": "anonymous_anon_1758390386641_jlh414j",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758390388837
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758390398641
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758390398641
+      },
+      {
+        "userId": "anonymous_anon_1758390386641_jlh414j",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391244819
+      },
+      {
+        "userId": "anonymous_anon_1758390386641_jlh414j",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391244819
+      },
+      {
+        "userId": "anonymous_anon_1758391306139_tqfswo6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391309039
+      },
+      {
+        "userId": "anonymous_anon_1758391306139_tqfswo6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391309039
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758391327126
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758391327126
+      },
+      {
+        "userId": "anonymous_anon_1758391428356_l0s1kaa",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391431057
+      },
+      {
+        "userId": "anonymous_anon_1758391428356_l0s1kaa",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758391431057
+      },
+      {
+        "userId": "anonymous_anon_1758540008399_v5tzr4h",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758540009536
+      },
+      {
+        "userId": "anonymous_anon_1758540008399_v5tzr4h",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758540009536
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758540312347
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758540312347
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758551512436
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758551512436
+      },
+      {
+        "userId": "anonymous_anon_1758552589598_y08ju91",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758552592107
+      },
+      {
+        "userId": "anonymous_anon_1758553638117_9n1vlyf",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758553639819
+      },
+      {
+        "userId": "anonymous_anon_1758553638117_9n1vlyf",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758553639819
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758553648926
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758553648926
+      },
+      {
+        "userId": "anonymous_anon_1758553711619_id66lrz",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758553713495
+      },
+      {
+        "userId": "anonymous_anon_1758553711619_id66lrz",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758553713495
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758553730007
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758553730007
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758554325025
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758554325025
+      },
+      {
+        "userId": "anonymous_anon_1758553638117_9n1vlyf",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758554328164
+      },
+      {
+        "userId": "anonymous_anon_1758554418584_wd5e0q2",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758554420562
+      },
+      {
+        "userId": "anonymous_anon_1758554418584_wd5e0q2",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758554420562
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758554432241
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758554432241
+      },
+      {
+        "userId": "anonymous_anon_1758555306423_rghyq1m",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758555308494
+      },
+      {
+        "userId": "anonymous_anon_1758555306423_rghyq1m",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758555308494
+      },
+      {
+        "userId": "customer3@o2o.com",
+        "name": "Casey Dune",
+        "company": "Gamma Goods",
+        "timestamp": 1758555329844
+      },
+      {
+        "userId": "customer3@o2o.com",
+        "name": "Casey Dune",
+        "company": "Gamma Goods",
+        "timestamp": 1758555329844
+      },
+      {
+        "userId": "anonymous_anon_1758555958224_07s1902",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758555960830
+      },
+      {
+        "userId": "anonymous_anon_1758555958224_07s1902",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758555960830
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758555967660
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758555967660
+      },
+      {
+        "userId": "anonymous_anon_1758561159321_r2zocxd",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758561183307
+      },
+      {
+        "userId": "anonymous_anon_1758561159321_r2zocxd",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758561183307
+      },
+      {
+        "userId": "anonymous_anon_1758561159321_r2zocxd",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758561578575
+      },
+      {
+        "userId": "anonymous_anon_1758561159321_r2zocxd",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758561578575
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758561596392
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758561596392
+      }
+    ]
+  },
+  {
+    "listingId": "LST-QWQFTO",
+    "views": 0,
+    "downloads": 5,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208934270
+        ]
+      },
+      {
+        "timestamps": [
+          1758210663897,
+          1758210663897,
+          1758211431099,
+          1758211431099
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-09CBLQ",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208934270
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-Y06HUI",
+    "views": 0,
+    "downloads": 3,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamps": [
+          1758208934270,
+          1758209364190,
+          1758209364190
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-JSMKFT",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "timestamps": [
+          1758210663897
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-8KQX5D",
+    "views": 0,
+    "downloads": 3,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "timestamps": [
+          1758211370639
+        ]
+      },
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758879893303,
+          1758879893304
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-ELTUE2",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "timestamps": [
+          1758211370639
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-VTQ5LE",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "superadmin@o2o.com",
+        "name": "O2O Super Admin",
+        "company": "O2O Platform",
+        "timestamp": 1758330947237
+      }
+    ]
+  },
+  {
+    "listingId": "LST-MMX3PE",
+    "views": 3,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "admin@kailashlogistics.com",
+        "name": "Kailash Logistics",
+        "company": "Kailash Logistics",
+        "timestamp": 1758331404141
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347695711
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347695711
+      }
+    ]
+  },
+  {
+    "listingId": "LST-KKGGMD",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758333332670
+      }
+    ]
+  },
+  {
+    "listingId": "LST-QM0CX2",
+    "views": 3,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758345908010
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758359580862
+      },
+      {
+        "userId": "customer2@o2o.com",
+        "name": "Ben Carter",
+        "company": "Beta Retail",
+        "timestamp": 1758359580862
+      }
+    ]
+  },
+  {
+    "listingId": "LST-YMLUBS",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758346633052
+      }
+    ]
+  },
+  {
+    "listingId": "LST-YLX4O7",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758346680727
+      }
+    ]
+  },
+  {
+    "listingId": "LST-XC7X0X",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347055245
+      }
+    ]
+  },
+  {
+    "listingId": "LST-U0L6J6",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347279129
+      }
+    ]
+  },
+  {
+    "listingId": "LST-80DJ0W",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347500761
+      }
+    ]
+  },
+  {
+    "listingId": "LST-X635SS",
+    "views": 11,
+    "downloads": 1,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758347915488
+      },
+      {
+        "userId": "anonymous_anon_1758613307313_auoiu1a",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758613324296
+      },
+      {
+        "userId": "anonymous_anon_1758613307313_auoiu1a",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758613324296
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758613352538
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758613352538
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758614181881
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758614827733
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758614827733
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758617723993
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758617723993
+      },
+      {
+        "userId": "anonymous_anon_1758613307313_auoiu1a",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758620356084
+      }
+    ],
+    "downloadedBy": [
+      {
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamps": [
+          1758762699648
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-3RV9B9",
+    "views": 3,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758348788491
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758359609439
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758359609439
+      }
+    ]
+  },
+  {
+    "listingId": "LST-KEN0P1",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758351151211
+      }
+    ]
+  },
+  {
+    "listingId": "LST-6BDQYG",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758352421756
+      }
+    ]
+  },
+  {
+    "listingId": "LST-SYXJNY",
+    "views": 3,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758359530256
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758360473136
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758360473136
+      }
+    ]
+  },
+  {
+    "listingId": "LST-R41ULG",
+    "views": 2,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758360779795
+      },
+      {
+        "userId": "anonymous_anon_1758361464259_b0q5qq5",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758361466067
+      }
+    ]
+  },
+  {
+    "listingId": "LST-90DWHQ",
+    "views": 3,
+    "downloads": 2,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "anonymous_anon_1758361228847_kh0u5tw",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758361230470
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758361241638
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758361241638
+      }
+    ],
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758761150512,
+          1758761150512
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-UC3IN5",
+    "views": 3,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "anonymous_anon_1758386079683_dy6te1z",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758386081370
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758386095424
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758386095424
+      }
+    ]
+  },
+  {
+    "listingId": "LST-EDCYH9",
+    "views": 19,
+    "downloads": 2,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "anonymous_anon_1758607739773_dsfg3k6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758607745801
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758607758073
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758607758073
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758609856409
+      },
+      {
+        "userId": "murugan@xyzlogistics.com",
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamp": 1758609856409
+      },
+      {
+        "userId": "anonymous_anon_1758607739773_dsfg3k6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758610134599
+      },
+      {
+        "userId": "anonymous_anon_1758607739773_dsfg3k6",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758610134599
+      },
+      {
+        "userId": "anonymous_anon_1758610191820_ebn32hn",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758610195102
+      },
+      {
+        "userId": "anonymous_anon_1758610191820_ebn32hn",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758610195102
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758610202947
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758610202947
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758610664327
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758610664327
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758610669995
+      },
+      {
+        "userId": "customer1@o2o.com",
+        "name": "Alex Ray",
+        "company": "Alpha Logistics",
+        "timestamp": 1758610669995
+      },
+      {
+        "userId": "anonymous_anon_1758620386943_tjfl3bv",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758620409368
+      },
+      {
+        "userId": "anonymous_anon_1758620386943_tjfl3bv",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758620409368
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758620436633
+      },
+      {
+        "userId": "betacustomer2@o2o.com",
+        "name": "Murugan",
+        "company": "Beta Retail",
+        "timestamp": 1758620436633
+      }
+    ],
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758761150512,
+          1758761150512
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-GLWXFK",
+    "views": 1,
+    "downloads": 0,
+    "customerIndustries": {},
+    "viewedBy": [
+      {
+        "userId": "anonymous_anon_1758695997367_gpyuo2a",
+        "name": "Anonymous",
+        "company": "Anonymous",
+        "timestamp": 1758695999200
+      }
+    ]
+  },
+  {
+    "listingId": "LST-FSHLEB",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758761150512
+        ]
+      }
+    ]
+  },
+  {
+    "listingId": "LST-KC5RZI",
+    "views": 0,
+    "downloads": 1,
+    "customerIndustries": {},
+    "downloadedBy": [
+      {
+        "name": "Murugan",
+        "company": "XYZ Logistics",
+        "timestamps": [
+          1758761150512
+        ]
+      }
+    ]
+  }
+]

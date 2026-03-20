@@ -1,0 +1,79 @@
+[
+  {
+    "id": "notif-1759388406106-namasivayam.lion@gmail.com-0.6053875427992131",
+    "type": "new_chat_message",
+    "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-DL-1758879893285-0.9151866550747662: \"Is this warehouse still available?...\"",
+    "href": "/dashboard/leads/LDR-DL-1758879893285-0.9151866550747662",
+    "recipientEmail": "namasivayam.lion@gmail.com",
+    "timestamp": "2025-10-02T07:00:06.106Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-2025-09-26T10:32:43.205Z-admin@ccidevelopers.com-0.14152800261141318",
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-DL-1758879893271-0.4572376849623483",
+    "message": "Murugan logged: Site Visit Request",
+    "href": "/dashboard/leads/LDR-DL-1758879893271-0.4572376849623483",
+    "recipientEmail": "admin@ccidevelopers.com",
+    "timestamp": "2025-09-26T10:32:43.205Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-2025-09-26T09:48:44.864Z-murugan@xyzlogistics.com-0.23764022976817667",
+    "type": "new_activity",
+    "title": "Update on Transaction: LDR-DL-1758879893271-0.4572376849623483",
+    "message": "Admin logged: Proposal Submitted",
+    "href": "/dashboard/leads/LDR-DL-1758879893271-0.4572376849623483",
+    "recipientEmail": "murugan@xyzlogistics.com",
+    "timestamp": "2025-09-26T09:48:44.864Z",
+    "triggeredBy": "admin@ccidevelopers.com",
+    "isRead": true
+  },
+  {
+    "id": "notif-1758879893285-namasivayam.lion@gmail.com-0.8995656068903296",
+    "type": "new_lead_for_provider",
+    "title": "New Direct Lead: XYZ Logistics",
+    "message": "A customer has requested a quote for your premium listing(s). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "namasivayam.lion@gmail.com",
+    "timestamp": "2025-09-26T09:44:53.286Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758879893285-admin@ccidevelopers.com-0.027563039155226066",
+    "type": "new_lead_for_provider",
+    "title": "New Direct Lead: XYZ Logistics",
+    "message": "A customer has requested a quote for your premium listing(s). Please acknowledge.",
+    "href": "/dashboard?tab=registered-leads",
+    "recipientEmail": "admin@ccidevelopers.com",
+    "timestamp": "2025-09-26T09:44:53.285Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  },
+  {
+    "id": "notif-1758798154415-murugan@xyzlogistics.com-0.02437517555198998",
+    "type": "new_chat_message",
+    "title": "New message from Indospace",
+    "message": "Regarding transaction LDR-DL-1758762152087: \"have you got my message...\"",
+    "href": "/dashboard/leads/LDR-DL-1758762152087",
+    "recipientEmail": "murugan@xyzlogistics.com",
+    "timestamp": "2025-09-25T11:02:34.415Z",
+    "triggeredBy": "admin@indospace.com",
+    "isRead": true
+  },
+  {
+    "id": "notif-1758798138816-admin@indospace.com-0.3543769636199414",
+    "type": "new_chat_message",
+    "title": "New message from Murugan",
+    "message": "Regarding transaction LDR-DL-1758762152087: \"Hi ...\"",
+    "href": "/dashboard/leads/LDR-DL-1758762152087",
+    "recipientEmail": "admin@indospace.com",
+    "timestamp": "2025-09-25T11:02:18.816Z",
+    "triggeredBy": "murugan@xyzlogistics.com",
+    "isRead": false
+  }
+]

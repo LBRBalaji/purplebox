@@ -1,0 +1,1611 @@
+[
+  {
+    "id": "LDR-DL-1758879893285-0.9151866550747662",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for 1 properties.",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-8KQX5D",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-26T09:44:53.285Z"
+  },
+  {
+    "id": "LDR-DL-1758879893271-0.4572376849623483",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for 1 properties.",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@ccidevelopers.com",
+        "properties": [
+          {
+            "listingId": "LST-8NGG6W",
+            "status": "Pending",
+            "rentPerSft": 26,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 210000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-26T09:44:53.271Z"
+  },
+  {
+    "id": "LDR-DL-1758762699648",
+    "customerId": "customer1@o2o.com",
+    "leadName": "Alpha Logistics",
+    "leadContact": "Alex Ray",
+    "leadEmail": "customer1@o2o.com",
+    "leadPhone": "2345678901",
+    "requirementsSummary": "Quote requested via download for Property ID: Seemavaram Part-A",
+    "registeredBy": "customer1@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-X635SS",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-25T01:11:39.648Z"
+  },
+  {
+    "id": "LDR-DL-1758762152087",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for Property ID: Ulavur B700",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-TGAV6G",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-25T01:02:32.087Z"
+  },
+  {
+    "id": "LDR-DL-1758761150518-1",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for Property ID: Oragadam II B100",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-90DWHQ",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-25T00:45:50.518Z"
+  },
+  {
+    "id": "LDR-DL-1758761150518-2",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for Property ID: Vishnuvakkam B 350",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-KC5RZI",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-25T00:45:50.518Z"
+  },
+  {
+    "id": "LDR-DL-1758761150517-1",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for Property ID: Block-B2 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@welspun.com",
+        "properties": [
+          {
+            "listingId": "LST-FSHLEB",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-25T00:45:50.517Z"
+  },
+  {
+    "id": "LDR-DL-1758761150517-2",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for Property ID: Blue Warehouse",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-9M05SY",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-25T00:45:50.517Z"
+  },
+  {
+    "id": "LDR-DL-1758761150512",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested via download for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-25T00:45:50.513Z",
+    "agentId": "balaji@lakshmibalajirealty.com"
+  },
+  {
+    "id": "LDR-MFWDF7WSMSDFZ",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-23T09:48:14.763Z",
+            "acknowledgedBy": {
+              "name": "Kailash Logistics",
+              "title": "manager",
+              "mobile": "+91 9841098170",
+              "email": "admin@kailashlogistics.com"
+            },
+            "rentPerSft": 45,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 135000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-23T09:46:54.303Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758620424207",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Murugan",
+    "leadEmail": "betacustomer2@o2o.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "betacustomer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-23T09:40:24.208Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758613355481",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Murugan",
+    "leadEmail": "betacustomer2@o2o.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Seemavaram Part-A",
+    "registeredBy": "betacustomer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-X635SS",
+            "status": "Pending",
+            "rentPerSft": 28,
+            "rentalSecurityDeposit": 8,
+            "actualChargeableArea": 53000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-23T07:42:35.484Z"
+  },
+  {
+    "id": "LDR-MFW7FQT2F88ME",
+    "customerId": "customer1@o2o.com",
+    "leadName": "Alpha Logistics",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-23T07:02:44.457Z",
+            "acknowledgedBy": {
+              "name": "Kailash Logistics",
+              "title": "obo",
+              "mobile": "+91 9841098170",
+              "email": "admin@kailashlogistics.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-23T06:59:25.187Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758610208250",
+    "customerId": "customer1@o2o.com",
+    "leadName": "Alpha Logistics",
+    "leadContact": "Alex Ray",
+    "leadEmail": "customer1@o2o.com",
+    "leadPhone": "2345678901",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "customer1@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-23T06:50:08.252Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758607761813",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-08 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-EDCYH9",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-23T06:09:21.815Z"
+  },
+  {
+    "id": "LDR-MFVI4057LTJVI",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T19:10:58.883Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "loin",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-22T19:10:17.599Z"
+  },
+  {
+    "id": "LDR-MFVGXVIQ8AELF",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:40:51.060Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "lion",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-22T18:38:08.064Z"
+  },
+  {
+    "id": "LDR-MFVFO5W90IEBI",
+    "customerId": "customer3@o2o.com",
+    "leadName": "Gamma Goods",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:03:12.155Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-22T18:02:32.267Z"
+  },
+  {
+    "id": "LDR-MFVEWH6KGC3XS",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "O2O Super Admin",
+    "leadEmail": "superadmin@o2o.com",
+    "leadPhone": "1234567890",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:08:47.348Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "head",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T17:41:21.119Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758555971632",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Murugan",
+    "leadEmail": "betacustomer2@o2o.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "betacustomer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-22T15:46:11.635Z"
+  },
+  {
+    "id": "LDR-MFVAH1NOOVXSJ",
+    "customerId": "customer3@o2o.com",
+    "leadName": "Gamma Goods",
+    "leadContact": "Casey Dune",
+    "leadEmail": "customer3@o2o.com",
+    "leadPhone": "4567890123",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T15:37:24.070Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T15:36:41.716Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758555334251",
+    "customerId": "customer3@o2o.com",
+    "leadName": "Gamma Goods",
+    "leadContact": "Casey Dune",
+    "leadEmail": "customer3@o2o.com",
+    "leadPhone": "4567890123",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "customer3@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-22T15:35:34.253Z"
+  },
+  {
+    "id": "LDR-MFV93YLORIJ8X",
+    "customerId": "customer1@o2o.com",
+    "leadName": "Alpha Logistics",
+    "leadContact": "Alex Ray",
+    "leadEmail": "customer1@o2o.com",
+    "leadPhone": "2345678901",
+    "requirementsSummary": "looking for one lakh sqft of warehouse, for short term 6 months use",
+    "registeredBy": "manager@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-8KQX5D",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:13:30.240Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "test",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T14:59:03.857Z"
+  },
+  {
+    "id": "LDR-MFV8T9M8ELE5P",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-8KQX5D",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:19:09.795Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "t",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 92000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T14:52:22.548Z"
+  },
+  {
+    "id": "LDR-MFV8R753E1NY8",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:19:44.764Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "n",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T14:49:58.997Z"
+  },
+  {
+    "id": "LDR-MFV8IGQ9GZA3V",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T14:48:22.474Z"
+  },
+  {
+    "id": "LDR-MFV8CVTB6PU2Y",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T14:41:35.000Z"
+  },
+  {
+    "id": "LDR-MFV84SJ9CTKXB",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:15:01.961Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "director",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T14:37:14.600Z"
+  },
+  {
+    "id": "LDR-MFV33FU44BSSY",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T13:09:02.577Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T13:08:36.908Z"
+  },
+  {
+    "id": "LDR-MFV2R6SLTJ84B",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T13:20:41.148Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "incharge",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T12:09:55.917Z"
+  },
+  {
+    "id": "LDR-MFV1TH74OXSH8",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:14:23.883Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T12:00:24.310Z"
+  },
+  {
+    "id": "LDR-MFV1SYQLWI12A",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T13:19:29.754Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "director",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            },
+            "rentPerSft": 20,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 31000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-22T11:34:11.504Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758540315500",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "customer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-22T11:25:15.504Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758391332311",
+    "customerId": "customer1@o2o.com",
+    "leadName": "Alpha Logistics",
+    "leadContact": "Alex Ray",
+    "leadEmail": "customer1@o2o.com",
+    "leadPhone": "2345678901",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "customer1@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T18:02:12.313Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758360784201",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Schedule-B",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-R41ULG",
+            "status": "Pending",
+            "rentPerSft": 30,
+            "rentalSecurityDeposit": 12,
+            "actualChargeableArea": 41000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T09:33:04.203Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758360477894",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Seemavaram Part-B",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-SYXJNY",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T09:27:57.896Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758359585116",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Kunnam B-200 ",
+    "registeredBy": "customer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-QM0CX2",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T09:13:05.116Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758359330575",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Box-18",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@ccidevelopers.com",
+        "properties": [
+          {
+            "listingId": "LST-XHJLWC",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T09:08:50.577Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758352425269",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Block-B6 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-6BDQYG",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T07:13:45.271Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758348790692",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Block A-4 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@welspun.com",
+        "properties": [
+          {
+            "listingId": "LST-3RV9B9",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T06:13:10.694Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758347917597",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Seemavaram Part-A",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-X635SS",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:58:37.598Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758347851492",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Green Warehouse",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "namasivayam.lion@gmail.com",
+        "properties": [
+          {
+            "listingId": "LST-91LUXK",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-22T18:13:57.578Z",
+            "acknowledgedBy": {
+              "name": "Namasivayam",
+              "title": "owner",
+              "mobile": "+91 9841098170",
+              "email": "namasivayam.lion@gmail.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:57:31.494Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758347700510",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Schedule-A",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-MMX3PE",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:55:00.512Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758347504657",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Block 4",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@pragati.com",
+        "properties": [
+          {
+            "listingId": "LST-80DJ0W",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:51:44.658Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758347284148",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Oragadam II B300C",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-U0L6J6",
+            "status": "Pending",
+            "rentPerSft": 32,
+            "rentalSecurityDeposit": 8,
+            "actualChargeableArea": 95000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:48:04.150Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758347061943",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Block-B5 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@welspun.com",
+        "properties": [
+          {
+            "listingId": "LST-XC7X0X",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:44:21.945Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758346687709",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Devariyambakkam B-01 ",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@kailashlogistics.com",
+        "properties": [
+          {
+            "listingId": "LST-YLX4O7",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:38:07.711Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758346642801",
+    "customerId": "murugan@xyzlogistics.com",
+    "leadName": "XYZ Logistics",
+    "leadContact": "Murugan",
+    "leadEmail": "murugan@xyzlogistics.com",
+    "leadPhone": "+91 9841098170",
+    "requirementsSummary": "Quote requested for Property ID: Vishnuvakkam B 400",
+    "registeredBy": "murugan@xyzlogistics.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-YMLUBS",
+            "status": "Pending"
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T05:37:22.804Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758333336097",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Vishnuvakkam B 100",
+    "registeredBy": "customer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-KKGGMD",
+            "status": "Pending",
+            "rentPerSft": 28,
+            "rentalSecurityDeposit": 6
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T01:55:36.099Z"
+  },
+  {
+    "id": "LDR-QUOTE-1758332020091",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Quote requested for Property ID: Ulavur B700",
+    "registeredBy": "customer2@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "admin@indospace.com",
+        "properties": [
+          {
+            "listingId": "LST-TGAV6G",
+            "status": "Pending",
+            "rentPerSft": 28,
+            "rentalSecurityDeposit": 6,
+            "actualChargeableArea": 350000
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": true,
+    "registeredAt": "2025-09-20T01:33:40.094Z"
+  },
+  {
+    "id": "LDR-MFC6GK2R8WSQK",
+    "customerId": "betacustomer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Murugan",
+    "leadEmail": "betacustomer2@o2o.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "My AuthProvider component uses these features extensively to manage user sessions and data, but I neglected to add the required 'use client' directive at the top of the file. This caused the application to try and run client-side code on the server, leading to the crash.",
+    "registeredBy": "manager@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-ELTUE2",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-09T06:37:36.561Z",
+            "acknowledgedBy": {
+              "name": "Developer One",
+              "title": "d",
+              "mobile": "5678901234",
+              "email": "wd1@o2o.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-09T06:37:02.124Z"
+  },
+  {
+    "id": "LDR-MFC6CXRK0C0UA",
+    "customerId": "customer3@o2o.com",
+    "leadName": "Gamma Goods",
+    "leadContact": "Casey Dune",
+    "leadEmail": "customer3@o2o.com",
+    "leadPhone": "4567890123",
+    "requirementsSummary": "Transactions\nManage ongoing transactions and register new business leads.",
+    "registeredBy": "manager@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-ELTUE2",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-09T06:35:04.655Z",
+            "acknowledgedBy": {
+              "name": "Developer One",
+              "title": "manager",
+              "mobile": "5678901234",
+              "email": "wd1@o2o.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-09T06:34:10.514Z"
+  },
+  {
+    "id": "LDR-MFC5ZW3RBXZ6U",
+    "customerId": "hemal@fedex.com",
+    "leadName": "FedEx",
+    "leadContact": "Hemal",
+    "leadEmail": "hemal@fedex.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Register New Lead with Providers\nUse this form to officially register a new business lead with one or more property providers and their specific properties.",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-ZNHZYG",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-09T06:31:55.031Z",
+            "acknowledgedBy": {
+              "name": "Developer One",
+              "title": "vp",
+              "mobile": "5678901234",
+              "email": "wd1@o2o.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-09T06:24:55.655Z"
+  },
+  {
+    "id": "LDR-MFC5GLK38WELH",
+    "customerId": "balajispillai@gmail.com",
+    "leadName": "LB ORS",
+    "leadContact": "Balaji",
+    "leadEmail": "balajispillai@gmail.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Register New Lead with Providers\nUse this form to officially register a new business lead with one or more property providers and their specific properties.",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "properties": [
+          {
+            "listingId": "LST-ZNHZYG",
+            "status": "Acknowledged",
+            "acknowledgedAt": "2025-09-09T06:11:16.929Z",
+            "acknowledgedBy": {
+              "name": "Developer One",
+              "title": "VP",
+              "mobile": "5678901234",
+              "email": "wd1@o2o.com"
+            }
+          }
+        ]
+      }
+    ],
+    "isO2OCollaborator": false,
+    "registeredAt": "2025-09-09T06:09:37.389Z"
+  },
+  {
+    "id": "LDR-MFB1MSNQ8BPB4",
+    "customerId": "balaji@kpn.com",
+    "leadName": "LBR",
+    "leadContact": "Balaji",
+    "leadEmail": "balaji@kpn.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Register New Lead with Providers\nUse this form to officially register a new business lead with one or more property providers and their specific properties",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "listingIds": [
+          "LST-ELTUE2",
+          "LST-ZNHZYG"
+        ],
+        "status": "Pending"
+      }
+    ],
+    "registeredAt": "2025-09-08T11:34:39.375Z"
+  },
+  {
+    "id": "LDR-MFB0VLBGE69QO",
+    "customerId": "balaji@kpn.com",
+    "leadName": "BBC Corporation",
+    "leadContact": "Balaji",
+    "leadEmail": "balaji@kpn.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Open in New Tab: This button will link to the full details page for the property, opening it in a new browser tab (target=\"_blank\"). This allows you to review the property without losing your place on the registration form.",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "listingIds": [
+          "LST-ELTUE2",
+          "LST-ZNHZYG"
+        ],
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T11:22:27.789Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "director",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
+      }
+    ],
+    "registeredAt": "2025-09-08T11:13:11.428Z"
+  },
+  {
+    "id": "LDR-MFB09HPZC67Z8",
+    "customerId": "s@abc.com",
+    "leadName": "ABC Corporation",
+    "leadContact": "Sivan",
+    "leadEmail": "s@abc.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Register New Lead with Providers\nUse this form to officially register a new business lead with one or more property providers and their specific properties.",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "listingIds": [
+          "LST-ELTUE2",
+          "LST-ZNHZYG"
+        ],
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T10:58:07.541Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "director",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
+      }
+    ],
+    "registeredAt": "2025-09-08T10:56:29.654Z"
+  },
+  {
+    "id": "LDR-MFB00CG21XBSI",
+    "customerId": "balaji@kpn.com",
+    "leadName": "Kovai Pazhamudhir Solai",
+    "leadContact": "Balaji",
+    "leadEmail": "balaji@kpn.com",
+    "leadPhone": "9841098170",
+    "requirementsSummary": "Correct the Dashboard View (src/app/dashboard/page.tsx): I will add a specific view for O2O Managers that defaults to showing the \"Registered Leads\" tab. Crucially, I will also ensure that Agents are shown the correct view, giving them access to the \"My Registered Leads\" and the \"Register New Lead\" tabs. This was the missing piece.",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "listingIds": [
+          "LST-ZNHZYG"
+        ],
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T10:53:51.883Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "Director",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
+      }
+    ],
+    "registeredAt": "2025-09-08T10:48:56.160Z"
+  },
+  {
+    "id": "LDR-MFAW2NJDDGSSV",
+    "customerId": "y@reliance.com",
+    "leadName": "Reliance Industries",
+    "leadContact": "Balaji",
+    "leadEmail": "y@reliance.com",
+    "leadPhone": "234567891",
+    "requirementsSummary": "hey do you want to get into discussion with me to find out where the 'property details' card ",
+    "registeredBy": "mlakshmibalaji@gmail.com",
+    "providers": [
+      {
+        "providerEmail": "wd1@o2o.com",
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T08:59:56.644Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "Director",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
+      },
+      {
+        "providerEmail": "wd2@o2o.com",
+        "status": "Pending"
+      },
+      {
+        "providerEmail": "wd3@o2o.com",
+        "status": "Pending"
+      }
+    ],
+    "registeredAt": "2025-09-08T08:59:03.317Z"
+  },
+  {
+    "id": "LDR-MFAUQJKZCJ67K",
+    "customerId": "customer2@o2o.com",
+    "leadName": "Beta Retail",
+    "leadContact": "Ben Carter",
+    "leadEmail": "customer2@o2o.com",
+    "leadPhone": "3456789012",
+    "requirementsSummary": "Update activities of 'Lead Registration & Tracking\nSite Visits\nCustomer Feedback\nTenant Improvements\nDigital Negotiation Sheets\nCommercial Terms Sheet\nTenant Improvements Sheet' to customer user, so all three customer, developer, O2O and Agent will all get updated on real time basis of their activities. You can rename Lead Registration & Tracking to 'Manage Transactions'. under which Register New Lead will be the first step, which will be available to Customer, O2O, and Agent.",
+    "registeredBy": "superadmin@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "wd2@o2o.com",
+        "status": "Pending"
+      },
+      {
+        "providerEmail": "wd3@o2o.com",
+        "status": "Pending"
+      },
+      {
+        "providerEmail": "wd1@o2o.com",
+        "status": "Acknowledged",
+        "acknowledgedAt": "2025-09-08T08:23:57.098Z",
+        "acknowledgedBy": {
+          "name": "Developer One",
+          "title": "VP",
+          "mobile": "5678901234",
+          "email": "wd1@o2o.com"
+        }
+      }
+    ],
+    "registeredAt": "2025-09-08T08:21:07.944Z"
+  },
+  {
+    "id": "LDR-MFAU80PXAY91M",
+    "customerId": "customer1@o2o.com",
+    "leadName": "Alpha Logistics",
+    "leadContact": "Alex Ray",
+    "leadEmail": "customer1@o2o.com",
+    "leadPhone": "2345678901",
+    "requirementsSummary": "Customer looking for 2 lakhs sft of space within 3 months possession, around MWC",
+    "registeredBy": "manager@o2o.com",
+    "providers": [
+      {
+        "providerEmail": "superadmin@o2o.com",
+        "status": "Pending"
+      }
+    ],
+    "registeredAt": "2025-09-08T08:07:24.720Z"
+  }
+]

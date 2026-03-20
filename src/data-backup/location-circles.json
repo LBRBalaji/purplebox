@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Sriperumbudur Circle",
+    "locations": [
+      "sriperumbudur",
+      "oragadam",
+      "walajabad",
+      "sunguvarchatram",
+      "pondhur",
+      "vallam",
+      "vadagal",
+      "vallam-vadakal",
+      "vadakal",
+      "araneri",
+      "mambakkam",
+      "kattavakkam"
+    ]
+  },
+  {
+    "name": "Madhavaram Circle",
+    "locations": [
+      "madhavaram",
+      "redhills",
+      "puzhal",
+      "ambattur",
+      "tamaraipakkam",
+      "poochiathipedu",
+      "alamathi"
+    ]
+  },
+  {
+    "name": "Karanodai Circle",
+    "locations": [
+      "sholavaram",
+      " cholavaram",
+      "karanodai",
+      "periyapalayam",
+      "thatchur",
+      "thatchoor",
+      "kannigaiper",
+      "kavarapettai"
+    ]
+  },
+  {
+    "name": "Thiruvallur",
+    "locations": [
+      "thiruvallur",
+      "tiruvallur",
+      "mannur",
+      "mappedu",
+      "ulundhai",
+      "mevaloorkuppam",
+      "polivakkam",
+      "aranvoyal",
+      "paparampakkam",
+      "sengadu",
+      "keelacheri",
+      "irungattukottai",
+      "katrambakkam"
+    ]
+  },
+  {
+    "name": "Poonamallee",
+    "locations": [
+      "poonamallee",
+      "thirumazhisai",
+      "kuthambakkam",
+      "chembarambakkam",
+      "irungattukottai",
+      "vanagaram",
+      "maduravoyal",
+      "koyambedu",
+      "thiruverkadu"
+    ]
+  },
+  {
+    "name": "Chengalpet",
+    "locations": [
+      "maraimalai nagar",
+      "singa perumal kovil",
+      "singaperumal kovil",
+      "singa perumal koil",
+      "sp kovil",
+      "chengalpet",
+      "chengalpattu",
+      "mamandur",
+      "pazhamathur",
+      "uthiramerur",
+      "uthramerur",
+      "mwc",
+      "mahindra world city"
+    ]
+  },
+  {
+    "name": "Bhiwandi",
+    "locations": []
+  }
+]

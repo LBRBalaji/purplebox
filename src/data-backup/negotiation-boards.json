@@ -1,0 +1,278 @@
+
+[
+  {
+    "sessions": [
+      {
+        "date": "2025-09-08T12:32:47.545Z",
+        "customerAttendees": [
+          {
+            "name": "Balaji",
+            "title": "Lead"
+          }
+        ],
+        "providerAttendees": [
+          {
+            "name": "Test Provider",
+            "title": "Director"
+          }
+        ],
+        "facilitatorAttendees": []
+      }
+    ],
+    "siteInfo": {
+      "listingId": {
+        "agreedTerms": "",
+        "status": "Agreed"
+      },
+      "postalAddress": {
+        "agreedTerms": "123 Industrial Way, Oragadam, Chennai",
+        "proposedBy": "Customer",
+        "status": "Agreed"
+      },
+      "buildingNumber": {
+        "agreedTerms": "5B",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "googleCoordinates": {
+        "agreedTerms": "12.83, 79.95",
+        "proposedBy": "Customer",
+        "status": "Agreed"
+      },
+      "buildingStatus": {
+        "agreedTerms": "Ready for Occupancy",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      }
+    },
+    "area": {
+      "plinthArea": {
+        "agreedTerms": "450000",
+        "proposedBy": "Customer",
+        "status": "Agreed"
+      },
+      "mezzanineArea1": {
+        "agreedTerms": "6000",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      },
+      "mezzanineArea2": {
+        "agreedTerms": "0",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      },
+      "canopyArea": {
+        "agreedTerms": "7000",
+        "proposedBy": "Customer",
+        "status": "Agreed"
+      },
+      "driversRestRoom": {
+        "agreedTerms": "2000",
+        "proposedBy": "Customer",
+        "status": "Reserved For Discussion"
+      },
+      "totalChargeableArea": {
+        "agreedTerms": "450000",
+        "proposedBy": "Customer",
+        "status": "Reserved For Discussion"
+      }
+    },
+    "leaseTerms": {
+      "leaseTenure": {
+        "agreedTerms": "9 years",
+        "proposedBy": "Customer",
+        "status": "Agreed"
+      },
+      "leaseLockIn": {
+        "agreedTerms": "1 years",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "rentEscalation": {
+        "agreedTerms": "15% every 3 years",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      }
+    },
+    "commercialTerms": {
+      "chargeableArea": {
+        "agreedTerms": "450000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "buildingRentPerSft": {
+        "agreedTerms": "25",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "totalRentPerMonth": {
+        "agreedTerms": "11250000",
+        "proposedBy": "Customer",
+        "status": "Agreed"
+      },
+      "camCharges": {
+        "agreedTerms": "2",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      },
+      "ifrsd": {
+        "agreedTerms": "22500000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "capexItems": [],
+      "netCostPerMonth": 11250000
+    },
+    "actionableItems": [
+      {
+        "item": "Finalize rent escalation clause",
+        "responsibility": "O2O",
+        "schedule": "Next Meeting",
+        "status": "Pending",
+        "remarks": ""
+      }
+    ],
+    "overallRemarks": "Initial meeting was positive. Key discussion point for the next session is the rent escalation percentage. Customer is firm on 10%, provider wants 15%.",
+    "leadId": "LDR-MFB1MSNQ8BPB4"
+  },
+  {
+    "sessions": [
+      {
+        "date": "2025-09-08T12:55:25.055Z",
+        "customerAttendees": [
+          {
+            "name": "Balaji",
+            "title": "Lead"
+          }
+        ],
+        "providerAttendees": [
+          {
+            "name": "Test Provider",
+            "title": "Director"
+          }
+        ],
+        "facilitatorAttendees": []
+      },
+      {
+        "date": "2025-09-08T12:58:01.332Z",
+        "venue": "",
+        "customerAttendees": [],
+        "providerAttendees": [],
+        "facilitatorAttendees": []
+      }
+    ],
+    "siteInfo": {
+      "listingId": {
+        "agreedTerms": "",
+        "status": "Agreed"
+      },
+      "postalAddress": {
+        "agreedTerms": "123 Industrial Way, Oragadam, Chennai",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "buildingNumber": {
+        "agreedTerms": "20C",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "googleCoordinates": {
+        "agreedTerms": "12.83, 79.95",
+        "status": "Agreed"
+      },
+      "buildingStatus": {
+        "agreedTerms": "Ready for Occupancy",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      }
+    },
+    "area": {
+      "plinthArea": {
+        "agreedTerms": "450000",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      },
+      "mezzanineArea1": {
+        "agreedTerms": "6000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "mezzanineArea2": {
+        "agreedTerms": "0",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "canopyArea": {
+        "agreedTerms": "7000",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      },
+      "driversRestRoom": {
+        "agreedTerms": "2000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "totalChargeableArea": {
+        "agreedTerms": "150000",
+        "proposedBy": "Provider",
+        "status": "Reserved For Discussion"
+      }
+    },
+    "leaseTerms": {
+      "leaseTenure": {
+        "agreedTerms": "5 years",
+        "proposedBy": "Customer",
+        "status": "Reserved For Discussion"
+      },
+      "leaseLockIn": {
+        "agreedTerms": "3 years",
+        "proposedBy": "Customer",
+        "status": "Agreed"
+      },
+      "rentEscalation": {
+        "agreedTerms": "15% every 3 years",
+        "status": "Agreed"
+      }
+    },
+    "commercialTerms": {
+      "chargeableArea": {
+        "agreedTerms": "150000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "buildingRentPerSft": {
+        "agreedTerms": "25",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "totalRentPerMonth": {
+        "agreedTerms": "3750000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "camCharges": {
+        "agreedTerms": "2",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "ifrsd": {
+        "agreedTerms": "22500000",
+        "proposedBy": "Provider",
+        "status": "Agreed"
+      },
+      "capexItems": [],
+      "netCostPerMonth": 3750000
+    },
+    "actionableItems": [
+      {
+        "item": "Finalize rent escalation clause",
+        "responsibility": "O2O",
+        "schedule": "Next Meeting",
+        "status": "Pending",
+        "remarks": ""
+      }
+    ],
+    "overallRemarks": "Initial meeting was positive. Key discussion point for the next session is the rent escalation percentage. Customer is firm on 10%, provider wants 15%.",
+    "leadId": "LDR-MFB0VLBGE69QO"
+  }
+]

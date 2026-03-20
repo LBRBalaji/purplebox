@@ -1,0 +1,293 @@
+{
+  "LDR-QUOTE-1758333336097-LST-KKGGMD": [
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "Hi",
+      "timestamp": "2025-09-20T04:14:42.698Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "hello",
+      "timestamp": "2025-09-20T04:17:16.572Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "can we connect",
+      "timestamp": "2025-09-20T04:17:59.785Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "what time?",
+      "timestamp": "2025-09-20T04:19:38.259Z"
+    },
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "now",
+      "timestamp": "2025-09-20T04:23:10.389Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "Attachment: Screenshot 2025-09-19 at 2.44.21 PM.png",
+      "timestamp": "2025-09-20T04:47:31.504Z",
+      "attachment": {
+        "fileName": "Screenshot 2025-09-19 at 2.44.21 PM.png",
+        "fileUrl": "/uploads/1758343651439-Screenshot_2025-09-19_at_2.44.21_PM.png",
+        "fileType": "image/png"
+      }
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "have you got it",
+      "timestamp": "2025-09-20T04:47:40.484Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "have you got it?",
+      "timestamp": "2025-09-20T04:48:00.223Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "Attachment: Screenshot 2025-09-19 at 2.44.14 PM.png",
+      "timestamp": "2025-09-20T04:54:51.399Z",
+      "attachment": {
+        "fileName": "Screenshot 2025-09-19 at 2.44.14 PM.png",
+        "fileUrl": "/uploads/1758344091018-Screenshot_2025-09-19_at_2.44.14_PM.png",
+        "fileType": "image/png"
+      }
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "hello",
+      "timestamp": "2025-09-20T04:59:21.166Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "hello",
+      "timestamp": "2025-09-20T05:08:34.663Z"
+    },
+    {
+      "senderEmail": "customer2@o2o.com",
+      "senderName": "Ben Carter",
+      "text": "this the test message to check whether data crunch happens",
+      "timestamp": "2025-09-20T05:08:57.632Z"
+    }
+  ],
+  "LDR-QUOTE-1758346642801-LST-YMLUBS": [
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "hi",
+      "timestamp": "2025-09-20T05:40:28.491Z"
+    },
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "Add New Activity\nLog a new interaction or update for this lead.",
+      "timestamp": "2025-09-20T05:40:48.559Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "thanks man",
+      "timestamp": "2025-09-20T05:43:17.506Z"
+    }
+  ],
+  "LDR-QUOTE-1758360784201-LST-R41ULG": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "yes",
+      "timestamp": "2025-09-20T09:43:15.356Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "thanks",
+      "timestamp": "2025-09-20T09:43:18.316Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "👍",
+      "timestamp": "2025-09-20T09:47:07.946Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "can we schedule an online meeting?",
+      "timestamp": "2025-09-20T09:57:25.573Z"
+    }
+  ],
+  "chat-LDR-QUOTE-1758360784201-admin@kailashlogistics.com": [
+    {
+      "senderEmail": "admin@kailashlogistics.com",
+      "senderName": "Kailash Logistics",
+      "text": "hi",
+      "timestamp": "2025-09-20T12:17:27.096Z"
+    },
+    {
+      "senderEmail": "admin@kailashlogistics.com",
+      "senderName": "Kailash Logistics",
+      "text": "🙏🙏",
+      "timestamp": "2025-09-20T12:17:37.257Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "hey",
+      "timestamp": "2025-09-20T12:40:44.195Z"
+    }
+  ],
+  "chat-LDR-QUOTE-1758359330575-admin@ccidevelopers.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "welcome",
+      "timestamp": "2025-09-20T12:41:00.601Z",
+      "isNew": false
+    }
+  ],
+  "chat-LDR-QUOTE-1758360477894-admin@kailashlogistics.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "hi",
+      "timestamp": "2025-09-20T16:25:33.098Z"
+    },
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "is this facility available",
+      "timestamp": "2025-09-20T16:26:40.345Z"
+    }
+  ],
+  "chat-LDR-QUOTE-1758348790692-admin@welspun.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "can you lease part of the facility?",
+      "timestamp": "2025-09-20T16:27:57.011Z"
+    }
+  ],
+  "chat-LDR-QUOTE-1758347284148-admin@indospace.com": [
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "hi",
+      "timestamp": "2025-09-20T16:55:57.842Z"
+    }
+  ],
+  "chat-LDR-MFV33FU44BSSY-namasivayam.lion@gmail.com": [
+    {
+      "senderEmail": "namasivayam.lion@gmail.com",
+      "senderName": "Namasivayam",
+      "text": "hi",
+      "timestamp": "2025-09-22T14:32:49.741Z"
+    },
+    {
+      "senderEmail": "namasivayam.lion@gmail.com",
+      "senderName": "Namasivayam",
+      "text": "i have received a interest from you, is that correct",
+      "timestamp": "2025-09-22T14:33:05.885Z"
+    },
+    {
+      "senderEmail": "namasivayam.lion@gmail.com",
+      "senderName": "Namasivayam",
+      "text": "?",
+      "timestamp": "2025-09-22T14:33:08.720Z"
+    }
+  ],
+  "chat-LDR-MFV8R753E1NY8-namasivayam.lion@gmail.com": [
+    {
+      "senderEmail": "namasivayam.lion@gmail.com",
+      "senderName": "Namasivayam",
+      "text": "hey",
+      "timestamp": "2025-09-22T18:21:30.441Z",
+      "isNew": false
+    },
+    {
+      "senderEmail": "namasivayam.lion@gmail.com",
+      "senderName": "Namasivayam",
+      "text": "when do you intent to visit the site",
+      "timestamp": "2025-09-22T18:21:38.588Z",
+      "isNew": false
+    }
+  ],
+  "chat-LDR-MFVGXVIQ8AELF-namasivayam.lion@gmail.com": [
+    {
+      "senderEmail": "namasivayam.lion@gmail.com",
+      "senderName": "Namasivayam",
+      "text": "hello",
+      "timestamp": "2025-09-22T18:41:45.530Z",
+      "isNew": false
+    },
+    {
+      "senderEmail": "namasivayam.lion@gmail.com",
+      "senderName": "Namasivayam",
+      "text": "have you seen my warehouse?",
+      "timestamp": "2025-09-22T18:41:55.244Z",
+      "isNew": false
+    }
+  ],
+  "chat-LDR-MFW7FQT2F88ME-admin@kailashlogistics.com": [
+    {
+      "senderEmail": "superadmin@o2o.com",
+      "senderName": "O2O Super Admin",
+      "text": "thank you for confirming, send me the quote pls",
+      "timestamp": "2025-09-23T07:04:02.400Z",
+      "isNew": false
+    },
+    {
+      "senderEmail": "superadmin@o2o.com",
+      "senderName": "O2O Super Admin",
+      "text": "i am waiting to hear from you",
+      "timestamp": "2025-09-23T07:17:31.868Z",
+      "isNew": false
+    }
+  ],
+  "chat-LDR-MFWDF7WSMSDFZ-admin@kailashlogistics.com": [
+    {
+      "senderEmail": "admin@kailashlogistics.com",
+      "senderName": "Kailash Logistics",
+      "text": "Hi what is this the purpose of use by this company?",
+      "timestamp": "2025-09-23T09:50:10.300Z",
+      "isNew": true
+    }
+  ],
+  "chat-LDR-DL-1758762152087-admin@indospace.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "Hi ",
+      "timestamp": "2025-09-25T11:02:18.815Z",
+      "isNew": true
+    },
+    {
+      "senderEmail": "admin@indospace.com",
+      "senderName": "Indospace",
+      "text": "have you got my message",
+      "timestamp": "2025-09-25T11:02:34.414Z",
+      "isNew": true
+    }
+  ],
+  "chat-LDR-DL-1758879893285-0.9151866550747662-namasivayam.lion@gmail.com": [
+    {
+      "senderEmail": "murugan@xyzlogistics.com",
+      "senderName": "Murugan",
+      "text": "Is this warehouse still available?",
+      "timestamp": "2025-10-02T07:00:06.105Z",
+      "isNew": true
+    }
+  ]
+}
