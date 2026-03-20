@@ -16,6 +16,7 @@ export type User = {
   userName: string;
   phone: string;
   createdAt: string;
+  status?: 'pending' | 'approved' | 'rejected';
 };
 
 export type NewUser = User & {
@@ -115,7 +116,7 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
     }
     try {
       await createUserWithEmailAndPassword(auth, email, details.password);
-      const newUser: User = { ...details, email, isCompanyAdmin: false, createdAt: new Date().toISOString() };
+      const newUser: User = { ...details, email, isCompanyAdmin: false, status: 'pending', createdAt: new Date().toISOString() };
       await setDoc(doc(db, 'users', email), newUser);
       setUser(newUser);
       sessionStorage.setItem('user', JSON.stringify(newUser));
@@ -134,7 +135,7 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
     const email = details.email.toLowerCase();
     try {
       await createUserWithEmailAndPassword(auth, email, details.password);
-      const newUser: User = { ...details, email, createdAt: new Date().toISOString() };
+      const newUser: User = { ...details, email, status: 'pending', createdAt: new Date().toISOString() };
       await setDoc(doc(db, 'users', email), newUser);
       await fetchUsers();
       await sendPasswordResetEmail(auth, email);
