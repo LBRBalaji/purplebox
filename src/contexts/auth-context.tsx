@@ -33,6 +33,7 @@ type AuthContextType = {
   addUser: (details: NewUser) => void;
   updateUser: (details: Partial<NewUser> & { email: string }) => void;
   deleteUser: (email: string) => void;
+  fetchUsers: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -171,7 +172,7 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
   };
 
   return (
-    <AuthContext.Provider value={{ user, users, login, signup, logout, isLoading, addUser, updateUser, deleteUser }}>
+    <AuthContext.Provider value={{ user, users, login, signup, logout, isLoading, addUser, updateUser, deleteUser, fetchUsers }}>
       {children}
     </AuthContext.Provider>
   );
