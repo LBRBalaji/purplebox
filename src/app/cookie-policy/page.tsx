@@ -22,7 +22,7 @@ export default function CookiePolicyPage() {
           </CardHeader>
           <CardContent className="space-y-8">
             <p className="text-muted-foreground">
-              This Cookie Policy explains how Lakshmi Balaji O2O ("we", "us", or "our") uses cookies and similar technologies to recognize you when you visit our website. It explains what these technologies are and why we use them, as well as your rights to control our use of them.
+              This Cookie Policy explains how ORS-ONE ("we", "us", or "our") uses cookies and similar technologies to recognize you when you visit our website. It explains what these technologies are and why we use them, as well as your rights to control our use of them.
             </p>
 
             <Separator />

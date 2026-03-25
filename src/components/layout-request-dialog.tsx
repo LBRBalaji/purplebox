@@ -138,7 +138,7 @@ export function LayoutRequestDialog({ isOpen, onOpenChange, listingId, listingNa
                 <ShieldCheck className="h-4 w-4" />
                 <AlertTitle className="font-semibold">Terms of Engagement</AlertTitle>
                 <AlertDescription className="text-xs">
-                    By submitting this request, you confirm your interest in this property for technical evaluation and agree to conduct any and all leasing activities exclusively through Lakshmi Balaji O2O.
+                    By submitting this request, you confirm your interest in this property for technical evaluation and agree to conduct any and all leasing activities exclusively through ORS-ONE.
                 </AlertDescription>
             </Alert>
 

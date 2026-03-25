@@ -49,7 +49,7 @@ export function ShortlistedProperties() {
         ["Email: balaji@lakshmibalajio2o.com"],
         ["Mobile: +91 98410 98170"],
         [],
-        ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
+        ["Powered by ORS-ONE | Building Transaction Ready Assets"]
     ];
     XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 

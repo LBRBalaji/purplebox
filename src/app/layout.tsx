@@ -16,8 +16,8 @@ import { Button } from '@/components/ui/button';
 import { GlobalChatWidget } from '@/components/global-chat';
 
 export const metadata: Metadata = {
-  title: 'Lakshmi Balaji O2O: Sourcing & Leasing Simplified',
-  description: 'Sourcing & Leasing Simplified',
+  title: 'ORS-ONE: Building Transaction Ready Assets',
+  description: 'Building Transaction Ready Assets',
 };
 
 const inter = Inter({
@@ -30,7 +30,7 @@ function Footer() {
     <footer className="p-4 border-t bg-card">
       <div className="container mx-auto text-center text-sm text-muted-foreground">
         <p>
-          <span className="font-bold text-primary">Lakshmi Balaji O2O</span> | Simplifying Real Estate Transactions. All rights reserved.
+          <span className="font-bold text-primary">ORS-ONE</span> | Simplifying Real Estate Transactions. All rights reserved.
         </p>
          <div className="mt-2 space-x-4">
             <Link href="/terms-and-conditions" className="hover:underline">

@@ -504,7 +504,7 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
             </Form>
             <div className="print-footer hidden">
                 <span>Transaction ID: {lead.id}</span>
-                <span>Transaction Facilitator: <a href="https://www.lakshmibalajio2o.com" target="_blank" rel="noopener noreferrer">Lakshmi Balaji O2O</a></span>
+                <span>Transaction Facilitator: <a href="https://www.lakshmibalajio2o.com" target="_blank" rel="noopener noreferrer">ORS-ONE</a></span>
             </div>
         </div>
     );

@@ -382,7 +382,7 @@ export default function ListingDetailPage() {
                 [],
                 ["Your growth is our growth. Come back tomorrow and download another set of O2O warehouse listings to serve your next customer", "www.LakshmiBalajiO2O.com"],
                 [],
-                ["Powered by Lakshmi Balaji O2O | Warehouse-Technical-Commercials, in a single CSV"]
+                ["Powered by ORS-ONE | Warehouse-Technical-Commercials, in a single CSV"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 

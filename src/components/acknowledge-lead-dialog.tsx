@@ -71,14 +71,14 @@ export function AcknowledgeLeadDialog({ isOpen, onOpenChange, lead, onSubmit }: 
                     <UserCheck className="h-4 w-4" />
                     <AlertTitle className="font-semibold">Formal Acknowledgment</AlertTitle>
                     <AlertDescription className="text-xs">
-                        I/We hereby acknowledge that the lead for <strong>{customerIdentifier}</strong> is a customer of Lakshmi Balaji O2O.
+                        I/We hereby acknowledge that the lead for <strong>{customerIdentifier}</strong> is a customer of ORS-ONE.
                     </AlertDescription>
                 </Alert>
                  <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle className="font-semibold">Financial Commitment</AlertTitle>
                     <AlertDescription className="text-xs">
-                        By acknowledging this lead, you agree that this is a brokered transaction. Upon successful conversion of this lead, you are contractually bound to pay the agreed-upon brokerage fees to Lakshmi Balaji O2O.
+                        By acknowledging this lead, you agree that this is a brokered transaction. Upon successful conversion of this lead, you are contractually bound to pay the agreed-upon brokerage fees to ORS-ONE.
                     </AlertDescription>
                 </Alert>
             </div>

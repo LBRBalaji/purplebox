@@ -62,8 +62,8 @@ function ShareDropdown({ post }: { post: CommunityPost }) {
     if (!currentUrl) return null;
     
     const postTitle = post.text.replace(/<[^>]+>/g, '').substring(0, 100);
-    const text = encodeURIComponent(`Check out this post on Lakshmi Balaji O2O: ${postTitle}...`);
-    const emailSubject = encodeURIComponent(`Interesting Post from Lakshmi Balaji O2O`);
+    const text = encodeURIComponent(`Check out this post on ORS-ONE: ${postTitle}...`);
+    const emailSubject = encodeURIComponent(`Interesting Post from ORS-ONE`);
     const emailBody = encodeURIComponent(`I thought you might be interested in this post: "${postTitle}..."\n\nRead more here: ${currentUrl}`);
 
     return (

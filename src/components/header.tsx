@@ -204,10 +204,10 @@ export function Header() {
         <div className="container mx-auto flex items-center justify-between gap-4">
           <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0">
               <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold font-headline text-primary">Lakshmi Balaji O2O</h1>
+                  <h1 className="text-xl font-bold font-headline text-primary">ORS-ONE</h1>
                   <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-50">Beta</Badge>
               </div>
-              <p className="text-xs text-accent">Sourcing & Leasing Simplified</p>
+              <p className="text-xs text-accent">Building Transaction Ready Assets</p>
           </Link>
           
           <nav className="hidden sm:flex items-center gap-6 mx-auto">

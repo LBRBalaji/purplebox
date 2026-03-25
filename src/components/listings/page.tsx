@@ -138,7 +138,7 @@ function DownloadBar() {
             // Add branding
             const footer = [
                 [], // Empty row for spacing
-                ["Powered by Lakshmi Balaji O2O | Sourcing & Leasing Simplified"]
+                ["Powered by ORS-ONE | Building Transaction Ready Assets"]
             ];
             XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
 

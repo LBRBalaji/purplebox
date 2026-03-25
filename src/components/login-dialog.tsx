@@ -52,7 +52,7 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
               </div>
               <div>
                   <DialogTitle className="text-xl font-bold font-headline">
-                      Login to <span className="text-primary">Lakshmi Balaji O2O</span>
+                      Login to <span className="text-primary">ORS-ONE</span>
                   </DialogTitle>
                   <DialogDescription>Enter your email and password to sign in.</DialogDescription>
               </div>

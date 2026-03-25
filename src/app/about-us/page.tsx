@@ -249,7 +249,7 @@ export default function AboutUsPage() {
                                     In 2014, we were grappling with the inefficiencies of the warehouse lease transactions. So, we built something for ourselves: a powerful application called <strong className="text-foreground">FOLLOWPROP</strong>. It was our own solution, born out of a real-world need.
                                 </p>
                                 <p>
-                                    A decade later, we've taken everything we learned and built a complete warehouse lease transaction platform, <strong className="text-foreground">Lakshmi Balaji O2O</strong>, for everyone. We believe our hands-on experience allows us to truly understand and solve the challenges our customers face.
+                                    A decade later, we've taken everything we learned and built a complete warehouse lease transaction platform, <strong className="text-foreground">ORS-ONE</strong>, for everyone. We believe our hands-on experience allows us to truly understand and solve the challenges our customers face.
                                 </p>
                              </div>
                         </div>

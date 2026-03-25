@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack -p 9002",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "build": "next build",
+    "build": "mkdir -p src/app/_not-found && echo \"export default function NotFound() { return null; }\" > src/app/_not-found/page.tsx && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"

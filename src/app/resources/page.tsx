@@ -34,7 +34,7 @@ export default function ProductReportPage() {
         <div className="mb-8 flex justify-between items-center gap-4 no-print">
             <div>
                 <h1 className="text-3xl font-bold font-headline tracking-tight">Product Report: PropSource AI</h1>
-                <p className="text-muted-foreground mt-2">A comprehensive overview of the Lakshmi Balaji O2O platform.</p>
+                <p className="text-muted-foreground mt-2">A comprehensive overview of the ORS-ONE platform.</p>
             </div>
             <Button onClick={handlePrint}>
                 <Printer className="mr-2 h-4 w-4" /> Download / Print
@@ -58,7 +58,7 @@ export default function ProductReportPage() {
 
         <div className="space-y-12">
             <Section id="overview" title="1. Product Overview: What is PropSource AI?">
-                <p><strong>PropSource AI</strong> (branded as Lakshmi Balaji O2O) is a comprehensive, Online-to-Offline (O2O) platform designed to digitize and streamline the entire lifecycle of commercial real estate transactions, with a specific focus on the industrial and warehousing sector.</p>
+                <p><strong>PropSource AI</strong> (branded as ORS-ONE) is a comprehensive, Online-to-Offline (O2O) platform designed to digitize and streamline the entire lifecycle of commercial real estate transactions, with a specific focus on the industrial and warehousing sector.</p>
                 <ul>
                     <li><strong>Core Problem:</strong> The platform directly addresses the primary pain points of the traditional commercial real estate market: fragmentation of information, lack of standardization in property data, inefficient communication channels, and a general absence of transparency throughout the transaction process.</li>
                     <li><strong>Mission:</strong> To simplify and accelerate the sourcing, negotiation, and leasing of warehouse properties by providing a single source of truth for all stakeholders.</li>

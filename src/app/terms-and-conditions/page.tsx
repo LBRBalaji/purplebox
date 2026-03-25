@@ -20,13 +20,13 @@ export default function TermsAndConditionsPage() {
             <p className="text-muted-foreground">Last Updated: October 28, 2023</p>
           </CardHeader>
           <CardContent className="space-y-8">
-            <p className="text-muted-foreground">Welcome to Lakshmi Balaji O2O, a platform operated by Lakshmi Balaj Realty Private Limited ("Company", "we", "us", or "our"). These Terms and Conditions ("Terms") govern your access to and use of our website, services, and platform (collectively, the "Service").</p>
+            <p className="text-muted-foreground">Welcome to ORS-ONE, a platform operated by Lakshmi Balaj Realty Private Limited ("Company", "we", "us", or "our"). These Terms and Conditions ("Terms") govern your access to and use of our website, services, and platform (collectively, the "Service").</p>
             <p className="text-muted-foreground">By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the Service.</p>
 
             <Separator />
 
             <Section title="1. Description of Service">
-                <p>Lakshmi Balaji Realty is a real estate brokerage firm and Lakshmi Balaji O2O is an Online to Offline Platform to simplify real estate transactions. This online platform is used to manage the marketing of warehouses and other properties, enabling customers to list their demands and source properties, and allowing developers to list their properties to connect with customers.</p>
+                <p>Lakshmi Balaji Realty is a real estate brokerage firm and ORS-ONE is an Online to Offline Platform to simplify real estate transactions. This online platform is used to manage the marketing of warehouses and other properties, enabling customers to list their demands and source properties, and allowing developers to list their properties to connect with customers.</p>
                 <p>In addition to this platform, our services include, but are not limited to:</p>
                 <ul className="list-disc pl-5 space-y-1">
                     <li>Facilitating site visits for customers.</li>
@@ -51,12 +51,12 @@ export default function TermsAndConditionsPage() {
             </Section>
 
             <Section title="4. Data Accuracy and Information Disclaimer">
-                <p>The information provided on the Lakshmi Balaji O2O platform, including but not limited to property listings, specifications, and availability, is provided by third-party Providers. While we strive to ensure the information is current, we do not independently verify the complete accuracy of all data.</p>
+                <p>The information provided on the ORS-ONE platform, including but not limited to property listings, specifications, and availability, is provided by third-party Providers. While we strive to ensure the information is current, we do not independently verify the complete accuracy of all data.</p>
                 <p>All users are encouraged to conduct their own due diligence and verify all information independently before entering into any transaction or agreement.</p>
             </Section>
 
             <Section title="5. Brokerage and Fees">
-                <p>By using this Service, you acknowledge and agree that Lakshmi Balaji O2O operates as a real estate brokerage. Standard brokerage fees are applicable for services rendered to both Customers (tenants) and Providers (developers/owners). The specific amount and percentage of brokerage will be determined for each transaction, and users agree to confirm these terms directly with Lakshmi Balaji O2O.</p>
+                <p>By using this Service, you acknowledge and agree that ORS-ONE operates as a real estate brokerage. Standard brokerage fees are applicable for services rendered to both Customers (tenants) and Providers (developers/owners). The specific amount and percentage of brokerage will be determined for each transaction, and users agree to confirm these terms directly with ORS-ONE.</p>
             </Section>
 
             <Section title="6. Confidentiality and Privacy">

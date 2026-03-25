@@ -98,7 +98,7 @@ const generateCsvFilename = (toolName: string) => {
 const addCsvFooter = (worksheet: XLSX.WorkSheet) => {
     const footer = [
         [], // Empty row for spacing
-        ["Source:", "Lakshmi Balaji O2O", "URL:", "www.lakshmibalajio2o.com"],
+        ["Source:", "ORS-ONE", "URL:", "www.lakshmibalajio2o.com"],
         ["Page Number:", 1]
     ];
     XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
