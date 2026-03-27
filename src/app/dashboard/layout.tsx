@@ -41,10 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
-        // Redirect non-admins away from settings (only super admin has access)
-        if (pathname.startsWith('/dashboard/settings') && !isSuperAdmin) {
-            router.push('/dashboard');
-        }
+        // Settings accessible to all logged-in users (for Change Password)
 
         // Redirect non-admins/O2O away from listing management
         if (pathname.startsWith('/dashboard/manage-listings') && !isAdmin) {
