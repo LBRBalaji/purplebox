@@ -42,7 +42,7 @@ export function EmailOtpDialog({ isOpen, onOpenChange, email, onVerified }: Emai
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
       setStep('verify');
-      setCountdown(30);
+      setCountdown(60);
       toast({ title: 'OTP Sent!', description: `Verification code sent to ${maskedEmail}` });
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Error', description: error.message || 'Failed to send OTP.' });
