@@ -450,9 +450,12 @@ const TrendingSpecSchema = z.object({
 });
 
 export const PredictDemandTrendsOutputSchema = z.object({
-  marketOutlook: z.string().describe('A summary of the predicted market outlook for the upcoming period, including key trends and shifts.'),
+  marketOutlook: z.string().describe('A summary of the predicted market outlook including key trends and shifts.'),
   predictedHotspots: z.array(PredictedHotspotSchema).describe('A list of geographic locations where demand is expected to increase.'),
-  trendingSpecifications: z.array(TrendingSpecSchema).describe('A list of specifications that are predicted to be in high demand.'),
+  trendingSpecifications: z.array(TrendingSpecSchema).describe('A list of specifications predicted to be in high demand.'),
+  supplyGaps: z.array(z.string()).optional().describe('Key gaps in current supply that present opportunities.'),
+  riskFactors: z.array(z.string()).optional().describe('Potential risks or headwinds that could affect demand.'),
+  strategicRecommendations: z.array(z.string()).optional().describe('Actionable recommendations for the brokerage.'),
 });
 export type PredictDemandTrendsOutput = z.infer<typeof PredictDemandTrendsOutputSchema>;
 
