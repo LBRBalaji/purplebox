@@ -24,7 +24,7 @@ import { Badge } from './ui/badge';
 import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DownloadTermsDialog } from './download-terms-dialog';
-import { OtpVerifyDialog } from './otp-verify-dialog';
+import { EmailOtpDialog } from './email-otp-dialog';
 import { useRouter } from 'next/navigation';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Skeleton } from './ui/skeleton';
