@@ -295,7 +295,7 @@ function DownloadBar() {
             return;
         }
 
-        if (user.role !== 'User') {
+        if (user.role !== 'User' && user.role !== 'SuperAdmin') {
             toast({
                 variant: 'destructive',
                 title: 'Download Not Available',
