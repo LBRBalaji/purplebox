@@ -196,7 +196,7 @@ export function UserList() {
                       )}
                     </TableCell>
                     <TableCell>{user.companyName}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{user.userPhone || "-"}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{user.phone || "-"}</TableCell>
                     <TableCell>
                        <Badge variant={user.role === 'SuperAdmin' ? "destructive" : user.role === 'O2O' ? 'default' : "outline"}>
                           {user.role === 'SuperAdmin' ? 'O2O Super Admin' : user.role === 'O2O' ? 'O2O Manager' : user.role === 'Warehouse Developer' ? 'Provider' : user.role === 'User' ? 'Customer' : user.role}
