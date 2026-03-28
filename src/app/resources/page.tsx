@@ -40,9 +40,9 @@ const PLATFORM_TOOLS = [
 ];
 
 const StatPill = ({ icon: Icon, value, label }) => (
-  <div className="flex items-center gap-3 bg-primary-foreground/10 backdrop-blur rounded-xl px-4 py-3">
+  <div className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-xl px-4 py-3">
     <Icon className="h-5 w-5 text-primary" />
-    <div><div className="text-primary-foreground font-black text-lg leading-none">{value}</div><div className="text-primary-foreground/60 text-xs mt-0.5">{label}</div></div>
+    <div><div className="text-white font-black text-lg leading-none">{value}</div><div className="text-white/60 text-xs mt-0.5">{label}</div></div>
   </div>
 );
 
@@ -61,7 +61,7 @@ const ResourceCard = ({ post, index }) => {
         )}
         <div className="p-5">
           <div className="flex items-center gap-2 mb-3">
-            <span className="h-6 w-6 rounded-lg bg-primary text-primary-foreground text-xs font-black flex items-center justify-center flex-shrink-0">{index + 1}</span>
+            <span className="h-6 w-6 rounded-lg bg-primary text-white text-xs font-black flex items-center justify-center flex-shrink-0">{index + 1}</span>
             <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-[hsl(259,44%,94%)] text-[#6141ac]"><BookOpen className="h-3 w-3" />Learn</span>
           </div>
           <h3 className="font-bold text-primary text-sm mb-2 leading-snug group-hover:text-primary transition-colors line-clamp-2">{title}</h3>
@@ -141,8 +141,8 @@ export default function ResourcesPage() {
               <div className="h-2 w-2 rounded-full bg-primary" />
               <span className="text-primary text-xs font-bold tracking-widest uppercase">ORS-ONE Resource Centre</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-primary-foreground leading-tight mb-4">Everything You Need.<span className="block text-primary">All in One Place.</span></h1>
-            <p className="text-primary-foreground/60 text-base md:text-lg max-w-xl mx-auto">Guides, tools, calculators and knowledge resources to help you source, evaluate and transact warehouse properties with confidence.</p>
+            <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-4">Everything You Need.<span className="block text-primary">All in One Place.</span></h1>
+            <p className="text-white/60 text-base md:text-lg max-w-xl mx-auto">Guides, tools, calculators and knowledge resources to help you source, evaluate and transact warehouse properties with confidence.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-3 mb-10">
             <StatPill icon={BookOpen} value={String(learnPosts.length)} label="Learning Guides" />
@@ -151,9 +151,9 @@ export default function ResourcesPage() {
             <StatPill icon={TrendingUp} value="3" label="Market Tools" />
           </div>
           <div className="relative max-w-xl mx-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-foreground/40" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search guides and resources..."
-              className="w-full bg-primary-foreground/10 backdrop-blur border border-primary-foreground/20 rounded-xl pl-11 pr-4 py-3 text-primary-foreground placeholder-primary-foreground/40 text-sm focus:outline-none focus:border-primary/50 transition-all" />
+              className="w-full bg-white/10 backdrop-blur border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-white/40 text-sm focus:outline-none focus:border-primary/50 transition-all" />
           </div>
         </div>
       </section>
@@ -208,20 +208,20 @@ export default function ResourcesPage() {
               </div>
             )}
             <div className="bg-primary rounded-2xl p-5">
-              <h3 className="font-bold text-primary-foreground text-sm mb-4">Quick Links</h3>
+              <h3 className="font-bold text-white text-sm mb-4">Quick Links</h3>
               <div className="space-y-2">
                 {[{label:'Browse Listings',href:'/'},{label:'Map Search',href:'/map-search'},{label:'Community',href:'/community'},{label:'About ORS-ONE',href:'/about-us'},{label:'Agent Signup',href:'/agent-signup'}].map((link, i) => (
-                  <Link key={i} href={link.href} className="flex items-center justify-between py-2 border-b border-primary-foreground/10 last:border-0 group">
-                    <span className="text-primary-foreground/70 text-sm group-hover:text-primary transition-colors">{link.label}</span>
-                    <ChevronRight className="h-3.5 w-3.5 text-primary-foreground/30 group-hover:text-primary transition-colors" />
+                  <Link key={i} href={link.href} className="flex items-center justify-between py-2 border-b border-white/10 last:border-0 group">
+                    <span className="text-white/70 text-sm group-hover:text-primary transition-colors">{link.label}</span>
+                    <ChevronRight className="h-3.5 w-3.5 text-white/30 group-hover:text-primary transition-colors" />
                   </Link>
                 ))}
               </div>
             </div>
             <div className="bg-primary rounded-2xl p-5 text-center">
-              <BookOpen className="h-8 w-8 text-primary-foreground mx-auto mb-3" />
-              <h3 className="font-black text-primary-foreground text-base mb-2">Have Something to Share?</h3>
-              <p className="text-primary-foreground/80 text-xs mb-4">Post a guide or tutorial in the community for fellow industry professionals.</p>
+              <BookOpen className="h-8 w-8 text-white mx-auto mb-3" />
+              <h3 className="font-black text-white text-base mb-2">Have Something to Share?</h3>
+              <p className="text-white/80 text-xs mb-4">Post a guide or tutorial in the community for fellow industry professionals.</p>
               <Link href="/community" className="block bg-card text-primary font-bold text-sm py-2.5 rounded-xl hover:bg-primary-foreground/90 transition-colors">Go to Community</Link>
             </div>
           </div>

@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 
 const Stat = ({ value, label }) => (
   <div className="text-center">
-    <div className="text-4xl md:text-5xl font-black text-primary-foreground leading-none">{value}</div>
-    <div className="text-sm text-primary-foreground/70 mt-2 font-medium tracking-wide">{label}</div>
+    <div className="text-4xl md:text-5xl font-black text-white leading-none">{value}</div>
+    <div className="text-sm text-white/70 mt-2 font-medium tracking-wide">{label}</div>
   </div>
 );
 
@@ -24,7 +24,7 @@ const Pillar = ({ icon: Icon, title, body }) => (
 const TimelineItem = ({ year, title, body, accent }) => (
   <div className="flex gap-6">
     <div className="flex flex-col items-center">
-      <div className="h-12 w-12 rounded-full flex items-center justify-center text-primary-foreground text-xs font-black flex-shrink-0" style={{ background: accent }}>{year}</div>
+      <div className="h-12 w-12 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0" style={{ background: accent }}>{year}</div>
       <div className="w-0.5 bg-slate-200 flex-1 mt-3" />
     </div>
     <div className="pb-10">
@@ -36,7 +36,7 @@ const TimelineItem = ({ year, title, body, accent }) => (
 
 const StakeholderCard = ({ label, icon: Icon, points, color }) => (
   <div className="rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-shadow">
-    <div className="p-5 text-primary-foreground flex items-center gap-3" style={{ background: color }}>
+    <div className="p-5 text-white flex items-center gap-3" style={{ background: color }}>
       <Icon className="h-5 w-5" />
       <span className="font-bold tracking-wide text-sm uppercase">{label}</span>
     </div>
@@ -64,15 +64,15 @@ export default function AboutUsPage() {
               <div className="h-2 w-2 rounded-full bg-primary" />
               <span className="text-primary text-xs font-bold tracking-widest uppercase">About ORS-ONE</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-primary-foreground leading-tight mb-6">
+            <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6">
               Building Transaction
               <span className="block text-primary">Ready Assets.</span>
             </h1>
-            <p className="text-primary-foreground/70 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            <p className="text-white/70 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
               India's dedicated marketplace for industrial warehouse leasing — connecting developers, tenants and brokers on one transparent platform.
             </p>
           </div>
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto border-t border-primary-foreground/10 pt-12">
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto border-t border-white/10 pt-12">
             <Stat value="68+" label="Verified Listings" />
             <Stat value="20+" label="Years of Domain Expertise" />
             <Stat value="3.5M+" label="Sq Ft Transacted" />
@@ -162,17 +162,17 @@ export default function AboutUsPage() {
 
       <section className="py-20 bg-primary">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-primary-foreground mb-4">Ready to <span className="text-primary">Reach the Market?</span></h2>
-          <p className="text-primary-foreground/60 text-lg max-w-xl mx-auto mb-10">Whether you are searching for a warehouse, listing a property, or building an agent network — your journey starts here.</p>
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Ready to <span className="text-primary">Reach the Market?</span></h2>
+          <p className="text-white/60 text-lg max-w-xl mx-auto mb-10">Whether you are searching for a warehouse, listing a property, or building an agent network — your journey starts here.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 rounded-xl">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold px-8 rounded-xl">
               <Link href="/">Browse Listings <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-card hover:text-primary font-bold px-8 rounded-xl bg-transparent">
+            <Button asChild size="lg" variant="outline" className="border-white/30 text-white hover:bg-card hover:text-primary font-bold px-8 rounded-xl bg-transparent">
               <Link href="/agent-signup">Become a Transaction Partner <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
-          <p className="text-primary-foreground/30 text-xs mt-10">Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app  ·  Building Transaction Ready Assets</p>
+          <p className="text-white/30 text-xs mt-10">Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app  ·  Building Transaction Ready Assets</p>
         </div>
       </section>
     </div>
