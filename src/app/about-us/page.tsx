@@ -56,7 +56,7 @@ const StakeholderCard = ({ label, icon: Icon, points, color }) => (
 export default function AboutUsPage() {
   return (
     <div className="flex-grow flex flex-col font-sans bg-background">
-      <section className="bg-primary py-24 md:py-32 relative overflow-hidden">
+      <section className="bg-[#2a1060] py-24 md:py-32 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, #6141ac 0%, transparent 60%), radial-gradient(circle at 80% 20%, #5B3FA8 0%, transparent 50%)' }} />
         <div className="container mx-auto px-4 relative">
           <div className="max-w-4xl mx-auto text-center">

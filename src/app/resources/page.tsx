@@ -133,7 +133,7 @@ export default function ResourcesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="bg-primary pt-16 pb-12 relative overflow-hidden">
+      <section className="bg-[#2a1060] pt-16 pb-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 10% 50%, #6141ac, transparent 50%), radial-gradient(circle at 90% 20%, #6141ac, transparent 50%)' }} />
         <div className="container mx-auto px-4 relative">
           <div className="max-w-3xl mx-auto text-center mb-10">
