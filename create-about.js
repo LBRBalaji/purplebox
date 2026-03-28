@@ -1,4 +1,6 @@
-'use client';
+const fs = require('fs');
+
+const newAboutUs = `'use client';
 import * as React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Building2, Download, Users, ClipboardCheck, Award, Zap, ShieldCheck, MapPin, TrendingUp } from 'lucide-react';
@@ -178,3 +180,7 @@ export default function AboutUsPage() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/app/about-us/page.tsx', newAboutUs);
+console.log('Done!');
