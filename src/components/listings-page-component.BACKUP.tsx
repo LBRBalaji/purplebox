@@ -210,7 +210,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
             </Button>
         </div>
         <ShareDropdown listing={listing} />
-        <Button asChild className="w-full bg-[#0D1F3C] hover:bg-[#132840] text-white border-none rounded-xl font-semibold">
+        <Button asChild className="w-full" variant="outline">
             <Link href={`/commercial-calculator?compare=${listing.listingId}`}>
                 <Calculator className="mr-2 h-4 w-4" /> Calculate
             </Link>
@@ -354,15 +354,15 @@ function DownloadBar() {
     return (
         <>
             <div className="fixed bottom-4 inset-x-0 z-50 flex justify-center">
-                <div className="flex items-center justify-between gap-6 p-4 rounded-2xl shadow-2xl bg-[#0D1F3C] border border-[#1E3A5F] w-full max-w-2xl animate-in slide-in-from-bottom-5">
-                    <p className="font-semibold text-sm text-white">
+                <div className="flex items-center justify-between gap-6 p-4 rounded-lg shadow-2xl bg-card border w-full max-w-2xl animate-in slide-in-from-bottom-5">
+                    <p className="font-semibold text-sm">
                         {selectedForDownload.length} listing{selectedForDownload.length > 1 ? 's' : ''} selected
                     </p>
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" onClick={clearSelectedForDownload} className="text-white/70 hover:text-white hover:bg-white/10">
+                        <Button variant="ghost" size="sm" onClick={clearSelectedForDownload}>
                             <X className="mr-2 h-4 w-4" /> Clear
                         </Button>
-                        <Button onClick={handleDownload} className="bg-[#F18F01] hover:bg-[#E07309] text-white border-none font-bold rounded-xl">
+                        <Button onClick={handleDownload}>
                             <Download className="mr-2 h-4 w-4" /> Download Selected
                         </Button>
                     </div>
@@ -648,7 +648,7 @@ export function ListingsPage() {
               <Button onClick={resetFilters} variant="outline">
                   <X className="mr-2 h-4 w-4" /> Clear All Filters
               </Button>
-              <Button onClick={handleLogDemandClick} className="bg-[#F18F01] hover:bg-[#E07309] text-white border-none font-bold rounded-xl mt-2">
+              <Button onClick={handleLogDemandClick}>
                   <ClipboardPlus className="mr-2 h-4 w-4" /> Log New Demand
               </Button>
           </div>
@@ -668,25 +668,25 @@ export function ListingsPage() {
                     <div className="w-8 h-px bg-border"/>
                     <Download className="w-6 h-6"/>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#0D1F3C]" style={{fontFamily:"Calibri,Arial,sans-serif"}}>Search-Select-Download</h1>
-                <p className="mt-4 text-base text-[#F18F01] font-semibold">Warehouse-Technical-Compliance-Commercials, in a single CSV</p>
+                <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-primary">Search-Select-Download</h1>
+                <p className="mt-4 text-lg text-accent">Warehouse-Technical-Compliance-Commercials, in a single CSV</p>
                 
                  <div className="mt-8 flex items-center justify-center gap-4 md:gap-8 text-center animate-in fade-in-0 duration-1000">
                     <div className="text-center">
-                        {isDataLoading ? <Skeleton className="h-9 w-12 mx-auto" /> : <p className="text-2xl md:text-3xl font-black text-[#0D1F3C]">{inventoryCount}</p>}
+                        {isDataLoading ? <Skeleton className="h-9 w-12 mx-auto" /> : <p className="text-2xl md:text-3xl font-bold text-primary">{inventoryCount}</p>}
                         <p className="text-xs text-muted-foreground tracking-wider">WAREHOUSES</p>
                     </div>
                     <Separator orientation="vertical" className="h-10" />
                     <div className="text-center">
-                         {isDataLoading ? <Skeleton className="h-9 w-20 mx-auto" /> : <p className="text-2xl md:text-3xl font-black text-[#0D1F3C]">{formatSize(totalInventorySize)}</p>}
+                         {isDataLoading ? <Skeleton className="h-9 w-20 mx-auto" /> : <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>}
                         <p className="text-xs text-muted-foreground tracking-wider">SQ. FT. LISTED</p>
                     </div>
                 </div>
 
             </div>
-             <Alert className="mb-8 bg-[#0D1F3C]/5 border-[#0D1F3C]/15 p-6 rounded-2xl grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+             <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <div className="md:col-span-8">
-                    <AlertTitle className="font-black text-[#0D1F3C] text-lg flex items-center gap-3">
+                    <AlertTitle className="font-bold text-primary/90 text-xl flex items-center gap-3">
                         <Info className="h-6 w-6 text-primary/80" />
                          Download up to 5 listings at once!
                     </AlertTitle>
@@ -717,7 +717,7 @@ export function ListingsPage() {
             </Alert>
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
                 <div className="w-full">
-                    <h2 className="text-xl font-black text-[#0D1F3C] tracking-tight">Use our advanced filters to find the perfect Warehouse, Temperature Controlled Warehouses, 3PL Operated Warehouse and Industrial Buildings for your needs.</h2>
+                    <h2 className="text-2xl font-bold font-headline tracking-tight">Use our advanced filters to find the perfect Warehouse, Temperature Controlled Warehouses, 3PL Operated Warehouse and Industrial Buildings for your needs.</h2>
                 </div>
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
                     <div className="lg:col-span-2 space-y-2">
