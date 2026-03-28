@@ -1,4 +1,6 @@
-'use client';
+const fs = require('fs');
+
+const part1 = `'use client';
 
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
@@ -59,7 +61,9 @@ const EditorToolbar = ({ editor }: { editor: any }) => {
       {btn(<Heading2 className="h-3.5 w-3.5" />, editor.isActive('heading', { level: 2 }), () => editor.chain().focus().toggleHeading({ level: 2 }).run())}
     </div>
   );
-};
+};`;
+
+const part2 = `
 function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost | null; onFinished: () => void }) {
   const { user } = useAuth();
   const { addCommunityPost, updateCommunityPost } = useData();
@@ -167,7 +171,9 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
       </div>
     </div>
   );
-}
+}`;
+
+const part3 = `
 function PostCard({ post, onEdit, onDelete }: { post: CommunityPost; onEdit: (p: CommunityPost) => void; onDelete: (id: string) => void }) {
   const { user, users } = useAuth();
   const author = users[post.authorEmail] || { userName: post.authorName, companyName: post.authorCompanyName };
@@ -251,7 +257,9 @@ const TabBtn = ({ active, onClick, icon: Icon, label, count }: { active: boolean
     <Icon className="h-4 w-4" />{label}
     <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-bold', active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500')}>{count}</span>
   </button>
-);
+);`;
+
+const part4 = `
 function CommunityPageInner() {
   const { user, isLoading: authLoading } = useAuth();
   const { communityPosts, isLoading: dataLoading, deleteCommunityPost } = useData();
@@ -341,7 +349,7 @@ function CommunityPageInner() {
             <div className="grid grid-cols-1">
               <EmptyState icon={activeTab === 'learn' ? BookOpen : activeTab === 'events' ? Calendar : Briefcase}
                 title={debouncedSearch ? 'No results found' : 'No posts yet'}
-                desc={debouncedSearch ? `No posts match "${debouncedSearch}"` : 'Be the first to share something with the community.'} />
+                desc={debouncedSearch ? \`No posts match "\${debouncedSearch}"\` : 'Be the first to share something with the community.'} />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -368,4 +376,7 @@ export default function CommunityPage() {
       <CommunityPageInner />
     </React.Suspense>
   );
-}
+}`;
+
+fs.writeFileSync('src/app/community/page.tsx', part1 + part2 + part3 + part4);
+console.log('Community page written!');
