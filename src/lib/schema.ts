@@ -416,7 +416,11 @@ export type TenantImprovementsSheet = z.infer<typeof tenantImprovementsSheetSche
 
 // Schemas for Predictive Analytics Flow
 export const PredictDemandTrendsInputSchema = z.object({
-  timeHorizon: z.enum(['next quarter', 'next 6 months']).default('next quarter')
+  listings: z.array(z.any()).optional().describe("Live listings data from platform."),
+  demands: z.array(z.any()).optional().describe("Live demands data from platform."),
+  submissions: z.array(z.any()).optional().describe("Live submissions data from platform."),
+  analytics: z.array(z.any()).optional().describe("Live analytics data from platform."),
+  timeHorizon: z.enum(['next quarter', 'next 6 months', 'next year']).default('next quarter')
     .describe('The time period for which to predict demand trends.'),
   location: z.string().optional().describe('An optional location (e.g., city or industrial park) to focus the analysis on.'),
   buildingType: z.string().optional().describe('An optional building type to filter the analysis.'),
