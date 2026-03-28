@@ -1,4 +1,6 @@
-'use client';
+const fs = require('fs');
+
+const newResources = `'use client';
 
 import * as React from 'react';
 import { useData } from '@/contexts/data-context';
@@ -9,14 +11,14 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 const getTitle = (html) => {
-  const h1 = html.match(/<h1[^>]*>(.*?)<\/h1>/);
-  const h2 = html.match(/<h2[^>]*>(.*?)<\/h2>/);
+  const h1 = html.match(/<h1[^>]*>(.*?)<\\/h1>/);
+  const h2 = html.match(/<h2[^>]*>(.*?)<\\/h2>/);
   const match = h1 || h2;
   return match ? match[1].replace(/<[^>]+>/g, '').trim() : 'Untitled Resource';
 };
 
 const getExcerpt = (html, len = 180) => {
-  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const text = html.replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();
   return text.length > len ? text.substring(0, len) + '...' : text;
 };
 
@@ -230,3 +232,7 @@ export default function ResourcesPage() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/app/resources/page.tsx', newResources);
+console.log('Done!');
