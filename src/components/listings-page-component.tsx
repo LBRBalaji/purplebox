@@ -246,7 +246,7 @@ function DownloadBar() {
     
     const onTermsAccept = () => {
         setIsTermsOpen(false);
-        proceedWithDownload();
+        setIsOtpOpen(true);
     };
 
     const proceedWithDownload = () => {
