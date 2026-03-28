@@ -332,6 +332,7 @@ function DownloadBar() {
             </div>
             <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess}/>
             <DownloadTermsDialog isOpen={isTermsOpen} onOpenChange={setIsTermsOpen} onAccept={onTermsAccept} />
+            <EmailOtpDialog isOpen={isOtpOpen} onOpenChange={setIsOtpOpen} email={user?.email || ""} onVerified={proceedWithDownload} />
         </>
     )
 }
