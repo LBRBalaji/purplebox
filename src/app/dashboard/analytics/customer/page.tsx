@@ -148,22 +148,30 @@ export default function CustomerAnalyticsPage() {
   }, [users]);
 
   const data = React.useMemo(() => {
-    if (isLoading) { return null; }
+    const safeViews = viewHistory ?? [];
+    const safeDownloads = downloadHistory ?? [];
+    const safeDemands = demands ?? [];
+    const safeQuotes = registeredLeads ?? [];
+    const safeLayouts = layoutRequests ?? [];
+    const safeActivities = transactionActivities ?? [];
+    const safeBoards = negotiationBoards ?? [];
+    const safeListings = listings ?? [];
+    const safeUsers = users ?? {};
     const from = dateRange?.from || new Date(0);
     const to = new Date(dateRange?.to || new Date()); to.setHours(23,59,59,999);
     const isAll = selectedCompany === 'all';
     const companyEmails = new Set<string>();
-    Object.values(users).forEach(u => { if (u.role === 'User' && (isAll || u.companyName === selectedCompany)) companyEmails.add(u.email); });
+    Object.values(safeUsers).forEach(u => { if (u.role === 'User' && (isAll || u.companyName === selectedCompany)) companyEmails.add(u.email); });
     const dateFilter = (ts: string | number | Date) => { const d = new Date(ts); return d >= from && d <= to; };
 
-    const relViews = viewHistory.filter(v => companyEmails.has(v.userId) && dateFilter(v.timestamp));
-    const relDownloads = downloadHistory.filter(d => companyEmails.has(d.userId) && dateFilter(d.timestamp));
-    const relDemands = demands.filter(d => companyEmails.has(d.userEmail) && d.createdAt && dateFilter(d.createdAt));
-    const relQuotes = registeredLeads.filter(l => companyEmails.has(l.customerId) && dateFilter(l.registeredAt));
-    const relLayouts = layoutRequests.filter(r => { const u = Object.values(users).find(u => u.email === r.userEmail); return u && companyEmails.has(u.email) && dateFilter(r.requestedAt); });
+    const relViews = safeViews.filter(v => companyEmails.has(v.userId) && dateFilter(v.timestamp));
+    const relDownloads = safeDownloads.filter(d => companyEmails.has(d.userId) && dateFilter(d.timestamp));
+    const relDemands = safeDemands.filter(d => companyEmails.has(d.userEmail) && d.createdAt && dateFilter(d.createdAt));
+    const relQuotes = safeQuotes.filter(l => companyEmails.has(l.customerId) && dateFilter(l.registeredAt));
+    const relLayouts = safeLayouts.filter(r => { const u = Object.values(users).find(u => u.email === r.userEmail); return u && companyEmails.has(u.email) && dateFilter(r.requestedAt); });
     const relLeadsSet = new Set(registeredLeads.filter(l => companyEmails.has(l.customerId)).map(l => l.id));
-    const relTI = transactionActivities.filter(a => a.activityType === 'Tenant Improvements' && relLeadsSet.has(a.leadId) && dateFilter(a.createdAt));
-    const relNeg = negotiationBoards.flatMap(n => n.sessions.filter(s => relLeadsSet.has(n.leadId) && dateFilter(s.date))).length;
+    const relTI = safeActivities.filter(a => a.activityType === 'Tenant Improvements' && relLeadsSet.has(a.leadId) && dateFilter(a.createdAt));
+    const relNeg = safeBoards.flatMap(n => n.sessions.filter(s => relLeadsSet.has(n.leadId) && dateFilter(s.date))).length;
 
     // Funnel
     const uniqueViewers = new Set(relViews.map(v => v.userId)).size;
@@ -172,12 +180,12 @@ export default function CustomerAnalyticsPage() {
     const uniqueActive = new Set(relTI.map(a => registeredLeads.find(l => l.id === a.leadId)?.customerId).filter(Boolean)).size;
 
     // Top lists
-    const topLocations = groupAndSort(relViews, v => listings.find(l => l.listingId === v.listingId)?.location?.split(',')[0]?.trim());
-    const topDevelopers = groupAndSort(relViews, v => { const l = listings.find(x => x.listingId === v.listingId); return l ? Object.values(users).find(u => u.email === l.developerId)?.companyName : undefined; });
+    const topLocations = groupAndSort(relViews, v => safeListings.find(l => l.listingId === v.listingId)?.location?.split(',')[0]?.trim());
+    const topDevelopers = groupAndSort(relViews, v => { const l = safeListings.find(x => x.listingId === v.listingId); return l ? Object.values(users).find(u => u.email === l.developerId)?.companyName : undefined; });
 
     // Customer leaderboard
     const customerScores: Record<string, { company: string; views: number; downloads: number; demands: number }> = {};
-    Object.values(users).filter(u => u.role === 'User' && companyEmails.has(u.email)).forEach(u => {
+    Object.values(safeUsers).filter(u => u.role === 'User' && companyEmails.has(u.email)).forEach(u => {
       if (!customerScores[u.companyName]) customerScores[u.companyName] = { company: u.companyName, views: 0, downloads: 0, demands: 0 };
     });
     relViews.forEach(v => { const u = users[v.userId]; if (u && customerScores[u.companyName]) customerScores[u.companyName].views++; });
@@ -195,7 +203,7 @@ export default function CustomerAnalyticsPage() {
       ...relDemands.map(item => ({ type: 'New Demand' as const, subject: item.demandId, timestamp: item.createdAt!, link: `/dashboard?editDemandId=${item.demandId}`, userName: item.userName })),
       ...relLayouts.map(item => ({ type: 'Layout Request' as const, subject: item.listingName, timestamp: item.requestedAt, link: `/listings/${item.listingId}`, userName: item.userName })),
       ...relTI.map(item => ({ type: 'Tenant Improvements' as const, subject: `Update for Lead ${item.leadId}`, timestamp: item.createdAt, link: `/dashboard/leads/${item.leadId}?tab=improvements`, userName: registeredLeads.find(l => l.id === item.leadId)?.leadContact || 'N/A' })),
-      ...negotiationBoards.filter(n => relLeadsSet.has(n.leadId)).flatMap(n => n.sessions.filter(s => dateFilter(s.date)).map(s => ({ type: 'Negotiation Board Update' as const, subject: `Session for Lead ${n.leadId}`, timestamp: s.date, link: `/dashboard/leads/${n.leadId}?tab=negotiation-board`, userName: registeredLeads.find(l => l.id === n.leadId)?.leadContact || 'N/A' }))),
+      ...safeBoards.filter(n => relLeadsSet.has(n.leadId)).flatMap(n => n.sessions.filter(s => dateFilter(s.date)).map(s => ({ type: 'Negotiation Board Update' as const, subject: `Session for Lead ${n.leadId}`, timestamp: s.date, link: `/dashboard/leads/${n.leadId}?tab=negotiation-board`, userName: registeredLeads.find(l => l.id === n.leadId)?.leadContact || 'N/A' }))),
     ].sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     return {
