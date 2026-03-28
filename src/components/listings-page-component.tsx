@@ -231,6 +231,7 @@ function DownloadBar() {
     const { selectedForDownload, logDownload, clearSelectedForDownload, downloadAcknowledgments } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isTermsOpen, setIsTermsOpen] = useState(false);
+    const [isOtpOpen, setIsOtpOpen] = useState(false);
 
     if (selectedForDownload.length === 0) {
         return null;
