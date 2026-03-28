@@ -123,7 +123,7 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
       sessionStorage.setItem('user', JSON.stringify(newUser));
       router.push('/dashboard');
     } catch (error) {
-      toast({ variant: 'destructive', title: 'Signup Failed', description: 'Could not create account. Please try again.' });
+      const errMsg = (error as any)?.code === 'auth/email-already-in-use' ? 'This email is already registered. Please login instead.' : (error as any)?.code === 'auth/invalid-email' ? 'Invalid email address.' : (error as any)?.code === 'auth/weak-password' ? 'Password is too weak. Use at least 6 characters.' : 'Could not create account. Please try again.'; toast({ variant: 'destructive', title: 'Signup Failed', description: errMsg });
     }
   };
 
