@@ -491,7 +491,7 @@ export function ListingsPage() {
       const lowerLocation = locationFilter.toLowerCase();
       const matchedCircle = locationCircles.find(circle => 
           circle.name.toLowerCase().includes(lowerLocation) || 
-          circle.locations.some(loc => lowerLocation.includes(loc))
+          circle.locations.some(loc => lowerLocation.includes(loc) || loc.includes(lowerLocation) || loc.replace(/\s/g, "").includes(lowerLocation.replace(/\s/g, "")))
       );
 
       if (matchedCircle) {
