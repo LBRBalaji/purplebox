@@ -276,7 +276,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [shortlistedItems, setShortlistedItems] = useState<Submission[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
   const [viewHistory, setViewHistory] = useState<ViewRecord[]>([]);
-  const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>([]);
+  const [selectedForDownload, setSelectedForDownload] = useState<ListingSchema[]>(() => {
+    try {
+      const saved = sessionStorage.getItem('pendingDownloadSelection');
+      if (saved) { sessionStorage.removeItem('pendingDownloadSelection'); return JSON.parse(saved); }
+    } catch(e) {}
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [generalShortlist, setGeneralShortlist] = useState<string[]>([]);
   const [isShortlistLoading, setIsShortlistLoading] = useState(true);

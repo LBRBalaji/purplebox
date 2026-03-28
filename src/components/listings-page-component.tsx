@@ -291,6 +291,7 @@ function DownloadBar() {
 
     const handleDownload = () => {
         if (!user) {
+            try { sessionStorage.setItem('pendingDownloadSelection', JSON.stringify(selectedForDownload)); } catch(e) {}
             setIsLoginOpen(true);
             return;
         }
@@ -530,7 +531,7 @@ export function ListingsPage() {
       return;
     }
 
-    if (user.role !== 'User') {
+    if (user.role !== 'User' && user.role !== 'SuperAdmin') {
       toast({
         variant: 'destructive',
         title: 'Selection Not Available',
