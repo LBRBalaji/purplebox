@@ -148,9 +148,7 @@ export default function CustomerAnalyticsPage() {
   }, [users]);
 
   const data = React.useMemo(() => {
-    if (isLoading || !demands || !viewHistory || !downloadHistory || !listings || !users || !registeredLeads || !layoutRequests || !transactionActivities || !negotiationBoards) {
-      return null;
-    }
+    if (isLoading) { return null; }
     const from = dateRange?.from || new Date(0);
     const to = new Date(dateRange?.to || new Date()); to.setHours(23,59,59,999);
     const isAll = selectedCompany === 'all';
