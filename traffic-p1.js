@@ -1,4 +1,5 @@
-'use client';
+const fs = require('fs');
+const content = `'use client';
 
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
@@ -294,4 +295,6 @@ export default function TrafficAnalyticsPage() {
       </div>
     </main>
   );
-}
+}`;
+fs.writeFileSync('src/app/dashboard/analytics/traffic/page.tsx', content);
+console.log('Done!');
