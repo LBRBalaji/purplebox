@@ -1,4 +1,5 @@
-'use client';
+const fs = require('fs');
+const content = `'use client';
 
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
@@ -73,7 +74,7 @@ const TopPostCard = ({ post, rank, shares, maxScore }: { post: any; rank: number
   const CatIcon = cat.icon;
   return (
     <div className="flex items-start gap-3 py-3 border-b border-border last:border-0">
-      <span className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${rank===1?'bg-amber-100 text-amber-700':rank===2?'bg-slate-100 text-slate-600':rank===3?'bg-orange-50 text-orange-600':'bg-secondary text-muted-foreground'}`}>{rank}</span>
+      <span className={\`h-7 w-7 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 \${rank===1?'bg-amber-100 text-amber-700':rank===2?'bg-slate-100 text-slate-600':rank===3?'bg-orange-50 text-orange-600':'bg-secondary text-muted-foreground'}\`}>{rank}</span>
       <div className="flex-1 min-w-0">
         <Link href={'/community/'+post.id} target="_blank" className="text-sm font-semibold text-foreground hover:text-primary transition-colors line-clamp-2 block">{excerpt}</Link>
         <div className="flex items-center gap-3 mt-1.5">
@@ -92,7 +93,7 @@ const TopPostCard = ({ post, rank, shares, maxScore }: { post: any; rank: number
 // ── Author Row ────────────────────────────────────────────────
 const AuthorRow = ({ rank, name, company, posts, comments }: { rank: number; name: string; company: string; posts: number; comments: number }) => (
   <div className="flex items-center gap-3 py-3 border-b border-border last:border-0">
-    <span className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${rank===1?'bg-amber-100 text-amber-700':rank===2?'bg-slate-100 text-slate-600':rank===3?'bg-orange-50 text-orange-600':'bg-secondary text-muted-foreground'}`}>{rank}</span>
+    <span className={\`h-7 w-7 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 \${rank===1?'bg-amber-100 text-amber-700':rank===2?'bg-slate-100 text-slate-600':rank===3?'bg-orange-50 text-orange-600':'bg-secondary text-muted-foreground'}\`}>{rank}</span>
     <Avatar className="h-8 w-8 flex-shrink-0"><AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">{name.charAt(0)}</AvatarFallback></Avatar>
     <div className="flex-1 min-w-0">
       <p className="text-sm font-semibold text-foreground truncate">{name}</p>
@@ -105,7 +106,7 @@ const AuthorRow = ({ rank, name, company, posts, comments }: { rank: number; nam
 // ── Sharer Row ────────────────────────────────────────────────
 const SharerRow = ({ rank, name, company, count, max }: { rank: number; name: string; company: string; count: number; max: number }) => (
   <div className="flex items-center gap-3 py-3 border-b border-border last:border-0">
-    <span className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${rank===1?'bg-amber-100 text-amber-700':rank===2?'bg-slate-100 text-slate-600':rank===3?'bg-orange-50 text-orange-600':'bg-secondary text-muted-foreground'}`}>{rank}</span>
+    <span className={\`h-7 w-7 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 \${rank===1?'bg-amber-100 text-amber-700':rank===2?'bg-slate-100 text-slate-600':rank===3?'bg-orange-50 text-orange-600':'bg-secondary text-muted-foreground'}\`}>{rank}</span>
     <div className="flex-1 min-w-0">
       <p className="text-sm font-semibold text-foreground truncate">{name}</p>
       <p className="text-xs text-muted-foreground">{company}</p>
@@ -262,4 +263,6 @@ export default function CommunityAnalyticsPage() {
       </div>
     </main>
   );
-}
+}`;
+fs.writeFileSync('src/app/dashboard/analytics/community/page.tsx', content);
+console.log('Done!');
