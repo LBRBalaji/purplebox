@@ -171,8 +171,7 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
           {user && !isSuperAdmin && <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" />}
           <NavItem href="/" icon={List} label="Browse Listings" />
-          <NavItem href="/map-search" icon={Map} label="Map Search" />
-          <NavItem href="/listing-comparison" icon={Calculator} label="Compare Listings" />
+
 
           <div className="pt-2 pb-1 px-4">
             <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Tools</p>
