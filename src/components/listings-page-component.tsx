@@ -660,12 +660,13 @@ export function ListingsPage() {
     <>
     <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-             <div className="text-center py-8 md:py-12">
-                <div className="flex items-center justify-center gap-4 text-primary mb-4">
+             <div className="text-center py-16 md:py-20 px-4 -mx-4 md:-mx-8 mb-8 bg-[#0D1F3C] relative overflow-hidden" style={{backgroundImage:"radial-gradient(circle at 10% 50%, rgba(241,143,1,0.1), transparent 50%), radial-gradient(circle at 90% 20%, rgba(124,58,237,0.1), transparent 50%)"}}>
+                <div className="inline-flex items-center gap-2 bg-[#F18F01]/10 border border-[#F18F01]/30 rounded-full px-4 py-1.5 mb-6"><div className="h-2 w-2 rounded-full bg-[#F18F01]" /><span className="text-[#F18F01] text-xs font-bold tracking-widest uppercase">ORS-ONE Marketplace</span></div>
+                <div className="flex items-center justify-center gap-4 text-[#F18F01] mb-4">
                     <Search className="w-6 h-6"/>
-                    <div className="w-8 h-px bg-border"/>
+                    <div className="w-8 h-px bg-white/20" />
                     <CheckSquare className="w-6 h-6"/>
-                    <div className="w-8 h-px bg-border"/>
+                    <div className="w-8 h-px bg-white/20" />
                     <Download className="w-6 h-6"/>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#0D1F3C]" style={{fontFamily:"Calibri,Arial,sans-serif"}}>Search-Select-Download</h1>
@@ -674,12 +675,12 @@ export function ListingsPage() {
                  <div className="mt-8 flex items-center justify-center gap-4 md:gap-8 text-center animate-in fade-in-0 duration-1000">
                     <div className="text-center">
                         {isDataLoading ? <Skeleton className="h-9 w-12 mx-auto" /> : <p className="text-2xl md:text-3xl font-black text-[#0D1F3C]">{inventoryCount}</p>}
-                        <p className="text-xs text-muted-foreground tracking-wider">WAREHOUSES</p>
+                        <p className="text-xs text-white/50 tracking-wider">WAREHOUSES</p>
                     </div>
-                    <Separator orientation="vertical" className="h-10" />
+                    <Separator orientation="vertical" className="h-10 bg-white/20" />
                     <div className="text-center">
                          {isDataLoading ? <Skeleton className="h-9 w-20 mx-auto" /> : <p className="text-2xl md:text-3xl font-black text-[#0D1F3C]">{formatSize(totalInventorySize)}</p>}
-                        <p className="text-xs text-muted-foreground tracking-wider">SQ. FT. LISTED</p>
+                        <p className="text-xs text-white/50 tracking-wider">SQ. FT. LISTED</p>
                     </div>
                 </div>
 
