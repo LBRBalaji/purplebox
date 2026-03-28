@@ -4,8 +4,7 @@ import {ai} from '@/ai/genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
 import { 
-    demandSchema, 
-    listingSchema, 
+    
     PredictDemandTrendsInputSchema, 
     PredictDemandTrendsOutputSchema,
     type PredictDemandTrendsInput,
@@ -34,8 +33,8 @@ const prompt = ai.definePrompt({
     ventilation: z.string().optional(),
     sizeMin: z.number().optional(),
     sizeMax: z.number().optional(),
-    demands: z.array(demandSchema),
-    listings: z.array(listingSchema),
+    demands: z.array(z.any()),
+    listings: z.array(z.any()),
     submissions: z.array(z.any()),
     analytics: z.array(z.any()),
   })},
