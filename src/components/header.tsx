@@ -137,7 +137,7 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
     <SheetClose asChild>
       <Link href={href} className={cn(
         "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
-        pathname === href || pathname.startsWith(href + '/') ? "bg-[#0D1F3C] text-white" : "text-slate-600 hover:bg-slate-100"
+        pathname === href || pathname.startsWith(href + '/') ? "bg-primary text-white" : "text-slate-600 hover:bg-slate-100"
       )}>
         <Icon className="h-4 w-4" /> {label}
       </Link>
@@ -153,7 +153,7 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
       </SheetTrigger>
       <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
         {/* Header */}
-        <div className="bg-[#0D1F3C] p-5">
+        <div className="bg-primary p-5">
           <div className="flex items-center gap-1.5 mb-1">
             <span className="text-lg font-bold text-white">ORS-ONE</span>
             <span className="text-xs border border-amber-400 text-amber-400 bg-amber-400/10 px-1 rounded">Beta</span>
@@ -211,7 +211,7 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
             </SheetClose>
           ) : (
             <SheetClose asChild>
-              <Button className="w-full rounded-xl bg-[#0D1F3C] hover:bg-[#132840] text-white" onClick={onLoginClick}>
+              <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white" onClick={onLoginClick}>
                 <LogIn className="mr-2 h-4 w-4" /> Login
               </Button>
             </SheetClose>
