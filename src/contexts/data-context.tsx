@@ -395,11 +395,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     } catch (error) {
         console.error(`Error persisting ${entityName}:`, error);
+        if (!entityName.includes("download history") && !entityName.includes("view history") && !entityName.includes("notifications")) {
         toast({
             variant: "destructive",
             title: "Data Sync Error",
             description: `Could not save ${entityName} changes to the server.`
-        });
+        }); }
     }
   }, [toast]);
 
