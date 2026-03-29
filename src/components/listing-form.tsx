@@ -692,8 +692,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                                     <SelectItem value="Concise">Concise</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Button type="button" variant="outline" onClick={handleGenerateDescription} disabled={isGenerating}>
-                                {isGenerating ? <><Sparkles className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : <><Wand2 className="mr-2 h-4 w-4" /> Generate with AI</>}
+                            <Button type="button" variant="outline" onClick={handleGenerateDescription} disabled={true} disabled={isGenerating}>
+                                <><Wand2 className="mr-2 h-4 w-4" /> Generate with AI (Coming Soon)</>
                             </Button>
                         </div>
                     </div>
