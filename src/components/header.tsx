@@ -110,26 +110,6 @@ const ManageDropdown = ({ isSuperAdmin }) => {
   );
 };
 
-const MoreDropdown = () => {
-  const pathname = usePathname();
-  const isActive = pathname.startsWith('/resources') || pathname.startsWith('/how-to-use') || pathname.startsWith('/about-us') || pathname.startsWith('/community');
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <DropTrigger isActive={isActive}>
-          More <ChevronDown className="h-3 w-3" />
-        </DropTrigger>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48">
-        <DropdownMenuItem asChild><Link href="/resources"><BookOpen className="mr-2 h-4 w-4" /> Resources</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link href="/how-to-use"><HelpCircle className="mr-2 h-4 w-4" /> How To Use</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link href="/about-us"><Info className="mr-2 h-4 w-4" /> About Us</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link href="/community"><Users className="mr-2 h-4 w-4" /> Community</Link></DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
 const NotificationsBell = () => {
   const { user } = useAuth();
   const { unreadCount } = useData();
@@ -146,11 +126,13 @@ const NotificationsBell = () => {
   );
 };
 
+
 const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => void, onLoginClick: () => void }) => {
   const pathname = usePathname();
   const isSuperAdmin = user?.role === 'SuperAdmin';
   const isO2O = user?.role === 'O2O';
   const isProvider = user?.role === 'Warehouse Developer';
+  const isCustomer = user?.role === 'User';
   const roleLabel = user?.role === 'Warehouse Developer' ? 'Property Provider' : user?.role === 'User' ? 'Customer' : user?.role;
 
   const NavItem = ({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) => (
@@ -172,6 +154,7 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
+        {/* Header */}
         <div className="bg-primary p-5">
           <div className="flex items-center gap-1.5 mb-1">
             <span className="text-lg font-bold text-white">ORS-ONE</span>
@@ -185,16 +168,21 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
             </div>
           )}
         </div>
+
+        {/* Nav items */}
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
           {user && !isSuperAdmin && <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" />}
           {isProvider && <NavItem href="/dashboard?tab=my-listings" icon={List} label="My Listings" />}
           {!isProvider && <NavItem href="/" icon={List} label="Browse Listings" />}
+
+
           <div className="pt-2 pb-1 px-4">
             <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Tools</p>
           </div>
           <NavItem href="/roi-calculator" icon={Calculator} label="ROI Calculator" />
           <NavItem href="/commercial-calculator" icon={Calculator} label="Commercial Calculator" />
           <NavItem href="/registration-calculator" icon={Calculator} label="Registration Calculator" />
+
           <div className="pt-2 pb-1 px-4">
             <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Explore</p>
           </div>
@@ -202,6 +190,7 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
           <NavItem href="/how-to-use" icon={HelpCircle} label="How To Use" />
           <NavItem href="/about-us" icon={Info} label="About Us" />
           <NavItem href="/community" icon={Users} label="Community" />
+
           {(isSuperAdmin || isO2O) && (
             <>
               <div className="pt-2 pb-1 px-4">
@@ -214,6 +203,8 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
             </>
           )}
         </div>
+
+        {/* Footer */}
         <div className="p-3 border-t border-slate-100">
           {user ? (
             <SheetClose asChild>
@@ -244,49 +235,39 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-        <div className="container mx-auto flex h-14 items-center gap-3 px-4">
-
+        <div className="container mx-auto flex h-14 items-center gap-4 px-4">
           <MobileMenu user={user} logout={logout} onLoginClick={() => setIsLoginOpen(true)} />
-
-          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0">
+          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0 mr-2">
             <div className="flex items-center gap-1.5">
               <span className="text-lg font-bold text-primary">ORS-ONE</span>
               <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-50 py-0 px-1">Beta</Badge>
             </div>
             <p className="text-xs text-muted-foreground leading-none">Building Transaction Ready Assets</p>
           </Link>
-
-          <nav className="hidden md:flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
+          <nav className="hidden md:flex items-center gap-5 flex-1">
             {isLoading ? (
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-4 w-20" />
-              </div>
+              <div className="flex items-center gap-4"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-20" /></div>
             ) : (
               <>
-                {user && !isSuperAdmin && (
-                  <NavLink href="/dashboard"><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
-                )}
+                {user && !isSuperAdmin && (<NavLink href="/dashboard"><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>)}
                 <ListingsDropdown />
                 <ToolsDropdown />
-                <MoreDropdown />
+                <NavLink href="/resources"><BookOpen className="h-3.5 w-3.5" /> Resources</NavLink>
+                <NavLink href="/how-to-use"><HelpCircle className="h-3.5 w-3.5" /> How To Use</NavLink>
+                <NavLink href="/about-us"><Info className="h-3.5 w-3.5" /> About Us</NavLink>
+                <NavLink href="/community"><Users className="h-3.5 w-3.5" /> Community</NavLink>
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
                 {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
               </>
             )}
           </nav>
-
           <div className="flex items-center gap-2 ml-auto flex-shrink-0">
             {(!user || (!isSuperAdmin && !isO2O)) && (
               <Link href="https://wa.me/919841098170?text=need%20O2O%20support%20call%20me%20back%20please" target="_blank" rel="noopener noreferrer" className="hidden lg:block">
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
-                  <WhatsAppIcon /> Ask a Call Back
-                </Button>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5"><WhatsAppIcon /> Ask a Call Back</Button>
               </Link>
             )}
-            {isLoading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : user ? (
+            {isLoading ? (<Skeleton className="h-8 w-20" />) : user ? (
               <div className="flex items-center gap-2">
                 <NotificationsBell />
                 <DropdownMenu>
@@ -304,23 +285,16 @@ export function Header() {
                     <DropdownMenuLabel className="font-semibold text-sm py-0">{user.userName}</DropdownMenuLabel>
                     <DropdownMenuLabel className="text-xs text-muted-foreground py-0 font-normal">{roleLabel}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/dashboard/settings"><Settings className="mr-2 h-4 w-4" /> Settings</Link>
-                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/dashboard/settings"><Settings className="mr-2 h-4 w-4" /> Settings</Link></DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" /> Logout
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer"><LogOut className="mr-2 h-4 w-4" /> Logout</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             ) : (
-              <Button size="sm" className="h-8" onClick={() => setIsLoginOpen(true)}>
-                <LogIn className="mr-2 h-4 w-4" /> Login
-              </Button>
+              <Button size="sm" className="h-8" onClick={() => setIsLoginOpen(true)}><LogIn className="mr-2 h-4 w-4" /> Login</Button>
             )}
           </div>
-
         </div>
       </header>
       <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
