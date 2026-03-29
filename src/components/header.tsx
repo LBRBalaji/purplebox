@@ -131,6 +131,8 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
   const pathname = usePathname();
   const isSuperAdmin = user?.role === 'SuperAdmin';
   const isO2O = user?.role === 'O2O';
+  const isProvider = user?.role === 'Warehouse Developer';
+  const isCustomer = user?.role === 'User';
   const roleLabel = user?.role === 'Warehouse Developer' ? 'Property Provider' : user?.role === 'User' ? 'Customer' : user?.role;
 
   const NavItem = ({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) => (
@@ -170,7 +172,8 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
         {/* Nav items */}
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
           {user && !isSuperAdmin && <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" />}
-          <NavItem href="/" icon={List} label="Browse Listings" />
+          {isProvider && <NavItem href="/dashboard?tab=my-listings" icon={List} label="My Listings" />}
+          {!isProvider && <NavItem href="/" icon={List} label="Browse Listings" />}
 
 
           <div className="pt-2 pb-1 px-4">
