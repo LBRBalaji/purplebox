@@ -94,13 +94,37 @@ export function DataGovernance() {
         setPhase('done');
         return;
       }
-      await Promise.all(preview.map(item => patchListing(item.id, { _copiedTo: toUser, _copyStatus: 'pending' })));
       // Create copies under new account
-      await Promise.all(preview.map(item => {
-        const newListing = { ...item.data, developerId: toUser, listingId: item.id + '-T', status: 'pending', _copiedFrom: item.id };
-        return patchListing(item.id + '-T', newListing);
+      const copyResults = await Promise.all(preview.map(async item => {
+        const newListing = { ...item.data, developerId: toUser, status: 'pending', _copiedFrom: item.id };
+        const res = await fetch('/api/listings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newListing }),
+        });
+        const data = await res.json();
+        return { ok: res.ok, original: item.id, newId: data.listingId };
       }));
-      toast({ title: preview.length + ' listings copied!', description: 'Now decide what to do with the originals.' });
+      
+      const succeeded = copyResults.filter(r => r.ok);
+      const failed = copyResults.filter(r => !r.ok);
+      
+      if (failed.length > 0) {
+        toast({ 
+          variant: 'destructive', 
+          title: failed.length + ' listings failed to copy', 
+          description: 'Only ' + succeeded.length + ' of ' + preview.length + ' were copied. Please try again.' 
+        });
+        if (succeeded.length === 0) return;
+      }
+      
+      // Mark originals as copied
+      await Promise.all(succeeded.map(r => patchListing(r.original, { _copiedTo: toUser, _copyStatus: 'done', _copyId: r.newId })));
+      
+      toast({ 
+        title: succeeded.length + ' of ' + preview.length + ' listings copied to ' + toUserData?.companyName + '!', 
+        description: 'Now decide what to do with each original.' 
+      });
       setPhase('copied');
     } catch (e: any) {
       toast({ variant: 'destructive', title: 'Error', description: e.message });
