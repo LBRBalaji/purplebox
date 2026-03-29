@@ -148,8 +148,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
     name: "documents"
   });
   
-  const watchedCircle = form.watch('locationCircle');
-  const warehouseModel = form.watch('warehouseModel');
+  const [watchedCircle, warehouseModel] = form.watch(['locationCircle', 'warehouseModel']);
   const selectedCircleLocations = React.useMemo(() => {
     if (!watchedCircle) return [];
     const circle = locationCircles.find(c => c.name === watchedCircle);
