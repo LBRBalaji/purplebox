@@ -21,7 +21,16 @@ import { DemandList } from '@/components/demand-list';
 
 
 // ── Provider Dashboard Overview ───────────────────────────────
-function ProviderOverview() {
+const ScoreBar = ({ score }: { score: number }) => (
+  <div className="flex items-center gap-2">
+    <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
+      <div className="h-full bg-primary rounded-full transition-all" style={{ width: score + '%' }} />
+    </div>
+    <span className="text-xs font-bold text-primary w-8">{score}%</span>
+  </div>
+);
+
+const ProviderOverview = React.memo(function ProviderOverview() {
   const { user } = useAuth();
   const { listings, listingAnalytics, registeredLeads } = useData();
 
@@ -70,14 +79,7 @@ function ProviderOverview() {
     return { active: active.length, pending: pending.length, leased: leased.length, totalSqFt, totalViews, totalDownloads, newLeads, topListingName, topViews: topListing?.views || 0, healthScores };
   }, [myListings, listingAnalytics, registeredLeads]);
 
-  const ScoreBar = ({ score }: { score: number }) => (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
-        <div className="h-full bg-primary rounded-full transition-all" style={{ width: score + '%' }} />
-      </div>
-      <span className="text-xs font-bold text-primary w-8">{score}%</span>
-    </div>
-  );
+
 
   return (
     <div className="space-y-6 mb-6">
