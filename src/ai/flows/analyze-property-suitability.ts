@@ -52,7 +52,7 @@ export async function analyzePropertySuitability(
 
 const prompt = ai.definePrompt({
   name: 'analyzePropertySuitabilityPrompt',
-  model: googleAI.model('gemini-1.5-flash:latest'),
+  model: googleAI.model('gemini-2.0-flash'),
   input: {schema: AnalyzePropertySuitabilityInputSchema},
   output: {schema: AnalyzePropertySuitabilityOutputSchema},
   prompt: `You are an AI assistant that analyzes property features against demand criteria.
