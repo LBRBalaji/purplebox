@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
-import { adminDb } from '@/lib/firebase-admin';
+import { getDb } from '@/lib/firebase-admin';
 
 const COLLECTION = 'listings';
 const headers = {
@@ -38,7 +38,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const newData = await request.json();
-    const colRef = adminDb.collection(COLLECTION);
+    const colRef = getDb().collection(COLLECTION);
     const snapshot = await colRef.get();
     await Promise.all(snapshot.docs.map(d => d.ref.delete()));
     if (Array.isArray(newData)) {
@@ -64,7 +64,7 @@ export async function PATCH(request) {
     if (newListing) {
       const newId = 'LST-' + Math.random().toString(36).substr(2, 6).toUpperCase();
       const finalListing = { ...newListing, listingId: newId };
-      await adminDb.collection(COLLECTION).doc(newId).set(finalListing);
+      await getDb().collection(COLLECTION).doc(newId).set(finalListing);
       return NextResponse.json({ message: 'Listing created', listingId: newId }, { headers });
     }
 
@@ -72,7 +72,7 @@ export async function PATCH(request) {
     if (!listingId) {
       return NextResponse.json({ message: 'listingId required' }, { status: 400, headers });
     }
-    const snapshot = await adminDb.collection(COLLECTION).get();
+    const snapshot = await getDb().collection(COLLECTION).get();
     const existing = snapshot.docs.find(d => d.data().listingId === listingId);
     if (!existing) {
       return NextResponse.json({ message: 'Listing not found: ' + listingId }, { status: 404, headers });
