@@ -48,7 +48,7 @@ const EditorToolbar = ({ editor }: { editor: any }) => {
   const btn = (label: React.ReactNode, active: boolean, fn: () => void) => (
     <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={fn}
       className={cn('h-8 w-8 flex items-center justify-center rounded-md text-sm border transition-colors',
-        active ? 'bg-primary text-white border-[#6141ac]' : 'bg-card text-foreground/80 border-border hover:border-primary')}>
+        active ? 'bg-primary text-foreground border-[#6141ac]' : 'bg-card text-foreground/80 border-border hover:border-primary')}>
       {label}
     </button>
   );
@@ -116,7 +116,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="p-6 space-y-5">
               <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10"><AvatarFallback className="bg-primary text-white font-bold">{user.userName.charAt(0)}</AvatarFallback></Avatar>
+                <Avatar className="h-10 w-10"><AvatarFallback className="bg-primary text-foreground font-bold">{user.userName.charAt(0)}</AvatarFallback></Avatar>
                 <div><p className="font-semibold text-sm text-primary">{user.userName}</p><p className="text-xs text-muted-foreground">{user.companyName}</p></div>
               </div>
               <FormField control={form.control} name="text" render={() => (
@@ -158,7 +158,7 @@ function CreatePostForm({ postToEdit, onFinished }: { postToEdit?: CommunityPost
             </div>
             <div className="flex items-center justify-end gap-3 px-6 pb-6">
               <Button type="button" variant="outline" onClick={onFinished} className="rounded-xl px-6">Cancel</Button>
-              <Button type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid} className="rounded-xl px-6 bg-primary hover:bg-primary/90 text-white">
+              <Button type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid} className="rounded-xl px-6 bg-primary hover:bg-primary/90 text-foreground">
                 <Send className="mr-2 h-4 w-4" />{isEdit ? 'Save Changes' : 'Publish'}
               </Button>
             </div>
@@ -196,7 +196,7 @@ function PostCard({ post, onEdit, onDelete }: { post: CommunityPost; onEdit: (p:
         <p className="text-foreground text-sm leading-relaxed flex-1 mb-5">{summary}</p>
         <div className="flex items-center justify-between pt-4 border-t border-slate-50">
           <div className="flex items-center gap-2.5">
-            <Avatar className="h-8 w-8"><AvatarFallback className="bg-primary text-white text-xs font-bold">{initials}</AvatarFallback></Avatar>
+            <Avatar className="h-8 w-8"><AvatarFallback className="bg-primary text-foreground text-xs font-bold">{initials}</AvatarFallback></Avatar>
             <div><p className="text-xs font-semibold text-primary">{author.userName}</p><p className="text-xs text-muted-foreground/70">{dateStr}</p></div>
           </div>
           <div className="flex items-center gap-1">
@@ -221,7 +221,7 @@ function PostCard({ post, onEdit, onDelete }: { post: CommunityPost; onEdit: (p:
               </AlertDialog>
             )}
             <Link href={'/community/' + post.id}>
-              <button className="h-7 px-3 flex items-center gap-1 rounded-lg bg-primary text-white text-xs font-medium hover:bg-primary/90 transition-colors">Read <ArrowRight className="h-3 w-3" /></button>
+              <button className="h-7 px-3 flex items-center gap-1 rounded-lg bg-primary text-foreground text-xs font-medium hover:bg-primary/90 transition-colors">Read <ArrowRight className="h-3 w-3" /></button>
             </Link>
           </div>
         </div>
@@ -239,17 +239,17 @@ const EmptyState = ({ icon: Icon, title, desc }: { icon: React.ElementType; titl
 );
 
 const StatPill = ({ icon: Icon, value, label }: { icon: React.ElementType; value: string; label: string }) => (
-  <div className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-xl px-4 py-3">
+  <div className="flex items-center gap-3 bg-primary/5 backdrop-blur rounded-xl px-4 py-3">
     <Icon className="h-5 w-5 text-primary" />
-    <div><div className="text-white font-black text-lg leading-none">{value}</div><div className="text-white/60 text-xs mt-0.5">{label}</div></div>
+    <div><div className="text-foreground font-black text-lg leading-none">{value}</div><div className="text-muted-foreground text-xs mt-0.5">{label}</div></div>
   </div>
 );
 
 const TabBtn = ({ active, onClick, icon: Icon, label, count }: { active: boolean; onClick: () => void; icon: React.ElementType; label: string; count: number }) => (
   <button onClick={onClick} className={cn('flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap',
-    active ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground hover:text-slate-800 hover:bg-secondary')}>
+    active ? 'bg-primary text-foreground shadow-sm' : 'text-muted-foreground hover:text-slate-800 hover:bg-secondary')}>
     <Icon className="h-4 w-4" />{label}
-    <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-bold', active ? 'bg-white/20 text-white' : 'bg-secondary text-muted-foreground')}>{count}</span>
+    <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-bold', active ? 'bg-primary/10 text-foreground' : 'bg-secondary text-muted-foreground')}>{count}</span>
   </button>
 );
 function CommunityPageInner() {
@@ -299,7 +299,7 @@ function CommunityPageInner() {
       {formOpen && <CreatePostForm postToEdit={editingPost} onFinished={handleFormClose} />}
       <LoginDialog isOpen={loginOpen} onOpenChange={setLoginOpen} />
       <div className="min-h-screen bg-background">
-        <section className="bg-[#2a1060] pt-16 pb-12 relative overflow-hidden">
+        <section className="bg-secondary/50 pt-16 pb-12 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 10% 50%, #6141ac, transparent 50%), radial-gradient(circle at 90% 20%, #6141ac, transparent 50%)' }} />
           <div className="container mx-auto px-4 relative">
             <div className="max-w-3xl mx-auto text-center mb-10">
@@ -307,8 +307,8 @@ function CommunityPageInner() {
                 <div className="h-2 w-2 rounded-full bg-primary" />
                 <span className="text-primary text-xs font-bold tracking-widest uppercase">ORS-ONE Community</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-4">Share. Learn. Grow.<span className="block text-primary">Together.</span></h1>
-              <p className="text-white/60 text-base md:text-lg max-w-xl mx-auto">The professional community for warehouse market stakeholders — developers, tenants, brokers and industry experts.</p>
+              <h1 className="text-4xl md:text-5xl font-black text-foreground leading-tight mb-4">Share. Learn. Grow.<span className="block text-primary">Together.</span></h1>
+              <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">The professional community for warehouse market stakeholders — developers, tenants, brokers and industry experts.</p>
             </div>
             <div className="flex flex-wrap justify-center gap-3 mb-10">
               <StatPill icon={FileText} value={String(counts.all)} label="Total Posts" />
@@ -318,11 +318,11 @@ function CommunityPageInner() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search posts, authors, companies..."
-                  className="w-full bg-white/10 backdrop-blur border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-white/40 text-sm focus:outline-none focus:border-primary/50 transition-all" />
+                  className="w-full bg-primary/5 backdrop-blur border border-primary/20 rounded-xl pl-11 pr-4 py-3 text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:border-primary/50 transition-all" />
               </div>
-              <button onClick={handleCreate} className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-xl transition-colors flex-shrink-0">
+              <button onClick={handleCreate} className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-foreground font-bold px-6 py-3 rounded-xl transition-colors flex-shrink-0">
                 <Plus className="h-4 w-4" />Create Post
               </button>
             </div>
@@ -351,9 +351,9 @@ function CommunityPageInner() {
 
           {!user && filtered.length > 0 && (
             <div className="mt-12 bg-primary rounded-2xl p-8 text-center">
-              <h3 className="text-xl font-black text-white mb-2">Join the Conversation</h3>
-              <p className="text-white/60 text-sm mb-5">Sign in to create posts, share insights and engage with the community.</p>
-              <button onClick={() => setLoginOpen(true)} className="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-3 rounded-xl transition-colors text-sm">Sign In to Post</button>
+              <h3 className="text-xl font-black text-foreground mb-2">Join the Conversation</h3>
+              <p className="text-muted-foreground text-sm mb-5">Sign in to create posts, share insights and engage with the community.</p>
+              <button onClick={() => setLoginOpen(true)} className="bg-primary hover:bg-primary/90 text-foreground font-bold px-8 py-3 rounded-xl transition-colors text-sm">Sign In to Post</button>
             </div>
           )}
         </section>
