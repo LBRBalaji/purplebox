@@ -69,28 +69,24 @@ export function DataGovernance() {
     setIsLoading(true);
     try {
       if (activeOp === 'transfer-listings' || activeOp === 'merge-accounts') {
-        for (const item of preview) {
+        await Promise.all(preview.map(item => {
           const listing = listings.find(l => l.listingId === item.id);
-          if (listing) {
-            await fetch('/api/listings', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ ...listing, developerId: toUser }),
-            });
-          }
-        }
+          return fetch('/api/listings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...listing, developerId: toUser }),
+          });
+        }));
         toast({ title: 'Done!', description: preview.length + ' listings transferred to ' + toUserData?.userName });
       } else if (activeOp === 'deactivate-reassign') {
-        for (const item of preview) {
+        await Promise.all(preview.map(item => {
           const listing = listings.find(l => l.listingId === item.id);
-          if (listing && toUser) {
-            await fetch('/api/listings', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ ...listing, developerId: toUser }),
-            });
-          }
-        }
+          return fetch('/api/listings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...listing, developerId: toUser }),
+          });
+        }));
         // Also update user status via API
         await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(
           Object.values(users).map(u => u.email === fromUser ? { ...u, status: 'deactivated' } : u)
@@ -98,16 +94,14 @@ export function DataGovernance() {
         toast({ title: 'Done!', description: fromUserData?.userName + ' deactivated. ' + preview.length + ' listings reassigned.' });
       } else if (activeOp === 'company-rebrand') {
         const listingItems = preview.filter(p => p.type === 'listing');
-        for (const item of listingItems) {
+        await Promise.all(listingItems.map(item => {
           const listing = listings.find(l => l.listingId === item.id);
-          if (listing) {
-            await fetch('/api/listings', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ ...listing, developerName: newCompanyName }),
-            });
-          }
-        }
+          return fetch('/api/listings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...listing, developerName: newCompanyName }),
+          });
+        }));
         // Update user company name
         await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(
           Object.values(users).map(u => u.email === fromUser ? { ...u, companyName: newCompanyName } : u)
