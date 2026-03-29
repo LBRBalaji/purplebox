@@ -247,7 +247,7 @@ const StatPill = ({ icon: Icon, value, label }: { icon: React.ElementType; value
 
 const TabBtn = ({ active, onClick, icon: Icon, label, count }: { active: boolean; onClick: () => void; icon: React.ElementType; label: string; count: number }) => (
   <button onClick={onClick} className={cn('flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap',
-    active ? 'bg-primary text-foreground shadow-sm' : 'text-muted-foreground hover:text-slate-800 hover:bg-secondary')}>
+    active ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary')}>
     <Icon className="h-4 w-4" />{label}
     <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-bold', active ? 'bg-primary/10 text-foreground' : 'bg-secondary text-muted-foreground')}>{count}</span>
   </button>
@@ -322,7 +322,7 @@ function CommunityPageInner() {
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search posts, authors, companies..."
                   className="w-full bg-primary/5 backdrop-blur border border-primary/20 rounded-xl pl-11 pr-4 py-3 text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:border-primary/50 transition-all" />
               </div>
-              <button onClick={handleCreate} className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-foreground font-bold px-6 py-3 rounded-xl transition-colors flex-shrink-0">
+              <button onClick={handleCreate} className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-xl transition-colors flex-shrink-0">
                 <Plus className="h-4 w-4" />Create Post
               </button>
             </div>
@@ -351,8 +351,8 @@ function CommunityPageInner() {
 
           {!user && filtered.length > 0 && (
             <div className="mt-12 bg-primary rounded-2xl p-8 text-center">
-              <h3 className="text-xl font-black text-foreground mb-2">Join the Conversation</h3>
-              <p className="text-muted-foreground text-sm mb-5">Sign in to create posts, share insights and engage with the community.</p>
+              <h3 className="text-xl font-black text-white mb-2">Join the Conversation</h3>
+              <p className="text-white/70 text-sm mb-5">Sign in to create posts, share insights and engage with the community.</p>
               <button onClick={() => setLoginOpen(true)} className="bg-primary hover:bg-primary/90 text-foreground font-bold px-8 py-3 rounded-xl transition-colors text-sm">Sign In to Post</button>
             </div>
           )}

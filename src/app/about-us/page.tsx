@@ -162,8 +162,8 @@ export default function AboutUsPage() {
 
       <section className="py-20 bg-primary">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">Ready to <span className="text-primary">Reach the Market?</span></h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">Whether you are searching for a warehouse, listing a property, or building an agent network — your journey starts here.</p>
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Ready to <span className="text-primary">Reach the Market?</span></h2>
+          <p className="text-white/70 text-lg max-w-xl mx-auto mb-10">Whether you are searching for a warehouse, listing a property, or building an agent network — your journey starts here.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-foreground font-bold px-8 rounded-xl">
               <Link href="/">Browse Listings <ArrowRight className="ml-2 h-4 w-4" /></Link>
