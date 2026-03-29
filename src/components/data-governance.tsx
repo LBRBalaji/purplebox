@@ -22,9 +22,10 @@ const OPS: { id: Op; icon: React.ElementType; title: string; desc: string; color
 
 export function DataGovernance() {
   const { users } = useAuth();
-  const { listings, registeredLeads, updateListing } = useData();
+  const { listings, registeredLeads } = useData();
   const { toast } = useToast();
   const [activeOp, setActiveOp] = React.useState<Op | null>(null);
+  React.useEffect(() => { reset(); }, [activeOp]);
   const [fromUser, setFromUser] = React.useState('');
   const [toUser, setToUser] = React.useState('');
   const [newCompanyName, setNewCompanyName] = React.useState('');
@@ -70,13 +71,25 @@ export function DataGovernance() {
       if (activeOp === 'transfer-listings' || activeOp === 'merge-accounts') {
         for (const item of preview) {
           const listing = listings.find(l => l.listingId === item.id);
-          if (listing) await updateListing({ ...listing, developerId: toUser });
+          if (listing) {
+            await fetch('/api/listings', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...listing, developerId: toUser }),
+            });
+          }
         }
         toast({ title: 'Done!', description: preview.length + ' listings transferred to ' + toUserData?.userName });
       } else if (activeOp === 'deactivate-reassign') {
         for (const item of preview) {
           const listing = listings.find(l => l.listingId === item.id);
-          if (listing && toUser) await updateListing({ ...listing, developerId: toUser });
+          if (listing && toUser) {
+            await fetch('/api/listings', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...listing, developerId: toUser }),
+            });
+          }
         }
         // Also update user status via API
         await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(
@@ -87,7 +100,13 @@ export function DataGovernance() {
         const listingItems = preview.filter(p => p.type === 'listing');
         for (const item of listingItems) {
           const listing = listings.find(l => l.listingId === item.id);
-          if (listing) await updateListing({ ...listing, developerName: newCompanyName });
+          if (listing) {
+            await fetch('/api/listings', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...listing, developerName: newCompanyName }),
+            });
+          }
         }
         // Update user company name
         await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(
