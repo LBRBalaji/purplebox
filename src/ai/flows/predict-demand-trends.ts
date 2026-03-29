@@ -99,7 +99,7 @@ const predictDemandTrendsFlow = ai.defineFlow(
     if (input.sizeMin !== undefined && input.sizeMax !== undefined) { filteredListings = filteredListings.filter(l => l.sizeSqFt >= input.sizeMin! && l.sizeSqFt <= input.sizeMax!); }
 
     // Trim data to avoid Gemini token limits
-    const trimmedListings = filteredListings.slice(0, 25).map((l: any) => ({
+    const trimmedListings = filteredListings.slice(0, 15).map((l: any) => ({
       listingId: l.listingId, location: l.location, sizeSqFt: l.sizeSqFt,
       availabilityDate: l.availabilityDate, warehouseModel: l.warehouseModel,
       buildingType: l.buildingSpecifications?.buildingType,
@@ -110,12 +110,12 @@ const predictDemandTrendsFlow = ai.defineFlow(
       fireNOC: l.certificatesAndApprovals?.fireNOC,
       rentPerSqFt: l.rentPerSqFt, status: l.status,
     }));
-    const trimmedDemands = (input.demands || []).slice(0, 15).map((d: any) => ({
+    const trimmedDemands = (input.demands || []).slice(0, 10).map((d: any) => ({
       location: d.location, size: d.size, sizeMin: d.sizeMin, sizeMax: d.sizeMax,
       readiness: d.readiness, buildingType: d.buildingType,
       operationType: d.operationType, createdAt: d.createdAt,
     }));
-    const trimmedAnalytics = (input.analytics || []).slice(0, 25).map((a: any) => ({
+    const trimmedAnalytics = (input.analytics || []).slice(0, 15).map((a: any) => ({
       listingId: a.listingId, views: a.views, downloads: a.downloads,
     }));
 
@@ -123,7 +123,7 @@ const predictDemandTrendsFlow = ai.defineFlow(
       ...input,
       listings: trimmedListings,
       demands: trimmedDemands,
-      submissions: (input.submissions || []).slice(0, 10),
+      submissions: (input.submissions || []).slice(0, 5),
       analytics: trimmedAnalytics,
     });
     return output!;
