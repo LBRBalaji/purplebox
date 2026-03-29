@@ -115,7 +115,7 @@ function AdminListingCard({ listing, analytics, providerName, maxViews, onStatus
         </div>
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1"><Scaling className="h-3 w-3" /> {listing.sizeSqFt?.toLocaleString()} sqft</span>
-//           {listing.plan === 'Paid_Premium' && (<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: '#FDD017', color: '#333' }}><Sparkles className="h-3 w-3" /> Premium</span>)}
+          {listing.plan === 'Paid_Premium' && (<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: '#FDD017', color: '#333' }}><Sparkles className="h-3 w-3" /> Premium</span>)}
         </div>
       </div>
       <div className="px-5 pb-4"><EngagementBar views={views} downloads={downloads} maxViews={maxViews} /></div>
@@ -244,7 +244,7 @@ export function AdminListings() {
   const [circleFilter, setCircleFilter] = React.useState<string[]>([]);
   const [availabilityFilter, setAvailabilityFilter] = React.useState('all');
   const [sizeRange, setSizeRange] = React.useState([0, 1000000]);
-//   const [premiumOnly, setPremiumOnly] = React.useState(false);
+  const [premiumOnly, setPremiumOnly] = React.useState(false);
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({ from: subDays(new Date(), 29), to: new Date() });
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);
@@ -257,7 +257,7 @@ export function AdminListings() {
   const maxSliderSize = React.useMemo(() => { const max = Math.max(...listings.map(w=>w.sizeSqFt),0); return max>0?Math.ceil(max/100000)*100000:1000000; }, [listings]);
   React.useEffect(() => {
     let results = [...listings];
-//     if (premiumOnly) results = results.filter(l=>l.plan==='Paid_Premium');
+    if (premiumOnly) results = results.filter(l=>l.plan==='Paid_Premium');
     if (keywordFilter) { const q=keywordFilter.toLowerCase(); results=results.filter(l=>l.location.toLowerCase().includes(q)||l.listingId.toLowerCase().includes(q)); }
     if (developerFilter!=='all') results=results.filter(l=>l.developerId===developerFilter);
     if (statusFilter!=='all') results=results.filter(l=>l.status===statusFilter);
@@ -265,7 +265,7 @@ export function AdminListings() {
     if (availabilityFilter!=='all') results=results.filter(l=>l.availabilityDate===availabilityFilter);
     results=results.filter(l=>l.sizeSqFt>=sizeRange[0]&&l.sizeSqFt<=sizeRange[1]);
     setFilteredListings(results);
-//   }, [listings,keywordFilter,developerFilter,statusFilter,circleFilter,availabilityFilter,sizeRange,premiumOnly]);
+  }, [listings,keywordFilter,developerFilter,statusFilter,circleFilter,availabilityFilter,sizeRange,premiumOnly]);
   const kpis = React.useMemo(() => {
     const totalViews=listingAnalytics.reduce((s,a)=>s+a.views,0);
     const totalDownloads=listingAnalytics.reduce((s,a)=>s+a.downloads,0);
@@ -276,7 +276,7 @@ export function AdminListings() {
   }, [listings,listingAnalytics]);
   const maxViews = React.useMemo(() => Math.max(...listingAnalytics.map(a=>a.views),1), [listingAnalytics]);
   const getProviderName = (id: string) => Object.values(users).find(u=>u.email===id)?.companyName||'Unknown';
-//   const resetFilters = () => { setKeywordFilter('');setDeveloperFilter('all');setStatusFilter('all');setCircleFilter([]);setAvailabilityFilter('all');setSizeRange([0,maxSliderSize]);setPremiumOnly(false);setDateRange({from:subDays(new Date(),29),to:new Date()}); };
+  const resetFilters = () => { setKeywordFilter('');setDeveloperFilter('all');setStatusFilter('all');setCircleFilter([]);setAvailabilityFilter('all');setSizeRange([0,maxSliderSize]);setPremiumOnly(false);setDateRange({from:subDays(new Date(),29),to:new Date()}); };
   const handleEdit = (listing: ListingSchema, intent?: 'approve') => { setSelectedListing(listing);setEditIntent(intent);setIsFormOpen(true); };
   const handleFormSubmit = (data: ListingSchema) => {
     if (data.isAdmin&&editIntent==='approve'&&data.locationCircle) { data.status='approved'; toast({title:'Listing Approved',description:`"${data.listingId}" approved.`}); }
@@ -312,7 +312,7 @@ export function AdminListings() {
     });
     const ws=XLSX.utils.json_to_sheet(reportData);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Listings Performance');XLSX.writeFile(wb,`LBR_O2O_Performance_Report_${format(new Date(),'yyyy-MM-dd')}.xlsx`);
   };
-//   const activeFilterCount=[keywordFilter,developerFilter!=='all',statusFilter!=='all',circleFilter.length>0,availabilityFilter!=='all',premiumOnly].filter(Boolean).length;
+  const activeFilterCount=[keywordFilter,developerFilter!=='all',statusFilter!=='all',circleFilter.length>0,availabilityFilter!=='all',premiumOnly].filter(Boolean).length;
 
   return (
     <>
@@ -371,7 +371,7 @@ export function AdminListings() {
                 <div className="lg:col-span-2 space-y-1.5"><label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Date Range</label>
                   <Popover><PopoverTrigger asChild><Button variant="outline" className={cn('w-full justify-start text-left font-normal rounded-xl',!dateRange&&'text-muted-foreground')}><CalendarIcon className="mr-2 h-4 w-4" />{dateRange?.from?(dateRange.to?<>{format(dateRange.from,'LLL dd, y')} – {format(dateRange.to,'LLL dd, y')}</>:format(dateRange.from,'LLL dd, y')):'Pick a date'}</Button></PopoverTrigger><PopoverContent className="w-auto p-0 rounded-xl" align="end"><Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={2}/></PopoverContent></Popover>
                 </div>
-                
+                <div className="flex items-center gap-2 pt-4"><Switch id="premium" checked={premiumOnly} onCheckedChange={setPremiumOnly} /><Label htmlFor="premium" className="text-sm">Premium Only</Label></div>
               </div>
             )}
             <p className="text-sm text-muted-foreground">{filteredListings.length} listing{filteredListings.length!==1?'s':''} {activeFilterCount>0?'matching filters':'total'}</p>
@@ -396,7 +396,7 @@ export function AdminListings() {
               <div className="md:col-span-2 bg-card rounded-2xl border border-border p-5">
                 <h3 className="font-bold text-foreground mb-4">Platform Overview</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-//                   {[{label:'Premium Listings',value:listings.filter(l=>l.plan==='Paid_Premium').length,sub:'Active on platform',icon:Sparkles},{label:'Non-Premium',value:listings.filter(l=>l.plan!=='Paid_Premium').length,sub:'Standard listings',icon:Building},{label:'Premium Size',value:listings.filter(l=>l.plan==='Paid_Premium').reduce((s,l)=>s+l.sizeSqFt,0).toLocaleString(),sub:'Sq. ft.',icon:Scaling},{label:'Unique Developers',value:new Set(listings.map(l=>l.developerId)).size,sub:'Contributing',icon:Users}].map((item,i)=>(
+                  {[{label:'Premium Listings',value:listings.filter(l=>l.plan==='Paid_Premium').length,sub:'Active on platform',icon:Sparkles},{label:'Non-Premium',value:listings.filter(l=>l.plan!=='Paid_Premium').length,sub:'Standard listings',icon:Building},{label:'Premium Size',value:listings.filter(l=>l.plan==='Paid_Premium').reduce((s,l)=>s+l.sizeSqFt,0).toLocaleString(),sub:'Sq. ft.',icon:Scaling},{label:'Unique Developers',value:new Set(listings.map(l=>l.developerId)).size,sub:'Contributing',icon:Users}].map((item,i)=>(
                     <div key={i} className="bg-secondary/30 rounded-xl p-4"><item.icon className="h-5 w-5 text-primary mb-2" /><p className="text-xl font-black text-foreground">{item.value}</p><p className="text-xs font-semibold text-foreground">{item.label}</p><p className="text-xs text-muted-foreground">{item.sub}</p></div>
                   ))}
                 </div>

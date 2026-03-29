@@ -259,7 +259,7 @@ export default function ListingDetailPage() {
     const executeQuoteRequest = () => {
         if (!user || !listing) return;
         
-//         const isBrokered = listing.plan !== 'Paid_Premium';
+  const isBrokered = true;
         const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
 
         const newLead: Omit<RegisteredLead, 'registeredAt'> = {
@@ -446,7 +446,7 @@ export default function ListingDetailPage() {
         toggleGeneralShortlist(listing.id);
     };
     
-//     const isPremiumListing = listing.plan === 'Paid_Premium';
+  const isPremiumListing = false;
 
     return (
         <>
@@ -457,10 +457,10 @@ export default function ListingDetailPage() {
                         <div>
                             <div className="flex items-center gap-4 mb-2">
                                 <Badge variant="secondary">{listing.listingId}</Badge>
-//                                 {isPremiumListing && (
+                                {isPremiumListing && (
                                     <Badge style={{ backgroundColor: '#FDD017', color: '#333' }} className="border-amber-400">
                                         <Sparkles className="mr-1.5 h-3 w-3"/>
-//                                         Premium Listing
+                                        Premium Listing
                                     </Badge>
                                 )}
                             </div>
@@ -684,19 +684,19 @@ export default function ListingDetailPage() {
                                         <Button className="w-full" onClick={() => handleGetQuote()}>
                                             <div className="flex flex-col text-center">
                                                 <span>Get Commercials Quote</span>
-//                                                 <span className="text-xs font-normal opacity-80">({isPremiumListing ? "Direct from Developer" : "via O2O Broking"})</span>
+                                                <span className="text-xs font-normal opacity-80">({isPremiumListing ? "Direct from Developer" : "via O2O Broking"})</span>
                                             </div>
                                         </Button>
                                      )}
                                 </CardFooter>
                             </Card>
 
-//                              {!isPremiumListing && (
+                             {!isPremiumListing && (
                                 <Alert variant="default" className="bg-primary/5 border-primary/20">
                                     <Sparkles className="h-4 w-4 text-primary" />
                                     <AlertTitle className="font-semibold text-primary/90">Note for Customers</AlertTitle>
                                     <AlertDescription className="text-primary/80">
-//                                         Always look for <strong style={{ color: '#FDD017' }}>Premium Listings</strong> to engage directly with property developers.
+                                        Always look for <strong style={{ color: '#FDD017' }}>Premium Listings</strong> to engage directly with property developers.
                                     </AlertDescription>
                                 </Alert>
                             )}

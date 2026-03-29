@@ -148,12 +148,7 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
                   </>
               )}
             </Carousel>
-//              {listing.plan === 'Paid_Premium' && (
-                <Badge style={{ backgroundColor: '#FDD017', color: '#333' }} className="absolute top-2 right-2 border-amber-400">
-                    <Sparkles className="mr-1.5 h-3 w-3"/>
-//                     Premium Listing
-                </Badge>
-            )}
+
         </div>
        </CardHeader>
        <CardContent className="flex-grow p-6 space-y-4">
@@ -397,7 +392,7 @@ export function ListingsPage() {
   const [locationFilter, setLocationFilter] = useState('');
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
-//   const [showOnlyPremium, setShowOnlyPremium] = useState(false);
+  const [showOnlyPremium, setShowOnlyPremium] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
@@ -449,8 +444,8 @@ export function ListingsPage() {
     let results = approvedListings;
 
     // Premium filter
-//     if (showOnlyPremium) {
-//         results = results.filter(l => l.plan === 'Paid_Premium');
+    if (showOnlyPremium) {
+        results = results.filter(l => l.plan === 'Paid_Premium');
     }
 
     // Keyword search
@@ -517,14 +512,14 @@ export function ListingsPage() {
     } catch (e) {
         console.error("Could not write to sessionStorage", e);
     }
-//   }, [searchTerm, locationFilter, availability, sizeRange, approvedListings, locationCircles, showOnlyPremium]);
+  }, [searchTerm, locationFilter, availability, sizeRange, approvedListings, locationCircles, showOnlyPremium]);
 
 
   const resetFilters = () => {
     setSearchTerm('');
     setLocationFilter('');
     setAvailability('all');
-//     setShowOnlyPremium(false);
+    setShowOnlyPremium(false);
     
     const maxArea = Math.max(...approvedListings.map(w => w.sizeSqFt), 0);
     if (maxArea > 0) {
@@ -780,10 +775,7 @@ export function ListingsPage() {
                                                 <span>{sizeRange[1].toLocaleString()}</span>
                                             </div>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-//                                             <Checkbox id="premium-filter" checked={showOnlyPremium} onCheckedChange={(checked) => setShowOnlyPremium(!!checked)} />
-//                                             <label htmlFor="premium-filter" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Show Premium Listings Only</label>
-                                        </div>
+
                                     </div>
                                 </div>
                             </PopoverContent>
