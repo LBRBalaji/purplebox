@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/auth-context';
+import { HelpCircle, useAuth } from '@/contexts/auth-context';
 import { LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
@@ -184,6 +184,7 @@ const MobileMenu = ({ user, logout, onLoginClick }: { user: any, logout: () => v
             <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Explore</p>
           </div>
           <NavItem href="/resources" icon={BookOpen} label="Resources" />
+          <NavItem href="/how-to-use" icon={HelpCircle} label="How To Use" />
           <NavItem href="/about-us" icon={Info} label="About Us" />
           <NavItem href="/community" icon={Users} label="Community" />
 
@@ -249,6 +250,7 @@ export function Header() {
                 <ListingsDropdown />
                 <ToolsDropdown />
                 <NavLink href="/resources"><BookOpen className="h-3.5 w-3.5" /> Resources</NavLink>
+                <NavLink href="/how-to-use"><HelpCircle className="h-3.5 w-3.5" /> How To Use</NavLink>
                 <NavLink href="/about-us"><Info className="h-3.5 w-3.5" /> About Us</NavLink>
                 <NavLink href="/community"><Users className="h-3.5 w-3.5" /> Community</NavLink>
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
