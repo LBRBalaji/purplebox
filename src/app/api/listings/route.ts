@@ -59,20 +59,19 @@ export async function PATCH(request) {
     const body = await request.json();
     const { listingId, updates, newListing } = body;
 
-    const snapshot = await getDocs(collection(db, COLLECTION));
-
-    // If newListing provided — create a brand new document
+    // Create new listing
     if (newListing) {
       const newId = 'LST-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-      const docRef = doc(db, COLLECTION, newId);
-      await setDoc(docRef, { ...newListing, listingId: newId });
+      const finalListing = { ...newListing, listingId: newId };
+      await setDoc(doc(db, COLLECTION, newId), finalListing);
       return NextResponse.json({ message: 'Listing created', listingId: newId }, { headers });
     }
 
-    // Otherwise update existing listing by listingId
+    // Update existing listing
     if (!listingId) {
       return NextResponse.json({ message: 'listingId required' }, { status: 400, headers });
     }
+    const snapshot = await getDocs(collection(db, COLLECTION));
     const existing = snapshot.docs.find(d => d.data().listingId === listingId);
     if (!existing) {
       return NextResponse.json({ message: 'Listing not found: ' + listingId }, { status: 404, headers });
@@ -81,6 +80,6 @@ export async function PATCH(request) {
     return NextResponse.json({ message: 'Listing updated' }, { headers });
   } catch (error) {
     console.error('PATCH failed:', error);
-    return NextResponse.json({ message: 'Failed to update listing' }, { status: 500, headers });
+    return NextResponse.json({ message: 'Failed: ' + error.message }, { status: 500, headers });
   }
 }
