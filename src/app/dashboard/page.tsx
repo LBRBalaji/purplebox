@@ -172,7 +172,7 @@ const ProviderOverview = React.memo(function ProviderOverview() {
       </div>
     </div>
   );
-}
+});
 
 const MainDashboard = () => {
     const { user } = useAuth();
