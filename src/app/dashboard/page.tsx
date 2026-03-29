@@ -32,7 +32,7 @@ const ScoreBar = ({ score }: { score: number }) => (
 
 const ProviderOverview = React.memo(function ProviderOverview() {
   const { user } = useAuth();
-  const { listings, listingAnalytics, registeredLeads } = useData();
+  const { listings, listingAnalytics } = useData();
 
   const myListings = React.useMemo(() =>
     listings.filter(l => l.developerId === user?.email),
@@ -51,13 +51,10 @@ const ProviderOverview = React.memo(function ProviderOverview() {
     const totalViews = myAnalytics.reduce((s, a) => s + a.views, 0);
     const totalDownloads = myAnalytics.reduce((s, a) => s + a.downloads, 0);
 
-    const myLeads = registeredLeads.filter(l =>
-      l.properties?.some((p: any) => myListings.some(ml => ml.listingId === p.listingId))
-    );
-    const newLeads = myLeads.filter(l => l.status === 'Pending').length;
+    const newLeads = 0;
 
     // Top listing by views
-    const topListing = myAnalytics.sort((a, b) => b.views - a.views)[0];
+    const topListing = [...myAnalytics].sort((a, b) => b.views - a.views)[0];
     const topListingName = topListing
       ? myListings.find(l => l.listingId === topListing.listingId)?.listingId || topListing.listingId
       : null;
@@ -74,10 +71,10 @@ const ProviderOverview = React.memo(function ProviderOverview() {
       if (l.documents && l.documents.length > 0) score += 20;
       if (l.latLng) score += 10;
       return { listingId: l.listingId, location: l.location, score, status: l.status };
-    }).sort((a, b) => a.score - b.score);
+    }).sort((a, b) => a.score - b.score).slice(0, 4);
 
     return { active: active.length, pending: pending.length, leased: leased.length, totalSqFt, totalViews, totalDownloads, newLeads, topListingName, topViews: topListing?.views || 0, healthScores };
-  }, [myListings, listingAnalytics, registeredLeads]);
+  }, [myListings, listingAnalytics]);
 
 
 
