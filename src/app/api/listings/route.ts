@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
 
 const COLLECTION = 'listings';
-
 const headers = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
 };
@@ -38,14 +38,14 @@ export async function GET() {
 export async function POST(request) {
   try {
     const newData = await request.json();
-    const colRef = collection(db, COLLECTION);
-    const snapshot = await getDocs(colRef);
-    await Promise.all(snapshot.docs.map(d => deleteDoc(d.ref)));
+    const colRef = adminDb.collection(COLLECTION);
+    const snapshot = await colRef.get();
+    await Promise.all(snapshot.docs.map(d => d.ref.delete()));
     if (Array.isArray(newData)) {
-      await Promise.all(newData.map((item, i) => setDoc(doc(db, COLLECTION, String(i)), item)));
+      await Promise.all(newData.map((item, i) => colRef.doc(String(i)).set(item)));
     } else {
       await Promise.all(Object.entries(newData).map(([key, value]) =>
-        setDoc(doc(db, COLLECTION, key), typeof value === 'object' ? value : { value })
+        colRef.doc(key).set(typeof value === 'object' ? value : { value })
       ));
     }
     return NextResponse.json({ message: COLLECTION + ' updated successfully' }, { headers });
@@ -54,6 +54,7 @@ export async function POST(request) {
     return NextResponse.json({ message: 'Failed to update data' }, { status: 500, headers });
   }
 }
+
 export async function PATCH(request) {
   try {
     const body = await request.json();
@@ -63,7 +64,7 @@ export async function PATCH(request) {
     if (newListing) {
       const newId = 'LST-' + Math.random().toString(36).substr(2, 6).toUpperCase();
       const finalListing = { ...newListing, listingId: newId };
-      await setDoc(doc(db, COLLECTION, newId), finalListing);
+      await adminDb.collection(COLLECTION).doc(newId).set(finalListing);
       return NextResponse.json({ message: 'Listing created', listingId: newId }, { headers });
     }
 
@@ -71,12 +72,12 @@ export async function PATCH(request) {
     if (!listingId) {
       return NextResponse.json({ message: 'listingId required' }, { status: 400, headers });
     }
-    const snapshot = await getDocs(collection(db, COLLECTION));
+    const snapshot = await adminDb.collection(COLLECTION).get();
     const existing = snapshot.docs.find(d => d.data().listingId === listingId);
     if (!existing) {
       return NextResponse.json({ message: 'Listing not found: ' + listingId }, { status: 404, headers });
     }
-    await setDoc(doc(db, COLLECTION, existing.id), { ...existing.data(), ...updates });
+    await existing.ref.update(updates);
     return NextResponse.json({ message: 'Listing updated' }, { headers });
   } catch (error) {
     console.error('PATCH failed:', error);
