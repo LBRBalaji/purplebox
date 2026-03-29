@@ -18,17 +18,8 @@ export async function OPTIONS() {
 export async function GET() {
   try {
     const snapshot = await getDocs(collection(db, COLLECTION));
-    const allNumeric = snapshot.docs.every(d => d.id.match(/^[0-9]+$/));
-    if (allNumeric) {
-      const data = snapshot.docs
-        .sort((a, b) => Number(a.id) - Number(b.id))
-        .map(d => d.data());
-      return NextResponse.json(data, { headers });
-    } else {
-      const data = {};
-      snapshot.forEach(d => { data[d.id] = d.data(); });
-      return NextResponse.json(data, { headers });
-    }
+    const data = snapshot.docs.map(d => d.data());
+    return NextResponse.json(data, { headers });
   } catch (error) {
     console.error('Failed to read ' + COLLECTION + ':', error);
     return NextResponse.json({ message: 'Failed to read data' }, { status: 500, headers });
