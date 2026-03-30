@@ -857,25 +857,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         newDownloadRecords.push(record);
     });
 
-    Object.entries(providerToListingsMap).forEach(([providerEmail, listingIds]) => {
-        const newLead: Omit<RegisteredLead, 'registeredAt'> = {
-            id: `LDR-DL-${Date.now()}-${Math.random()}`,
-            customerId: user.email,
-            leadName: user.companyName,
-            leadContact: user.userName,
-            leadEmail: user.email,
-            leadPhone: user.phone,
-            requirementsSummary: `Quote requested via download for ${listingIds.length} properties.`,
-            registeredBy: user.email,
-            providers: [{
-                providerEmail: providerEmail,
-                properties: listingIds.map(id => ({ listingId: id, status: 'Pending' }))
-            }],
-            isO2OCollaborator: providerEmail === 'superadmin@o2o.com',
-        };
-        addRegisteredLead(newLead, user.email);
-    });
-
     setDownloadHistory(prev => {
         const updatedHistory = [...prev, ...newDownloadRecords];
         persistDownloadHistory(updatedHistory);
