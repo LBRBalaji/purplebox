@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, CheckCircle, Clock, Building2 } from 'lucide-react';
+import { Eye, CheckCircle, Clock, Building2, Warehouse } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ConnectionStatus = 'none' | 'requested' | 'connected';
@@ -168,10 +168,12 @@ export function ProspectsTab() {
     return (
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-0">
         <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 text-xs font-black text-primary">
-          {getInitials(prospect.industryType || '')}
+          {prospect.industryType && prospect.industryType !== 'Unknown Industry'
+            ? getInitials(prospect.industryType)
+            : <Warehouse className="h-4 w-4 text-primary" />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-foreground truncate">{prospect.industryType || 'Industry Not Specified'}</p>
+          <p className="text-sm font-bold text-foreground truncate">{prospect.industryType && prospect.industryType !== 'Unknown Industry' ? prospect.industryType : 'Verified Prospect'}</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             {prospect.activityType === 'download'
               ? prospect.activityCount + ' download' + (prospect.activityCount > 1 ? 's' : '')
