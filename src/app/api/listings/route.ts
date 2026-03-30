@@ -1,6 +1,5 @@
+import { getDb } from '@/lib/firebase-admin';
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/firebase-admin';
-import { getDb } from '@/lib/firebase-admin';
 
 const COLLECTION = 'listings';
 const headers = {
