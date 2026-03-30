@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download, Eye, CheckCircle, Clock, Building2 } from 'lucide-react';
+import { Eye, CheckCircle, Clock, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ConnectionStatus = 'none' | 'requested' | 'connected';
@@ -170,8 +170,8 @@ export function ProspectsTab() {
             : 'bg-accent/10 text-accent-foreground border-accent/20'
         )}>
           {prospect.activityType === 'download'
-            ? <><Download className="h-3 w-3 mr-1" />Download</>
-            : <><Eye className="h-3 w-3 mr-1" />View</>
+            ? 'Listing Accessed'
+            : 'Listing Viewed'
           }
         </Badge>
         {status === 'connected' ? (

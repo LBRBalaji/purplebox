@@ -2,6 +2,7 @@
 'use client';
 import { AgentWaitlist } from "@/components/agent-waitlist";
 import { DataGovernance } from "@/components/data-governance";
+import { PaymentRequests } from "@/components/payment-requests";
 import { UserList } from "@/components/user-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
@@ -34,10 +35,11 @@ export default function ManageUsersPage() {
                     </p>
                 </div>
                 <Tabs defaultValue="users">
-                    <TabsList className="grid w-full grid-cols-3">
+                    <TabsList className="grid w-full grid-cols-4">
                         <TabsTrigger value="users">Platform Users</TabsTrigger>
                         <TabsTrigger value="agents">Agent Waitlist</TabsTrigger>
                         <TabsTrigger value="governance">Data Governance</TabsTrigger>
+                        <TabsTrigger value="payments">Payment Requests</TabsTrigger>
                     </TabsList>
                     <TabsContent value="users" className="mt-6">
                         <UserList />
@@ -46,6 +48,7 @@ export default function ManageUsersPage() {
                         <AgentWaitlist />
                     </TabsContent>
                     <TabsContent value="governance" className="mt-6"><DataGovernance /></TabsContent>
+                    <TabsContent value="payments" className="mt-6"><PaymentRequests /></TabsContent>
                 </Tabs>
             </div>
         </main>
