@@ -255,6 +255,7 @@ export function Header() {
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isSuperAdmin = user?.role === 'SuperAdmin';
   const isO2O = user?.role === 'O2O';
+  const isProvider = user?.role === 'Warehouse Developer';
   const roleLabel = user?.role === 'Warehouse Developer' ? 'Property Provider' : user?.role === 'User' ? 'Customer' : user?.role;
 
   return (
