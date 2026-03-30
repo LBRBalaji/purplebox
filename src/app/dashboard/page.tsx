@@ -11,6 +11,7 @@ import { MySubmissions } from '@/components/my-submissions';
 import { ApprovalQueue } from '@/components/approval-queue';
 import { useData } from '@/contexts/data-context';
 import { ProviderListings } from '@/components/provider-listings';
+import { ProspectsTab } from '@/components/prospects-tab';
 import { Building2, Eye, Download, TrendingUp, Users, ShieldCheck, CheckCircle2, AlertCircle, Scaling } from 'lucide-react';
 import { ProviderLeads } from '@/components/provider-leads';
 import { CustomerTransactions } from '@/components/customer-transactions';
@@ -225,12 +226,14 @@ const MainDashboard = () => {
       <div>
         <ProviderOverview />
         <Tabs value={providerTab} onValueChange={setProviderTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="my-listings">My Listings</TabsTrigger>
+          <TabsTrigger value="prospects">Prospects</TabsTrigger>
           <TabsTrigger value="registered-leads">My Leads & Proposals</TabsTrigger>
           <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
         </TabsList>
         <TabsContent value="my-listings"><ProviderListings /></TabsContent>
+        <TabsContent value="prospects"><ProspectsTab /></TabsContent>
         <TabsContent value="registered-leads"><ProviderLeads /></TabsContent>
         <TabsContent value="submit-match">
           <DemandForm demandId={propertyMatchDemandId} />
