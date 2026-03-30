@@ -188,7 +188,7 @@ export function GlobalChatWidget() {
     const boxId = listing?.warehouseBoxId || listing?.name || '';
     headerSub = boxId ? boxId + ' · ' + (listing?.location || '') : (listing?.location || '');
     refBar = (
-      <div className="flex items-center gap-3 px-4 py-2 bg-primary/5 border-b border-border text-xs flex-shrink-0">
+      <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 border-b border-border text-xs flex-shrink-0 overflow-hidden">
         {listing?.listingId && <span className="text-muted-foreground">ID: <span className="font-bold text-primary">{listing.listingId}</span></span>}
         {boxId && <span className="text-muted-foreground">Box: <span className="font-bold text-primary">{boxId}</span></span>}
         {listing?.sizeSqFt && <span className="text-muted-foreground">Size: <span className="font-bold text-primary">{listing.sizeSqFt.toLocaleString()} sq ft</span></span>}
