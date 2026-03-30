@@ -27,6 +27,7 @@ export type Submission = {
 export type DownloadedByRecord = {
   name: string;
   company: string;
+  email: string;
   timestamps: number[];
 };
 
@@ -891,13 +892,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
             if (user) {
               analytic.downloadedBy = analytic.downloadedBy || [];
-              let customerRecord = analytic.downloadedBy.find(c => c.company === user.companyName);
+              let customerRecord = analytic.downloadedBy.find(c => c.email === user.email);
               if (customerRecord) {
                 customerRecord.timestamps.push(Date.now());
               } else {
                 analytic.downloadedBy.push({
                     name: user.userName,
                     company: user.companyName,
+                    email: user.email,
                     timestamps: [Date.now()],
                 });
               }

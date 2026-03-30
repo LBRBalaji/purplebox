@@ -61,9 +61,9 @@ export function PaymentRequests() {
         const allUsers = Object.values(users || {}) as any[];
 
         const downloader = analytics?.downloadedBy?.find((d: any) => d.company === request.prospectCompany);
-        let customerEmail = '';
-        if (downloader) {
-          const matchedUser = allUsers.find(u => u.companyName === request.prospectCompany && u.role === 'User');
+        let customerEmail = downloader?.email || '';
+        if (!customerEmail) {
+          const matchedUser = allUsers.find((u: any) => u.companyName === request.prospectCompany && u.role === 'User');
           customerEmail = matchedUser?.email || '';
         }
 
