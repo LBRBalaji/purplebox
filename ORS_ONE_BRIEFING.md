@@ -76,3 +76,22 @@ Business model: Source → Engage → Transact
 - Firestore reads high (813k) — delete-all-rewrite pattern pending optimization
 - Real-time updates via onSnapshot caused crashes — reverted, needs proper fix
 - Industry type shows "Verified Prospect" for old downloads (no industryType stored)
+
+## Conversation History
+Full transcript available at: /mnt/transcripts/2026-03-30-17-19-57-ors-one-app-development.txt
+To read it in a new chat: "Please read the transcript at /mnt/transcripts/2026-03-30-17-19-57-ors-one-app-development.txt for full context"
+
+## Last Session Summary (30 Mar 2026)
+- Fixed Data Governance merge tool (status preserved on transfer)
+- Built Prospects tab for Property Providers (industry type shown)
+- Built Pay to Connect flow (INR 5000 per prospect)
+- Built Payment Requests tab for SuperAdmin
+- Auto-creates Registered Lead on payment confirmation
+- Redesigned chat to WhatsApp style with real-time onSnapshot
+- Migrated all 20 APIs from client Firebase SDK to firebase-admin SDK
+- Added industry type to customer signup (15 types, mandatory)
+- Fixed chat history, frozen buttons, header overflow
+- Suppressed typing status error toast (non-critical)
+- Reverted onSnapshot on data-context (caused crash)
+- Reverted delete-all-rewrite optimization (caused crash)
+- Added ORS_ONE_BRIEFING.md for Claude context in new chats
