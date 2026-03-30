@@ -1,5 +1,8 @@
 
 'use client';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
+
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type NegotiationBoardSchema, type AcknowledgmentDetails, type LayoutRequestData, type CommunityPost, type ShareHistoryEntry } from '@/lib/schema';
@@ -310,6 +313,32 @@ export function DataProvider({ children }: { children: ReactNode }) {
     'layout-requests', 'chat-messages', 'notifications', 'typing-status',
     'community-posts', 'share-history'
   ];
+
+  
+  useEffect(() => {
+    const unsubNotif = onSnapshot(doc(db, 'notifications', '0'), (snap) => {
+      if (snap.exists()) {
+        const d = snap.data();
+        const notifs = Array.isArray(d?.data) ? d.data : [];
+        setNotifications(notifs);
+      }
+    });
+    const unsubLeads = onSnapshot(doc(db, 'registered-leads', '0'), (snap) => {
+      if (snap.exists()) {
+        const d = snap.data();
+        const leads = Array.isArray(d) ? d : Object.values(d || {});
+        if (leads.length > 0) setRegisteredLeads(leads);
+      }
+    });
+    const unsubAnalytics = onSnapshot(doc(db, 'listing-analytics', '0'), (snap) => {
+      if (snap.exists()) {
+        const d = snap.data();
+        const analytics = Array.isArray(d?.data) ? d.data : Object.values(d || {});
+        if (analytics.length > 0) setListingAnalytics(analytics);
+      }
+    });
+    return () => { unsubNotif(); unsubLeads(); unsubAnalytics(); };
+  }, []);
 
   const fetchData = useCallback(() => {
     (async () => {
