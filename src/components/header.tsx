@@ -214,6 +214,7 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
           <div className="pt-2 pb-1 px-4">
             <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Explore</p>
           </div>
+          <NavItem href="/pricing" icon={Zap} label="Pricing" />
           <NavItem href="/resources" icon={BookOpen} label="Resources" />
           <NavItem href="/how-to-use" icon={HelpCircle} label="How To Use" />
           <NavItem href="/about-us" icon={Info} label="About Us" />
@@ -292,6 +293,7 @@ export function Header() {
               )}
                 <ToolsDropdown />
                 <MoreDropdown />
+              <NavLink href="/pricing">Pricing</NavLink>
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
                 {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
               </>
