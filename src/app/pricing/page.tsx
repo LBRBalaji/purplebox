@@ -35,7 +35,7 @@ export default function PricingPage() {
             Simple, Transparent Pricing
           </Badge>
           <h1 className="text-4xl font-black text-foreground tracking-tight mb-4">
-            List Free. Pay Only When You Get a Lead.
+            Reduce Vacancy. Lease Faster.
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
             No monthly fees. No subscriptions. No surprises. ORS-ONE operates on a pure <strong className="text-foreground">pay-per-lead</strong> model — you only pay when a real customer reaches out about your property.
@@ -50,12 +50,8 @@ export default function PricingPage() {
               <div className="h-12 w-12 rounded-2xl bg-muted flex items-center justify-center mb-4">
                 <Building2 className="h-6 w-6 text-muted-foreground" />
               </div>
-              <h2 className="text-2xl font-black text-foreground">Free Listing</h2>
-              <p className="text-muted-foreground text-sm mt-1">Get started at zero cost</p>
-              <div className="mt-4 flex items-end gap-1">
-                <span className="text-5xl font-black text-foreground">₹0</span>
-                <span className="text-muted-foreground mb-2 text-sm">forever</span>
-              </div>
+              <h2 className="text-2xl font-black text-foreground">Standard Listing</h2>
+              
             </div>
             <div className="flex-1 mb-8">
               <PlanFeature text="List up to 3 warehouse properties" included={true} />
@@ -93,7 +89,7 @@ export default function PricingPage() {
               <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                 <Zap className="h-6 w-6 text-primary" />
               </div>
-              <h2 className="text-2xl font-black text-foreground">Pay Per Lead</h2>
+              <h2 className="text-2xl font-black text-foreground">Pay For Purpose</h2>
               <p className="text-muted-foreground text-sm mt-1">Only pay when you get a real enquiry</p>
               <div className="mt-4 flex items-end gap-1">
                 <span className="text-5xl font-black text-primary">₹5,000</span>
