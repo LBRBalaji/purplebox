@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { getDb } from '@/lib/firebase-admin';
 
 const COLLECTION = 'community-posts';
 
@@ -17,7 +16,7 @@ export async function OPTIONS() {
 
 export async function GET() {
   try {
-    const snapshot = await getDocs(collection(db, COLLECTION));
+    const snapshot = await getDb().collection(COLLECTION).get();
     const allNumeric = snapshot.docs.every(d => d.id.match(/^[0-9]+$/));
     if (allNumeric) {
       const data = snapshot.docs
@@ -38,11 +37,11 @@ export async function GET() {
 export async function POST(request) {
   try {
     const newData = await request.json();
-    const colRef = collection(db, COLLECTION);
+    const colRef = getDb().collection(COLLECTION);
     const snapshot = await getDocs(colRef);
-    await Promise.all(snapshot.docs.map(d => deleteDoc(d.ref)));
+    await Promise.all(snapshot.docs.map(d => d.ref.delete()));
     if (Array.isArray(newData)) {
-      await Promise.all(newData.map((item, i) => setDoc(doc(db, COLLECTION, String(i)), item)));
+      await Promise.all(newData.map((item, i) => colRef.doc(String(i)).set(item)));
     } else {
       await Promise.all(Object.entries(newData).map(([key, value]) =>
         setDoc(doc(db, COLLECTION, key), typeof value === 'object' ? value : { value })

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { getDb } from '@/lib/firebase-admin';
 import { getDb } from '@/lib/firebase-admin';
 
 const COLLECTION = 'listings';
@@ -17,7 +16,7 @@ export async function OPTIONS() {
 
 export async function GET() {
   try {
-    const snapshot = await getDocs(collection(db, COLLECTION));
+    const snapshot = await getDb().collection(COLLECTION).get();
     const data = snapshot.docs.map(d => d.data());
     return NextResponse.json(data, { headers });
   } catch (error) {
