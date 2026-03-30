@@ -422,7 +422,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistViewHistory = useCallback((updatedHistory: ViewRecord[]) => persistData('view-history', updatedHistory, 'view history'), [persistData]);
   const persistLayoutRequests = useCallback((updatedRequests: LayoutRequestRecord[]) => persistData('layout-requests', updatedRequests, 'layout requests'), [persistData]);
   const persistChatMessages = useCallback((updatedMessages: Record<string, ChatMessage[]>) => persistData('chat-messages', updatedMessages, 'chat messages'), [persistData]);
-  const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status'), [persistData]);
+  const persistTypingStatus = useCallback((updatedStatus: Record<string, TypingStatus>) => persistData('typing-status', updatedStatus, 'typing status').catch(() => {}), [persistData]);
   const persistNotifications = useCallback((updatedNotifications: Notification[]) => persistData('notifications', updatedNotifications, 'notifications'), [persistData]);
   const persistCommunityPosts = useCallback((updatedPosts: CommunityPost[]) => persistData('community-posts', updatedPosts, 'community posts'), [persistData]);
   const persistShareHistory = useCallback((updatedHistory: ShareHistoryEntry[]) => persistData('share-history', updatedHistory, 'share history'), [persistData]);
