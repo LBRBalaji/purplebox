@@ -96,7 +96,29 @@ export function PaymentRequests() {
         }
 
 
-        toast({ title: 'Payment Confirmed', description: 'Engagement lead auto-created for ' + request.prospectCompany });
+        // Notify developer via notifications API
+        try {
+          const notifRes = await fetch('/api/notifications');
+          const notifData = await notifRes.json();
+          const existingNotifs = Array.isArray(notifData) ? notifData : Object.values(notifData);
+          const newNotif = {
+            id: 'notif-' + Date.now(),
+            type: 'new_lead_for_provider',
+            title: 'Payment Confirmed — Connect with Your Prospect',
+            message: 'Your payment has been confirmed. An engagement lead has been created. Open the Chat widget (bottom right) to connect with your prospect on the platform.',
+            href: '/dashboard?tab=registered-leads',
+            timestamp: new Date().toISOString(),
+            recipientEmail: request.developerId,
+            triggeredBy: 'admin',
+            isRead: false,
+          };
+          await fetch('/api/notifications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify([...existingNotifs, newNotif]),
+          });
+        } catch(e) { console.error('Notification error:', e); }
+        toast({ title: 'Payment Confirmed', description: 'Developer notified. Engagement lead created for ' + request.prospectCompany });
       } else {
         toast({ title: 'Request Rejected', description: 'Developer will be notified.' });
       }
