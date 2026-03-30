@@ -14,11 +14,11 @@ type Op = 'transfer-listings' | 'transfer-leads' | 'merge-accounts' | 'deactivat
 type ItemAction = 'keep' | 'archive' | 'delete';
 
 const OPS = [
-  { id: 'transfer-listings' as Op, icon: Building2, title: 'Transfer Listings', desc: 'Copy listings from one developer to another' },
-  { id: 'transfer-leads' as Op, icon: Users, title: 'Transfer Leads', desc: 'Move active leads between accounts' },
-  { id: 'merge-accounts' as Op, icon: RefreshCw, title: 'Merge Accounts', desc: 'Combine duplicate accounts into one' },
-  { id: 'deactivate-reassign' as Op, icon: UserX, title: 'Deactivate & Reassign', desc: 'Deactivate a user and reassign their assets' },
-  { id: 'company-rebrand' as Op, icon: Tag, title: 'Company Rebrand', desc: 'Update company name across all listings and leads' },
+  { id: 'transfer-listings' as Op, icon: Building2, title: 'Transfer Listings', desc: 'Copy listings from one developer to another. Approved listings stay approved — no re-approval needed.' },
+  { id: 'transfer-leads' as Op, icon: Users, title: 'Transfer Leads', desc: 'Move active customer leads from one provider to another. Use when a developer account changes.' },
+  { id: 'merge-accounts' as Op, icon: RefreshCw, title: 'Merge Accounts', desc: 'Move listings from a dummy/test account into a real account. Use Keep on originals to avoid hiding live listings.' },
+  { id: 'deactivate-reassign' as Op, icon: UserX, title: 'Deactivate & Reassign', desc: 'Permanently deactivate a developer account and move their listings to another. The deactivated user cannot log in.' },
+  { id: 'company-rebrand' as Op, icon: Tag, title: 'Company Rebrand', desc: 'Update a developer company name across all their listings. Use when a company officially changes its name.' },
 ];
 
 // ── API Helpers ───────────────────────────────────────────────
@@ -123,7 +123,7 @@ export function DataGovernance() {
         const newListing = {
           ...cleanData,
           developerId: toUser,
-          status: 'pending',
+          status: item.data.status === 'approved' ? 'approved' : 'pending',
           _copiedFrom: item.id,
           _copiedFromCompany: fromUserData?.companyName,
         };
@@ -352,10 +352,14 @@ export function DataGovernance() {
                 <p className="text-sm font-bold text-green-700 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" /> Copied to {toUserData?.companyName} successfully!
                 </p>
-                <p className="text-xs text-green-600 mt-1">Copies are pending approval. Now decide what to do with each original:</p>
+                <p className="text-xs text-green-600 mt-1">Copies transferred successfully. Now decide what to do with each original listing:</p>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-start gap-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs mb-2">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                  <span><strong>Caution:</strong> Archive hides listings from the platform. Delete removes them permanently. <strong>Keep</strong> is the safe default — use it unless you are certain.</span>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-semibold text-muted-foreground">Apply to all:</span>
                 {(['keep', 'archive', 'delete'] as ItemAction[]).map(a => (
                   <button key={a} onClick={() => setAllActions(a)}
