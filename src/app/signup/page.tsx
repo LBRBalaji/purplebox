@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Building, Sparkles, UserPlus } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,7 +29,8 @@ export default function SignupPage() {
     userName: '',
     phone: '',
     role: 'User',
-    password: ''
+    password: '',
+    industryType: '',
   });
   const [confirmPassword, setConfirmPassword] = React.useState('');
 
@@ -42,6 +44,14 @@ export default function SignupPage() {
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.role === 'User' && !formData.industryType) {
+      toast({
+        variant: 'destructive',
+        title: 'Industry Type Required',
+        description: 'Please select your industry type to continue.',
+      });
+      return;
+    }
     if (formData.password !== confirmPassword) {
       toast({
         variant: "destructive",
@@ -124,6 +134,35 @@ export default function SignupPage() {
               <Label htmlFor="phone">Phone Number</Label>
               <Input id="phone" type="tel" placeholder="+1 234 567 890" required onChange={handleChange} value={formData.phone} />
             </div>
+            {formData.role === 'User' && (
+              <div className="space-y-2">
+                <Label>Industry Type <span className="text-destructive">*</span></Label>
+                <Select value={formData.industryType} onValueChange={v => setFormData({...formData, industryType: v})}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select your industry..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[
+                      '3PL & Logistics',
+                      'E-Commerce',
+                      'FMCG',
+                      'Manufacturing',
+                      'Pharma & Healthcare',
+                      'Retail',
+                      'Automotive',
+                      'Cold Chain & Food Processing',
+                      'Textile & Apparel',
+                      'Electronics & Technology',
+                      'Chemical & Petrochemical',
+                      'Agricultural & Agro Processing',
+                      'Engineering & Industrial',
+                      'Media & Publishing',
+                      'Financial Services & Banking',
+                    ].map(i => <SelectItem key={i} value={i}>{i}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required onChange={handleChange} value={formData.password} />

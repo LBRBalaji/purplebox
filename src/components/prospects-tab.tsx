@@ -15,6 +15,7 @@ type ProspectRecord = {
   listingName: string;
   location: string;
   prospectCompany: string;
+  industryType: string;
   activityType: 'download' | 'view';
   lastActivity: number;
   activityCount: number;
@@ -69,6 +70,7 @@ export function ProspectsTab() {
             listingName: listing.name || listing.listingId,
             location: listing.location,
             prospectCompany: d.company,
+            industryType: d.industryType || 'Unknown Industry',
             activityType: 'download',
             lastActivity: last,
             activityCount: d.timestamps.length,
@@ -86,6 +88,7 @@ export function ProspectsTab() {
             listingName: listing.name || listing.listingId,
             location: listing.location,
             prospectCompany: v.company,
+            industryType: v.industryType || 'Unknown Industry',
             activityType: 'view',
             lastActivity: v.timestamp,
             activityCount: 1,
@@ -142,8 +145,8 @@ export function ProspectsTab() {
     return new Date(ts).toLocaleDateString();
   };
 
-  const getInitials = (company: string) =>
-    company.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  const getInitials = (industry: string) =>
+    industry.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
   const ProspectRow = ({ prospect }: { prospect: ProspectRecord }) => {
     const key = prospect.listingId + '_' + prospect.prospectCompany;
@@ -156,7 +159,7 @@ export function ProspectsTab() {
           {getInitials(prospect.prospectCompany)}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-foreground truncate">{prospect.prospectCompany}</p>
+          <p className="text-sm font-bold text-foreground truncate">{prospect.industryType || 'Industry Not Specified'}</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             {prospect.activityType === 'download'
               ? prospect.activityCount + ' download' + (prospect.activityCount > 1 ? 's' : '')

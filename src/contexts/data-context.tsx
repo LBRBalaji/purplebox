@@ -28,6 +28,7 @@ export type DownloadedByRecord = {
   name: string;
   company: string;
   email: string;
+  industryType?: string;
   timestamps: number[];
 };
 
@@ -35,6 +36,7 @@ export type ViewedByRecord = {
     userId: string;
     name: string;
     company: string;
+    industryType?: string;
     timestamp: number;
 };
 
@@ -900,6 +902,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                     name: user.userName,
                     company: user.companyName,
                     email: user.email,
+                    industryType: (user as any).industryType || '',
                     timestamps: [Date.now()],
                 });
               }
@@ -955,6 +958,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
               userId: userId,
               name: user?.userName || 'Anonymous',
               company: user?.companyName || 'Anonymous',
+              industryType: (user as any)?.industryType || '',
               timestamp: now,
           });
 

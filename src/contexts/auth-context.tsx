@@ -21,6 +21,7 @@ export type User = {
 
 export type NewUser = User & {
   password: string;
+  industryType?: string;
 };
 
 type AuthContextType = {
