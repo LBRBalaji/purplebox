@@ -110,8 +110,9 @@ export function PaymentRequests() {
         toast({ title: 'Request Rejected', description: 'Developer will be notified.' });
       }
       await fetchRequests();
-    } catch {
-      toast({ variant: 'destructive', title: 'Error', description: 'Please try again.' });
+    } catch(err: any) {
+      console.error('Payment confirmation error:', err);
+      toast({ variant: 'destructive', title: 'Error', description: err?.message || 'Please try again.' });
     } finally {
       setLoading(prev => ({ ...prev, [request.id]: false }));
     }
