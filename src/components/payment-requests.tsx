@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Clock, Building2 } from 'lucide-react';
 
+
 type PaymentRequest = {
   id: string;
   developerId: string;
@@ -20,7 +21,7 @@ type PaymentRequest = {
 
 export function PaymentRequests() {
   const { users } = useAuth();
-  const { listings, addNotification } = useData();
+  const { listings, listingAnalytics, addNotification, addRegisteredLead } = useData();
   const { toast } = useToast();
   const [requests, setRequests] = React.useState<PaymentRequest[]>([]);
   const [loading, setLoading] = React.useState<Record<string, boolean>>({});
@@ -56,17 +57,46 @@ export function PaymentRequests() {
 
       if (action === 'connected') {
         const listing = listings.find(l => l.listingId === request.listingId);
+        const analytics = listingAnalytics.find(a => a.listingId === request.listingId);
+        const allUsers = Object.values(users || {}) as any[];
+
+        const downloader = analytics?.downloadedBy?.find((d: any) => d.company === request.prospectCompany);
+        let customerEmail = '';
+        if (downloader) {
+          const matchedUser = allUsers.find(u => u.companyName === request.prospectCompany && u.role === 'User');
+          customerEmail = matchedUser?.email || '';
+        }
+
+        if (customerEmail && listing) {
+          const leadId = 'TXN-' + Date.now().toString(36).toUpperCase();
+          addRegisteredLead({
+            id: leadId,
+            customerId: customerEmail,
+            leadName: request.prospectCompany,
+            leadContact: request.prospectCompany,
+            leadEmail: customerEmail,
+            leadPhone: '',
+            requirementsSummary: 'Prospect connected via platform after downloading listing ' + (listing.name || request.listingId),
+            registeredBy: 'system',
+            providers: [{
+              providerEmail: request.developerId,
+              properties: [{ listingId: request.listingId, status: 'Pending' }],
+            }],
+            isO2OCollaborator: false,
+          }, 'system');
+        }
+
         addNotification({
           id: Date.now().toString(),
           type: 'new_lead_for_provider',
-          title: 'Payment Confirmed — Connection Unlocked',
-          message: 'Your payment for prospect ' + request.prospectCompany + ' on listing ' + (listing?.name || request.listingId) + ' has been confirmed. You can now connect with this prospect on the platform.',
-          href: '/dashboard?tab=prospects',
+          title: 'Payment Confirmed — Engagement Lead Created',
+          message: 'Your payment for prospect ' + request.prospectCompany + ' has been confirmed. A new engagement lead has been created. Go to My Leads & Proposals to connect.',
+          href: '/dashboard?tab=registered-leads',
           timestamp: new Date().toISOString(),
           recipientEmail: request.developerId,
           triggeredBy: 'admin',
         });
-        toast({ title: 'Payment Confirmed', description: 'Developer notified. Connection unlocked for ' + request.prospectCompany });
+        toast({ title: 'Payment Confirmed', description: 'Engagement lead auto-created for ' + request.prospectCompany });
       } else {
         toast({ title: 'Request Rejected', description: 'Developer will be notified.' });
       }
