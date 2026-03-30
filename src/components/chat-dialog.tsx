@@ -244,7 +244,7 @@ export function ChatPanel({
 
 
   return (
-    <div className="absolute inset-0 flex flex-col">
+    <div className="flex flex-col h-full">
         <div className="flex-grow overflow-y-auto">
             <ScrollArea className="h-full" scrollableViewportRef={scrollViewportRef}>
                 <div className="space-y-4 p-4">
