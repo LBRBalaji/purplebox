@@ -532,7 +532,7 @@ export function AdminListings() {
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="rejected" className="mt-5"><RejectedListingsTab listings={listings} onDelete={async (ids) => { const idSet = new Set(ids); const remaining = listings.filter(l => !idSet.has(l.listingId)); const res = await fetch("/api/listings", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(remaining)}); if(res.ok){ toast({title: "Deleted", description: ids.length + " listings permanently deleted."}); window.location.reload(); } else { toast({variant:"destructive", title:"Error", description:"Delete failed. Please try again."}); } }} />
+          <TabsContent value="rejected" className="mt-5"><RejectedListingsTab listings={listings} onDelete={async (ids) => { const idSet = new Set(ids); const remaining = listings.filter(l => !idSet.has(l.listingId)); const res = await fetch("/api/listings", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(remaining)}); if(res.ok){ toast({title: "Deleted", description: ids.length + " listings permanently deleted."}); window.location.reload(); } else { toast({variant:"destructive", title:"Error", description:"Delete failed. Please try again."}); } }} /></TabsContent>
           <TabsContent value="providers" className="mt-5">
             <ProviderSummaryTable allDevelopers={allDevelopers} providerSummary={providerSummary} />
           </TabsContent>
