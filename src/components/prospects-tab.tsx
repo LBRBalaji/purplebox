@@ -145,8 +145,23 @@ export function ProspectsTab() {
     return new Date(ts).toLocaleDateString();
   };
 
-  const getInitials = (industry: string) =>
-    industry.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  const getInitials = (industry: string) => {
+    if (industry.includes('3PL')) return '3P';
+    if (industry.includes('E-Commerce')) return 'EC';
+    if (industry.includes('FMCG')) return 'FM';
+    if (industry.includes('Pharma')) return 'PH';
+    if (industry.includes('Automotive')) return 'AU';
+    if (industry.includes('Cold Chain')) return 'CC';
+    if (industry.includes('Textile')) return 'TX';
+    if (industry.includes('Electronics')) return 'EL';
+    if (industry.includes('Chemical')) return 'CH';
+    if (industry.includes('Agricultural')) return 'AG';
+    if (industry.includes('Engineering')) return 'EN';
+    if (industry.includes('Financial')) return 'FI';
+    if (industry.includes('Media')) return 'ME';
+    if (industry.includes('Retail')) return 'RT';
+    return industry.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  };
 
   const ProspectRow = ({ prospect }: { prospect: ProspectRecord }) => {
     const key = prospect.listingId + '_' + prospect.prospectCompany;
