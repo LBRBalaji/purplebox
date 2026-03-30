@@ -1,282 +1,233 @@
-
 'use client';
 
 import * as React from 'react';
 import { useData } from '@/contexts/data-context';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Minus, X, ArrowLeft, Users, ExternalLink, Scaling, MapPin, Search } from 'lucide-react';
+import { MessageSquare, X, ArrowLeft, Search } from 'lucide-react';
 import { ChatPanel, type ChatSubmission } from './chat-dialog';
 import { useAuth } from '@/contexts/auth-context';
-import { Avatar, AvatarFallback } from './ui/avatar';
 import { Badge } from './ui/badge';
-import Link from 'next/link';
-import { ScrollArea } from './ui/scroll-area';
 import { Input } from './ui/input';
-import { type DemandSchema } from '@/lib/schema';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 function ConversationList({ onSelectConversation }: { onSelectConversation: (chat: ChatSubmission) => void }) {
-    const { user, users } = useAuth();
-    const { registeredLeads, listings, chatMessages, clearNewMessages, unreadChatCount } = useData();
-    const [searchTerm, setSearchTerm] = React.useState('');
-    const [filter, setFilter] = React.useState('all');
+  const { user, users } = useAuth();
+  const { registeredLeads, listings, clearNewMessages, unreadChatCount } = useData();
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [filter, setFilter] = React.useState('all');
+  const [chatMessages, setChatMessages] = React.useState<Record<string, any[]>>({});
 
-    const conversations = React.useMemo(() => {
-        if (!user) return [];
+  React.useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'chat-messages', '0'), (snap) => {
+      if (snap.exists()) setChatMessages(snap.data() as any);
+    });
+    return () => unsub();
+  }, []);
 
-        const allUserLeads = registeredLeads.filter(lead => 
-            lead.customerId === user.email || 
-            lead.agentId === user.email ||
-            lead.providers.some(p => p.providerEmail === user.email) ||
-            (user.role === 'SuperAdmin' || user.role === 'O2O')
-        );
+  const conversations = React.useMemo(() => {
+    if (!user) return [];
+    const allUserLeads = registeredLeads.filter(lead =>
+      lead.customerId === user.email ||
+      lead.agentId === user.email ||
+      lead.providers.some(p => p.providerEmail === user.email) ||
+      user.role === 'SuperAdmin' || user.role === 'O2O'
+    );
 
-        return allUserLeads.flatMap(lead => {
-             const providerForLead = lead.providers.find(p => p.providerEmail !== 'superadmin@o2o.com') || lead.providers[0];
-             if (!providerForLead || !providerForLead.properties || providerForLead.properties.length === 0) return [];
-             
-             const listing = listings.find(l => l.listingId === providerForLead.properties[0]?.listingId);
-             const customer = users[lead.customerId];
-             const developer = users[providerForLead.providerEmail];
+    return allUserLeads.flatMap(lead => {
+      const providerForLead = lead.providers.find(p => p.providerEmail !== 'superadmin@o2o.com') || lead.providers[0];
+      if (!providerForLead || !providerForLead.properties || providerForLead.properties.length === 0) return [];
+      const listing = listings.find(l => l.listingId === providerForLead.properties[0]?.listingId);
+      const customer = users[lead.customerId];
+      const developer = users[providerForLead.providerEmail];
+      const isProvider = user.email === developer?.email;
+      let chatPartnerName: string;
+      let partnerInitials: string;
+      if (user.email === customer?.email) {
+        chatPartnerName = lead.isO2OCollaborator ? 'O2O Team' : (developer?.companyName || 'Developer');
+        partnerInitials = lead.isO2OCollaborator ? 'O2' : (developer?.companyName?.slice(0,2) || 'D');
+      } else {
+        const customerCompany = customer?.companyName || 'Customer';
+        chatPartnerName = isProvider && lead.isO2OCollaborator ? 'For-' + customerCompany : customerCompany;
+        partnerInitials = customerCompany.slice(0,2).toUpperCase();
+      }
+      const threadId = 'chat-' + lead.id + '-' + providerForLead.providerEmail;
+      const messages = chatMessages[threadId] || [];
+      const lastMessage = messages[messages.length - 1];
+      const isUnread = messages.some((m: any) => m.isNew && m.senderEmail !== user.email);
+      const boxId = listing?.warehouseBoxId || listing?.name || '';
+      const listingId = listing?.listingId || '';
+      const refLabel = boxId ? boxId + ' · ' + listingId : listingId;
 
-             let chatPartnerName: string;
-             let partnerInitials: string;
-             const isBrokeredDeal = lead.isO2OCollaborator;
-             const isProvider = user.email === developer?.email;
+      return {
+        id: threadId,
+        partnerName: chatPartnerName,
+        partnerInitials,
+        refLabel,
+        lastMessage: lastMessage ? lastMessage.senderName + ': ' + (lastMessage.text || '').substring(0, 40) : 'Re: ' + refLabel,
+        timestamp: lastMessage ? new Date(lastMessage.timestamp) : new Date(lead.registeredAt),
+        isUnread,
+        submission: {
+          submissionId: threadId,
+          demandId: lead.id,
+          listingId: listing?.listingId || '',
+          providerEmail: providerForLead.providerEmail,
+          listing,
+          customerName: customer?.userName || '',
+          customerId: customer?.email || '',
+          customerCompany: customer?.companyName || '',
+          chatPartnerName,
+        } as ChatSubmission,
+      };
+    }).filter(Boolean).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }, [user, users, registeredLeads, listings, chatMessages]);
 
-             if (user.email === customer?.email) {
-                 chatPartnerName = isBrokeredDeal ? "O2O Team" : (developer?.companyName || "Developer");
-                 partnerInitials = isBrokeredDeal ? "O2O" : (developer?.companyName?.[0] || 'D');
-             } else { 
-                 const customerCompany = customer?.companyName || "Customer";
-                 if (isProvider) {
-                     chatPartnerName = isBrokeredDeal ? `For-${customerCompany}` : customerCompany;
-                 } else { // Admin or Agent view
-                     chatPartnerName = customerCompany;
-                 }
-                 partnerInitials = customer?.companyName?.[0] || 'C';
-             }
-             
-             const threadId = `chat-${lead.id}-${providerForLead.providerEmail}`;
-             const messages = chatMessages[threadId] || [];
-             const lastMessage = messages[messages.length - 1];
-             const isUnread = messages.some(m => m.isNew && m.senderEmail !== user.email);
-
-             const listingIdentifier = user.role === 'Warehouse Developer' ? listing?.warehouseBoxId : listing?.listingId;
-
-             return {
-                 id: threadId,
-                 submission: {
-                     submissionId: threadId,
-                     demandId: lead.id,
-                     listingId: listing?.listingId || '',
-                     providerEmail: providerForLead.providerEmail,
-                     listing: listing,
-                     customerName: customer?.userName || '',
-                     customerId: customer?.email || '',
-                     customerCompany: customer?.companyName || '',
-                     chatPartnerName,
-                 },
-                 partnerName: chatPartnerName,
-                 partnerInitials: partnerInitials,
-                 lastMessage: lastMessage ? `${lastMessage.senderName}: ${lastMessage.text?.substring(0, 30)}...` : `Re: ${listingIdentifier || lead.requirementsSummary}`,
-                 timestamp: lastMessage ? new Date(lastMessage.timestamp) : new Date(lead.registeredAt),
-                 isUnread,
-             } as const;
-        }).filter((c): c is NonNullable<typeof c> => !!c)
-        .sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime());
-        
-    }, [user, users, registeredLeads, listings, chatMessages]);
-
-    const filteredConversations = React.useMemo(() => {
-        let results = conversations;
-
-        if (filter === 'unread') {
-            results = results.filter(c => c.isUnread);
-        }
-
-        if (searchTerm) {
-            const lowerCaseSearch = searchTerm.toLowerCase();
-            return results.filter(conv => 
-                conv.partnerName.toLowerCase().includes(lowerCaseSearch) ||
-                conv.lastMessage.toLowerCase().includes(lowerCaseSearch) ||
-                conv.submission.listing?.listingId.toLowerCase().includes(lowerCaseSearch) ||
-                conv.submission.listing?.warehouseBoxId?.toLowerCase().includes(lowerCaseSearch) ||
-                conv.submission.demandId.toLowerCase().includes(lowerCaseSearch)
-            );
-        }
-        return results;
-    }, [conversations, searchTerm, filter]);
-    
-    const handleSelect = (chat: ChatSubmission) => {
-        clearNewMessages(chat.submissionId);
-        onSelectConversation(chat);
+  const filtered = React.useMemo(() => {
+    let r = conversations;
+    if (filter === 'unread') r = r.filter(c => c.isUnread);
+    if (searchTerm) {
+      const s = searchTerm.toLowerCase();
+      r = r.filter(c => c.partnerName.toLowerCase().includes(s) || c.refLabel.toLowerCase().includes(s) || c.lastMessage.toLowerCase().includes(s));
     }
+    return r;
+  }, [conversations, searchTerm, filter]);
 
-    if(conversations.length === 0) {
-        return <div className="p-8 text-center text-sm text-muted-foreground">No active conversations.</div>
-    }
-
+  if (conversations.length === 0) {
     return (
-        <div className="flex flex-col h-full">
-            <div className="p-4 border-b shrink-0 space-y-3">
-                <h3 className="font-semibold">Conversations</h3>
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                        placeholder="Search conversations..."
-                        className="pl-9"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-            </div>
-             <Tabs value={filter} onValueChange={setFilter} className="w-full shrink-0">
-                <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="unread">
-                        Unread
-                        {unreadChatCount > 0 && <Badge variant="destructive" className="ml-2">{unreadChatCount}</Badge>}
-                    </TabsTrigger>
-                </TabsList>
-            </Tabs>
-            <div className="flex-grow overflow-y-auto">
-                <ScrollArea className="h-full">
-                     <div className="p-2 space-y-1">
-                        {filteredConversations.length > 0 ? filteredConversations.map(conv => (
-                            <button key={conv.id} onClick={() => handleSelect(conv.submission as ChatSubmission)} className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors relative">
-                                <div className="flex items-center gap-3">
-                                    <Avatar>
-                                        <AvatarFallback>{conv.partnerInitials}</AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-grow overflow-hidden">
-                                        <p className="font-semibold truncate">{conv.partnerName}</p>
-                                        <p className="text-xs text-muted-foreground truncate">{conv.lastMessage}</p>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground self-start shrink-0">{conv.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                </div>
-                                {conv.isUnread && <div className="absolute right-3 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-primary" />}
-                            </button>
-                        )) : (
-                            <div className="p-8 text-center text-sm text-muted-foreground">No {filter === 'unread' ? 'unread' : ''} conversations match your search.</div>
-                        )}
-                    </div>
-                </ScrollArea>
-            </div>
+      <div className="flex-1 flex items-center justify-center p-8 text-center">
+        <div>
+          <MessageSquare className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-30" />
+          <p className="text-sm text-muted-foreground">No active conversations yet.</p>
         </div>
-    )
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="px-3 py-2 flex-shrink-0">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input placeholder="Search conversations..." className="pl-8 h-8 text-xs rounded-full bg-secondary border-0" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+        </div>
+      </div>
+      <div className="flex border-b border-border flex-shrink-0">
+        {['all','unread'].map(f => (
+          <button key={f} onClick={() => setFilter(f)}
+            className={'flex-1 py-2 text-xs font-semibold capitalize transition-colors ' + (filter === f ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground')}>
+            {f === 'unread' ? (
+              <span className="flex items-center justify-center gap-1.5">
+                Unread {unreadChatCount > 0 && <span className="bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{unreadChatCount}</span>}
+              </span>
+            ) : 'All'}
+          </button>
+        ))}
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        {filtered.map(conv => (
+          <button key={conv.id} onClick={() => { clearNewMessages(conv.id); onSelectConversation(conv.submission as ChatSubmission); }}
+            className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors border-b border-border/50 relative">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-black text-primary flex-shrink-0">
+              {conv.partnerInitials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <p className={'text-sm font-semibold truncate ' + (conv.isUnread ? 'text-foreground' : 'text-foreground/80')}>{conv.partnerName}</p>
+                <p className="text-xs text-muted-foreground flex-shrink-0 ml-2">{conv.timestamp.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</p>
+              </div>
+              <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.lastMessage}</p>
+              {conv.refLabel && (
+                <span className="inline-block text-xs bg-primary/8 text-primary font-semibold px-2 py-0.5 rounded-full mt-1">{conv.refLabel}</span>
+              )}
+            </div>
+            {conv.isUnread && <div className="absolute right-3 top-3 h-2 w-2 rounded-full bg-primary" />}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-
 export function GlobalChatWidget() {
-    const { user } = useAuth();
-    const { activeChat, setActiveChat, demands, registeredLeads, unreadChatCount } = useData();
-    const [isOpen, setIsOpen] = React.useState(false);
+  const { user } = useAuth();
+  const { activeChat, setActiveChat, registeredLeads, listings, unreadChatCount } = useData();
+  const [isOpen, setIsOpen] = React.useState(false);
 
-    if (!user) return null;
+  if (!user) return null;
 
-    const handleSelectConversation = (chat: ChatSubmission) => {
-        setActiveChat(chat);
-    };
+  const handleSelectConversation = (chat: ChatSubmission) => setActiveChat(chat);
+  const handleBackToList = () => setActiveChat(null);
 
-    const handleBackToList = () => {
-        setActiveChat(null);
-    };
-    
-    if (!isOpen) {
-        return (
-            <div className="fixed bottom-8 right-8 z-50">
-                <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full shadow-lg h-14 pl-5 pr-6 flex items-center gap-3 relative">
-                    <MessageSquare className="h-6 w-6" />
-                    <span className="text-lg font-medium">Chat</span>
-                    {unreadChatCount > 0 && (
-                        <Badge variant="destructive" className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center rounded-full">
-                            {unreadChatCount}
-                        </Badge>
-                    )}
-                </Button>
-            </div>
-        )
-    }
-    
-    let title = "Conversations";
-    let subtitle: React.ReactNode = null;
-    let linkHref = null;
-
-    if (activeChat) {
-        const listing = activeChat.listing;
-        const lead = registeredLeads.find(l => l.id === activeChat.demandId);
-        
-        let headerTitle: string;
-        
-        if (user?.email === activeChat.customerId) {
-            headerTitle = activeChat.chatPartnerName;
-        } else {
-            const customerCompany = activeChat.customerCompany || 'Customer';
-            const isProvider = user?.email === activeChat.providerEmail;
-            if (isProvider) {
-                 headerTitle = lead?.isO2OCollaborator ? `For-${customerCompany}` : customerCompany;
-            } else {
-                 headerTitle = customerCompany;
-            }
-        }
-
-        title = headerTitle;
-
-        const isDeveloper = user?.email === activeChat.providerEmail;
-        const listingIdentifier = isDeveloper ? listing?.warehouseBoxId : listing?.listingId;
-
-        subtitle = (
-            <div className="text-xs text-muted-foreground space-y-1">
-                <p>
-                    <span className="font-semibold">Listing:</span> {listingIdentifier || 'N/A'} | {listing?.location} | {listing?.sizeSqFt.toLocaleString()} sq. ft.
-                </p>
-                 <p>
-                    <span className="font-semibold">Demand:</span> {activeChat.demandId}
-                </p>
-            </div>
-        );
-
-        linkHref = `/dashboard/leads/${activeChat.demandId}`;
-    }
-
-
+  if (!isOpen) {
     return (
-        <div className="fixed bottom-0 right-8 z-50 w-full max-w-sm h-[600px] flex flex-col">
-            <Card className="flex flex-col h-full shadow-2xl border-border">
-                <CardHeader className="flex flex-row items-center justify-between p-4 border-b bg-secondary/50 rounded-t-lg shrink-0">
-                    <div className="flex items-center gap-2 overflow-hidden">
-                        {activeChat && (
-                             <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={handleBackToList}>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Button>
-                        )}
-                        <div className="flex-grow space-y-1 overflow-hidden">
-                            <CardTitle className="text-base flex items-center gap-2 truncate">
-                                {activeChat ? <Users className="h-4 w-4 shrink-0" /> : <MessageSquare className="h-4 w-4 shrink-0" /> }
-                                <span className="truncate">{title}</span>
-                                {linkHref && (
-                                    <Link href={linkHref} target="_blank">
-                                        <ExternalLink className="h-3 w-3 text-muted-foreground hover:text-primary" />
-                                    </Link>
-                                )}
-                            </CardTitle>
-                            {subtitle && <div className="truncate">{subtitle}</div>}
-                        </div>
-                    </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setIsOpen(false)}>
-                        <X className="h-4 w-4" />
-                    </Button>
-                </CardHeader>
-                <CardContent className="p-0 flex-grow relative">
-                    {activeChat ? (
-                        <ChatPanel submission={activeChat} />
-                    ) : (
-                        <ConversationList onSelectConversation={handleSelectConversation} />
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full shadow-xl h-14 px-6 flex items-center gap-2 bg-primary hover:bg-primary/90 relative">
+          <MessageSquare className="h-5 w-5" />
+          <span className="font-semibold">Chat</span>
+          {unreadChatCount > 0 && (
+            <Badge variant="destructive" className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full p-0 text-xs">{unreadChatCount}</Badge>
+          )}
+        </Button>
+      </div>
     );
+  }
+
+  let headerTitle = 'Conversations';
+  let headerSub = '';
+  let refBar: React.ReactNode = null;
+
+  if (activeChat) {
+    const listing = activeChat.listing;
+    const lead = registeredLeads.find(l => l.id === activeChat.demandId);
+    const isProvider = user?.email === activeChat.providerEmail;
+    if (user?.email === activeChat.customerId) {
+      headerTitle = lead?.isO2OCollaborator ? 'O2O Team' : activeChat.chatPartnerName;
+    } else {
+      headerTitle = isProvider && lead?.isO2OCollaborator ? 'For-' + activeChat.customerCompany : activeChat.customerCompany;
+    }
+    const boxId = listing?.warehouseBoxId || listing?.name || '';
+    headerSub = boxId ? boxId + ' · ' + (listing?.location || '') : (listing?.location || '');
+    refBar = (
+      <div className="flex items-center gap-3 px-4 py-2 bg-primary/5 border-b border-border text-xs flex-shrink-0">
+        {listing?.listingId && <span className="text-muted-foreground">ID: <span className="font-bold text-primary">{listing.listingId}</span></span>}
+        {boxId && <span className="text-muted-foreground">Box: <span className="font-bold text-primary">{boxId}</span></span>}
+        {listing?.sizeSqFt && <span className="text-muted-foreground">Size: <span className="font-bold text-primary">{listing.sizeSqFt.toLocaleString()} sq ft</span></span>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed bottom-0 right-6 z-50 w-[360px] flex flex-col" style={{height: 'min(600px, 85vh)'}}>
+      <div className="flex flex-col h-full bg-card rounded-t-2xl shadow-2xl border border-border overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3 bg-primary flex-shrink-0">
+          {activeChat && (
+            <button onClick={handleBackToList} className="h-7 w-7 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0 hover:bg-white/25 transition-colors">
+              <ArrowLeft className="h-3.5 w-3.5 text-white" />
+            </button>
+          )}
+          {activeChat && (
+            <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-black text-white flex-shrink-0">
+              {(activeChat.customerCompany || activeChat.chatPartnerName || 'C').slice(0,2).toUpperCase()}
+            </div>
+          )}
+          {!activeChat && (
+            <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+              <MessageSquare className="h-4 w-4 text-white" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-white truncate">{headerTitle}</p>
+            {headerSub && <p className="text-xs text-white/70 truncate">{headerSub}</p>}
+          </div>
+          <button onClick={() => setIsOpen(false)} className="h-7 w-7 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0 hover:bg-white/25 transition-colors">
+            <X className="h-3.5 w-3.5 text-white" />
+          </button>
+        </div>
+        {refBar}
+        <div className="flex-1 flex flex-col min-h-0">
+          {activeChat ? <ChatPanel submission={activeChat} /> : <ConversationList onSelectConversation={handleSelectConversation} />}
+        </div>
+      </div>
+    </div>
+  );
 }

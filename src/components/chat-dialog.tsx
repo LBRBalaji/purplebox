@@ -12,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, MessageSquare, Paperclip, File as FileIcon, ExternalLink, Smile } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { type Submission } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
