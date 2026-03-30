@@ -21,7 +21,7 @@ type PaymentRequest = {
 
 export function PaymentRequests() {
   const { users } = useAuth();
-  const { listings, listingAnalytics, addNotification } = useData();
+  const { listings, listingAnalytics } = useData();
   const { toast } = useToast();
   const [requests, setRequests] = React.useState<PaymentRequest[]>([]);
   const [loading, setLoading] = React.useState<Record<string, boolean>>({});
@@ -95,16 +95,7 @@ export function PaymentRequests() {
           });
         }
 
-        addNotification({
-          id: Date.now().toString(),
-          type: 'new_lead_for_provider',
-          title: 'Payment Confirmed — Engagement Lead Created',
-          message: 'Your payment for prospect ' + request.prospectCompany + ' has been confirmed. A new engagement lead has been created. Go to My Leads & Proposals to connect.',
-          href: '/dashboard?tab=registered-leads',
-          timestamp: new Date().toISOString(),
-          recipientEmail: request.developerId,
-          triggeredBy: 'admin',
-        });
+
         toast({ title: 'Payment Confirmed', description: 'Engagement lead auto-created for ' + request.prospectCompany });
       } else {
         toast({ title: 'Request Rejected', description: 'Developer will be notified.' });
