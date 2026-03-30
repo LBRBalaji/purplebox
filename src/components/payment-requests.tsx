@@ -61,9 +61,10 @@ export function PaymentRequests() {
           type: 'new_lead_for_provider',
           title: 'Payment Confirmed — Connection Unlocked',
           message: 'Your payment for prospect ' + request.prospectCompany + ' on listing ' + (listing?.name || request.listingId) + ' has been confirmed. You can now connect with this prospect on the platform.',
-          timestamp: Date.now(),
+          href: '/dashboard?tab=prospects',
+          timestamp: new Date().toISOString(),
           recipientEmail: request.developerId,
-          isRead: false,
+          triggeredBy: 'admin',
         });
         toast({ title: 'Payment Confirmed', description: 'Developer notified. Connection unlocked for ' + request.prospectCompany });
       } else {
