@@ -398,7 +398,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     } catch (error) {
         console.error(`Error persisting ${entityName}:`, error);
-        if (!entityName.includes("download history") && !entityName.includes("view history") && !entityName.includes("notifications")) {
+        if (!entityName.includes("download history") && !entityName.includes("view history") && !entityName.includes("notifications") && !entityName.includes("typing status")) {
         toast({
             variant: "destructive",
             title: "Data Sync Error",
