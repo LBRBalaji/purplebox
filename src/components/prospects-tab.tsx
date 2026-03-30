@@ -136,13 +136,10 @@ export function ProspectsTab() {
   };
 
   const formatTime = (ts: number) => {
-    const diff = Date.now() - ts;
-    const hrs = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    if (hrs < 1) return 'Just now';
-    if (hrs < 24) return hrs + ' hour' + (hrs > 1 ? 's' : '') + ' ago';
-    if (days < 7) return days + ' day' + (days > 1 ? 's' : '') + ' ago';
-    return new Date(ts).toLocaleDateString();
+    return new Date(ts).toLocaleString('en-IN', {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
   };
 
   const getInitials = (industry: string) => {
@@ -171,7 +168,7 @@ export function ProspectsTab() {
     return (
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-0">
         <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 text-xs font-black text-primary">
-          {getInitials(prospect.prospectCompany)}
+          {getInitials(prospect.industryType || '')}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-foreground truncate">{prospect.industryType || 'Industry Not Specified'}</p>
