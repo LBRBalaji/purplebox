@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { HelpCircle, LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck } from 'lucide-react';
+import { HelpCircle, LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -284,6 +284,11 @@ export function Header() {
                   <NavLink href="/dashboard"><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
                 )}
                 <ListingsDropdown isSuperAdmin={isSuperAdmin} />
+              {isProvider && (
+                <Link href="/dashboard?tab=my-listings&createNew=true" className="flex items-center gap-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-lg whitespace-nowrap">
+                  <PlusCircle className="h-3.5 w-3.5" /> New Listing
+                </Link>
+              )}
                 <ToolsDropdown />
                 <MoreDropdown />
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
