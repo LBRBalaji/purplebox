@@ -21,7 +21,7 @@ type PaymentRequest = {
 
 export function PaymentRequests() {
   const { users } = useAuth();
-  const { listings, listingAnalytics, addNotification, addRegisteredLead } = useData();
+  const { listings, listingAnalytics, addNotification } = useData();
   const { toast } = useToast();
   const [requests, setRequests] = React.useState<PaymentRequest[]>([]);
   const [loading, setLoading] = React.useState<Record<string, boolean>>({});
@@ -69,7 +69,10 @@ export function PaymentRequests() {
 
         if (customerEmail && listing) {
           const leadId = 'TXN-' + Date.now().toString(36).toUpperCase();
-          addRegisteredLead({
+          const existingRes = await fetch('/api/registered-leads');
+          const existingData = await existingRes.json();
+          const existingLeads = Array.isArray(existingData) ? existingData : Object.values(existingData);
+          const newLead = {
             id: leadId,
             customerId: customerEmail,
             leadName: request.prospectCompany,
@@ -78,12 +81,18 @@ export function PaymentRequests() {
             leadPhone: '',
             requirementsSummary: 'Prospect connected via platform after downloading listing ' + (listing.name || request.listingId),
             registeredBy: 'system',
+            registeredAt: new Date().toISOString(),
             providers: [{
               providerEmail: request.developerId,
               properties: [{ listingId: request.listingId, status: 'Pending' }],
             }],
             isO2OCollaborator: false,
-          }, 'system');
+          };
+          await fetch('/api/registered-leads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify([...existingLeads, newLead]),
+          });
         }
 
         addNotification({
