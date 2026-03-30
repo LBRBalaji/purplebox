@@ -30,6 +30,134 @@ import { Eye, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, 
 
 type ProviderSummary = { [email: string]: { listingCount: number; totalSize: number } };
 
+
+const RejectedListingsTab = ({ listings, onDelete }: { listings: any[], onDelete: (ids: string[]) => Promise<void> }) => {
+  const rejected = listings.filter(l => l.status === 'rejected');
+  const [selected, setSelected] = React.useState<Set<string>>(new Set());
+  const [confirming, setConfirming] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const { toast } = useToast();
+
+  const byDeveloper = React.useMemo(() => {
+    const map: Record<string, any[]> = {};
+    rejected.forEach(l => {
+      if (!map[l.developerId]) map[l.developerId] = [];
+      map[l.developerId].push(l);
+    });
+    return map;
+  }, [rejected]);
+
+  const toggleOne = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selected.size === rejected.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(rejected.map(l => l.listingId)));
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    await onDelete([...selected]);
+    setSelected(new Set());
+    setConfirming(false);
+    setIsDeleting(false);
+  };
+
+  if (rejected.length === 0) {
+    return (
+      <div className="bg-card rounded-2xl border border-border p-12 text-center">
+        <CheckCircle className="h-10 w-10 text-green-500 mx-auto mb-3" />
+        <h3 className="font-bold text-foreground text-lg mb-1">All Clean</h3>
+        <p className="text-muted-foreground text-sm">No rejected listings found.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-card rounded-2xl border border-border p-5 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <input type="checkbox" id="select-all" checked={selected.size === rejected.length && rejected.length > 0} onChange={toggleAll} className="h-4 w-4 accent-primary cursor-pointer" />
+            <label htmlFor="select-all" className="text-sm font-semibold text-foreground cursor-pointer">Select All</label>
+          </div>
+          <span className="text-xs text-muted-foreground">{rejected.length} rejected listings · {selected.size} selected</span>
+        </div>
+        {selected.size > 0 && (
+          <Button variant="destructive" size="sm" className="rounded-xl gap-2" onClick={() => setConfirming(true)}>
+            <XCircle className="h-4 w-4" /> Delete Selected ({selected.size})
+          </Button>
+        )}
+      </div>
+
+      {confirming && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex items-start gap-4">
+          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-bold text-red-800 text-sm mb-1">Permanently delete {selected.size} listing{selected.size > 1 ? 's' : ''}?</p>
+            <p className="text-red-600 text-xs mb-4">This cannot be undone. The listings will be permanently removed from Firestore.</p>
+            <div className="flex gap-3">
+              <Button variant="destructive" size="sm" className="rounded-xl" onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Yes, Delete Permanently'}
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-xl" onClick={() => setConfirming(false)}>Cancel</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {Object.entries(byDeveloper).map(([dev, devListings]) => (
+        <div key={dev} className="bg-card rounded-2xl border border-border overflow-hidden">
+          <div className="px-5 py-3 border-b border-border bg-secondary/30 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <input type="checkbox"
+                checked={devListings.every(l => selected.has(l.listingId))}
+                onChange={() => {
+                  const allSelected = devListings.every(l => selected.has(l.listingId));
+                  setSelected(prev => {
+                    const next = new Set(prev);
+                    devListings.forEach(l => allSelected ? next.delete(l.listingId) : next.add(l.listingId));
+                    return next;
+                  });
+                }}
+                className="h-4 w-4 accent-primary cursor-pointer"
+              />
+              <span className="text-sm font-bold text-foreground">{dev}</span>
+            </div>
+            <Badge variant="outline" className="text-xs">{devListings.length} listings</Badge>
+          </div>
+          <div className="divide-y divide-border">
+            {devListings.map(l => (
+              <div key={l.listingId} className="px-5 py-3 flex items-center gap-4">
+                <input type="checkbox" checked={selected.has(l.listingId)} onChange={() => toggleOne(l.listingId)} className="h-4 w-4 accent-primary cursor-pointer flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-mono font-bold text-primary">{l.listingId}</span>
+                    <span className="text-xs text-muted-foreground">{l.location}</span>
+                    {l.name && <span className="text-xs text-foreground">{l.name}</span>}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{l.sizeSqFt?.toLocaleString()} sq ft</div>
+                </div>
+                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg text-xs" onClick={() => { setSelected(new Set([l.listingId])); setConfirming(true); }}>
+                  Delete
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const KpiCard = ({ label, value, sub, icon: Icon, trend }: { label: string; value: string | number; sub?: string; icon: React.ElementType; trend?: 'up' | 'down' | 'neutral' }) => (
   <div className="bg-card rounded-2xl border border-border p-5 flex items-start gap-4">
     <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -333,10 +461,11 @@ export function AdminListings() {
           <KpiCard label="Conversion Rate" value={kpis.convRate} icon={TrendingUp} trend="up" />
         </div>
         <Tabs defaultValue="listings">
-          <TabsList className="grid w-full grid-cols-3 rounded-xl">
+          <TabsList className="grid w-full grid-cols-4 rounded-xl">
             <TabsTrigger value="listings" className="rounded-lg">All Listings</TabsTrigger>
             <TabsTrigger value="insights" className="rounded-lg">Top Performers</TabsTrigger>
             <TabsTrigger value="providers" className="rounded-lg">Provider Summary</TabsTrigger>
+            <TabsTrigger value="rejected" className="rounded-lg">Rejected Listings</TabsTrigger>
           </TabsList>
           <TabsContent value="listings" className="space-y-5 mt-5">
             <div className="flex items-center gap-3">
@@ -403,6 +532,7 @@ export function AdminListings() {
               </div>
             </div>
           </TabsContent>
+          <TabsContent value="rejected" className="mt-5"><RejectedListingsTab listings={listings} onDelete={async (ids) => { const idSet = new Set(ids); const remaining = listings.filter(l => !idSet.has(l.listingId)); const res = await fetch("/api/listings", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(remaining)}); if(res.ok){ toast({title: "Deleted", description: ids.length + " listings permanently deleted."}); window.location.reload(); } else { toast({variant:"destructive", title:"Error", description:"Delete failed. Please try again."}); } }} />
           <TabsContent value="providers" className="mt-5">
             <ProviderSummaryTable allDevelopers={allDevelopers} providerSummary={providerSummary} />
           </TabsContent>
