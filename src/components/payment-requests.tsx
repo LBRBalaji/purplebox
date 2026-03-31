@@ -118,7 +118,25 @@ export function PaymentRequests() {
             body: JSON.stringify([...existingNotifs, newNotif]),
           });
         } catch(e) { console.error('Notification error:', e); }
-        toast({ title: 'Payment Confirmed', description: 'Developer notified. Engagement lead created for ' + request.prospectCompany });
+        // Send receipt to developer
+        const receiptId = 'RCPT-' + Date.now().toString(36).toUpperCase();
+        const developer = allUsers.find((u: any) => u.email === request.developerId);
+        fetch('/api/send-receipt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            developerEmail: request.developerId,
+            developerName: developer?.userName || request.developerId,
+            developerCompany: developer?.companyName || '',
+            prospectCompany: request.prospectCompany,
+            listingId: request.listingId,
+            listingLocation: listing?.location || '',
+            amount: '₹5,000 + GST',
+            receiptId,
+            confirmedAt: Date.now(),
+          }),
+        }).catch(e => console.error('Receipt email error:', e));
+        toast({ title: 'Payment Confirmed', description: 'Developer notified and receipt sent. Engagement lead created for ' + request.prospectCompany });
       } else {
         toast({ title: 'Request Rejected', description: 'Developer will be notified.' });
       }
