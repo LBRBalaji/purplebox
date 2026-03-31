@@ -71,7 +71,7 @@ export default function PricingPage() {
           </div>
           <div className="flex-1 p-10 flex flex-col relative" style={{background: 'hsl(259 25% 11%)'}}>
             <div className="absolute top-0 right-8 bg-primary text-primary-foreground text-xs font-black tracking-widest uppercase px-4 py-1.5 rounded-b-xl">
-              Recommended
+              For Developers
             </div>
             <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{color: '#9b7ee0'}}>Pay For Purpose</div>
             <div className="text-3xl font-black mb-2 transition-all duration-300" style={{color: '#ffffff'}}>{TIERS[currentTier].name}</div>
