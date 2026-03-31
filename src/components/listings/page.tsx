@@ -159,8 +159,8 @@ function DownloadBar() {
         } else {
              toast({
                 variant: 'destructive',
-                title: 'Daily Download Limit Reached',
-                description: `You have already downloaded twice today. Please try again tomorrow.`
+                title: 'Download Limit Reached',
+                description: `You've reached your daily download limit. Your access refreshes tomorrow. Explore our Premium plans for higher limits.`
             });
         }
     }

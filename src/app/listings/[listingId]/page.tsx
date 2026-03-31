@@ -404,9 +404,7 @@ export default function ListingDetailPage() {
         if (limitReached) {
              toast({
                 variant: 'destructive',
-                title: "Download Limit Reached",
-                description: `You have reached your daily download limit.`,
-            });
+                title: "Download Limit Reached", description: "You've reached your daily download limit. Your access refreshes tomorrow. Upgrade to Premium for higher limits."});
         }
     };
 
