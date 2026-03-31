@@ -112,3 +112,16 @@ To read it in a new chat: "Please read the transcript at /mnt/transcripts/2026-0
 - getEmailDomain() identifies company by email domain (@flipkart.com etc)
 - balajispillai@gmail.com gets own domain 'balaji-test' (exempt from company limits)
 - toggleSelectedForDownload already limits selection to 5 listings max
+
+## Session 3 Updates (31 Mar 2026)
+- Session security: one device at a time for Customer/Developer/Agent (SuperAdmin exempt)
+- SessionWatcher component in dashboard/layout.tsx - uses onSnapshot on sessions/{email}
+- On new login from another device: 10 second countdown dialog then auto-logout
+- sessionToken stored in sessionStorage and Firestore sessions collection
+- Sessions API: src/app/api/sessions/route.ts (POST to create, DELETE to clear)
+- Download limits fully rebuilt: 5/day individual, 5/city company, 3 cities max
+- Premium users: 15/day, 5/city, 10 cities max
+- Soft warning toast when 1 download remaining
+- LimitExceededDialog upgraded with Premium CTA and pricing link
+- Old hardcoded limit messages updated across listings pages
+- getEmailDomain() identifies company by domain, balajispillai@gmail.com gets own domain
