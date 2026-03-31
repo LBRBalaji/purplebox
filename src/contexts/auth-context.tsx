@@ -22,6 +22,7 @@ export type User = {
 export type NewUser = User & {
   password: string;
   industryType?: string;
+  emailNotifications?: boolean;
 };
 
 type AuthContextType = {

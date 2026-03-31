@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Save, Settings, Trash2, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { PlusCircle, Save, Settings, Trash2, KeyRound, Eye, EyeOff, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
@@ -30,7 +30,26 @@ export default function PlatformSettingsPage() {
   const [showCurrent, setShowCurrent] = React.useState(false);
   const [showNew, setShowNew] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState(false);
+  const [emailNotif, setEmailNotif] = React.useState(user?.emailNotifications ?? true);
+  const [savingNotif, setSavingNotif] = React.useState(false);
   const hasAccess = user?.role === 'SuperAdmin';
+
+  const handleSaveNotifPreference = async (val: boolean) => {
+    setSavingNotif(true);
+    setEmailNotif(val);
+    try {
+      const allUsers = Object.values({});
+      await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...user, emailNotifications: val }),
+      });
+      toast({ title: val ? 'Email notifications enabled' : 'Email notifications disabled', description: val ? 'You will receive important alerts by email.' : 'You will only see alerts in the app.' });
+    } catch {
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not save preference.' });
+    }
+    setSavingNotif(false);
+  };
 
   React.useEffect(() => { if (!isLoading && !user) router.push('/dashboard'); }, [user, isLoading, router]);
 

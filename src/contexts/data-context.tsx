@@ -436,9 +436,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const persistShareHistory = useCallback((updatedHistory: ShareHistoryEntry[]) => persistData('share-history', updatedHistory, 'share history'), [persistData]);
 
 
+  const sendEmailNotification = async (recipientEmail: string, title: string, message: string, href: string) => {
+    try {
+      const allUsers = Object.values(users || {}) as any[];
+      const recipient = allUsers.find((u: any) => u.email === recipientEmail);
+      if (!recipient || recipient.emailNotifications === false) return;
+      await fetch('/api/send-notification-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: recipientEmail, userName: recipient.userName, title, message, href }),
+      });
+    } catch(e) { console.error('Email notification error:', e); }
+  };
+
   const addNotification = useCallback((notification: Omit<Notification, 'isRead'>) => {
     setNotifications(prev => {
         const newNotification = { ...notification, isRead: false };
+        if (notification.recipientEmail) {
+          sendEmailNotification(notification.recipientEmail, notification.title, notification.message || '', notification.href || '/dashboard');
+        }
         const updatedNotifications = [newNotification, ...prev];
         persistNotifications(updatedNotifications);
         return updatedNotifications;
