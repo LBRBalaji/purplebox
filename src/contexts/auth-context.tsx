@@ -73,6 +73,7 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
       } else {
         setUser(null);
         sessionStorage.removeItem('user');
+    sessionStorage.removeItem('sessionToken');
       }
       setIsLoading(false);
     });
@@ -96,6 +97,19 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
         }
         setUser(userData);
         sessionStorage.setItem('user', JSON.stringify(userData));
+
+        // Session security — skip for SuperAdmin/O2O
+        if (userData.role !== 'SuperAdmin' && userData.role !== 'O2O') {
+          const sessionToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+          sessionStorage.setItem('sessionToken', sessionToken);
+          const deviceInfo = navigator.userAgent.substring(0, 100);
+          fetch('/api/sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userData.email, sessionToken, deviceInfo }),
+          }).catch(() => {});
+        }
+
         if (onLoginSuccess) {
           onLoginSuccess();
         } else {
