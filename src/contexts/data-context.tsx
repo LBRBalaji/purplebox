@@ -243,6 +243,7 @@ type DataContextType = {
   setActiveChat: (chat: ChatSubmission | null) => void;
   reassignAnonymousViews: (anonymousId: string, user: User) => void;
   notifications: Notification[];
+  setNotificationsFromWatcher: (notifs: Notification[]) => void;
   unreadCount: number;
   unreadChatCount: number;
   markNotificationsAsRead: () => void;

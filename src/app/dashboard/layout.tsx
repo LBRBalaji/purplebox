@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useRouter, usePathname } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SessionWatcher } from '@/components/session-watcher';
+import { NotificationWatcher } from '@/components/notification-watcher';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -81,6 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <>
       <SessionWatcher />
+      <NotificationWatcher />
       <React.Suspense fallback={
           <div className="container mx-auto p-4 md:p-8">
             <div className="max-w-6xl mx-auto space-y-8">
