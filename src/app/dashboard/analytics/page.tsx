@@ -75,8 +75,8 @@ export default function AnalyticsHubPage() {
   const totalLeads = registeredLeads.length;
   const totalDemands = demands.length;
   const totalUsers = allUsers.length;
-  const customers = allUsers.filter((u: any) => u.role === 'User').length;
-  const developers = allUsers.filter((u: any) => u.role === 'Warehouse Developer').length;
+  const customers = (allUsers || []).filter((u: any) => u.role === 'User').length;
+  const developers = (allUsers || []).filter((u: any) => u.role === 'Warehouse Developer').length;
 
   // ── Conversion Funnel ──
   const funnel = [
@@ -253,7 +253,7 @@ export default function AnalyticsHubPage() {
           <TabsContent value="prospects" className="space-y-6 mt-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <KPI label="Total Downloads" value={totalDownloads} icon={Download} />
-              <KPI label="Unique Prospects" value={new Set(downloadHistory.map(d=>d.userId)).size} icon={Users} />
+              <KPI label="Unique Prospects" value={new Set((downloadHistory || []).map(d=>d.userId)).size} icon={Users} />
               <KPI label="Leads Created" value={totalLeads} icon={TrendingUp} />
               <KPI label="Active Demands" value={totalDemands} icon={FileText} />
             </div>
@@ -291,7 +291,7 @@ export default function AnalyticsHubPage() {
               <KPI label="Total Users" value={totalUsers} icon={Users} />
               <KPI label="Customers" value={customers} icon={Users} />
               <KPI label="Developers" value={developers} icon={Building2} />
-              <KPI label="Agents" value={allUsers.filter((u:any)=>u.role==='Agent').length} icon={Crown} />
+              <KPI label="Agents" value={(allUsers || []).filter((u:any)=>u.role==='Agent').length} icon={Crown} />
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-card rounded-2xl border border-border p-5">
@@ -312,8 +312,8 @@ export default function AnalyticsHubPage() {
                     <Pie data={[
                       { name: 'Customers', value: customers },
                       { name: 'Developers', value: developers },
-                      { name: 'Agents', value: allUsers.filter((u:any)=>u.role==='Agent').length },
-                      { name: 'O2O Team', value: allUsers.filter((u:any)=>u.role==='O2O'||u.role==='SuperAdmin').length },
+                      { name: 'Agents', value: (allUsers || []).filter((u:any)=>u.role==='Agent').length },
+                      { name: 'O2O Team', value: (allUsers || []).filter((u:any)=>u.role==='O2O'||u.role==='SuperAdmin').length },
                     ]} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={({name, percent}) => name + ' ' + (percent*100).toFixed(0)+'%'} labelLine={false} fontSize={10}>
                       {COLORS.map((c, i) => <Cell key={i} fill={c} />)}
                     </Pie>
@@ -325,7 +325,7 @@ export default function AnalyticsHubPage() {
             <div className="bg-card rounded-2xl border border-border p-5">
               <SectionTitle>Recent User Registrations</SectionTitle>
               <div className="space-y-2">
-                {[...allUsers].sort((a:any,b:any) => new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime()).slice(0,8).map((u:any) => (
+                {[...(allUsers || [])].sort((a:any,b:any) => new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime()).slice(0,8).map((u:any) => (
                   <div key={u.email} className="flex items-center gap-3 p-2 rounded-xl hover:bg-secondary/50">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-black text-primary flex-shrink-0">
                       {u.userName?.slice(0,2).toUpperCase()}
@@ -348,14 +348,14 @@ export default function AnalyticsHubPage() {
           <TabsContent value="community" className="space-y-6 mt-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <KPI label="Total Posts" value={communityPosts.length} icon={MessageSquare} />
-              <KPI label="Total Comments" value={communityPosts.reduce((s,p:any)=>s+(p.comments?.length||0),0)} icon={MessageSquare} />
-              <KPI label="Total Likes" value={communityPosts.reduce((s,p:any)=>s+(p.likes||0),0)} icon={TrendingUp} />
-              <KPI label="Active Authors" value={new Set(communityPosts.map((p:any)=>p.authorId)).size} icon={Users} />
+              <KPI label="Total Comments" value={(communityPosts || []).reduce((s,p:any)=>s+(p.comments?.length||0),0)} icon={MessageSquare} />
+              <KPI label="Total Likes" value={(communityPosts || []).reduce((s,p:any)=>s+(p.likes||0),0)} icon={TrendingUp} />
+              <KPI label="Active Authors" value={new Set((communityPosts || []).map((p:any)=>p.authorId)).size} icon={Users} />
             </div>
             <div className="bg-card rounded-2xl border border-border p-5">
               <SectionTitle>Recent Posts</SectionTitle>
               <div className="space-y-3">
-                {[...communityPosts].sort((a:any,b:any)=>new Date(b.createdAt||0).getTime()-new Date(a.createdAt||0).getTime()).slice(0,5).map((p:any) => (
+                {[...(communityPosts || [])].sort((a:any,b:any)=>new Date(b.createdAt||0).getTime()-new Date(a.createdAt||0).getTime()).slice(0,5).map((p:any) => (
                   <div key={p.id} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/30">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-foreground truncate">{p.title || p.content?.substring(0,50)}</p>
