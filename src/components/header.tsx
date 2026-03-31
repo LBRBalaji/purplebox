@@ -83,13 +83,10 @@ const AnalyticsDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild><DropTrigger isActive={isActive}><BarChart className="h-3.5 w-3.5" /> Analytics <ChevronDown className="h-3 w-3" /></DropTrigger></DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-52">
-        <DropdownMenuItem asChild><Link href="/dashboard/analytics/listings-performance">Listing Performance</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link href="/dashboard/analytics/customer">Customer Engagement</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link href="/dashboard/analytics/traffic">Platform Traffic</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link href="/dashboard/analytics/community">Community Analytics</Link></DropdownMenuItem>
+      <DropdownMenuContent align="start" className="rounded-xl border-border w-56">
+        <DropdownMenuItem asChild><Link href="/dashboard/analytics"><BarChart className="mr-2 h-4 w-4" /> Analytics Hub</Link></DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild><Link href="/dashboard/analytics/predictive"><Sparkles className="mr-2 h-4 w-4" /> Predictive Analytics</Link></DropdownMenuItem>
+        <DropdownMenuItem asChild><Link href="/dashboard/analytics/predictive"><Sparkles className="mr-2 h-4 w-4" /> AI Predictive Analytics</Link></DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
