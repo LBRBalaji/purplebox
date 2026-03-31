@@ -104,3 +104,11 @@ To read it in a new chat: "Please read the transcript at /mnt/transcripts/2026-0
 - User list: Status column added (Pending/Active/Rejected) with Approve/Reject buttons
 - Auto-approval email via Resend when SuperAdmin approves user
 - Auth login: signOut called before showing pending/rejected toast
+
+## Session 2 Additional Updates (31 Mar 2026)
+- Download limits: Individual 5/day (Premium 15), Company 5/city/day, max 3 cities/day (Premium 10)
+- Soft warning toast when 1 download remaining
+- Limit messages are gentle - suggest upgrade not threats
+- getEmailDomain() identifies company by email domain (@flipkart.com etc)
+- balajispillai@gmail.com gets own domain 'balaji-test' (exempt from company limits)
+- toggleSelectedForDownload already limits selection to 5 listings max
