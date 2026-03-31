@@ -234,6 +234,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                         </TableHeader>
                         <TableBody>
                             {myLeads.map(lead => {
+                                const leadKey = lead.id;
                                 const providerInfoForCurrentUser = lead.providers.find(p => p.providerEmail === user?.email);
                                 const hasPending = isProvider && providerInfoForCurrentUser?.properties.some(p => p.status === 'Pending');
                                 // Acknowledge button should only show for brokered deals that have pending items.
@@ -258,7 +259,8 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
 
 
                                 return (
-                                    <TableRow key={lead.id}>
+                                    <React.Fragment key={lead.id}>
+                                    <TableRow>
                                         <TableCell className="font-medium">{lead.isO2OCollaborator && isProvider ? lead.id : lead.leadName}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col gap-1">
@@ -363,6 +365,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                         </TableCell>
                                       </TableRow>
                                     )}
+                                    </React.Fragment>
                                 );
                             })}
                         </TableBody>
