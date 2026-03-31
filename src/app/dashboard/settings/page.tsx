@@ -38,7 +38,6 @@ export default function PlatformSettingsPage() {
     setSavingNotif(true);
     setEmailNotif(val);
     try {
-      const allUsers = Object.values({});
       await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,8 +54,8 @@ export default function PlatformSettingsPage() {
 
   React.useEffect(() => {
     if (!hasAccess) return;
-    fetch('/api/location-circles').then(r => r.json()).then(setCircles).catch(() => toast({ variant: 'destructive', title: 'Error', description: 'Could not load location circles.' }));
-  }, [toast, hasAccess]);
+    fetch('/api/location-circles').then(r => r.json()).then(setCircles).catch(() => {});
+  }, [hasAccess]);
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) { toast({ variant: 'destructive', title: 'Missing Fields', description: 'Please fill in all password fields.' }); return; }
@@ -131,6 +130,28 @@ export default function PlatformSettingsPage() {
             <Button onClick={handleChangePassword} disabled={isChangingPassword}><KeyRound className="mr-2 h-4 w-4" />{isChangingPassword ? 'Updating...' : 'Update Password'}</Button>
           </CardFooter>
         </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Bell className="h-5 w-5 text-primary" /> Notification Preferences</CardTitle>
+            <CardDescription>Choose how you want to receive important alerts from ORS-ONE.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/20">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Email Notifications</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Receive important platform alerts to your registered email address</p>
+              </div>
+              <button
+                onClick={() => handleSaveNotifPreference(!emailNotif)}
+                disabled={savingNotif}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${emailNotif ? 'bg-primary' : 'bg-muted'}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${emailNotif ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3">You will be notified by email for: payment confirmations, new leads, account updates, and other time-sensitive alerts.</p>
+          </CardContent>
+        </Card>
+
         {hasAccess && (
           <Card>
             <CardHeader>
