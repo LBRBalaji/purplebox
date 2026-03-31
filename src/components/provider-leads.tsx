@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { AcknowledgeLeadDialog } from './acknowledge-lead-dialog';
+import { DeveloperEngagePath } from './developer-engage-path';
 import { type AcknowledgmentDetails } from '@/lib/schema';
 import { useRouter } from 'next/navigation';
 import {
@@ -99,6 +100,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
   const { toast } = useToast();
 
   const [leadToAcknowledge, setLeadToAcknowledge] = React.useState<RegisteredLead | null>(null);
+  const [expandedLeadId, setExpandedLeadId] = React.useState<string | null>(null);
   const [isAcknowledgeDialogOpen, setIsAcknowledgeDialogOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<any>({});
   
@@ -344,9 +346,23 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                                     {isAlreadyRegisteredWithProvider ? 'Provider Assigned' : 'Assign to Provider'}
                                                 </Button>
                                             )}
+                                            {isProvider && !lead.isO2OCollaborator && (
+                                                <Button size="sm" variant={lead.developerEngagePath ? 'outline' : 'default'}
+                                                  className={lead.developerEngagePath ? 'border-green-200 text-green-700 bg-green-50' : ''}
+                                                  onClick={() => setExpandedLeadId(expandedLeadId === lead.id ? null : lead.id)}>
+                                                  {lead.developerEngagePath ? '✓ Path Chosen' : 'Choose Engage Path'}
+                                                </Button>
+                                            )}
                                             </div>
                                         </TableCell>
                                     </TableRow>
+                                    {isProvider && !lead.isO2OCollaborator && expandedLeadId === lead.id && (
+                                      <TableRow>
+                                        <TableCell colSpan={5} className="bg-secondary/20 p-5">
+                                          <DeveloperEngagePath leadId={lead.id} currentPath={lead.developerEngagePath} />
+                                        </TableCell>
+                                      </TableRow>
+                                    )}
                                 );
                             })}
                         </TableBody>

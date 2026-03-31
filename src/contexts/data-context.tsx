@@ -127,6 +127,7 @@ export type RegisteredLead = {
   providers: RegisteredLeadProvider[];
   isO2OCollaborator?: boolean;
   engagePath?: 'direct' | 'orsone' | 'agent' | null;
+  developerEngagePath?: 'independent' | 'orsone-partner' | null;
   agentInviteCode?: string;
   agentInviteEmail?: string;
   agentInviteExpiry?: number;
