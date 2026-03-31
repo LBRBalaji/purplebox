@@ -125,3 +125,23 @@ To read it in a new chat: "Please read the transcript at /mnt/transcripts/2026-0
 - LimitExceededDialog upgraded with Premium CTA and pricing link
 - Old hardcoded limit messages updated across listings pages
 - getEmailDomain() identifies company by domain, balajispillai@gmail.com gets own domain
+
+## Session 4 Updates (31 Mar 2026)
+- Auto-lead creation on download re-enabled (grouped by provider, one lead per provider)
+- RegisteredLead type: added engagePath, agentInviteCode, agentInviteEmail, agentInviteExpiry, messageGated fields
+- Developer message gate: messages blurred with Pay to Read overlay when lead.messageGated=true
+- Chat disabled for developer until payment (lock banner + disabled input)
+- EngagePathSelector component: customer chooses Direct/ORS-ONE/Own Agent per transaction
+- ORS-ONE path notifies balaji@lakshmibalajio2o.com via notifications API
+- Agent invite flow: generates AGT-XXXXXX code (3 day validity), sends email via Resend
+- Agent signup page: invite code field added (optional, validates AGT- prefix)
+- AgentLead type: inviteCode field added
+- CustomerTransactions: click to expand row shows EngagePathSelector
+- Session security: SessionWatcher component in dashboard layout
+- Sessions API: src/app/api/sessions/route.ts
+- sessionToken generated on login, stored in sessionStorage + Firestore sessions collection
+- SuperAdmin/O2O exempt from session security
+- Send agent invite API: src/app/api/send-agent-invite/route.ts
+- Send approval email API: src/app/api/send-approval-email/route.ts
+- Download limits: 5/day individual, 5/city company, 3 cities max (Premium: 15/10)
+- LimitExceededDialog: upgraded with Premium CTA and pricing link
