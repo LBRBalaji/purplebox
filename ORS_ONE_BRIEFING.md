@@ -145,3 +145,66 @@ To read it in a new chat: "Please read the transcript at /mnt/transcripts/2026-0
 - Send approval email API: src/app/api/send-approval-email/route.ts
 - Download limits: 5/day individual, 5/city company, 3 cities max (Premium: 15/10)
 - LimitExceededDialog: upgraded with Premium CTA and pricing link
+
+## Session 5 Updates (31 Mar 2026)
+- Pricing page: auto-shuffling tiers Solo/Team/Full Connect (INR 5000/10000/17500)
+- Customer signup: email OTP verification mandatory, personal emails blocked
+- Login: pending/rejected accounts blocked from dashboard access
+- SuperAdmin user list: Approve/Reject buttons, Status column, Set Admin button
+- Auto-approval email via Resend on SuperAdmin approval
+- Download limits: 5/day individual, 5/city company, 3 cities max (Premium: 15/10)
+- LimitExceededDialog with Premium upgrade CTA linking to pricing
+- Session security: SessionWatcher component, one device at a time, 10s countdown
+- Auto-lead creation on download re-enabled (grouped by provider)
+- Developer message gate: messages blurred with Pay to Read overlay
+- Customer EngagePathSelector: Direct/ORS-ONE/Own Agent with SuperAdmin notification
+- Agent invite flow: AGT-XXXXXX code, 3 day validity, Resend email
+- Agent signup: invite code field added
+- Developer Stage 2&3 path: Independent vs ORS-ONE Partner with T&C checkbox
+- 3 free transactions for developers before upgrade prompt
+- Separate T&C pages: /terms-and-conditions/customer, /developer, /agent
+- Footer updated with role-specific T&C links
+- Email notification preference toggle in Settings for ALL users
+- Auto-email via send-notification-email API for time-sensitive notifications
+- Company Admin system: Customer + Developer team dashboards
+- SuperAdmin can designate Company Admin (Paid users only, Crown button)
+- Developer notified when customer sends message (correct recipient logic)
+- Payment receipt email via Resend on payment confirmation
+- In-app receipt view: SuperAdmin Payment Requests + Developer Prospects tab
+- Google Analytics configured: G-TSH8PC6VLH in .env and Vercel
+- Firebase Analytics initialized in src/lib/firebase.ts
+- Unified Analytics Hub: 6 tabs (Overview/Listings/Prospects/Users/Community/AI)
+- Predictive Analytics restored from git history (Gemini AI flow working)
+- Analytics header: Analytics Hub as primary, AI Predictive as secondary
+- Real-time NotificationWatcher: crash-protected, max 3 retries, isolated component
+- Platform feature access disclaimer added to T&C, receipt email, payment prompt, engage path
+- EOI letter drafts created: Developer EOI and Customer EOI (Word template style)
+- Data Governance: merge tool status preserved, caution warnings added
+- Rejected Listings tab in SuperAdmin dashboard
+
+## Pending (carry forward)
+- End-to-end testing (multi-browser, multi-user)
+- Predictive Analytics: Analysis Failed error (check Vercel GEMINI_API_KEY env var)
+- Google Analytics Data API integration into Analytics Hub
+- DPDP Compliance: Privacy Policy page
+- EOI in-app flow (deferred - using letter draft for now)
+- Agent full onboarding flow (waitlist to active)
+- Firestore reads optimization (813k reads, delete-all-rewrite pattern)
+- Real-time updates for prospects/leads (safe onSnapshot needed)
+
+## Key Files Added Today
+- src/components/session-watcher.tsx
+- src/components/notification-watcher.tsx
+- src/components/engage-path-selector.tsx
+- src/components/developer-engage-path.tsx
+- src/components/company-admin-dashboard.tsx
+- src/components/developer-team-dashboard.tsx
+- src/app/api/send-approval-email/route.ts
+- src/app/api/send-notification-email/route.ts
+- src/app/api/send-receipt/route.ts
+- src/app/api/send-agent-invite/route.ts
+- src/app/api/sessions/route.ts
+- src/app/api/eoi/route.ts
+- src/app/terms-and-conditions/customer/page.tsx
+- src/app/terms-and-conditions/developer/page.tsx
+- src/app/terms-and-conditions/agent/page.tsx
