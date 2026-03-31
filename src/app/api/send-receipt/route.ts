@@ -51,6 +51,9 @@ export async function POST(req: NextRequest) {
                 <td style="padding:16px 0 8px;font-size:20px;font-weight:900;color:#6141ac;text-align:right;">${amount}</td>
               </tr>
             </table>
+            <div style="background:#f4f6f9;border-radius:8px;padding:14px;font-size:12px;color:#555;margin-bottom:12px;">
+              <strong style="color:#6141ac;">Please note:</strong> This payment is specifically for the stated Pay For Purpose service. Access to other platform features — including the Negotiation Board, Tenant Improvement tools, Chat and others — is provided as part of your experience on ORS-ONE and is not included as a right in this payment. ORS-ONE reserves the right to modify access to any feature at its sole discretion.
+            </div>
             <div style="background:#f4f6f9;border-radius:8px;padding:14px;font-size:12px;color:#888;text-align:center;">
               This is a computer-generated receipt. For queries, contact balaji@lakshmibalajio2o.com
             </div>

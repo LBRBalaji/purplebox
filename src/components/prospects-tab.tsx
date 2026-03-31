@@ -127,7 +127,7 @@ export function ProspectsTab() {
         }),
       });
       setConnections(prev => ({ ...prev, [key]: 'requested' }));
-      toast({ title: 'Request Sent!', description: 'ORS-ONE team will confirm your payment and unlock the connection.' });
+      toast({ title: 'Request Sent!', description: 'This payment is for connecting with this specific prospect only. ORS-ONE team will confirm receipt and unlock the connection.' });
     } catch {
       toast({ variant: 'destructive', title: 'Error', description: 'Please try again.' });
     } finally {
@@ -203,7 +203,7 @@ export function ProspectsTab() {
           <Button size="sm" className="rounded-lg text-xs font-bold flex-shrink-0 bg-primary hover:bg-primary/90"
             onClick={() => handleRequestConnect(prospect)}
             disabled={isLoading}>
-            {isLoading ? 'Requesting...' : 'Pay ₹5,000 to Connect'}
+            {isLoading ? 'Requesting...' : 'Pay ₹5,000 — Connect with Prospect'}
           </Button>
         )}
       </div>

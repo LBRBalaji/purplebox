@@ -135,6 +135,9 @@ export function DeveloperEngagePath({ leadId, currentPath }: Props) {
       <div>
         <p className="text-sm font-bold text-foreground mb-1">Stage 2 & 3 — Choose Your Engagement Path</p>
         <p className="text-xs text-muted-foreground">You have successfully connected with this prospect. Now choose how you would like to proceed with the Engage and Transact stages.</p>
+        <div className="mt-3 bg-secondary/40 rounded-xl px-4 py-3 text-xs text-muted-foreground border border-border">
+          <span className="font-semibold text-foreground">Please note:</span> Your payment was for connecting with this specific prospect. Access to platform tools such as the Negotiation Board, Tenant Improvement Sheet and Chat is provided as part of your experience on ORS-ONE. ORS-ONE reserves the right to modify access to any feature at its sole discretion.
+        </div>
         {!currentPath && remaining <= 3 && (
           <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs text-amber-700">
             You have <strong>{remaining} free transaction{remaining !== 1 ? 's' : ''}</strong> remaining. Experience ORS-ONE's full capability — upgrade when you're ready.
