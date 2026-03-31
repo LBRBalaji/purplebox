@@ -12,10 +12,12 @@ import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus, Submission } from '@/contexts/data-context';
 import Link from 'next/link';
 import type { ListingSchema } from '@/lib/schema';
+import { EngagePathSelector } from './engage-path-selector';
 
 export function CustomerTransactions() {
   const { user, users } = useAuth();
   const { registeredLeads } = useData();
+  const [expandedLead, setExpandedLead] = React.useState<string | null>(null);
 
   const myTransactions = React.useMemo(() => {
     if (!user) return [];
@@ -54,7 +56,8 @@ export function CustomerTransactions() {
                 <TableBody>
                 {myTransactions.map(lead => {
                     return (
-                    <TableRow key={lead.id}>
+                    <React.Fragment key={lead.id}>
+                    <TableRow className="cursor-pointer hover:bg-secondary/30" onClick={() => setExpandedLead(expandedLead === lead.id ? null : lead.id)}>
                         <TableCell className="font-mono text-primary">{lead.id}</TableCell>
                         <TableCell className="max-w-xs truncate">{lead.requirementsSummary}</TableCell>
                         <TableCell>
@@ -80,6 +83,14 @@ export function CustomerTransactions() {
                             </div>
                         </TableCell>
                     </TableRow>
+                    {expandedLead === lead.id && (
+                      <TableRow>
+                        <TableCell colSpan={4} className="bg-secondary/20 p-5">
+                          <EngagePathSelector leadId={lead.id} currentPath={lead.engagePath} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    </React.Fragment>
                     );
                 })}
                 </TableBody>

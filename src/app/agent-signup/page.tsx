@@ -27,6 +27,8 @@ export default function AgentSignupPage() {
   const { addAgentLead } = useData();
   const { toast } = useToast();
   const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [inviteCode, setInviteCode] = React.useState('');
+  const [inviteError, setInviteError] = React.useState('');
   const [formData, setFormData] = React.useState<Omit<AgentLead, 'id' | 'status'>>({
     agentType: 'Individual',
     name: '',
@@ -45,12 +47,21 @@ export default function AgentSignupPage() {
     setFormData({ ...formData, agentType: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addAgentLead(formData);
+    setInviteError('');
+    if (inviteCode) {
+      if (!inviteCode.startsWith('AGT-') || inviteCode.length < 8) {
+        setInviteError('Invalid invite code format. Please check and try again.');
+        return;
+      }
+      addAgentLead({ ...formData, inviteCode });
+    } else {
+      addAgentLead(formData);
+    }
     toast({
         title: "Registration Received!",
-        description: "Thank you for your interest. We will review your details and be in touch.",
+        description: "Thank you for your interest. We will review your details and be in touch shortly.",
     });
     setIsSubmitted(true);
   };
@@ -162,6 +173,11 @@ export default function AgentSignupPage() {
              <div className="space-y-2">
               <Label htmlFor="address">Office Address</Label>
               <Textarea id="address" placeholder="123 Main St, Anytown, USA" required onChange={handleChange} value={formData.address} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="inviteCode">Invite Code <span className="text-xs text-muted-foreground">(optional — if invited by a client)</span></Label>
+              <Input id="inviteCode" placeholder="AGT-XXXXXX" value={inviteCode} onChange={e => setInviteCode(e.target.value.toUpperCase())} maxLength={10} />
+              {inviteError && <p className="text-xs text-destructive">{inviteError}</p>}
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
