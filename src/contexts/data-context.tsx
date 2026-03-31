@@ -797,6 +797,38 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistSubmissions]);
   
+  const getEmailDomain = (email: string) => {
+    if (email === 'balajispillai@gmail.com') return 'balaji-test';
+    return email.split('@')[1]?.toLowerCase() || email;
+  };
+
+  const getDownloadLimits = useCallback((user: User, listingsToDownload: ListingSchema[]) => {
+    const todayStart = startOfDay(new Date()).getTime();
+    const domain = getEmailDomain(user.email);
+    const isPremium = user.plan === 'Paid_Premium';
+    const INDIVIDUAL_LIMIT = isPremium ? 15 : 5;
+    const CITY_LIMIT = isPremium ? 15 : 5;
+    const MAX_CITIES = isPremium ? 10 : 3;
+    const individualToday = downloadHistory.filter(d => d.userId === user.email && d.timestamp >= todayStart).length;
+    if (individualToday >= INDIVIDUAL_LIMIT) {
+      return { allowed: false, message: `You've reached your daily limit of ${INDIVIDUAL_LIMIT} downloads. Your access refreshes tomorrow.${!isPremium ? ' Upgrade to Premium for higher limits.' : ''}` };
+    }
+    const companyTodayDownloads = downloadHistory.filter(d => getEmailDomain(d.userId) === domain && d.timestamp >= todayStart);
+    const citiesDownloadedToday = [...new Set(companyTodayDownloads.map(d => d.location?.toLowerCase().trim()))].filter(Boolean);
+    const newCities = [...new Set(listingsToDownload.map(l => l.location?.toLowerCase().trim()))].filter(Boolean);
+    for (const city of newCities) {
+      const cityDownloads = companyTodayDownloads.filter(d => d.location?.toLowerCase().trim() === city).length;
+      if (cityDownloads >= CITY_LIMIT) {
+        return { allowed: false, message: `Your team has reached the daily download limit for ${city}. Explore listings in other locations or upgrade your plan.` };
+      }
+    }
+    const allCitiesToday = new Set([...citiesDownloadedToday, ...newCities]);
+    if (allCitiesToday.size > MAX_CITIES) {
+      return { allowed: false, message: `Your team has reached the maximum of ${MAX_CITIES} cities per day. Upgrade to Premium to access more locations.` };
+    }
+    return { allowed: true, message: '' };
+  }, [downloadHistory]);
+
   const getCompanyDownloadCounts = useCallback((companyName: string): { daily: number; weekly: number } => {
     const now = new Date();
     const todayStart = startOfDay(now).getTime();
@@ -827,19 +859,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [persistDownloadAcknowledgments]);
 
   const logDownload = useCallback((user: User, listingsToDownload: ListingSchema[]): { success: boolean; limitReached: boolean; message: string } => {
-    const { daily, weekly } = getCompanyDownloadCounts(user.companyName);
-
-    if (user.plan !== 'Paid_Premium') {
-        if (daily >= 2) {
-            const message = "Your company has reached its daily download limit of 2. Premium users have unlimited downloads.";
-            toast({ variant: "destructive", title: "Daily Limit Reached", description: message });
-            return { success: false, limitReached: true, message };
-        }
-        if (weekly >= 4) {
-            const message = "Your company has reached its weekly download limit of 4. Premium users have unlimited downloads.";
-            toast({ variant: "destructive", title: "Weekly Limit Reached", description: message });
-            return { success: false, limitReached: true, message };
-        }
+    const limitCheck = getDownloadLimits(user, listingsToDownload);
+    if (!limitCheck.allowed) {
+        toast({ variant: "destructive", title: "Download Limit Reached", description: limitCheck.message });
+        return { success: false, limitReached: true, message: limitCheck.message };
+    }
+    const todayStart = startOfDay(new Date()).getTime();
+    const individualToday = downloadHistory.filter(d => d.userId === user.email && d.timestamp >= todayStart).length;
+    const INDIVIDUAL_LIMIT = user.plan === 'Paid_Premium' ? 15 : 5;
+    if (individualToday === INDIVIDUAL_LIMIT - 1) {
+        toast({ title: "Almost at your limit", description: "You have 1 download remaining today." });
     }
     
     const newDownloadRecords: DownloadRecord[] = [];
@@ -896,7 +925,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
 
     return { success: true, limitReached: false, message: "Download successful." };
-  }, [getCompanyDownloadCounts, persistDownloadHistory, persistListingAnalytics, toast, addRegisteredLead]);
+  }, [getCompanyDownloadCounts, getDownloadLimits, persistDownloadHistory, persistListingAnalytics, toast]);
 
   const logListingView = useCallback((user: User | null, listingId: string) => {
       const now = Date.now();
