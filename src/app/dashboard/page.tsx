@@ -18,6 +18,8 @@ import { CustomerTransactions } from '@/components/customer-transactions';
 import { AdminListings } from '@/components/admin-listings';
 import { TransactionsPage } from '@/components/transactions-page';
 import { GeneralShortlist } from '@/components/general-shortlist';
+import { CompanyAdminDashboard } from '@/components/company-admin-dashboard';
+import { DeveloperTeamDashboard } from '@/components/developer-team-dashboard';
 import { DemandList } from '@/components/demand-list';
 
 
@@ -226,11 +228,12 @@ const MainDashboard = () => {
       <div>
         <ProviderOverview />
         <Tabs value={providerTab} onValueChange={setProviderTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className={`grid w-full ${user?.isCompanyAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
           <TabsTrigger value="my-listings">My Listings</TabsTrigger>
           <TabsTrigger value="prospects">Prospects</TabsTrigger>
           <TabsTrigger value="registered-leads">My Leads & Proposals</TabsTrigger>
           <TabsTrigger value="submit-match">Submit a Match</TabsTrigger>
+          {user?.isCompanyAdmin && <TabsTrigger value="my-team">My Team</TabsTrigger>}
         </TabsList>
         <TabsContent value="my-listings"><ProviderListings /></TabsContent>
         <TabsContent value="prospects"><ProspectsTab /></TabsContent>
@@ -238,17 +241,21 @@ const MainDashboard = () => {
         <TabsContent value="submit-match">
           <DemandForm demandId={propertyMatchDemandId} />
         </TabsContent>
+        {user?.isCompanyAdmin && (
+          <TabsContent value="my-team"><DeveloperTeamDashboard /></TabsContent>
+        )}
       </Tabs>
       </div>
     );
 
     const renderCustomerContent = () => (
       <Tabs value={customerTab} onValueChange={setCustomerTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className={`grid w-full ${user?.isCompanyAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
           <TabsTrigger value="my-demands">My Demands & Matches</TabsTrigger>
           <TabsTrigger value="log-demand">Log New Demand</TabsTrigger>
           <TabsTrigger value="my-shortlist">My Shortlist</TabsTrigger>
           <TabsTrigger value="my-transactions">My Transactions</TabsTrigger>
+          {user?.isCompanyAdmin && <TabsTrigger value="my-team">My Team</TabsTrigger>}
         </TabsList>
         <TabsContent value="my-demands">
             <MyDemands onSwitchTab={setCustomerTab} />
@@ -262,6 +269,11 @@ const MainDashboard = () => {
         <TabsContent value="my-transactions">
             <CustomerTransactions />
         </TabsContent>
+        {user?.isCompanyAdmin && (
+          <TabsContent value="my-team">
+            <CompanyAdminDashboard />
+          </TabsContent>
+        )}
       </Tabs>
     );
     
