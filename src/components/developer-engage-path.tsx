@@ -24,6 +24,19 @@ export function DeveloperEngagePath({ leadId, currentPath }: Props) {
   const [confirmed, setConfirmed] = React.useState(!!currentPath);
   const lead = registeredLeads.find(l => l.id === leadId);
 
+  const FREE_TRANSACTION_LIMIT = 3;
+  const usedTransactions = React.useMemo(() => {
+    return registeredLeads.filter(l =>
+      l.providers.some(p => p.providerEmail === user?.email) &&
+      l.developerEngagePath !== null &&
+      l.developerEngagePath !== undefined &&
+      l.id !== leadId
+    ).length;
+  }, [registeredLeads, user, leadId]);
+
+  const isLimitReached = usedTransactions >= FREE_TRANSACTION_LIMIT;
+  const remaining = Math.max(0, FREE_TRANSACTION_LIMIT - usedTransactions);
+
   const PATHS = [
     {
       id: 'independent' as DevPath,
@@ -99,11 +112,34 @@ export function DeveloperEngagePath({ leadId, currentPath }: Props) {
     );
   }
 
+  if (isLimitReached && !currentPath) {
+    return (
+      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 text-center space-y-4">
+        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+          <DollarSign className="h-6 w-6 text-primary" />
+        </div>
+        <div>
+          <p className="font-bold text-foreground text-sm">You've used your 3 free Engage & Transact transactions</p>
+          <p className="text-xs text-muted-foreground mt-1">You have experienced ORS-ONE's full transaction capability. To continue with more transactions, please contact our team to activate your plan.</p>
+        </div>
+        <a href="https://wa.me/919841098170?text=I%20would%20like%20to%20activate%20my%20ORS-ONE%20transaction%20plan" target="_blank"
+          className="inline-flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary/90 transition-colors">
+          Talk to Our Team
+        </a>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 p-1">
       <div>
         <p className="text-sm font-bold text-foreground mb-1">Stage 2 & 3 — Choose Your Engagement Path</p>
         <p className="text-xs text-muted-foreground">You have successfully connected with this prospect. Now choose how you would like to proceed with the Engage and Transact stages.</p>
+        {!currentPath && remaining <= 3 && (
+          <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs text-amber-700">
+            You have <strong>{remaining} free transaction{remaining !== 1 ? 's' : ''}</strong> remaining. Experience ORS-ONE's full capability — upgrade when you're ready.
+          </div>
+        )}
       </div>
       <div className="space-y-3">
         {PATHS.map(path => {
