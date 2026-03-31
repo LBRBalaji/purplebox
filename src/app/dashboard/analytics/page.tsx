@@ -70,8 +70,8 @@ export default function AnalyticsHubPage() {
   // ── Overview KPIs ──
   const totalListings = listings.length;
   const approvedListings = listings.filter(l => l.status === 'approved').length;
-  const totalViews = listingAnalytics.reduce((s, a) => s + a.views, 0);
-  const totalDownloads = listingAnalytics.reduce((s, a) => s + a.downloads, 0);
+  const totalViews = (listingAnalytics || []).reduce((s, a) => s + (a.views || 0), 0);
+  const totalDownloads = (listingAnalytics || []).reduce((s, a) => s + (a.downloads || 0), 0);
   const totalLeads = registeredLeads.length;
   const totalDemands = demands.length;
   const totalUsers = allUsers.length;
@@ -88,7 +88,7 @@ export default function AnalyticsHubPage() {
 
   // ── Industry breakdown from downloads ──
   const industryMap: Record<string, number> = {};
-  listingAnalytics.forEach(a => {
+  (listingAnalytics || []).forEach(a => {
     (a.downloadedBy || []).forEach((d: any) => {
       if (d.industryType) industryMap[d.industryType] = (industryMap[d.industryType] || 0) + 1;
     });
@@ -97,18 +97,18 @@ export default function AnalyticsHubPage() {
 
   // ── Location breakdown ──
   const locationMap: Record<string, number> = {};
-  downloadHistory.forEach(d => {
+  (downloadHistory || []).forEach(d => {
     if (d.location) locationMap[d.location] = (locationMap[d.location] || 0) + 1;
   });
   const locationData = Object.entries(locationMap).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([name, value]) => ({ name, value }));
 
   // ── User growth chart ──
-  const userGrowth = groupByDay(allUsers as any[], (u: any) => new Date(u.createdAt || Date.now()));
-  const downloadTrend = groupByDay(downloadHistory, d => new Date(d.timestamp));
-  const leadTrend = groupByDay(registeredLeads, l => new Date(l.registeredAt));
+  const userGrowth = groupByDay((allUsers || []) as any[], (u: any) => new Date(u.createdAt || Date.now()));
+  const downloadTrend = groupByDay(downloadHistory || [], d => new Date(d.timestamp));
+  const leadTrend = groupByDay(registeredLeads || [], l => new Date(l.registeredAt));
 
   // ── Top listings ──
-  const topListings = [...listingAnalytics]
+  const topListings = [...(listingAnalytics || [])]
     .sort((a, b) => (b.downloads + b.views) - (a.downloads + a.views))
     .slice(0, 5)
     .map(a => ({
@@ -117,8 +117,8 @@ export default function AnalyticsHubPage() {
     }));
 
   // ── Revenue pipeline ──
-  const todayDownloads = downloadHistory.filter(d => d.timestamp >= todayStart).length;
-  const totalSqFt = listings.filter(l => l.status === 'approved').reduce((s, l) => s + l.sizeSqFt, 0);
+  const todayDownloads = (downloadHistory || []).filter(d => d.timestamp >= todayStart).length;
+  const totalSqFt = (listings || []).filter(l => l.status === 'approved').reduce((s, l) => s + (l.sizeSqFt || 0), 0);
 
   if (!user) return null;
 
