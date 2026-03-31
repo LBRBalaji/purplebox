@@ -492,15 +492,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return updatedMessages;
     });
 
-    const recipient = context.lead.customerId === authUser?.email ? context.partner : users[context.lead.customerId];
-    if (recipient) {
+    // Determine recipient — if customer sent, notify developer and vice versa
+    const isCustomerSending = context.lead.customerId === authUser?.email;
+    const providerEmail = context.lead.providers?.[0]?.providerEmail;
+    const recipientEmail = isCustomerSending ? providerEmail : context.lead.customerId;
+    const recipient = recipientEmail ? users[recipientEmail] : null;
+    if (recipient && recipientEmail) {
+      const notifTitle = isCustomerSending
+        ? 'Customer sent you a message'
+        : `New message from ${authUser?.userName}`;
+      const notifMessage = isCustomerSending
+        ? 'A customer has sent you a message. Pay to connect and read their message.'
+        : `Regarding transaction ${context.lead.id}: "${message.text?.substring(0, 50)}..."`;
       addNotification({
-        id: `notif-${Date.now()}-${recipient.email}-${Math.random()}`,
+        id: `notif-${Date.now()}-${recipientEmail}-${Math.random()}`,
         type: 'new_chat_message',
-        title: `New message from ${authUser?.userName}`,
-        message: `Regarding transaction ${context.lead.id}: "${message.text?.substring(0, 50)}..."`,
-        href: `/dashboard/leads/${context.lead.id}`,
-        recipientEmail: recipient.email,
+        title: notifTitle,
+        message: notifMessage,
+        href: `/dashboard?tab=${isCustomerSending ? 'prospects' : 'registered-leads'}`,
+        recipientEmail,
         timestamp: new Date().toISOString(),
         triggeredBy: authUser?.email || 'system',
       });
