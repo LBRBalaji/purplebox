@@ -95,3 +95,12 @@ To read it in a new chat: "Please read the transcript at /mnt/transcripts/2026-0
 - Reverted onSnapshot on data-context (caused crash)
 - Reverted delete-all-rewrite optimization (caused crash)
 - Added ORS_ONE_BRIEFING.md for Claude context in new chats
+
+## Session 2 Updates (31 Mar 2026)
+- Pricing page: auto-shuffling right card (Solo/Team/Full Connect - INR 5000/10000/17500)
+- Signup: personal email blocked (Gmail/Yahoo etc) except balajispillai@gmail.com
+- Signup: email OTP verification mandatory for Customer role
+- Login: pending/rejected accounts blocked from dashboard access
+- User list: Status column added (Pending/Active/Rejected) with Approve/Reject buttons
+- Auto-approval email via Resend when SuperAdmin approves user
+- Auth login: signOut called before showing pending/rejected toast
