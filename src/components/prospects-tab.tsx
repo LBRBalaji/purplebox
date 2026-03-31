@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, CheckCircle, Clock, Building2, Warehouse } from 'lucide-react';
+import { Eye, CheckCircle, Clock, Building2, Warehouse, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ConnectionStatus = 'none' | 'requested' | 'connected';
