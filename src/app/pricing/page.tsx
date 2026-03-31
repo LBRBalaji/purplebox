@@ -13,10 +13,24 @@ const WhatsAppIcon = (props) => (
   </svg>
 );
 
+const TIERS = [
+  { name: 'Solo Connect', sub: 'Perfect for focused outreach to a single key prospect', price: '₹5,000', users: '1 user per lead' },
+  { name: 'Team Connect', sub: 'Loop in your leasing team — three decision makers on one lead', price: '₹10,000', users: '3 users per lead' },
+  { name: 'Full Connect', sub: 'Entire deal team on board — five users, one powerful lead', price: '₹17,500', users: '5 users per lead' },
+];
+
 export default function PricingPage() {
   const { user } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isProvider = user?.role === 'Warehouse Developer';
+  const [currentTier, setCurrentTier] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTier(prev => (prev + 1) % 3);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-background">
@@ -60,12 +74,16 @@ export default function PricingPage() {
               Recommended
             </div>
             <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{color: '#9b7ee0'}}>Pay For Purpose</div>
-            <div className="text-3xl font-black mb-2" style={{color: '#ffffff'}}>Pay For Purpose</div>
-            <div className="text-sm mb-8" style={{color: '#9b7ee0'}}>Connect with Every Prospect — From Every City</div>
+            <div className="text-3xl font-black mb-2 transition-all duration-300" style={{color: '#ffffff'}}>{TIERS[currentTier].name}</div>
+            <div className="text-sm mb-8 transition-all duration-300" style={{color: '#9b7ee0'}}>{TIERS[currentTier].sub}</div>
             <div className="pt-6 mb-8" style={{borderTop: '1px solid hsl(259 25% 22%)'}}>
               <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-black" style={{color: '#8b68d4'}}>&#8377;5,000</span>
+                <span className="text-5xl font-black transition-all duration-300" style={{color: '#8b68d4'}}>{TIERS[currentTier].price}</span>
                 <span className="text-sm" style={{color: '#7a60b8'}}>per lead</span>
+              </div>
+              <div className="flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full w-fit" style={{background: 'hsl(259 25% 18%)', border: '1px solid hsl(259 25% 28%)'}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9b7ee0" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span className="text-xs font-bold" style={{color: '#9b7ee0'}}>{TIERS[currentTier].users}</span>
               </div>
             </div>
             <div className="mt-auto">
@@ -74,6 +92,13 @@ export default function PricingPage() {
                   <WhatsAppIcon className="mr-2" /> Talk to Us
                 </Button>
               </Link>
+              <div className="flex justify-center gap-2 mt-4">
+                {TIERS.map((_, i) => (
+                  <button key={i} onClick={() => setCurrentTier(i)}
+                    className="w-2 h-2 rounded-full transition-all duration-300"
+                    style={{background: i === currentTier ? '#6141ac' : 'hsl(259 25% 28%)'}} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
