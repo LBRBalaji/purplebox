@@ -32,14 +32,14 @@ function Footer() {
         <p>
           <span className="font-bold text-primary">ORS-ONE</span> | Simplifying Real Estate Transactions. All rights reserved.
         </p>
-         <div className="mt-2 space-x-4">
-            <Link href="/terms-and-conditions" className="hover:underline">
-              Terms & Conditions
-            </Link>
+         <div className="mt-2 flex items-center justify-center flex-wrap gap-x-4 gap-y-1">
+            <Link href="/terms-and-conditions/customer" className="hover:underline">Customer T&C</Link>
             <span>|</span>
-            <Link href="/cookie-policy" className="hover:underline">
-              Cookie Policy
-            </Link>
+            <Link href="/terms-and-conditions/developer" className="hover:underline">Developer T&C</Link>
+            <span>|</span>
+            <Link href="/terms-and-conditions/agent" className="hover:underline">Agent T&C</Link>
+            <span>|</span>
+            <Link href="/cookie-policy" className="hover:underline">Cookie Policy</Link>
           </div>
           <div className="mt-4 text-xs text-muted-foreground/80">
             <Popover>
