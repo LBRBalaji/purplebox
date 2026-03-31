@@ -226,7 +226,7 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
               </div>
               <NavItem href="/dashboard/approval" icon={ClipboardCheck} label="Approval Queue" />
               <NavItem href="/dashboard/manage-users" icon={Users} label="Manage Users" />
-              <NavItem href="/dashboard/analytics/listings-performance" icon={BarChart} label="Analytics" />
+              <NavItem href="/dashboard/analytics" icon={BarChart} label="Analytics" />
               <NavItem href="/dashboard/settings" icon={Settings} label="Settings" />
             </>
           )}
