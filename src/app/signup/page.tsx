@@ -233,6 +233,12 @@ export default function SignupPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
+            <p className="text-xs text-muted-foreground text-center">
+              By signing up, you agree to our{' '}
+              <a href={formData.role === 'User' ? '/terms-and-conditions/customer' : '/terms-and-conditions/developer'} target="_blank" className="text-primary underline">
+                Terms and Conditions
+              </a>
+            </p>
             <Button type="submit" className="w-full">
               <UserPlus className="mr-2 h-4 w-4" /> Sign Up
             </Button>

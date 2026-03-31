@@ -181,6 +181,12 @@ export default function AgentSignupPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
+            <p className="text-xs text-muted-foreground text-center">
+              By registering, you agree to our{' '}
+              <a href="/terms-and-conditions/agent" target="_blank" className="text-primary underline">
+                Agent Terms and Conditions
+              </a>
+            </p>
             <Button type="submit" className="w-full">
               <UserPlus className="mr-2 h-4 w-4" /> Submit Registration
             </Button>
