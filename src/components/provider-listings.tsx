@@ -335,6 +335,18 @@ export function ProviderListings() {
     });
   };
 
+  const handleConsent = async (listing: ListingSchema) => {
+    await updateListing({
+      ...listing,
+      status: 'pending',
+      consentStatus: 'consented',
+      consentTimestamp: Date.now(),
+    });
+    toast({ title: 'Authorisation Confirmed', description: 'Thank you. Your listing has been submitted for final approval and will go live shortly.' });
+  };
+
+  const pendingConsentListings = myListings.filter((l: any) => l.status === 'pending_consent');
+
   const handleEdit = (listing: ListingSchema) => {
     setSelectedListing(listing);
     setIsFormOpen(true);
@@ -385,6 +397,37 @@ export function ProviderListings() {
 
   return (
     <>
+      {pendingConsentListings.length > 0 && (
+        <div className="mb-6 space-y-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3">
+            <p className="text-sm font-bold text-amber-800 mb-1">Action Required — Developer Consent</p>
+            <p className="text-xs text-amber-700">ORS-ONE has prepared the following listing(s) on your behalf. Please review and authorise to publish.</p>
+          </div>
+          {pendingConsentListings.map((listing: any) => (
+            <div key={listing.listingId} className="bg-card border-2 border-amber-300 rounded-2xl p-5">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="font-bold text-foreground mb-1">{listing.name || listing.listingId}</p>
+                  <p className="text-xs text-muted-foreground">{listing.location} · {listing.sizeSqFt?.toLocaleString()} sq ft</p>
+                  <p className="text-xs text-muted-foreground mt-1">Prepared by ORS-ONE team on your behalf</p>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => { setSelectedListing(listing); setIsFormOpen(true); }}
+                    className="text-xs font-bold text-primary border border-primary/30 bg-primary/5 px-4 py-2 rounded-xl hover:bg-primary/10 transition-colors">
+                    Review Details
+                  </button>
+                  <button
+                    onClick={() => handleConsent(listing)}
+                    className="text-xs font-bold text-white bg-primary px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors">
+                    I confirm this information is accurate — Authorise to Publish Listing
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="mt-8">
         <div className="mb-8 flex justify-between items-start flex-wrap gap-4">
           <div>

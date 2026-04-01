@@ -361,6 +361,78 @@ function ProviderSummaryTable({ allDevelopers, providerSummary }: { allDeveloper
     </div>
   );
 }
+
+function StaffDraftsTab({ listings, users, updateListingStatus, updateListing }: any) {
+  const { toast } = useToast();
+  const drafts = listings.filter((l: any) => l.status === 'draft');
+
+  const handleApproveForConsent = async (listing: any) => {
+    await updateListing({ ...listing, status: 'pending_consent' });
+    // Notify developer
+    try {
+      await fetch('/api/send-notification-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: listing.developerId,
+          userName: users[listing.developerId]?.userName || 'Developer',
+          title: 'A new listing has been prepared for your account',
+          message: 'ORS-ONE has prepared a warehouse listing on your behalf. Please log in to review the details and authorise publication.',
+          href: '/dashboard?tab=my-listings',
+        }),
+      });
+    } catch(e) {}
+    toast({ title: 'Sent for Developer Consent', description: 'Developer notified to review and authorise the listing.' });
+  };
+
+  const handleRejectDraft = async (listing: any) => {
+    await updateListing({ ...listing, status: 'rejected' });
+    toast({ title: 'Draft Rejected', description: 'The draft listing has been rejected.' });
+  };
+
+  if (drafts.length === 0) return (
+    <div className="bg-card rounded-2xl border border-border p-12 text-center">
+      <p className="font-bold text-foreground">No staff drafts</p>
+      <p className="text-sm text-muted-foreground mt-2">Listings created by internal staff will appear here for review.</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3 text-sm text-amber-800">
+        Review drafts created by internal staff. Approve to send to developer for consent, or reject to discard.
+      </div>
+      {drafts.map((listing: any) => {
+        const dev = users[listing.developerId];
+        const createdByUser = users[listing.createdBy];
+        return (
+          <div key={listing.listingId} className="bg-card border border-border rounded-2xl p-5">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="font-bold text-foreground">{listing.name || listing.listingId}</p>
+                  <span className="text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">Draft</span>
+                </div>
+                <p className="text-xs text-muted-foreground">{listing.location} · {listing.sizeSqFt?.toLocaleString()} sq ft</p>
+                <p className="text-xs text-muted-foreground mt-1">For: <span className="font-semibold text-foreground">{dev?.userName || listing.developerId}</span> — {dev?.companyName}</p>
+                <p className="text-xs text-muted-foreground">Created by: <span className="font-semibold text-foreground">{createdByUser?.userName || listing.createdBy}</span></p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" className="rounded-xl text-xs bg-primary hover:bg-primary/90" onClick={() => handleApproveForConsent(listing)}>
+                  Send for Developer Consent
+                </Button>
+                <Button size="sm" variant="outline" className="rounded-xl text-xs text-destructive border-destructive/20" onClick={() => handleRejectDraft(listing)}>
+                  Reject Draft
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function AdminListings() {
   const { listings, listingAnalytics, updateListing, updateListingStatus, locationCircles } = useData();
   const { users } = useAuth();
@@ -461,11 +533,12 @@ export function AdminListings() {
           <KpiCard label="Conversion Rate" value={kpis.convRate} icon={TrendingUp} trend="up" />
         </div>
         <Tabs defaultValue="listings">
-          <TabsList className="grid w-full grid-cols-4 rounded-xl">
+          <TabsList className="grid w-full grid-cols-5 rounded-xl">
             <TabsTrigger value="listings" className="rounded-lg">All Listings</TabsTrigger>
             <TabsTrigger value="insights" className="rounded-lg">Top Performers</TabsTrigger>
             <TabsTrigger value="providers" className="rounded-lg">Provider Summary</TabsTrigger>
             <TabsTrigger value="rejected" className="rounded-lg">Rejected Listings</TabsTrigger>
+            <TabsTrigger value="drafts" className="rounded-lg">Staff Drafts</TabsTrigger>
           </TabsList>
           <TabsContent value="listings" className="space-y-5 mt-5">
             <div className="flex items-center gap-3">
@@ -535,6 +608,10 @@ export function AdminListings() {
           <TabsContent value="rejected" className="mt-5"><RejectedListingsTab listings={listings} onDelete={async (ids) => { const idSet = new Set(ids); const remaining = listings.filter(l => !idSet.has(l.listingId)); const res = await fetch("/api/listings", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(remaining)}); if(res.ok){ toast({title: "Deleted", description: ids.length + " listings permanently deleted."}); window.location.reload(); } else { toast({variant:"destructive", title:"Error", description:"Delete failed. Please try again."}); } }} /></TabsContent>
           <TabsContent value="providers" className="mt-5">
             <ProviderSummaryTable allDevelopers={allDevelopers} providerSummary={providerSummary} />
+          </TabsContent>
+        
+          <TabsContent value="drafts" className="mt-5">
+            <StaffDraftsTab listings={listings} users={users} updateListingStatus={updateListingStatus} updateListing={updateListing} />
           </TabsContent>
         </Tabs>
       </div>

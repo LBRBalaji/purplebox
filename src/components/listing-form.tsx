@@ -104,6 +104,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   const [previewImageUrl, setPreviewImageUrl] = React.useState<string | null>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+  const isInternalStaff = (user as any)?.isInternalStaff === true;
+  const canCreateForDeveloper = isAdmin || isInternalStaff;
+  const [selectedDeveloperId, setSelectedDeveloperId] = React.useState<string>('');
+  const allDevelopers = React.useMemo(() => Object.values(users || {}).filter((u: any) => u.role === 'Warehouse Developer' && u.status === 'approved'), [users]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<ListingSchema>({
@@ -117,7 +121,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
             {...listing, plan: listing.plan || 'Free', documents: listing.documents || []} : 
             {
               status: 'pending' as const,
-              developerId: user?.email || '',
+              developerId: (canCreateForDeveloper && selectedDeveloperId) ? selectedDeveloperId : user?.email || '',
               listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
               plan: 'Free' as const,
               warehouseBoxId: '',
@@ -250,6 +254,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
 
 
   const handleSubmitWrapper = async (data: ListingSchema) => {
+    if (isInternalStaff && !selectedDeveloperId) {
+      toast({ variant: 'destructive', title: 'Select Developer', description: 'Please select the developer this listing belongs to.' });
+      return;
+    }
     setIsSubmitting(true);
     try {
         // Smart Approval Logic for Admins
@@ -257,7 +265,12 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
             data.status = 'approved';
         }
         
-        const finalData = { ...data, isAdmin };
+        const finalData = {
+          ...data,
+          isAdmin,
+          developerId: (canCreateForDeveloper && selectedDeveloperId) ? selectedDeveloperId : data.developerId,
+          ...(isInternalStaff ? { status: 'draft' as const, createdBy: user?.email } : {}),
+        };
         await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
         onSubmit(finalData);
         
@@ -304,6 +317,23 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
           </DialogHeader>
             <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmitWrapper, onInvalidSubmit)}>
+              {canCreateForDeveloper && !listing && (
+                <div className="px-6 pt-4 pb-2">
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+                    <label className="text-xs font-bold text-primary uppercase tracking-wide mb-2 block">Creating on behalf of Developer</label>
+                    <select
+                      className="w-full border border-border rounded-xl px-3 py-2 text-sm bg-background"
+                      value={selectedDeveloperId}
+                      onChange={e => setSelectedDeveloperId(e.target.value)}>
+                      <option value="">Select Developer...</option>
+                      {(allDevelopers as any[]).map((d: any) => (
+                        <option key={d.email} value={d.email}>{d.userName} — {d.companyName}</option>
+                      ))}
+                    </select>
+                    {isInternalStaff && <p className="text-xs text-muted-foreground mt-2">This listing will be saved as a draft pending SuperAdmin approval and developer consent.</p>}
+                  </div>
+                </div>
+              )}
               <ScrollArea className="h-[70vh] p-1 pr-6">
                 <div className="space-y-8">
                   
