@@ -156,7 +156,12 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
   const pathname = usePathname();
   const isO2O = user?.role === 'O2O';
   const isProvider = user?.role === 'Warehouse Developer';
-  const roleLabel = user?.role === 'Warehouse Developer' ? 'Property Provider' : user?.role === 'User' ? 'Customer' : user?.role;
+  const isInternalStaffMobile = (user as any)?.isInternalStaff;
+  const roleLabel = isInternalStaffMobile
+    ? ((user as any)?.staffRole || 'ORS-ONE Staff')
+    : user?.role === 'Warehouse Developer' ? 'Property Provider'
+    : user?.role === 'User' ? 'Customer'
+    : user?.role;
 
   const NavItem = ({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) => (
     <SheetClose asChild>
@@ -315,7 +320,7 @@ export function Header() {
                     <Button variant="outline" size="sm" className="h-8 gap-1.5 max-w-[180px]">
                       <div className="flex flex-col items-start overflow-hidden">
                         <span className="text-xs font-semibold truncate leading-none max-w-[120px]">{user.userName}</span>
-                        <span className="text-xs text-muted-foreground leading-none mt-0.5">{roleLabel}</span>
+                        <span className="text-xs text-muted-foreground leading-none mt-0.5">{isInternalStaff ? user.userName + ' · ORS-ONE' : roleLabel}</span>
                       </div>
                       <ChevronDown className="h-3 w-3 flex-shrink-0 ml-1" />
                     </Button>
@@ -324,6 +329,7 @@ export function Header() {
                     <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">Signed in as</DropdownMenuLabel>
                     <DropdownMenuLabel className="font-semibold text-sm py-0">{user.userName}</DropdownMenuLabel>
                     <DropdownMenuLabel className="text-xs text-muted-foreground py-0 font-normal">{roleLabel}</DropdownMenuLabel>
+                    {isInternalStaff && <DropdownMenuLabel className="py-0"><span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">ORS-ONE Staff</span></DropdownMenuLabel>}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/settings"><Settings className="mr-2 h-4 w-4" /> Settings</Link>

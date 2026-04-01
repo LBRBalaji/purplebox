@@ -20,6 +20,7 @@ import { TransactionsPage } from '@/components/transactions-page';
 import { GeneralShortlist } from '@/components/general-shortlist';
 import { CompanyAdminDashboard } from '@/components/company-admin-dashboard';
 import { DeveloperTeamDashboard } from '@/components/developer-team-dashboard';
+import { StaffDashboard } from '@/components/staff-dashboard';
 import { DemandList } from '@/components/demand-list';
 
 
@@ -191,6 +192,7 @@ const MainDashboard = () => {
     const isProvider = user?.role === 'Warehouse Developer';
     const isCustomer = user?.role === 'User';
     const isAgent = user?.role === 'Agent';
+    const isInternalStaff = (user as any)?.isInternalStaff === true;
 
     // State for each role's dashboard tabs
     const [providerTab, setProviderTab] = React.useState(defaultTabParam || 'registered-leads');
@@ -333,7 +335,17 @@ const MainDashboard = () => {
       </Tabs>
     );
     
-    if (isSuperAdmin) {
+    if (isInternalStaff) {
+        return (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-2xl font-black text-foreground">Staff Dashboard</h2>
+              <p className="text-sm text-muted-foreground mt-1">Welcome back, {user?.userName}. Here are your assigned modules.</p>
+            </div>
+            <StaffDashboard />
+          </div>
+        );
+    } else if (isSuperAdmin) {
         return renderMainAdminContent();
     } else if (isO2OManager) {
         return renderO2OContent();
