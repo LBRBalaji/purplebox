@@ -335,14 +335,40 @@ const MainDashboard = () => {
       </Tabs>
     );
     
+    const staffPrivileges: string[] = (user as any)?.privileges || [];
+    const hasPrivilege = (p: string) => staffPrivileges.includes(p);
+    const [staffListingOpen, setStaffListingOpen] = React.useState(false);
+    const { addListing, locationCircles: staffLocationCircles } = useData();
+
     if (isInternalStaff) {
+        const activeTab = defaultTabParam || 'home';
         return (
           <div className="space-y-4">
-            <div>
-              <h2 className="text-2xl font-black text-foreground">Staff Dashboard</h2>
-              <p className="text-sm text-muted-foreground mt-1">Welcome back, {user?.userName}. Here are your assigned modules.</p>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h2 className="text-2xl font-black text-foreground">Staff Dashboard</h2>
+                <p className="text-sm text-muted-foreground mt-1">Welcome back, {user?.userName}. Here are your assigned modules.</p>
+              </div>
+              {hasPrivilege('create_listings') && (
+                <button onClick={() => setStaffListingOpen(true)}
+                  className="inline-flex items-center gap-2 bg-primary text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors">
+                  + Create New Listing
+                </button>
+              )}
             </div>
             <StaffDashboard />
+            {hasPrivilege('create_listings') && (
+              <ListingForm
+                isOpen={staffListingOpen}
+                onOpenChange={setStaffListingOpen}
+                listing={null}
+                onSubmit={(data) => {
+                  addListing(data, user?.email);
+                  setStaffListingOpen(false);
+                }}
+                locationCircles={staffLocationCircles || []}
+              />
+            )}
           </div>
         );
     } else if (isSuperAdmin) {
