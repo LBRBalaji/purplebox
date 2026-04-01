@@ -259,7 +259,13 @@ export function Header() {
   const isSuperAdmin = user?.role === 'SuperAdmin';
   const isO2O = user?.role === 'O2O';
   const isProvider = user?.role === 'Warehouse Developer';
-  const roleLabel = user?.role === 'Warehouse Developer' ? 'Property Provider' : user?.role === 'User' ? 'Customer' : user?.role;
+  const isInternalStaff = (user as any)?.isInternalStaff === true;
+  const staffRole = (user as any)?.staffRole;
+  const roleLabel = isInternalStaff
+    ? (staffRole || 'ORS-ONE Staff')
+    : user?.role === 'Warehouse Developer' ? 'Property Provider'
+    : user?.role === 'User' ? 'Customer'
+    : user?.role;
 
   return (
     <>
