@@ -20,9 +20,12 @@ export const listingSchema = z.object({
   // System Metadata
   listingId: z.string(),
   developerId: z.string(), // references userId
-  status: z.enum(['pending', 'approved', 'rejected', 'leased']),
+  status: z.enum(['pending', 'approved', 'rejected', 'leased', 'draft', 'pending_consent']),
   plan: z.enum(['Free', 'Paid_Premium']).optional().default('Paid_Premium'),
   createdAt: z.string().datetime().optional(),
+  createdBy: z.string().optional(),
+  consentStatus: z.enum(['pending_consent', 'consented']).optional(),
+  consentTimestamp: z.number().optional(),
   
   // General Information
   warehouseBoxId: z.string().optional(),

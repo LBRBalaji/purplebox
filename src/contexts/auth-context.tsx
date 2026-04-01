@@ -12,6 +12,9 @@ export type User = {
   role: 'SuperAdmin' | 'User' | 'O2O' | 'Warehouse Developer' | 'Agent';
   plan?: 'Free' | 'Paid_Premium';
   isCompanyAdmin?: boolean;
+  isInternalStaff?: boolean;
+  staffRole?: string;
+  privileges?: string[];
   companyName: string;
   userName: string;
   phone: string;

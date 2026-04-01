@@ -5,6 +5,7 @@ import { DataGovernance } from "@/components/data-governance";
 import { PaymentRequests } from "@/components/payment-requests";
 import { UserList } from "@/components/user-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StaffManagement } from '@/components/staff-management';
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import * as React from 'react';
@@ -35,11 +36,12 @@ export default function ManageUsersPage() {
                     </p>
                 </div>
                 <Tabs defaultValue="users">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-5">
                         <TabsTrigger value="users">Platform Users</TabsTrigger>
                         <TabsTrigger value="agents">Agent Waitlist</TabsTrigger>
                         <TabsTrigger value="governance">Data Governance</TabsTrigger>
                         <TabsTrigger value="payments">Payment Requests</TabsTrigger>
+                        <TabsTrigger value="staff">Internal Staff</TabsTrigger>
                     </TabsList>
                     <TabsContent value="users" className="mt-6">
                         <UserList />
@@ -49,6 +51,7 @@ export default function ManageUsersPage() {
                     </TabsContent>
                     <TabsContent value="governance" className="mt-6"><DataGovernance /></TabsContent>
                     <TabsContent value="payments" className="mt-6"><PaymentRequests /></TabsContent>
+                    <TabsContent value="staff" className="mt-6"><StaffManagement /></TabsContent>
                 </Tabs>
             </div>
         </main>
