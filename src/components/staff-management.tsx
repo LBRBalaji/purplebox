@@ -65,7 +65,20 @@ export function StaffManagement() {
           staffRole: form.staffRole,
           privileges: form.privileges,
         } as any);
-        toast({ title: 'Staff Account Created', description: form.userName + ' added as ' + form.staffRole + '. Share login credentials separately.' });
+        const tempPassword = 'ORS@' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      // Send welcome email
+      fetch('/api/send-staff-welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.email,
+          userName: form.userName,
+          staffRole: form.staffRole,
+          password: tempPassword,
+          privileges: form.privileges,
+        }),
+      }).catch(e => console.error('Welcome email error:', e));
+      toast({ title: 'Staff Account Created', description: form.userName + ' added as ' + form.staffRole + '. Welcome email sent to ' + form.email });
       }
       setForm({ email: '', userName: '', phone: '', staffRole: '', privileges: [] });
       setShowForm(false);
