@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import Link from 'next/link';
-import { Building2, PhoneCall } from 'lucide-react';
+import { Building2, PhoneCall, CheckCircle, Zap, Sparkles, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/auth-context';
@@ -19,6 +19,32 @@ const TIERS = [
   { name: 'Full Connect', sub: 'Entire deal team on board — five users, one powerful lead', price: '₹17,500', users: '5 users per lead' },
 ];
 
+const ZeroBadge = () => (
+  <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0">
+    <CheckCircle className="h-3 w-3" /> Zero Cost
+  </span>
+);
+
+const PFPBadge = () => (
+  <span className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0">
+    <Zap className="h-3 w-3" /> Pay For Purpose
+  </span>
+);
+
+const StageTag = ({ n, green }: { n: string; green?: boolean }) => (
+  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${green ? 'bg-green-50 text-green-700 border-green-200' : 'bg-primary/10 text-primary border-primary/20'}`}>{n}</span>
+);
+
+const Row = ({ label, badge, note }: { label: string; badge: React.ReactNode; note?: string }) => (
+  <div className="flex items-start justify-between gap-3 py-2.5 border-b border-border last:border-0">
+    <div className="min-w-0">
+      <p className="text-sm font-medium text-foreground">{label}</p>
+      {note && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{note}</p>}
+    </div>
+    <div className="flex-shrink-0 mt-0.5">{badge}</div>
+  </div>
+);
+
 export default function PricingPage() {
   const { user } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
@@ -26,83 +52,221 @@ export default function PricingPage() {
   const [currentTier, setCurrentTier] = React.useState(0);
 
   React.useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTier(prev => (prev + 1) % 3);
-    }, 3000);
+    const timer = setInterval(() => setCurrentTier(prev => (prev + 1) % 3), 3000);
     return () => clearInterval(timer);
   }, []);
+
   return (
     <div className="min-h-screen bg-background">
+
+      {/* Hero */}
       <div className="border-b border-border bg-background">
         <div className="container mx-auto px-4 py-20 text-center max-w-3xl">
           <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 mb-5 text-xs px-4 py-1.5 rounded-full tracking-wide">
             Transparent Pricing
           </Badge>
           <h1 className="text-5xl font-black text-foreground tracking-tight mb-5 leading-tight">
-            Reduce Vacancy.<br />Lease Faster.
+            Enable First.<br />Pay For Purpose.
           </h1>
           <p className="text-base text-muted-foreground leading-relaxed max-w-xl mx-auto">
-            No monthly fees. No subscriptions. You only pay when a real customer reaches out about your property.
+            Experience the full power of ORS-ONE. Pay only when you choose to take action.
           </p>
         </div>
       </div>
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
-        <div className="rounded-2xl overflow-hidden border border-border flex flex-col md:flex-row">
-          <div className="flex-1 bg-card p-10 flex flex-col border-b md:border-b-0 md:border-r border-border">
-            <div className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-3">Standard</div>
-            <div className="text-3xl font-black text-foreground mb-2">Standard Listing</div>
-            <div className="text-sm text-muted-foreground mb-8">Let's Grow Together</div>
-            <div className="border-t border-border pt-6 mb-8">
-              <span className="text-xs font-bold tracking-widest uppercase text-muted-foreground">No listing fee</span>
+
+      <div className="container mx-auto px-4 py-16 max-w-5xl">
+
+        {/* Two Column Pricing */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+          {/* DEVELOPER COLUMN */}
+          <div className="bg-card rounded-3xl border border-border overflow-hidden">
+            <div className="px-6 py-5" style={{background: 'hsl(259 25% 11%)'}}>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="h-8 w-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="h-4 w-4 text-white" />
+                </div>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{color: '#9b7ee0'}}>For Developers</p>
+              </div>
+              <p className="text-xl font-black text-white">Property Providers</p>
             </div>
-            <div className="mt-auto">
-              {isProvider ? (
-                <Link href="/dashboard?tab=my-listings&createNew=true">
-                  <Button variant="outline" className="w-full rounded-xl h-12 text-sm font-bold">
-                    <Building2 className="mr-2 h-4 w-4" /> Go to My Listings
+
+            <div className="p-6 space-y-6">
+
+              {/* Stage 1 */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <StageTag n="Stage 1" green />
+                  <p className="text-sm font-bold text-foreground">List Your Warehouse</p>
+                </div>
+                <div className="bg-secondary/40 rounded-2xl p-4">
+                  <Row label="List &amp; publish listings" badge={<ZeroBadge />} note="No cost to list. Get your properties in front of verified tenants immediately." />
+                </div>
+              </div>
+
+              <div className="h-px bg-border" />
+
+              {/* Stage 2 — animated tiers */}
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <StageTag n="Stage 2" />
+                  <p className="text-sm font-bold text-foreground">Connect With Prospect</p>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3 ml-1">Pay For Purpose — choose your connect plan per prospect</p>
+                <div className="space-y-3">
+                  {TIERS.map((tier, i) => (
+                    <div key={tier.name}
+                      onClick={() => setCurrentTier(i)}
+                      className={`rounded-2xl p-4 cursor-pointer transition-all ${i === currentTier ? 'border-2 border-primary bg-primary/5' : 'border border-border hover:border-primary/30'}`}>
+                      <div className="flex items-start justify-between mb-1">
+                        <p className="text-sm font-bold text-foreground">{tier.name}</p>
+                        <p className="text-base font-black text-primary">{tier.price}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-1">{tier.sub}</p>
+                      <p className="text-xs text-muted-foreground">{tier.users}</p>
+                      {i === currentTier && (
+                        <div className="flex justify-end mt-2">
+                          <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">Selected</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <div className="flex justify-center gap-2 mt-2">
+                    {TIERS.map((_, i) => (
+                      <button key={i} onClick={() => setCurrentTier(i)}
+                        className="w-2 h-2 rounded-full transition-all duration-300"
+                        style={{background: i === currentTier ? '#6141ac' : 'hsl(259 30% 80%)'}} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px bg-border" />
+
+              {/* Stage 3 */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <StageTag n="Stage 3" />
+                  <p className="text-sm font-bold text-foreground">Engage &amp; Transact</p>
+                </div>
+                <div className="bg-secondary/40 rounded-2xl p-4">
+                  <Row label="Within threshold" badge={<ZeroBadge />} note="Experience &amp; enjoy — Negotiation Board, Chat, Tenant Improvements &amp; more" />
+                  <Row label="Beyond threshold" badge={<PFPBadge />} note="Continue independently on platform fee" />
+                </div>
+                <div className="mt-3 bg-primary/5 border border-primary/20 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-bold text-primary">ORS-ONE as Transaction Partner</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Industry standard fee applicable on successful deal closure</p>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Link href="https://wa.me/919841098170?text=I%20want%20to%20know%20more%20about%20ORS-ONE%20for%20Developers" target="_blank" rel="noopener noreferrer">
+                  <Button className="w-full rounded-xl h-11 text-sm font-bold bg-primary hover:bg-primary/90">
+                    <WhatsAppIcon className="mr-2" /> Talk to Our Team
                   </Button>
                 </Link>
-              ) : (
-                <Button variant="outline" className="w-full rounded-xl h-12 text-sm font-bold" onClick={() => setIsLoginOpen(true)}>
-                  Get Started
-                </Button>
-              )}
+              </div>
+
             </div>
           </div>
-          <div className="flex-1 p-10 flex flex-col relative" style={{background: 'hsl(259 25% 11%)'}}>
-            <div className="absolute top-0 right-8 bg-primary text-primary-foreground text-xs font-black tracking-widest uppercase px-4 py-1.5 rounded-b-xl">
-              For Developers
+
+          {/* CUSTOMER COLUMN */}
+          <div className="bg-card rounded-3xl border border-border overflow-hidden">
+            <div className="px-6 py-5 bg-primary">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <Users className="h-4 w-4 text-white" />
+                </div>
+                <p className="text-xs font-bold text-white/70 uppercase tracking-widest">For Customers</p>
+              </div>
+              <p className="text-xl font-black text-white">Tenants &amp; Occupiers</p>
             </div>
-            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{color: '#9b7ee0'}}>Pay For Purpose</div>
-            <div className="text-3xl font-black mb-2 transition-all duration-300" style={{color: '#ffffff'}}>{TIERS[currentTier].name}</div>
-            <div className="text-sm mb-8 transition-all duration-300" style={{color: '#9b7ee0'}}>{TIERS[currentTier].sub}</div>
-            <div className="pt-6 mb-8" style={{borderTop: '1px solid hsl(259 25% 22%)'}}>
-              <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-black transition-all duration-300" style={{color: '#8b68d4'}}>{TIERS[currentTier].price}</span>
-                <span className="text-sm" style={{color: '#7a60b8'}}>per lead</span>
+
+            <div className="p-6 space-y-6">
+
+              {/* Stage 1 */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <StageTag n="Stage 1" green />
+                  <p className="text-sm font-bold text-foreground">Source Listings</p>
+                </div>
+                <div className="bg-secondary/40 rounded-2xl p-4">
+                  <Row label="Browse &amp; download listings" badge={<ZeroBadge />} note="Within your daily &amp; city threshold — experience the full power of ORS-ONE" />
+                  <Row label="Beyond threshold" badge={<PFPBadge />} note="Expanded access on platform fee — ideal for high-volume sourcing teams" />
+                </div>
               </div>
-              <div className="flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full w-fit" style={{background: 'hsl(259 25% 18%)', border: '1px solid hsl(259 25% 28%)'}}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9b7ee0" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span className="text-xs font-bold" style={{color: '#9b7ee0'}}>{TIERS[currentTier].users}</span>
+
+              <div className="h-px bg-border" />
+
+              {/* Stage 2 */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <StageTag n="Stage 2" />
+                  <p className="text-sm font-bold text-foreground">Connect With Developer</p>
+                </div>
+                <div className="bg-secondary/40 rounded-2xl p-4">
+                  <Row label="Within threshold" badge={<ZeroBadge />} note="Experience &amp; enjoy the platform — connect, chat and explore developer profiles" />
+                  <Row label="Beyond threshold" badge={<PFPBadge />} note="Or engage ORS-ONE as Transaction Partner" />
+                </div>
               </div>
-            </div>
-            <div className="mt-auto">
-              <Link href="https://wa.me/919841098170?text=I%20want%20to%20know%20more%20about%20Pay%20For%20Purpose%20on%20ORS-ONE" target="_blank" rel="noopener noreferrer">
-                <Button className="w-full rounded-xl h-12 text-sm font-bold" style={{background: '#ffffff', color: '#6141ac'}}>
-                  <WhatsAppIcon className="mr-2" /> Talk to Us
-                </Button>
-              </Link>
-              <div className="flex justify-center gap-2 mt-4">
-                {TIERS.map((_, i) => (
-                  <button key={i} onClick={() => setCurrentTier(i)}
-                    className="w-2 h-2 rounded-full transition-all duration-300"
-                    style={{background: i === currentTier ? '#6141ac' : 'hsl(259 25% 28%)'}} />
-                ))}
+
+              <div className="h-px bg-border" />
+
+              {/* Stage 3 */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <StageTag n="Stage 3" />
+                  <p className="text-sm font-bold text-foreground">Engage &amp; Transact</p>
+                </div>
+                <div className="bg-secondary/40 rounded-2xl p-4">
+                  <Row label="Within threshold" badge={<ZeroBadge />} note="Experience &amp; enjoy — Negotiation Board, Chat, Tenant Improvements &amp; more" />
+                  <Row label="Beyond threshold" badge={<PFPBadge />} note="Or engage ORS-ONE as Transaction Partner" />
+                </div>
+
+                <div className="mt-3 rounded-2xl overflow-hidden border border-green-200">
+                  <div className="bg-green-700 px-4 py-3 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-white" />
+                    <p className="text-sm font-bold text-white">ORS-ONE as Transaction Partner</p>
+                  </div>
+                  <div className="bg-green-50 p-4">
+                    <Row label="3PL &amp; Logistics" badge={<span className="inline-flex items-center gap-1 bg-green-700 text-white text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"><CheckCircle className="h-3 w-3" /> Zero Brokerage</span>} />
+                    <Row label="Other industries" badge={<span className="text-xs font-bold text-green-800 flex-shrink-0">Industry standard fee</span>} />
+                  </div>
+                </div>
               </div>
+
+              <div className="pt-2">
+                {user ? (
+                  <Link href="/dashboard">
+                    <Button className="w-full rounded-xl h-11 text-sm font-bold bg-primary hover:bg-primary/90">
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button className="w-full rounded-xl h-11 text-sm font-bold bg-primary hover:bg-primary/90" onClick={() => setIsLoginOpen(true)}>
+                    Get Started
+                  </Button>
+                )}
+              </div>
+
             </div>
           </div>
+
         </div>
-        <div className="mt-20">
+
+        {/* Disclaimer */}
+        <div className="bg-secondary/40 rounded-2xl p-5 text-center border border-border mb-20">
+          <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+            All platform features — including the Negotiation Board, Chat and Tenant Improvements — are available to explore within threshold limits.
+            ORS-ONE reserves the right to modify access to any feature at its sole discretion.
+          </p>
+        </div>
+
+        {/* How it works */}
+        <div className="mt-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black text-foreground mb-2">How Pay For Purpose Works</h2>
             <p className="text-muted-foreground text-sm">Four steps. No complexity.</p>
@@ -112,7 +276,7 @@ export default function PricingPage() {
               { step: '01', title: 'List your property', desc: 'Add your warehouse with specs, images, location and documents. No listing fee. No setup cost.' },
               { step: '02', title: 'Customer enquires', desc: 'A verified customer submits a demand or expresses interest in your property.' },
               { step: '03', title: 'We notify you', desc: 'Only verified business profiles reach this stage — spam and fake enquiries are filtered at source.' },
-              { step: '04', title: 'Pay and connect', desc: 'Pay Rs.5,000 to unlock full lead contact details and close the deal directly.' },
+              { step: '04', title: 'Pay and connect', desc: 'Pay ₹5,000 to unlock full lead contact details and close the deal directly.' },
             ].map((item) => (
               <div key={item.step} className="relative bg-card rounded-2xl border border-border p-6 overflow-hidden">
                 <div className="absolute -bottom-3 -right-2 text-7xl font-black text-primary/5 leading-none select-none">{item.step}</div>
@@ -125,9 +289,11 @@ export default function PricingPage() {
             ))}
           </div>
         </div>
+
+        {/* Bottom CTA */}
         <div className="mt-24 rounded-3xl border border-primary/20 p-12 text-center bg-card">
-          <h2 className="text-3xl font-black text-foreground mb-3">Ready to list your warehouse?</h2>
-          <p className="text-muted-foreground text-sm mb-8">No listing fee. No commitment. Your property, your terms.</p>
+          <h2 className="text-3xl font-black text-foreground mb-3">Ready to get started?</h2>
+          <p className="text-muted-foreground text-sm mb-8">No listing fee. No commitment. Experience the platform today.</p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             {isProvider ? (
               <Link href="/dashboard?tab=my-listings&createNew=true">
@@ -137,7 +303,7 @@ export default function PricingPage() {
               </Link>
             ) : (
               <Button className="h-12 px-8 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold" onClick={() => setIsLoginOpen(true)}>
-                <Building2 className="mr-2 h-4 w-4" /> List Your Property
+                <Building2 className="mr-2 h-4 w-4" /> Get Started
               </Button>
             )}
             <Link href="https://wa.me/919841098170?text=I%20want%20to%20know%20more%20about%20ORS-ONE%20pricing" target="_blank" rel="noopener noreferrer">
@@ -147,6 +313,7 @@ export default function PricingPage() {
             </Link>
           </div>
         </div>
+
       </div>
       <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
     </div>
