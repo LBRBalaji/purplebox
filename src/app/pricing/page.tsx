@@ -20,19 +20,26 @@ const TIERS = [
 ];
 
 const ZeroBadge = () => (
-  <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0">
+  <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"
+    style={{background: 'hsl(259 44% 94%)', color: '#6141ac', border: '1px solid hsl(259 44% 82%)'}}>
     <CheckCircle className="h-3 w-3" /> Zero Cost
   </span>
 );
 
 const PFPBadge = () => (
-  <span className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0">
+  <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"
+    style={{background: 'hsl(259 25% 18%)', color: '#9b7ee0', border: '1px solid hsl(259 25% 28%)'}}>
     <Zap className="h-3 w-3" /> Pay For Purpose
   </span>
 );
 
-const StageTag = ({ n, green }: { n: string; green?: boolean }) => (
-  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${green ? 'bg-green-50 text-green-700 border-green-200' : 'bg-primary/10 text-primary border-primary/20'}`}>{n}</span>
+const StageTag = ({ n, filled }: { n: string; filled?: boolean }) => (
+  <span className="text-xs font-bold px-3 py-1 rounded-full"
+    style={filled
+      ? {background: '#6141ac', color: '#ffffff'}
+      : {background: 'hsl(259 44% 94%)', color: '#6141ac', border: '1px solid hsl(259 44% 82%)'}}>
+    {n}
+  </span>
 );
 
 const Row = ({ label, badge, note }: { label: string; badge: React.ReactNode; note?: string }) => (
@@ -83,8 +90,8 @@ export default function PricingPage() {
           <div className="bg-card rounded-3xl border border-border overflow-hidden">
             <div className="px-6 py-5" style={{background: 'hsl(259 25% 11%)'}}>
               <div className="flex items-center gap-3 mb-1">
-                <div className="h-8 w-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <Building2 className="h-4 w-4 text-white" />
+                <div className="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{background: 'hsl(259 25% 20%)'}}>
+                  <Building2 className="h-4 w-4" style={{color: '#9b7ee0'}} />
                 </div>
                 <p className="text-xs font-bold uppercase tracking-widest" style={{color: '#9b7ee0'}}>For Developers</p>
               </div>
@@ -96,20 +103,20 @@ export default function PricingPage() {
               {/* Stage 1 */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <StageTag n="Stage 1" green />
+                  <StageTag n="Stage 1" />
                   <p className="text-sm font-bold text-foreground">List Your Warehouse</p>
                 </div>
-                <div className="bg-secondary/40 rounded-2xl p-4">
+                <div className="rounded-2xl p-4" style={{background: 'hsl(259 30% 94%)', border: '1px solid hsl(259 30% 88%)'}}>
                   <Row label="List &amp; publish listings" badge={<ZeroBadge />} note="No cost to list. Get your properties in front of verified tenants immediately." />
                 </div>
               </div>
 
               <div className="h-px bg-border" />
 
-              {/* Stage 2 — animated tiers */}
+              {/* Stage 2 */}
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <StageTag n="Stage 2" />
+                  <StageTag n="Stage 2" filled />
                   <p className="text-sm font-bold text-foreground">Connect With Prospect</p>
                 </div>
                 <p className="text-xs text-muted-foreground mb-3 ml-1">Pay For Purpose — choose your connect plan per prospect</p>
@@ -117,18 +124,16 @@ export default function PricingPage() {
                   {TIERS.map((tier, i) => (
                     <div key={tier.name}
                       onClick={() => setCurrentTier(i)}
-                      className={`rounded-2xl p-4 cursor-pointer transition-all ${i === currentTier ? 'border-2 border-primary bg-primary/5' : 'border border-border hover:border-primary/30'}`}>
+                      className="rounded-2xl p-4 cursor-pointer transition-all"
+                      style={i === currentTier
+                        ? {border: '2px solid #6141ac', background: 'hsl(259 44% 96%)'}
+                        : {border: '1px solid hsl(259 30% 88%)', background: '#ffffff'}}>
                       <div className="flex items-start justify-between mb-1">
                         <p className="text-sm font-bold text-foreground">{tier.name}</p>
-                        <p className="text-base font-black text-primary">{tier.price}</p>
+                        <p className="text-base font-black" style={{color: '#6141ac'}}>{tier.price}</p>
                       </div>
                       <p className="text-xs text-muted-foreground mb-1">{tier.sub}</p>
                       <p className="text-xs text-muted-foreground">{tier.users}</p>
-                      {i === currentTier && (
-                        <div className="flex justify-end mt-2">
-                          <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">Selected</span>
-                        </div>
-                      )}
                     </div>
                   ))}
                   <div className="flex justify-center gap-2 mt-2">
@@ -149,16 +154,16 @@ export default function PricingPage() {
                   <StageTag n="Stage 3" />
                   <p className="text-sm font-bold text-foreground">Engage &amp; Transact</p>
                 </div>
-                <div className="bg-secondary/40 rounded-2xl p-4">
+                <div className="rounded-2xl p-4" style={{background: 'hsl(259 30% 94%)', border: '1px solid hsl(259 30% 88%)'}}>
                   <Row label="Within threshold" badge={<ZeroBadge />} note="Experience &amp; enjoy — Negotiation Board, Chat, Tenant Improvements &amp; more" />
                   <Row label="Beyond threshold" badge={<PFPBadge />} note="Continue independently on platform fee" />
                 </div>
-                <div className="mt-3 bg-primary/5 border border-primary/20 rounded-2xl p-4">
+                <div className="mt-3 rounded-2xl p-4" style={{background: 'hsl(259 25% 11%)', border: '1px solid hsl(259 25% 22%)'}}>
                   <div className="flex items-center gap-2 mb-1">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <p className="text-sm font-bold text-primary">ORS-ONE as Transaction Partner</p>
+                    <Sparkles className="h-4 w-4" style={{color: '#9b7ee0'}} />
+                    <p className="text-sm font-bold" style={{color: '#c5b8e8'}}>ORS-ONE as Transaction Partner</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">Industry standard fee applicable on successful deal closure</p>
+                  <p className="text-xs" style={{color: '#9b7ee0'}}>Industry standard fee applicable on successful deal closure</p>
                 </div>
               </div>
 
@@ -175,12 +180,12 @@ export default function PricingPage() {
 
           {/* CUSTOMER COLUMN */}
           <div className="bg-card rounded-3xl border border-border overflow-hidden">
-            <div className="px-6 py-5 bg-primary">
+            <div className="px-6 py-5" style={{background: 'hsl(259 25% 11%)'}}>
               <div className="flex items-center gap-3 mb-1">
-                <div className="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-                  <Users className="h-4 w-4 text-white" />
+                <div className="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{background: 'hsl(259 25% 20%)'}}>
+                  <Users className="h-4 w-4" style={{color: '#9b7ee0'}} />
                 </div>
-                <p className="text-xs font-bold text-white/70 uppercase tracking-widest">For Customers</p>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{color: '#9b7ee0'}}>For Customers</p>
               </div>
               <p className="text-xl font-black text-white">Tenants &amp; Occupiers</p>
             </div>
@@ -190,10 +195,10 @@ export default function PricingPage() {
               {/* Stage 1 */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <StageTag n="Stage 1" green />
+                  <StageTag n="Stage 1" />
                   <p className="text-sm font-bold text-foreground">Source Listings</p>
                 </div>
-                <div className="bg-secondary/40 rounded-2xl p-4">
+                <div className="rounded-2xl p-4" style={{background: 'hsl(259 30% 94%)', border: '1px solid hsl(259 30% 88%)'}}>
                   <Row label="Browse &amp; download listings" badge={<ZeroBadge />} note="Within your daily &amp; city threshold — experience the full power of ORS-ONE" />
                   <Row label="Beyond threshold" badge={<PFPBadge />} note="Expanded access on platform fee — ideal for high-volume sourcing teams" />
                 </div>
@@ -204,10 +209,10 @@ export default function PricingPage() {
               {/* Stage 2 */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <StageTag n="Stage 2" />
+                  <StageTag n="Stage 2" filled />
                   <p className="text-sm font-bold text-foreground">Connect With Developer</p>
                 </div>
-                <div className="bg-secondary/40 rounded-2xl p-4">
+                <div className="rounded-2xl p-4" style={{background: 'hsl(259 30% 94%)', border: '1px solid hsl(259 30% 88%)'}}>
                   <Row label="Within threshold" badge={<ZeroBadge />} note="Experience &amp; enjoy the platform — connect, chat and explore developer profiles" />
                   <Row label="Beyond threshold" badge={<PFPBadge />} note="Or engage ORS-ONE as Transaction Partner" />
                 </div>
@@ -221,19 +226,34 @@ export default function PricingPage() {
                   <StageTag n="Stage 3" />
                   <p className="text-sm font-bold text-foreground">Engage &amp; Transact</p>
                 </div>
-                <div className="bg-secondary/40 rounded-2xl p-4">
+                <div className="rounded-2xl p-4" style={{background: 'hsl(259 30% 94%)', border: '1px solid hsl(259 30% 88%)'}}>
                   <Row label="Within threshold" badge={<ZeroBadge />} note="Experience &amp; enjoy — Negotiation Board, Chat, Tenant Improvements &amp; more" />
                   <Row label="Beyond threshold" badge={<PFPBadge />} note="Or engage ORS-ONE as Transaction Partner" />
                 </div>
 
-                <div className="mt-3 rounded-2xl overflow-hidden border border-green-200">
-                  <div className="bg-green-700 px-4 py-3 flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-white" />
-                    <p className="text-sm font-bold text-white">ORS-ONE as Transaction Partner</p>
+                <div className="mt-3 rounded-2xl overflow-hidden" style={{border: '1px solid hsl(259 25% 22%)'}}>
+                  <div className="px-4 py-3 flex items-center gap-2" style={{background: 'hsl(259 25% 11%)'}}>
+                    <Sparkles className="h-4 w-4" style={{color: '#9b7ee0'}} />
+                    <p className="text-sm font-bold" style={{color: '#c5b8e8'}}>ORS-ONE as Transaction Partner</p>
                   </div>
-                  <div className="bg-green-50 p-4">
-                    <Row label="3PL &amp; Logistics" badge={<span className="inline-flex items-center gap-1 bg-green-700 text-white text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"><CheckCircle className="h-3 w-3" /> Zero Brokerage</span>} />
-                    <Row label="Other industries" badge={<span className="text-xs font-bold text-green-800 flex-shrink-0">Industry standard fee</span>} />
+                  <div className="p-4" style={{background: 'hsl(259 44% 96%)', borderTop: '1px solid hsl(259 30% 88%)'}}>
+                    <Row
+                      label="3PL &amp; Logistics"
+                      badge={
+                        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"
+                          style={{background: '#6141ac', color: '#ffffff'}}>
+                          <CheckCircle className="h-3 w-3" /> Zero Brokerage
+                        </span>
+                      }
+                    />
+                    <Row
+                      label="Other industries"
+                      badge={
+                        <span className="text-xs font-bold flex-shrink-0" style={{color: '#6141ac'}}>
+                          Industry standard fee
+                        </span>
+                      }
+                    />
                   </div>
                 </div>
               </div>
@@ -258,7 +278,8 @@ export default function PricingPage() {
         </div>
 
         {/* Disclaimer */}
-        <div className="bg-secondary/40 rounded-2xl p-5 text-center border border-border mb-20">
+        <div className="rounded-2xl p-5 text-center border border-border mb-20"
+          style={{background: 'hsl(259 30% 94%)'}}>
           <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl mx-auto">
             All platform features — including the Negotiation Board, Chat and Tenant Improvements — are available to explore within threshold limits.
             ORS-ONE reserves the right to modify access to any feature at its sole discretion.
