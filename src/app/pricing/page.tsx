@@ -56,6 +56,7 @@ export default function PricingPage() {
   const { user } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isProvider = user?.role === 'Warehouse Developer';
+  const isCustomer = user?.role === 'User';
   const [currentTier, setCurrentTier] = React.useState(0);
 
   React.useEffect(() => {
@@ -200,7 +201,7 @@ export default function PricingPage() {
                 </div>
                 <div className="rounded-2xl p-4" style={{background: 'hsl(259 30% 94%)', border: '1px solid hsl(259 30% 88%)'}}>
                   <Row label="Browse &amp; download listings" badge={<ZeroBadge />} note="Within your daily &amp; city threshold — experience the full power of ORS-ONE" />
-                  <Row label="Beyond threshold" badge={<PFPBadge />} note="Expanded access on platform fee — ideal for high-volume sourcing teams" />
+                  {!isCustomer && <Row label="Beyond threshold" badge={<PFPBadge />} note="Expanded access on platform fee — ideal for high-volume sourcing teams" />}
                 </div>
               </div>
 
@@ -214,7 +215,7 @@ export default function PricingPage() {
                 </div>
                 <div className="rounded-2xl p-4" style={{background: 'hsl(259 30% 94%)', border: '1px solid hsl(259 30% 88%)'}}>
                   <Row label="Within threshold" badge={<ZeroBadge />} note="Experience &amp; enjoy the platform — connect, chat and explore developer profiles" />
-                  <Row label="Beyond threshold" badge={<PFPBadge />} note="Or engage ORS-ONE as Transaction Partner" />
+                  {!isCustomer && <Row label="Beyond threshold" badge={<PFPBadge />} note="Or engage ORS-ONE as Transaction Partner" />}
                 </div>
               </div>
 
@@ -228,9 +229,10 @@ export default function PricingPage() {
                 </div>
                 <div className="rounded-2xl p-4" style={{background: 'hsl(259 30% 94%)', border: '1px solid hsl(259 30% 88%)'}}>
                   <Row label="Within threshold" badge={<ZeroBadge />} note="Experience &amp; enjoy — Negotiation Board, Chat, Tenant Improvements &amp; more" />
-                  <Row label="Beyond threshold" badge={<PFPBadge />} note="Or engage ORS-ONE as Transaction Partner" />
+                  {!isCustomer && <Row label="Beyond threshold" badge={<PFPBadge />} note="Or engage ORS-ONE as Transaction Partner" />}
                 </div>
 
+                {!isCustomer && (
                 <div className="mt-3 rounded-2xl overflow-hidden" style={{border: '1px solid hsl(259 25% 22%)'}}>
                   <div className="px-4 py-3 flex items-center gap-2" style={{background: 'hsl(259 25% 11%)'}}>
                     <Sparkles className="h-4 w-4" style={{color: '#9b7ee0'}} />
@@ -256,6 +258,7 @@ export default function PricingPage() {
                     />
                   </div>
                 </div>
+                )}
               </div>
 
               <div className="pt-2">

@@ -849,7 +849,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const MAX_CITIES = isPremium ? 10 : 3;
     const individualToday = downloadHistory.filter(d => d.userId === user.email && d.timestamp >= todayStart).length;
     if (individualToday >= INDIVIDUAL_LIMIT) {
-      return { allowed: false, message: `You've reached your daily limit of ${INDIVIDUAL_LIMIT} downloads. Your access refreshes tomorrow.${!isPremium ? ' Upgrade to Premium for higher limits.' : ''}` };
+      const tomorrowDate = new Date();
+      tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+      tomorrowDate.setHours(0, 0, 0, 0);
+      const resumeStr = tomorrowDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + ' at 12:00 AM';
+      return { allowed: false, message: `You've reached your daily download limit of ${INDIVIDUAL_LIMIT}. Access resumes on ${resumeStr}. For increased limits, write to balaji@lakshmibalajio2o.com.` };
     }
     const companyTodayDownloads = downloadHistory.filter(d => getEmailDomain(d.userId) === domain && d.timestamp >= todayStart);
     const citiesDownloadedToday = [...new Set(companyTodayDownloads.map(d => d.location?.toLowerCase().trim()))].filter(Boolean);
@@ -857,12 +861,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     for (const city of newCities) {
       const cityDownloads = companyTodayDownloads.filter(d => d.location?.toLowerCase().trim() === city).length;
       if (cityDownloads >= CITY_LIMIT) {
-        return { allowed: false, message: `Your team has reached the daily download limit for ${city}. Explore listings in other locations or upgrade your plan.` };
+        return { allowed: false, message: `Your team has reached the daily download limit for ${city}. Try listings in other cities. For increased limits, write to balaji@lakshmibalajio2o.com.` };
       }
     }
     const allCitiesToday = new Set([...citiesDownloadedToday, ...newCities]);
     if (allCitiesToday.size > MAX_CITIES) {
-      return { allowed: false, message: `Your team has reached the maximum of ${MAX_CITIES} cities per day. Upgrade to Premium to access more locations.` };
+      return { allowed: false, message: `Your team has reached the maximum of ${MAX_CITIES} cities per day. For increased limits, write to balaji@lakshmibalajio2o.com.` };
     }
     return { allowed: true, message: '' };
   }, [downloadHistory]);
@@ -906,7 +910,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const individualToday = downloadHistory.filter(d => d.userId === user.email && d.timestamp >= todayStart).length;
     const INDIVIDUAL_LIMIT = user.plan === 'Paid_Premium' ? 15 : 5;
     if (individualToday === INDIVIDUAL_LIMIT - 1) {
-        toast({ title: "Almost at your limit", description: "You have 1 download remaining today." });
+        toast({ title: "1 download remaining today", description: "You are close to your daily limit." });
     }
     
     const newDownloadRecords: DownloadRecord[] = [];
