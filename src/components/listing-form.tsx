@@ -95,7 +95,7 @@ async function uploadFiles(files: File[]): Promise<{ name: string; url: string; 
 
 
 export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationCircles = [], initialIntent }: ListingFormProps) {
-  const { user } = useAuth();
+  const { user, users } = useAuth();
   const { toast } = useToast();
   const isEditMode = !!listing;
   const [isGenerating, setIsGenerating] = React.useState(false);

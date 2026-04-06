@@ -1404,6 +1404,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         unreadCount,
         unreadChatCount,
         markNotificationsAsRead,
+        setNotificationsFromWatcher,
         addAgentToLead,
         communityPosts,
         addCommunityPost,
