@@ -305,7 +305,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [typingStatus, setTypingStatus] = useState<Record<string, TypingStatus>>({});
   const [activeChat, setActiveChat] = useState<ChatSubmission | null>(null);
   const [notifications,
-        setNotificationsFromWatcher, setNotifications] = useState<Notification[]>([]);
+        setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadChatCount, setUnreadChatCount] = useState(0);
   const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
