@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { useData, type ListingStatus } from '@/contexts/data-context';
 import { useAuth } from '@/contexts/auth-context';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import type { ListingSchema } from '@/lib/schema';
 import { Badge } from './ui/badge';
 import { Archive, Building, CircleCheck, ClipboardList, Edit, Eye, History, PlusCircle, Truck, ArchiveRestore, Download, Users, ChevronDown, Clock, MoreHorizontal, CheckCircle, XCircle, PauseCircle, BarChart2, Scaling, Search } from 'lucide-react';
@@ -277,9 +277,12 @@ export function ProviderListings() {
   
   const isAdmin = user?.role === 'SuperAdmin';
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const hasOpenedRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (searchParams.get('createNew') === 'true') {
+    if (searchParams.get('createNew') === 'true' && !hasOpenedRef.current) {
+      hasOpenedRef.current = true;
       setSelectedListing(null);
       setIsFormOpen(true);
     }
@@ -367,6 +370,9 @@ export function ProviderListings() {
     }
     setIsFormOpen(false);
     setSelectedListing(null);
+    if (searchParams.get('createNew') === 'true') {
+      router.replace('/dashboard?tab=my-listings');
+    }
   }
   
   if (isAdmin) {
