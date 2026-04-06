@@ -278,11 +278,8 @@ export function ProviderListings() {
   const isAdmin = user?.role === 'SuperAdmin';
   const searchParams = useSearchParams();
   const router = useRouter();
-  const hasOpenedRef = React.useRef(false);
-
   React.useEffect(() => {
-    if (searchParams.get('createNew') === 'true' && !hasOpenedRef.current) {
-      hasOpenedRef.current = true;
+    if (searchParams.get('createNew') === 'true') {
       setSelectedListing(null);
       setIsFormOpen(true);
     }
