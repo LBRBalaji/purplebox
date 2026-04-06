@@ -304,7 +304,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [chatMessages, setChatMessages] = useState<Record<string, ChatMessage[]>>({});
   const [typingStatus, setTypingStatus] = useState<Record<string, TypingStatus>>({});
   const [activeChat, setActiveChat] = useState<ChatSubmission | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications,
+        setNotificationsFromWatcher, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadChatCount, setUnreadChatCount] = useState(0);
   const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
@@ -461,6 +462,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return updatedNotifications;
     });
   }, [persistNotifications]);
+
+  const setNotificationsFromWatcher = useCallback((notifs: Notification[]) => {
+    setNotifications(notifs);
+  }, []);
 
   const markNotificationsAsRead = useCallback(() => {
     if (!authUser) return;
