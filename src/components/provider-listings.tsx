@@ -314,7 +314,7 @@ export function ProviderListings() {
         setMyListings(listings);
         setIsLoading(false);
     }
-  }, [user, listings, toast, isAdmin]);
+  }, [user, toast, isAdmin]);
   
   const filteredMyListings = React.useMemo(() => {
     if (!searchTerm) return myListings;
@@ -363,7 +363,8 @@ export function ProviderListings() {
       setMyListings(prev => prev.map(l => l.listingId === data.listingId ? data : l));
     } else {
       addListing(data, user?.email);
-      setMyListings(prev => [data, ...prev]);
+      const newEntry = { ...data, status: 'pending' as const, createdAt: new Date().toISOString() };
+      setMyListings(prev => [newEntry, ...prev]);
     }
     setIsFormOpen(false);
     setSelectedListing(null);
