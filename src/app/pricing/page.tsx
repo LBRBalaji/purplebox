@@ -85,7 +85,7 @@ export default function PricingPage() {
       <div className="container mx-auto px-4 py-16 max-w-5xl">
 
         {/* Two Column Pricing */}
-        <div className={`grid grid-cols-1 ${!isCustomer ? "lg:grid-cols-2" : ""} gap-6 mb-8`}>
+        <div className="grid grid-cols-1 lg:grid-cols-1 max-w-2xl mx-auto gap-6 mb-8">
 
           {/* DEVELOPER COLUMN */}
           <div className="bg-card rounded-3xl border border-border overflow-hidden">
@@ -179,9 +179,9 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {!isCustomer && (
+          {false && (
           <>
-          {/* CUSTOMER COLUMN */}
+          {/* CUSTOMER COLUMN - hidden for all users */}
           <div className="bg-card rounded-3xl border border-border overflow-hidden">
             <div className="px-6 py-5" style={{background: 'hsl(259 25% 11%)'}}>
               <div className="flex items-center gap-3 mb-1">
