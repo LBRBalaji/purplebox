@@ -435,13 +435,9 @@ export function ProviderListings() {
                 <Building /> My Property Listings
             </h2>
             <p className="text-muted-foreground mt-2">
-                Create new listings, manage active properties, and view your archived deals.
+                Manage active properties and view your archived deals.
             </p>
           </div>
-          <Button onClick={handleCreateNew}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create New Listing
-          </Button>
         </div>
 
         <Card className="mb-8">
@@ -498,7 +494,7 @@ export function ProviderListings() {
                 ) : (
                     <Card className="text-center p-12">
                         <CardTitle>No Active Listings Found</CardTitle>
-                        <CardDescription className="mt-2">Use the button above to create your first warehouse listing.</CardDescription>
+                        <CardDescription className="mt-2">Use the 'New Listing' button on the home screen to create your first warehouse listing.</CardDescription>
                     </Card>
                 )}
             </TabsContent>
