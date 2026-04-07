@@ -73,11 +73,13 @@ async function uploadFiles(files: File[]): Promise<{ name: string; url: string; 
                 method: 'POST',
                 body: formData,
             });
+            const contentType = response.headers.get('content-type') || '';
+            const result = contentType.includes('application/json')
+                ? await response.json()
+                : { success: false, error: `Server error ${response.status}` };
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Upload failed');
+                throw new Error(result.error || 'Upload failed');
             }
-            const result = await response.json();
             return {
                 type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
                 name: file.name,

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStorage } from '@/lib/firebase-admin';
 
+// Raise the body size limit for this route to 20MB
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const data = await request.formData();
@@ -8,6 +11,11 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json({ success: false, error: 'No file found' }, { status: 400 });
+    }
+
+    const MAX_SIZE = 20 * 1024 * 1024; // 20MB
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ success: false, error: 'File too large. Maximum size is 20MB.' }, { status: 413 });
     }
 
     const bytes = await file.arrayBuffer();

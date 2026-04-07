@@ -3,6 +3,7 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  serverExternalPackages: ['firebase-admin'],
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -32,6 +33,9 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
+    serverActions: {
+      bodySizeLimit: '20mb',
+    },
     // This is the new configuration to allow cross-origin requests in development.
     allowedDevOrigins: [
       'https://6000-firebase-v2lakshmi-balaji-o2o-1756988156129.cluster-ubrd2huk7jh6otbgyei4h62ope.cloudworkstations.dev',
