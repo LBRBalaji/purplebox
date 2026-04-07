@@ -16,6 +16,19 @@ async function getAccessToken(): Promise<string> {
   return token.token as string;
 }
 
+async function tryUpload(bucketName: string, filename: string, bytes: ArrayBuffer, contentType: string, accessToken: string) {
+  const uploadUrl = `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucketName)}/o?uploadType=media&name=${encodeURIComponent(filename)}`;
+  const res = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': contentType || 'application/octet-stream',
+    },
+    body: bytes,
+  });
+  return res;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const data = await request.formData();
@@ -31,10 +44,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: `"${file.name}" is ${sizeMB}MB. Maximum is 20MB. Please compress and retry.` }, { status: 413 });
     }
 
-    const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-    if (!bucketName) {
-      return NextResponse.json({ success: false, error: 'Storage not configured. Contact platform admin.' }, { status: 500 });
-    }
+    const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'purpleboxone-backup-45535400';
+
+    // Try env var first, then both standard Firebase bucket name formats
+    const candidateBuckets = [
+      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      `${projectId}.appspot.com`,
+      `${projectId}.firebasestorage.app`,
+    ].filter(Boolean) as string[];
+
+    // Deduplicate
+    const buckets = [...new Set(candidateBuckets)];
 
     const bytes = await file.arrayBuffer();
     const sanitized = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -48,36 +68,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: `Authentication failed: ${e.message}` }, { status: 500 });
     }
 
-    const uploadUrl = `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucketName)}/o?uploadType=media&name=${encodeURIComponent(filename)}`;
+    let uploadRes: Response | null = null;
+    let successBucket = '';
 
-    const uploadRes = await fetch(uploadUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': file.type || 'application/octet-stream',
-        'Content-Length': String(bytes.byteLength),
-      },
-      body: bytes,
-    });
+    for (const bucket of buckets) {
+      const res = await tryUpload(bucket, filename, bytes, file.type, accessToken);
+      if (res.ok) {
+        uploadRes = res;
+        successBucket = bucket;
+        break;
+      }
+      const errText = await res.text();
+      console.log(`Bucket ${bucket} failed (${res.status}):`, errText.substring(0, 100));
+    }
 
-    if (!uploadRes.ok) {
-      const errText = await uploadRes.text();
-      console.error('GCS upload error:', errText);
-      return NextResponse.json({ success: false, error: `Storage upload failed (${uploadRes.status}): ${errText.substring(0, 200)}` }, { status: 500 });
+    if (!uploadRes || !successBucket) {
+      return NextResponse.json({
+        success: false,
+        error: `Could not find a valid Firebase Storage bucket. Tried: ${buckets.join(', ')}. Please verify NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET in Vercel environment variables.`,
+      }, { status: 500 });
     }
 
     // Make public
-    const aclUrl = `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(bucketName)}/o/${encodeURIComponent(filename)}/acl`;
+    const aclUrl = `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(successBucket)}/o/${encodeURIComponent(filename)}/acl`;
     await fetch(aclUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ entity: 'allUsers', role: 'READER' }),
     });
 
-    const publicUrl = `https://storage.googleapis.com/${bucketName}/${filename}`;
+    const publicUrl = `https://storage.googleapis.com/${successBucket}/${filename}`;
     return NextResponse.json({ success: true, url: publicUrl });
 
   } catch (error: any) {
