@@ -50,7 +50,7 @@ export default function PlatformSettingsPage() {
     setSavingNotif(false);
   };
 
-  React.useEffect(() => { if (!isLoading && !user) router.push('/dashboard'); }, [user, isLoading, router]);
+  React.useEffect(() => { if (!isLoading && !user && !isChangingPassword) router.push('/dashboard'); }, [user, isLoading, router, isChangingPassword]);
 
   React.useEffect(() => {
     if (!hasAccess) return;
@@ -70,8 +70,9 @@ export default function PlatformSettingsPage() {
       toast({ title: 'Password Updated', description: 'Your password has been changed successfully.' });
       setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
     } catch (error) {
-      const msg = error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' ? 'Current password is incorrect.' : error.message || 'Failed to change password.';
-      toast({ variant: 'destructive', title: 'Error', description: msg });
+      const errCode = (error as any)?.code || '';
+      const msg = errCode === 'auth/wrong-password' || errCode === 'auth/invalid-credential' ? 'Current password is incorrect.' : (error as any)?.message || 'Failed to change password.';
+      toast({ variant: 'destructive', title: 'Password Update Failed', description: msg });
     } finally { setIsChangingPassword(false); }
   };
 
