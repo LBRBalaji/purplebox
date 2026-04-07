@@ -62,10 +62,12 @@ const buildingTypes = [
     { id: 'Standard Shed', label: 'Standard Shed' },
 ];
 
-async function uploadFiles(files: File[]): Promise<{ name: string; url: string; type: 'image' | 'video' | 'layout'; }[] | null> {
-    if (!files || files.length === 0) return null;
+type UploadResult = { name: string; url: string; type: 'image' | 'video' | 'layout'; error?: never } | { name: string; url?: never; type?: never; error: string };
 
-    const uploadPromises = files.map(async (file) => {
+async function uploadFiles(files: File[]): Promise<UploadResult[]> {
+    if (!files || files.length === 0) return [];
+
+    const uploadPromises = files.map(async (file): Promise<UploadResult> => {
         const formData = new FormData();
         formData.append('file', file);
         try {
@@ -76,23 +78,22 @@ async function uploadFiles(files: File[]): Promise<{ name: string; url: string; 
             const contentType = response.headers.get('content-type') || '';
             const result = contentType.includes('application/json')
                 ? await response.json()
-                : { success: false, error: `Server error ${response.status}` };
-            if (!response.ok) {
-                throw new Error(result.error || 'Upload failed');
+                : { success: false, error: `Server error ${response.status} — please try again.` };
+            if (!response.ok || !result.success) {
+                return { name: file.name, error: result.error || 'Upload failed' };
             }
             return {
                 type: file.type.startsWith('image') ? 'image' : file.type.startsWith('video') ? 'video' : 'layout',
                 name: file.name,
                 url: result.url,
             };
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error uploading file:', file.name, error);
-            return null;
+            return { name: file.name, error: error.message || 'Network error. Check your connection and try again.' };
         }
     });
 
-    const results = await Promise.all(uploadPromises);
-    return results.filter(r => r !== null) as { name: string; url: string; type: 'image' | 'video' | 'layout'; }[];
+    return Promise.all(uploadPromises);
 }
 
 
@@ -172,22 +173,33 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
     toast({ title: "Uploading...", description: `${fileList.length} file(s) selected.` });
 
     try {
-        const uploadedFiles = await uploadFiles(fileList);
+        const results = await uploadFiles(fileList);
         
-        if (uploadedFiles && uploadedFiles.length > 0) {
-          const newDocuments = uploadedFiles.map(file => ({
+        const succeeded = results.filter(r => r.url);
+        const failed = results.filter(r => r.error);
+
+        if (succeeded.length > 0) {
+          const newDocuments = succeeded.map(file => ({
             type: file.type as 'image' | 'video' | 'layout',
             name: file.name,
-            url: file.url,
+            url: file.url!,
           }));
           append(newDocuments);
-          toast({ title: "Upload Complete", description: `${newDocuments.length} file(s) added.` });
-        } else {
-          toast({ variant: 'destructive', title: "Upload Failed", description: `Could not upload the selected files.` });
+          toast({ title: `${succeeded.length} file(s) uploaded`, description: succeeded.map(f => f.name).join(', ') });
         }
-    } catch (error) {
+
+        if (failed.length > 0) {
+          failed.forEach(f => {
+            toast({ variant: 'destructive', title: `Upload failed: ${f.name}`, description: f.error, duration: 8000 });
+          });
+        }
+
+        if (succeeded.length === 0 && failed.length === 0) {
+          toast({ variant: 'destructive', title: 'Upload Failed', description: 'No files were uploaded. Please try again.' });
+        }
+    } catch (error: any) {
         console.error(error);
-        toast({ variant: 'destructive', title: "Upload Error", description: `An unexpected error occurred during upload.` });
+        toast({ variant: 'destructive', title: 'Upload Error', description: error.message || 'An unexpected error occurred.' });
     } finally {
         if (event.target) {
             event.target.value = ''; // Reset file input
