@@ -160,27 +160,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   }, [watchedCircle, locationCircles]);
 
 
-  // Watch for changes in area fields to auto-calculate total
-  const plinthArea = form.watch("area.plinthArea");
-  const mezzanineArea1 = form.watch("area.mezzanineArea1");
-  const mezzanineArea2 = form.watch("area.mezzanineArea2");
-  const canopyArea = form.watch("area.canopyArea");
-  const driversRestRoomArea = form.watch("area.driversRestRoomArea");
 
-  React.useEffect(() => {
-    const total =
-      (Number(plinthArea) || 0) +
-      (Number(mezzanineArea1) || 0) +
-      (Number(mezzanineArea2) || 0) +
-      (Number(canopyArea) || 0) +
-      (Number(driversRestRoomArea) || 0);
-
-    const currentTotal = Number(form.getValues("area.totalChargeableArea")) || 0;
-
-    if (total !== currentTotal) {
-        form.setValue("area.totalChargeableArea", total, { shouldValidate: true });
-    }
-  }, [plinthArea, mezzanineArea1, mezzanineArea2, canopyArea, driversRestRoomArea, form]);
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
@@ -434,7 +414,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                             <FormItem><FormLabel>Driver's Rest Room Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="area.totalChargeableArea" render={({ field }) => (
-                            <FormItem><FormLabel>Total Chargeable Area</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} readOnly className="bg-secondary" /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Total Chargeable Area (SFT)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))} placeholder="Enter manually" /></FormControl><FormMessage /></FormItem>
                         )} />
                     </div>
                   </div>
