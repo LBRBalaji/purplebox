@@ -1,100 +1,87 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as admin from 'firebase-admin';
 
 export const dynamic = 'force-dynamic';
 
-function getStorageBucket() {
-  const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-  if (!bucketName) {
-    throw new Error('Storage bucket not configured. NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET env var is missing.');
-  }
-
-  // Use a dedicated app instance for storage to avoid bucket conflicts
-  const appName = 'upload-app';
-  let app: admin.app.App;
-  try {
-    app = admin.app(appName);
-  } catch {
-    app = admin.initializeApp(
-      {
-        credential: admin.credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        }),
-        storageBucket: bucketName,
-      },
-      appName
-    );
-  }
-  return admin.storage(app).bucket(bucketName);
+async function getAccessToken(): Promise<string> {
+  const { GoogleAuth } = await import('google-auth-library');
+  const auth = new GoogleAuth({
+    credentials: {
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    },
+    scopes: ['https://www.googleapis.com/auth/devstorage.read_write'],
+  });
+  const client = await auth.getClient();
+  const token = await client.getAccessToken();
+  return token.token as string;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    let data: FormData;
-    try {
-      data = await request.formData();
-    } catch (e: any) {
-      return NextResponse.json(
-        { success: false, error: `Could not read uploaded file: ${e.message}. Try a smaller file or a different format.` },
-        { status: 400 }
-      );
-    }
-
+    const data = await request.formData();
     const file = data.get('file') as File | null;
+
     if (!file) {
-      return NextResponse.json({ success: false, error: 'No file received. Please select a file and try again.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'No file received.' }, { status: 400 });
     }
 
     const MAX_SIZE = 20 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      return NextResponse.json(
-        { success: false, error: `File "${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)}MB. Maximum allowed is 20MB. Please compress the file and retry.` },
-        { status: 413 }
-      );
+      const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+      return NextResponse.json({ success: false, error: `"${file.name}" is ${sizeMB}MB. Maximum is 20MB. Please compress and retry.` }, { status: 413 });
     }
 
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'application/pdf'];
-    if (!allowed.includes(file.type) && !file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-      return NextResponse.json(
-        { success: false, error: `File type "${file.type}" is not supported. Please upload images (JPG, PNG, WEBP), videos (MP4), or PDF files.` },
-        { status: 400 }
-      );
+    const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+    if (!bucketName) {
+      return NextResponse.json({ success: false, error: 'Storage not configured. Contact platform admin.' }, { status: 500 });
     }
 
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const sanitized = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const filename = `listings/${Date.now()}-${sanitized}`;
 
-    let bucket;
+    let accessToken: string;
     try {
-      bucket = getStorageBucket();
+      accessToken = await getAccessToken();
     } catch (e: any) {
-      console.error('Storage init error:', e);
-      return NextResponse.json(
-        { success: false, error: `Storage not ready: ${e.message}` },
-        { status: 500 }
-      );
+      console.error('Auth error:', e);
+      return NextResponse.json({ success: false, error: `Authentication failed: ${e.message}` }, { status: 500 });
     }
 
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const filename = `listings/${Date.now()}-${sanitizedName}`;
-    const fileRef = bucket.file(filename);
+    const uploadUrl = `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucketName)}/o?uploadType=media&name=${encodeURIComponent(filename)}`;
 
-    await fileRef.save(buffer, {
-      metadata: { contentType: file.type },
+    const uploadRes = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': file.type || 'application/octet-stream',
+        'Content-Length': String(bytes.byteLength),
+      },
+      body: bytes,
     });
 
-    await fileRef.makePublic();
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text();
+      console.error('GCS upload error:', errText);
+      return NextResponse.json({ success: false, error: `Storage upload failed (${uploadRes.status}): ${errText.substring(0, 200)}` }, { status: 500 });
+    }
 
-    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`;
+    // Make public
+    const aclUrl = `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(bucketName)}/o/${encodeURIComponent(filename)}/acl`;
+    await fetch(aclUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ entity: 'allUsers', role: 'READER' }),
+    });
+
+    const publicUrl = `https://storage.googleapis.com/${bucketName}/${filename}`;
     return NextResponse.json({ success: true, url: publicUrl });
 
   } catch (error: any) {
     console.error('Upload error:', error);
-    const msg = error.code === 'storage/unauthorized'
-      ? 'Storage permission denied. Please contact support.'
-      : error.message || 'Upload failed. Please try again.';
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message || 'Upload failed. Please try again.' }, { status: 500 });
   }
 }
