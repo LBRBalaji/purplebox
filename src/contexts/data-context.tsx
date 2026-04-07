@@ -918,8 +918,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const providerToListingsMap: { [providerEmail: string]: string[] } = {};
 
     listingsToDownload.forEach(listing => {
-        const isBrokered = listing.plan !== 'Paid_Premium';
-        const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
+        // Always use the actual developer's email — every download creates a chat thread
+        const providerEmail = listing.developerId || 'superadmin@o2o.com';
         
         if (!providerToListingsMap[providerEmail]) {
             providerToListingsMap[providerEmail] = [];
@@ -930,27 +930,30 @@ export function DataProvider({ children }: { children: ReactNode }) {
         newDownloadRecords.push(record);
     });
 
-    // Auto-create leads per provider on download
+    // Auto-create one lead per listing per provider — each gets its own chat thread
     Object.entries(providerToListingsMap).forEach(([providerEmail, listingIds]) => {
       if (providerEmail === 'superadmin@o2o.com') return;
-      const leadId = 'LDR-DL-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2,5).toUpperCase();
-      const newLead: Omit<RegisteredLead, 'registeredAt'> = {
-        id: leadId,
-        customerId: user.email,
-        leadName: user.companyName,
-        leadContact: user.userName,
-        leadEmail: user.email,
-        leadPhone: user.phone || '',
-        requirementsSummary: 'Customer downloaded listing details. Awaiting engagement.',
-        registeredBy: user.email,
-        providers: [{
-          providerEmail,
-          properties: listingIds.map(id => ({ listingId: id, status: 'Pending' })),
-        }],
-        isO2OCollaborator: false,
-        engagePath: null,
-      };
-      addRegisteredLead(newLead, user.email);
+      listingIds.forEach(listingId => {
+        const listing = listingsToDownload.find(l => l.listingId === listingId);
+        const leadId = 'LDR-DL-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2,5).toUpperCase();
+        const newLead: Omit<RegisteredLead, 'registeredAt'> = {
+          id: leadId,
+          customerId: user.email,
+          leadName: user.companyName,
+          leadContact: user.userName,
+          leadEmail: user.email,
+          leadPhone: user.phone || '',
+          requirementsSummary: `Customer downloaded: ${listing?.name || listingId}. Awaiting engagement.`,
+          registeredBy: user.email,
+          providers: [{
+            providerEmail,
+            properties: [{ listingId, status: 'Pending' }],
+          }],
+          isO2OCollaborator: false,
+          engagePath: null,
+        };
+        addRegisteredLead(newLead, user.email);
+      });
     });
 
     setDownloadHistory(prev => {
