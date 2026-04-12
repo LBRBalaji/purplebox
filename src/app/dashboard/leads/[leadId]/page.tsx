@@ -537,37 +537,11 @@ export default function LeadDetailPage() {
               )}
 
             <Tabs defaultValue={defaultTab} className="w-full">
-                <div className="flex items-center gap-3">
-                  <TabsList className="grid grid-cols-3 flex-1">
+                <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="activity" data-value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
                     <TabsTrigger value="negotiation-board" data-value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
                     <TabsTrigger value="improvements" data-value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
-                  </TabsList>
-                  <button
-                    onClick={() => {
-                      if (!selectedProvider || !lead) return;
-                      const listing = selectedProviderListings[0] || null;
-                      const customerUser = users[lead.customerId];
-                      setActiveChat({
-                        submissionId: `chat-${lead.id}-${selectedProvider.providerEmail}`,
-                        demandId: lead.id,
-                        listingId: listing?.listingId || '',
-                        providerEmail: selectedProvider.providerEmail,
-                        listing: listing || undefined,
-                        customerName: customerUser?.userName || '',
-                        customerId: lead.customerId,
-                        customerCompany: customerUser?.companyName || '',
-                        chatPartnerName: isCustomer
-                          ? (listing ? [listing.warehouseBoxId, listing.listingId, listing.location?.split(',')[0]].filter(Boolean).join(' · ') : 'Developer')
-                          : (customerUser?.companyName || 'Customer'),
-                      } as any);
-                      window.dispatchEvent(new CustomEvent('openChatWidget'));
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-90 flex-shrink-0"
-                    style={{background:'#6141ac', color:'#ffffff'}}>
-                    <MessageSquare className="h-4 w-4" /> Chat
-                  </button>
-                </div>
+                </TabsList>
                 <TabsContent value="activity" className="mt-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                         <div className="md:col-span-2 space-y-6">
