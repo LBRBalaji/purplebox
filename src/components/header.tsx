@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { HelpCircle, LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck, PlusCircle, Zap } from 'lucide-react';
+import { HelpCircle, LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck, PlusCircle, Zap, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -118,7 +118,7 @@ const ManageDropdown = ({ isSuperAdmin }) => {
 
 const MoreDropdown = () => {
   const pathname = usePathname();
-  const isActive = pathname.startsWith('/resources') || pathname.startsWith('/how-to-use') || pathname.startsWith('/about-us') || pathname.startsWith('/community');
+  const isActive = pathname.startsWith('/resources') || pathname.startsWith('/how-to-use') || pathname.startsWith('/about-us') || pathname.startsWith('/community') || pathname.startsWith('/partnership-and-access');
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -131,6 +131,8 @@ const MoreDropdown = () => {
         <DropdownMenuItem asChild><Link href="/how-to-use"><HelpCircle className="mr-2 h-4 w-4" /> How To Use</Link></DropdownMenuItem>
         <DropdownMenuItem asChild><Link href="/about-us"><Info className="mr-2 h-4 w-4" /> About Us</Link></DropdownMenuItem>
         <DropdownMenuItem asChild><Link href="/community"><Users className="mr-2 h-4 w-4" /> Community</Link></DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild><Link href="/partnership-and-access"><Handshake className="mr-2 h-4 w-4" /> Partnership &amp; Access</Link></DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -217,11 +219,11 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
           <div className="pt-2 pb-1 px-4">
             <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Explore</p>
           </div>
-          <NavItem href="/pricing" icon={Zap} label="Pricing" />
           <NavItem href="/resources" icon={BookOpen} label="Resources" />
           <NavItem href="/how-to-use" icon={HelpCircle} label="How To Use" />
           <NavItem href="/about-us" icon={Info} label="About Us" />
           <NavItem href="/community" icon={Users} label="Community" />
+          <NavItem href="/partnership-and-access" icon={Handshake} label="Partnership & Access" />
           {(isSuperAdmin || isO2O) && (
             <>
               <div className="pt-2 pb-1 px-4">
@@ -308,7 +310,6 @@ export function Header() {
               )}
                 <ToolsDropdown />
                 <MoreDropdown />
-              <NavLink href="/pricing">Pricing</NavLink>
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
                 {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
               </>

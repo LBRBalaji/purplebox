@@ -364,6 +364,10 @@ export default function SignupPage() {
               <a href={formData.role === 'User' ? '/terms-and-conditions/customer' : formData.role === 'Agent' ? '/terms-and-conditions/agent' : '/terms-and-conditions/developer'} target="_blank" className="text-primary underline">
                 Terms and Conditions
               </a>
+              {' '}and{' '}
+              <a href="/partnership-and-access" target="_blank" className="text-primary underline">
+                Partnership &amp; Access terms
+              </a>
             </p>
             <Button type="submit" className="w-full">
 {formData.role === 'Agent' ? <><UserPlus className="mr-2 h-4 w-4" /> Submit Application</> : <><UserPlus className="mr-2 h-4 w-4" /> Sign Up</>}
