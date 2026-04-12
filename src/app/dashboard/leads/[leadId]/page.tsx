@@ -187,7 +187,7 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead, getNegotiationBoard, getTenantImprovements } = useData();
+  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead, getNegotiationBoard, getTenantImprovements, setActiveChat } = useData();
   const { toast } = useToast();
   const searchParams = useSearchParams();
 
@@ -430,12 +430,34 @@ export default function LeadDetailPage() {
                     <p className="text-xs" style={{color:'hsl(259 30% 55%)'}}>
                       <span style={{color:'#9b7ee0'}}>✓</span> Identities revealed — you are now in the Transaction Workspace
                     </p>
-                    <Link
-                      href={isCustomer ? '/dashboard?tab=my-transactions' : '/dashboard?tab=registered-leads'}
+                    <button
+                      onClick={() => {
+                        if (!selectedProvider || !lead) return;
+                        const listing = selectedProviderListings[0] || null;
+                        const customerUser = users[lead.customerId];
+                        const provUser = users[selectedProvider.providerEmail];
+                        const threadId = `chat-${lead.id}-${selectedProvider.providerEmail}`;
+                        setActiveChat({
+                          submissionId: threadId,
+                          demandId: lead.id,
+                          listingId: listing?.listingId || '',
+                          providerEmail: selectedProvider.providerEmail,
+                          listing: listing || undefined,
+                          customerName: customerUser?.userName || '',
+                          customerId: lead.customerId,
+                          customerCompany: customerUser?.companyName || '',
+                          chatPartnerName: isCustomer
+                            ? (listing ? [listing.warehouseBoxId, listing.listingId, listing.location?.split(',')[0]].filter(Boolean).join(' · ') : 'Developer')
+                            : (customerUser?.companyName || 'Customer'),
+                        } as any);
+                        // Signal global widget to open
+                        try { sessionStorage.setItem('openChatWidget', '1'); } catch {}
+                        window.dispatchEvent(new CustomEvent('openChatWidget'));
+                      }}
                       className="text-xs font-bold flex items-center gap-1 hover:opacity-80 transition-opacity"
                       style={{color:'#9b7ee0'}}>
-                      ← Back to Chat
-                    </Link>
+                      ← Continue in Chat
+                    </button>
                   </div>
                 )}
               </div>
@@ -515,11 +537,37 @@ export default function LeadDetailPage() {
               )}
 
             <Tabs defaultValue={defaultTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <div className="flex items-center gap-3">
+                  <TabsList className="grid grid-cols-3 flex-1">
                     <TabsTrigger value="activity" data-value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
                     <TabsTrigger value="negotiation-board" data-value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
                     <TabsTrigger value="improvements" data-value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
-                </TabsList>
+                  </TabsList>
+                  <button
+                    onClick={() => {
+                      if (!selectedProvider || !lead) return;
+                      const listing = selectedProviderListings[0] || null;
+                      const customerUser = users[lead.customerId];
+                      setActiveChat({
+                        submissionId: `chat-${lead.id}-${selectedProvider.providerEmail}`,
+                        demandId: lead.id,
+                        listingId: listing?.listingId || '',
+                        providerEmail: selectedProvider.providerEmail,
+                        listing: listing || undefined,
+                        customerName: customerUser?.userName || '',
+                        customerId: lead.customerId,
+                        customerCompany: customerUser?.companyName || '',
+                        chatPartnerName: isCustomer
+                          ? (listing ? [listing.warehouseBoxId, listing.listingId, listing.location?.split(',')[0]].filter(Boolean).join(' · ') : 'Developer')
+                          : (customerUser?.companyName || 'Customer'),
+                      } as any);
+                      window.dispatchEvent(new CustomEvent('openChatWidget'));
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-90 flex-shrink-0"
+                    style={{background:'#6141ac', color:'#ffffff'}}>
+                    <MessageSquare className="h-4 w-4" /> Chat
+                  </button>
+                </div>
                 <TabsContent value="activity" className="mt-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                         <div className="md:col-span-2 space-y-6">

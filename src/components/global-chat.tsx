@@ -158,6 +158,19 @@ export function GlobalChatWidget() {
   const { activeChat, setActiveChat, registeredLeads, listings, unreadChatCount } = useData();
   const [isOpen, setIsOpen] = React.useState(false);
 
+  React.useEffect(() => {
+    const handler = () => setIsOpen(true);
+    window.addEventListener('openChatWidget', handler);
+    // Also check sessionStorage on mount
+    try {
+      if (sessionStorage.getItem('openChatWidget') === '1') {
+        sessionStorage.removeItem('openChatWidget');
+        setIsOpen(true);
+      }
+    } catch {}
+    return () => window.removeEventListener('openChatWidget', handler);
+  }, []);
+
   if (!user) return null;
 
   const handleSelectConversation = (chat: ChatSubmission) => setActiveChat(chat);
