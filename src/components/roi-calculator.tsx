@@ -195,6 +195,54 @@ export function RoiCalculator() {
         setLeveragedResult(generateProjections(annualLandLoanPayment, annualConstLoanPayment));
     };
 
+    const ResultTable = ({ title, result }: { title: string; result: ScenarioResult }) => (
+        <Card className="mt-6">
+            <CardHeader>
+                <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-primary" /> {title}
+                </CardTitle>
+                <div className="grid grid-cols-3 gap-4 mt-2">
+                    {[
+                        { label: 'Avg ROI (10 Yr)', value: result.averages.avg10 },
+                        { label: 'Avg ROI (20 Yr)', value: result.averages.avg20 },
+                        { label: 'Avg ROI (30 Yr)', value: result.averages.avg30 },
+                    ].map(({ label, value }) => (
+                        <div key={label} className="bg-primary/5 rounded-xl p-3 text-center">
+                            <p className="text-2xl font-black text-primary">{value.toFixed(1)}%</p>
+                            <p className="text-xs text-muted-foreground mt-1">{label}</p>
+                        </div>
+                    ))}
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Year</TableHead>
+                                <TableHead className="text-right">Gross Revenue</TableHead>
+                                <TableHead className="text-right">Loan Payments</TableHead>
+                                <TableHead className="text-right">Net Cash Flow</TableHead>
+                                <TableHead className="text-right">ROI %</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {result.tableRows.map(row => (
+                                <TableRow key={row.year} className={row.year % 10 === 0 ? 'bg-primary/5 font-semibold' : ''}>
+                                    <TableCell>{row.year}</TableCell>
+                                    <TableCell className="text-right">{formatCurrency(row.grossRevenue)}</TableCell>
+                                    <TableCell className="text-right">{formatCurrency(row.loanPayment)}</TableCell>
+                                    <TableCell className={`text-right font-medium ${row.netCashFlow >= 0 ? 'text-green-700' : 'text-red-600'}`}>{formatCurrency(row.netCashFlow)}</TableCell>
+                                    <TableCell className={`text-right font-bold ${row.roi >= 0 ? 'text-green-700' : 'text-red-600'}`}>{row.roi.toFixed(2)}%</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </CardContent>
+        </Card>
+    );
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -248,5 +296,14 @@ export function RoiCalculator() {
                 </div>
             </form>
         </Form>
+
+        {(nonLeveragedResult || leveragedResult) && (
+            <div className="space-y-6 mt-8">
+                <Separator />
+                <h2 className="text-2xl font-bold text-gray-800">Results</h2>
+                {nonLeveragedResult && <ResultTable title="Non-Leveraged Scenario (No Loans)" result={nonLeveragedResult} />}
+                {leveragedResult && <ResultTable title="Leveraged Scenario (With Loans)" result={leveragedResult} />}
+            </div>
+        )}
     );
 }
