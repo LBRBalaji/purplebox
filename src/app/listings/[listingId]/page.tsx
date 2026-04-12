@@ -404,7 +404,7 @@ export default function ListingDetailPage() {
         if (limitReached) {
              toast({
                 variant: 'destructive',
-                title: "Download Limit Reached", description: "You've reached your daily download limit. Your access refreshes tomorrow. Upgrade to Premium for higher limits."});
+                title: "Download Limit Reached", description: "You've reached your daily download limit. Your access refreshes tomorrow. Contact balaji@lakshmibalajio2o.com for assistance."});
         }
     };
 
@@ -444,7 +444,6 @@ export default function ListingDetailPage() {
         toggleGeneralShortlist(listing.id);
     };
     
-  const isPremiumListing = false;
 
     return (
         <>
@@ -455,12 +454,7 @@ export default function ListingDetailPage() {
                         <div>
                             <div className="flex items-center gap-4 mb-2">
                                 <Badge variant="secondary">{listing.listingId}</Badge>
-                                {isPremiumListing && (
-                                    <Badge style={{ backgroundColor: '#FDD017', color: '#333' }} className="border-amber-400">
-                                        <Sparkles className="mr-1.5 h-3 w-3"/>
-                                        Premium Listing
-                                    </Badge>
-                                )}
+
                             </div>
                             <h1 className="text-4xl font-bold font-headline tracking-tight mt-2">{listing.name || `Warehouse in ${listing.location}`}</h1>
                             <p className="text-lg text-muted-foreground flex items-center gap-2 mt-2">
@@ -680,24 +674,13 @@ export default function ListingDetailPage() {
                                         </div>
                                      ) : (
                                         <Button className="w-full" onClick={() => handleGetQuote()}>
-                                            <div className="flex flex-col text-center">
-                                                <span>Get Commercials Quote</span>
-                                                <span className="text-xs font-normal opacity-80">({isPremiumListing ? "Direct from Developer" : "via O2O Broking"})</span>
-                                            </div>
+                                            <span>Get Commercials Quote</span>
                                         </Button>
                                      )}
                                 </CardFooter>
                             </Card>
 
-                             {!isPremiumListing && (
-                                <Alert variant="default" className="bg-primary/5 border-primary/20">
-                                    <Sparkles className="h-4 w-4 text-primary" />
-                                    <AlertTitle className="font-semibold text-primary/90">Note for Customers</AlertTitle>
-                                    <AlertDescription className="text-primary/80">
-                                        Always look for <strong style={{ color: '#FDD017' }}>Premium Listings</strong> to engage directly with property developers.
-                                    </AlertDescription>
-                                </Alert>
-                            )}
+
 
                             <Card>
                                 <CardHeader>

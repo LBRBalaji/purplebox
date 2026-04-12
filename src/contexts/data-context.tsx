@@ -718,7 +718,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
                 type: 'new_lead_for_provider',
                 title: `New Direct Lead: ${newLead.leadName}`,
-                message: `A customer has requested a quote for your premium listing(s). Please acknowledge.`,
+                message: `A customer has downloaded your listing and initiated contact. Please acknowledge.`,
                 href: '/dashboard?tab=registered-leads',
                 recipientEmail: providerEmail,
                 timestamp: new Date().toISOString(),
@@ -844,10 +844,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const getDownloadLimits = useCallback((user: User, listingsToDownload: ListingSchema[]) => {
     const todayStart = startOfDay(new Date()).getTime();
     const domain = getEmailDomain(user.email);
-    const isPremium = user.plan === 'Paid_Premium';
-    const INDIVIDUAL_LIMIT = isPremium ? 15 : 5;
-    const CITY_LIMIT = isPremium ? 15 : 5;
-    const MAX_CITIES = isPremium ? 10 : 3;
+    const INDIVIDUAL_LIMIT = 5;
+    const CITY_LIMIT = 5;
+    const MAX_CITIES = 3;
     const individualToday = downloadHistory.filter(d => d.userId === user.email && d.timestamp >= todayStart).length;
     if (individualToday >= INDIVIDUAL_LIMIT) {
       const tomorrowDate = new Date();
@@ -909,7 +908,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
     const todayStart = startOfDay(new Date()).getTime();
     const individualToday = downloadHistory.filter(d => d.userId === user.email && d.timestamp >= todayStart).length;
-    const INDIVIDUAL_LIMIT = user.plan === 'Paid_Premium' ? 15 : 5;
+    const INDIVIDUAL_LIMIT = 5;
     if (individualToday === INDIVIDUAL_LIMIT - 1) {
         toast({ title: "1 download remaining today", description: "You are close to your daily limit." });
     }

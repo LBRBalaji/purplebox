@@ -138,10 +138,6 @@ export function UserList() {
 
 
   const handleDesignateAdmin = async (u: User) => {
-    if (u.plan !== 'Paid_Premium') {
-      toast({ variant: 'destructive', title: 'Paid Plan Required', description: 'Company Admin can only be designated for Paid Premium users.' });
-      return;
-    }
     const domain = u.email.split('@')[1]?.toLowerCase();
     const allUsersList = Object.values(users) as User[];
     // Remove admin from any existing admin in same domain

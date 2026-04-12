@@ -438,7 +438,6 @@ export function ListingsPage() {
 
     // Premium filter
     if (showOnlyPremium) {
-        results = results.filter(l => l.plan === 'Paid_Premium');
     }
 
     // Keyword search
