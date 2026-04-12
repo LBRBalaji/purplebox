@@ -20,6 +20,8 @@ export type User = {
   phone: string;
   createdAt: string;
   status?: 'pending' | 'approved' | 'rejected' | 'suspended';
+  gstNumber?: string;
+  panNumber?: string;
 };
 
 export type NewUser = User & {
@@ -128,9 +130,40 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
   const signup = async (details: NewUser) => {
     const email = details.email.toLowerCase();
     const emailDomain = email.split('@')[1];
-    if (personalEmailDomains.includes(emailDomain)) {
+    const isPersonalEmail = personalEmailDomains.includes(emailDomain);
+
+    // Developers may use personal email — block only for Customer/Agent roles
+    if (details.role !== 'Warehouse Developer' && isPersonalEmail) {
       toast({ variant: 'destructive', title: 'Invalid Email', description: 'Please use your official company email.' });
       return;
+    }
+
+    // Developer: validate GST or PAN and check uniqueness
+    if (details.role === 'Warehouse Developer') {
+      const gst = (details as any).gstNumber?.trim().toUpperCase();
+      const pan = (details as any).panNumber?.trim().toUpperCase();
+      if (!gst && !pan) {
+        toast({ variant: 'destructive', title: 'GST or PAN Required', description: 'Please provide your GST number or PAN to register as a Property Developer.' });
+        return;
+      }
+      if (gst && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst)) {
+        toast({ variant: 'destructive', title: 'Invalid GST Number', description: 'GST number must be 15 characters in valid format (e.g. 29ABCDE1234F1Z5).' });
+        return;
+      }
+      if (!gst && pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
+        toast({ variant: 'destructive', title: 'Invalid PAN Number', description: 'PAN must be 10 characters (e.g. ABCDE1234F).' });
+        return;
+      }
+      // Check uniqueness — no two developers with same GST/PAN
+      const existingUsers = Object.values(users || {}) as any[];
+      if (gst && existingUsers.some(u => u.gstNumber?.toUpperCase() === gst)) {
+        toast({ variant: 'destructive', title: 'GST Already Registered', description: 'An account with this GST number already exists. Please login or contact support.' });
+        return;
+      }
+      if (!gst && pan && existingUsers.some(u => u.panNumber?.toUpperCase() === pan)) {
+        toast({ variant: 'destructive', title: 'PAN Already Registered', description: 'An account with this PAN number already exists. Please login or contact support.' });
+        return;
+      }
     }
     const searchString = email + ' ' + details.companyName.toLowerCase();
     const foundKeyword = competitorKeywords.find(k => searchString.includes(k));

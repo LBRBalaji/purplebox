@@ -27,7 +27,7 @@ export default function SignupPage() {
   const { signup } = useAuth();
   const { addAgentLead } = useData();
   const { toast } = useToast();
-  const [formData, setFormData] = React.useState<Omit<NewUser, 'createdAt'>>({
+  const [formData, setFormData] = React.useState<Omit<NewUser, 'createdAt'> & { gstNumber?: string; panNumber?: string }>({
     email: '',
     companyName: '',
     userName: '',
@@ -35,7 +35,10 @@ export default function SignupPage() {
     role: 'User',
     password: '',
     industryType: '',
+    gstNumber: '',
+    panNumber: '',
   });
+  const [taxIdType, setTaxIdType] = React.useState<'gst' | 'pan'>('gst');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [agentType, setAgentType] = React.useState<'Individual' | 'Company'>('Individual');
   const [agentAddress, setAgentAddress] = React.useState('');
@@ -59,7 +62,7 @@ export default function SignupPage() {
 
   const handleSendOtp = async () => {
     if (!formData.email) { setOtpError('Please enter your email first.'); return; }
-    if (isPersonalEmail(formData.email)) { setOtpError('Please use your official company email address.'); return; }
+    if (formData.role !== 'Warehouse Developer' && isPersonalEmail(formData.email)) { setOtpError('Please use your official company email address.'); return; }
     setOtpLoading(true); setOtpError('');
     try {
       const res = await fetch('/api/send-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: formData.email }) });
@@ -96,7 +99,7 @@ export default function SignupPage() {
       toast({ variant: 'destructive', title: 'Official Email Required', description: 'Please use your official company email address to sign up.' });
       return;
     }
-    if (formData.role === 'User' && !otpVerified) {
+    if ((formData.role === 'User' || formData.role === 'Warehouse Developer') && !otpVerified) {
       toast({ variant: 'destructive', title: 'Email Verification Required', description: 'Please verify your email address before signing up.' });
       return;
     }
@@ -221,10 +224,10 @@ export default function SignupPage() {
                 </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email {formData.role === 'User' && <span className="text-xs text-muted-foreground">(official company email only)</span>}</Label>
+              <Label htmlFor="email">Email {formData.role === 'User' ? <span className="text-xs text-muted-foreground">(official company email only)</span> : formData.role === 'Warehouse Developer' ? <span className="text-xs text-muted-foreground">(any email accepted)</span> : null}</Label>
               <div className="flex gap-2">
                 <Input id="email" type="email" placeholder="you@yourcompany.com" required onChange={e => { handleChange(e); setOtpSent(false); setOtpVerified(false); setOtpError(''); }} value={formData.email} disabled={otpVerified} className="flex-1" />
-                {formData.role === 'User' && !otpVerified && (
+                {(formData.role === 'User' || formData.role === 'Warehouse Developer') && !otpVerified && (
                   <button type="button" onClick={handleSendOtp} disabled={otpLoading || !formData.email}
                     className="px-3 py-2 rounded-lg text-xs font-bold bg-primary text-white hover:bg-primary/90 disabled:opacity-50 whitespace-nowrap">
                     {otpLoading ? 'Sending...' : otpSent ? 'Resend' : 'Verify Email'}
@@ -232,7 +235,7 @@ export default function SignupPage() {
                 )}
                 {otpVerified && <div className="flex items-center gap-1 text-green-600 text-xs font-bold"><CheckCircle className="h-4 w-4" /> Verified</div>}
               </div>
-              {formData.role === 'User' && otpSent && !otpVerified && (
+              {(formData.role === 'User' || formData.role === 'Warehouse Developer') && otpSent && !otpVerified && (
                 <div className="space-y-2 mt-2">
                   <div className="flex gap-2">
                     <Input placeholder="Enter 6-digit OTP" value={otpValue} onChange={e => setOtpValue(e.target.value)} maxLength={6} className="flex-1" />
@@ -250,6 +253,43 @@ export default function SignupPage() {
               <Label htmlFor="phone">Phone Number</Label>
               <Input id="phone" type="tel" placeholder="+1 234 567 890" required onChange={handleChange} value={formData.phone} />
             </div>
+            {formData.role === 'Warehouse Developer' && (
+              <div className="space-y-2">
+                <Label>GST / PAN Number <span className="text-destructive">*</span></Label>
+                <div className="flex gap-2 mb-2">
+                  <button type="button"
+                    onClick={() => setTaxIdType('gst')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${taxIdType === 'gst' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground'}`}>
+                    GST Number
+                  </button>
+                  <button type="button"
+                    onClick={() => setTaxIdType('pan')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${taxIdType === 'pan' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground'}`}>
+                    PAN (no GST)
+                  </button>
+                </div>
+                {taxIdType === 'gst' ? (
+                  <Input
+                    id="gstNumber"
+                    placeholder="29ABCDE1234F1Z5"
+                    maxLength={15}
+                    value={formData.gstNumber || ''}
+                    onChange={e => setFormData({ ...formData, gstNumber: e.target.value.toUpperCase(), panNumber: '' })}
+                  />
+                ) : (
+                  <Input
+                    id="panNumber"
+                    placeholder="ABCDE1234F"
+                    maxLength={10}
+                    value={formData.panNumber || ''}
+                    onChange={e => setFormData({ ...formData, panNumber: e.target.value.toUpperCase(), gstNumber: '' })}
+                  />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {taxIdType === 'gst' ? '15-character GST number. Used to verify your business identity.' : '10-character PAN. Use this only if you do not have a GST registration.'}
+                </p>
+              </div>
+            )}
             {formData.role === 'User' && (
               <div className="space-y-2">
                 <Label>Industry Type <span className="text-destructive">*</span></Label>

@@ -259,7 +259,11 @@ export function UserList() {
                           </TooltipProvider>
                       )}
                     </TableCell>
-                    <TableCell>{user.companyName}</TableCell>
+                    <TableCell>
+                      {user.companyName}
+                      {(user as any).gstNumber && <p className="text-xs text-muted-foreground mt-0.5">GST: {(user as any).gstNumber}</p>}
+                      {!(user as any).gstNumber && (user as any).panNumber && <p className="text-xs text-muted-foreground mt-0.5">PAN: {(user as any).panNumber}</p>}
+                    </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{user.phone || "-"}</TableCell>
                     <TableCell>
                        <Badge variant={user.role === 'SuperAdmin' ? "destructive" : user.role === 'O2O' ? 'default' : "outline"}>
