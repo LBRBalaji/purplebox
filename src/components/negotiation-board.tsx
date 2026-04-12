@@ -26,6 +26,169 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { ScrollArea } from './ui/scroll-area';
 
+// All term sheet sections from the lease term sheet template
+const TERM_SHEET_SECTIONS = [
+  {
+    id: 'siteInfo', label: '1. Site Information', icon: 'MapPin',
+    fields: [
+      { id: '1.1', label: 'Postal Address of Facility', type: 'text', listingKey: 'location' },
+      { id: '1.2', label: 'Building Number', type: 'text', listingKey: 'warehouseBoxId' },
+      { id: '1.4', label: 'Google Coordinates', type: 'text', listingKey: 'latLng' },
+      { id: '1.5', label: 'Building Status', type: 'select', options: ['Ready for Occupancy', 'Under Construction', 'BTS-Built To Suit'], listingKey: 'availabilityDate' },
+    ]
+  },
+  {
+    id: 'area', label: '2. Area (SFT)', icon: 'Home',
+    fields: [
+      { id: '2.1', label: 'Plinth Area (Shop Floor) - SFT', type: 'number', listingKey: 'area.plinthArea' },
+      { id: '2.2', label: 'Mezzanine Area 1 - SFT', type: 'number', listingKey: 'area.mezzanineArea1' },
+      { id: '2.3', label: 'Mezzanine Area 2 - SFT', type: 'number', listingKey: 'area.mezzanineArea2' },
+      { id: '2.4', label: 'Canopy Area - SFT', type: 'number', listingKey: 'area.canopyArea' },
+      { id: '2.5', label: "Driver's Rest Room - SFT", type: 'number', listingKey: 'area.driversRestRoomArea' },
+      { id: '2.6', label: 'Total Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
+    ]
+  },
+  {
+    id: 'tenantImprovements', label: '3. Tenant Improvement Items', icon: 'HardHat',
+    fields: [
+      { id: '3.1', label: 'Electricity Power', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '3.2', label: 'Internal Cabling & Power Gear', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '3.3', label: 'HVAC', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
+      { id: '3.4', label: 'Mechanised Access to Mezzanine', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
+      { id: '3.5', label: 'Wash Rooms on Mezzanine Floor', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
+      { id: '3.6', label: 'Ramp (if required due to partition)', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
+    ]
+  },
+  {
+    id: 'leaseTerms', label: '4. Lease Terms', icon: 'Calendar',
+    fields: [
+      { id: '4.1', label: 'Lease Tenure', type: 'select', options: ['1 Year', '2 Years', '3 Years', '5 Years', '7 Years', '9 Years', '10 Years', 'Custom'] },
+      { id: '4.2', label: 'Lease Lock-In Period', type: 'select', options: ['None', '6 Months', '1 Year', '2 Years', '3 Years', 'Custom'] },
+      { id: '4.3', label: 'Tentative Handover Date for Fitout', type: 'date' },
+      { id: '4.4', label: 'Tentative 100% Handover Date', type: 'date' },
+      { id: '4.5', label: 'Rent Free Period (for Fitout)', type: 'select', options: ['None', '1 Month', '2 Months', '3 Months', 'Custom'] },
+      { id: '4.6', label: 'Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
+      { id: '4.7', label: 'Lease Commencement Date', type: 'date' },
+      { id: '4.8', label: 'Rent Commencement Date (Post Rent Free)', type: 'date' },
+      { id: '4.9', label: 'Scope & Cost of Lease Registration', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared 50:50'] },
+    ]
+  },
+  {
+    id: 'commercialTerms', label: '5. Commercial Terms', icon: 'HandCoins',
+    fields: [
+      { id: '5.1', label: 'Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
+      { id: '5.2a', label: 'Building Rent per SFT (INR)', type: 'number', listingKey: 'rentPerSqFt' },
+      { id: '5.2b', label: 'Building Rent - Total Chargeable Area per Month (INR)', type: 'number' },
+      { id: '5.3', label: 'Monthly Amortization - CAPEX Item 1 (excl. GST)', type: 'number' },
+      { id: '5.4', label: 'Monthly Amortization - CAPEX Item 2 (excl. GST)', type: 'number' },
+      { id: '5.5', label: 'Monthly Amortization - CAPEX Item 3 (excl. GST)', type: 'number' },
+      { id: '5.6', label: 'Net Total Rental incl. CAPEX Amortization (excl. GST)', type: 'number' },
+      { id: '5.7', label: 'CAM Charges per SFT (excl. GST)', type: 'number', listingKey: 'camCharges' },
+      { id: '5.8', label: 'IFRSD - Interest Free Refundable Security Deposit', type: 'number' },
+      { id: '5.9', label: 'Rent Escalation % and Frequency', type: 'text' },
+      { id: '5.10', label: 'Commitment for Phase II', type: 'radio', options: ['Yes', 'No', 'To be discussed'] },
+      { id: '5.11', label: 'Additional Charges', type: 'text' },
+    ]
+  },
+  {
+    id: 'electrical', label: '6. Electrical Infrastructure', icon: 'Power',
+    fields: [
+      { id: '6.1', label: 'Installed Capacity of Sub-Station in Park', type: 'text' },
+      { id: '6.2', label: 'Power Requirement - Phase I', type: 'text' },
+      { id: '6.3', label: 'Power Requirement - Phase II', type: 'text' },
+      { id: '6.4', label: 'Scope of Providing Required Power', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '6.15', label: 'Genset Requirement', type: 'radio', options: ['Yes', 'No'] },
+      { id: '6.16', label: 'Genset Capacity (if required)', type: 'text' },
+      { id: '6.18', label: 'HVAC Requirement', type: 'radio', options: ['Yes', 'No'] },
+      { id: '6.19', label: 'HVAC Capacity (if required)', type: 'text' },
+      { id: '6.21', label: 'False Ceiling', type: 'radio', options: ['Yes', 'No', 'Partial'] },
+    ]
+  },
+  {
+    id: 'legal', label: '7. Legal & Statutory Compliances', icon: 'ShieldCheck',
+    fields: [
+      { id: '7.1', label: 'Building Plan Approved By & Approval Number', type: 'text' },
+      { id: '7.2', label: 'Status & Scope of Fire License & NOC', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '7.3', label: 'Business Licenses / PCB CTO - Scope', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+      { id: '7.4', label: 'All Building/Property Approvals & Taxes', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+      { id: '7.5', label: 'Title Due-Diligence', type: 'lessor_lessee', options: ['Lessor to Provide', 'Lessee to Conduct', 'Jointly'] },
+    ]
+  },
+  {
+    id: 'maintenance', label: '8. Maintenance & Insurance', icon: 'Home',
+    fields: [
+      { id: '8.1', label: 'Maintenance of Access Road', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '8.2', label: 'Maintenance of Leased Space', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+      { id: '8.3', label: 'Common Area Maintenance', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '8.4', label: 'Insurance of Proposed Lease Building', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+      { id: '8.5', label: 'Insurance for Goods Inside the Building', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+    ]
+  },
+  {
+    id: 'parties', label: '9. Lessor & Lessee Details', icon: 'Users',
+    fields: [
+      { id: '9.1', label: 'Lessee Company Name', type: 'text' },
+      { id: '9.2', label: 'Lessee - Signing Authority & Designation', type: 'text' },
+      { id: '9.3', label: 'Lessee - Corporate Office Address', type: 'text' },
+      { id: '9.4.1', label: 'Lessor Company Name (Rental Agreement)', type: 'text' },
+      { id: '9.4.2', label: 'Lessor Company Name (Services Agreement)', type: 'text' },
+      { id: '9.5', label: 'Lessor - Signing Authority & Designation', type: 'text' },
+      { id: '9.6', label: 'Lessor - Corporate Office Address', type: 'text' },
+    ]
+  },
+  {
+    id: 'periphery', label: '10. Periphery Area', icon: 'MapPin',
+    fields: [
+      { id: '10.1', label: 'Plot Elevation Above Road (meters)', type: 'number' },
+      { id: '10.2', label: 'Flooring Type - Inside Warehouse', type: 'select', options: ['FM 2', 'FM 1', 'PU Coating', 'Concrete', 'Other'] },
+      { id: '10.3', label: 'Flooring Type - Outside Warehouse', type: 'select', options: ['RCC', 'Asphalt', 'Paver Blocks', 'Other'] },
+      { id: '10.4', label: 'Road Type - Main Gate to Warehouse', type: 'select', options: ['RCC', 'Asphalt', 'WBM', 'Other'] },
+    ]
+  },
+  {
+    id: 'building', label: '11. The Building', icon: 'Warehouse',
+    fields: [
+      { id: '11.1', label: 'Building Type', type: 'select', options: ['Grade-A Pre-Engineered Building', 'RCC', 'Standard Shed', 'Other'] },
+      { id: '11.2', label: 'Shop Floor Dimension (L x W meters)', type: 'text' },
+      { id: '11.3', label: 'Mezzanine Floor Height & Dimension', type: 'text' },
+      { id: '11.4', label: 'Number of Docks & Shutters', type: 'text', listingKey: 'buildingSpecifications.numberOfDocksAndShutters' },
+      { id: '11.5', label: 'Canopy Dimension', type: 'text' },
+      { id: '11.6', label: 'Natural Lighting & Ventilation', type: 'radio', options: ['Yes', 'No', 'Partial'] },
+      { id: '11.7', label: 'Roof Insulation', type: 'radio', options: ['Yes', 'No'] },
+    ]
+  },
+  {
+    id: 'water', label: '12. Water, Toilet & Sewerage', icon: 'Droplets',
+    fields: [
+      { id: '12.1', label: 'Workers Toilet', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide', 'Shared'] },
+      { id: '12.2', label: 'Executive Toilet', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide', 'Shared'] },
+      { id: '12.8', label: 'STP Provided', type: 'radio', options: ['Yes', 'No'] },
+      { id: '12.9', label: 'Solid Waste Disposal', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+    ]
+  },
+  {
+    id: 'safety', label: '13. Safety & Security', icon: 'ShieldCheck',
+    fields: [
+      { id: '13.1', label: 'Fire Exit Doors', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide'] },
+      { id: '13.2', label: 'Fire Hydrant - Outside Building', type: 'radio', options: ['Yes', 'No'] },
+      { id: '13.3', label: 'Fire Hydrant - Inside Building', type: 'radio', options: ['Yes', 'No'] },
+      { id: '13.4', label: 'Fire Sprinklers', type: 'radio', options: ['Yes', 'No'] },
+      { id: '13.6', label: 'Park Fully Compounded', type: 'radio', options: ['Yes', 'No', 'Partial'] },
+      { id: '13.7', label: 'Security at Gate', type: 'radio', options: ['Yes', 'No'] },
+      { id: '13.8', label: 'CCTV Installed', type: 'radio', options: ['Yes', 'No'] },
+    ]
+  },
+];
+
+// Helper to get listing field value by dot-path
+function getListingValue(listing: ListingSchema | null, path?: string): string {
+  if (!listing || !path) return '';
+  const parts = path.split('.');
+  let val: any = listing;
+  for (const p of parts) { val = val?.[p]; }
+  return val !== undefined && val !== null ? String(val) : '';
+}
+
 const SectionHeader = ({ icon, title, description }: { icon: React.ElementType; title: string, description?: string }) => {
     const Icon = icon;
     return (
@@ -244,35 +407,51 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
     }
 
      const handleBuildTermSheet = () => {
-        const sessionPath = `sessions.0`;
-        const currentSections: any[] = form.getValues(`sessions.0.sections`) || [];
-        const existingSectionIds = currentSections.map((s: any) => s.id);
+        // Ensure sessions[0] exists — create it if board is fresh
+        const existingSessions = form.getValues('sessions') || [];
+        if (existingSessions.length === 0) {
+            appendSession({
+                date: new Date().toISOString(),
+                venue: 'Term Sheet',
+                customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
+                providerAttendees: [],
+                facilitatorAttendees: [],
+                sections: [],
+            } as any);
+            // Give React a tick to update form state
+        }
 
-        selectedTermSections.forEach(sectionId => {
-            if (existingSectionIds.includes(sectionId)) return; // skip already added
-            const def = TERM_SHEET_SECTIONS.find(s => s.id === sectionId);
-            if (!def) return;
-            const newSection = {
-                id: def.id,
-                title: def.label,
-                fields: def.fields.map(f => ({
-                    id: f.id,
-                    label: f.label,
-                    isLabelEditable: false,
-                    agreedTerms: {
-                        current: getListingValue(primaryListing, (f as any).listingKey),
-                        history: [],
-                    },
-                    proposedBy: { current: '', history: [] },
-                    status: { current: 'Pending', history: [] },
-                    // Store field type metadata in label suffix for rendering
-                    fieldType: f.type,
-                    fieldOptions: (f as any).options || [],
-                }))
-            };
-            currentSections.push(newSection);
-        });
-        form.setValue(`sessions.0.sections`, currentSections);
+        // Use setTimeout to ensure form state is updated before reading
+        setTimeout(() => {
+            const currentSections: any[] = form.getValues('sessions.0.sections') || [];
+            const existingSectionIds = currentSections.map((s: any) => s.id);
+
+            selectedTermSections.forEach(sectionId => {
+                if (existingSectionIds.includes(sectionId)) return;
+                const def = TERM_SHEET_SECTIONS.find(s => s.id === sectionId);
+                if (!def) return;
+                const newSection = {
+                    id: def.id,
+                    title: def.label,
+                    fields: def.fields.map(f => ({
+                        id: f.id,
+                        label: f.label,
+                        isLabelEditable: false,
+                        agreedTerms: {
+                            current: getListingValue(primaryListing, (f as any).listingKey),
+                            history: [],
+                        },
+                        proposedBy: { current: '', history: [] },
+                        status: { current: 'Pending', history: [] },
+                        fieldType: f.type,
+                        fieldOptions: (f as any).options || [],
+                    }))
+                };
+                currentSections.push(newSection);
+            });
+            form.setValue('sessions.0.sections', currentSections, { shouldDirty: true });
+        }, 50);
+
         setShowTermSheetBuilder(false);
         setSelectedTermSections([]);
     };
@@ -449,169 +628,6 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
             </Collapsible>
         </Card>
     );
-}
-
-// All term sheet sections from the lease term sheet template
-const TERM_SHEET_SECTIONS = [
-  {
-    id: 'siteInfo', label: '1. Site Information', icon: 'MapPin',
-    fields: [
-      { id: '1.1', label: 'Postal Address of Facility', type: 'text', listingKey: 'location' },
-      { id: '1.2', label: 'Building Number', type: 'text', listingKey: 'warehouseBoxId' },
-      { id: '1.4', label: 'Google Coordinates', type: 'text', listingKey: 'latLng' },
-      { id: '1.5', label: 'Building Status', type: 'select', options: ['Ready for Occupancy', 'Under Construction', 'BTS-Built To Suit'], listingKey: 'availabilityDate' },
-    ]
-  },
-  {
-    id: 'area', label: '2. Area (SFT)', icon: 'Home',
-    fields: [
-      { id: '2.1', label: 'Plinth Area (Shop Floor) - SFT', type: 'number', listingKey: 'area.plinthArea' },
-      { id: '2.2', label: 'Mezzanine Area 1 - SFT', type: 'number', listingKey: 'area.mezzanineArea1' },
-      { id: '2.3', label: 'Mezzanine Area 2 - SFT', type: 'number', listingKey: 'area.mezzanineArea2' },
-      { id: '2.4', label: 'Canopy Area - SFT', type: 'number', listingKey: 'area.canopyArea' },
-      { id: '2.5', label: "Driver's Rest Room - SFT", type: 'number', listingKey: 'area.driversRestRoomArea' },
-      { id: '2.6', label: 'Total Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
-    ]
-  },
-  {
-    id: 'tenantImprovements', label: '3. Tenant Improvement Items', icon: 'HardHat',
-    fields: [
-      { id: '3.1', label: 'Electricity Power', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
-      { id: '3.2', label: 'Internal Cabling & Power Gear', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
-      { id: '3.3', label: 'HVAC', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
-      { id: '3.4', label: 'Mechanised Access to Mezzanine', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
-      { id: '3.5', label: 'Wash Rooms on Mezzanine Floor', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
-      { id: '3.6', label: 'Ramp (if required due to partition)', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
-    ]
-  },
-  {
-    id: 'leaseTerms', label: '4. Lease Terms', icon: 'Calendar',
-    fields: [
-      { id: '4.1', label: 'Lease Tenure', type: 'select', options: ['1 Year', '2 Years', '3 Years', '5 Years', '7 Years', '9 Years', '10 Years', 'Custom'] },
-      { id: '4.2', label: 'Lease Lock-In Period', type: 'select', options: ['None', '6 Months', '1 Year', '2 Years', '3 Years', 'Custom'] },
-      { id: '4.3', label: 'Tentative Handover Date for Fitout', type: 'date' },
-      { id: '4.4', label: 'Tentative 100% Handover Date', type: 'date' },
-      { id: '4.5', label: 'Rent Free Period (for Fitout)', type: 'select', options: ['None', '1 Month', '2 Months', '3 Months', 'Custom'] },
-      { id: '4.6', label: 'Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
-      { id: '4.7', label: 'Lease Commencement Date', type: 'date' },
-      { id: '4.8', label: 'Rent Commencement Date (Post Rent Free)', type: 'date' },
-      { id: '4.9', label: 'Scope & Cost of Lease Registration', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared 50:50'] },
-    ]
-  },
-  {
-    id: 'commercialTerms', label: '5. Commercial Terms', icon: 'HandCoins',
-    fields: [
-      { id: '5.1', label: 'Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
-      { id: '5.2a', label: 'Building Rent per SFT (INR)', type: 'number', listingKey: 'rentPerSqFt' },
-      { id: '5.2b', label: 'Building Rent - Total Chargeable Area per Month (INR)', type: 'number' },
-      { id: '5.3', label: 'Monthly Amortization - CAPEX Item 1 (excl. GST)', type: 'number' },
-      { id: '5.4', label: 'Monthly Amortization - CAPEX Item 2 (excl. GST)', type: 'number' },
-      { id: '5.5', label: 'Monthly Amortization - CAPEX Item 3 (excl. GST)', type: 'number' },
-      { id: '5.6', label: 'Net Total Rental incl. CAPEX Amortization (excl. GST)', type: 'number' },
-      { id: '5.7', label: 'CAM Charges per SFT (excl. GST)', type: 'number', listingKey: 'camCharges' },
-      { id: '5.8', label: 'IFRSD - Interest Free Refundable Security Deposit', type: 'number' },
-      { id: '5.9', label: 'Rent Escalation % and Frequency', type: 'text' },
-      { id: '5.10', label: 'Commitment for Phase II', type: 'radio', options: ['Yes', 'No', 'To be discussed'] },
-      { id: '5.11', label: 'Additional Charges', type: 'text' },
-    ]
-  },
-  {
-    id: 'electrical', label: '6. Electrical Infrastructure', icon: 'Power',
-    fields: [
-      { id: '6.1', label: 'Installed Capacity of Sub-Station in Park', type: 'text' },
-      { id: '6.2', label: 'Power Requirement - Phase I', type: 'text' },
-      { id: '6.3', label: 'Power Requirement - Phase II', type: 'text' },
-      { id: '6.4', label: 'Scope of Providing Required Power', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
-      { id: '6.15', label: 'Genset Requirement', type: 'radio', options: ['Yes', 'No'] },
-      { id: '6.16', label: 'Genset Capacity (if required)', type: 'text' },
-      { id: '6.18', label: 'HVAC Requirement', type: 'radio', options: ['Yes', 'No'] },
-      { id: '6.19', label: 'HVAC Capacity (if required)', type: 'text' },
-      { id: '6.21', label: 'False Ceiling', type: 'radio', options: ['Yes', 'No', 'Partial'] },
-    ]
-  },
-  {
-    id: 'legal', label: '7. Legal & Statutory Compliances', icon: 'ShieldCheck',
-    fields: [
-      { id: '7.1', label: 'Building Plan Approved By & Approval Number', type: 'text' },
-      { id: '7.2', label: 'Status & Scope of Fire License & NOC', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
-      { id: '7.3', label: 'Business Licenses / PCB CTO - Scope', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
-      { id: '7.4', label: 'All Building/Property Approvals & Taxes', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
-      { id: '7.5', label: 'Title Due-Diligence', type: 'lessor_lessee', options: ['Lessor to Provide', 'Lessee to Conduct', 'Jointly'] },
-    ]
-  },
-  {
-    id: 'maintenance', label: '8. Maintenance & Insurance', icon: 'Home',
-    fields: [
-      { id: '8.1', label: 'Maintenance of Access Road', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
-      { id: '8.2', label: 'Maintenance of Leased Space', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
-      { id: '8.3', label: 'Common Area Maintenance', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
-      { id: '8.4', label: 'Insurance of Proposed Lease Building', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
-      { id: '8.5', label: 'Insurance for Goods Inside the Building', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
-    ]
-  },
-  {
-    id: 'parties', label: '9. Lessor & Lessee Details', icon: 'Users',
-    fields: [
-      { id: '9.1', label: 'Lessee Company Name', type: 'text' },
-      { id: '9.2', label: 'Lessee - Signing Authority & Designation', type: 'text' },
-      { id: '9.3', label: 'Lessee - Corporate Office Address', type: 'text' },
-      { id: '9.4.1', label: 'Lessor Company Name (Rental Agreement)', type: 'text' },
-      { id: '9.4.2', label: 'Lessor Company Name (Services Agreement)', type: 'text' },
-      { id: '9.5', label: 'Lessor - Signing Authority & Designation', type: 'text' },
-      { id: '9.6', label: 'Lessor - Corporate Office Address', type: 'text' },
-    ]
-  },
-  {
-    id: 'periphery', label: '10. Periphery Area', icon: 'MapPin',
-    fields: [
-      { id: '10.1', label: 'Plot Elevation Above Road (meters)', type: 'number' },
-      { id: '10.2', label: 'Flooring Type - Inside Warehouse', type: 'select', options: ['FM 2', 'FM 1', 'PU Coating', 'Concrete', 'Other'] },
-      { id: '10.3', label: 'Flooring Type - Outside Warehouse', type: 'select', options: ['RCC', 'Asphalt', 'Paver Blocks', 'Other'] },
-      { id: '10.4', label: 'Road Type - Main Gate to Warehouse', type: 'select', options: ['RCC', 'Asphalt', 'WBM', 'Other'] },
-    ]
-  },
-  {
-    id: 'building', label: '11. The Building', icon: 'Warehouse',
-    fields: [
-      { id: '11.1', label: 'Building Type', type: 'select', options: ['Grade-A Pre-Engineered Building', 'RCC', 'Standard Shed', 'Other'] },
-      { id: '11.2', label: 'Shop Floor Dimension (L x W meters)', type: 'text' },
-      { id: '11.3', label: 'Mezzanine Floor Height & Dimension', type: 'text' },
-      { id: '11.4', label: 'Number of Docks & Shutters', type: 'text', listingKey: 'buildingSpecifications.numberOfDocksAndShutters' },
-      { id: '11.5', label: 'Canopy Dimension', type: 'text' },
-      { id: '11.6', label: 'Natural Lighting & Ventilation', type: 'radio', options: ['Yes', 'No', 'Partial'] },
-      { id: '11.7', label: 'Roof Insulation', type: 'radio', options: ['Yes', 'No'] },
-    ]
-  },
-  {
-    id: 'water', label: '12. Water, Toilet & Sewerage', icon: 'Droplets',
-    fields: [
-      { id: '12.1', label: 'Workers Toilet', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide', 'Shared'] },
-      { id: '12.2', label: 'Executive Toilet', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide', 'Shared'] },
-      { id: '12.8', label: 'STP Provided', type: 'radio', options: ['Yes', 'No'] },
-      { id: '12.9', label: 'Solid Waste Disposal', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
-    ]
-  },
-  {
-    id: 'safety', label: '13. Safety & Security', icon: 'ShieldCheck',
-    fields: [
-      { id: '13.1', label: 'Fire Exit Doors', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide'] },
-      { id: '13.2', label: 'Fire Hydrant - Outside Building', type: 'radio', options: ['Yes', 'No'] },
-      { id: '13.3', label: 'Fire Hydrant - Inside Building', type: 'radio', options: ['Yes', 'No'] },
-      { id: '13.4', label: 'Fire Sprinklers', type: 'radio', options: ['Yes', 'No'] },
-      { id: '13.6', label: 'Park Fully Compounded', type: 'radio', options: ['Yes', 'No', 'Partial'] },
-      { id: '13.7', label: 'Security at Gate', type: 'radio', options: ['Yes', 'No'] },
-      { id: '13.8', label: 'CCTV Installed', type: 'radio', options: ['Yes', 'No'] },
-    ]
-  },
-];
-
-// Helper to get listing field value by dot-path
-function getListingValue(listing: ListingSchema | null, path?: string): string {
-  if (!listing || !path) return '';
-  const parts = path.split('.');
-  let val: any = listing;
-  for (const p of parts) { val = val?.[p]; }
-  return val !== undefined && val !== null ? String(val) : '';
 }
 
 export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
