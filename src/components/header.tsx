@@ -156,6 +156,8 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
   const pathname = usePathname();
   const isO2O = user?.role === 'O2O';
   const isProvider = user?.role === 'Warehouse Developer';
+  const isCustomer = user?.role === 'User';
+  const isCustomer = user?.role === 'User';
   const isInternalStaffMobile = (user as any)?.isInternalStaff;
   const roleLabel = isInternalStaffMobile
     ? ((user as any)?.staffRole || 'ORS-ONE Staff')
@@ -259,6 +261,8 @@ export function Header() {
   const isSuperAdmin = user?.role === 'SuperAdmin';
   const isO2O = user?.role === 'O2O';
   const isProvider = user?.role === 'Warehouse Developer';
+  const isCustomer = user?.role === 'User';
+  const isCustomer = user?.role === 'User';
   const isInternalStaff = (user as any)?.isInternalStaff === true;
   const staffRole = (user as any)?.staffRole;
   const roleLabel = isInternalStaff
@@ -297,6 +301,11 @@ export function Header() {
               {isProvider && (
                 <Link href="/dashboard?tab=my-listings&createNew=true" className="flex items-center gap-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-lg whitespace-nowrap">
                   <PlusCircle className="h-3.5 w-3.5" /> New Listing
+                </Link>
+              )}
+              {isCustomer && (
+                <Link href="/dashboard?tab=my-sublease&createNew=true" className="flex items-center gap-1.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors px-3 py-1.5 rounded-lg whitespace-nowrap">
+                  <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
                 </Link>
               )}
                 <ToolsDropdown />

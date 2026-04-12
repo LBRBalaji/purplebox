@@ -224,6 +224,11 @@ function AdminListingCard({ listing, analytics, providerName, maxViews, onStatus
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <StatusBadge status={listing.status} />
+            {(listing as any).listingType === 'Sublease' && (
+              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                Sublease
+              </span>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-secondary transition-colors"><MoreHorizontal className="h-4 w-4 text-muted-foreground" /></button>

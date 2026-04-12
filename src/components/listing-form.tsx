@@ -108,7 +108,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   const isInternalStaff = (user as any)?.isInternalStaff === true;
+  const isCustomer = user?.role === 'User';
   const canCreateForDeveloper = isAdmin || isInternalStaff;
+  const [showSubleaseWarning, setShowSubleaseWarning] = React.useState(false);
+  const [subleaseConfirmed, setSubleaseConfirmed] = React.useState(false);
   const [selectedDeveloperId, setSelectedDeveloperId] = React.useState<string>('');
   const allDevelopers = React.useMemo(() => Object.values(users || {}).filter((u: any) => u.role === 'Warehouse Developer' && u.status === 'approved'), [users]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -127,6 +130,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
               developerId: (canCreateForDeveloper && selectedDeveloperId) ? selectedDeveloperId : user?.email || '',
               listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
               plan: 'Free' as const,
+              listingType: (isCustomer ? 'Sublease' : 'Owner') as 'Owner' | 'Sublease',
               warehouseBoxId: '',
               actualSizeSqFt: undefined,
               additionalInformation: '',
@@ -276,9 +280,53 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
 
   const approvalFields = Object.keys(form.formState.defaultValues?.certificatesAndApprovals || {}) as (keyof ListingSchema['certificatesAndApprovals'])[];
 
+  // Show sublease caution dialog for customers on first open
+  const effectiveOpen = isCustomer && !subleaseConfirmed && !isEditMode ? false : isOpen;
+
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      {/* Sublease caution dialog for customers */}
+      {isCustomer && !subleaseConfirmed && !isEditMode && isOpen && (
+        <Dialog open={true} onOpenChange={(open) => { if (!open) onOpenChange(false); }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                </div>
+                <DialogTitle className="text-lg">List Your Excess Space</DialogTitle>
+              </div>
+              <DialogDescription className="text-left space-y-3 pt-1">
+                <p className="text-sm text-foreground font-medium">This feature is for customers who have unused warehouse space they wish to sublease.</p>
+                <p className="text-sm text-muted-foreground">Use this only if:</p>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-4">
+                  <li>You currently occupy a warehouse and have <strong>excess space</strong> you don't need</li>
+                  <li>Your lease agreement <strong>permits subleasing</strong> to a third party</li>
+                  <li>You have obtained the necessary <strong>landlord / developer consent</strong></li>
+                </ul>
+                <div className="rounded-xl p-3 mt-2" style={{background:'hsl(259 44% 96%)', border:'1px solid hsl(259 44% 86%)'}}>
+                  <p className="text-xs" style={{color:'hsl(259 25% 40%)'}}>Your listing will be reviewed by ORS-ONE admin before going live. Listings without valid leasehold rights will be removed.</p>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex-col sm:flex-row gap-2 pt-2">
+              <button type="button"
+                onClick={() => onOpenChange(false)}
+                className="px-4 py-2 rounded-xl text-sm font-semibold border border-border text-muted-foreground hover:bg-secondary">
+                Cancel
+              </button>
+              <button type="button"
+                onClick={() => setSubleaseConfirmed(true)}
+                className="px-4 py-2 rounded-xl text-sm font-bold text-white"
+                style={{background:'#6141ac'}}>
+                Yes, I understand — Proceed to List
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      <Dialog open={effectiveOpen} onOpenChange={(open) => { if (!open) setSubleaseConfirmed(false); onOpenChange(open); }}>
         <DialogContent 
             className="sm:max-w-4xl"
             onInteractOutside={(e) => {

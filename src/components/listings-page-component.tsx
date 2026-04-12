@@ -7,7 +7,7 @@ import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare, Smile, Share, Mail, Linkedin, Twitter, Facebook, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowRightLeft, Building2, Calendar, Calculator, ClipboardPlus, Download, Info, MapPin, Scaling, Search, SlidersHorizontal, Star, X, Zap, Award, Users, Truck, ChevronsUp, CheckSquare, Smile, Share, Mail, Linkedin, Twitter, Facebook, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -385,6 +385,7 @@ export function ListingsPage() {
   const [availability, setAvailability] = useState('all');
   const [sizeRange, setSizeRange] = useState([0, 1000000]);
   const [showOnlyPremium, setShowOnlyPremium] = useState(false);
+  const [subleaseFilter, setSubleaseFilter] = useState<'all' | 'sublease' | 'owner'>('all');
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
@@ -488,6 +489,13 @@ export function ListingsPage() {
       }
     }
     
+    // Sublease / Owner filter
+    if (subleaseFilter === 'sublease') {
+        results = results.filter(l => (l as any).listingType === 'Sublease');
+    } else if (subleaseFilter === 'owner') {
+        results = results.filter(l => (l as any).listingType !== 'Sublease');
+    }
+
     // Possession Readiness filter
     if (availability !== 'all') {
         results = results.filter(l => l.availabilityDate === availability);
@@ -504,7 +512,7 @@ export function ListingsPage() {
     } catch (e) {
         console.error("Could not write to sessionStorage", e);
     }
-  }, [searchTerm, locationFilter, availability, sizeRange, approvedListings, locationCircles, showOnlyPremium]);
+  }, [searchTerm, locationFilter, availability, sizeRange, approvedListings, locationCircles, showOnlyPremium, subleaseFilter]);
 
 
   const resetFilters = () => {
@@ -512,6 +520,7 @@ export function ListingsPage() {
     setLocationFilter('');
     setAvailability('all');
     setShowOnlyPremium(false);
+    setSubleaseFilter('all');
     
     const maxArea = Math.max(...approvedListings.map(w => w.sizeSqFt), 0);
     if (maxArea > 0) {
@@ -750,6 +759,17 @@ export function ListingsPage() {
                                                     <SelectItem value="Under Construction">Under Construction</SelectItem>
                                                     <SelectItem value="Available in 3 months">Available in 3 months</SelectItem>
                                                     <SelectItem value="BTS-Built To Suit">BTS-Built To Suit</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Listing Type</Label>
+                                            <Select value={subleaseFilter} onValueChange={(v) => setSubleaseFilter(v as any)}>
+                                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">All Listings</SelectItem>
+                                                    <SelectItem value="owner">Owner Listings</SelectItem>
+                                                    <SelectItem value="sublease">Sublease Only</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>

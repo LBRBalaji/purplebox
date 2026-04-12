@@ -22,6 +22,7 @@ import { CompanyAdminDashboard } from '@/components/company-admin-dashboard';
 import { DeveloperTeamDashboard } from '@/components/developer-team-dashboard';
 import { StaffDashboard } from '@/components/staff-dashboard';
 import { DemandList } from '@/components/demand-list';
+import { CustomerSubleaseListings } from '@/components/customer-sublease-listings';
 
 
 // ── Provider Dashboard Overview ───────────────────────────────
@@ -216,7 +217,7 @@ const MainDashboard = () => {
         setAdminTab('submit-match');
       } else if (defaultTabParam) {
         if (isProvider) setProviderTab(defaultTabParam);
-        if (isCustomer) setCustomerTab(defaultTabParam);
+        if (isCustomer) setCustomerTab(defaultTabParam === 'my-sublease' ? 'my-sublease' : defaultTabParam);
         if (isO2OManager) setAdminTab(defaultTabParam);
         if (isAgent) setAgentTab(defaultTabParam);
       } else {
@@ -251,11 +252,12 @@ const MainDashboard = () => {
 
     const renderCustomerContent = () => (
       <Tabs value={customerTab} onValueChange={setCustomerTab}>
-        <TabsList className={`grid w-full ${user?.isCompanyAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+        <TabsList className={`grid w-full ${user?.isCompanyAdmin ? 'grid-cols-6' : 'grid-cols-5'}`}>
           <TabsTrigger value="my-demands">My Demands & Matches</TabsTrigger>
           <TabsTrigger value="log-demand">Log New Demand</TabsTrigger>
           <TabsTrigger value="my-shortlist">My Shortlist</TabsTrigger>
           <TabsTrigger value="my-transactions">My Transactions</TabsTrigger>
+          <TabsTrigger value="my-sublease">My Sublease Listings</TabsTrigger>
           {user?.isCompanyAdmin && <TabsTrigger value="my-team">My Team</TabsTrigger>}
         </TabsList>
         <TabsContent value="my-demands">
@@ -269,6 +271,9 @@ const MainDashboard = () => {
         </TabsContent>
         <TabsContent value="my-transactions">
             <CustomerTransactions />
+        </TabsContent>
+        <TabsContent value="my-sublease">
+          <CustomerSubleaseListings />
         </TabsContent>
         {user?.isCompanyAdmin && (
           <TabsContent value="my-team">

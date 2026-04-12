@@ -22,6 +22,7 @@ export const listingSchema = z.object({
   developerId: z.string(), // references userId
   status: z.enum(['pending', 'approved', 'rejected', 'leased', 'draft', 'pending_consent']),
   plan: z.enum(['Free', 'Paid_Premium']).optional().default('Paid_Premium'),
+  listingType: z.enum(['Owner', 'Sublease']).optional().default('Owner'),
   createdAt: z.string().datetime().optional(),
   createdBy: z.string().optional(),
   consentStatus: z.enum(['pending_consent', 'consented']).optional(),
