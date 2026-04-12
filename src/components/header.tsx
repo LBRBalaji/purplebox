@@ -157,7 +157,6 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
   const isO2O = user?.role === 'O2O';
   const isProvider = user?.role === 'Warehouse Developer';
   const isCustomer = user?.role === 'User';
-  const isCustomer = user?.role === 'User';
   const isInternalStaffMobile = (user as any)?.isInternalStaff;
   const roleLabel = isInternalStaffMobile
     ? ((user as any)?.staffRole || 'ORS-ONE Staff')
@@ -261,7 +260,6 @@ export function Header() {
   const isSuperAdmin = user?.role === 'SuperAdmin';
   const isO2O = user?.role === 'O2O';
   const isProvider = user?.role === 'Warehouse Developer';
-  const isCustomer = user?.role === 'User';
   const isCustomer = user?.role === 'User';
   const isInternalStaff = (user as any)?.isInternalStaff === true;
   const staffRole = (user as any)?.staffRole;
