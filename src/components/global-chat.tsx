@@ -44,8 +44,13 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
       let chatPartnerName: string;
       let partnerInitials: string;
       if (user.email === customer?.email) {
-        chatPartnerName = lead.isO2OCollaborator ? 'O2O Team' : (developer?.companyName || 'Developer');
-        partnerInitials = lead.isO2OCollaborator ? 'O2' : (developer?.companyName?.slice(0,2) || 'D');
+        // Customer view — hide developer name, show Box ID · ORS ID · Location
+        const boxId = listing?.warehouseBoxId || '';
+        const orsId = listing?.listingId || '';
+        const loc = listing?.location?.split(',')[0] || '';
+        const parts = [boxId, orsId, loc].filter(Boolean);
+        chatPartnerName = lead.isO2OCollaborator ? 'O2O Team' : (parts.join(' · ') || 'Listing');
+        partnerInitials = lead.isO2OCollaborator ? 'O2' : (boxId?.slice(0,2) || orsId?.slice(0,2) || 'WH').toUpperCase();
       } else {
         const customerCompany = customer?.companyName || 'Customer';
         chatPartnerName = isProvider && lead.isO2OCollaborator ? 'For-' + customerCompany : customerCompany;
