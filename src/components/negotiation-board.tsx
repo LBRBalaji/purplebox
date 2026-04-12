@@ -393,6 +393,7 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
     const [newSectionName, setNewSectionName] = React.useState('');
     const [showTermSheetBuilder, setShowTermSheetBuilder] = React.useState(false);
     const [selectedTermSections, setSelectedTermSections] = React.useState<string[]>([]);
+    const [expandedTermSections, setExpandedTermSections] = React.useState<string[]>([]);
 
     const handleAddNewSection = () => {
         if (newSectionName.trim()) {
@@ -582,30 +583,60 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
                                  <div className="grid grid-cols-1 gap-2">
                                    {TERM_SHEET_SECTIONS.map(section => {
                                      const selected = selectedTermSections.includes(section.id);
+                                     const expanded = expandedTermSections.includes(section.id);
                                      return (
-                                       <button key={section.id} type="button"
-                                         onClick={() => setSelectedTermSections(prev =>
-                                           prev.includes(section.id) ? prev.filter(s => s !== section.id) : [...prev, section.id]
-                                         )}
-                                         className="flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all"
-                                         style={selected
-                                           ? {background:'hsl(259 44% 94%)', border:'2px solid #6141ac'}
-                                           : {background:'hsl(259 30% 97%)', border:'1px solid hsl(259 30% 88%)'}}>
-                                         <div className="h-5 w-5 rounded flex items-center justify-center flex-shrink-0"
-                                           style={{background: selected ? '#6141ac' : 'white', border: selected ? 'none' : '2px solid hsl(259 30% 78%)'}}>
-                                           {selected && <span className="text-white text-xs">✓</span>}
-                                         </div>
-                                         <div className="flex-1 min-w-0">
-                                           <p className="text-sm font-semibold text-foreground">{section.label}</p>
-                                           <p className="text-xs text-muted-foreground mt-0.5">{section.fields.length} fields
-                                             {section.fields.some(f => (f as any).listingKey) && (
-                                               <span className="ml-2 px-1.5 py-0.5 rounded text-xs" style={{background:'hsl(259 44% 90%)', color:'#6141ac'}}>
-                                                 ✦ auto-filled from listing
-                                               </span>
+                                       <div key={section.id} className="rounded-xl overflow-hidden transition-all"
+                                         style={selected ? {border:'2px solid #6141ac'} : {border:'1px solid hsl(259 30% 88%)'}}>
+                                         <div className="flex items-center gap-3 px-4 py-3"
+                                           style={selected ? {background:'hsl(259 44% 94%)'} : {background:'hsl(259 30% 97%)'}}>
+                                           <button type="button"
+                                             onClick={() => setSelectedTermSections(prev =>
+                                               prev.includes(section.id) ? prev.filter(s => s !== section.id) : [...prev, section.id]
                                              )}
-                                           </p>
+                                             className="h-5 w-5 rounded flex items-center justify-center flex-shrink-0"
+                                             style={{background: selected ? '#6141ac' : 'white', border: selected ? 'none' : '2px solid hsl(259 30% 78%)'}}>
+                                             {selected && <span className="text-white text-xs font-bold">✓</span>}
+                                           </button>
+                                           <button type="button" className="flex-1 text-left"
+                                             onClick={() => setSelectedTermSections(prev =>
+                                               prev.includes(section.id) ? prev.filter(s => s !== section.id) : [...prev, section.id]
+                                             )}>
+                                             <p className="text-sm font-semibold text-foreground">{section.label}</p>
+                                             <p className="text-xs text-muted-foreground mt-0.5">{section.fields.length} fields
+                                               {section.fields.some(f => (f as any).listingKey) && (
+                                                 <span className="ml-2 px-1.5 py-0.5 rounded text-xs" style={{background:'hsl(259 44% 90%)', color:'#6141ac'}}>auto-filled</span>
+                                               )}
+                                             </p>
+                                           </button>
+                                           <button type="button"
+                                             onClick={() => setExpandedTermSections(prev =>
+                                               prev.includes(section.id) ? prev.filter(s => s !== section.id) : [...prev, section.id]
+                                             )}
+                                             className="h-6 w-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold hover:opacity-70"
+                                             style={{background: 'hsl(259 30% 88%)', color:'hsl(259 15% 45%)'}}>
+                                             {expanded ? '▲' : '▼'}
+                                           </button>
                                          </div>
-                                       </button>
+                                         {expanded && (
+                                           <div className="px-4 pb-3 pt-2 space-y-1"
+                                             style={{background: selected ? 'hsl(259 44% 97%)' : 'white', borderTop:'1px solid hsl(259 30% 90%)'}}>
+                                             {section.fields.map(f => (
+                                               <div key={f.id} className="flex items-center gap-2 py-1">
+                                                 <span className="text-xs font-mono flex-shrink-0 w-10" style={{color:'hsl(259 15% 60%)'}}>{f.id}</span>
+                                                 <span className="text-xs text-foreground flex-1">{f.label}</span>
+                                                 <div className="flex gap-1 flex-shrink-0">
+                                                   {(f as any).listingKey && (
+                                                     <span className="text-xs px-1.5 py-0.5 rounded" style={{background:'hsl(259 44% 90%)', color:'#6141ac'}}>auto</span>
+                                                   )}
+                                                   <span className="text-xs px-1.5 py-0.5 rounded" style={{background:'hsl(259 30% 92%)', color:'hsl(259 15% 45%)'}}>
+                                                     {['radio','lessor_lessee'].includes((f as any).type) ? 'toggle' : (f as any).type === 'select' ? 'select' : (f as any).type === 'number' ? 'number' : (f as any).type === 'date' ? 'date' : 'text'}
+                                                   </span>
+                                                 </div>
+                                               </div>
+                                             ))}
+                                           </div>
+                                         )}
+                                       </div>
                                      );
                                    })}
                                  </div>
