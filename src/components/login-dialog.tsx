@@ -105,12 +105,7 @@ export function LoginDialog({ isOpen, onOpenChange, onLoginSuccess }: { isOpen: 
                         Sign Up
                     </Link>
                 </div>
-                 <div>
-                    Are you an agent?{' '}
-                    <Link href="/agent-signup" className="underline text-primary" onClick={() => onOpenChange(false)}>
-                        Register Here
-                    </Link>
-                </div>
+
             </div>
         </div>
       </DialogContent>

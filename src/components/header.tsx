@@ -244,7 +244,7 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
           ) : (
             <SheetClose asChild>
               <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white" onClick={onLoginClick}>
-                <LogIn className="mr-2 h-4 w-4" /> Login
+                <LogIn className="mr-2 h-4 w-4" /> Login / Sign Up
               </Button>
             </SheetClose>
           )}
@@ -356,7 +356,7 @@ export function Header() {
               </div>
             ) : (
               <Button size="sm" className="h-8" onClick={() => setIsLoginOpen(true)}>
-                <LogIn className="mr-2 h-4 w-4" /> Login
+                <LogIn className="mr-2 h-4 w-4" /> Login / Sign Up
               </Button>
             )}
           </div>
