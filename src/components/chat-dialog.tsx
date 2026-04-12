@@ -62,7 +62,7 @@ export function ChatPanel({
 
   const lead = registeredLeads.find(l => l.id === submission?.demandId);
   const threadId = lead && submission ? `chat-${lead.id}-${submission.providerEmail}` : null;
-  const isMessageGated = lead?.messageGated && user?.email === submission?.providerEmail;
+  const isMessageGated = false; // Payment gate removed — developers see messages directly
   const otherUserTyping = threadId ? typingStatus[threadId] : null;
   
   const fetchMessages = useCallback(async () => {
@@ -247,16 +247,7 @@ export function ChatPanel({
   return (
     <div className="flex flex-col h-full">
         <div className="flex-grow overflow-y-auto">
-            {isMessageGated && (
-              <div className="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b border-border flex-shrink-0">
-                <Lock className="h-4 w-4 text-primary flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-foreground">Messages are locked</p>
-                  <p className="text-xs text-muted-foreground">Pay ₹5,000 to unlock and read customer messages</p>
-                </div>
-                <a href="/dashboard/manage-users?tab=payments" className="text-xs font-bold text-primary hover:underline flex-shrink-0">Pay Now →</a>
-              </div>
-            )}
+
             <ScrollArea className="h-full" scrollableViewportRef={scrollViewportRef}>
                 <div className="space-y-4 p-4">
                     {initialMessage && messages.length === 0 && (
