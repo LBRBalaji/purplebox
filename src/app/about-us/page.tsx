@@ -160,19 +160,19 @@ export default function AboutUsPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-primary">
+      <section className="py-20" style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Ready to <span className="text-primary">Reach the Market?</span></h2>
-          <p className="text-white/70 text-lg max-w-xl mx-auto mb-10">Whether you are searching for a warehouse, listing a property, or building an agent network — your journey starts here.</p>
+          <h2 className="text-3xl md:text-4xl font-black mb-4" style={{color:'#ffffff'}}>Ready to <span style={{color:'#c5b8e8'}}>Reach the Market?</span></h2>
+          <p className="text-lg max-w-xl mx-auto mb-10" style={{color:'rgba(255,255,255,0.7)'}}>Whether you are searching for a warehouse, listing a property, or building an agent network — your journey starts here.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-foreground font-bold px-8 rounded-xl">
+            <Button asChild size="lg" className="font-bold px-8 rounded-xl" style={{background:'#6141ac',color:'#ffffff'}}>
               <Link href="/">Browse Listings <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-primary/30 text-foreground hover:bg-card hover:text-primary font-bold px-8 rounded-xl bg-transparent">
-              <Link href="/agent-signup">Become a Transaction Partner <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Button asChild size="lg" variant="outline" className="font-bold px-8 rounded-xl" style={{borderColor:'rgba(255,255,255,0.3)',color:'#ffffff',background:'transparent'}}>
+              <Link href="/signup">Become a Transaction Partner <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
-          <p className="text-muted-foreground/50 text-xs mt-10">Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app  ·  Building Transaction Ready Assets</p>
+          <p className="text-xs mt-10" style={{color:'rgba(255,255,255,0.35)'}}>Lakshmi Balaji ORS Private Limited · lease.orsone.app · Building Transaction Ready Assets</p>
         </div>
       </section>
     </div>
