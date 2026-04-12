@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from './ui/input';
-import { listingSchema, type ListingSchema, type GenerateListingDescriptionInput, type Document } from '@/lib/schema';
+import { listingSchema, type ListingSchema, type Document } from '@/lib/schema';
 import {
   Select,
   SelectContent,
@@ -36,11 +36,9 @@ import { Textarea } from "./ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
-import { AlertTriangle, Trash2, Wand2, PlusCircle, UploadCloud, Maximize, Link, ExternalLink, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, Trash2, PlusCircle, UploadCloud, Maximize, Link, ExternalLink, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
-import { generateListingDescriptionAction } from "@/lib/actions";
-import { Sparkles } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
@@ -101,13 +99,11 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   const { user, users } = useAuth();
   const { toast } = useToast();
   const isEditMode = !!listing;
-  const [isGenerating, setIsGenerating] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [mediaTab, setMediaTab] = React.useState<'upload' | 'url'>('url');
   const [urlInput, setUrlInput] = React.useState('');
   const [urlName, setUrlName] = React.useState('');
   const [urlType, setUrlType] = React.useState<'image' | 'video' | 'layout'>('image');
-  const [tone, setTone] = React.useState<'Professional' | 'Sales-Oriented' | 'Concise'>('Professional');
   const [previewImageUrl, setPreviewImageUrl] = React.useState<string | null>(null);
   
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
@@ -232,43 +228,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
     toast({ title: 'Link added', description: '"' + name + '" added to your listing.' });
   };
 
-  const handleGenerateDescription = async () => {
-    setIsGenerating(true);
-    try {
-        const data = form.getValues();
-        const input: GenerateListingDescriptionInput = {
-            name: data.name,
-            location: data.location,
-            sizeSqFt: data.sizeSqFt,
-            availabilityDate: data.availabilityDate,
-            warehouseModel: data.warehouseModel,
-            rentPerSqFt: typeof data.rentPerSqFt === 'number' ? data.rentPerSqFt : undefined,
-            buildingType: data.buildingSpecifications.buildingType,
-            roofType: data.buildingSpecifications.roofType,
-            eveHeightMeters: data.buildingSpecifications.eveHeightMeters,
-            developerName: user?.companyName,
-            tone: tone,
-        };
 
-        const result = await generateListingDescriptionAction(input);
-        if (result.error || !result.generatedDescription) {
-            throw new Error(result.error || "Failed to generate description");
-        }
-
-        form.setValue("description", result.generatedDescription, { shouldValidate: true });
-        toast({ title: "Description generated successfully!" });
-
-    } catch (e) {
-        const error = e as Error;
-        toast({
-            variant: "destructive",
-            title: "Generation Failed",
-            description: error.message,
-        });
-    } finally {
-        setIsGenerating(false);
-    }
-  };
 
 
   const handleSubmitWrapper = async (data: ListingSchema) => {
@@ -768,34 +728,19 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                   {/* Description */}
                   <div className="space-y-4">
                     <FormLabel className="text-lg font-semibold">Description</FormLabel>
-                    <div className="p-4 border rounded-md space-y-4">
+                    <div className="p-4 border rounded-md">
                         <FormField
                           control={form.control}
                           name="description"
                           render={({ field }) => (
                             <FormItem>
-                                <FormLabel>AI-Generated Description</FormLabel>
+                                <FormLabel>Property Description</FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} value={field.value ?? ''} placeholder="Describe the key features of your property, or generate one with AI." className="min-h-32"/>
+                                    <Textarea {...field} value={field.value ?? ''} placeholder="Describe the key features of your property." className="min-h-32"/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <div className="flex items-center gap-2">
-                            <Select value={tone} onValueChange={(value) => setTone(value as any)}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Professional">Professional</SelectItem>
-                                    <SelectItem value="Sales-Oriented">Sales-Oriented</SelectItem>
-                                    <SelectItem value="Concise">Concise</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Button type="button" variant="outline" onClick={handleGenerateDescription} disabled={true} disabled={isGenerating}>
-                                <><Wand2 className="mr-2 h-4 w-4" /> Generate with AI (Coming Soon)</>
-                            </Button>
-                        </div>
                     </div>
                   </div>
                   <Separator/>
