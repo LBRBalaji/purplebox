@@ -19,7 +19,7 @@ export type User = {
   userName: string;
   phone: string;
   createdAt: string;
-  status?: 'pending' | 'approved' | 'rejected';
+  status?: 'pending' | 'approved' | 'rejected' | 'suspended';
 };
 
 export type NewUser = User & {
@@ -113,6 +113,11 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
         if (userData.status === 'rejected') {
           await signOut(auth);
           toast({ variant: 'destructive', title: 'Account Not Approved', description: 'Your account has not been approved. Please contact support.' });
+          return;
+        }
+        if (userData.status === 'suspended') {
+          await signOut(auth);
+          toast({ variant: 'destructive', title: 'Account Suspended', description: 'Your account has been temporarily suspended. Please contact balaji@lakshmibalajio2o.com.' });
           return;
         }
         setUser(userData);

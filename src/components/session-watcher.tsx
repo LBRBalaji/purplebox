@@ -18,7 +18,7 @@ export function SessionWatcher() {
     if (!storedToken) return;
 
     const unsub = onSnapshot(doc(db, 'sessions', user.email), (snap) => {
-      if (!snap.exists()) return;
+      if (!snap.exists()) { setKicked(true); return; }
       const data = snap.data();
       if (data?.sessionToken && data.sessionToken !== storedToken) {
         setKicked(true);
@@ -51,11 +51,11 @@ export function SessionWatcher() {
           </div>
           <DialogTitle className="text-center">Session Ended</DialogTitle>
           <DialogDescription className="text-center">
-            Your account has been accessed from another device. For security, this session has ended.
+            Your session has been ended by the platform administrator, or your account has been accessed from another device.
             <br/><br/>
             <span className="font-semibold text-foreground">You will be logged out in {countdown} seconds.</span>
             <br/>
-            If this was not you, please change your password immediately.
+            For assistance, contact balaji@lakshmibalajio2o.com
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center pt-2">

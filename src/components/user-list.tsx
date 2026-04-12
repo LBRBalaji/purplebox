@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import type { User, NewUser } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from './ui/button';
-import { Pencil, PlusCircle, Trash2, Shield, Users, Search, Building, Scaling, CheckCircle, XCircle, Clock, Crown } from 'lucide-react';
+import { Pencil, PlusCircle, Trash2, Shield, Users, Search, Building, Scaling, CheckCircle, XCircle, Clock, Crown, UserMinus, UserCheck } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -189,6 +189,24 @@ export function UserList() {
     toast({ title: 'User Rejected', description: u.userName + ' has been rejected.' });
   };
 
+  const handleSuspend = async (u: User) => {
+    updateUser({ ...u, status: 'suspended' });
+    // Kill their active session immediately
+    try {
+      await fetch('/api/sessions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: u.email }),
+      });
+    } catch {}
+    toast({ title: 'User Suspended', description: u.userName + ' has been suspended and logged out.' });
+  };
+
+  const handleReinstate = (u: User) => {
+    updateUser({ ...u, status: 'approved' });
+    toast({ title: 'User Reinstated', description: u.userName + ' has been reinstated.' });
+  };
+
   return (
     <>
       <div className="mb-6 grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
@@ -276,6 +294,8 @@ export function UserList() {
                         <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1"><Clock className="h-3 w-3" /> Pending</Badge>
                       ) : user.status === 'rejected' ? (
                         <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1"><XCircle className="h-3 w-3" /> Rejected</Badge>
+                      ) : user.status === 'suspended' ? (
+                        <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 gap-1"><UserMinus className="h-3 w-3" /> Suspended</Badge>
                       ) : (
                         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1"><CheckCircle className="h-3 w-3" /> Active</Badge>
                       )}
@@ -291,6 +311,21 @@ export function UserList() {
                               <XCircle className="h-3.5 w-3.5 mr-1" /> Reject
                             </Button>
                           </>
+                        )}
+                        {user.status === 'approved' && (
+                          <Button size="sm" variant="outline"
+                            className="rounded-lg text-xs h-8 px-3 border-orange-200 text-orange-700 hover:bg-orange-50"
+                            onClick={() => handleSuspend(user)}
+                            disabled={user.email === currentUser?.email}>
+                            <UserMinus className="h-3.5 w-3.5 mr-1" /> Suspend
+                          </Button>
+                        )}
+                        {user.status === 'suspended' && (
+                          <Button size="sm" variant="outline"
+                            className="rounded-lg text-xs h-8 px-3 border-green-200 text-green-700 hover:bg-green-50"
+                            onClick={() => handleReinstate(user)}>
+                            <UserCheck className="h-3.5 w-3.5 mr-1" /> Reinstate
+                          </Button>
                         )}
                         {user.status === 'approved' && user.role === 'User' && (
                           <Button size="sm" variant="outline"
