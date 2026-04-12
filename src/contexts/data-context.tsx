@@ -208,6 +208,7 @@ type DataContextType = {
   addAgentLead: (lead: Omit<AgentLead, 'id' | 'status'>) => void;
   updateAgentLeadStatus: (leadId: string, status: AgentStatus) => void;
   isLoading: boolean;
+  downloadHistory: DownloadRecord[];
   logDownload: (user: User, listings: ListingSchema[]) => { success: boolean; limitReached: boolean; message: string };
   selectedForDownload: ListingSchema[];
   toggleSelectedForDownload: (listing: ListingSchema) => { limitReached: boolean };
@@ -1367,6 +1368,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     <DataContext.Provider value={{ 
         listings, addListing, updateListing, updateListingStatus, listingAnalytics, logListingView,
         demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading,
+        downloadHistory,
         logDownload,
         selectedForDownload,
         toggleSelectedForDownload,

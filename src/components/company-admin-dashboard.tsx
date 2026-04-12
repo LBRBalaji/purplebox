@@ -10,10 +10,11 @@ import { startOfDay } from 'date-fns';
 
 export function CompanyAdminDashboard() {
   const { user, users, updateUser } = useAuth();
-  const { downloadHistory } = useData();
+  const { downloadHistory: rawDownloadHistory } = useData();
+  const downloadHistory = rawDownloadHistory || [];
   const { toast } = useToast();
 
-  const domain = user?.email.split('@')[1]?.toLowerCase();
+  const domain = user?.email?.split('@')[1]?.toLowerCase() || '';
 
   const teamMembers = React.useMemo(() => {
     if (!domain) return [];
