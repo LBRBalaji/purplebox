@@ -301,8 +301,13 @@ function DownloadBar() {
             XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Listings");
 
             const now = new Date();
-            const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
-            const filename = `Lakshmi_Balaji_O2O_Selected_Listings_${timestamp}.csv`;
+            const yyyy = now.getFullYear();
+            const mm = (now.getMonth() + 1).toString().padStart(2, '0');
+            const dd = now.getDate().toString().padStart(2, '0');
+            const hh = now.getHours().toString().padStart(2, '0');
+            const min = now.getMinutes().toString().padStart(2, '0');
+            const ss = now.getSeconds().toString().padStart(2, '0');
+            const filename = `ORS-ONE_Selected_Listings_${yyyy}-${mm}-${dd}_${hh}${min}${ss}.csv`;
             
             XLSX.writeFile(workbook, filename, { bookType: "csv" });
 
