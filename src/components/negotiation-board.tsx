@@ -112,9 +112,43 @@ const FormRow = ({ fieldName, control, form, disabled }: { fieldName: any; contr
                 )}
             </div>
             <div className="col-span-12 md:col-span-3">
-                <FormField control={control} name={`${fieldName}.agreedTerms.current`} render={({ field }) => (
-                    <FormItem><FormControl><Input placeholder="Agreed terms..." {...field} value={field.value ?? ''} className="h-10 p-2" disabled={disabled} onFocus={() => setFocusedFieldValue({field: 'agreedTerms', value: field.value})} onBlur={() => handleFieldChange('agreedTerms', field.value)} /></FormControl><FormMessage /></FormItem>
-                )} />
+                <FormField control={control} name={`${fieldName}.agreedTerms.current`} render={({ field }) => {
+                  const fieldType = watch(`${fieldName}.fieldType`);
+                  const fieldOptions: string[] = watch(`${fieldName}.fieldOptions`) || [];
+                  // radio / select / lessor_lessee
+                  if ((fieldType === 'radio' || fieldType === 'select' || fieldType === 'lessor_lessee') && fieldOptions.length > 0) {
+                    return (
+                      <FormItem>
+                        <FormControl>
+                          <div className="flex flex-wrap gap-1">
+                            {fieldOptions.map((opt: string) => (
+                              <button key={opt} type="button" disabled={disabled}
+                                onClick={() => { const old = field.value; field.onChange(opt); handleFieldChange('agreedTerms', opt, old); }}
+                                className="px-2 py-1 rounded-lg text-xs font-semibold border transition-all"
+                                style={field.value === opt
+                                  ? {background:'#6141ac', color:'#fff', borderColor:'#6141ac'}
+                                  : {background:'white', color:'hsl(259 15% 40%)', borderColor:'hsl(259 30% 82%)'}}>
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }
+                  return (
+                    <FormItem><FormControl>
+                      <Input
+                        placeholder={fieldType === 'number' ? '0' : fieldType === 'date' ? 'DD/MM/YYYY' : 'Enter value...'}
+                        type={fieldType === 'number' ? 'number' : fieldType === 'date' ? 'date' : 'text'}
+                        {...field} value={field.value ?? ''} className="h-10 p-2" disabled={disabled}
+                        onFocus={() => setFocusedFieldValue({field: 'agreedTerms', value: field.value})}
+                        onBlur={() => handleFieldChange('agreedTerms', field.value)}
+                      />
+                    </FormControl><FormMessage /></FormItem>
+                  );
+                }} />
             </div>
              <div className="col-span-6 md:col-span-2">
                  <FormField control={control} name={`${fieldName}.proposedBy.current`} render={({ field }) => (
@@ -194,6 +228,8 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
     const { fields, append, remove } = useFieldArray({ name: `${sessionPath}.sections`, control });
 
     const [newSectionName, setNewSectionName] = React.useState('');
+    const [showTermSheetBuilder, setShowTermSheetBuilder] = React.useState(false);
+    const [selectedTermSections, setSelectedTermSections] = React.useState<string[]>([]);
 
     const handleAddNewSection = () => {
         if (newSectionName.trim()) {
@@ -206,6 +242,40 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
             setNewSectionName('');
         }
     }
+
+     const handleBuildTermSheet = () => {
+        const sessionPath = `sessions.0`;
+        const currentSections: any[] = form.getValues(`sessions.0.sections`) || [];
+        const existingSectionIds = currentSections.map((s: any) => s.id);
+
+        selectedTermSections.forEach(sectionId => {
+            if (existingSectionIds.includes(sectionId)) return; // skip already added
+            const def = TERM_SHEET_SECTIONS.find(s => s.id === sectionId);
+            if (!def) return;
+            const newSection = {
+                id: def.id,
+                title: def.label,
+                fields: def.fields.map(f => ({
+                    id: f.id,
+                    label: f.label,
+                    isLabelEditable: false,
+                    agreedTerms: {
+                        current: getListingValue(primaryListing, (f as any).listingKey),
+                        history: [],
+                    },
+                    proposedBy: { current: '', history: [] },
+                    status: { current: 'Pending', history: [] },
+                    // Store field type metadata in label suffix for rendering
+                    fieldType: f.type,
+                    fieldOptions: (f as any).options || [],
+                }))
+            };
+            currentSections.push(newSection);
+        });
+        form.setValue(`sessions.0.sections`, currentSections);
+        setShowTermSheetBuilder(false);
+        setSelectedTermSections([]);
+    };
 
      const handleAddNewField = (sectionIndex: number) => {
         const sections = getValues(`${sessionPath}.sections`);
@@ -289,18 +359,259 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
                             ))}
                          </div>
                          {canEdit && (
-                            <div className="pt-6 border-t">
-                                <div className="flex items-center gap-2">
-                                <Input value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} placeholder="New section name"/>
-                                <Button type="button" onClick={handleAddNewSection}><PlusCircle className="mr-2 h-4 w-4" /> Add Section</Button>
-                                </div>
+                            <div className="pt-6 border-t space-y-3">
+                              {/* Primary: Build Term Sheet */}
+                              <div>
+                                <Button type="button" className="w-full" onClick={() => setShowTermSheetBuilder(true)}
+                                  style={{background:'#6141ac'}}>
+                                  <FileText className="mr-2 h-4 w-4" /> Build Commercial Term Sheet
+                                </Button>
+                                <p className="text-xs text-center text-muted-foreground mt-1">Select sections from the standard lease term sheet template</p>
+                              </div>
+                              {/* Secondary: custom blank section */}
+                              <div className="flex items-center gap-2">
+                                <Input value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} placeholder="Or add a custom section..."/>
+                                <Button type="button" variant="outline" onClick={handleAddNewSection}><PlusCircle className="mr-2 h-4 w-4" /> Add</Button>
+                              </div>
                             </div>
+                         )}
+
+                         {/* Term Sheet Builder Modal */}
+                         {showTermSheetBuilder && (
+                           <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,0.5)'}}>
+                             <div className="bg-card rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col" style={{maxHeight:'85vh'}}>
+                               <div className="px-6 py-5 border-b flex items-center justify-between" style={{background:'hsl(259 25% 10%)', borderRadius:'1rem 1rem 0 0'}}>
+                                 <div>
+                                   <h3 className="text-lg font-black text-white">Build Commercial Term Sheet</h3>
+                                   <p className="text-xs mt-0.5" style={{color:'hsl(259 30% 60%)'}}>Select sections to include. Fields pre-filled from listing where available.</p>
+                                 </div>
+                                 <button onClick={() => setShowTermSheetBuilder(false)} className="h-8 w-8 rounded-full flex items-center justify-center" style={{background:'hsl(259 25% 20%)'}}>
+                                   <span className="text-white text-sm">✕</span>
+                                 </button>
+                               </div>
+                               <div className="overflow-y-auto flex-1 p-5">
+                                 <div className="flex justify-between mb-4">
+                                   <button type="button" className="text-xs font-bold" style={{color:'#6141ac'}}
+                                     onClick={() => setSelectedTermSections(TERM_SHEET_SECTIONS.map(s => s.id))}>
+                                     Select All
+                                   </button>
+                                   <button type="button" className="text-xs text-muted-foreground"
+                                     onClick={() => setSelectedTermSections([])}>
+                                     Clear All
+                                   </button>
+                                 </div>
+                                 <div className="grid grid-cols-1 gap-2">
+                                   {TERM_SHEET_SECTIONS.map(section => {
+                                     const selected = selectedTermSections.includes(section.id);
+                                     return (
+                                       <button key={section.id} type="button"
+                                         onClick={() => setSelectedTermSections(prev =>
+                                           prev.includes(section.id) ? prev.filter(s => s !== section.id) : [...prev, section.id]
+                                         )}
+                                         className="flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all"
+                                         style={selected
+                                           ? {background:'hsl(259 44% 94%)', border:'2px solid #6141ac'}
+                                           : {background:'hsl(259 30% 97%)', border:'1px solid hsl(259 30% 88%)'}}>
+                                         <div className="h-5 w-5 rounded flex items-center justify-center flex-shrink-0"
+                                           style={{background: selected ? '#6141ac' : 'white', border: selected ? 'none' : '2px solid hsl(259 30% 78%)'}}>
+                                           {selected && <span className="text-white text-xs">✓</span>}
+                                         </div>
+                                         <div className="flex-1 min-w-0">
+                                           <p className="text-sm font-semibold text-foreground">{section.label}</p>
+                                           <p className="text-xs text-muted-foreground mt-0.5">{section.fields.length} fields
+                                             {section.fields.some(f => (f as any).listingKey) && (
+                                               <span className="ml-2 px-1.5 py-0.5 rounded text-xs" style={{background:'hsl(259 44% 90%)', color:'#6141ac'}}>
+                                                 ✦ auto-filled from listing
+                                               </span>
+                                             )}
+                                           </p>
+                                         </div>
+                                       </button>
+                                     );
+                                   })}
+                                 </div>
+                               </div>
+                               <div className="px-5 py-4 border-t flex items-center justify-between gap-3">
+                                 <p className="text-sm text-muted-foreground">{selectedTermSections.length} section{selectedTermSections.length !== 1 ? 's' : ''} selected</p>
+                                 <div className="flex gap-2">
+                                   <Button type="button" variant="outline" onClick={() => setShowTermSheetBuilder(false)}>Cancel</Button>
+                                   <Button type="button" disabled={selectedTermSections.length === 0} onClick={handleBuildTermSheet}
+                                     style={{background:'#6141ac', color:'white'}}>
+                                     <FileText className="mr-2 h-4 w-4" /> Add {selectedTermSections.length} Section{selectedTermSections.length !== 1 ? 's' : ''} →
+                                   </Button>
+                                 </div>
+                               </div>
+                             </div>
+                           </div>
                          )}
                     </div>
                 </CollapsibleContent>
             </Collapsible>
         </Card>
     );
+}
+
+// All term sheet sections from the lease term sheet template
+const TERM_SHEET_SECTIONS = [
+  {
+    id: 'siteInfo', label: '1. Site Information', icon: 'MapPin',
+    fields: [
+      { id: '1.1', label: 'Postal Address of Facility', type: 'text', listingKey: 'location' },
+      { id: '1.2', label: 'Building Number', type: 'text', listingKey: 'warehouseBoxId' },
+      { id: '1.4', label: 'Google Coordinates', type: 'text', listingKey: 'latLng' },
+      { id: '1.5', label: 'Building Status', type: 'select', options: ['Ready for Occupancy', 'Under Construction', 'BTS-Built To Suit'], listingKey: 'availabilityDate' },
+    ]
+  },
+  {
+    id: 'area', label: '2. Area (SFT)', icon: 'Home',
+    fields: [
+      { id: '2.1', label: 'Plinth Area (Shop Floor) - SFT', type: 'number', listingKey: 'area.plinthArea' },
+      { id: '2.2', label: 'Mezzanine Area 1 - SFT', type: 'number', listingKey: 'area.mezzanineArea1' },
+      { id: '2.3', label: 'Mezzanine Area 2 - SFT', type: 'number', listingKey: 'area.mezzanineArea2' },
+      { id: '2.4', label: 'Canopy Area - SFT', type: 'number', listingKey: 'area.canopyArea' },
+      { id: '2.5', label: "Driver's Rest Room - SFT", type: 'number', listingKey: 'area.driversRestRoomArea' },
+      { id: '2.6', label: 'Total Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
+    ]
+  },
+  {
+    id: 'tenantImprovements', label: '3. Tenant Improvement Items', icon: 'HardHat',
+    fields: [
+      { id: '3.1', label: 'Electricity Power', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '3.2', label: 'Internal Cabling & Power Gear', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '3.3', label: 'HVAC', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
+      { id: '3.4', label: 'Mechanised Access to Mezzanine', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
+      { id: '3.5', label: 'Wash Rooms on Mezzanine Floor', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
+      { id: '3.6', label: 'Ramp (if required due to partition)', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Not Required'] },
+    ]
+  },
+  {
+    id: 'leaseTerms', label: '4. Lease Terms', icon: 'Calendar',
+    fields: [
+      { id: '4.1', label: 'Lease Tenure', type: 'select', options: ['1 Year', '2 Years', '3 Years', '5 Years', '7 Years', '9 Years', '10 Years', 'Custom'] },
+      { id: '4.2', label: 'Lease Lock-In Period', type: 'select', options: ['None', '6 Months', '1 Year', '2 Years', '3 Years', 'Custom'] },
+      { id: '4.3', label: 'Tentative Handover Date for Fitout', type: 'date' },
+      { id: '4.4', label: 'Tentative 100% Handover Date', type: 'date' },
+      { id: '4.5', label: 'Rent Free Period (for Fitout)', type: 'select', options: ['None', '1 Month', '2 Months', '3 Months', 'Custom'] },
+      { id: '4.6', label: 'Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
+      { id: '4.7', label: 'Lease Commencement Date', type: 'date' },
+      { id: '4.8', label: 'Rent Commencement Date (Post Rent Free)', type: 'date' },
+      { id: '4.9', label: 'Scope & Cost of Lease Registration', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared 50:50'] },
+    ]
+  },
+  {
+    id: 'commercialTerms', label: '5. Commercial Terms', icon: 'HandCoins',
+    fields: [
+      { id: '5.1', label: 'Chargeable Area - SFT', type: 'number', listingKey: 'area.totalChargeableArea' },
+      { id: '5.2a', label: 'Building Rent per SFT (INR)', type: 'number', listingKey: 'rentPerSqFt' },
+      { id: '5.2b', label: 'Building Rent - Total Chargeable Area per Month (INR)', type: 'number' },
+      { id: '5.3', label: 'Monthly Amortization - CAPEX Item 1 (excl. GST)', type: 'number' },
+      { id: '5.4', label: 'Monthly Amortization - CAPEX Item 2 (excl. GST)', type: 'number' },
+      { id: '5.5', label: 'Monthly Amortization - CAPEX Item 3 (excl. GST)', type: 'number' },
+      { id: '5.6', label: 'Net Total Rental incl. CAPEX Amortization (excl. GST)', type: 'number' },
+      { id: '5.7', label: 'CAM Charges per SFT (excl. GST)', type: 'number', listingKey: 'camCharges' },
+      { id: '5.8', label: 'IFRSD - Interest Free Refundable Security Deposit', type: 'number' },
+      { id: '5.9', label: 'Rent Escalation % and Frequency', type: 'text' },
+      { id: '5.10', label: 'Commitment for Phase II', type: 'radio', options: ['Yes', 'No', 'To be discussed'] },
+      { id: '5.11', label: 'Additional Charges', type: 'text' },
+    ]
+  },
+  {
+    id: 'electrical', label: '6. Electrical Infrastructure', icon: 'Power',
+    fields: [
+      { id: '6.1', label: 'Installed Capacity of Sub-Station in Park', type: 'text' },
+      { id: '6.2', label: 'Power Requirement - Phase I', type: 'text' },
+      { id: '6.3', label: 'Power Requirement - Phase II', type: 'text' },
+      { id: '6.4', label: 'Scope of Providing Required Power', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '6.15', label: 'Genset Requirement', type: 'radio', options: ['Yes', 'No'] },
+      { id: '6.16', label: 'Genset Capacity (if required)', type: 'text' },
+      { id: '6.18', label: 'HVAC Requirement', type: 'radio', options: ['Yes', 'No'] },
+      { id: '6.19', label: 'HVAC Capacity (if required)', type: 'text' },
+      { id: '6.21', label: 'False Ceiling', type: 'radio', options: ['Yes', 'No', 'Partial'] },
+    ]
+  },
+  {
+    id: 'legal', label: '7. Legal & Statutory Compliances', icon: 'ShieldCheck',
+    fields: [
+      { id: '7.1', label: 'Building Plan Approved By & Approval Number', type: 'text' },
+      { id: '7.2', label: 'Status & Scope of Fire License & NOC', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '7.3', label: 'Business Licenses / PCB CTO - Scope', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+      { id: '7.4', label: 'All Building/Property Approvals & Taxes', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+      { id: '7.5', label: 'Title Due-Diligence', type: 'lessor_lessee', options: ['Lessor to Provide', 'Lessee to Conduct', 'Jointly'] },
+    ]
+  },
+  {
+    id: 'maintenance', label: '8. Maintenance & Insurance', icon: 'Home',
+    fields: [
+      { id: '8.1', label: 'Maintenance of Access Road', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '8.2', label: 'Maintenance of Leased Space', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+      { id: '8.3', label: 'Common Area Maintenance', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+      { id: '8.4', label: 'Insurance of Proposed Lease Building', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+      { id: '8.5', label: 'Insurance for Goods Inside the Building', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope'] },
+    ]
+  },
+  {
+    id: 'parties', label: '9. Lessor & Lessee Details', icon: 'Users',
+    fields: [
+      { id: '9.1', label: 'Lessee Company Name', type: 'text' },
+      { id: '9.2', label: 'Lessee - Signing Authority & Designation', type: 'text' },
+      { id: '9.3', label: 'Lessee - Corporate Office Address', type: 'text' },
+      { id: '9.4.1', label: 'Lessor Company Name (Rental Agreement)', type: 'text' },
+      { id: '9.4.2', label: 'Lessor Company Name (Services Agreement)', type: 'text' },
+      { id: '9.5', label: 'Lessor - Signing Authority & Designation', type: 'text' },
+      { id: '9.6', label: 'Lessor - Corporate Office Address', type: 'text' },
+    ]
+  },
+  {
+    id: 'periphery', label: '10. Periphery Area', icon: 'MapPin',
+    fields: [
+      { id: '10.1', label: 'Plot Elevation Above Road (meters)', type: 'number' },
+      { id: '10.2', label: 'Flooring Type - Inside Warehouse', type: 'select', options: ['FM 2', 'FM 1', 'PU Coating', 'Concrete', 'Other'] },
+      { id: '10.3', label: 'Flooring Type - Outside Warehouse', type: 'select', options: ['RCC', 'Asphalt', 'Paver Blocks', 'Other'] },
+      { id: '10.4', label: 'Road Type - Main Gate to Warehouse', type: 'select', options: ['RCC', 'Asphalt', 'WBM', 'Other'] },
+    ]
+  },
+  {
+    id: 'building', label: '11. The Building', icon: 'Warehouse',
+    fields: [
+      { id: '11.1', label: 'Building Type', type: 'select', options: ['Grade-A Pre-Engineered Building', 'RCC', 'Standard Shed', 'Other'] },
+      { id: '11.2', label: 'Shop Floor Dimension (L x W meters)', type: 'text' },
+      { id: '11.3', label: 'Mezzanine Floor Height & Dimension', type: 'text' },
+      { id: '11.4', label: 'Number of Docks & Shutters', type: 'text', listingKey: 'buildingSpecifications.numberOfDocksAndShutters' },
+      { id: '11.5', label: 'Canopy Dimension', type: 'text' },
+      { id: '11.6', label: 'Natural Lighting & Ventilation', type: 'radio', options: ['Yes', 'No', 'Partial'] },
+      { id: '11.7', label: 'Roof Insulation', type: 'radio', options: ['Yes', 'No'] },
+    ]
+  },
+  {
+    id: 'water', label: '12. Water, Toilet & Sewerage', icon: 'Droplets',
+    fields: [
+      { id: '12.1', label: 'Workers Toilet', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide', 'Shared'] },
+      { id: '12.2', label: 'Executive Toilet', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide', 'Shared'] },
+      { id: '12.8', label: 'STP Provided', type: 'radio', options: ['Yes', 'No'] },
+      { id: '12.9', label: 'Solid Waste Disposal', type: 'lessor_lessee', options: ['Lessor Scope', 'Lessee Scope', 'Shared'] },
+    ]
+  },
+  {
+    id: 'safety', label: '13. Safety & Security', icon: 'ShieldCheck',
+    fields: [
+      { id: '13.1', label: 'Fire Exit Doors', type: 'lessor_lessee', options: ['Lessor Provides', 'Lessee to Provide'] },
+      { id: '13.2', label: 'Fire Hydrant - Outside Building', type: 'radio', options: ['Yes', 'No'] },
+      { id: '13.3', label: 'Fire Hydrant - Inside Building', type: 'radio', options: ['Yes', 'No'] },
+      { id: '13.4', label: 'Fire Sprinklers', type: 'radio', options: ['Yes', 'No'] },
+      { id: '13.6', label: 'Park Fully Compounded', type: 'radio', options: ['Yes', 'No', 'Partial'] },
+      { id: '13.7', label: 'Security at Gate', type: 'radio', options: ['Yes', 'No'] },
+      { id: '13.8', label: 'CCTV Installed', type: 'radio', options: ['Yes', 'No'] },
+    ]
+  },
+];
+
+// Helper to get listing field value by dot-path
+function getListingValue(listing: ListingSchema | null, path?: string): string {
+  if (!listing || !path) return '';
+  const parts = path.split('.');
+  let val: any = listing;
+  for (const p of parts) { val = val?.[p]; }
+  return val !== undefined && val !== null ? String(val) : '';
 }
 
 export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
