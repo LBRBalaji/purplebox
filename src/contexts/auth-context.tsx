@@ -71,21 +71,6 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
             setUser(userData);
             sessionStorage.setItem('user', JSON.stringify(userData));
 
-            // Restore session token — if one already exists in sessionStorage keep it (same tab).
-            // If none exists (new tab or page refresh that cleared it), generate a new one
-            // so this device's watcher has a valid token to compare against.
-            if (userData.role !== 'SuperAdmin' && userData.role !== 'O2O') {
-              let token = sessionStorage.getItem('sessionToken');
-              if (!token) {
-                token = Math.random().toString(36).substring(2) + Date.now().toString(36);
-                sessionStorage.setItem('sessionToken', token);
-                fetch('/api/sessions', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: userData.email, sessionToken: token, deviceInfo: navigator.userAgent.substring(0, 100) }),
-                }).catch(() => {});
-              }
-            }
           }
         } catch (error) {
           console.error('Error fetching user profile:', error);
@@ -93,7 +78,7 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
       } else {
         setUser(null);
         sessionStorage.removeItem('user');
-    sessionStorage.removeItem('sessionToken');
+
       }
       setIsLoading(false);
     });
@@ -123,17 +108,6 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
         setUser(userData);
         sessionStorage.setItem('user', JSON.stringify(userData));
 
-        // Session security — skip for SuperAdmin/O2O
-        if (userData.role !== 'SuperAdmin' && userData.role !== 'O2O') {
-          const sessionToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
-          sessionStorage.setItem('sessionToken', sessionToken);
-          const deviceInfo = navigator.userAgent.substring(0, 100);
-          fetch('/api/sessions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: userData.email, sessionToken, deviceInfo }),
-          }).catch(() => {});
-        }
 
         if (onLoginSuccess) {
           onLoginSuccess();

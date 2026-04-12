@@ -191,14 +191,7 @@ export function UserList() {
 
   const handleSuspend = async (u: User) => {
     updateUser({ ...u, status: 'suspended' });
-    // Kill their active session immediately
-    try {
-      await fetch('/api/sessions', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: u.email }),
-      });
-    } catch {}
+
     toast({ title: 'User Suspended', description: u.userName + ' has been suspended and logged out.' });
   };
 
