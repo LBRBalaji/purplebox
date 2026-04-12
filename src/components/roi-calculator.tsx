@@ -244,6 +244,7 @@ export function RoiCalculator() {
     );
 
     return (
+        <>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <Section title="Inputs">
@@ -305,5 +306,6 @@ export function RoiCalculator() {
                 {leveragedResult && <ResultTable title="Leveraged Scenario (With Loans)" result={leveragedResult} />}
             </div>
         )}
+        </>
     );
 }

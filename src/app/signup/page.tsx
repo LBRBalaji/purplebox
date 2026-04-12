@@ -350,14 +350,16 @@ export default function SignupPage() {
               </>
             )}
             {formData.role !== 'Agent' && (
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input id="confirmPassword" type="password" required onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} />
-            </div>
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input id="confirmPassword" type="password" required onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} />
+                </div>
+              </>
             )}
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
