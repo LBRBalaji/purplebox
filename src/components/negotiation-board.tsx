@@ -408,30 +408,15 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
     }
 
      const handleBuildTermSheet = () => {
-        // Ensure sessions[0] exists — create it if board is fresh
-        const existingSessions = form.getValues('sessions') || [];
-        if (existingSessions.length === 0) {
-            appendSession({
-                date: new Date().toISOString(),
-                venue: 'Term Sheet',
-                customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
-                providerAttendees: [],
-                facilitatorAttendees: [],
-                sections: [],
-            } as any);
-            // Give React a tick to update form state
-        }
-
-        // Use setTimeout to ensure form state is updated before reading
-        setTimeout(() => {
-            const currentSections: any[] = form.getValues('sessions.0.sections') || [];
-            const existingSectionIds = currentSections.map((s: any) => s.id);
-
+        // Build the new sections from selected definitions
+        const buildSections = (existingSections: any[]) => {
+            const existingSectionIds = existingSections.map((s: any) => s.id);
+            const newSections = [...existingSections];
             selectedTermSections.forEach(sectionId => {
                 if (existingSectionIds.includes(sectionId)) return;
                 const def = TERM_SHEET_SECTIONS.find(s => s.id === sectionId);
                 if (!def) return;
-                const newSection = {
+                newSections.push({
                     id: def.id,
                     title: def.label,
                     fields: def.fields.map(f => ({
@@ -447,11 +432,29 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
                         fieldType: f.type,
                         fieldOptions: (f as any).options || [],
                     }))
-                };
-                currentSections.push(newSection);
+                });
             });
-            form.setValue('sessions.0.sections', currentSections, { shouldDirty: true });
-        }, 50);
+            return newSections;
+        };
+
+        const existingSessions = form.getValues('sessions') || [];
+
+        if (existingSessions.length === 0) {
+            // No session yet — create session[0] with the sections baked in directly
+            const newSession = {
+                date: new Date().toISOString(),
+                venue: 'Term Sheet',
+                customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
+                providerAttendees: [],
+                facilitatorAttendees: [],
+                sections: buildSections([]),
+            };
+            form.setValue('sessions', [newSession] as any, { shouldDirty: true });
+        } else {
+            // Session exists — merge into existing sections
+            const existingSections = form.getValues('sessions.0.sections') || [];
+            form.setValue('sessions.0.sections', buildSections(existingSections), { shouldDirty: true });
+        }
 
         setShowTermSheetBuilder(false);
         setSelectedTermSections([]);
@@ -541,12 +544,12 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
                          {canEdit && (
                             <div className="pt-6 border-t space-y-3">
                               {/* Primary: Build Term Sheet */}
-                              <div>
-                                <Button type="button" className="w-full" onClick={() => setShowTermSheetBuilder(true)}
+                              <div className="flex flex-col items-start gap-1">
+                                <Button type="button" onClick={() => setShowTermSheetBuilder(true)}
                                   style={{background:'#6141ac'}}>
                                   <FileText className="mr-2 h-4 w-4" /> Build Commercial Term Sheet
                                 </Button>
-                                <p className="text-xs text-center text-muted-foreground mt-1">Select sections from the standard lease term sheet template</p>
+                                <p className="text-xs text-muted-foreground">Select sections from the standard lease term sheet template</p>
                               </div>
                               {/* Secondary: custom blank section */}
                               <div className="flex items-center gap-2">
