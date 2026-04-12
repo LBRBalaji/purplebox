@@ -339,6 +339,39 @@ export default function LeadDetailPage() {
   
   const backLink = getBackLink();
   const defaultTab = searchParams.get('tab') || 'activity';
+
+  // Journey stage computation (used in JSX below)
+  const hasProposal = selectedProvider ? selectedProvider.properties.some(p => p.rentPerSft !== undefined) : false;
+  const negotiation = lead ? getNegotiationBoard(lead.id) : null;
+  const hasNegotiation = !!(negotiation && (negotiation as any).actionableItems?.length > 0);
+  const tenantImpr = lead ? getTenantImprovements(lead.id) : null;
+  const hasFitOut = !!(tenantImpr && ((tenantImpr as any).items?.length > 0 || (tenantImpr as any).requirements));
+  const hasMoU = hasProposal && hasNegotiation && hasFitOut;
+
+  const journeyStages = [
+    { key: 'chat', label: 'Chat', done: true },
+    { key: 'proposal', label: 'Proposal', done: hasProposal },
+    { key: 'negotiation', label: 'Negotiation', done: hasNegotiation },
+    { key: 'fitout', label: 'Fit-Out', done: hasFitOut },
+    { key: 'mou', label: 'MoU', done: hasMoU },
+  ];
+  const currentStageIdx = journeyStages.reduce((acc, s, i) => s.done ? i : acc, 0);
+
+  const journeyNextAction = (() => {
+    if (isProvider) {
+      if (!hasProposal) return { msg: 'Submit your commercial proposal to start the negotiation.', action: 'Submit Proposal', tab: 'activity', highlight: true };
+      if (!hasNegotiation) return { msg: 'Proposal submitted. Open the Negotiation Board to align on terms with the customer.', action: 'Go to Negotiation Board', tab: 'negotiation-board', highlight: false };
+      if (!hasFitOut) return { msg: "Terms are being discussed. Stay tuned for the customer's fit-out requirements.", action: null, tab: null, highlight: false };
+      return { msg: 'Deal progressing well. Review fit-out requirements and confirm with ORS-ONE for MoU.', action: null, tab: null, highlight: false };
+    }
+    if (isCustomer) {
+      if (!hasProposal) return { msg: 'Waiting for the developer to submit their commercial proposal.', action: null, tab: null, highlight: false };
+      if (!hasNegotiation) return { msg: 'Developer has submitted a proposal. Review it and open the Negotiation Board to discuss terms.', action: 'Review & Negotiate', tab: 'negotiation-board', highlight: true };
+      if (!hasFitOut) return { msg: 'Negotiation in progress. Define your fit-out and warehouse requirements next.', action: 'Define Fit-Out Requirements', tab: 'improvements', highlight: true };
+      return { msg: 'All stages complete. ORS-ONE will reach out to finalise the MoU.', action: null, tab: null, highlight: false };
+    }
+    return null;
+  })();
   
   return (
     <main className="container mx-auto p-4 md:p-8">
@@ -411,50 +444,16 @@ export default function LeadDetailPage() {
 
         {!selectedProvider ? (
             <DeveloperSelection lead={lead} onSelect={handleProviderSelect} />
-        ) : (() => {
-            // Derive journey stage
-            const hasProposal = selectedProvider.properties.some(p => p.rentPerSft !== undefined);
-            const negotiation = getNegotiationBoard(lead.id);
-            const hasNegotiation = !!(negotiation && (negotiation as any).actionableItems?.length > 0);
-            const tenantImpr = getTenantImprovements(lead.id);
-            const hasFitOut = !!(tenantImpr && ((tenantImpr as any).items?.length > 0 || (tenantImpr as any).requirements));
-            const hasMoU = activities.some(a => a.activityType === 'Proposal Submitted' && hasNegotiation && hasFitOut);
-
-            const stages = [
-              { key: 'chat', label: 'Chat', done: true },
-              { key: 'proposal', label: 'Proposal', done: hasProposal },
-              { key: 'negotiation', label: 'Negotiation', done: hasNegotiation },
-              { key: 'fitout', label: 'Fit-Out', done: hasFitOut },
-              { key: 'mou', label: 'MoU', done: hasMoU },
-            ];
-            const currentStageIdx = stages.reduce((acc, s, i) => s.done ? i : acc, 0);
-
-            // Next action card content per role
-            const getNextAction = () => {
-              if (isProvider) {
-                if (!hasProposal) return { msg: 'Submit your commercial proposal to start the negotiation.', action: 'Submit Proposal', tab: 'activity', highlight: true };
-                if (!hasNegotiation) return { msg: 'Proposal submitted. Open the Negotiation Board to align on terms with the customer.', action: 'Go to Negotiation Board', tab: 'negotiation-board', highlight: false };
-                if (!hasFitOut) return { msg: 'Terms are being discussed. Stay tuned for the customer's fit-out requirements.', action: null, tab: null, highlight: false };
-                return { msg: 'Deal is progressing well. Review fit-out requirements and confirm with ORS-ONE for MoU.', action: null, tab: null, highlight: false };
-              }
-              if (isCustomer) {
-                if (!hasProposal) return { msg: 'Waiting for the developer to submit their commercial proposal.', action: null, tab: null, highlight: false };
-                if (!hasNegotiation) return { msg: 'Developer has submitted a proposal. Review it and open the Negotiation Board to discuss terms.', action: 'Review & Negotiate', tab: 'negotiation-board', highlight: true };
-                if (!hasFitOut) return { msg: 'Negotiation in progress. Define your fit-out and warehouse requirements next.', action: 'Define Fit-Out Requirements', tab: 'improvements', highlight: true };
-                return { msg: 'All stages complete. ORS-ONE will reach out to finalise the MoU.', action: null, tab: null, highlight: false };
-              }
-              return null;
-            };
-            const nextAction = getNextAction();
-
-            return (
+        ) : (
             <div className="space-y-5">
+
+
 
               {/* Journey progress bar */}
               <div className="rounded-2xl p-5" style={{background:'#ffffff', border:'1px solid hsl(259 30% 88%)'}}>
                 <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{color:'hsl(259 15% 50%)'}}>Transaction Journey</p>
                 <div className="flex items-center gap-0">
-                  {stages.map((stage, i) => (
+                  {journeyStages.map((stage, i) => (
                     <React.Fragment key={stage.key}>
                       <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                         <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all"
@@ -472,7 +471,7 @@ export default function LeadDetailPage() {
                           {stage.label}
                         </span>
                       </div>
-                      {i < stages.length - 1 && (
+                      {i < journeyStages.length - 1 && (
                         <div className="flex-1 h-0.5 mb-5 mx-1 transition-all"
                           style={{background: stage.done ? '#6141ac' : 'hsl(259 30% 88%)'}} />
                       )}
@@ -482,34 +481,34 @@ export default function LeadDetailPage() {
               </div>
 
               {/* Next action card */}
-              {nextAction && (
+              {journeyNextAction && (
                 <div className="rounded-2xl p-4 flex items-start justify-between gap-4"
-                  style={nextAction.highlight
+                  style={journeyNextAction.highlight
                     ? {background:'hsl(259 25% 10%)', border:'1px solid hsl(259 25% 22%)'}
                     : {background:'hsl(259 44% 96%)', border:'1px solid hsl(259 44% 86%)'}}>
                   <div className="flex items-start gap-3">
                     <div className="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                      style={{background: nextAction.highlight ? '#6141ac' : 'hsl(259 44% 88%)'}}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={nextAction.highlight ? '#ffffff' : '#6141ac'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                      style={{background: journeyNextAction.highlight ? '#6141ac' : 'hsl(259 44% 88%)'}}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={journeyNextAction.highlight ? '#ffffff' : '#6141ac'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                     </div>
                     <div>
                       <p className="text-xs font-bold uppercase tracking-widest mb-1"
-                        style={{color: nextAction.highlight ? '#9b7ee0' : '#6141ac'}}>Your Next Step</p>
+                        style={{color: journeyNextAction.highlight ? '#9b7ee0' : '#6141ac'}}>Your Next Step</p>
                       <p className="text-sm leading-relaxed"
-                        style={{color: nextAction.highlight ? '#c5b8e8' : 'hsl(259 15% 35%)'}}>
-                        {nextAction.msg}
+                        style={{color: journeyNextAction.highlight ? '#c5b8e8' : 'hsl(259 15% 35%)'}}>
+                        {journeyNextAction.msg}
                       </p>
                     </div>
                   </div>
-                  {nextAction.action && nextAction.tab && (
+                  {journeyNextAction.action && journeyNextAction.tab && (
                     <button
                       onClick={() => {
-                        const tab = document.querySelector(`[data-value="${nextAction.tab}"]`) as HTMLElement;
+                        const tab = document.querySelector(`[data-value="${journeyNextAction.tab}"]`) as HTMLElement;
                         if (tab) tab.click();
                       }}
                       className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:opacity-90 whitespace-nowrap"
                       style={{background:'#6141ac', color:'#ffffff'}}>
-                      {nextAction.action} →
+                      {journeyNextAction.action} →
                     </button>
                   )}
                 </div>
@@ -711,8 +710,7 @@ export default function LeadDetailPage() {
                 </TabsContent>
             </Tabs>
             </div>
-            );
-        })()}
+        )}
       </div>
     </main>
   );
