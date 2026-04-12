@@ -382,7 +382,7 @@ const AttendeeSection = ({ sessionIndex, type, disabled }: { sessionIndex: numbe
 };
 
 
-const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any, lead: RegisteredLead }) => {
+const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead, primaryListing }: { sessionIndex: number; onRemove: () => void; canEdit: boolean; form: any, lead: RegisteredLead, primaryListing: ListingSchema | null }) => {
     const { control, watch, setValue, getValues } = useFormContext<NegotiationBoardSchema>();
     const { user, users } = useAuth();
     const { addAgentToLead } = useData();
@@ -408,53 +408,33 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead }: { s
     }
 
      const handleBuildTermSheet = () => {
-        // Build the new sections from selected definitions
-        const buildSections = (existingSections: any[]) => {
-            const existingSectionIds = existingSections.map((s: any) => s.id);
-            const newSections = [...existingSections];
-            selectedTermSections.forEach(sectionId => {
-                if (existingSectionIds.includes(sectionId)) return;
-                const def = TERM_SHEET_SECTIONS.find(s => s.id === sectionId);
-                if (!def) return;
-                newSections.push({
-                    id: def.id,
-                    title: def.label,
-                    fields: def.fields.map(f => ({
-                        id: f.id,
-                        label: f.label,
-                        isLabelEditable: false,
-                        agreedTerms: {
-                            current: getListingValue(primaryListing, (f as any).listingKey),
-                            history: [],
-                        },
-                        proposedBy: { current: '', history: [] },
-                        status: { current: 'Pending', history: [] },
-                        fieldType: f.type,
-                        fieldOptions: (f as any).options || [],
-                    }))
-                });
-            });
-            return newSections;
-        };
+        // useFieldArray's append is the only reliable way to add sections and trigger re-render
+        // form.setValue bypasses the fieldArray internal state and doesn't update `fields`
+        const existingSectionIds = fields.map((f: any) => f.id);
 
-        const existingSessions = form.getValues('sessions') || [];
-
-        if (existingSessions.length === 0) {
-            // No session yet — create session[0] with the sections baked in directly
-            const newSession = {
-                date: new Date().toISOString(),
-                venue: 'Term Sheet',
-                customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
-                providerAttendees: [],
-                facilitatorAttendees: [],
-                sections: buildSections([]),
-            };
-            form.setValue('sessions', [newSession] as any, { shouldDirty: true });
-        } else {
-            // Session exists — merge into existing sections
-            const existingSections = form.getValues('sessions.0.sections') || [];
-            form.setValue('sessions.0.sections', buildSections(existingSections), { shouldDirty: true });
-        }
+        selectedTermSections.forEach(sectionId => {
+            if (existingSectionIds.includes(sectionId)) return;
+            const def = TERM_SHEET_SECTIONS.find(s => s.id === sectionId);
+            if (!def) return;
+            append({
+                id: def.id,
+                title: def.label,
+                icon: 'FileText',
+                fields: def.fields.map(f => ({
+                    id: f.id,
+                    label: f.label,
+                    isLabelEditable: false,
+                    agreedTerms: {
+                        current: getListingValue(primaryListing, (f as any).listingKey),
+                        history: [],
+                    },
+                    proposedBy: { current: '', history: [] },
+                    status: { current: 'Pending', history: [] },
+                    fieldType: f.type,
+                    fieldOptions: (f as any).options || [],
+                }))
+            } as any);
+        });
 
         setShowTermSheetBuilder(false);
         setSelectedTermSections([]);
@@ -795,6 +775,7 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                     canEdit={canEdit}
                                     form={form}
                                     lead={lead}
+                                    primaryListing={primaryListing}
                                 />
                             ))}
                         </CardContent>
