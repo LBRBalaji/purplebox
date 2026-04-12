@@ -752,43 +752,36 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                         {fields.length === 0 && <p className="text-sm text-muted-foreground">No media uploaded yet.</p>}
                     </div>
                   </div>
-                  {/* Additional Information */}
+                  {/* Property Description */}
                   <div className="space-y-4">
-                    <FormLabel className="text-lg font-semibold">Additional Information</FormLabel>
-                    <div className="p-4 border rounded-md">
+                    <FormLabel className="text-lg font-semibold">Property Description</FormLabel>
+                    <div className="p-4 border rounded-md space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Overview</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} value={field.value ?? ''} placeholder="Describe the key features, location advantages, and highlights of your property." className="min-h-32"/>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         control={form.control}
                         name="additionalInformation"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Developer Notes</FormLabel>
+                            <FormLabel>Developer Notes <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
                             <FormControl>
-                              <Textarea {...field} value={field.value ?? ''} placeholder="Provide any extra details, special features, or notes about the property here." className="min-h-24"/>
+                              <Textarea {...field} value={field.value ?? ''} placeholder="Any additional details, special features, or internal notes about the property." className="min-h-24"/>
                             </FormControl>
-                            <FormDescription>This information will be displayed separately on the listing page.</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div className="space-y-4">
-                    <FormLabel className="text-lg font-semibold">Description</FormLabel>
-                    <div className="p-4 border rounded-md">
-                        <FormField
-                          control={form.control}
-                          name="description"
-                          render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Property Description</FormLabel>
-                                <FormControl>
-                                    <Textarea {...field} value={field.value ?? ''} placeholder="Describe the key features of your property." className="min-h-32"/>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
                     </div>
                   </div>
                   <Separator/>
