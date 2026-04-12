@@ -49,7 +49,7 @@ export function CustomerTransactions() {
                 <TableRow>
                     <TableHead>Transaction ID</TableHead>
                     <TableHead>Requirements Summary</TableHead>
-                    <TableHead>Developer(s)</TableHead>
+                    <TableHead>Listing(s)</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
                 </TableHeader>
@@ -62,15 +62,14 @@ export function CustomerTransactions() {
                         <TableCell className="max-w-xs truncate">{lead.requirementsSummary}</TableCell>
                         <TableCell>
                         <div className="flex flex-col gap-2">
-                            {lead.providers.map(p => {
-                            const providerUser = users[p.providerEmail];
-                            return (
-                                <div key={p.providerEmail} className="flex items-center gap-2">
+                            {lead.providers.map(p => (
+                              p.properties.slice(0,1).map(prop => (
+                                <div key={prop.listingId} className="flex items-center gap-2">
                                     <Building className="h-4 w-4 text-muted-foreground"/>
-                                    <span className="text-sm font-medium flex-grow">{providerUser?.companyName || p.providerEmail}</span>
+                                    <span className="text-sm font-mono text-primary">{prop.listingId}</span>
                                 </div>
-                            )
-                            })}
+                              ))
+                            ))}
                         </div>
                         </TableCell>
                         <TableCell className="text-right">

@@ -359,6 +359,57 @@ export default function LeadDetailPage() {
             <p className="text-muted-foreground mt-2">
                 Tracking all activities for Transaction ID: <span className="font-mono text-primary">{lead.id}</span>
             </p>
+
+            {/* Identity reveal banner — shown only on transaction page */}
+            {customer && providerUser && (
+              <div className="mt-5 rounded-2xl p-4 flex items-center gap-4 flex-wrap"
+                style={{background:'hsl(259 25% 11%)', border:'1px solid hsl(259 25% 22%)'}}>
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{background:'hsl(259 44% 25%)'}}>
+                    <span className="text-xs font-black" style={{color:'#c5b8e8'}}>{customer.companyName?.slice(0,2).toUpperCase()}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{color:'hsl(259 30% 55%)'}}>Tenant</p>
+                    <p className="text-sm font-bold text-white truncate">{customer.companyName}</p>
+                    <p className="text-xs" style={{color:'hsl(259 30% 60%)'}}>{customer.userName}</p>
+                  </div>
+                </div>
+                <div className="flex-shrink-0 px-3">
+                  <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{background:'hsl(259 44% 20%)'}}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b7ee0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 flex-1 min-w-0 justify-end text-right">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{color:'hsl(259 30% 55%)'}}>Property Provider</p>
+                    <p className="text-sm font-bold text-white truncate">{providerUser.companyName}</p>
+                    <p className="text-xs" style={{color:'hsl(259 30% 60%)'}}>{providerUser.userName}</p>
+                  </div>
+                  <div className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{background:'hsl(259 44% 25%)'}}>
+                    <span className="text-xs font-black" style={{color:'#c5b8e8'}}>{providerUser.companyName?.slice(0,2).toUpperCase()}</span>
+                  </div>
+                </div>
+                {/* Back to chat link */}
+                {selectedProvider && (
+                  <div className="w-full border-t pt-3 mt-1 flex items-center justify-between" style={{borderColor:'hsl(259 25% 22%)'}}>
+                    <p className="text-xs" style={{color:'hsl(259 30% 55%)'}}>
+                      <span style={{color:'#9b7ee0'}}>✓</span> Identities revealed — you are now in the Transaction Workspace
+                    </p>
+                    <button
+                      onClick={() => {
+                        const threadId = `chat-${lead.id}-${selectedProvider.providerEmail}`;
+                        window.history.back();
+                      }}
+                      className="text-xs font-bold flex items-center gap-1 hover:opacity-80 transition-opacity"
+                      style={{color:'#9b7ee0'}}>
+                      ← Back to Chat
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
         </div>
 
         {!selectedProvider ? (
@@ -438,15 +489,15 @@ export default function LeadDetailPage() {
                                     {customer && (
                                         <div className="p-3 bg-secondary/50 rounded-md">
                                             <p className="text-xs text-muted-foreground">Customer</p>
-                                            <p className="font-semibold">{isBrokeredDeal && (isProvider || isAgent) ? customer.companyName : customer.companyName}</p>
-                                            <p className="text-xs">{isBrokeredDeal && (isProvider || isAgent) ? 'Details Private' : customer.userName}</p>
+                                            <p className="font-semibold">{customer.companyName}</p>
+                                            <p className="text-xs">{customer.userName}</p>
                                         </div>
                                     )}
                                     {providerUser && (
                                         <div className="p-3 bg-secondary/50 rounded-md">
                                             <p className="text-xs text-muted-foreground">Provider</p>
-                                            <p className="font-semibold">{isBrokeredDeal && isCustomer ? 'Developer' : providerUser.companyName}</p>
-                                            <p className="text-xs">{isBrokeredDeal && isCustomer ? 'Details Private' : providerUser.userName}</p>
+                                            <p className="font-semibold">{providerUser.companyName}</p>
+                                            <p className="text-xs">{providerUser.userName}</p>
                                         </div>
                                     )}
                                     {agentUser && (

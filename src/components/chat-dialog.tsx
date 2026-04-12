@@ -255,6 +255,26 @@ export function ChatPanel({
                             {initialMessage}
                         </div>
                     )}
+                    {/* Transaction workspace nudge — shown after 2nd message */}
+                    {messages.length >= 2 && lead && (
+                      <div className="mx-2 my-3 rounded-2xl p-4 flex items-start gap-3"
+                        style={{background:'hsl(259 44% 96%)', border:'1px solid hsl(259 44% 86%)'}}>
+                        <div className="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{background:'#6141ac'}}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-foreground">Ready to move forward?</p>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Open your Transaction Workspace to negotiate terms, define fit-out requirements and track this deal end to end — identities revealed inside.</p>
+                          <a href={`/dashboard/leads/${lead.id}`}
+                            className="inline-flex items-center gap-1.5 mt-2 text-xs font-bold rounded-lg px-3 py-1.5 text-white transition-all hover:opacity-90"
+                            style={{background:'#6141ac'}}>
+                            Open Transaction Workspace →
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
                     {messages.map((message, index) => {
                     const isUser = message.senderEmail === user?.email;
                     const senderInitial = message.senderName ? message.senderName[0].toUpperCase() : '?';
