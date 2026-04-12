@@ -245,6 +245,10 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
         // Smart Approval Logic for Admins
         if (isAdmin && initialIntent === 'approve' && data.locationCircle && listing?.status === 'pending') {
             data.status = 'approved';
+        } else if (!isAdmin && isEditMode && data.status === 'approved') {
+            // Non-admin edits must go back through approval
+            data.status = 'pending';
+            toast({ title: 'Edit submitted for approval', description: 'Your changes have been saved and sent to admin for re-approval before going live.' });
         }
         
         const finalData = {
@@ -705,11 +709,11 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                                     >
                                     {fileType === 'image' && fileUrl ? (
                                         <>
-                                            <Image
+                                            <img
                                                 src={fileUrl}
                                                 alt={field.name || 'Preview'}
-                                                fill
-                                                className="object-cover"
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }}
                                             />
                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Maximize className="h-6 w-6 text-white" />

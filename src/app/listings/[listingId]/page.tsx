@@ -492,13 +492,13 @@ export default function ListingDetailPage() {
                                         <CarouselContent>
                                             {imageDocuments.length > 0 ? imageDocuments.map((doc, index) => (
                                                 <CarouselItem key={index}>
-                                                    <div className="aspect-video relative">
-                                                        <Image
+                                                    <div className="aspect-video relative bg-secondary overflow-hidden">
+                                                        {/* Use img not Image — Drive URLs redirect to googleusercontent.com which Next Image can't follow */}
+                                                        <img
                                                             src={doc.url}
                                                             alt={doc.name || listing.listingId}
-                                                            fill
-                                                            className="object-cover"
-                                                            data-ai-hint="warehouse industrial building"
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }}
                                                         />
                                                     </div>
                                                 </CarouselItem>
