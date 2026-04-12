@@ -74,15 +74,7 @@ export function DownloadTermsDialog({ isOpen, onOpenChange, onAccept }: Download
                                 <strong className="font-semibold">For Startups:</strong> To support young entrepreneurs, we offer a zero transaction fee on the first transaction for startups recognized by the Government of India.
                             </span>
                         </div>
-                        <div className="flex items-start gap-3">
-                            <Truck className="h-4 w-4 shrink-0 mt-0.5" />
-                            <span>
-                            <strong className="font-semibold">For Logistics Companies:</strong> To foster long-term association, we offer a zero transaction fee for all deals with logistics companies.
-                            </span>
-                        </div>
                     </div>
-                    <Separator className="bg-green-200"/>
-                    <p className="text-xs text-green-600">For all other customers, standard brokerage fees are applicable as per industry norms.</p>
                 </div>
 
                 <div className="flex items-start space-x-3 pt-4 p-2">

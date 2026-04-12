@@ -12,7 +12,6 @@ import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus, Submission } from '@/contexts/data-context';
 import Link from 'next/link';
 import type { ListingSchema } from '@/lib/schema';
-import { EngagePathSelector } from './engage-path-selector';
 
 export function CustomerTransactions() {
   const { user, users } = useAuth();
@@ -82,13 +81,7 @@ export function CustomerTransactions() {
                             </div>
                         </TableCell>
                     </TableRow>
-                    {expandedLead === lead.id && (
-                      <TableRow>
-                        <TableCell colSpan={4} className="bg-secondary/20 p-5">
-                          <EngagePathSelector leadId={lead.id} currentPath={lead.engagePath} />
-                        </TableCell>
-                      </TableRow>
-                    )}
+
                     </React.Fragment>
                     );
                 })}

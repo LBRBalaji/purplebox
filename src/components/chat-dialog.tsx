@@ -62,7 +62,6 @@ export function ChatPanel({
 
   const lead = registeredLeads.find(l => l.id === submission?.demandId);
   const threadId = lead && submission ? `chat-${lead.id}-${submission.providerEmail}` : null;
-  const isMessageGated = false; // Payment gate removed — developers see messages directly
   const otherUserTyping = threadId ? typingStatus[threadId] : null;
   
   const fetchMessages = useCallback(async () => {
@@ -301,18 +300,7 @@ export function ChatPanel({
                                 )}
                             >
                                 {message.text && (
-                              isMessageGated && !isUser ? (
-                                <div className="relative">
-                                  <p className="text-sm break-words [overflow-wrap:anywhere] blur-sm select-none">{'█'.repeat(Math.min(message.text.length, 40))}</p>
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="flex items-center gap-1 text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">
-                                      <Lock className="h-3 w-3" /> Pay to Read
-                                    </div>
-                                  </div>
-                                </div>
-                              ) : (
-                                <p className="text-sm break-words [overflow-wrap:anywhere]">{linkify(message.text)}</p>
-                              )
+<p className="text-sm break-words [overflow-wrap:anywhere]">{linkify(message.text)}</p>
                             )}
                                 {message.attachment && (
                                     <a href={message.attachment.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mt-2 p-2 rounded-md bg-black/10 hover:bg-black/20">
@@ -348,7 +336,7 @@ export function ChatPanel({
         </div>
         <div className="pt-2 px-4 pb-4 shrink-0">
         {uploadProgress !== null && <Progress value={uploadProgress} className="mb-2 h-1" />}
-        <form onSubmit={isMessageGated ? (e) => e.preventDefault() : handleSendMessage} className="flex w-full items-center gap-2">
+        <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
             <input
                 type="file"
                 ref={fileInputRef}

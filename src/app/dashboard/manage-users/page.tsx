@@ -2,7 +2,6 @@
 'use client';
 import { AgentWaitlist } from "@/components/agent-waitlist";
 import { DataGovernance } from "@/components/data-governance";
-import { PaymentRequests } from "@/components/payment-requests";
 import { UserList } from "@/components/user-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StaffManagement } from '@/components/staff-management';
@@ -40,7 +39,6 @@ export default function ManageUsersPage() {
                         <TabsTrigger value="users">Platform Users</TabsTrigger>
                         <TabsTrigger value="agents">Agent Waitlist</TabsTrigger>
                         <TabsTrigger value="governance">Data Governance</TabsTrigger>
-                        <TabsTrigger value="payments">Payment Requests</TabsTrigger>
                         <TabsTrigger value="staff">Internal Staff</TabsTrigger>
                     </TabsList>
                     <TabsContent value="users" className="mt-6">
@@ -50,7 +48,6 @@ export default function ManageUsersPage() {
                         <AgentWaitlist />
                     </TabsContent>
                     <TabsContent value="governance" className="mt-6"><DataGovernance /></TabsContent>
-                    <TabsContent value="payments" className="mt-6"><PaymentRequests /></TabsContent>
                     <TabsContent value="staff" className="mt-6"><StaffManagement /></TabsContent>
                 </Tabs>
             </div>

@@ -479,7 +479,7 @@ export function AdminListings() {
   }, [listings,listingAnalytics]);
   const maxViews = React.useMemo(() => Math.max(...listingAnalytics.map(a=>a.views),1), [listingAnalytics]);
   const getProviderName = (id: string) => Object.values(users).find(u=>u.email===id)?.companyName||'Unknown';
-  const resetFilters = () => { setKeywordFilter('');setDeveloperFilter('all');setStatusFilter('all');setCircleFilter([]);setAvailabilityFilter('all');setSizeRange([0,maxSliderSize]);setPremiumOnly(false);setDateRange({from:subDays(new Date(),29),to:new Date()}); };
+  const resetFilters = () => { setKeywordFilter('');setDeveloperFilter('all');setStatusFilter('all');setCircleFilter([]);setAvailabilityFilter('all');setSizeRange([0,maxSliderSize]);setDateRange({from:subDays(new Date(),29),to:new Date()}); };
   const handleEdit = (listing: ListingSchema, intent?: 'approve') => { setSelectedListing(listing);setEditIntent(intent);setIsFormOpen(true); };
   const handleFormSubmit = (data: ListingSchema) => {
     if (data.isAdmin&&editIntent==='approve'&&data.locationCircle) { data.status='approved'; toast({title:'Listing Approved',description:`"${data.listingId}" approved.`}); }
@@ -601,7 +601,7 @@ export function AdminListings() {
               <div className="md:col-span-2 bg-card rounded-2xl border border-border p-5">
                 <h3 className="font-bold text-foreground mb-4">Platform Overview</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  [{label:'Total Listings',value:listings.filter(l=>l.status==='approved').length,sub:'Active on platform',icon:Building},{label:'Pending Review',value:listings.filter(l=>l.status==='pending').length,sub:'Awaiting approval',icon:Scaling},{label:'Total Area',value:(listings.filter(l=>l.status==='approved').reduce((s,l)=>s+l.sizeSqFt,0)/1000000).toFixed(1)+'M sft',sub:'Listed sq. ft.',icon:Scaling},{label:'Unique Developers',value:new Set(listings.map(l=>l.developerId)).size,sub:'Contributing',icon:Users}].map((item,i)=>(
+                  {[{label:'Total Listings',value:listings.filter(l=>l.status==='approved').length,sub:'Active on platform',icon:Building},{label:'Pending Review',value:listings.filter(l=>l.status==='pending').length,sub:'Awaiting approval',icon:Scaling},{label:'Total Area',value:(listings.filter(l=>l.status==='approved').reduce((s,l)=>s+l.sizeSqFt,0)/1000000).toFixed(1)+'M sft',sub:'Listed sq. ft.',icon:Scaling},{label:'Unique Developers',value:new Set(listings.map(l=>l.developerId)).size,sub:'Contributing',icon:Users}].map((item,i)=>(
                     <div key={i} className="bg-secondary/30 rounded-xl p-4"><item.icon className="h-5 w-5 text-primary mb-2" /><p className="text-xl font-black text-foreground">{item.value}</p><p className="text-xs font-semibold text-foreground">{item.label}</p><p className="text-xs text-muted-foreground">{item.sub}</p></div>
                   ))}
                 </div>

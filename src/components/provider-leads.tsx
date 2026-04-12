@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { AcknowledgeLeadDialog } from './acknowledge-lead-dialog';
-import { DeveloperEngagePath } from './developer-engage-path';
 import { type AcknowledgmentDetails } from '@/lib/schema';
 import { useRouter } from 'next/navigation';
 import {
@@ -361,7 +360,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                     {isProvider && !lead.isO2OCollaborator && expandedLeadId === lead.id && (
                                       <TableRow>
                                         <TableCell colSpan={5} className="bg-secondary/20 p-5">
-                                          <DeveloperEngagePath leadId={lead.id} currentPath={lead.developerEngagePath} />
+
                                         </TableCell>
                                       </TableRow>
                                     )}

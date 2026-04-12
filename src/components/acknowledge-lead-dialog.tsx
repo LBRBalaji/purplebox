@@ -74,13 +74,7 @@ export function AcknowledgeLeadDialog({ isOpen, onOpenChange, lead, onSubmit }: 
                         I/We hereby acknowledge that the lead for <strong>{customerIdentifier}</strong> is a customer of ORS-ONE.
                     </AlertDescription>
                 </Alert>
-                 <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle className="font-semibold">Financial Commitment</AlertTitle>
-                    <AlertDescription className="text-xs">
-                        By acknowledging this lead, you agree that this is a brokered transaction. Upon successful conversion of this lead, you are contractually bound to pay the agreed-upon brokerage fees to ORS-ONE.
-                    </AlertDescription>
-                </Alert>
+
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

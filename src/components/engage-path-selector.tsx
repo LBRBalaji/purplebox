@@ -11,8 +11,7 @@ type EngagePath = 'direct' | 'orsone' | 'agent';
 type Props = { leadId: string; currentPath?: EngagePath | null; onPathSelected?: (path: EngagePath) => void; };
 
 const PATHS = [
-  { id: 'direct' as EngagePath, icon: Building2, title: 'Connect Directly with Developer', desc: 'Engage and negotiate directly with the property developer on the platform. All communication stays within ORS-ONE.', badge: null, color: '' },
-  { id: 'orsone' as EngagePath, icon: Users, title: 'ORS-ONE as Transaction Partner', desc: 'Let ORS-ONE facilitate the entire transaction. Our team manages negotiations, documentation and deal closure on your behalf.', badge: '3PL & Logistics: Zero Brokerage', color: 'bg-green-50 text-green-700 border-green-200' },
+  { id: 'direct' as EngagePath, icon: Building2, title: 'Proceed Directly', desc: 'Engage and negotiate directly with the property developer on the platform. All communication stays within ORS-ONE.', badge: null, color: '' },
   { id: 'agent' as EngagePath, icon: UserPlus, title: 'Engage Your Own Agent', desc: 'Invite your trusted agent to represent you on the platform. Your agent will receive an email invitation to join and assist with this transaction.', badge: null, color: '' },
 ];
 
@@ -53,29 +52,7 @@ export function EngagePathSelector({ leadId, currentPath, onPathSelected }: Prop
         toast({ title: 'Agent Invited!', description: agentName + ' will receive an invitation. Code: ' + inviteCode + ' (valid 3 days)' });
       } else {
         updateRegisteredLead({ ...lead, engagePath: selected });
-        if (selected === 'orsone') {
-          try {
-            const notifRes = await fetch('/api/notifications');
-            const notifData = await notifRes.json();
-            const existing = Array.isArray(notifData) ? notifData : Object.values(notifData);
-            const newNotif = {
-              id: 'notif-' + Date.now(),
-              type: 'new_activity',
-              title: 'ORS-ONE Transaction Partner Request',
-              message: (user?.companyName || user?.userName || 'A customer') + ' has selected ORS-ONE as Official Transaction Partner for lead ' + leadId + '. Please follow up.',
-              href: '/dashboard/transactions',
-              timestamp: new Date().toISOString(),
-              recipientEmail: 'balaji@lakshmibalajio2o.com',
-              triggeredBy: user?.email || 'customer',
-              isRead: false,
-            };
-            await fetch('/api/notifications', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify([...existing, newNotif]),
-            });
-          } catch(e) { console.error('Notification error:', e); }
-        }
+
         toast({ title: 'Engagement Path Selected', description: 'Your preference has been saved.' });
       }
       setConfirmed(true);
