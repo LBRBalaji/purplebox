@@ -656,7 +656,7 @@ export function ListingsPage() {
                     <Download className="w-6 h-6"/>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-primary">Search-Select-Download</h1>
-                <p className="mt-4 text-lg text-accent">Warehouse-Technical-Compliance-Commercials, in a single CSV</p>
+                <p className="mt-4 text-lg text-accent">Warehouse-Technical-Compliance-Commercials, in a single Excel</p>
                 
                  <div className="mt-8 flex items-center justify-center gap-4 md:gap-8 text-center animate-in fade-in-0 duration-1000">
                     <div className="text-center">
