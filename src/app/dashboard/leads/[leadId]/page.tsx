@@ -373,72 +373,90 @@ export default function LeadDetailPage() {
     return null;
   })();
   
-  return (
-    <main className="container mx-auto p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-            {lead.providers.length > 1 && selectedProvider && !isProvider ? (
-                <Button variant="ghost" onClick={() => setSelectedProvider(null)} className="mb-4">
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Developer Selection
-                </Button>
-            ) : (
-                <Button variant="ghost" asChild className="mb-4">
-                    <Link href={backLink}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Transactions
-                    </Link>
-                </Button>
-            )}
-            <h2 className="text-3xl font-bold font-headline tracking-tight">Transaction Details</h2>
-            <p className="text-muted-foreground mt-2">
-                Tracking all activities for Transaction ID: <span className="font-mono text-primary">{lead.id}</span>
-            </p>
+  // Activity type badge colours
+  const activityBadge = (type: string) => {
+    const map: Record<string, {bg: string, color: string}> = {
+      'Proposal Submitted':  {bg:'#fef9c3', color:'#92400e'},
+      'Lead Registered':     {bg:'#f0fdf4', color:'#15803d'},
+      'Lead Acknowledged':   {bg:'#eff6ff', color:'#1d4ed8'},
+      'Site Visit Request':  {bg:'#fdf4ff', color:'#7e22ce'},
+      'Site Visit Update':   {bg:'#fdf4ff', color:'#7e22ce'},
+      'Customer Feedback':   {bg:'#fff7ed', color:'#c2410c'},
+      'Tenant Improvements': {bg:'#f0fdf4', color:'#15803d'},
+    };
+    return map[type] || {bg:'#f4f2fb', color:'#6141ac'};
+  };
 
-            {/* Identity reveal banner — shown only on transaction page */}
+  return (
+    <main style={{background:'#f4f2fb', minHeight:'100vh'}} className="p-4 md:p-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-5">
+            {/* Back nav */}
+            {lead.providers.length > 1 && selectedProvider && !isProvider ? (
+                <button onClick={() => setSelectedProvider(null)}
+                  className="mb-4 flex items-center gap-1.5 text-sm font-medium transition-colors hover:opacity-70"
+                  style={{color:'#6141ac'}}>
+                  <ArrowLeft className="h-4 w-4"/> Back to Developer Selection
+                </button>
+            ) : (
+                <Link href={backLink}
+                  className="mb-4 flex items-center gap-1.5 text-sm font-medium transition-colors hover:opacity-70"
+                  style={{color:'#6141ac'}}>
+                  <ArrowLeft className="h-4 w-4"/> Back to Transactions
+                </Link>
+            )}
+
+            {/* Hero identity card */}
             {customer && providerUser && (
-              <div className="mt-5 rounded-2xl p-4 flex items-center gap-4 flex-wrap"
-                style={{background:'hsl(259 25% 11%)', border:'1px solid hsl(259 25% 22%)'}}>
+              <div className="rounded-2xl p-5 flex items-center gap-4 flex-wrap mt-2"
+                style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
+                {/* Tenant */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{background:'hsl(259 44% 25%)'}}>
-                    <span className="text-xs font-black" style={{color:'#c5b8e8'}}>{customer.companyName?.slice(0,2).toUpperCase()}</span>
+                  <div className="h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-xs font-black"
+                    style={{background:'hsl(259 44% 25%)',color:'#c5b8e8'}}>
+                    {customer.companyName?.slice(0,2).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{color:'hsl(259 30% 55%)'}}>Tenant</p>
+                    <p className="text-xs font-bold uppercase tracking-widest" style={{color:'hsl(259 30% 55%)'}}>Tenant</p>
                     <p className="text-sm font-bold text-white truncate">{customer.companyName}</p>
                     <p className="text-xs" style={{color:'hsl(259 30% 60%)'}}>{customer.userName}</p>
                   </div>
                 </div>
-                <div className="flex-shrink-0 px-3">
-                  <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{background:'hsl(259 44% 20%)'}}>
+                {/* Divider */}
+                <div className="flex-shrink-0">
+                  <div className="h-9 w-9 rounded-full flex items-center justify-center" style={{background:'hsl(259 44% 20%)'}}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b7ee0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                   </div>
                 </div>
+                {/* Provider */}
                 <div className="flex items-center gap-3 flex-1 min-w-0 justify-end text-right">
                   <div className="min-w-0">
-                    <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{color:'hsl(259 30% 55%)'}}>Property Provider</p>
+                    <p className="text-xs font-bold uppercase tracking-widest" style={{color:'hsl(259 30% 55%)'}}>Property Provider</p>
                     <p className="text-sm font-bold text-white truncate">{providerUser.companyName}</p>
                     <p className="text-xs" style={{color:'hsl(259 30% 60%)'}}>{providerUser.userName}</p>
                   </div>
-                  <div className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{background:'hsl(259 44% 25%)'}}>
-                    <span className="text-xs font-black" style={{color:'#c5b8e8'}}>{providerUser.companyName?.slice(0,2).toUpperCase()}</span>
+                  <div className="h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-xs font-black"
+                    style={{background:'hsl(259 44% 25%)',color:'#c5b8e8'}}>
+                    {providerUser.companyName?.slice(0,2).toUpperCase()}
                   </div>
                 </div>
-                {/* Back to chat link */}
+                {/* Footer row */}
                 {selectedProvider && (
-                  <div className="w-full border-t pt-3 mt-1 flex items-center justify-between" style={{borderColor:'hsl(259 25% 22%)'}}>
-                    <p className="text-xs" style={{color:'hsl(259 30% 55%)'}}>
-                      <span style={{color:'#9b7ee0'}}>✓</span> Identities revealed — you are now in the Transaction Workspace
-                    </p>
+                  <div className="w-full flex items-center justify-between pt-3 mt-1"
+                    style={{borderTop:'1px solid hsl(259 25% 22%)'}}>
+                    <div className="flex items-center gap-2">
+                      <span style={{color:'#9b7ee0',fontSize:'11px'}}>✓</span>
+                      <p className="text-xs" style={{color:'hsl(259 30% 55%)'}}>
+                        Identities revealed · Transaction ID: <span className="font-mono" style={{color:'#9b7ee0'}}>{lead.id}</span>
+                      </p>
+                    </div>
                     <button
                       onClick={() => {
                         if (!selectedProvider || !lead) return;
                         const listing = selectedProviderListings[0] || null;
                         const customerUser = users[lead.customerId];
-                        const provUser = users[selectedProvider.providerEmail];
-                        const threadId = `chat-${lead.id}-${selectedProvider.providerEmail}`;
                         setActiveChat({
-                          submissionId: threadId,
+                          submissionId: `chat-${lead.id}-${selectedProvider.providerEmail}`,
                           demandId: lead.id,
                           listingId: listing?.listingId || '',
                           providerEmail: selectedProvider.providerEmail,
@@ -450,13 +468,12 @@ export default function LeadDetailPage() {
                             ? (listing ? [listing.warehouseBoxId, listing.listingId, listing.location?.split(',')[0]].filter(Boolean).join(' · ') : 'Developer')
                             : (customerUser?.companyName || 'Customer'),
                         } as any);
-                        // Signal global widget to open
                         try { sessionStorage.setItem('openChatWidget', '1'); } catch {}
                         window.dispatchEvent(new CustomEvent('openChatWidget'));
                       }}
                       className="text-xs font-bold flex items-center gap-1 hover:opacity-80 transition-opacity"
                       style={{color:'#9b7ee0'}}>
-                      ← Continue in Chat
+                      Continue in Chat →
                     </button>
                   </div>
                 )}
@@ -536,201 +553,218 @@ export default function LeadDetailPage() {
                 </div>
               )}
 
-            <Tabs defaultValue={defaultTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="activity" data-value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
-                    <TabsTrigger value="negotiation-board" data-value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
-                    <TabsTrigger value="improvements" data-value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
-                </TabsList>
-                <TabsContent value="activity" className="mt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-                        <div className="md:col-span-2 space-y-6">
-                            {canAddActivity && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">Activity Log</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                {activities.length > 0 ? (
-                                        <Timeline>
-                                            {activities.map((activity) => {
-                                                const Icon = activityIcons[activity.activityType] || Mic;
-                                                const acknowledgedByDetails = activity.details.acknowledgedBy;
-                                                return(
-                                                    <TimelineItem key={activity.activityId}>
-                                                        <TimelineConnector />
-                                                        <TimelineHeader>
-                                                            <TimelineIcon><Icon /></TimelineIcon>
-                                                            <TimelineTitle>{activity.activityType}</TimelineTitle>
-                                                        </TimelineHeader>
-                                                        <TimelineBody className="space-y-2">
-                                                            {activity.activityType === 'Lead Registered' && <p className="text-sm">Lead registered by <b>{users[activity.createdBy]?.userName || activity.createdBy}</b>.</p>}
-                                                            {activity.details.visitDateTime && <p className="text-sm"><b>Date & Time:</b> {new Date(activity.details.visitDateTime).toLocaleString()}</p>}
-                                                            {activity.details.status && <p className="text-sm"><b>Status:</b> <span className="font-semibold text-primary">{activity.details.status}</span></p>}
-                                                            {activity.details.message && <p className="text-sm"><b>Message:</b> {activity.details.message}</p>}
-                                                            {activity.details.notes && <p className="text-sm"><b>O2O Notes:</b> {activity.details.notes}</p>}
-                                                            {activity.details.feedbackText && <p className="text-sm"><b>Feedback:</b> {activity.details.feedbackText}</p>}
-                                                            {activity.details.improvementsText && <p className="text-sm"><b>Requirements:</b> {activity.details.improvementsText}</p>}
-                                                            {activity.activityType === 'Proposal Submitted' && activity.details.listingId && (
-                                                                <div className="text-sm space-y-1">
-                                                                    <p><b>For Listing:</b> {activity.details.listingId}</p>
-                                                                    <p><b>Rent:</b> ₹{activity.details.rentPerSft}/sft</p>
-                                                                    <p><b>Deposit:</b> {activity.details.rentalSecurityDeposit} months</p>
-                                                                    <p><b>Area:</b> {activity.details.actualChargeableArea?.toLocaleString()} sft</p>
-                                                                </div>
-                                                            )}
-                                                            {activity.activityType === 'Lead Acknowledged' && acknowledgedByDetails && (
-                                                                <div className="text-sm space-y-1">
-                                                                    <p>Lead formally acknowledged by <b>{acknowledgedByDetails.name}</b> ({acknowledgedByDetails.title}) from the provider's side.</p>
-                                                                </div>
-                                                            )}
-                                                            <TimelineDescription>
-                                                                Logged by {users[activity.createdBy]?.userName || activity.createdBy} on {new Date(activity.createdAt).toLocaleString()}
-                                                            </TimelineDescription>
-                                                        </TimelineBody>
-                                                    </TimelineItem>
-                                                )
-                                            })}
-                                        </Timeline>
-                                ) : (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <p>No activities have been logged for this lead yet.</p>
+            {/* Workspace tabs */}
+            <div className="rounded-2xl overflow-hidden" style={{border:'1px solid hsl(259 30% 88%)'}}>
+              <div className="flex" style={{background:'hsl(259 30% 96%)'}}>
+                {[
+                  { value: 'activity', label: 'Activity Log', Icon: ClipboardList },
+                  { value: 'negotiation-board', label: 'Negotiation Board', Icon: FileSignature },
+                  { value: 'improvements', label: 'Tenant Improvements', Icon: HardHat },
+                ].map(({value, label, Icon}) => (
+                  <button key={value}
+                    data-value={value}
+                    onClick={() => {
+                      const url = new URL(window.location.href);
+                      url.searchParams.set('tab', value);
+                      window.history.replaceState({}, '', url.toString());
+                      document.querySelectorAll('[data-workspace-tab]').forEach(el => (el as HTMLElement).style.display = 'none');
+                      const target = document.getElementById(`tab-${value}`);
+                      if (target) target.style.display = 'block';
+                      document.querySelectorAll('[data-tab-btn]').forEach(el => {
+                        (el as HTMLElement).style.color = '#888';
+                        (el as HTMLElement).style.borderBottom = '2px solid transparent';
+                        (el as HTMLElement).style.background = 'transparent';
+                      });
+                      const btn = document.querySelector(`[data-tab-btn="${value}"]`) as HTMLElement;
+                      if (btn) { btn.style.color = '#6141ac'; btn.style.borderBottom = '2px solid #6141ac'; btn.style.background = '#fff'; }
+                    }}
+                    data-tab-btn={value}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold transition-all"
+                    style={defaultTab === value
+                      ? {background:'#fff', color:'#6141ac', borderBottom:'2px solid #6141ac'}
+                      : {background:'transparent', color:'#888', borderBottom:'2px solid transparent'}}>
+                    <Icon className="h-3.5 w-3.5"/>
+                    <span className="hidden sm:inline">{label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Activity Log tab */}
+              <div id="tab-activity" data-workspace-tab style={{display: defaultTab === 'activity' ? 'block' : 'none', padding:'20px'}}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                  <div className="md:col-span-2 space-y-4">
+                    {canAddActivity && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                    <div className="rounded-2xl p-5" style={{background:'#fff', border:'1px solid hsl(259 30% 91%)'}}>
+                      <p className="text-sm font-bold mb-4" style={{color:'#1e1537'}}>Activity Log</p>
+                      {activities.length > 0 ? (
+                        <div className="space-y-0">
+                          {activities.map((activity, idx) => {
+                            const badge = activityBadge(activity.activityType);
+                            const acknowledgedByDetails = activity.details.acknowledgedBy;
+                            return (
+                              <div key={activity.activityId} className="flex gap-3">
+                                {/* Timeline line */}
+                                <div className="flex flex-col items-center flex-shrink-0">
+                                  <div className="h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0" style={{background: badge.bg}}>
+                                    <span style={{color: badge.color, fontSize:'12px'}}>●</span>
+                                  </div>
+                                  {idx < activities.length - 1 && <div className="w-0.5 flex-1 my-1" style={{background:'hsl(259 30% 91%)', minHeight:'16px'}}/>}
+                                </div>
+                                <div className="flex-1 pb-4" style={{paddingTop:'6px'}}>
+                                  <div className="flex items-start justify-between gap-2 flex-wrap">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm font-semibold" style={{color:'#1e1537'}}>{activity.activityType}</span>
+                                      <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background: badge.bg, color: badge.color}}>{activity.activityType.split(' ')[0]}</span>
                                     </div>
-                                )}
-                                </CardContent>
-                            </Card>
-                        </div>
-                        <div className="space-y-6 sticky top-24">
-                             <Card>
-                                <CardHeader>
-                                  <CardTitle>Participants</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                  <div className="space-y-4 text-sm">
-                                    {customer && (
-                                        <div className="p-3 bg-secondary/50 rounded-md">
-                                            <p className="text-xs text-muted-foreground">Customer</p>
-                                            <p className="font-semibold">{customer.companyName}</p>
-                                            <p className="text-xs">{customer.userName}</p>
+                                    <span className="text-xs" style={{color:'#aaa'}}>{new Date(activity.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</span>
+                                  </div>
+                                  <div className="mt-1.5 text-xs space-y-1" style={{color:'#555'}}>
+                                    {activity.activityType === 'Lead Registered' && <p>Registered by <b>{users[activity.createdBy]?.userName || activity.createdBy}</b></p>}
+                                    {activity.details.visitDateTime && <p><b>Date & Time:</b> {new Date(activity.details.visitDateTime).toLocaleString()}</p>}
+                                    {activity.details.status && <p><b>Status:</b> <span style={{color:'#6141ac',fontWeight:600}}>{activity.details.status}</span></p>}
+                                    {activity.details.message && <p><b>Message:</b> {activity.details.message}</p>}
+                                    {activity.details.notes && <p><b>O2O Notes:</b> {activity.details.notes}</p>}
+                                    {activity.details.feedbackText && <p><b>Feedback:</b> {activity.details.feedbackText}</p>}
+                                    {activity.details.improvementsText && <p><b>Requirements:</b> {activity.details.improvementsText}</p>}
+                                    {activity.activityType === 'Proposal Submitted' && activity.details.listingId && (
+                                      <div className="mt-2 rounded-xl p-3" style={{background:'hsl(259 30% 97%)', border:'1px solid hsl(259 30% 91%)'}}>
+                                        <div className="grid grid-cols-3 gap-3">
+                                          <div><p className="text-xs" style={{color:'#aaa'}}>Listing</p><p className="text-sm font-bold" style={{color:'#1e1537'}}>{activity.details.listingId}</p></div>
+                                          <div><p className="text-xs" style={{color:'#aaa'}}>Rent/sft</p><p className="text-sm font-bold" style={{color:'#1e1537'}}>₹{activity.details.rentPerSft}</p></div>
+                                          <div><p className="text-xs" style={{color:'#aaa'}}>Area</p><p className="text-sm font-bold" style={{color:'#1e1537'}}>{activity.details.actualChargeableArea?.toLocaleString()} sft</p></div>
                                         </div>
+                                      </div>
                                     )}
-                                    {providerUser && (
-                                        <div className="p-3 bg-secondary/50 rounded-md">
-                                            <p className="text-xs text-muted-foreground">Provider</p>
-                                            <p className="font-semibold">{providerUser.companyName}</p>
-                                            <p className="text-xs">{providerUser.userName}</p>
-                                        </div>
-                                    )}
-                                    {agentUser && (
-                                        <div className="p-3 bg-secondary/50 rounded-md">
-                                            <p className="text-xs text-muted-foreground">Agent</p>
-                                            <p className="font-semibold">{agentUser.companyName}</p>
-                                            <p className="text-xs">{agentUser.userName}</p>
-                                        </div>
+                                    {activity.activityType === 'Lead Acknowledged' && acknowledgedByDetails && (
+                                      <p>Acknowledged by <b>{acknowledgedByDetails.name}</b> ({acknowledgedByDetails.title})</p>
                                     )}
                                   </div>
-                                </CardContent>
-                             </Card>
-                             { (isO2O || isAgent) && (
-                              <Card>
-                                <CardHeader>
-                                  <CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5" /> Agent Facilitation</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                  {agentUser ? (
-                                      <div className="p-3 bg-secondary/50 rounded-md text-sm">
-                                        <p className="font-semibold">Facilitated by:</p>
-                                        <p>{agentUser.userName} ({agentUser.companyName})</p>
-                                      </div>
-                                  ) : (
-                                      <div className="space-y-2">
-                                        <p className="text-sm text-muted-foreground">Add an agent to facilitate this transaction.</p>
-                                        <Select onValueChange={setAgentToAdd}>
-                                            <SelectTrigger><SelectValue placeholder="Select an agent..." /></SelectTrigger>
-                                            <SelectContent>
-                                                {allAgents.map(agent => (
-                                                    <SelectItem key={agent.email} value={agent.email}>{agent.userName} ({agent.companyName})</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <Button size="sm" className="w-full" onClick={() => agentToAdd && handleAddAgent(agentToAdd)} disabled={!agentToAdd}>Confirm Agent</Button>
-                                      </div>
-                                  )}
-                                </CardContent>
-                              </Card>
-                             )}
-
-                             {selectedProviderListings.length > 0 && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2"><Warehouse className="h-5 w-5"/> Linked Properties</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                          {selectedProvider.properties.map((property, index) => {
-                                              const listing = listings.find(l => l.listingId === property.listingId);
-                                              if (!listing) return null;
-                                              
-                                              return (
-                                                <React.Fragment key={property.listingId}>
-                                                  {index > 0 && <Separator />}
-                                                  <div className="space-y-3">
-                                                      <div className="flex items-start justify-between gap-4">
-                                                          <div className="flex-grow space-y-1">
-                                                              <Link href={`/listings/${listing.listingId}`} target="_blank" className="font-semibold hover:underline">{listing.name}</Link>
-                                                              <p className="text-xs text-muted-foreground">{listing.location} &bull; {listing.sizeSqFt.toLocaleString()} sq. ft.</p>
-                                                          </div>
-                                                          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                                                              <Link href={`/listings/${listing.listingId}`} target="_blank"><Link2 className="h-4 w-4" /></Link>
-                                                          </Button>
-                                                      </div>
-                                                       {isProvider && (
-                                                          <ProposalForm 
-                                                              listing={listing} 
-                                                              lead={lead} 
-                                                              provider={selectedProvider} 
-                                                              onSubmit={handleProposalSubmit} 
-                                                          />
-                                                      )}
-                                                       {(isCustomer || isAgent || isO2O) && (
-                                                          <div className="p-3 bg-secondary/50 rounded-md">
-                                                              <p className="text-sm font-semibold mb-2 text-primary">Developer's Proposal</p>
-                                                              {property.rentPerSft !== undefined ? (
-                                                                   <div className="grid grid-cols-2 gap-4 text-sm">
-                                                                      <div>
-                                                                          <p className="text-muted-foreground">Quoted Rent</p>
-                                                                          <p className="font-medium">₹{property.rentPerSft}/sft</p>
-                                                                      </div>
-                                                                       <div>
-                                                                          <p className="text-muted-foreground">Chargeable Area</p>
-                                                                          <p className="font-medium">{property.actualChargeableArea?.toLocaleString()} sft</p>
-                                                                      </div>
-                                                                      <div>
-                                                                          <p className="text-muted-foreground">Security Deposit</p>
-                                                                          <p className="font-medium">{property.rentalSecurityDeposit} months</p>
-                                                                      </div>
-                                                                  </div>
-                                                              ) : (
-                                                                  <p className="text-sm text-muted-foreground">Waiting for developer to submit their proposal.</p>
-                                                              )}
-                                                          </div>
-                                                      )}
-                                                  </div>
-                                                </React.Fragment>
-                                              )
-                                          })}
-                                    </CardContent>
-                                </Card>
-                            )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
+                      ) : (
+                        <div className="text-center py-10">
+                          <ClipboardList className="h-8 w-8 mx-auto mb-2" style={{color:'hsl(259 30% 80%)'}}/>
+                          <p className="text-sm font-medium" style={{color:'#888'}}>No activities logged yet</p>
+                          <p className="text-xs mt-1" style={{color:'#aaa'}}>Activities will appear here as the transaction progresses</p>
+                        </div>
+                      )}
                     </div>
-                </TabsContent>
-                <TabsContent value="negotiation-board" className="mt-6">
-                    <NegotiationBoard lead={lead} primaryListing={selectedProviderListings[0] || null} />
-                </TabsContent>
-                 <TabsContent value="improvements" className="mt-6">
-                    <TenantImprovementsSheet leadId={lead.id} />
-                </TabsContent>
-            </Tabs>
+                  </div>
+
+                  {/* Sidebar */}
+                  <div className="space-y-4 sticky top-6">
+                    {/* Participants */}
+                    <div className="rounded-2xl p-4" style={{background:'#fff', border:'1px solid hsl(259 30% 91%)'}}>
+                      <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{color:'#888'}}>Participants</p>
+                      <div className="space-y-3">
+                        {customer && (
+                          <div className="flex items-center gap-2.5">
+                            <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0" style={{background:'hsl(259 44% 92%)',color:'#6141ac'}}>
+                              {customer.companyName?.slice(0,2).toUpperCase()}
+                            </div>
+                            <div><p className="text-xs font-semibold" style={{color:'#1e1537'}}>{customer.companyName}</p><p className="text-xs" style={{color:'#aaa'}}>{customer.userName} · Customer</p></div>
+                          </div>
+                        )}
+                        {providerUser && (
+                          <div className="flex items-center gap-2.5">
+                            <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0" style={{background:'#eff6ff',color:'#1d4ed8'}}>
+                              {providerUser.companyName?.slice(0,2).toUpperCase()}
+                            </div>
+                            <div><p className="text-xs font-semibold" style={{color:'#1e1537'}}>{providerUser.companyName}</p><p className="text-xs" style={{color:'#aaa'}}>{providerUser.userName} · Provider</p></div>
+                          </div>
+                        )}
+                        {agentUser && (
+                          <div className="flex items-center gap-2.5">
+                            <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0" style={{background:'#f0fdf4',color:'#15803d'}}>
+                              {agentUser.companyName?.slice(0,2).toUpperCase()}
+                            </div>
+                            <div><p className="text-xs font-semibold" style={{color:'#1e1537'}}>{agentUser.companyName}</p><p className="text-xs" style={{color:'#aaa'}}>{agentUser.userName} · Agent</p></div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Linked property */}
+                    {selectedProviderListings.length > 0 && (
+                      <div className="rounded-2xl p-4" style={{background:'#fff', border:'1px solid hsl(259 30% 91%)'}}>
+                        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{color:'#888'}}>Linked Property</p>
+                        {selectedProvider.properties.map((property, index) => {
+                          const listing = listings.find(l => l.listingId === property.listingId);
+                          if (!listing) return null;
+                          return (
+                            <div key={property.listingId}>
+                              {index > 0 && <Separator className="my-3"/>}
+                              <Link href={`/listings/${listing.listingId}`} target="_blank"
+                                className="text-sm font-semibold hover:underline" style={{color:'#6141ac'}}>
+                                {listing.name || listing.listingId}
+                              </Link>
+                              <p className="text-xs mt-1" style={{color:'#aaa'}}>{listing.location} · {listing.sizeSqFt?.toLocaleString()} sft</p>
+                              {isProvider && (
+                                <ProposalForm listing={listing} lead={lead} provider={selectedProvider} onSubmit={handleProposalSubmit} />
+                              )}
+                              {(isCustomer || isAgent || isO2O) && property.rentPerSft !== undefined && (
+                                <div className="mt-3 rounded-xl p-3" style={{background:'hsl(259 30% 97%)', border:'1px solid hsl(259 30% 91%)'}}>
+                                  <p className="text-xs font-bold mb-2" style={{color:'#6141ac'}}>Developer's Proposal</p>
+                                  <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div><p style={{color:'#aaa'}}>Rent/sft</p><p className="font-semibold" style={{color:'#1e1537'}}>₹{property.rentPerSft}</p></div>
+                                    <div><p style={{color:'#aaa'}}>Area</p><p className="font-semibold" style={{color:'#1e1537'}}>{property.actualChargeableArea?.toLocaleString()} sft</p></div>
+                                    <div><p style={{color:'#aaa'}}>Deposit</p><p className="font-semibold" style={{color:'#1e1537'}}>{property.rentalSecurityDeposit} months</p></div>
+                                  </div>
+                                </div>
+                              )}
+                              {(isCustomer || isAgent || isO2O) && property.rentPerSft === undefined && (
+                                <p className="text-xs mt-2" style={{color:'#aaa'}}>Awaiting developer's proposal</p>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Agent facilitation */}
+                    {(isO2O || isAgent) && (
+                      <div className="rounded-2xl p-4" style={{background:'#fff', border:'1px solid hsl(259 30% 91%)'}}>
+                        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{color:'#888'}}>Agent Facilitation</p>
+                        {agentUser ? (
+                          <div className="flex items-center gap-2.5">
+                            <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0" style={{background:'#f0fdf4',color:'#15803d'}}>
+                              {agentUser.companyName?.slice(0,2).toUpperCase()}
+                            </div>
+                            <div><p className="text-xs font-semibold" style={{color:'#1e1537'}}>{agentUser.userName}</p><p className="text-xs" style={{color:'#aaa'}}>{agentUser.companyName}</p></div>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <p className="text-xs" style={{color:'#888'}}>Add an agent to facilitate this transaction.</p>
+                            <Select onValueChange={setAgentToAdd}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select an agent..." /></SelectTrigger>
+                              <SelectContent>
+                                {allAgents.map(agent => (
+                                  <SelectItem key={agent.email} value={agent.email}>{agent.userName} ({agent.companyName})</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button size="sm" className="w-full text-xs" onClick={() => agentToAdd && handleAddAgent(agentToAdd)} disabled={!agentToAdd}>Confirm Agent</Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Negotiation Board tab */}
+              <div id="tab-negotiation-board" data-workspace-tab style={{display: defaultTab === 'negotiation-board' ? 'block' : 'none', padding:'20px'}}>
+                <NegotiationBoard lead={lead} primaryListing={selectedProviderListings[0] || null} />
+              </div>
+
+              {/* Tenant Improvements tab */}
+              <div id="tab-improvements" data-workspace-tab style={{display: defaultTab === 'improvements' ? 'block' : 'none', padding:'20px'}}>
+                <TenantImprovementsSheet leadId={lead.id} />
+              </div>
+            </div>
             </div>
         )}
       </div>
