@@ -132,6 +132,19 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
     const emailDomain = email.split('@')[1];
     const isPersonalEmail = personalEmailDomains.includes(emailDomain);
 
+    // Block duplicate registration and cross-role registration
+    const existingUser = (users || {})[email] as any;
+    if (existingUser) {
+      const existingRole = existingUser.role;
+      if (existingRole === details.role) {
+        toast({ variant: 'destructive', title: 'Account Already Exists', description: 'An account with this email already exists. Please login instead.' });
+      } else {
+        const roleLabel = (r: string) => r === 'Warehouse Developer' ? 'Property Developer' : r === 'User' ? 'Customer' : r;
+        toast({ variant: 'destructive', title: 'Email Already Registered', description: `This email is already registered as a ${roleLabel(existingRole)}. Cross-role registration is not permitted.` });
+      }
+      return;
+    }
+
     // Developers may use personal email — block only for Customer/Agent roles
     if (details.role !== 'Warehouse Developer' && isPersonalEmail) {
       toast({ variant: 'destructive', title: 'Invalid Email', description: 'Please use your official company email.' });

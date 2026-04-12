@@ -17,15 +17,13 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Building, Sparkles, UserPlus, Mail, CheckCircle } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
-import { useData } from '@/contexts/data-context';
-import type { AgentLead } from '@/contexts/data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SignupPage() {
-  const { signup } = useAuth();
-  const { addAgentLead } = useData();
+  const { signup, users } = useAuth();
+  
   const { toast } = useToast();
   const [formData, setFormData] = React.useState<Omit<NewUser, 'createdAt'> & { gstNumber?: string; panNumber?: string }>({
     email: '',
@@ -111,45 +109,46 @@ export default function SignupPage() {
       });
       return;
     }
+    // Duplicate / cross-role check for all roles
+    const existingUser = (users as any)[formData.email.toLowerCase()];
+    if (existingUser) {
+      const existingRole = existingUser.role;
+      if (existingRole === formData.role) {
+        toast({ variant: 'destructive', title: 'Account Already Exists', description: 'An account with this email already exists. Please login instead.' });
+      } else {
+        toast({ variant: 'destructive', title: 'Email Already Registered', description: `This email is registered as a ${existingRole === 'Warehouse Developer' ? 'Property Developer' : existingRole === 'User' ? 'Customer' : existingRole}. Cross-role registration is not permitted. Please use a different email.` });
+      }
+      return;
+    }
+
     if (formData.role === 'Agent') {
+      if (!formData.password || formData.password.length < 6) {
+        toast({ variant: 'destructive', title: 'Password Required', description: 'Please set a password (min 6 characters) for your agent account.' });
+        return;
+      }
+      if (formData.password !== confirmPassword) {
+        toast({ variant: 'destructive', title: 'Passwords Do Not Match', description: 'Please re-enter your passwords.' });
+        return;
+      }
       if (inviteCode && (!inviteCode.startsWith('AGT-') || inviteCode.length < 8)) {
         setInviteError('Invalid invite code format.');
         return;
       }
-      const agentLead: Omit<AgentLead, 'id' | 'status'> = {
+      // Route agent through normal signup — creates pending account for SuperAdmin approval
+      signup({
+        ...formData,
+        role: 'Agent',
         agentType,
-        name: formData.userName,
-        companyName: formData.companyName,
-        email: formData.email,
-        phone: formData.phone,
-        address: agentAddress,
-        socialProfileId: agentLinkedIn,
+        agentAddress,
+        agentLinkedIn,
         ...(inviteCode ? { inviteCode } : {}),
-      };
-      addAgentLead(agentLead);
-      setAgentSubmitted(true);
-      toast({ title: 'Registration Received!', description: 'Thank you. We will review your details and be in touch shortly.' });
+      } as any);
       return;
     }
     signup(formData);
   };
 
-  if (agentSubmitted) {
-    return (
-      <div className="flex-grow bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <CardTitle className="text-2xl">Application Received!</CardTitle>
-            <CardDescription className="mt-2">Thank you for applying as an Agent Partner. Our team will review your details and get back to you shortly.</CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button asChild className="w-full"><Link href="/">Return to Home</Link></Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
+
 
   return (
     <div className="flex-grow bg-background flex items-center justify-center p-4">
@@ -345,18 +344,14 @@ export default function SignupPage() {
                 </div>
               </>
             )}
-            {formData.role !== 'Agent' && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input id="confirmPassword" type="password" required onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} />
-                </div>
-              </>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input id="confirmPassword" type="password" required onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} />
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <p className="text-xs text-muted-foreground text-center">
