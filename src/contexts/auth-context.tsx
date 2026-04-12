@@ -22,6 +22,8 @@ export type User = {
   status?: 'pending' | 'approved' | 'rejected' | 'suspended';
   gstNumber?: string;
   panNumber?: string;
+  aadhaarNumber?: string;
+  aadhaarDocUrl?: string;
 };
 
 export type NewUser = User & {
@@ -151,30 +153,56 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
       return;
     }
 
-    // Developer: validate GST or PAN and check uniqueness
-    if (details.role === 'Warehouse Developer') {
-      const gst = (details as any).gstNumber?.trim().toUpperCase();
-      const pan = (details as any).panNumber?.trim().toUpperCase();
-      if (!gst && !pan) {
-        toast({ variant: 'destructive', title: 'GST or PAN Required', description: 'Please provide your GST number or PAN to register as a Property Developer.' });
-        return;
+    // Identity verification — GST/PAN + Aadhaar rules
+    const isBusinessRole = details.role === 'Warehouse Developer' || details.role === 'User' || details.role === 'Agent';
+    if (isBusinessRole) {
+      const gst = (details as any).gstNumber?.trim().toUpperCase() || '';
+      const pan = (details as any).panNumber?.trim().toUpperCase() || '';
+      const aadhaar = (details as any).aadhaarNumber?.trim() || '';
+      const aadhaarDoc = (details as any).aadhaarDocUrl?.trim() || '';
+      const existingUsers = Object.values(users || {}) as any[];
+
+      if (isPersonalEmail) {
+        // Personal email: GST or PAN mandatory + Aadhaar mandatory + Aadhaar doc mandatory
+        if (!gst && !pan) {
+          toast({ variant: 'destructive', title: 'GST or PAN Required', description: 'Personal email accounts must provide a GST number or PAN for identity verification.' });
+          return;
+        }
+        if (!aadhaar) {
+          toast({ variant: 'destructive', title: 'Aadhaar Number Required', description: 'Personal email accounts must provide an Aadhaar number for identity verification.' });
+          return;
+        }
+        if (!/^[2-9]{1}[0-9]{11}$/.test(aadhaar)) {
+          toast({ variant: 'destructive', title: 'Invalid Aadhaar Number', description: 'Aadhaar must be a valid 12-digit number.' });
+          return;
+        }
+        if (!aadhaarDoc) {
+          toast({ variant: 'destructive', title: 'Aadhaar Document Required', description: 'Please upload both pages of your Aadhaar card (PDF or image).' });
+          return;
+        }
       }
+
+      // Validate GST format if provided
       if (gst && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst)) {
         toast({ variant: 'destructive', title: 'Invalid GST Number', description: 'GST number must be 15 characters in valid format (e.g. 29ABCDE1234F1Z5).' });
         return;
       }
+      // Validate PAN format if provided
       if (!gst && pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
         toast({ variant: 'destructive', title: 'Invalid PAN Number', description: 'PAN must be 10 characters (e.g. ABCDE1234F).' });
         return;
       }
-      // Check uniqueness — no two developers with same GST/PAN
-      const existingUsers = Object.values(users || {}) as any[];
+      // Uniqueness checks across all roles
       if (gst && existingUsers.some(u => u.gstNumber?.toUpperCase() === gst)) {
         toast({ variant: 'destructive', title: 'GST Already Registered', description: 'An account with this GST number already exists. Please login or contact support.' });
         return;
       }
       if (!gst && pan && existingUsers.some(u => u.panNumber?.toUpperCase() === pan)) {
         toast({ variant: 'destructive', title: 'PAN Already Registered', description: 'An account with this PAN number already exists. Please login or contact support.' });
+        return;
+      }
+      if (aadhaar && existingUsers.some(u => u.aadhaarNumber === aadhaar)) {
+        toast({ variant: 'destructive', title: 'Aadhaar Already Registered', description: 'An account with this Aadhaar number already exists. Please login or contact support.' });
         return;
       }
     }

@@ -25,7 +25,7 @@ export default function SignupPage() {
   const { signup, users } = useAuth();
   
   const { toast } = useToast();
-  const [formData, setFormData] = React.useState<Omit<NewUser, 'createdAt'> & { gstNumber?: string; panNumber?: string }>({
+  const [formData, setFormData] = React.useState<Omit<NewUser, 'createdAt'> & { gstNumber?: string; panNumber?: string; aadhaarNumber?: string; aadhaarDocUrl?: string }>({
     email: '',
     companyName: '',
     userName: '',
@@ -35,6 +35,8 @@ export default function SignupPage() {
     industryType: '',
     gstNumber: '',
     panNumber: '',
+    aadhaarNumber: '',
+    aadhaarDocUrl: '',
   });
   const [taxIdType, setTaxIdType] = React.useState<'gst' | 'pan'>('gst');
   const [confirmPassword, setConfirmPassword] = React.useState('');
@@ -42,6 +44,9 @@ export default function SignupPage() {
   const [agentAddress, setAgentAddress] = React.useState('');
   const [agentLinkedIn, setAgentLinkedIn] = React.useState('');
   const [inviteCode, setInviteCode] = React.useState('');
+  const [aadhaarUploadUrl, setAadhaarUploadUrl] = React.useState('');
+  const [aadhaarUploading, setAadhaarUploading] = React.useState(false);
+  const aadhaarFileRef = React.useRef<HTMLInputElement>(null);
   const [inviteError, setInviteError] = React.useState('');
   const [agentSubmitted, setAgentSubmitted] = React.useState(false);
   const [otpSent, setOtpSent] = React.useState(false);
@@ -85,6 +90,32 @@ export default function SignupPage() {
 
   const handleRoleChange = (value: 'User' | 'Warehouse Developer' | 'Agent' | 'O2O' | 'SuperAdmin') => {
     setFormData({ ...formData, role: value });
+  };
+
+  const isPersonalEmailAddr = (email: string) => {
+    const personal = ['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','live.com','msn.com','protonmail.com'];
+    return personal.includes(email.split('@')[1]?.toLowerCase() || '');
+  };
+
+  const handleAadhaarUpload = async (file: File) => {
+    if (!file) return;
+    setAadhaarUploading(true);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: formDataUpload });
+      const data = await res.json();
+      if (data.url) {
+        setAadhaarUploadUrl(data.url);
+        setFormData(prev => ({ ...prev, aadhaarDocUrl: data.url }));
+        toast({ title: 'Aadhaar document uploaded' });
+      } else {
+        toast({ variant: 'destructive', title: 'Upload failed', description: data.error || 'Please try again.' });
+      }
+    } catch {
+      toast({ variant: 'destructive', title: 'Upload failed', description: 'Please try again.' });
+    }
+    setAadhaarUploading(false);
   };
 
   const handleSignup = (e: React.FormEvent) => {
@@ -248,43 +279,83 @@ export default function SignupPage() {
               <Label htmlFor="phone">Phone Number</Label>
               <Input id="phone" type="tel" placeholder="+1 234 567 890" required onChange={handleChange} value={formData.phone} />
             </div>
-            {formData.role === 'Warehouse Developer' && (
-              <div className="space-y-2">
-                <Label>GST / PAN Number <span className="text-destructive">*</span></Label>
-                <div className="flex gap-2 mb-2">
-                  <button type="button"
-                    onClick={() => setTaxIdType('gst')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${taxIdType === 'gst' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground'}`}>
-                    GST Number
-                  </button>
-                  <button type="button"
-                    onClick={() => setTaxIdType('pan')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${taxIdType === 'pan' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground'}`}>
-                    PAN (no GST)
-                  </button>
+            {/* Identity Verification — shown for all business roles */}
+            {(formData.role === 'Warehouse Developer' || formData.role === 'User' || formData.role === 'Agent') && (() => {
+              const isPersonal = isPersonalEmailAddr(formData.email);
+              const mandatory = isPersonal;
+              return (
+                <div className="space-y-4 rounded-xl p-4 border" style={{background:'hsl(259 44% 97%)', borderColor:'hsl(259 44% 88%)'}}>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider" style={{color:'#6141ac'}}>Identity Verification</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {mandatory
+                        ? 'Personal email detected — GST/PAN, Aadhaar number and Aadhaar document are mandatory.'
+                        : 'Official email detected — identity fields are optional but recommended.'}
+                    </p>
+                  </div>
+
+                  {/* GST / PAN */}
+                  <div className="space-y-2">
+                    <Label>GST / PAN Number {mandatory && <span className="text-destructive">*</span>}</Label>
+                    <div className="flex gap-2 mb-2">
+                      <button type="button" onClick={() => setTaxIdType('gst')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${taxIdType === 'gst' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground'}`}>
+                        GST Number
+                      </button>
+                      <button type="button" onClick={() => setTaxIdType('pan')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${taxIdType === 'pan' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground'}`}>
+                        PAN (no GST)
+                      </button>
+                    </div>
+                    {taxIdType === 'gst' ? (
+                      <Input id="gstNumber" placeholder="29ABCDE1234F1Z5" maxLength={15}
+                        value={formData.gstNumber || ''}
+                        onChange={e => setFormData({ ...formData, gstNumber: e.target.value.toUpperCase(), panNumber: '' })} />
+                    ) : (
+                      <Input id="panNumber" placeholder="ABCDE1234F" maxLength={10}
+                        value={formData.panNumber || ''}
+                        onChange={e => setFormData({ ...formData, panNumber: e.target.value.toUpperCase(), gstNumber: '' })} />
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {taxIdType === 'gst' ? '15-character GST number.' : '10-character PAN. Use if you do not have GST.'}
+                    </p>
+                  </div>
+
+                  {/* Aadhaar Number */}
+                  <div className="space-y-2">
+                    <Label>Aadhaar Number {mandatory && <span className="text-destructive">*</span>}</Label>
+                    <Input
+                      placeholder="1234 5678 9012"
+                      maxLength={12}
+                      value={formData.aadhaarNumber || ''}
+                      onChange={e => setFormData({ ...formData, aadhaarNumber: e.target.value.replace(/\D/g, '').slice(0, 12) })}
+                    />
+                    <p className="text-xs text-muted-foreground">12-digit Aadhaar number. Kept confidential and used only for identity verification.</p>
+                  </div>
+
+                  {/* Aadhaar Document Upload */}
+                  <div className="space-y-2">
+                    <Label>Aadhaar Card Document {mandatory && <span className="text-destructive">*</span>}</Label>
+                    <p className="text-xs text-muted-foreground">Upload both pages of your Aadhaar card (PDF or image, max 20MB)</p>
+                    <div className="flex items-center gap-3">
+                      <button type="button"
+                        onClick={() => aadhaarFileRef.current?.click()}
+                        disabled={aadhaarUploading}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold border transition-all hover:bg-accent"
+                        style={{borderColor:'hsl(259 44% 78%)', color:'#6141ac', background:'white'}}>
+                        {aadhaarUploading ? 'Uploading...' : aadhaarUploadUrl ? '✓ Uploaded — Replace' : 'Upload Aadhaar Document'}
+                      </button>
+                      {aadhaarUploadUrl && (
+                        <a href={aadhaarUploadUrl} target="_blank" rel="noopener noreferrer"
+                          className="text-xs underline" style={{color:'#6141ac'}}>View uploaded</a>
+                      )}
+                    </div>
+                    <input ref={aadhaarFileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
+                      onChange={e => { const f = e.target.files?.[0]; if (f) handleAadhaarUpload(f); e.target.value = ''; }} />
+                  </div>
                 </div>
-                {taxIdType === 'gst' ? (
-                  <Input
-                    id="gstNumber"
-                    placeholder="29ABCDE1234F1Z5"
-                    maxLength={15}
-                    value={formData.gstNumber || ''}
-                    onChange={e => setFormData({ ...formData, gstNumber: e.target.value.toUpperCase(), panNumber: '' })}
-                  />
-                ) : (
-                  <Input
-                    id="panNumber"
-                    placeholder="ABCDE1234F"
-                    maxLength={10}
-                    value={formData.panNumber || ''}
-                    onChange={e => setFormData({ ...formData, panNumber: e.target.value.toUpperCase(), gstNumber: '' })}
-                  />
-                )}
-                <p className="text-xs text-muted-foreground">
-                  {taxIdType === 'gst' ? '15-character GST number. Used to verify your business identity.' : '10-character PAN. Use this only if you do not have a GST registration.'}
-                </p>
-              </div>
-            )}
+              );
+            })()}
             {formData.role === 'User' && (
               <div className="space-y-2">
                 <Label>Industry Type <span className="text-destructive">*</span></Label>
