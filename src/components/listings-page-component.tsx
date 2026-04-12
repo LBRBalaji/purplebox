@@ -327,11 +327,11 @@ function DownloadBar() {
             return;
         }
 
-        if (user.role !== 'User' && user.role !== 'SuperAdmin') {
+        if (user.role !== 'User' && user.role !== 'Agent' && user.role !== 'SuperAdmin') {
             toast({
                 variant: 'destructive',
                 title: 'Download Not Available',
-                description: 'Only Customer accounts can download listings.'
+                description: 'Only Customer and Agent accounts can download listings.'
             });
             return;
         }
@@ -557,7 +557,7 @@ export function ListingsPage() {
       return;
     }
 
-    if (user.role !== 'User' && user.role !== 'SuperAdmin') {
+    if (user.role !== 'User' && user.role !== 'Agent' && user.role !== 'SuperAdmin') {
       toast({
         variant: 'destructive',
         title: 'Selection Not Available',

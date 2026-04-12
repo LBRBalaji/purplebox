@@ -16,12 +16,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Building, Sparkles, UserPlus, Mail, CheckCircle } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { useData } from '@/contexts/data-context';
+import type { AgentLead } from '@/contexts/data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SignupPage() {
   const { signup } = useAuth();
+  const { addAgentLead } = useData();
   const { toast } = useToast();
   const [formData, setFormData] = React.useState<Omit<NewUser, 'createdAt'>>({
     email: '',
@@ -33,6 +37,12 @@ export default function SignupPage() {
     industryType: '',
   });
   const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [agentType, setAgentType] = React.useState<'Individual' | 'Company'>('Individual');
+  const [agentAddress, setAgentAddress] = React.useState('');
+  const [agentLinkedIn, setAgentLinkedIn] = React.useState('');
+  const [inviteCode, setInviteCode] = React.useState('');
+  const [inviteError, setInviteError] = React.useState('');
+  const [agentSubmitted, setAgentSubmitted] = React.useState(false);
   const [otpSent, setOtpSent] = React.useState(false);
   const [otpValue, setOtpValue] = React.useState('');
   const [otpVerified, setOtpVerified] = React.useState(false);
@@ -72,7 +82,7 @@ export default function SignupPage() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleRoleChange = (value: 'User' | 'Warehouse Developer' | 'O2O' | 'SuperAdmin') => {
+  const handleRoleChange = (value: 'User' | 'Warehouse Developer' | 'Agent' | 'O2O' | 'SuperAdmin') => {
     setFormData({ ...formData, role: value });
   };
 
@@ -98,8 +108,45 @@ export default function SignupPage() {
       });
       return;
     }
+    if (formData.role === 'Agent') {
+      if (inviteCode && (!inviteCode.startsWith('AGT-') || inviteCode.length < 8)) {
+        setInviteError('Invalid invite code format.');
+        return;
+      }
+      const agentLead: Omit<AgentLead, 'id' | 'status'> = {
+        agentType,
+        name: formData.userName,
+        companyName: formData.companyName,
+        email: formData.email,
+        phone: formData.phone,
+        address: agentAddress,
+        socialProfileId: agentLinkedIn,
+        ...(inviteCode ? { inviteCode } : {}),
+      };
+      addAgentLead(agentLead);
+      setAgentSubmitted(true);
+      toast({ title: 'Registration Received!', description: 'Thank you. We will review your details and be in touch shortly.' });
+      return;
+    }
     signup(formData);
   };
+
+  if (agentSubmitted) {
+    return (
+      <div className="flex-grow bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <CardTitle className="text-2xl">Application Received!</CardTitle>
+            <CardDescription className="mt-2">Thank you for applying as an Agent Partner. Our team will review your details and get back to you shortly.</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button asChild className="w-full"><Link href="/">Return to Home</Link></Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-grow bg-background flex items-center justify-center p-4">
@@ -126,7 +173,7 @@ export default function SignupPage() {
                 <Label>Account Type</Label>
                 <RadioGroup
                     defaultValue="User"
-                    className="grid grid-cols-2 gap-4"
+                    className={`grid gap-4 ${formData.role === "Agent" ? "grid-cols-2" : "grid-cols-2"}`}
                     onValueChange={handleRoleChange}
                     value={formData.role}
                 >
@@ -150,6 +197,15 @@ export default function SignupPage() {
                         className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                     >
                         Property Provider
+                    </Label>
+                    </div>
+                    <div>
+                    <RadioGroupItem value="Agent" id="role-agent" className="peer sr-only" />
+                    <Label
+                        htmlFor="role-agent"
+                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary col-span-2"
+                    >
+                        Agent Partner
                     </Label>
                     </div>
                 </RadioGroup>
@@ -223,6 +279,37 @@ export default function SignupPage() {
                 </Select>
               </div>
             )}
+            {formData.role === 'Agent' && (
+              <>
+                <div className="space-y-2">
+                  <Label>Agent Type</Label>
+                  <RadioGroup value={agentType} onValueChange={(v) => setAgentType(v as any)} className="grid grid-cols-2 gap-3">
+                    <div>
+                      <RadioGroupItem value="Individual" id="agt-individual" className="peer sr-only" />
+                      <Label htmlFor="agt-individual" className="flex items-center justify-center rounded-md border-2 border-muted bg-popover p-3 text-sm font-medium hover:bg-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">Individual</Label>
+                    </div>
+                    <div>
+                      <RadioGroupItem value="Company" id="agt-company" className="peer sr-only" />
+                      <Label htmlFor="agt-company" className="flex items-center justify-center rounded-md border-2 border-muted bg-popover p-3 text-sm font-medium hover:bg-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">Company</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agentLinkedIn">LinkedIn Profile <span className="text-xs text-muted-foreground">(optional)</span></Label>
+                  <Input id="agentLinkedIn" placeholder="linkedin.com/in/yourprofile" value={agentLinkedIn} onChange={e => setAgentLinkedIn(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agentAddress">Office Address <span className="text-destructive">*</span></Label>
+                  <Textarea id="agentAddress" placeholder="123 Main St, Anytown" required={formData.role === 'Agent'} value={agentAddress} onChange={e => setAgentAddress(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="inviteCode">Invite Code <span className="text-xs text-muted-foreground">(optional — if invited by a client)</span></Label>
+                  <Input id="inviteCode" placeholder="AGT-XXXXXX" value={inviteCode} onChange={e => setInviteCode(e.target.value.toUpperCase())} maxLength={10} />
+                  {inviteError && <p className="text-xs text-destructive">{inviteError}</p>}
+                </div>
+              </>
+            )}
+            {formData.role !== 'Agent' && (
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
@@ -231,16 +318,17 @@ export default function SignupPage() {
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input id="confirmPassword" type="password" required onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} />
             </div>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <p className="text-xs text-muted-foreground text-center">
               By signing up, you agree to our{' '}
-              <a href={formData.role === 'User' ? '/terms-and-conditions/customer' : '/terms-and-conditions/developer'} target="_blank" className="text-primary underline">
+              <a href={formData.role === 'User' ? '/terms-and-conditions/customer' : formData.role === 'Agent' ? '/terms-and-conditions/agent' : '/terms-and-conditions/developer'} target="_blank" className="text-primary underline">
                 Terms and Conditions
               </a>
             </p>
             <Button type="submit" className="w-full">
-              <UserPlus className="mr-2 h-4 w-4" /> Sign Up
+{formData.role === 'Agent' ? <><UserPlus className="mr-2 h-4 w-4" /> Submit Application</> : <><UserPlus className="mr-2 h-4 w-4" /> Sign Up</>}
             </Button>
             <div className="text-sm text-center text-muted-foreground">
                 Already have an account?{' '}
