@@ -244,20 +244,23 @@ export function UserList() {
                 const summary = providerSummary[user.email];
                 return (
                   <TableRow key={user.email}>
-                    <TableCell className="font-medium flex items-center gap-2">
-                      {user.userName}
-                      {user.isCompanyAdmin && (
-                          <TooltipProvider>
-                              <Tooltip>
-                                  <TooltipTrigger>
-                                      <Shield className="h-4 w-4 text-primary" />
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                      <p>Company Admin</p>
-                                  </TooltipContent>
-                              </Tooltip>
-                          </TooltipProvider>
-                      )}
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {user.userName}
+                        {user.isCompanyAdmin && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Shield className="h-4 w-4 text-primary" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Company Admin</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5 font-normal">{user.email}</p>
                     </TableCell>
                     <TableCell>
                       {user.companyName}
