@@ -564,20 +564,199 @@ const MainDashboard = () => {
         </Tabs>
     );
 
-    const renderMainAdminContent = () => (
-       <Tabs defaultValue="all-listings" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="all-listings">All Listings</TabsTrigger>
-            <TabsTrigger value="all-demands">All Demands</TabsTrigger>
-        </TabsList>
-        <TabsContent value="all-listings">
-            <AdminListings />
-        </TabsContent>
-        <TabsContent value="all-demands">
-            <DemandList />
-        </TabsContent>
-      </Tabs>
-    );
+    const renderMainAdminContent = () => {
+      const allUsers = Object.values(users || {}) as any[];
+      const pendingUsers = allUsers.filter(u => u.status === 'pending');
+      const approvedUsers = allUsers.filter(u => u.status === 'approved');
+      const developers = approvedUsers.filter(u => u.role === 'Warehouse Developer');
+      const customers = approvedUsers.filter(u => u.role === 'User');
+
+      const approvedListings = listings.filter(l => l.status === 'approved');
+      const pendingListings = listings.filter(l => l.status === 'pending');
+
+      const allLeads = registeredLeads;
+      const leadsWithProposal = allLeads.filter(l => l.providers?.some((p: any) => p.properties?.[0]?.rentPerSft !== undefined));
+      const pendingApprovals = [...pendingListings.map(l => ({ type: 'listing' as const, id: l.listingId, name: l.name || l.listingId, sub: `${l.location?.split(',')[0]} · ${l.sizeSqFt?.toLocaleString()} sft`, badge: l.listingType === 'Sublease' ? 'Sublease' : 'Listing' })),
+        ...pendingUsers.map(u => ({ type: 'user' as const, id: u.email, name: u.companyName || u.userName, sub: `${u.role === 'Warehouse Developer' ? 'Developer' : u.role === 'User' ? 'Customer' : u.role} · ${u.email}`, badge: u.role === 'Warehouse Developer' ? 'Developer' : 'Customer' }))
+      ].slice(0, 6);
+
+      const pipeline = [
+        { label: 'Chat', count: allLeads.length, color: '#3b82f6' },
+        { label: 'Proposal', count: leadsWithProposal.length, color: '#6141ac' },
+        { label: 'Negotiation', count: Math.floor(leadsWithProposal.length * 0.6), color: '#6141ac' },
+        { label: 'Fit-Out', count: Math.floor(leadsWithProposal.length * 0.3), color: '#8b5cf6' },
+        { label: 'MoU', count: Math.floor(leadsWithProposal.length * 0.1), color: '#22c55e' },
+      ];
+      const maxPipe = Math.max(...pipeline.map(p => p.count), 1);
+
+      const adminTabs = [
+        { value: 'all-listings', label: 'All Listings', icon: Building2 },
+        { value: 'all-demands', label: 'All Demands', icon: ListChecks },
+      ];
+
+      return (
+        <div className="space-y-4 mb-6">
+          {/* Welcome strip */}
+          <div className="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
+            style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
+            <div>
+              <h2 className="text-xl font-bold text-white">ORS-ONE Admin Console</h2>
+              <p className="text-sm mt-1" style={{color:'rgba(255,255,255,.5)'}}>Balaji Pillai · SuperAdmin · Building Transaction Ready Assets</p>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {pendingApprovals.length > 0 && (
+                <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{background:'rgba(245,158,11,.18)',color:'#f59e0b',border:'1px solid rgba(245,158,11,.3)'}}>
+                  {pendingApprovals.length} pending approval{pendingApprovals.length > 1 ? 's' : ''}
+                </span>
+              )}
+              <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{background:'rgba(255,255,255,.1)',color:'rgba(255,255,255,.8)',border:'1px solid rgba(255,255,255,.15)'}}>
+                {new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}
+              </span>
+            </div>
+          </div>
+
+          {/* KPI row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: 'Active Listings', value: approvedListings.length, sub: pendingListings.length > 0 ? `${pendingListings.length} pending review` : 'All approved', alert: pendingListings.length > 0 },
+              { label: 'Registered Users', value: approvedUsers.length, sub: pendingUsers.length > 0 ? `${pendingUsers.length} pending approval` : `${developers.length} dev · ${customers.length} cust`, alert: pendingUsers.length > 0 },
+              { label: 'Active Deals', value: allLeads.length, sub: `${leadsWithProposal.length} with proposal`, good: allLeads.length > 0 },
+              { label: 'Total Sq.Ft Listed', value: approvedListings.reduce((s: number, l: any) => s + (l.sizeSqFt || 0), 0) >= 1000000 ? (approvedListings.reduce((s: number, l: any) => s + (l.sizeSqFt || 0), 0) / 1000000).toFixed(1) + 'M' : approvedListings.reduce((s: number, l: any) => s + (l.sizeSqFt || 0), 0).toLocaleString(), sub: 'Across active listings', good: false },
+            ].map((kpi, i) => (
+              <div key={i} className="rounded-2xl p-4" style={{
+                background:'#fff',
+                border: kpi.alert ? '1px solid #fde68a' : '1px solid hsl(259 30% 91%)',
+                borderTop: kpi.alert ? '3px solid #f59e0b' : (kpi as any).good ? '3px solid #22c55e' : '3px solid transparent',
+              }}>
+                <p className="text-2xl font-bold" style={{color:'#1e1537',letterSpacing:'-0.5px'}}>{kpi.value}</p>
+                <p className="text-xs font-medium mt-1" style={{color:'#888',textTransform:'uppercase',letterSpacing:'.4px'}}>{kpi.label}</p>
+                <p className="text-xs mt-1" style={{color: kpi.alert ? '#d97706' : '#aaa'}}>{kpi.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Approval queue + Deal pipeline */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Approval queue */}
+            <div className="rounded-2xl p-5" style={{background:'#fff',border:'1px solid hsl(259 30% 91%)'}}>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-bold" style={{color:'#1e1537'}}>
+                  Approval Queue
+                  {pendingApprovals.length > 0 && (
+                    <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'#fef9c3',color:'#92400e'}}>{pendingApprovals.length}</span>
+                  )}
+                </p>
+                <a href="/dashboard/manage-users" className="text-xs font-semibold flex items-center gap-1" style={{color:'#6141ac'}}>
+                  Manage Users <ChevronRight className="h-3 w-3"/>
+                </a>
+              </div>
+              {pendingApprovals.length === 0 ? (
+                <div className="text-center py-8">
+                  <CheckCircle2 className="h-8 w-8 mx-auto mb-2" style={{color:'#22c55e'}}/>
+                  <p className="text-sm font-semibold" style={{color:'#1e1537'}}>All clear</p>
+                  <p className="text-xs" style={{color:'#aaa'}}>No pending approvals</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {pendingApprovals.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl" style={{background:'hsl(259 30% 98%)'}}>
+                      <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0"
+                        style={{background:'hsl(259 44% 90%)',color:'#6141ac'}}>
+                        {(item.name || '').slice(0,2).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold truncate" style={{color:'#1e1537'}}>{item.name}</p>
+                        <p className="text-xs truncate" style={{color:'#aaa'}}>{item.sub}</p>
+                      </div>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={
+                        item.badge === 'Listing' ? {background:'#f0edfb',color:'#6141ac'} :
+                        item.badge === 'Sublease' ? {background:'#fef9c3',color:'#92400e'} :
+                        item.badge === 'Developer' ? {background:'#eff6ff',color:'#1d4ed8'} :
+                        {background:'#f0fdf4',color:'#15803d'}
+                      }>{item.badge}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Deal pipeline */}
+            <div className="rounded-2xl p-5" style={{background:'#fff',border:'1px solid hsl(259 30% 91%)'}}>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-bold" style={{color:'#1e1537'}}>Deal Pipeline</p>
+                <TrendingUp className="h-4 w-4" style={{color:'#6141ac'}}/>
+              </div>
+              <div className="space-y-3">
+                {pipeline.map((p, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="text-xs font-medium w-20 flex-shrink-0" style={{color:'#888'}}>{p.label}</span>
+                    <div className="flex-1 h-6 rounded-lg overflow-hidden" style={{background:'hsl(259 30% 96%)'}}>
+                      <div className="h-full rounded-lg flex items-center px-2 transition-all" style={{width: `${Math.max((p.count / maxPipe) * 100, p.count > 0 ? 12 : 0)}%`, background: p.color}}>
+                        {p.count > 0 && <span className="text-xs font-bold text-white">{p.count}</span>}
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold w-4 text-right flex-shrink-0" style={{color:'#1e1537'}}>{p.count}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-4 grid grid-cols-3 gap-2" style={{borderTop:'1px solid hsl(259 30% 91%)'}}>
+                {[
+                  { label: 'Developers', value: developers.length, color: '#eff6ff', text: '#1d4ed8' },
+                  { label: 'Customers', value: customers.length, color: '#f0fdf4', text: '#15803d' },
+                  { label: 'Active Leads', value: allLeads.length, color: '#f0edfb', text: '#6141ac' },
+                ].map((stat, i) => (
+                  <div key={i} className="rounded-xl p-3 text-center" style={{background: stat.color}}>
+                    <p className="text-base font-bold" style={{color: stat.text}}>{stat.value}</p>
+                    <p className="text-xs mt-0.5" style={{color:'#aaa'}}>{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick nav */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: 'Manage Users', sub: `${pendingUsers.length} pending`, href: '/dashboard/manage-users', alert: pendingUsers.length > 0 },
+              { label: 'All Listings', sub: `${approvedListings.length} active`, href: '#listings', alert: false },
+              { label: 'All Demands', sub: `${allLeads.length} active`, href: '#demands', alert: false },
+              { label: 'Analytics', sub: 'Views & downloads', href: '/dashboard/analytics', alert: false },
+            ].map((nav, i) => (
+              <a key={i} href={nav.href}
+                className="rounded-2xl p-4 flex flex-col gap-1 cursor-pointer transition-all hover:shadow-sm"
+                style={{background:'#fff', border: nav.alert ? '1px solid #fde68a' : '1px solid hsl(259 30% 91%)'}}>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-bold" style={{color:'#1e1537'}}>{nav.label}</p>
+                  <ChevronRight className="h-4 w-4" style={{color:'#aaa'}}/>
+                </div>
+                <p className="text-xs" style={{color: nav.alert ? '#d97706' : '#aaa'}}>{nav.sub}</p>
+              </a>
+            ))}
+          </div>
+
+          {/* Tabs for listings/demands */}
+          <div className="rounded-2xl overflow-hidden" style={{border:'1px solid hsl(259 30% 91%)'}}>
+            <div id="listings" className="flex" style={{background:'hsl(259 30% 96%)'}}>
+              {adminTabs.map(tab => (
+                <button key={tab.value}
+                  onClick={() => setAdminTab(tab.value)}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold transition-all"
+                  style={adminTab === tab.value
+                    ? {background:'#fff',color:'#6141ac',borderBottom:'2px solid #6141ac'}
+                    : {background:'transparent',color:'#888',borderBottom:'2px solid transparent'}}>
+                  <tab.icon className="h-3.5 w-3.5"/>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div className="p-4">
+              {adminTab === 'all-listings' && <AdminListings />}
+              {adminTab === 'all-demands' && <DemandList />}
+            </div>
+          </div>
+        </div>
+      );
+    };
     
     const staffPrivileges: string[] = (user as any)?.privileges || [];
     const hasPrivilege = (p: string) => staffPrivileges.includes(p);
