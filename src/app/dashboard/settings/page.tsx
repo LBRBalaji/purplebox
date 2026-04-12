@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Save, Settings, Trash2, KeyRound, Eye, EyeOff, Bell, ShieldCheck, UploadCloud } from 'lucide-react';
+import { PlusCircle, Save, Settings, Trash2, KeyRound, Eye, EyeOff, Bell, ShieldCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
@@ -38,46 +38,24 @@ export default function PlatformSettingsPage() {
   const [idGst, setIdGst] = React.useState('');
   const [idPan, setIdPan] = React.useState('');
   const [idTaxType, setIdTaxType] = React.useState<'gst'|'pan'>('gst');
-  const [idAadhaar, setIdAadhaar] = React.useState('');
-  const [idAadhaarDocUrl, setIdAadhaarDocUrl] = React.useState('');
-  const [idAadhaarUploading, setIdAadhaarUploading] = React.useState(false);
   const [idSaving, setIdSaving] = React.useState(false);
-  const idAadhaarFileRef = React.useRef<HTMLInputElement>(null);
 
   const personalDomains = ['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','live.com','msn.com','protonmail.com'];
   const isPersonalEmail = personalDomains.includes(user?.email?.split('@')[1]?.toLowerCase() || '');
   const isBusinessRole = user?.role === 'Warehouse Developer' || user?.role === 'User' || user?.role === 'Agent';
   const missingGstPan = !((user as any)?.gstNumber || (user as any)?.panNumber);
-  const missingAadhaar = !(user as any)?.aadhaarNumber;
-  const missingAadhaarDoc = !(user as any)?.aadhaarDocUrl;
-  const showIdentitySection = isBusinessRole && (missingGstPan || missingAadhaar || missingAadhaarDoc);
+  const showIdentitySection = isBusinessRole && missingGstPan;
 
-  const handleAadhaarDocUpload = async (file: File) => {
-    setIdAadhaarUploading(true);
-    try {
-      const fd = new FormData(); fd.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (data.url) { setIdAadhaarDocUrl(data.url); toast({ title: 'Aadhaar document uploaded' }); }
-      else toast({ variant: 'destructive', title: 'Upload failed', description: data.error || 'Please try again.' });
-    } catch { toast({ variant: 'destructive', title: 'Upload failed' }); }
-    setIdAadhaarUploading(false);
-  };
+
 
   const handleSaveIdentity = async () => {
-    if (isPersonalEmail) {
-      if (!idGst && !idPan) { toast({ variant: 'destructive', title: 'GST or PAN required' }); return; }
-      if (!idAadhaar) { toast({ variant: 'destructive', title: 'Aadhaar number required' }); return; }
-      if (!idAadhaarDocUrl) { toast({ variant: 'destructive', title: 'Aadhaar document required' }); return; }
-    }
-    if (idAadhaar && !/^[2-9]{1}[0-9]{11}$/.test(idAadhaar)) { toast({ variant: 'destructive', title: 'Invalid Aadhaar number' }); return; }
     if (idGst && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(idGst)) { toast({ variant: 'destructive', title: 'Invalid GST number' }); return; }
     if (!idGst && idPan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(idPan)) { toast({ variant: 'destructive', title: 'Invalid PAN number' }); return; }
     setIdSaving(true);
     try {
-      const updated = { ...user, ...(idGst ? { gstNumber: idGst } : {}), ...(idPan && !idGst ? { panNumber: idPan } : {}), ...(idAadhaar ? { aadhaarNumber: idAadhaar } : {}), ...(idAadhaarDocUrl ? { aadhaarDocUrl: idAadhaarDocUrl } : {}) };
+      const updated = { ...user, ...(idGst ? { gstNumber: idGst } : {}), ...(idPan && !idGst ? { panNumber: idPan } : {}) };
       await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
-      toast({ title: 'Identity details saved', description: 'Your account has been updated.' });
+      toast({ title: 'GST/PAN saved', description: 'Your account has been updated.' });
     } catch { toast({ variant: 'destructive', title: 'Save failed' }); }
     setIdSaving(false);
   };
@@ -206,9 +184,7 @@ export default function PlatformSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-primary" /> Identity Verification</CardTitle>
               <CardDescription>
-                {isPersonalEmail
-                  ? 'Your account uses a personal email. GST/PAN, Aadhaar number, and Aadhaar document are required.'
-                  : 'Complete your identity details. These are optional for official email accounts but recommended.'}
+                Add your GST or PAN number for identity and invoicing purposes. These details are not mandatory but recommended.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5 max-w-md">
@@ -230,28 +206,7 @@ export default function PlatformSettingsPage() {
                     : <Input placeholder="ABCDE1234F" maxLength={10} value={idPan} onChange={e => { setIdPan(e.target.value.toUpperCase()); setIdGst(''); }} />}
                 </div>
               )}
-              {missingAadhaar && (
-                <div className="space-y-2">
-                  <Label>Aadhaar Number {isPersonalEmail && <span className="text-destructive">*</span>}</Label>
-                  <Input placeholder="12-digit Aadhaar number" maxLength={12}
-                    value={idAadhaar} onChange={e => setIdAadhaar(e.target.value.replace(/\D/g, '').slice(0, 12))} />
-                </div>
-              )}
-              {missingAadhaarDoc && (
-                <div className="space-y-2">
-                  <Label>Aadhaar Card Document {isPersonalEmail && <span className="text-destructive">*</span>}</Label>
-                  <p className="text-xs text-muted-foreground">Upload both pages of your Aadhaar card (PDF or image)</p>
-                  <div className="flex items-center gap-3">
-                    <Button type="button" variant="outline" onClick={() => idAadhaarFileRef.current?.click()} disabled={idAadhaarUploading} size="sm">
-                      <UploadCloud className="mr-2 h-4 w-4" />
-                      {idAadhaarUploading ? 'Uploading...' : idAadhaarDocUrl ? 'Replace Document' : 'Upload Aadhaar'}
-                    </Button>
-                    {idAadhaarDocUrl && <a href={idAadhaarDocUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline">View uploaded</a>}
-                  </div>
-                  <input ref={idAadhaarFileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
-                    onChange={e => { const f = e.target.files?.[0]; if (f) handleAadhaarDocUpload(f); e.target.value = ''; }} />
-                </div>
-              )}
+
             </CardContent>
             <CardFooter>
               <Button onClick={handleSaveIdentity} disabled={idSaving}>
