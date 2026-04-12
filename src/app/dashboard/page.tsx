@@ -66,12 +66,11 @@ const ProviderOverview = React.memo(function ProviderOverview() {
     // Listing health scores
     const healthScores = myListings.map(l => {
       let score = 0;
-      if (l.name) score += 10;
-      if (l.description) score += 15;
+      if (l.name) score += 15;
       if (l.rentPerSqFt) score += 15;
       if (l.buildingSpecifications?.eveHeightMeters) score += 10;
-      if (l.buildingSpecifications?.buildingType?.length) score += 10;
-      if (l.buildingSpecifications?.numberOfDocksAndShutters) score += 10;
+      if (l.buildingSpecifications?.buildingType?.length) score += 15;
+      if (l.buildingSpecifications?.numberOfDocksAndShutters) score += 15;
       if (l.documents && l.documents.length > 0) score += 20;
       if (l.latLng) score += 10;
       return { listingId: l.listingId, location: l.location, score, status: l.status };
@@ -147,7 +146,7 @@ const ProviderOverview = React.memo(function ProviderOverview() {
         <div className="bg-card rounded-2xl border border-border p-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center"><ShieldCheck className="h-4 w-4 text-primary" /></div>
-            <div><h3 className="font-bold text-foreground text-sm">Listing Completeness</h3><p className="text-xs text-muted-foreground">Higher score = better visibility</p></div>
+            <div><h3 className="font-bold text-foreground text-sm">Listing Completeness</h3><p className="text-xs text-muted-foreground">Name · Rent · Building specs · Media · Location</p></div>
           </div>
           {stats.healthScores.length > 0 ? (
             <div className="space-y-3">
