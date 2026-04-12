@@ -167,7 +167,7 @@ export default function SignupPage() {
           </div>
           <CardTitle className="text-2xl">Create an Account</CardTitle>
           <CardDescription>
-            Sign up as a customer or a property provider.
+            Sign up as a Customer, Property Provider, or Agent Partner.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSignup}>
@@ -176,7 +176,7 @@ export default function SignupPage() {
                 <Label>Account Type</Label>
                 <RadioGroup
                     defaultValue="User"
-                    className={`grid gap-4 ${formData.role === "Agent" ? "grid-cols-2" : "grid-cols-2"}`}
+                    className="grid grid-cols-3 gap-3"
                     onValueChange={handleRoleChange}
                     value={formData.role}
                 >
@@ -184,31 +184,27 @@ export default function SignupPage() {
                     <RadioGroupItem value="User" id="role-user" className="peer sr-only" />
                     <Label
                         htmlFor="role-user"
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 text-xs font-medium text-center hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                     >
-                        Customer (Tenant)
+                        Customer<br/><span className="text-muted-foreground font-normal">(Tenant)</span>
                     </Label>
                     </div>
                     <div>
-                    <RadioGroupItem
-                        value="Warehouse Developer"
-                        id="role-provider"
-                        className="peer sr-only"
-                    />
+                    <RadioGroupItem value="Warehouse Developer" id="role-provider" className="peer sr-only" />
                     <Label
                         htmlFor="role-provider"
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 text-xs font-medium text-center hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                     >
-                        Property Provider
+                        Property<br/><span className="text-muted-foreground font-normal">(Developer)</span>
                     </Label>
                     </div>
                     <div>
                     <RadioGroupItem value="Agent" id="role-agent" className="peer sr-only" />
                     <Label
                         htmlFor="role-agent"
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary col-span-2"
+                        className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 text-xs font-medium text-center hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                     >
-                        Agent Partner
+                        Agent<br/><span className="text-muted-foreground font-normal">(Partner)</span>
                     </Label>
                     </div>
                 </RadioGroup>
