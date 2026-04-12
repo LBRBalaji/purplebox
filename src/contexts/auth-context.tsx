@@ -143,9 +143,11 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
       await createUserWithEmailAndPassword(auth, email, details.password);
       const newUser: User = { ...details, email, isCompanyAdmin: false, status: 'pending', createdAt: new Date().toISOString() };
       await setDoc(doc(db, 'users', email), newUser);
-      setUser(newUser);
-      sessionStorage.setItem('user', JSON.stringify(newUser));
-      router.push('/dashboard');
+      // Sign out immediately — user must wait for SuperAdmin approval before accessing dashboard
+      await signOut(auth);
+      setUser(null);
+      toast({ title: 'Registration Submitted', description: 'Your account is pending approval. You will receive an email once activated by our team.' });
+      router.push('/');
     } catch (error) {
       const errMsg = (error as any)?.code === 'auth/email-already-in-use' ? 'This email is already registered. Please login instead.' : (error as any)?.code === 'auth/invalid-email' ? 'Invalid email address.' : (error as any)?.code === 'auth/weak-password' ? 'Password is too weak. Use at least 6 characters.' : 'Could not create account. Please try again.'; toast({ variant: 'destructive', title: 'Signup Failed', description: errMsg });
     }
