@@ -23,7 +23,6 @@ import { LimitExceededDialog } from './limit-exceeded-dialog';
 import { Badge } from './ui/badge';
 import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { DownloadTermsDialog } from './download-terms-dialog';
 import { EmailOtpDialog } from './email-otp-dialog';
 import { useRouter } from 'next/navigation';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -223,9 +222,8 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
 function DownloadBar() {
     const { user } = useAuth();
     const { toast } = useToast();
-    const { selectedForDownload, logDownload, clearSelectedForDownload, downloadAcknowledgments } = useData();
+    const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
-    const [isTermsOpen, setIsTermsOpen] = useState(false);
     const [isOtpOpen, setIsOtpOpen] = useState(false);
 
     if (selectedForDownload.length === 0) {
@@ -240,11 +238,6 @@ function DownloadBar() {
         })
     }
     
-    const onTermsAccept = () => {
-        setIsTermsOpen(false);
-        setIsOtpOpen(true);
-    };
-
     const proceedWithDownload = () => {
         if (!user) return; // Should not happen if terms are accepted, but as a safeguard.
         const { success } = logDownload(user, selectedForDownload);
@@ -338,12 +331,7 @@ function DownloadBar() {
             return;
         }
 
-        const hasAcknowledged = downloadAcknowledgments.some(ack => ack.userId === user.email);
-        if (hasAcknowledged) {
-            setIsOtpOpen(true);
-        } else {
-            setIsTermsOpen(true);
-        }
+        setIsOtpOpen(true);
     }
 
     return (
@@ -364,7 +352,6 @@ function DownloadBar() {
                 </div>
             </div>
             <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess}/>
-            <DownloadTermsDialog isOpen={isTermsOpen} onOpenChange={setIsTermsOpen} onAccept={onTermsAccept} />
             <EmailOtpDialog isOpen={isOtpOpen} onOpenChange={setIsOtpOpen} email={user?.email || ""} onVerified={proceedWithDownload} />
         </>
     )
