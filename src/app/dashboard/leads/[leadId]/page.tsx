@@ -187,7 +187,7 @@ export default function LeadDetailPage() {
   const { leadId } = useParams();
   const router = useRouter();
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead } = useData();
+  const { registeredLeads, transactionActivities, listings, updateRegisteredLead, addTransactionActivity, isLoading: isDataLoading, addAgentToLead, getNegotiationBoard, getTenantImprovements } = useData();
   const { toast } = useToast();
   const searchParams = useSearchParams();
 
@@ -397,15 +397,12 @@ export default function LeadDetailPage() {
                     <p className="text-xs" style={{color:'hsl(259 30% 55%)'}}>
                       <span style={{color:'#9b7ee0'}}>✓</span> Identities revealed — you are now in the Transaction Workspace
                     </p>
-                    <button
-                      onClick={() => {
-                        const threadId = `chat-${lead.id}-${selectedProvider.providerEmail}`;
-                        window.history.back();
-                      }}
+                    <Link
+                      href={isCustomer ? '/dashboard?tab=my-transactions' : '/dashboard?tab=registered-leads'}
                       className="text-xs font-bold flex items-center gap-1 hover:opacity-80 transition-opacity"
                       style={{color:'#9b7ee0'}}>
                       ← Back to Chat
-                    </button>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -414,12 +411,115 @@ export default function LeadDetailPage() {
 
         {!selectedProvider ? (
             <DeveloperSelection lead={lead} onSelect={handleProviderSelect} />
-        ) : (
+        ) : (() => {
+            // Derive journey stage
+            const hasProposal = selectedProvider.properties.some(p => p.rentPerSft !== undefined);
+            const negotiation = getNegotiationBoard(lead.id);
+            const hasNegotiation = !!(negotiation && (negotiation as any).actionableItems?.length > 0);
+            const tenantImpr = getTenantImprovements(lead.id);
+            const hasFitOut = !!(tenantImpr && ((tenantImpr as any).items?.length > 0 || (tenantImpr as any).requirements));
+            const hasMoU = activities.some(a => a.activityType === 'Proposal Submitted' && hasNegotiation && hasFitOut);
+
+            const stages = [
+              { key: 'chat', label: 'Chat', done: true },
+              { key: 'proposal', label: 'Proposal', done: hasProposal },
+              { key: 'negotiation', label: 'Negotiation', done: hasNegotiation },
+              { key: 'fitout', label: 'Fit-Out', done: hasFitOut },
+              { key: 'mou', label: 'MoU', done: hasMoU },
+            ];
+            const currentStageIdx = stages.reduce((acc, s, i) => s.done ? i : acc, 0);
+
+            // Next action card content per role
+            const getNextAction = () => {
+              if (isProvider) {
+                if (!hasProposal) return { msg: 'Submit your commercial proposal to start the negotiation.', action: 'Submit Proposal', tab: 'activity', highlight: true };
+                if (!hasNegotiation) return { msg: 'Proposal submitted. Open the Negotiation Board to align on terms with the customer.', action: 'Go to Negotiation Board', tab: 'negotiation-board', highlight: false };
+                if (!hasFitOut) return { msg: 'Terms are being discussed. Stay tuned for the customer's fit-out requirements.', action: null, tab: null, highlight: false };
+                return { msg: 'Deal is progressing well. Review fit-out requirements and confirm with ORS-ONE for MoU.', action: null, tab: null, highlight: false };
+              }
+              if (isCustomer) {
+                if (!hasProposal) return { msg: 'Waiting for the developer to submit their commercial proposal.', action: null, tab: null, highlight: false };
+                if (!hasNegotiation) return { msg: 'Developer has submitted a proposal. Review it and open the Negotiation Board to discuss terms.', action: 'Review & Negotiate', tab: 'negotiation-board', highlight: true };
+                if (!hasFitOut) return { msg: 'Negotiation in progress. Define your fit-out and warehouse requirements next.', action: 'Define Fit-Out Requirements', tab: 'improvements', highlight: true };
+                return { msg: 'All stages complete. ORS-ONE will reach out to finalise the MoU.', action: null, tab: null, highlight: false };
+              }
+              return null;
+            };
+            const nextAction = getNextAction();
+
+            return (
+            <div className="space-y-5">
+
+              {/* Journey progress bar */}
+              <div className="rounded-2xl p-5" style={{background:'#ffffff', border:'1px solid hsl(259 30% 88%)'}}>
+                <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{color:'hsl(259 15% 50%)'}}>Transaction Journey</p>
+                <div className="flex items-center gap-0">
+                  {stages.map((stage, i) => (
+                    <React.Fragment key={stage.key}>
+                      <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all"
+                          style={stage.done
+                            ? {background:'#6141ac', color:'#ffffff'}
+                            : i === currentStageIdx + 1
+                            ? {background:'hsl(259 44% 94%)', color:'#6141ac', border:'2px solid #6141ac'}
+                            : {background:'hsl(259 30% 92%)', color:'hsl(259 15% 60%)', border:'1px solid hsl(259 30% 84%)'}}>
+                          {stage.done ? (
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                          ) : (i + 1)}
+                        </div>
+                        <span className="text-xs font-semibold whitespace-nowrap"
+                          style={{color: stage.done ? '#6141ac' : i === currentStageIdx + 1 ? '#6141ac' : 'hsl(259 15% 60%)'}}>
+                          {stage.label}
+                        </span>
+                      </div>
+                      {i < stages.length - 1 && (
+                        <div className="flex-1 h-0.5 mb-5 mx-1 transition-all"
+                          style={{background: stage.done ? '#6141ac' : 'hsl(259 30% 88%)'}} />
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+
+              {/* Next action card */}
+              {nextAction && (
+                <div className="rounded-2xl p-4 flex items-start justify-between gap-4"
+                  style={nextAction.highlight
+                    ? {background:'hsl(259 25% 10%)', border:'1px solid hsl(259 25% 22%)'}
+                    : {background:'hsl(259 44% 96%)', border:'1px solid hsl(259 44% 86%)'}}>
+                  <div className="flex items-start gap-3">
+                    <div className="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                      style={{background: nextAction.highlight ? '#6141ac' : 'hsl(259 44% 88%)'}}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={nextAction.highlight ? '#ffffff' : '#6141ac'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-widest mb-1"
+                        style={{color: nextAction.highlight ? '#9b7ee0' : '#6141ac'}}>Your Next Step</p>
+                      <p className="text-sm leading-relaxed"
+                        style={{color: nextAction.highlight ? '#c5b8e8' : 'hsl(259 15% 35%)'}}>
+                        {nextAction.msg}
+                      </p>
+                    </div>
+                  </div>
+                  {nextAction.action && nextAction.tab && (
+                    <button
+                      onClick={() => {
+                        const tab = document.querySelector(`[data-value="${nextAction.tab}"]`) as HTMLElement;
+                        if (tab) tab.click();
+                      }}
+                      className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:opacity-90 whitespace-nowrap"
+                      style={{background:'#6141ac', color:'#ffffff'}}>
+                      {nextAction.action} →
+                    </button>
+                  )}
+                </div>
+              )}
+
             <Tabs defaultValue={defaultTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
-                    <TabsTrigger value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
-                    <TabsTrigger value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
+                    <TabsTrigger value="activity" data-value="activity"><ClipboardList className="mr-2 h-4 w-4"/> Activity Log</TabsTrigger>
+                    <TabsTrigger value="negotiation-board" data-value="negotiation-board"><FileSignature className="mr-2 h-4 w-4"/> Negotiation Board</TabsTrigger>
+                    <TabsTrigger value="improvements" data-value="improvements"><HardHat className="mr-2 h-4 w-4"/> Tenant Improvements</TabsTrigger>
                 </TabsList>
                 <TabsContent value="activity" className="mt-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
@@ -610,7 +710,9 @@ export default function LeadDetailPage() {
                     <TenantImprovementsSheet leadId={lead.id} />
                 </TabsContent>
             </Tabs>
-        )}
+            </div>
+            );
+        })()}
       </div>
     </main>
   );
