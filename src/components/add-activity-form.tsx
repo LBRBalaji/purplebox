@@ -62,7 +62,7 @@ export function AddActivityForm({ leadId, onAddActivity }: AddActivityFormProps)
   const form = useForm<ActivityFormValues>({
     resolver: zodResolver(activitySchema),
     defaultValues: {
-      activityType: 'Site Visit Request',
+      activityType: 'Quote Requested',
     },
   });
   
@@ -86,7 +86,7 @@ export function AddActivityForm({ leadId, onAddActivity }: AddActivityFormProps)
     };
     onAddActivity(activityData);
     form.reset({
-      activityType: 'Site Visit Request',
+      activityType: 'Quote Requested',
       visitDateTime: undefined,
       message: '',
       status: undefined,
