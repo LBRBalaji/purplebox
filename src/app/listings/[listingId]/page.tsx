@@ -280,13 +280,24 @@ export default function ListingDetailPage() {
 
         addRegisteredLead(newLead, user.email);
         setJustRequestedQuote(true);
-        
-        const partnerName = isBrokered ? "the O2O team" : (users[listing.developerId]?.companyName || "the developer");
-        
-        toast({
-            title: 'Quote Request Sent!',
-            description: `You have been connected with ${partnerName} for listing "${listing.warehouseBoxId || listing.listingId}". Your interaction begins on the 'My Transactions' page, where you can track all communications.`,
+
+        // Log Quote Requested activity on the new lead
+        addTransactionActivity({
+            leadId: newLead.id,
+            activityType: 'Quote Requested',
+            details: { message: `Formal quote requested for ${listing.listingId} — ${listing.name || listing.location}` },
+            createdBy: user.email,
         });
+
+        toast({
+            title: 'Transaction Workspace Created',
+            description: 'Taking you to your Transaction Workspace where you can track the quote, site visit, negotiation and all interactions for this property.',
+        });
+
+        // Navigate to the transaction journey page
+        setTimeout(() => {
+            router.push(`/dashboard/leads/${newLead.id}?tab=activity`);
+        }, 800);
     };
 
     const handleGetQuote = () => {
@@ -776,7 +787,7 @@ export default function ListingDetailPage() {
                         </div>
                         <div className="flex gap-3">
                             <button
-                                onClick={() => { handleGetQuote(); setShowRfqNudge(false); }}
+                                onClick={() => { setShowRfqNudge(false); handleGetQuote(); }}
                                 className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
                                 style={{background:'#6141ac'}}>
                                 Request Formal Quote

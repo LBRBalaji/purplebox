@@ -41,7 +41,7 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
 }: { 
   providerTab: string; setProviderTab: (t: string) => void; propertyMatchDemandId: string | null; user: any 
 }) {
-  const { listings, listingAnalytics, registeredLeads } = useData();
+  const { listings, listingAnalytics, registeredLeads, transactionActivities, unreadChatCount } = useData();
   const { users } = useAuth();
 
   const myListings = React.useMemo(() =>
@@ -57,6 +57,14 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
     const totalDownloads = myAnalytics.reduce((s, a) => s + a.downloads, 0);
     const myLeads = registeredLeads.filter(l => l.providers.some(p => p.providerEmail === userProp?.email));
     const newLeads = myLeads.filter(l => !l.providers.find(p => p.providerEmail === userProp?.email)?.properties[0]?.rentPerSft).length;
+    // Leads where customer requested a quote but developer hasn't submitted proposal yet
+    const urgentLeads = myLeads.filter(l => {
+      const leadActs = transactionActivities.filter((a: any) => a.leadId === l.id);
+      const hasQuoteReq = leadActs.some((a: any) => a.activityType === 'Quote Requested');
+      const hasProposalSub = leadActs.some((a: any) => a.activityType === 'Proposal Submitted');
+      return hasQuoteReq && !hasProposalSub;
+    });
+    const urgentCount = urgentLeads.length;
     const topListing = [...myAnalytics].sort((a, b) => b.views - a.views)[0];
     const healthScores = myListings.map(l => {
       let score = 0;
@@ -68,7 +76,7 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
       if (l.latLng) score += 10;
       return { listingId: l.listingId, location: l.location, score, status: l.status };
     }).sort((a, b) => a.score - b.score).slice(0, 4);
-    return { active: active.length, pending: pending.length, leased: leased.length, totalSqFt, totalViews, totalDownloads, newLeads, topListingId: topListing ? myListings.find(l => l.listingId === topListing.listingId)?.listingId || topListing.listingId : null, topViews: topListing?.views || 0, healthScores, myLeads, myListings: active };
+    return { active: active.length, pending: pending.length, leased: leased.length, totalSqFt, totalViews, totalDownloads, newLeads, urgentCount, urgentLeads, topListingId: topListing ? myListings.find(l => l.listingId === topListing.listingId)?.listingId || topListing.listingId : null, topViews: topListing?.views || 0, healthScores, myLeads, myListings: active };
   }, [myListings, listingAnalytics, registeredLeads, userProp]);
 
   const firstName = userProp?.userName?.split(' ')[0] || 'there';
@@ -106,13 +114,49 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
         </div>
       </div>
 
+      {/* Urgent response alert — shown when developer has leads awaiting quote response */}
+      {(stats.urgentCount > 0 || unreadChatCount > 0) && (
+        <div className="rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap"
+          style={{background:'linear-gradient(135deg,#2d1f52,#1e1537)',border:'1px solid hsl(259 44% 30%)'}}>
+          <div className="flex items-start gap-3">
+            <div className="h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{background:'rgba(239,68,68,0.2)',border:'1px solid rgba(239,68,68,0.4)'}}>
+              <svg width="14" height="14" fill="none" stroke="#f87171" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div>
+              <p className="text-sm font-bold" style={{color:'#fff'}}>Action Required</p>
+              <p className="text-xs mt-0.5" style={{color:'rgba(255,255,255,.6)'}}>
+                {stats.urgentCount > 0 && <span>{stats.urgentCount} lead{stats.urgentCount > 1 ? 's' : ''} waiting for your commercial quote{unreadChatCount > 0 ? ' · ' : ''}</span>}
+                {unreadChatCount > 0 && <span>{unreadChatCount} unread chat message{unreadChatCount > 1 ? 's' : ''}</span>}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {stats.urgentCount > 0 && (
+              <button onClick={() => setProviderTab('registered-leads')}
+                className="text-xs font-bold px-4 py-2 rounded-xl transition-all"
+                style={{background:'#6141ac',color:'#fff'}}>
+                Respond to Quotes →
+              </button>
+            )}
+            {unreadChatCount > 0 && (
+              <button onClick={() => setProviderTab('registered-leads')}
+                className="text-xs font-bold px-4 py-2 rounded-xl transition-all"
+                style={{background:'transparent',color:'#c5b8e8',border:'1px solid rgba(255,255,255,.2)'}}>
+                Open Chats →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Active Listings', value: stats.active, sub: stats.pending > 0 ? `${stats.pending} pending` : 'All approved', accent: false },
           { label: 'Total Area Listed', value: stats.totalSqFt >= 1000000 ? (stats.totalSqFt/1000000).toFixed(1)+'M sq.ft' : stats.totalSqFt.toLocaleString()+' sq.ft', sub: 'Across active listings', accent: false },
           { label: 'Total Views', value: stats.totalViews, sub: 'All time', accent: false },
-          { label: 'Leads Awaiting', value: stats.newLeads, sub: 'Need your response', accent: stats.newLeads > 0 },
+          { label: 'Quote Requests', value: stats.urgentCount, sub: stats.urgentCount > 0 ? 'Awaiting your response' : 'All responded', accent: stats.urgentCount > 0 },
         ].map((kpi, i) => (
           <div key={i} className="rounded-2xl p-4" style={{
             background:'#fff',
@@ -210,32 +254,41 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
               const hasProposal = myProvider?.properties[0]?.rentPerSft !== undefined;
               const customerUser = users?.[lead.customerId];
               const initials = customerUser?.companyName?.slice(0, 2).toUpperCase() || customerUser?.userName?.slice(0, 2).toUpperCase() || 'CU';
+              const leadActs = transactionActivities.filter((a: any) => a.leadId === lead.id);
+              const quoteRequested = leadActs.some((a: any) => a.activityType === 'Quote Requested');
+              const isUrgent = quoteRequested && !hasProposal;
               return (
-                <div key={lead.id} className="flex items-center gap-3 p-2.5 rounded-xl" style={{background:'hsl(259 30% 98%)'}}>
+                <div key={lead.id}
+                  className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all hover:opacity-90"
+                  style={{background: isUrgent ? 'hsl(259 44% 96%)' : 'hsl(259 30% 98%)', border: isUrgent ? '1px solid hsl(259 44% 82%)' : '1px solid transparent'}}
+                  onClick={() => window.location.href=`/dashboard/leads/${lead.id}?tab=activity`}>
                   <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0"
-                    style={{background:'hsl(259 44% 90%)',color:'#6141ac'}}>
+                    style={{background: isUrgent ? '#6141ac' : 'hsl(259 44% 90%)', color: isUrgent ? '#fff' : '#6141ac'}}>
                     {initials}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate" style={{color:'#1e1537'}}>
                       {customerUser?.companyName || lead.customerId}
                     </p>
-                    <p className="text-xs" style={{color:'#aaa'}}>
-                      {myProvider?.properties[0]?.listingId} · {hasProposal ? 'Proposal submitted' : 'Awaiting proposal'}
+                    <p className="text-xs" style={{color: isUrgent ? '#6141ac' : '#aaa'}}>
+                      {myProvider?.properties[0]?.listingId} · {isUrgent ? 'Quote requested — respond now' : hasProposal ? 'Proposal submitted' : 'Awaiting quote request'}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                      style={hasProposal
-                        ? {background:'#f0fdf4',color:'#15803d'}
-                        : {background:'#fffbeb',color:'#d97706'}}>
-                      {hasProposal ? '● Proposal sent' : '● Needs proposal'}
-                    </span>
-                    <button onClick={() => window.location.href=`/dashboard/leads/${lead.id}`}
-                      className="text-xs font-bold px-3 py-1.5 rounded-lg text-white flex-shrink-0"
-                      style={{background:'#6141ac'}}>
-                      {hasProposal ? 'Workspace →' : 'Submit →'}
-                    </button>
+                    {isUrgent ? (
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'#6141ac',color:'#fff'}}>
+                        ● Respond
+                      </span>
+                    ) : hasProposal ? (
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'#f0fdf4',color:'#15803d'}}>
+                        ● Done
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'hsl(259 30% 92%)',color:'#888'}}>
+                        ● Waiting
+                      </span>
+                    )}
+                    <svg width="14" height="14" fill="none" stroke="#6141ac" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
                   </div>
                 </div>
               );
@@ -247,17 +300,27 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
       {/* Tabs */}
       <div className="rounded-2xl overflow-hidden" style={{border:'1px solid hsl(259 30% 91%)'}}>
         <div className="flex" style={{background:'hsl(259 30% 96%)'}}>
-          {tabs.map(tab => (
+          {tabs.map(tab => {
+            const isLeadsTab = tab.value === 'registered-leads';
+            const badgeCount = isLeadsTab ? (stats.urgentCount + unreadChatCount) : 0;
+            return (
             <button key={tab.value}
               onClick={() => setProviderTab(tab.value)}
-              className="flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold transition-all"
+              className="flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold transition-all relative"
               style={providerTab === tab.value
                 ? {background:'#fff',color:'#6141ac',borderBottom:'2px solid #6141ac'}
                 : {background:'transparent',color:'#888',borderBottom:'2px solid transparent'}}>
               <tab.icon className="h-3.5 w-3.5"/>
               <span className="hidden sm:inline">{tab.label}</span>
+              {badgeCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 h-4 min-w-4 px-1 rounded-full text-white flex items-center justify-center"
+                  style={{background:'#ef4444',fontSize:'9px',fontWeight:700,lineHeight:1}}>
+                  {badgeCount}
+                </span>
+              )}
             </button>
-          ))}
+            );
+          })}
         </div>
         <div className="p-4">
           {providerTab === 'my-listings' && <ProviderListings />}
