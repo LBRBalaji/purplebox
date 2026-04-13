@@ -53,7 +53,7 @@ const ListingsDropdown = ({ isSuperAdmin }) => {
         ) : (
           <DropdownMenuItem disabled className="flex items-center justify-between opacity-50 cursor-not-allowed">
             <span className="flex items-center"><Map className="mr-2 h-4 w-4" /> Map Search</span>
-            <Badge variant="outline" className="text-xs ml-2 border-amber-400 text-amber-600 bg-amber-50 py-0 px-1">Soon</Badge>
+            <Badge variant="outline" className="text-xs ml-2 py-0 px-1" style={{background:"hsl(259 44% 94%)",color:"#6141ac",border:"1px solid hsl(259 44% 80%)"}}>Soon</Badge>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild><Link href="/listing-comparison"><Calculator className="mr-2 h-4 w-4" /> Compare Listings</Link></DropdownMenuItem>
@@ -207,7 +207,7 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
           ) : (
             <div className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-400 cursor-not-allowed">
               <span className="flex items-center gap-3"><Map className="h-4 w-4" /> Map Search</span>
-              <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-50 py-0 px-1">Soon</Badge>
+              <Badge variant="outline" className="text-xs py-0 px-1" style={{background:"hsl(259 44% 94%)",color:"#6141ac",border:"1px solid hsl(259 44% 80%)"}}>Soon</Badge>
             </div>
           )}
           <div className="pt-2 pb-1 px-4">
@@ -278,28 +278,12 @@ export function Header() {
 
           <MobileMenu user={user} logout={logout} onLoginClick={() => setIsLoginOpen(true)} isSuperAdmin={isSuperAdmin} />
 
-          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0 flex items-center gap-1">
-            <div style={{width:'44px',height:'44px',overflow:'hidden',flexShrink:0}}>
-              <img
-                src="/logo_ors.png"
-                alt="ORS-ONE"
-                style={{
-                  width: '100%',
-                  height: '200%',
-                  objectFit: 'cover',
-                  objectPosition: 'top center',
-                  mixBlendMode: 'multiply',
-                  filter: 'hue-rotate(230deg) saturate(2) brightness(0.75)',
-                }}
-              />
+          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-lg font-bold text-primary">ORS-ONE</span>
+              <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{background:'hsl(259 44% 94%)',color:'#6141ac',fontSize:'9px'}}>Beta</span>
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-base font-bold text-primary" style={{letterSpacing:'-0.3px'}}>ORS-ONE</span>
-                <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{background:'hsl(259 44% 94%)',color:'#6141ac',fontSize:'9px'}}>Beta</span>
-              </div>
-              <p className="text-xs leading-none mt-0.5" style={{color:'hsl(259 15% 55%)'}}>Building Transaction Ready Assets</p>
-            </div>
+            <p className="text-xs text-muted-foreground leading-none">Building Transaction Ready Assets</p>
           </Link>
 
           <nav className="hidden md:flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
@@ -320,7 +304,7 @@ export function Header() {
                 </Link>
               )}
               {isCustomer && (
-                <Link href="/dashboard?tab=my-sublease&createNew=true" className="flex items-center gap-1.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors px-3 py-1.5 rounded-lg whitespace-nowrap">
+                <Link href="/dashboard?tab=my-sublease&createNew=true" className="flex items-center gap-1.5 text-sm font-medium text-white transition-colors px-3 py-1.5 rounded-lg whitespace-nowrap" style={{background:'#6141ac'}}>
                   <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
                 </Link>
               )}
