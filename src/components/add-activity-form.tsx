@@ -46,7 +46,7 @@ type AddActivityFormProps = {
 };
 
 const activitySchema = z.object({
-  activityType: z.enum(['Site Visit Request', 'Site Visit Update', 'Customer Feedback', 'Tenant Improvements']),
+  activityType: z.enum(['Quote Requested', 'Site Visit Request', 'Site Visit Update', 'Customer Feedback', 'Tenant Improvements']),
   visitDateTime: z.date().optional(),
   message: z.string().optional(),
   status: z.enum(['Planned', 'Visited', 'Re-Scheduled', 'Cancelled']).optional(),
@@ -98,6 +98,22 @@ export function AddActivityForm({ leadId, onAddActivity }: AddActivityFormProps)
 
   const renderFormFields = () => {
     switch(activityType) {
+      case 'Quote Requested':
+        return (
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Message to Developer <span className="text-xs text-muted-foreground">(optional)</span></FormLabel>
+                <FormControl>
+                  <Textarea placeholder="e.g., Please provide current rent per sq ft, security deposit and lease tenure for this property." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
       case 'Site Visit Request':
         return (
           <>
@@ -232,7 +248,7 @@ export function AddActivityForm({ leadId, onAddActivity }: AddActivityFormProps)
     <Card>
       <CardHeader>
         <CardTitle>Add New Activity</CardTitle>
-        <CardDescription>Log a new interaction or update for this lead.</CardDescription>
+        <CardDescription>Log activities at each stage — quote request, site visit, feedback, and fit-out requirements.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -246,6 +262,7 @@ export function AddActivityForm({ leadId, onAddActivity }: AddActivityFormProps)
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
+                      <SelectItem value="Quote Requested">Request Formal Quote</SelectItem>
                       <SelectItem value="Site Visit Request">Site Visit Request</SelectItem>
                       <SelectItem value="Site Visit Update">Site Visit Update</SelectItem>
                       <SelectItem value="Customer Feedback">Customer Feedback</SelectItem>

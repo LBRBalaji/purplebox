@@ -351,35 +351,64 @@ export default function LeadDetailPage() {
   const hasMoU = hasProposal && hasNegotiation && hasFitOut;
 
   const leadActivities = lead ? transactionActivities.filter((a: any) => a.leadId === lead.id) : [];
+  // Quote stage done when: customer logged a Quote Requested activity OR lead was registered via Request Quote button
   const hasQuote = leadActivities.some((a: any) => a.activityType === 'Quote Requested');
-  const hasSiteVisit = leadActivities.some((a: any) => a.activityType === 'Site Visit Request' || a.activityType === 'Site Visit Update');
+  // Site visit done when a Site Visit Request activity exists
+  const hasSiteVisit = leadActivities.some((a: any) => a.activityType === 'Site Visit Request');
+  // Site visit confirmed when status is Visited
+  const siteVisitDone = leadActivities.some((a: any) => a.activityType === 'Site Visit Update' && a.details?.status === 'Visited');
 
   const journeyStages = [
-    { key: 'chat',        label: 'Chat',        done: true },
-    { key: 'rfq',         label: 'Get Quote',   done: hasQuote },
-    { key: 'sitevisit',   label: 'Site Visit',  done: hasSiteVisit },
-    { key: 'negotiation', label: 'Negotiation', done: hasNegotiation },
-    { key: 'fitout',      label: 'Fit-Out',     done: hasFitOut },
-    { key: 'mou',         label: 'MoU',         done: hasMoU },
+    { key: 'chat',        label: 'Chat',        done: true,           sub: 'Connected' },
+    { key: 'rfq',         label: 'Get Quote',   done: hasQuote,       sub: 'Formal RFQ' },
+    { key: 'sitevisit',   label: 'Site Visit',  done: siteVisitDone,  sub: 'Inspected' },
+    { key: 'negotiation', label: 'Negotiation', done: hasNegotiation, sub: 'Terms Agreed' },
+    { key: 'fitout',      label: 'Fit-Out',     done: hasFitOut,      sub: 'Requirements' },
+    { key: 'mou',         label: 'MoU',         done: hasMoU,         sub: 'Finalised' },
   ];
   const currentStageIdx = journeyStages.reduce((acc, s, i) => s.done ? i : acc, 0);
 
   const journeyNextAction = (() => {
     if (isProvider) {
-      if (!hasQuote)       return { msg: 'Customer has initiated contact. Wait for their formal quote request before submitting commercials.', action: null, tab: null, highlight: false };
-      if (!hasProposal)    return { msg: 'Customer has requested a formal quote. Submit your commercial proposal with current rent and lease terms.', action: 'Submit Commercial Quote', tab: 'activity', highlight: true };
-      if (!hasSiteVisit)   return { msg: 'Quote submitted. Co-ordinate a site visit with the customer to progress the transaction.', action: null, tab: null, highlight: false };
-      if (!hasNegotiation) return { msg: 'Site visit done. Open the Negotiation Board to align on final commercial terms.', action: 'Go to Negotiation Board', tab: 'negotiation-board', highlight: true };
-      if (!hasFitOut)      return { msg: "Terms being discussed. Stay tuned for the customer's fit-out and tenant improvement requirements.", action: null, tab: null, highlight: false };
-      return { msg: 'Deal progressing well. Review fit-out requirements and confirm with ORS-ONE for MoU.', action: null, tab: null, highlight: false };
+      if (!hasQuote)
+        return { msg: 'Customer has been connected. Waiting for them to raise a formal quote request.', action: null, tab: null, highlight: false };
+      if (!hasProposal)
+        return { msg: 'Customer has raised a formal quote request. Submit your commercial proposal — rent per sft, security deposit and lease tenure — via the Activity Log.', action: 'Submit Commercial Quote', tab: 'activity', highlight: true };
+      if (!hasSiteVisit)
+        return { msg: 'Quote submitted. Co-ordinate a site visit with the customer. They will log the request in the Activity Log.', action: null, tab: null, highlight: false };
+      if (!siteVisitDone)
+        return { msg: 'Site visit is scheduled. Update the visit status in the Activity Log once completed.', action: 'Update Site Visit', tab: 'activity', highlight: true };
+      if (!hasNegotiation)
+        return { msg: 'Site visit completed. Open the Negotiation Board to align on final commercial terms.', action: 'Open Negotiation Board', tab: 'negotiation-board', highlight: true };
+      if (!hasFitOut)
+        return { msg: "Negotiation in progress. Stay tuned for the customer's fit-out and tenant improvement requirements.", action: null, tab: null, highlight: false };
+      return { msg: 'All stages complete. Review fit-out requirements and confirm with ORS-ONE for MoU.', action: null, tab: null, highlight: false };
     }
     if (isCustomer) {
-      if (!hasQuote)       return { msg: 'You are connected. Request a formal commercial quote from the developer to get accurate rent and lease terms.', action: 'Request Formal Quote', tab: 'activity', highlight: true };
-      if (!hasProposal)    return { msg: 'Quote requested. The developer will respond with current commercial terms. You will be notified.', action: null, tab: null, highlight: false };
-      if (!hasSiteVisit)   return { msg: 'Commercial terms received. Log a site visit request to inspect the property in person.', action: 'Request Site Visit', tab: 'activity', highlight: true };
-      if (!hasNegotiation) return { msg: 'Site visit done. Open the Negotiation Board to discuss and align on final terms.', action: 'Start Negotiation', tab: 'negotiation-board', highlight: true };
-      if (!hasFitOut)      return { msg: 'Negotiation in progress. Define your fit-out and warehouse customisation requirements.', action: 'Define Fit-Out Requirements', tab: 'improvements', highlight: true };
+      if (!hasQuote)
+        return { msg: 'You are connected with the developer. Log a formal quote request to get accurate rent, deposit and lease terms.', action: 'Request Formal Quote', tab: 'activity', highlight: true };
+      if (!hasProposal)
+        return { msg: 'Quote requested. The developer will respond with current commercial terms. You will be notified.', action: null, tab: null, highlight: false };
+      if (!hasSiteVisit)
+        return { msg: 'Commercial terms received. Schedule a site visit to inspect the property before negotiating.', action: 'Schedule Site Visit', tab: 'activity', highlight: true };
+      if (!siteVisitDone)
+        return { msg: 'Site visit is scheduled. After the visit, log an update with your observations and feedback.', action: 'Log Site Visit Feedback', tab: 'activity', highlight: false };
+      if (!hasNegotiation)
+        return { msg: 'Site visit completed. Open the Negotiation Board to discuss and finalise commercial terms with the developer.', action: 'Start Negotiation', tab: 'negotiation-board', highlight: true };
+      if (!hasFitOut)
+        return { msg: 'Negotiation in progress. Define your warehouse fit-out and tenant improvement requirements.', action: 'Define Fit-Out Requirements', tab: 'improvements', highlight: true };
       return { msg: 'All stages complete. ORS-ONE will reach out to finalise the MoU.', action: null, tab: null, highlight: false };
+    }
+    if (isAgent) {
+      if (!hasQuote)
+        return { msg: 'Help your customer raise a formal quote request from the developer via the Activity Log.', action: 'Log Quote Request', tab: 'activity', highlight: true };
+      if (!hasSiteVisit)
+        return { msg: 'Quote has been requested. Schedule a site visit for your customer.', action: 'Schedule Site Visit', tab: 'activity', highlight: true };
+      if (!siteVisitDone)
+        return { msg: 'Site visit is scheduled. Log visit feedback once completed.', action: 'Update Site Visit', tab: 'activity', highlight: false };
+      if (!hasNegotiation)
+        return { msg: 'Site visit completed. Use the Negotiation Board to align terms between customer and developer.', action: 'Open Negotiation Board', tab: 'negotiation-board', highlight: true };
+      return { msg: 'Deal progressing. Support your customer through fit-out requirements and MoU.', action: null, tab: null, highlight: false };
     }
     return null;
   })();
@@ -507,7 +536,7 @@ export default function LeadDetailPage() {
                 <div className="flex items-center gap-0">
                   {journeyStages.map((stage, i) => (
                     <React.Fragment key={stage.key}>
-                      <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                      <div className="flex flex-col items-center gap-1 flex-shrink-0" style={{minWidth:'52px'}}>
                         <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all"
                           style={stage.done
                             ? {background:'#6141ac', color:'#ffffff'}
@@ -518,13 +547,16 @@ export default function LeadDetailPage() {
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
                           ) : (i + 1)}
                         </div>
-                        <span className="text-xs font-semibold whitespace-nowrap"
+                        <span className="text-xs font-bold whitespace-nowrap text-center"
                           style={{color: stage.done ? '#6141ac' : i === currentStageIdx + 1 ? '#6141ac' : 'hsl(259 15% 60%)'}}>
                           {stage.label}
                         </span>
+                        <span className="text-xs whitespace-nowrap text-center" style={{color:'hsl(259 15% 65%)', fontSize:'10px'}}>
+                          {(stage as any).sub}
+                        </span>
                       </div>
                       {i < journeyStages.length - 1 && (
-                        <div className="flex-1 h-0.5 mb-5 mx-1 transition-all"
+                        <div className="flex-1 h-0.5 mb-7 mx-1 transition-all"
                           style={{background: stage.done ? '#6141ac' : 'hsl(259 30% 88%)'}} />
                       )}
                     </React.Fragment>
@@ -555,8 +587,24 @@ export default function LeadDetailPage() {
                   {journeyNextAction.action && journeyNextAction.tab && (
                     <button
                       onClick={() => {
-                        const tab = document.querySelector(`[data-value="${journeyNextAction.tab}"]`) as HTMLElement;
-                        if (tab) tab.click();
+                        // Switch to correct tab
+                        const tabBtn = document.querySelector(`[data-value="${journeyNextAction.tab}"]`) as HTMLElement;
+                        if (tabBtn) tabBtn.click();
+                        // If going to activity log, pre-select the right activity type after a tick
+                        if (journeyNextAction.tab === 'activity') {
+                          setTimeout(() => {
+                            const sel = document.querySelector('select[name="activityType"], [data-activity-type-select]') as HTMLSelectElement;
+                            if (sel) {
+                              if (journeyNextAction.action?.toLowerCase().includes('quote')) sel.value = 'Quote Requested';
+                              else if (journeyNextAction.action?.toLowerCase().includes('site visit') || journeyNextAction.action?.toLowerCase().includes('schedule')) sel.value = 'Site Visit Request';
+                              else if (journeyNextAction.action?.toLowerCase().includes('update') || journeyNextAction.action?.toLowerCase().includes('feedback')) sel.value = 'Site Visit Update';
+                              sel.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                            // Scroll to form
+                            const form = document.querySelector('[data-add-activity-form]') as HTMLElement;
+                            if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }, 150);
+                        }
                       }}
                       className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:opacity-90 whitespace-nowrap"
                       style={{background:'#6141ac', color:'#ffffff'}}>
@@ -606,7 +654,7 @@ export default function LeadDetailPage() {
               <div id="tab-activity" data-workspace-tab style={{display: defaultTab === 'activity' ? 'block' : 'none', padding:'20px'}}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                   <div className="md:col-span-2 space-y-4">
-                    {canAddActivity && <AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} />}
+                    {canAddActivity && <div data-add-activity-form><AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} /></div>}
                     <div className="rounded-2xl p-5" style={{background:'#fff', border:'1px solid hsl(259 30% 91%)'}}>
                       <p className="text-sm font-bold mb-4" style={{color:'#1e1537'}}>Activity Log</p>
                       {activities.length > 0 ? (
