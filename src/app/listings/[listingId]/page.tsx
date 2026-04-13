@@ -211,6 +211,7 @@ export default function ListingDetailPage() {
     const [navigationList, setNavigationList] = React.useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = React.useState(-1);
     const [justRequestedQuote, setJustRequestedQuote] = React.useState(false);
+    const [showRfqNudge, setShowRfqNudge] = React.useState(false);
 
     const isLoading = isAuthLoading || isDataLoading;
 
@@ -429,8 +430,6 @@ export default function ListingDetailPage() {
     const isShortlisted = !!user && generalShortlist.includes(listing.id);
     
     const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
-
-    const [showRfqNudge, setShowRfqNudge] = React.useState(false);
 
     const handleRequestQuote = () => {
         if (!user || !listing) return;
