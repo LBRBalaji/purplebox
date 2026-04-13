@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { HelpCircle, LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck, PlusCircle, Zap, Handshake, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -116,6 +117,18 @@ const ManageDropdown = ({ isSuperAdmin }) => {
   );
 };
 
+// Tooltip wrapper for nav items with explanatory notes
+const NavTooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <TooltipProvider delayDuration={400}>
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side="bottom" className="max-w-xs text-xs leading-relaxed">
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+);
+
 const MoreDropdown = () => {
   const pathname = usePathname();
   const { user } = useAuth();
@@ -137,7 +150,22 @@ const MoreDropdown = () => {
         {user && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild><Link href="/register-deal" className="font-semibold" style={{color:'#6141ac'}}><FileText className="mr-2 h-4 w-4" /> Register a Deal</Link></DropdownMenuItem>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuItem asChild>
+                    <Link href="/register-deal" className="font-semibold" style={{color:'#6141ac'}}>
+                      <FileText className="mr-2 h-4 w-4" /> Register a Deal
+                    </Link>
+                  </DropdownMenuItem>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs text-xs leading-relaxed">
+                  <p className="font-semibold mb-1">Off-Platform Deal Registration</p>
+                  <p>Already in talks with a developer or customer outside ORS-ONE? Bring that deal into the platform to use the Commercial Term Sheet, Fit-Out tools and MoU drafting — with full version history and audit trail.</p>
+                  <p className="mt-1" style={{color:'rgba(255,255,255,0.6)'}}>Different from platform deals: skips Chat/Quote/Site Visit stages and starts directly at the Term Sheet.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </>
         )}
       </DropdownMenuContent>
@@ -247,13 +275,13 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
         <div className="p-3 border-t border-slate-100">
           {user ? (
             <SheetClose asChild>
-              <Button variant="outline" className="w-full rounded-xl" onClick={logout}>
+              <Button variant="outline" className="w-full rounded-none" onClick={logout}>
                 <LogOut className="mr-2 h-4 w-4" /> Logout
               </Button>
             </SheetClose>
           ) : (
             <SheetClose asChild>
-              <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white" onClick={onLoginClick}>
+              <Button className="w-full rounded-none bg-primary hover:bg-primary/90 text-white" onClick={onLoginClick}>
                 <LogIn className="mr-2 h-4 w-4" /> Login / Sign Up
               </Button>
             </SheetClose>
@@ -303,21 +331,33 @@ export function Header() {
             ) : (
               <>
                 {user && !isSuperAdmin && (
-                  <NavLink href="/dashboard"><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
+                  <NavTooltip label="Your personal workspace — manage listings, track leads, view analytics, and handle all transaction activity.">
+                    <NavLink href="/dashboard"><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
+                  </NavTooltip>
                 )}
-                <ListingsDropdown isSuperAdmin={isSuperAdmin} />
+                <NavTooltip label="Browse all approved warehouse listings on ORS-ONE. Search by location, size, building type and availability. Download specs as Excel.">
+                  <span><ListingsDropdown isSuperAdmin={isSuperAdmin} /></span>
+                </NavTooltip>
               {isProvider && (
-                <Link href="/dashboard?tab=my-listings&createNew=true" className="flex items-center gap-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-lg whitespace-nowrap">
-                  <PlusCircle className="h-3.5 w-3.5" /> New Listing
-                </Link>
+                <NavTooltip label="Create a new warehouse listing on ORS-ONE. Your listing goes to SuperAdmin for approval before going live on the marketplace.">
+                  <Link href="/dashboard?tab=my-listings&createNew=true" className="flex items-center gap-1.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-4 py-2 rounded-none whitespace-nowrap">
+                    <PlusCircle className="h-3.5 w-3.5" /> New Listing
+                  </Link>
+                </NavTooltip>
               )}
               {isCustomer && (
-                <Link href="/dashboard?tab=my-sublease&createNew=true" className="flex items-center gap-1.5 text-sm font-medium text-white transition-colors px-3 py-1.5 rounded-lg whitespace-nowrap" style={{background:'#6141ac'}}>
-                  <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
-                </Link>
+                <NavTooltip label="Have unused warehouse space? List it as a sublease on ORS-ONE. Other businesses can find and lease your excess space directly through the platform.">
+                  <Link href="/dashboard?tab=my-sublease&createNew=true" className="flex items-center gap-1.5 text-sm font-semibold text-white transition-colors px-4 py-2 rounded-none whitespace-nowrap" style={{background:'#6141ac'}}>
+                    <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
+                  </Link>
+                </NavTooltip>
               )}
-                <ToolsDropdown />
-                <MoreDropdown />
+                <NavTooltip label="Free calculators for warehouse leasing decisions — ROI analysis, commercial terms, and registration cost estimation. No login required.">
+                  <span><ToolsDropdown /></span>
+                </NavTooltip>
+                <NavTooltip label="Resources, guides, about ORS-ONE, community, and partnership information.">
+                  <span><MoreDropdown /></span>
+                </NavTooltip>
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
                 {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
               </>
@@ -327,9 +367,11 @@ export function Header() {
           <div className="flex items-center gap-2 ml-auto flex-shrink-0">
             {(!user || (!isSuperAdmin && !isO2O)) && (
               <Link href="https://wa.me/919841098170?text=need%20O2O%20support%20call%20me%20back%20please" target="_blank" rel="noopener noreferrer" className="hidden lg:block">
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
-                  <WhatsAppIcon /> Ask a Call Back
-                </Button>
+                <NavTooltip label="Speak directly with the ORS-ONE team. We will call you back to help with listings, demands, or transaction support.">
+                  <Button variant="outline" className="h-10 px-4 text-xs gap-1.5 rounded-none font-semibold">
+                    <WhatsAppIcon /> Ask a Call Back
+                  </Button>
+                </NavTooltip>
               </Link>
             )}
             {isLoading ? (
@@ -339,7 +381,7 @@ export function Header() {
                 <NotificationsBell />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8 gap-1.5 max-w-[180px]">
+                    <Button variant="outline" className="h-10 px-3 gap-1.5 max-w-[180px] rounded-none text-xs font-semibold">
                       <div className="flex flex-col items-start overflow-hidden">
                         <span className="text-xs font-semibold truncate leading-none max-w-[120px]">{user.userName}</span>
                         <span className="text-xs text-muted-foreground leading-none mt-0.5">{isInternalStaff ? user.userName + ' · ORS-ONE' : roleLabel}</span>
@@ -364,9 +406,11 @@ export function Header() {
                 </DropdownMenu>
               </div>
             ) : (
-              <Button size="sm" className="h-8" onClick={() => setIsLoginOpen(true)}>
-                <LogIn className="mr-2 h-4 w-4" /> Login / Sign Up
-              </Button>
+              <NavTooltip label="Sign in to access your dashboard, manage listings, track transactions and more. New? Create your account here.">
+                <Button className="h-10 px-5 text-sm font-semibold rounded-none" onClick={() => setIsLoginOpen(true)}>
+                  <LogIn className="mr-2 h-4 w-4" /> Login / Sign Up
+                </Button>
+              </NavTooltip>
             )}
           </div>
 
