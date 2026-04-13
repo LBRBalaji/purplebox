@@ -187,7 +187,12 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
       <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
         <div className="bg-primary p-5">
           <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-lg font-bold text-white">ORS-ONE</span>
+            <img
+                src="/logo_ors.png"
+                alt="ORS-ONE"
+                style={{height:'36px',width:'auto',objectFit:'contain',objectPosition:'top',filter:'brightness(0) invert(1) opacity(0.9)'}}
+              />
+              <span className="text-lg font-bold text-white">ORS-ONE</span>
             <span className="text-xs border border-amber-400 text-amber-400 bg-amber-400/10 px-1 rounded">Beta</span>
           </div>
           <p className="text-xs text-white/50">Building Transaction Ready Assets</p>
@@ -278,12 +283,25 @@ export function Header() {
 
           <MobileMenu user={user} logout={logout} onLoginClick={() => setIsLoginOpen(true)} isSuperAdmin={isSuperAdmin} />
 
-          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0">
-            <div className="flex items-center gap-1.5">
-              <span className="text-lg font-bold text-primary">ORS-ONE</span>
-              <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-50 py-0 px-1">Beta</Badge>
+          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0 flex items-center gap-2.5">
+            <img
+              src="/logo_ors.png"
+              alt="ORS-ONE"
+              style={{
+                height: '40px',
+                width: 'auto',
+                objectFit: 'contain',
+                objectPosition: 'top',
+                filter: 'hue-rotate(220deg) saturate(1.5) brightness(0.88)',
+              }}
+            />
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-base font-bold text-primary" style={{letterSpacing:'-0.3px'}}>ORS-ONE</span>
+                <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-50 py-0 px-1">Beta</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground leading-none mt-0.5">Building Transaction Ready Assets</p>
             </div>
-            <p className="text-xs text-muted-foreground leading-none">Building Transaction Ready Assets</p>
           </Link>
 
           <nav className="hidden md:flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
