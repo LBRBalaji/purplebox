@@ -113,6 +113,26 @@ export type RegisteredLeadProvider = {
   properties: RegisteredLeadProperty[];
 }
 
+export type OffPlatformProperty = {
+  address: string;
+  area: number;
+  buildingType: string;
+  indicativeRent?: number;
+  securityDeposit?: number;
+  leasePeriod?: string;
+  notes?: string;
+};
+
+export type DealInvitee = {
+  name: string;
+  email: string;
+  role: 'Customer' | 'Developer' | 'Agent';
+  token: string;
+  invitedAt: string;
+  lastAccessedAt?: string;
+  registered?: boolean;
+};
+
 export type RegisteredLead = {
   id: string;
   customerId: string;
@@ -132,6 +152,11 @@ export type RegisteredLead = {
   agentInviteEmail?: string;
   agentInviteExpiry?: number;
   messageGated?: boolean;
+  // Off-platform deal fields
+  isOffPlatform?: boolean;
+  offPlatformProperty?: OffPlatformProperty;
+  invitees?: DealInvitee[];
+  dealRegisteredAt?: string;
 }
 
 export type TransactionActivity = {

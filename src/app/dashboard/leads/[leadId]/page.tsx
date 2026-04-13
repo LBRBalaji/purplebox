@@ -357,8 +357,14 @@ export default function LeadDetailPage() {
   const hasSiteVisit = leadActivities.some((a: any) => a.activityType === 'Site Visit Request');
   // Site visit confirmed when status is Visited
   const siteVisitDone = leadActivities.some((a: any) => a.activityType === 'Site Visit Update' && a.details?.status === 'Visited');
+  const isOffPlatform = !!(lead as any)?.isOffPlatform;
 
-  const journeyStages = [
+  const journeyStages = isOffPlatform ? [
+    { key: 'registered',  label: 'Deal Registered', done: true,           sub: 'Off-Platform' },
+    { key: 'termsheet',   label: 'Term Sheet',       done: hasNegotiation, sub: 'Commercial Terms' },
+    { key: 'fitout',      label: 'Fit-Out',          done: hasFitOut,      sub: 'Requirements' },
+    { key: 'mou',         label: 'MoU',              done: hasMoU,         sub: 'Finalised' },
+  ] : [
     { key: 'chat',        label: 'Chat',        done: true,           sub: 'Connected' },
     { key: 'rfq',         label: 'Get Quote',   done: hasQuote,       sub: 'Formal RFQ' },
     { key: 'sitevisit',   label: 'Site Visit',  done: siteVisitDone,  sub: 'Inspected' },
@@ -369,6 +375,14 @@ export default function LeadDetailPage() {
   const currentStageIdx = journeyStages.reduce((acc, s, i) => s.done ? i : acc, 0);
 
   const journeyNextAction = (() => {
+    // Off-platform deals start directly at term sheet
+    if (isOffPlatform) {
+      if (!hasNegotiation)
+        return { msg: 'Deal registered. Open the Negotiation Board to build the Commercial Term Sheet with all parties.', action: 'Build Term Sheet', tab: 'negotiation-board', highlight: true };
+      if (!hasFitOut)
+        return { msg: 'Term sheet in progress. Define fit-out and tenant improvement requirements next.', action: 'Define Fit-Out', tab: 'improvements', highlight: true };
+      return { msg: 'All stages complete. Review and finalise the MoU with your legal counsel.', action: null, tab: null, highlight: false };
+    }
     if (isProvider) {
       if (!hasQuote)
         return { msg: 'Customer has been connected. Waiting for them to raise a formal quote request.', action: null, tab: null, highlight: false };
@@ -452,6 +466,14 @@ export default function LeadDetailPage() {
             {customer && providerUser && (
               <div className="rounded-2xl p-5 flex items-center gap-4 flex-wrap mt-2"
                 style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
+                {isOffPlatform && (
+                  <div className="w-full mb-1 flex items-center gap-2">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'rgba(29,158,117,0.2)',color:'#1d9e75',border:'1px solid rgba(29,158,117,0.3)'}}>
+                      Off-Platform Deal
+                    </span>
+                    <span className="text-xs font-mono" style={{color:'rgba(255,255,255,0.3)'}}>{lead.id}</span>
+                  </div>
+                )}
                 {/* Tenant */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-xs font-black"
@@ -618,9 +640,9 @@ export default function LeadDetailPage() {
             <div className="rounded-2xl overflow-hidden" style={{border:'1px solid hsl(259 30% 88%)'}}>
               <div className="flex" style={{background:'hsl(259 30% 96%)'}}>
                 {[
-                  { value: 'activity', label: 'Activity Log', Icon: ClipboardList },
-                  { value: 'negotiation-board', label: 'Negotiation Board', Icon: FileSignature },
-                  { value: 'improvements', label: 'Tenant Improvements', Icon: HardHat },
+                  ...(!isOffPlatform ? [{ value: 'activity', label: 'Activity Log', Icon: ClipboardList }] : []),
+                  { value: 'negotiation-board', label: 'Term Sheet', Icon: FileSignature },
+                  { value: 'improvements', label: 'Fit-Out', Icon: HardHat },
                 ].map(({value, label, Icon}) => (
                   <button key={value}
                     data-value={value}

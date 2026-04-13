@@ -133,6 +133,12 @@ const MoreDropdown = () => {
         <DropdownMenuItem asChild><Link href="/community"><Users className="mr-2 h-4 w-4" /> Community</Link></DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild><Link href="/partnership-and-access"><Handshake className="mr-2 h-4 w-4" /> Partnership &amp; Access</Link></DropdownMenuItem>
+        {user && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild><Link href="/register-deal" className="font-semibold" style={{color:'#6141ac'}}><FileText className="mr-2 h-4 w-4" /> Register a Deal</Link></DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -224,6 +230,7 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
           <NavItem href="/about-us" icon={Info} label="About Us" />
           <NavItem href="/community" icon={Users} label="Community" />
           <NavItem href="/partnership-and-access" icon={Handshake} label="Partnership & Access" />
+          {user && <NavItem href="/register-deal" icon={FileText} label="Register a Deal" />}
           {(isSuperAdmin || isO2O) && (
             <>
               <div className="pt-2 pb-1 px-4">

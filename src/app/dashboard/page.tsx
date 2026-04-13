@@ -100,10 +100,10 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
           <h2 className="text-xl font-bold text-white">{greeting}, {firstName} 👋</h2>
           <p className="text-sm mt-1" style={{color:'rgba(255,255,255,.5)'}}>{userProp?.companyName} · Property Provider</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {stats.newLeads > 0 && (
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{background:'rgba(245,158,11,.18)',color:'#f59e0b',border:'1px solid rgba(245,158,11,.3)'}}>
-              {stats.newLeads} lead{stats.newLeads > 1 ? 's' : ''} waiting
+        <div className="flex gap-2 flex-wrap items-center">
+          {stats.urgentCount > 0 && (
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{background:'rgba(239,68,68,.2)',color:'#f87171',border:'1px solid rgba(239,68,68,.3)'}}>
+              {stats.urgentCount} quote{stats.urgentCount > 1 ? 's' : ''} awaiting
             </span>
           )}
           {stats.pending > 0 && (
@@ -111,6 +111,9 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
               {stats.pending} pending approval
             </span>
           )}
+          <Link href="/register-deal" className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',border:'1px solid rgba(255,255,255,.2)'}}>
+            <FileText className="h-3 w-3" /> Register a Deal
+          </Link>
         </div>
       </div>
 
@@ -408,7 +411,7 @@ const MainDashboard = () => {
               <h2 className="text-xl font-bold text-white">{greeting}, {firstName} 👋</h2>
               <p className="text-sm mt-1" style={{color:'rgba(255,255,255,.5)'}}>{user?.companyName} · Customer · {(user as any)?.industryType || 'Warehouse Tenant'}</p>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap items-center">
               {hasProposalReady && (
                 <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{background:'rgba(245,158,11,.18)',color:'#f59e0b',border:'1px solid rgba(245,158,11,.3)'}}>
                   Proposal ready to review
@@ -419,6 +422,9 @@ const MainDashboard = () => {
                   {myLeads.length} active deal{myLeads.length > 1 ? 's' : ''}
                 </span>
               )}
+              <Link href="/register-deal" className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',border:'1px solid rgba(255,255,255,.2)'}}>
+                <FileText className="h-3 w-3" /> Register a Deal
+              </Link>
             </div>
           </div>
 
@@ -613,7 +619,21 @@ const MainDashboard = () => {
     );
 
     const renderAgentContent = () => (
-        <Tabs value={agentTab} onValueChange={setAgentTab} className="w-full">
+        <div className="space-y-4">
+          {/* Agent welcome strip */}
+          <div className="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
+            style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
+            <div>
+              <h2 className="text-xl font-bold text-white">{greeting}, {firstName} 👋</h2>
+              <p className="text-sm mt-1" style={{color:'rgba(255,255,255,.5)'}}>{user?.companyName} · Transaction Agent</p>
+            </div>
+            <div className="flex gap-2 flex-wrap items-center">
+              <Link href="/register-deal" className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',border:'1px solid rgba(255,255,255,.2)'}}>
+                <FileText className="h-3 w-3" /> Register a Deal
+              </Link>
+            </div>
+          </div>
+          <Tabs value={agentTab} onValueChange={setAgentTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
                 <TabsTrigger value="my-shortlist">My Shortlist</TabsTrigger>
@@ -624,7 +644,8 @@ const MainDashboard = () => {
             <TabsContent value="my-shortlist">
                 <GeneralShortlist />
             </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
     );
 
     const renderMainAdminContent = () => {
