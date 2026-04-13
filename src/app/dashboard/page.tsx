@@ -95,7 +95,7 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
   return (
     <div className="space-y-4 mb-6">
       {/* Welcome strip */}
-      <div className="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
+      <div className="rounded-none p-6 flex items-center justify-between flex-wrap gap-4"
         style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
         <div>
           <h2 className="text-xl font-bold text-white">{greeting}, {firstName} 👋</h2>
@@ -406,7 +406,7 @@ const MainDashboard = () => {
       return (
         <div className="space-y-4 mb-6">
           {/* Welcome strip */}
-          <div className="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
+          <div className="rounded-none p-6 flex items-center justify-between flex-wrap gap-4"
             style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
             <div>
               <h2 className="text-xl font-bold text-white">{greeting}, {firstName} 👋</h2>
@@ -423,8 +423,8 @@ const MainDashboard = () => {
                   {myLeads.length} active deal{myLeads.length > 1 ? 's' : ''}
                 </span>
               )}
-              <Link href="/register-deal" className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',border:'1px solid rgba(255,255,255,.2)'}}>
-                <FileText className="h-3 w-3" /> Register a Deal
+              <Link href="/register-deal" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-none transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff'}}>
+                <FileText className="h-4 w-4" /> Register a Deal
               </Link>
             </div>
           </div>
@@ -626,15 +626,15 @@ const MainDashboard = () => {
       return (
         <div className="space-y-4">
           {/* Agent welcome strip */}
-          <div className="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
+          <div className="rounded-none p-6 flex items-center justify-between flex-wrap gap-4"
             style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
             <div>
               <h2 className="text-xl font-bold text-white">{greeting}, {firstName} 👋</h2>
               <p className="text-sm mt-1" style={{color:'rgba(255,255,255,.5)'}}>{user?.companyName} · Transaction Agent</p>
             </div>
             <div className="flex gap-2 flex-wrap items-center">
-              <Link href="/register-deal" className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',border:'1px solid rgba(255,255,255,.2)'}}>
-                <FileText className="h-3 w-3" /> Register a Deal
+              <Link href="/register-deal" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-none transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff'}}>
+                <FileText className="h-4 w-4" /> Register a Deal
               </Link>
             </div>
           </div>
@@ -687,7 +687,7 @@ const MainDashboard = () => {
       return (
         <div className="space-y-4 mb-6">
           {/* Welcome strip */}
-          <div className="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
+          <div className="rounded-none p-6 flex items-center justify-between flex-wrap gap-4"
             style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
             <div>
               <h2 className="text-xl font-bold text-white">ORS-ONE Admin Console</h2>

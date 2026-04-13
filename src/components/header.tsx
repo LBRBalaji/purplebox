@@ -119,10 +119,12 @@ const ManageDropdown = ({ isSuperAdmin }) => {
 
 // Tooltip wrapper for nav items with explanatory notes
 const NavTooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <TooltipProvider delayDuration={400}>
+  <TooltipProvider delayDuration={300}>
     <Tooltip>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-xs text-xs leading-relaxed">
+      <TooltipTrigger style={{background:'none',border:'none',padding:0,display:'inline-flex',alignItems:'center'}} type="button" tabIndex={-1}>
+        {children}
+      </TooltipTrigger>
+      <TooltipContent side="bottom" className="text-xs leading-relaxed z-50" style={{maxWidth:'260px',lineHeight:'1.5'}}>
         {label}
       </TooltipContent>
     </Tooltip>
@@ -336,7 +338,7 @@ export function Header() {
                   </NavTooltip>
                 )}
                 <NavTooltip label="Browse all approved warehouse listings on ORS-ONE. Search by location, size, building type and availability. Download specs as Excel.">
-                  <span><ListingsDropdown isSuperAdmin={isSuperAdmin} /></span>
+                  <ListingsDropdown isSuperAdmin={isSuperAdmin} />
                 </NavTooltip>
               {isProvider && (
                 <NavTooltip label="Create a new warehouse listing on ORS-ONE. Your listing goes to SuperAdmin for approval before going live on the marketplace.">
@@ -353,10 +355,10 @@ export function Header() {
                 </NavTooltip>
               )}
                 <NavTooltip label="Free calculators for warehouse leasing decisions — ROI analysis, commercial terms, and registration cost estimation. No login required.">
-                  <span><ToolsDropdown /></span>
+                  <ToolsDropdown />
                 </NavTooltip>
                 <NavTooltip label="Resources, guides, about ORS-ONE, community, and partnership information.">
-                  <span><MoreDropdown /></span>
+                  <MoreDropdown />
                 </NavTooltip>
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
                 {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
