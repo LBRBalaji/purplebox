@@ -406,6 +406,7 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
       ...userDetails,
       demandId: "",
       operationType: "Warehousing",
+      isOrsoneTP: false,
       description: "",
       preferences: { nonCompromisable: [] },
     });
@@ -863,6 +864,41 @@ export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
               </Card>
             </div>
           </div>
+          {/* ORS-ONE Transaction Partner */}
+          <div className="rounded-2xl p-5 mt-6" style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
+            <FormField
+              control={form.control}
+              name="isOrsoneTP"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <FormLabel className="text-white font-bold text-sm cursor-pointer">
+                          Add ORS-ONE as Official Transaction Partner
+                        </FormLabel>
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'rgba(29,158,117,0.25)',color:'#4ade80',border:'1px solid rgba(29,158,117,0.4)'}}>
+                          Zero Cost to You
+                        </span>
+                      </div>
+                      <p className="text-xs" style={{color:'rgba(255,255,255,0.55)',lineHeight:1.6}}>
+                        ORS-ONE will facilitate this transaction on your behalf — property matching, negotiations, term sheet, and documentation. 
+                        <strong style={{color:'rgba(255,255,255,0.8)'}}> Brokerage is payable by the developer upon successful deal closure. You pay nothing.</strong>
+                      </p>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="flex-shrink-0 mt-1"
+                      />
+                    </FormControl>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+
           <div className="flex justify-end mt-8">
             <Button type="submit" size="lg" disabled={isLoading || isGenerating}>
               {isLoading ? (

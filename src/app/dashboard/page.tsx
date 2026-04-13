@@ -12,7 +12,8 @@ import { ApprovalQueue } from '@/components/approval-queue';
 import { useData } from '@/contexts/data-context';
 import { ProviderListings } from '@/components/provider-listings';
 import { ProspectsTab } from '@/components/prospects-tab';
-import { Building2, Eye, Download, TrendingUp, Users, ShieldCheck, CheckCircle2, AlertCircle, Scaling, MessageSquare, FileSignature, LayoutDashboard, ListChecks, UserPlus, ChevronRight, Zap } from 'lucide-react';
+import { Building2, Eye, Download, TrendingUp, Users, ShieldCheck, CheckCircle2, AlertCircle, Scaling, MessageSquare, FileSignature, LayoutDashboard, ListChecks, UserPlus, ChevronRight, Zap, FileText } from 'lucide-react';
+import Link from 'next/link';
 import { ProviderLeads } from '@/components/provider-leads';
 import { CustomerTransactions } from '@/components/customer-transactions';
 import { AdminListings } from '@/components/admin-listings';
@@ -87,7 +88,7 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
     { value: 'my-listings', label: 'My Listings', icon: Building2 },
     { value: 'prospects', label: 'Prospects', icon: Eye },
     { value: 'registered-leads', label: 'Leads & Proposals', icon: FileSignature },
-    { value: 'submit-match', label: 'Submit a Match', icon: ListChecks },
+    { value: 'submit-match', label: 'Demand Board', icon: ListChecks },
     ...(userProp?.isCompanyAdmin ? [{ value: 'my-team', label: 'My Team', icon: Users }] : []),
   ];
 
@@ -329,7 +330,7 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
           {providerTab === 'my-listings' && <ProviderListings />}
           {providerTab === 'prospects' && <ProspectsTab />}
           {providerTab === 'registered-leads' && <ProviderLeads />}
-          {providerTab === 'submit-match' && <DemandForm onDemandLogged={() => {}} />}
+          {providerTab === 'submit-match' && <DemandList />}
           {providerTab === 'my-team' && userProp?.isCompanyAdmin && <DeveloperTeamDashboard />}
         </div>
       </div>
@@ -618,7 +619,11 @@ const MainDashboard = () => {
       </Tabs>
     );
 
-    const renderAgentContent = () => (
+    const renderAgentContent = () => {
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      const firstName = user?.userName?.split(' ')[0] || 'there';
+      return (
         <div className="space-y-4">
           {/* Agent welcome strip */}
           <div className="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
@@ -646,7 +651,8 @@ const MainDashboard = () => {
             </TabsContent>
           </Tabs>
         </div>
-    );
+      );
+    };
 
     const renderMainAdminContent = () => {
       const allUsers = Object.values(users || {}) as any[];

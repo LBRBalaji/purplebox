@@ -127,7 +127,7 @@ export function ProspectsTab() {
         }),
       });
       setConnections(prev => ({ ...prev, [key]: 'requested' }));
-      toast({ title: 'Request Sent!', description: 'This payment is for connecting with this specific prospect only. ORS-ONE team will confirm receipt and unlock the connection.' });
+      toast({ title: 'Contact Initiated', description: 'ORS-ONE team has been notified and will connect you with this prospect shortly.' });
     } catch {
       toast({ variant: 'destructive', title: 'Error', description: 'Please try again.' });
     } finally {
@@ -200,10 +200,11 @@ export function ProspectsTab() {
             <Clock className="h-3.5 w-3.5" /> Awaiting Confirmation
           </div>
         ) : (
-          <Button size="sm" className="rounded-lg text-xs font-bold flex-shrink-0 bg-primary hover:bg-primary/90"
+          <Button size="sm" className="rounded-lg text-xs font-bold flex-shrink-0"
+            style={{background:'#6141ac',color:'#fff'}}
             onClick={() => handleRequestConnect(prospect)}
             disabled={isLoading}>
-            {isLoading ? 'Requesting...' : 'Pay ₹5,000 — Connect with Prospect'}
+            {isLoading ? 'Requesting...' : 'Initiate Contact'}
           </Button>
         )}
       </div>

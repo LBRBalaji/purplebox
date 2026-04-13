@@ -227,6 +227,7 @@ export const demandSchema = z.object({
       etpDetails: z.string().optional(),
       effluentCharacteristics: z.string().optional(),
   }).optional(),
+  isOrsoneTP: z.boolean().default(false),
 }).refine(data => {
     if (data.preferences?.nonCompromisable?.includes('ceilingHeight')) {
         return data.ceilingHeight !== undefined && data.ceilingHeight > 0;
