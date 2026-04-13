@@ -187,13 +187,8 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
       <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
         <div className="bg-primary p-5">
           <div className="flex items-center gap-1.5 mb-1">
-            <img
-                src="/logo_ors.png"
-                alt="ORS-ONE"
-                style={{height:'36px',width:'auto',objectFit:'contain',objectPosition:'top',filter:'brightness(0) invert(1) opacity(0.9)'}}
-              />
-              <span className="text-lg font-bold text-white">ORS-ONE</span>
-            <span className="text-xs border border-amber-400 text-amber-400 bg-amber-400/10 px-1 rounded">Beta</span>
+            <span className="text-lg font-bold text-white">ORS-ONE</span>
+            <span className="text-xs font-bold px-1.5 rounded" style={{background:'hsl(259 44% 30%)',color:'#c5b8e8',fontSize:'9px'}}>Beta</span>
           </div>
           <p className="text-xs text-white/50">Building Transaction Ready Assets</p>
           {user && (
@@ -283,24 +278,27 @@ export function Header() {
 
           <MobileMenu user={user} logout={logout} onLoginClick={() => setIsLoginOpen(true)} isSuperAdmin={isSuperAdmin} />
 
-          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0 flex items-center gap-2.5">
-            <img
-              src="/logo_ors.png"
-              alt="ORS-ONE"
-              style={{
-                height: '40px',
-                width: 'auto',
-                objectFit: 'contain',
-                objectPosition: 'top',
-                filter: 'hue-rotate(220deg) saturate(1.5) brightness(0.88)',
-              }}
-            />
+          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0 flex items-center gap-1">
+            <div style={{width:'44px',height:'44px',overflow:'hidden',flexShrink:0}}>
+              <img
+                src="/logo_ors.png"
+                alt="ORS-ONE"
+                style={{
+                  width: '100%',
+                  height: '200%',
+                  objectFit: 'cover',
+                  objectPosition: 'top center',
+                  mixBlendMode: 'multiply',
+                  filter: 'hue-rotate(230deg) saturate(2) brightness(0.75)',
+                }}
+              />
+            </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-base font-bold text-primary" style={{letterSpacing:'-0.3px'}}>ORS-ONE</span>
-                <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-50 py-0 px-1">Beta</Badge>
+                <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{background:'hsl(259 44% 94%)',color:'#6141ac',fontSize:'9px'}}>Beta</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-none mt-0.5">Building Transaction Ready Assets</p>
+              <p className="text-xs leading-none mt-0.5" style={{color:'hsl(259 15% 55%)'}}>Building Transaction Ready Assets</p>
             </div>
           </Link>
 
