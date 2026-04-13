@@ -118,6 +118,7 @@ const ManageDropdown = ({ isSuperAdmin }) => {
 
 const MoreDropdown = () => {
   const pathname = usePathname();
+  const { user } = useAuth();
   const isActive = pathname.startsWith('/resources') || pathname.startsWith('/how-to-use') || pathname.startsWith('/about-us') || pathname.startsWith('/community') || pathname.startsWith('/partnership-and-access');
   return (
     <DropdownMenu>
