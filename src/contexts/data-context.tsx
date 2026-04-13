@@ -137,7 +137,7 @@ export type RegisteredLead = {
 export type TransactionActivity = {
     activityId: string;
     leadId: string; // RegisteredLead ID
-    activityType: 'Lead Registered' | 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted' | 'Lead Acknowledged';
+    activityType: 'Lead Registered' | 'Quote Requested' | 'Quote Submitted' | 'Site Visit Request' | 'Site Visit Update' | 'Customer Feedback' | 'Tenant Improvements' | 'Proposal Submitted' | 'Lead Acknowledged';
     details: {
         visitDateTime?: string;
         message?: string;

@@ -203,7 +203,7 @@ export default function ListingDetailPage() {
     const router = useRouter();
     const { user, users, isLoading: isAuthLoading } = useAuth();
     const { toast } = useToast();
-    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest, addRegisteredLead, registeredLeads } = useData();
+    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest, addRegisteredLead, registeredLeads, addTransactionActivity } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [pendingAction, setPendingAction] = React.useState<(() => void) | null>(null);
@@ -396,9 +396,12 @@ export default function ListingDetailPage() {
             XLSX.writeFile(workbook, filename, { bookType: "csv" });
 
             toast({
-                title: "Download Started",
-                description: `Details for listing ${listing.listingId} are being downloaded.`,
+                title: "Specs Downloaded",
+                description: `Technical specs for ${listing.listingId} downloaded. These are indicative — request a formal quote for accurate commercial terms.`,
             });
+            setTimeout(() => setShowRfqNudge(true), 1200);
+            // Show RFQ nudge after download
+            setTimeout(() => setShowRfqNudge(true), 1500);
         }
 
         if (limitReached) {
@@ -415,6 +418,30 @@ export default function ListingDetailPage() {
     const isShortlisted = !!user && generalShortlist.includes(listing.id);
     
     const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
+
+    const [showRfqNudge, setShowRfqNudge] = React.useState(false);
+
+    const handleRequestQuote = () => {
+        if (!user || !listing) return;
+        // Create a lead if one doesn't exist yet
+        const existingLead = registeredLeads.find(l =>
+            l.customerId === user.email &&
+            l.providers.some(p => p.properties.some(prop => prop.listingId === listing.listingId))
+        );
+        if (existingLead) {
+            addTransactionActivity({
+                leadId: existingLead.id,
+                activityType: 'Quote Requested',
+                details: { message: `Customer ${user.companyName} has formally requested a commercial quote for ${listing.listingId}.` },
+                createdBy: user.email,
+            });
+        }
+        setShowRfqNudge(false);
+        toast({
+            title: 'Quote Requested',
+            description: 'Your request for a formal commercial quote has been sent to the developer. You will be notified once they respond.',
+        });
+    };
 
     const handleLayoutRequest = () => {
         const action = () => setIsLayoutRequestOpen(true);
@@ -673,9 +700,13 @@ export default function ListingDetailPage() {
                                             <p className="text-xs text-muted-foreground px-2">Your interaction begins here. Track all communication, site visits, and negotiations for this property on the 'My Transactions' page.</p>
                                         </div>
                                      ) : (
-                                        <Button className="w-full" onClick={() => handleGetQuote()}>
-                                            <span>Get Commercials Quote</span>
+                                        <>
+                                        <Button className="w-full" onClick={() => handleGetQuote()} style={{background:'#6141ac'}}>
+                                            <svg className="mr-2" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+                                            Request Formal Quote
                                         </Button>
+                                        <p className="text-xs text-center" style={{color:'hsl(259 15% 55%)'}}>Get current rent, deposit &amp; lease terms from the developer</p>
+                                        </>
                                      )}
                                 </CardFooter>
                             </Card>
@@ -719,6 +750,48 @@ export default function ListingDetailPage() {
             </main>
             <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={handleLoginSuccess} />
             {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name || `Warehouse in ${listing.location}`} onSubmit={addLayoutRequest} />}
+
+            {/* RFQ Nudge Modal — shown after download */}
+            {showRfqNudge && !hasRequestedQuote && (
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{background:'rgba(30,21,55,0.6)'}}>
+                    <div className="w-full max-w-md rounded-2xl p-6 space-y-4" style={{background:'#fff',boxShadow:'0 8px 40px rgba(97,65,172,0.18)'}}>
+                        <div className="flex items-start gap-3">
+                            <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:'hsl(259 44% 94%)'}}>
+                                <svg width="20" height="20" fill="none" stroke="#6141ac" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+                            </div>
+                            <div>
+                                <p className="font-bold text-sm" style={{color:'#1e1537'}}>Get Accurate Commercial Terms</p>
+                                <p className="text-xs mt-1" style={{color:'hsl(259 15% 50%)',lineHeight:1.6}}>
+                                    The specs you downloaded are indicative. Request a formal quote from the developer to get <strong>current rent, deposit and lease terms</strong> directly for this property.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="rounded-xl p-3" style={{background:'hsl(259 44% 97%)',border:'1px solid hsl(259 44% 88%)'}}>
+                            <p className="text-xs font-semibold" style={{color:'#6141ac'}}>What happens next?</p>
+                            <ul className="mt-1.5 space-y-1 text-xs" style={{color:'hsl(259 15% 45%)'}}>
+                                <li>→ Developer receives your request and responds with a formal quote</li>
+                                <li>→ All communication tracked in your Transaction Workspace</li>
+                                <li>→ Schedule a site visit, negotiate terms, finalise MoU — all in one place</li>
+                            </ul>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => { handleGetQuote(); setShowRfqNudge(false); }}
+                                className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
+                                style={{background:'#6141ac'}}>
+                                Request Formal Quote
+                            </button>
+                            <button
+                                onClick={() => setShowRfqNudge(false)}
+                                className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                                style={{background:'hsl(259 30% 93%)',color:'hsl(259 15% 45%)'}}>
+                                Later
+                            </button>
+                        </div>
+                        <p className="text-xs text-center" style={{color:'hsl(259 15% 65%)'}}>No cost. Connects you directly for this property.</p>
+                    </div>
+                </div>
+            )}
         </>
     );
 

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { MessageSquare, X, ArrowLeft, Search } from 'lucide-react';
 import { ChatPanel, type ChatSubmission } from './chat-dialog';
 import { useAuth } from '@/contexts/auth-context';
+import { useToast } from '@/hooks/use-toast';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { db } from '@/lib/firebase';
@@ -155,8 +156,36 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
 
 export function GlobalChatWidget() {
   const { user } = useAuth();
-  const { activeChat, setActiveChat, registeredLeads, listings, unreadChatCount } = useData();
+  const { toast } = useToast();
+  const { activeChat, setActiveChat, registeredLeads, listings, unreadChatCount, addRegisteredLead } = useData();
   const [isOpen, setIsOpen] = React.useState(false);
+
+  const handleRfqFromChat = React.useCallback(() => {
+    if (!user || !activeChat) return;
+    const lead = registeredLeads.find(l => l.id === activeChat.demandId);
+    if (!lead) return;
+    // Check if quote already requested
+    const alreadyHasQuote = lead.providers?.some(p =>
+      p.properties?.some(prop => prop.status === 'Quote Requested')
+    );
+    if (alreadyHasQuote) {
+      toast({ title: 'Quote already requested', description: 'You have already sent a quote request for this property.' });
+      return;
+    }
+    // Mark quote requested on the lead
+    const updated = {
+      ...lead,
+      providers: lead.providers.map(p => ({
+        ...p,
+        properties: p.properties.map(prop => ({ ...prop, status: 'Quote Requested' as const }))
+      }))
+    };
+    addRegisteredLead(updated, user.email);
+    toast({
+      title: 'Formal Quote Requested',
+      description: 'The developer has been notified. They will respond with accurate commercial terms in your Transaction Workspace.',
+    });
+  }, [user, activeChat, registeredLeads, addRegisteredLead, toast]);
 
   React.useEffect(() => {
     const handler = () => setIsOpen(true);
@@ -238,7 +267,7 @@ export function GlobalChatWidget() {
         </div>
         {refBar}
         <div className="flex-1 flex flex-col min-h-0">
-          {activeChat ? <ChatPanel submission={activeChat} /> : <ConversationList onSelectConversation={handleSelectConversation} />}
+          {activeChat ? <ChatPanel submission={activeChat} onRequestQuote={handleRfqFromChat} /> : <ConversationList onSelectConversation={handleSelectConversation} />}
         </div>
       </div>
     </div>

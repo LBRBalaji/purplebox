@@ -33,13 +33,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 
 const activityIcons: { [key in TransactionActivity['activityType']]: React.ElementType } = {
+  'Quote Requested':    ClipboardList,
+  'Quote Submitted':    FileSpreadsheet,
   'Site Visit Request': CalendarIcon,
-  'Site Visit Update': CalendarIcon,
-  'Customer Feedback': MessageSquare,
+  'Site Visit Update':  CalendarIcon,
+  'Customer Feedback':  MessageSquare,
   'Tenant Improvements': HardHat,
   'Proposal Submitted': FileSpreadsheet,
-  'Lead Acknowledged': UserCheck,
-  'Lead Registered': UserPlus,
+  'Lead Acknowledged':  UserCheck,
+  'Lead Registered':    UserPlus,
 };
 
 const ProposalFormSchema = z.object({
@@ -348,26 +350,35 @@ export default function LeadDetailPage() {
   const hasFitOut = !!(tenantImpr && ((tenantImpr as any).items?.length > 0 || (tenantImpr as any).requirements));
   const hasMoU = hasProposal && hasNegotiation && hasFitOut;
 
+  const leadActivities = lead ? transactionActivities.filter((a: any) => a.leadId === lead.id) : [];
+  const hasQuote = leadActivities.some((a: any) => a.activityType === 'Quote Requested');
+  const hasSiteVisit = leadActivities.some((a: any) => a.activityType === 'Site Visit Request' || a.activityType === 'Site Visit Update');
+
   const journeyStages = [
-    { key: 'chat', label: 'Chat', done: true },
-    { key: 'proposal', label: 'Proposal', done: hasProposal },
+    { key: 'chat',        label: 'Chat',        done: true },
+    { key: 'rfq',         label: 'Get Quote',   done: hasQuote },
+    { key: 'sitevisit',   label: 'Site Visit',  done: hasSiteVisit },
     { key: 'negotiation', label: 'Negotiation', done: hasNegotiation },
-    { key: 'fitout', label: 'Fit-Out', done: hasFitOut },
-    { key: 'mou', label: 'MoU', done: hasMoU },
+    { key: 'fitout',      label: 'Fit-Out',     done: hasFitOut },
+    { key: 'mou',         label: 'MoU',         done: hasMoU },
   ];
   const currentStageIdx = journeyStages.reduce((acc, s, i) => s.done ? i : acc, 0);
 
   const journeyNextAction = (() => {
     if (isProvider) {
-      if (!hasProposal) return { msg: 'Submit your commercial proposal to start the negotiation.', action: 'Submit Proposal', tab: 'activity', highlight: true };
-      if (!hasNegotiation) return { msg: 'Proposal submitted. Open the Negotiation Board to align on terms with the customer.', action: 'Go to Negotiation Board', tab: 'negotiation-board', highlight: false };
-      if (!hasFitOut) return { msg: "Terms are being discussed. Stay tuned for the customer's fit-out requirements.", action: null, tab: null, highlight: false };
+      if (!hasQuote)       return { msg: 'Customer has initiated contact. Wait for their formal quote request before submitting commercials.', action: null, tab: null, highlight: false };
+      if (!hasProposal)    return { msg: 'Customer has requested a formal quote. Submit your commercial proposal with current rent and lease terms.', action: 'Submit Commercial Quote', tab: 'activity', highlight: true };
+      if (!hasSiteVisit)   return { msg: 'Quote submitted. Co-ordinate a site visit with the customer to progress the transaction.', action: null, tab: null, highlight: false };
+      if (!hasNegotiation) return { msg: 'Site visit done. Open the Negotiation Board to align on final commercial terms.', action: 'Go to Negotiation Board', tab: 'negotiation-board', highlight: true };
+      if (!hasFitOut)      return { msg: "Terms being discussed. Stay tuned for the customer's fit-out and tenant improvement requirements.", action: null, tab: null, highlight: false };
       return { msg: 'Deal progressing well. Review fit-out requirements and confirm with ORS-ONE for MoU.', action: null, tab: null, highlight: false };
     }
     if (isCustomer) {
-      if (!hasProposal) return { msg: 'Waiting for the developer to submit their commercial proposal.', action: null, tab: null, highlight: false };
-      if (!hasNegotiation) return { msg: 'Developer has submitted a proposal. Review it and open the Negotiation Board to discuss terms.', action: 'Review & Negotiate', tab: 'negotiation-board', highlight: true };
-      if (!hasFitOut) return { msg: 'Negotiation in progress. Define your fit-out and warehouse requirements next.', action: 'Define Fit-Out Requirements', tab: 'improvements', highlight: true };
+      if (!hasQuote)       return { msg: 'You are connected. Request a formal commercial quote from the developer to get accurate rent and lease terms.', action: 'Request Formal Quote', tab: 'activity', highlight: true };
+      if (!hasProposal)    return { msg: 'Quote requested. The developer will respond with current commercial terms. You will be notified.', action: null, tab: null, highlight: false };
+      if (!hasSiteVisit)   return { msg: 'Commercial terms received. Log a site visit request to inspect the property in person.', action: 'Request Site Visit', tab: 'activity', highlight: true };
+      if (!hasNegotiation) return { msg: 'Site visit done. Open the Negotiation Board to discuss and align on final terms.', action: 'Start Negotiation', tab: 'negotiation-board', highlight: true };
+      if (!hasFitOut)      return { msg: 'Negotiation in progress. Define your fit-out and warehouse customisation requirements.', action: 'Define Fit-Out Requirements', tab: 'improvements', highlight: true };
       return { msg: 'All stages complete. ORS-ONE will reach out to finalise the MoU.', action: null, tab: null, highlight: false };
     }
     return null;
@@ -376,7 +387,9 @@ export default function LeadDetailPage() {
   // Activity type badge colours
   const activityBadge = (type: string) => {
     const map: Record<string, {bg: string, color: string}> = {
-      'Proposal Submitted':  {bg:'#fef9c3', color:'#92400e'},
+      'Quote Requested':     {bg:'hsl(259 44% 94%)', color:'#6141ac'},
+      'Quote Submitted':     {bg:'hsl(259 44% 88%)', color:'#3b2870'},
+      'Proposal Submitted':  {bg:'hsl(259 44% 94%)', color:'#6141ac'},
       'Lead Registered':     {bg:'#f0fdf4', color:'#15803d'},
       'Lead Acknowledged':   {bg:'#eff6ff', color:'#1d4ed8'},
       'Site Visit Request':  {bg:'#fdf4ff', color:'#7e22ce'},
