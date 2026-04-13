@@ -427,7 +427,7 @@ export default function ListingDetailPage() {
         return <DetailPageSkeleton />;
     }
 
-    const isShortlisted = !!user && generalShortlist.includes(listing.id);
+    const isShortlisted = !!user && generalShortlist.includes(listing.listingId);
     
     const imageDocuments = listing.documents?.filter(doc => doc.type === 'image') || [];
 
@@ -465,7 +465,7 @@ export default function ListingDetailPage() {
 
     const handleShortlistClick = () => {
         if (!user) {
-            setPendingAction(() => () => toggleGeneralShortlist(listing.id));
+            setPendingAction(() => () => toggleGeneralShortlist(listing.listingId));
             setIsLoginDialogOpen(true);
             return;
         }
@@ -478,7 +478,7 @@ export default function ListingDetailPage() {
             });
             return;
         }
-        toggleGeneralShortlist(listing.id);
+        toggleGeneralShortlist(listing.listingId);
     };
     
 
