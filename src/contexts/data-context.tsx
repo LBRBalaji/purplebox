@@ -157,6 +157,13 @@ export type RegisteredLead = {
   offPlatformProperty?: OffPlatformProperty;
   invitees?: DealInvitee[];
   dealRegisteredAt?: string;
+  // Transaction mode & broker fields
+  transactionMode?: 'direct' | 'ors-tp' | 'agent';
+  brokerEmail?: string;
+  brokerName?: string;
+  brokerAcknowledged?: boolean;
+  brokerAcknowledgedAt?: string;
+  platformFeeAccepted?: boolean;
 }
 
 export type TransactionActivity = {

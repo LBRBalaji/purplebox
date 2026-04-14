@@ -347,23 +347,15 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                                     {isAlreadyRegisteredWithProvider ? 'Provider Assigned' : 'Assign to Provider'}
                                                 </Button>
                                             )}
-                                            {isProvider && !lead.isO2OCollaborator && (
-                                                <Button size="sm" variant={lead.developerEngagePath ? 'outline' : 'default'}
-                                                  className={lead.developerEngagePath ? 'border-green-200 text-green-700 bg-green-50' : ''}
-                                                  onClick={() => setExpandedLeadId(expandedLeadId === lead.id ? null : lead.id)}>
-                                                  {lead.developerEngagePath ? '✓ Path Chosen' : 'Choose Engage Path'}
+                                            {isProvider && (
+                                                <Button asChild size="sm" style={{borderRadius:0,background:'#6141ac',color:'#fff'}}>
+                                                  <a href={`/dashboard/leads/${lead.id}`}>Open Transaction Workspace</a>
                                                 </Button>
                                             )}
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                    {isProvider && !lead.isO2OCollaborator && expandedLeadId === lead.id && (
-                                      <TableRow>
-                                        <TableCell colSpan={5} className="bg-secondary/20 p-5">
 
-                                        </TableCell>
-                                      </TableRow>
-                                    )}
                                     </React.Fragment>
                                 );
                             })}

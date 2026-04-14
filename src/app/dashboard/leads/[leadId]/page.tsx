@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineTitle, TimelineIcon, TimelineDescription, TimelineBody } from '@/components/ui/timeline';
 import { Building, ClipboardList, HardHat, MessageSquare, Mic, User, Calendar as CalendarIcon, FileSpreadsheet, HandCoins, Warehouse, MapPin, Scaling, UserCheck, ArrowRight, Handshake, ThumbsDown, ThumbsUp, AlertCircle, Link2, Check, X, Clock, ShieldCheck, Briefcase, FileSignature, DollarSign, Notebook, UserPlus, Users, ChevronsUpDown } from 'lucide-react';
 import { AddActivityForm } from '@/components/add-activity-form';
+import { EngagePathSelector } from '@/components/engage-path-selector';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -182,6 +183,80 @@ function ProposalForm({ listing, lead, provider, onSubmit }: { listing: ListingS
             </form>
         </Form>
     )
+}
+
+
+function BrokerageAckPrompt({ lead, brokerName, transactionMode }: { lead: any; brokerName: string; transactionMode: string }) {
+  const { updateRegisteredLead, addTransactionActivity } = useData();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [agreed, setAgreed] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
+
+  const handleAcknowledge = async () => {
+    if (!agreed) return;
+    setSaving(true);
+    try {
+      updateRegisteredLead({ ...lead, brokerAcknowledged: true, brokerAcknowledgedAt: new Date().toISOString() });
+      addTransactionActivity({
+        leadId: lead.id,
+        activityType: 'Lead Acknowledged',
+        details: { message: `Brokerage acknowledged by ${user?.companyName}. Payable to ${brokerName} upon successful deal closure.` },
+        createdBy: user?.email || '',
+      });
+      await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([{
+          id: `notif-brok-ack-${lead.id}-${Date.now()}`,
+          type: 'new_activity',
+          title: `Brokerage Acknowledged: ${lead.id}`,
+          message: `${user?.companyName} formally acknowledged brokerage payable to ${brokerName} upon deal closure for transaction ${lead.id}.`,
+          href: `/dashboard/leads/${lead.id}`,
+          recipientEmail: lead.brokerEmail,
+          timestamp: new Date().toISOString(),
+          triggeredBy: user?.email || '',
+          isRead: false,
+        }]),
+      }).catch(() => {});
+      toast({ title: 'Brokerage Acknowledged', description: `${brokerName} has been notified of your commitment.` });
+    } catch {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please try again.' });
+    }
+    setSaving(false);
+  };
+
+  return (
+    <div style={{border:'1px solid hsl(259 44% 82%)'}}>
+      <div className="px-4 py-3" style={{background:'hsl(259 44% 96%)'}}>
+        <p className="text-sm font-bold" style={{color:'#1e1537'}}>Brokerage Acknowledgement Required</p>
+        <p className="text-xs mt-0.5" style={{color:'hsl(259 15% 55%)'}}>
+          {transactionMode === 'agent'
+            ? `This transaction is represented by ${brokerName}. Please acknowledge the brokerage obligation.`
+            : `ORS-ONE is the Transaction Partner for this deal. Please acknowledge the brokerage obligation.`}
+        </p>
+      </div>
+      <div className="px-4 py-3 space-y-3" style={{background:'#fff'}}>
+        <div className="px-4 py-3 text-xs leading-relaxed" style={{background:'hsl(259 30% 97%)',border:'1px solid hsl(259 30% 90%)'}}>
+          {transactionMode === 'agent'
+            ? `${brokerName} is the appointed agent/broker for this transaction. Industry standard brokerage is payable to ${brokerName} upon successful deal closure.`
+            : `ORS-ONE (Lakshmi Balaji ORS Private Limited) is the Transaction Partner facilitating this deal. Industry standard brokerage is payable to ORS-ONE upon successful deal closure.`}
+        </div>
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)}
+            className="mt-0.5 h-4 w-4 accent-purple-600 flex-shrink-0" />
+          <span className="text-xs" style={{color:'#1e1537',lineHeight:1.6}}>
+            I, <strong>{user?.userName}</strong> ({user?.companyName}), formally acknowledge that industry standard brokerage is payable to <strong>{brokerName}</strong> upon successful deal closure for transaction <strong>{lead.id}</strong>. This is a binding commitment.
+          </span>
+        </label>
+        <button onClick={handleAcknowledge} disabled={!agreed || saving}
+          className="w-full py-2.5 text-sm font-bold text-white"
+          style={{background: agreed && !saving ? '#6141ac' : 'hsl(259 30% 80%)', borderRadius:0, cursor: agreed ? 'pointer' : 'not-allowed'}}>
+          {saving ? 'Saving...' : 'Confirm Brokerage Acknowledgement'}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 
@@ -358,6 +433,9 @@ export default function LeadDetailPage() {
   // Site visit confirmed when status is Visited
   const siteVisitDone = leadActivities.some((a: any) => a.activityType === 'Site Visit Update' && a.details?.status === 'Visited');
   const isOffPlatform = !!(lead as any)?.isOffPlatform;
+  const transactionMode = (lead as any)?.transactionMode as string | undefined;
+  const brokerName = (lead as any)?.brokerName as string | undefined;
+  const brokerAcknowledged = !!(lead as any)?.brokerAcknowledged;
 
   const journeyStages = isOffPlatform ? [
     { key: 'registered',  label: 'Deal Registered', done: true,           sub: 'Off-Platform' },
@@ -466,14 +544,32 @@ export default function LeadDetailPage() {
             {customer && providerUser && (
               <div className="rounded-2xl p-5 flex items-center gap-4 flex-wrap mt-2"
                 style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
-                {isOffPlatform && (
-                  <div className="w-full mb-1 flex items-center gap-2">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'rgba(29,158,117,0.2)',color:'#1d9e75',border:'1px solid rgba(29,158,117,0.3)'}}>
+                <div className="w-full mb-1 flex items-center gap-2 flex-wrap">
+                  {isOffPlatform && (
+                    <span className="text-xs font-bold px-2 py-0.5" style={{background:'rgba(29,158,117,0.2)',color:'#1d9e75',border:'1px solid rgba(29,158,117,0.3)'}}>
                       Off-Platform Deal
                     </span>
-                    <span className="text-xs font-mono" style={{color:'rgba(255,255,255,0.3)'}}>{lead.id}</span>
-                  </div>
-                )}
+                  )}
+                  {(transactionMode === 'direct' || transactionMode === 'ors-tp') && (
+                    <span className="text-xs font-bold px-2 py-0.5" style={{background:'rgba(97,65,172,0.35)',color:'#c5b8e8',border:'1px solid rgba(97,65,172,0.4)'}}>
+                      ORS-ONE Transaction Partner
+                    </span>
+                  )}
+                  {transactionMode === 'agent' && (
+                    <span className="text-xs font-bold px-2 py-0.5" style={{background:'rgba(59,130,246,0.25)',color:'#93c5fd',border:'1px solid rgba(59,130,246,0.35)'}}>
+                      Agent Represented — {brokerName}
+                    </span>
+                  )}
+                  {brokerAcknowledged && (
+                    <span className="text-xs font-bold px-2 py-0.5" style={{background:'rgba(34,197,94,0.2)',color:'#4ade80',border:'1px solid rgba(34,197,94,0.3)'}}>
+                      ✓ Brokerage Confirmed
+                    </span>
+                  )}
+                  {!transactionMode && !isOffPlatform && (
+                    <span className="text-xs px-2 py-0.5" style={{color:'rgba(255,255,255,0.3)'}}>Engagement path pending</span>
+                  )}
+                  <span className="text-xs font-mono ml-auto" style={{color:'rgba(255,255,255,0.25)'}}>{lead.id}</span>
+                </div>
                 {/* Tenant */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-xs font-black"
@@ -676,6 +772,38 @@ export default function LeadDetailPage() {
               <div id="tab-activity" data-workspace-tab style={{display: defaultTab === 'activity' ? 'block' : 'none', padding:'20px'}}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                   <div className="md:col-span-2 space-y-4">
+                    {/* Engage Path Selector — customer only */}
+                    {isCustomer && <EngagePathSelector leadId={lead.id} />}
+
+                    {/* Developer: brokerage acknowledgement prompt */}
+                    {isProvider && transactionMode && !brokerAcknowledged && (
+                      <BrokerageAckPrompt lead={lead} brokerName={brokerName || 'ORS-ONE'} transactionMode={transactionMode} />
+                    )}
+
+                    {/* Developer: pending amber banner */}
+                    {isProvider && transactionMode && !brokerAcknowledged && (
+                      <div className="flex items-center gap-2 px-4 py-2.5" style={{background:'#fffbeb',border:'1px solid #fde68a'}}>
+                        <svg width="14" height="14" fill="none" stroke="#d97706" strokeWidth="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <p className="text-xs font-semibold" style={{color:'#d97706'}}>Action required — brokerage acknowledgement pending for this transaction.</p>
+                      </div>
+                    )}
+
+                    {/* Agent: role clarity banner */}
+                    {isAgent && transactionMode === 'agent' && (
+                      <div className="flex items-start gap-3 px-4 py-3" style={{background:'hsl(259 44% 96%)',border:'1px solid hsl(259 44% 82%)'}}>
+                        <div className="flex-1">
+                          <p className="text-xs font-bold" style={{color:'#1e1537'}}>This is your transaction</p>
+                          <p className="text-xs mt-0.5" style={{color:'hsl(259 15% 55%)'}}>ORS-ONE provides the platform tools only — Term Sheet, Fit-Out, and MoU workspace. ORS-ONE has no commercial role in this deal.</p>
+                          {!brokerAcknowledged && (
+                            <p className="text-xs mt-1 font-semibold" style={{color:'#d97706'}}>⏳ Brokerage acknowledgement pending from developer.</p>
+                          )}
+                          {brokerAcknowledged && (
+                            <p className="text-xs mt-1 font-semibold" style={{color:'#15803d'}}>✓ Brokerage confirmed by developer on {new Date((lead as any)?.brokerAcknowledgedAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}.</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     {canAddActivity && <div data-add-activity-form><AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} existingActivities={leadActivities} /></div>}
                     <div className="rounded-2xl p-5" style={{background:'#fff', border:'1px solid hsl(259 30% 91%)'}}>
                       <p className="text-sm font-bold mb-4" style={{color:'#1e1537'}}>Activity Log</p>
