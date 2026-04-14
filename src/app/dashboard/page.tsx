@@ -121,8 +121,8 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
               {stats.pending} pending approval
             </span>
           )}
-          <Link href="/register-deal" className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',border:'1px solid rgba(255,255,255,.2)'}}>
-            <FileText className="h-3 w-3" /> Register a Deal
+          <Link href="/register-deal" title="Bring an off-platform deal into ORS-ONE. Already in talks with a customer or developer outside this platform? Register the deal here to use the Commercial Term Sheet, Fit-Out tools and MoU drafting. Starts directly at Term Sheet — no Chat or Quote stages." className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',borderRadius:0}}>
+            <FileText className="h-4 w-4" /> Register a Deal
           </Link>
         </div>
       </div>
@@ -450,7 +450,7 @@ const MainDashboard = () => {
                   {myLeads.length} active deal{myLeads.length > 1 ? 's' : ''}
                 </span>
               )}
-              <Link href="/register-deal" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-none transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff'}}>
+              <Link href="/register-deal" title="Bring an off-platform deal into ORS-ONE. If you are already in talks with a customer or developer outside this platform, register the deal here to use the Commercial Term Sheet, Fit-Out tools and MoU drafting. Starts directly at Term Sheet — no Chat or Quote stages." className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',borderRadius:0}}>
                 <FileText className="h-4 w-4" /> Register a Deal
               </Link>
             </div>
@@ -660,7 +660,7 @@ const MainDashboard = () => {
               <p className="text-sm mt-1" style={{color:'rgba(255,255,255,.5)'}}>{user?.companyName} · Transaction Agent</p>
             </div>
             <div className="flex gap-2 flex-wrap items-center">
-              <Link href="/register-deal" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-none transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff'}}>
+              <Link href="/register-deal" title="Bring an off-platform deal into ORS-ONE. If you are already in talks with a customer or developer outside this platform, register the deal here to use the Commercial Term Sheet, Fit-Out tools and MoU drafting. Starts directly at Term Sheet — no Chat or Quote stages." className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 transition-all hover:opacity-90" style={{background:'#6141ac',color:'#fff',borderRadius:0}}>
                 <FileText className="h-4 w-4" /> Register a Deal
               </Link>
             </div>

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { HelpCircle, LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck, PlusCircle, Zap, Handshake, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -117,20 +116,6 @@ const ManageDropdown = ({ isSuperAdmin }) => {
   );
 };
 
-// Tooltip wrapper for nav items with explanatory notes
-const NavTooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <TooltipProvider delayDuration={300}>
-    <Tooltip>
-      <TooltipTrigger style={{background:'none',border:'none',padding:0,display:'inline-flex',alignItems:'center'}} type="button" tabIndex={-1}>
-        {children}
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="text-xs leading-relaxed z-50" style={{maxWidth:'260px',lineHeight:'1.5'}}>
-        {label}
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-);
-
 const MoreDropdown = () => {
   const pathname = usePathname();
   const { user } = useAuth();
@@ -152,22 +137,11 @@ const MoreDropdown = () => {
         {user && (
           <>
             <DropdownMenuSeparator />
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuItem asChild>
-                    <Link href="/register-deal" className="font-semibold" style={{color:'#6141ac'}}>
-                      <FileText className="mr-2 h-4 w-4" /> Register a Deal
-                    </Link>
-                  </DropdownMenuItem>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="max-w-xs text-xs leading-relaxed">
-                  <p className="font-semibold mb-1">Off-Platform Deal Registration</p>
-                  <p>Already in talks with a developer or customer outside ORS-ONE? Bring that deal into the platform to use the Commercial Term Sheet, Fit-Out tools and MoU drafting — with full version history and audit trail.</p>
-                  <p className="mt-1" style={{color:'rgba(255,255,255,0.6)'}}>Different from platform deals: skips Chat/Quote/Site Visit stages and starts directly at the Term Sheet.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <DropdownMenuItem asChild>
+              <Link href="/register-deal" title="Already in talks outside ORS-ONE? Register the deal here to use Commercial Term Sheet, Fit-Out tools and MoU drafting. Different from platform deals — starts directly at Term Sheet, no Chat or Quote stages." className="font-semibold" style={{color:'#6141ac'}}>
+                <FileText className="mr-2 h-4 w-4" /> Register a Deal
+              </Link>
+            </DropdownMenuItem>
           </>
         )}
       </DropdownMenuContent>
@@ -333,28 +307,20 @@ export function Header() {
             ) : (
               <>
                 {user && !isSuperAdmin && (
-                  <NavTooltip label="Your personal workspace — manage listings, track leads, view analytics, and handle all transaction activity.">
-                    <NavLink href="/dashboard"><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
-                  </NavTooltip>
+                  <NavLink href="/dashboard" title="Your personal workspace — manage listings, track leads, view analytics, and handle all transaction activity."><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
                 )}
                 <ListingsDropdown isSuperAdmin={isSuperAdmin} />
               {isProvider && (
-                <NavTooltip label="Create a new warehouse listing on ORS-ONE. Your listing goes to SuperAdmin for approval before going live on the marketplace.">
-                  <Link href="/dashboard?tab=my-listings&createNew=true" className="flex items-center gap-1.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-4 py-2 whitespace-nowrap" style={{borderRadius:0}}>
-                    <PlusCircle className="h-3.5 w-3.5" /> New Listing
-                  </Link>
-                </NavTooltip>
+                <Link href="/dashboard?tab=my-listings&createNew=true" title="Create a new warehouse listing. Goes to SuperAdmin for approval before going live on the marketplace." className="flex items-center gap-1.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-4 py-2 whitespace-nowrap" style={{borderRadius:0}}>
+                  <PlusCircle className="h-3.5 w-3.5" /> New Listing
+                </Link>
               )}
               {isCustomer && (
-                <NavTooltip label="Have unused warehouse space? List it as a sublease on ORS-ONE. Other businesses can find and lease your excess space directly through the platform.">
-                  <Link href="/dashboard?tab=my-sublease&createNew=true" className="flex items-center gap-1.5 text-sm font-semibold text-white transition-colors px-4 py-2 whitespace-nowrap" style={{background:'#6141ac',borderRadius:0}}>
-                    <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
-                  </Link>
-                </NavTooltip>
+                <Link href="/dashboard?tab=my-sublease&createNew=true" title="Have unused warehouse space? List it as a sublease. Other businesses can find and lease your excess space directly." className="flex items-center gap-1.5 text-sm font-semibold text-white transition-colors px-4 py-2 whitespace-nowrap" style={{background:'#6141ac',borderRadius:0}}>
+                  <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
+                </Link>
               )}
-                <NavTooltip label="Free calculators for warehouse leasing decisions — ROI analysis, commercial terms, and registration cost estimation. No login required.">
-                  <ToolsDropdown />
-                </NavTooltip>
+                <ToolsDropdown />
                 <MoreDropdown />
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
                 {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
@@ -365,11 +331,9 @@ export function Header() {
           <div className="flex items-center gap-2 ml-auto flex-shrink-0">
             {(!user || (!isSuperAdmin && !isO2O)) && (
               <Link href="https://wa.me/919841098170?text=need%20O2O%20support%20call%20me%20back%20please" target="_blank" rel="noopener noreferrer" className="hidden lg:block">
-                <NavTooltip label="Speak directly with the ORS-ONE team. We will call you back to help with listings, demands, or transaction support.">
-                  <Button variant="outline" className="h-10 px-4 text-xs gap-1.5 font-semibold" style={{borderRadius:0}}>
-                    <WhatsAppIcon /> Ask a Call Back
-                  </Button>
-                </NavTooltip>
+                <Button variant="outline" className="h-10 px-4 text-xs gap-1.5 font-semibold" style={{borderRadius:0}} title="Speak directly with the ORS-ONE team. We will call you back to help with listings, demands, or transaction support.">
+                  <WhatsAppIcon /> Ask a Call Back
+                </Button>
               </Link>
             )}
             {isLoading ? (
@@ -404,11 +368,9 @@ export function Header() {
                 </DropdownMenu>
               </div>
             ) : (
-              <NavTooltip label="Sign in to access your dashboard, manage listings, track transactions and more. New? Create your account here.">
-                <Button className="h-10 px-5 text-sm font-semibold" style={{borderRadius:0}} onClick={() => setIsLoginOpen(true)}>
-                  <LogIn className="mr-2 h-4 w-4" /> Login / Sign Up
-                </Button>
-              </NavTooltip>
+              <Button className="h-10 px-5 text-sm font-semibold" style={{borderRadius:0}} title="Sign in to access your dashboard, manage listings, track transactions and more. New? Create your account here." onClick={() => setIsLoginOpen(true)}>
+                <LogIn className="mr-2 h-4 w-4" /> Login / Sign Up
+              </Button>
             )}
           </div>
 
