@@ -64,7 +64,7 @@ export function MySubmissions() {
 
     React.useEffect(() => {
         if (user?.email) {
-            const isAdmin = user.email === 'admin@example.com';
+            const isAdmin = user.email === 'balaji@lakshmibalajio2o.com';
             
             const relevantSubmissions = isAdmin
                 ? submissions
@@ -120,7 +120,7 @@ export function MySubmissions() {
                                 </TableCell>
                                 <TableCell>{listing.location}</TableCell>
                                 <TableCell>
-                                    {user?.email === 'admin@example.com' 
+                                    {user?.email === 'balaji@lakshmibalajio2o.com' 
                                         ? listing.developerName || submission.providerEmail 
                                         : 'Me'}
                                 </TableCell>

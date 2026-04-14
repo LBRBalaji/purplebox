@@ -60,7 +60,7 @@ export function TenantImprovementsSheet({ leadId }: TenantImprovementsSheetProps
   
   const isProvider = user?.role === 'SuperAdmin';
   const isCustomer = user?.role === 'User';
-  const isO2O = user?.role === 'O2O' || user?.email === 'admin@example.com';
+  const isO2O = user?.role === 'O2O' || user?.email === 'balaji@lakshmibalajio2o.com';
   
   const canEdit = isO2O || isCustomer;
   const canUpdateStatusOnly = isProvider;

@@ -15,7 +15,7 @@ export function AdminNotifier() {
   const [lastNotifiedTimestamp, setLastNotifiedTimestamp] = React.useState(averyLongTimeAgo);
 
   React.useEffect(() => {
-    if ((user?.role !== 'SuperAdmin' && user?.email !== 'admin@example.com') || !lastEvent || lastEvent.timestamp <= lastNotifiedTimestamp) {
+    if ((user?.role !== 'SuperAdmin' && user?.email !== 'balaji@lakshmibalajio2o.com') || !lastEvent || lastEvent.timestamp <= lastNotifiedTimestamp) {
       return;
     }
 

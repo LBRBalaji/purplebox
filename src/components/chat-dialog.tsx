@@ -165,7 +165,7 @@ export function ChatPanel({
           }
         };
         setMessages(prev => [...prev, message]);
-        const partner = lead.isO2OCollaborator ? users['superadmin@o2o.com'] : users[submission.providerEmail];
+        const partner = lead.isO2OCollaborator ? users['balaji@lakshmibalajio2o.com'] : users[submission.providerEmail];
         await addChatMessage(threadId, message, { lead, partner });
       } else {
         toast({ variant: 'destructive', title: 'Upload Failed', description: 'Could not upload the file.' });
@@ -204,7 +204,7 @@ export function ChatPanel({
       let partner = null;
       if (lead.isO2OCollaborator) {
         // In a brokered deal, all communication goes to the O2O Super Admin
-        partner = users['superadmin@o2o.com'];
+        partner = users['balaji@lakshmibalajio2o.com'];
       } else {
         // In a direct deal, find the other party
         partner = user.email === lead.customerId ? users[submission.providerEmail] : users[lead.customerId];

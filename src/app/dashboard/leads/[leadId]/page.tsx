@@ -676,7 +676,7 @@ export default function LeadDetailPage() {
               <div id="tab-activity" data-workspace-tab style={{display: defaultTab === 'activity' ? 'block' : 'none', padding:'20px'}}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                   <div className="md:col-span-2 space-y-4">
-                    {canAddActivity && <div data-add-activity-form><AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} /></div>}
+                    {canAddActivity && <div data-add-activity-form><AddActivityForm leadId={lead.id} onAddActivity={handleAddActivity} existingActivities={leadActivities} /></div>}
                     <div className="rounded-2xl p-5" style={{background:'#fff', border:'1px solid hsl(259 30% 91%)'}}>
                       <p className="text-sm font-bold mb-4" style={{color:'#1e1537'}}>Activity Log</p>
                       {activities.length > 0 ? (

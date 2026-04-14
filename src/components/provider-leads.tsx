@@ -238,7 +238,7 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                 const hasPending = isProvider && providerInfoForCurrentUser?.properties.some(p => p.status === 'Pending');
                                 // Acknowledge button should only show for brokered deals that have pending items.
                                 const shouldShowAcknowledgeButton = hasPending && lead.isO2OCollaborator;
-                                const isAlreadyRegisteredWithProvider = lead.providers.some(p => p.providerEmail !== 'superadmin@o2o.com');
+                                const isAlreadyRegisteredWithProvider = lead.providers.some(p => p.providerEmail !== 'balaji@lakshmibalajio2o.com');
                                 
                                 const registeredByUser = users[lead.registeredBy];
 

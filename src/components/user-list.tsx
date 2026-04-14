@@ -76,7 +76,7 @@ export function UserList() {
   }, [users]); // Re-fetch if users change
 
   const { filteredUsers, roleCounts } = React.useMemo(() => {
-    const allUsers = Object.values(users).filter(u => u.email !== 'admin@example.com');
+    const allUsers = Object.values(users).filter(u => u.email !== 'balaji@lakshmibalajio2o.com');
     
     const counts = {
         'O2O Super Admin': 0,

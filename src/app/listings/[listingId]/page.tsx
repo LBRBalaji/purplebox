@@ -259,45 +259,85 @@ export default function ListingDetailPage() {
 
     const executeQuoteRequest = () => {
         if (!user || !listing) return;
-        
-  const isBrokered = true;
-        const providerEmail = isBrokered ? 'superadmin@o2o.com' : listing.developerId;
+
+        const dealId = `LDR-QUOTE-${Date.now()}`;
+        const developerEmail = listing.developerId;  // actual developer always in providers
+        const orsoneAdmin = 'balaji@lakshmibalajio2o.com';  // ORS-ONE always co-notified
+
+        // Build providers list: developer first, ORS-ONE as collaborator
+        const providersList = developerEmail
+            ? [{ providerEmail: developerEmail, properties: [{ listingId: listing.listingId, status: 'Pending' as const }] }]
+            : [{ providerEmail: orsoneAdmin, properties: [{ listingId: listing.listingId, status: 'Pending' as const }] }];
 
         const newLead: Omit<RegisteredLead, 'registeredAt'> = {
-            id: `LDR-QUOTE-${Date.now()}`,
+            id: dealId,
             customerId: user.email,
             leadName: user.companyName,
             leadContact: user.userName,
             leadEmail: user.email,
             leadPhone: user.phone,
-            requirementsSummary: `Quote requested for Property ID: ${listing.warehouseBoxId || listing.listingId}`,
+            requirementsSummary: `Formal quote requested for ${listing.listingId} — ${listing.name || listing.location?.split(',')[0]}`,
             registeredBy: user.email,
-            providers: [{
-                providerEmail: providerEmail,
-                properties: [{ listingId: listing.listingId, status: 'Pending' }]
-            }],
-            isO2OCollaborator: isBrokered,
+            providers: providersList,
+            isO2OCollaborator: true,  // ORS-ONE always informed
         };
 
         addRegisteredLead(newLead, user.email);
         setJustRequestedQuote(true);
 
-        // Log Quote Requested activity on the new lead
+        // R2: Log Quote Requested activity with improved message — pass lead directly
+        // to avoid async state timing issue where registeredLeads may not contain newLead yet
         addTransactionActivity({
-            leadId: newLead.id,
+            leadId: dealId,
             activityType: 'Quote Requested',
-            details: { message: `Formal quote requested for ${listing.listingId} — ${listing.name || listing.location}` },
+            details: {
+                message: `${user.companyName} has formally requested a commercial quote for listing ${listing.listingId} at ${listing.location?.split(',')[0] || listing.location}. Please respond with current rent, deposit and lease terms via the Transaction Workspace.`,
+            },
             createdBy: user.email,
         });
 
+        // R4: Notify developer directly with specific context
+        if (developerEmail && developerEmail !== orsoneAdmin) {
+            fetch('/api/notifications').then(r => r.json()).then(data => {
+                const existing = Array.isArray(data) ? data : Object.values(data);
+                const devNotif = {
+                    id: `notif-rfq-${dealId}-dev`,
+                    type: 'new_lead_for_provider',
+                    title: `Quote Requested: ${listing.listingId}`,
+                    message: `${user.companyName} has formally requested a commercial quote for your listing ${listing.listingId} at ${listing.location?.split(',')[0] || listing.location}. Please respond with rent, deposit and lease terms.`,
+                    href: `/dashboard/leads/${dealId}?tab=activity`,
+                    recipientEmail: developerEmail,
+                    timestamp: new Date().toISOString(),
+                    triggeredBy: user.email,
+                    isRead: false,
+                };
+                const adminNotif = {
+                    id: `notif-rfq-${dealId}-admin`,
+                    type: 'new_lead_for_provider',
+                    title: `RFQ: ${user.companyName} → ${listing.listingId}`,
+                    message: `${user.companyName} requested a quote from ${listing.developerId} for listing ${listing.listingId}.`,
+                    href: `/dashboard/leads/${dealId}?tab=activity`,
+                    recipientEmail: orsoneAdmin,
+                    timestamp: new Date().toISOString(),
+                    triggeredBy: user.email,
+                    isRead: false,
+                };
+                return fetch('/api/notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([...existing, devNotif, adminNotif]),
+                });
+            }).catch(() => {});
+        }
+
         toast({
-            title: 'Transaction Workspace Created',
-            description: 'Taking you to your Transaction Workspace where you can track the quote, site visit, negotiation and all interactions for this property.',
+            title: 'Quote Request Sent',
+            description: `Your request has been sent to the developer. You will be notified once they respond with commercial terms.`,
         });
 
         // Navigate to the transaction journey page
         setTimeout(() => {
-            router.push(`/dashboard/leads/${newLead.id}?tab=activity`);
+            router.push(`/dashboard/leads/${dealId}?tab=activity`);
         }, 800);
     };
 

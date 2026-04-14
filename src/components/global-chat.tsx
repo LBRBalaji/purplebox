@@ -36,7 +36,7 @@ function ConversationList({ onSelectConversation }: { onSelectConversation: (cha
     );
 
     return allUserLeads.flatMap(lead => {
-      const providerForLead = lead.providers.find(p => p.providerEmail !== 'superadmin@o2o.com') || lead.providers[0];
+      const providerForLead = lead.providers.find(p => p.providerEmail !== 'balaji@lakshmibalajio2o.com') || lead.providers[0];
       if (!providerForLead || !providerForLead.properties || providerForLead.properties.length === 0) return [];
       const listing = listings.find(l => l.listingId === providerForLead.properties[0]?.listingId);
       const customer = users[lead.customerId];

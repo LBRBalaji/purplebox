@@ -944,7 +944,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     listingsToDownload.forEach(listing => {
         // Always use the actual developer's email — every download creates a chat thread
-        const providerEmail = listing.developerId || 'superadmin@o2o.com';
+        const providerEmail = listing.developerId || 'balaji@lakshmibalajio2o.com';
         
         if (!providerToListingsMap[providerEmail]) {
             providerToListingsMap[providerEmail] = [];
@@ -957,7 +957,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     // Auto-create one lead per listing per provider — each gets its own chat thread
     Object.entries(providerToListingsMap).forEach(([providerEmail, listingIds]) => {
-      if (providerEmail === 'superadmin@o2o.com') return;
+      if (providerEmail === 'balaji@lakshmibalajio2o.com') return;
       listingIds.forEach(listingId => {
         const listing = listingsToDownload.find(l => l.listingId === listingId);
         const leadId = 'LDR-DL-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2,5).toUpperCase();
