@@ -7,6 +7,8 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, on
 import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
+export type DeveloperSubRole = 'Inventory In-Charge' | 'Transaction In-Charge';
+
 export type User = {
   email: string;
   role: 'SuperAdmin' | 'User' | 'O2O' | 'Warehouse Developer' | 'Agent';
@@ -24,6 +26,10 @@ export type User = {
   panNumber?: string;
   aadhaarNumber?: string;
   aadhaarDocUrl?: string;
+  // Developer sub-roles (multi-city / official email developers only)
+  developerSubRoles?: DeveloperSubRole[];       // requested at signup
+  approvedSubRoles?: DeveloperSubRole[];        // confirmed by Company Admin / SuperAdmin
+  subRoleDeactivated?: boolean;                 // Company Admin can deactivate
 };
 
 export type NewUser = User & {

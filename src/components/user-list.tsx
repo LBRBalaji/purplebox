@@ -262,6 +262,19 @@ export function UserList() {
                       {user.companyName}
                       {(user as any).gstNumber && <p className="text-xs text-muted-foreground mt-0.5">GST: {(user as any).gstNumber}</p>}
                       {!(user as any).gstNumber && (user as any).panNumber && <p className="text-xs text-muted-foreground mt-0.5">PAN: {(user as any).panNumber}</p>}
+                      {user.role === 'Warehouse Developer' && (user as any).approvedSubRoles?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {((user as any).approvedSubRoles as string[]).map((r: string) => (
+                            <span key={r} className="text-xs px-1.5 py-0.5"
+                              style={{background:(user as any).subRoleDeactivated?'#f3f4f6':'hsl(259 44% 94%)',color:(user as any).subRoleDeactivated?'#9ca3af':'#6141ac',border:'1px solid',borderColor:(user as any).subRoleDeactivated?'#e5e7eb':'hsl(259 44% 80%)'}}>
+                              {(user as any).subRoleDeactivated ? '⊘ ' : ''}{r}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {user.role === 'Warehouse Developer' && (user as any).developerSubRoles?.length > 0 && !(user as any).approvedSubRoles?.length && (
+                        <p className="text-xs mt-1" style={{color:'#b45309'}}>Sub-role pending approval</p>
+                      )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{user.phone || "-"}</TableCell>
                     <TableCell>

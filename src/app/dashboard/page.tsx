@@ -84,6 +84,15 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
+  // Sub-role access control for multi-city (official email) developers
+  const approvedSubRoles: string[] = (userProp as any)?.approvedSubRoles || [];
+  const subRoleDeactivated = !!(userProp as any)?.subRoleDeactivated;
+  const isPersonalEmailDev = ['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','live.com','msn.com','protonmail.com'].includes(userProp?.email?.split('@')[1]?.toLowerCase() || '');
+  // Standalone devs (personal email) or those with no approved sub-roles have full access
+  const hasSubRoles = approvedSubRoles.length > 0 && !subRoleDeactivated && !isPersonalEmailDev;
+  const canManageInventory = !hasSubRoles || approvedSubRoles.includes('Inventory In-Charge');
+  const canManageTransactions = !hasSubRoles || approvedSubRoles.includes('Transaction In-Charge');
+
   const tabs = [
     { value: 'my-listings', label: 'My Listings', icon: Building2 },
     { value: 'prospects', label: 'Prospects', icon: Eye },
@@ -327,10 +336,28 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
           })}
         </div>
         <div className="p-4">
-          {providerTab === 'my-listings' && <ProviderListings />}
+          {providerTab === 'my-listings' && (
+            canManageInventory ? <ProviderListings /> :
+            <div className="p-8 text-center rounded-none" style={{background:'hsl(259 44% 96%)',border:'1px solid hsl(259 44% 82%)'}}>
+              <p className="text-sm font-bold" style={{color:'#1e1537'}}>Access Restricted</p>
+              <p className="text-xs mt-1" style={{color:'hsl(259 15% 55%)'}}>Your role is Transaction In-Charge. Inventory management is handled by your Inventory In-Charge team member. Contact your Company Admin to update your role.</p>
+            </div>
+          )}
           {providerTab === 'prospects' && <ProspectsTab />}
-          {providerTab === 'registered-leads' && <ProviderLeads />}
-          {providerTab === 'submit-match' && <DemandList />}
+          {providerTab === 'registered-leads' && (
+            canManageTransactions ? <ProviderLeads /> :
+            <div className="p-8 text-center rounded-none" style={{background:'hsl(259 44% 96%)',border:'1px solid hsl(259 44% 82%)'}}>
+              <p className="text-sm font-bold" style={{color:'#1e1537'}}>Access Restricted</p>
+              <p className="text-xs mt-1" style={{color:'hsl(259 15% 55%)'}}>Your role is Inventory In-Charge. Lead and transaction management is handled by your Transaction In-Charge team member. Contact your Company Admin to update your role.</p>
+            </div>
+          )}
+          {providerTab === 'submit-match' && (
+            canManageTransactions ? <DemandList /> :
+            <div className="p-8 text-center rounded-none" style={{background:'hsl(259 44% 96%)',border:'1px solid hsl(259 44% 82%)'}}>
+              <p className="text-sm font-bold" style={{color:'#1e1537'}}>Access Restricted</p>
+              <p className="text-xs mt-1" style={{color:'hsl(259 15% 55%)'}}>Demand Board is accessible to Transaction In-Charge only. Contact your Company Admin to update your role.</p>
+            </div>
+          )}
           {providerTab === 'my-team' && userProp?.isCompanyAdmin && <DeveloperTeamDashboard />}
         </div>
       </div>

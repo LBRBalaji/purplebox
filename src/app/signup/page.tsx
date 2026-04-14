@@ -42,6 +42,7 @@ export default function SignupPage() {
   const [agentAddress, setAgentAddress] = React.useState('');
   const [agentLinkedIn, setAgentLinkedIn] = React.useState('');
   const [inviteCode, setInviteCode] = React.useState('');
+  const [developerSubRoles, setDeveloperSubRoles] = React.useState<string[]>([]);
   const [inviteError, setInviteError] = React.useState('');
   const [agentSubmitted, setAgentSubmitted] = React.useState(false);
   const [otpSent, setOtpSent] = React.useState(false);
@@ -152,7 +153,7 @@ export default function SignupPage() {
       } as any);
       return;
     }
-    signup(formData);
+    signup({ ...formData, developerSubRoles: developerSubRoles.length > 0 ? developerSubRoles as any : undefined });
   };
 
 
@@ -289,6 +290,49 @@ export default function SignupPage() {
                 </div>
               </div>
             )}
+            {/* Developer Sub-Role — multi-city/official email developers only */}
+            {formData.role === 'Warehouse Developer' && !isPersonalEmailAddr(formData.email) && (
+              <div className="space-y-3 rounded-none p-4 border" style={{background:'hsl(259 44% 97%)', borderColor:'hsl(259 44% 88%)'}}>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider" style={{color:'#6141ac'}}>Your Role in the Organisation</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Official email detected — you are registering as part of a multi-location developer organisation.
+                    Select your functional role(s). You may select both. Your Company Admin can update this after registration.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {[
+                    { id: 'Inventory In-Charge', label: 'Inventory In-Charge', desc: 'Responsible for managing building data and technical specifications to ensure 100% data integrity.' },
+                    { id: 'Transaction In-Charge', label: 'Transaction In-Charge', desc: 'Responsible for engaging with verified leads and managing the transaction lifecycle on the platform.' },
+                  ].map(role => (
+                    <label key={role.id}
+                      className="flex items-start gap-3 p-3 rounded-none cursor-pointer border transition-all"
+                      style={{
+                        background: developerSubRoles.includes(role.id) ? 'hsl(259 44% 92%)' : '#fff',
+                        borderColor: developerSubRoles.includes(role.id) ? '#6141ac' : 'hsl(259 30% 88%)',
+                      }}>
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 h-4 w-4 accent-purple-600 flex-shrink-0"
+                        checked={developerSubRoles.includes(role.id)}
+                        onChange={e => {
+                          if (e.target.checked) setDeveloperSubRoles(prev => [...prev, role.id]);
+                          else setDeveloperSubRoles(prev => prev.filter(r => r !== role.id));
+                        }}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold" style={{color:'#1e1537'}}>{role.label}</p>
+                        <p className="text-xs mt-0.5" style={{color:'hsl(259 15% 50%)'}}>{role.desc}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs" style={{color:'hsl(259 15% 55%)'}}>
+                  Sub-roles are pending approval by your Company Admin or ORS-ONE. Until confirmed, you will have full access.
+                </p>
+              </div>
+            )}
+
             {/* GST/PAN — Customer with personal email only (optional but shown) */}
             {formData.role === 'User' && isPersonalEmailAddr(formData.email) && (
               <div className="space-y-3 rounded-xl p-4 border" style={{background:'hsl(259 44% 97%)', borderColor:'hsl(259 44% 88%)'}}>
