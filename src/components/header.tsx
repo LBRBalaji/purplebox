@@ -337,19 +337,17 @@ export function Header() {
                     <NavLink href="/dashboard"><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
                   </NavTooltip>
                 )}
-                <NavTooltip label="Browse all approved warehouse listings on ORS-ONE. Search by location, size, building type and availability. Download specs as Excel.">
-                  <ListingsDropdown isSuperAdmin={isSuperAdmin} />
-                </NavTooltip>
+                <ListingsDropdown isSuperAdmin={isSuperAdmin} />
               {isProvider && (
                 <NavTooltip label="Create a new warehouse listing on ORS-ONE. Your listing goes to SuperAdmin for approval before going live on the marketplace.">
-                  <Link href="/dashboard?tab=my-listings&createNew=true" className="flex items-center gap-1.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-4 py-2 rounded-none whitespace-nowrap">
+                  <Link href="/dashboard?tab=my-listings&createNew=true" className="flex items-center gap-1.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-4 py-2 whitespace-nowrap" style={{borderRadius:0}}>
                     <PlusCircle className="h-3.5 w-3.5" /> New Listing
                   </Link>
                 </NavTooltip>
               )}
               {isCustomer && (
                 <NavTooltip label="Have unused warehouse space? List it as a sublease on ORS-ONE. Other businesses can find and lease your excess space directly through the platform.">
-                  <Link href="/dashboard?tab=my-sublease&createNew=true" className="flex items-center gap-1.5 text-sm font-semibold text-white transition-colors px-4 py-2 rounded-none whitespace-nowrap" style={{background:'#6141ac'}}>
+                  <Link href="/dashboard?tab=my-sublease&createNew=true" className="flex items-center gap-1.5 text-sm font-semibold text-white transition-colors px-4 py-2 whitespace-nowrap" style={{background:'#6141ac',borderRadius:0}}>
                     <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
                   </Link>
                 </NavTooltip>
@@ -357,9 +355,7 @@ export function Header() {
                 <NavTooltip label="Free calculators for warehouse leasing decisions — ROI analysis, commercial terms, and registration cost estimation. No login required.">
                   <ToolsDropdown />
                 </NavTooltip>
-                <NavTooltip label="Resources, guides, about ORS-ONE, community, and partnership information.">
-                  <MoreDropdown />
-                </NavTooltip>
+                <MoreDropdown />
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
                 {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
               </>
@@ -370,7 +366,7 @@ export function Header() {
             {(!user || (!isSuperAdmin && !isO2O)) && (
               <Link href="https://wa.me/919841098170?text=need%20O2O%20support%20call%20me%20back%20please" target="_blank" rel="noopener noreferrer" className="hidden lg:block">
                 <NavTooltip label="Speak directly with the ORS-ONE team. We will call you back to help with listings, demands, or transaction support.">
-                  <Button variant="outline" className="h-10 px-4 text-xs gap-1.5 rounded-none font-semibold">
+                  <Button variant="outline" className="h-10 px-4 text-xs gap-1.5 font-semibold" style={{borderRadius:0}}>
                     <WhatsAppIcon /> Ask a Call Back
                   </Button>
                 </NavTooltip>
@@ -383,7 +379,7 @@ export function Header() {
                 <NotificationsBell />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="h-10 px-3 gap-1.5 max-w-[180px] rounded-none text-xs font-semibold">
+                    <Button variant="outline" className="h-10 px-3 gap-1.5 max-w-[180px] text-xs font-semibold" style={{borderRadius:0}}>
                       <div className="flex flex-col items-start overflow-hidden">
                         <span className="text-xs font-semibold truncate leading-none max-w-[120px]">{user.userName}</span>
                         <span className="text-xs text-muted-foreground leading-none mt-0.5">{isInternalStaff ? user.userName + ' · ORS-ONE' : roleLabel}</span>
@@ -409,7 +405,7 @@ export function Header() {
               </div>
             ) : (
               <NavTooltip label="Sign in to access your dashboard, manage listings, track transactions and more. New? Create your account here.">
-                <Button className="h-10 px-5 text-sm font-semibold rounded-none" onClick={() => setIsLoginOpen(true)}>
+                <Button className="h-10 px-5 text-sm font-semibold" style={{borderRadius:0}} onClick={() => setIsLoginOpen(true)}>
                   <LogIn className="mr-2 h-4 w-4" /> Login / Sign Up
                 </Button>
               </NavTooltip>
