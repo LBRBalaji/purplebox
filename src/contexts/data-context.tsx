@@ -490,14 +490,30 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const addNotification = useCallback((notification: Omit<Notification, 'isRead'>) => {
     setNotifications(prev => {
         const newNotification = { ...notification, isRead: false };
-        if (notification.recipientEmail) {
-          sendEmailNotification(notification.recipientEmail, notification.title, notification.message || '', notification.href || '/dashboard');
-        }
         const updatedNotifications = [newNotification, ...prev];
         persistNotifications(updatedNotifications);
+        // Fire email via the notifications API — it handles dedup + email sending server-side
+        // This ensures emails fire even for stale closure scenarios
+        if (notification.recipientEmail) {
+          const allUsers = Object.values(users || {}) as any[];
+          const recipient = allUsers.find((u: any) => u.email === notification.recipientEmail);
+          if (recipient?.emailNotifications !== false) {
+            fetch('/api/send-notification-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: notification.recipientEmail,
+                userName: recipient?.userName || '',
+                title: notification.title,
+                message: notification.message || '',
+                href: notification.href || '/dashboard',
+              }),
+            }).catch(() => {});
+          }
+        }
         return updatedNotifications;
     });
-  }, [persistNotifications]);
+  }, [persistNotifications, users]);
 
   const setNotificationsFromWatcher = useCallback((notifs: Notification[]) => {
     setNotifications(notifs);
@@ -694,6 +710,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 }
             });
         }
+        // Always include ORS-ONE admin on transactions
+        participants.add('balaji@lakshmibalajio2o.com');
+        // Include broker if appointed
+        if ((lead as any).brokerEmail) participants.add((lead as any).brokerEmail);
+        // Include agent if present
+        if ((lead as any).agentInviteEmail) participants.add((lead as any).agentInviteEmail);
         
         const uniqueParticipants = Array.from(participants).filter(p => p !== newActivity.createdBy);
 
@@ -752,9 +774,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
             addNotification({
                 id: `notif-${Date.now()}-${providerEmail}-${Math.random()}`,
                 type: 'new_lead_for_provider',
-                title: `New Direct Lead: ${newLead.leadName}`,
-                message: `A customer has downloaded your listing and initiated contact. Please acknowledge.`,
-                href: '/dashboard?tab=registered-leads',
+                title: `New Lead: ${newLead.leadName}`,
+                message: `${newLead.leadName} has shown interest in your listing and initiated contact on ORS-ONE. Please open the Transaction Workspace to review and respond.`,
+                href: `/dashboard/leads/${newLead.id}?tab=activity`,
                 recipientEmail: providerEmail,
                 timestamp: new Date().toISOString(),
                 triggeredBy: userEmail || 'system'
