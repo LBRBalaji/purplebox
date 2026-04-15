@@ -401,8 +401,8 @@ export default function ListingDetailPage() {
                 'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
                 'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
                 'Access Road': listing.siteSpecifications.typeOfRoad,
-                'Rent (per Sq. Ft.)': listing.rentPerSqFt ? `₹${listing.rentPerSqFt}/sft` : 'Request for Quote',
-                'Security Deposit (Months)': listing.rentalSecurityDeposit ? `${listing.rentalSecurityDeposit} months` : 'Request for Quote',
+                'Commercials': 'Request for Quote — visit listing page',
+                'Request for Quote (URL)': `https://lease.orsone.app/listings/${listing.listingId}`,
                 'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
                 'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
                 'Roof Type': listing.buildingSpecifications.roofType,
@@ -819,7 +819,7 @@ export default function ListingDetailPage() {
                         <div className="rounded-xl p-3" style={{background:'hsl(259 44% 97%)',border:'1px solid hsl(259 44% 88%)'}}>
                             <p className="text-xs font-semibold" style={{color:'#6141ac'}}>What happens next?</p>
                             <ul className="mt-1.5 space-y-1 text-xs" style={{color:'hsl(259 15% 45%)'}}>
-                                <li>→ Developer receives your request and responds with a formal quote</li>
+                                <li>→ Developer receives your request and responds with rent, deposit and lease terms</li>
                                 <li>→ All communication tracked in your Transaction Workspace</li>
                                 <li>→ Schedule a site visit, negotiate terms, finalise MoU — all in one place</li>
                             </ul>

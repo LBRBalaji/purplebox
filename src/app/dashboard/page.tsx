@@ -386,6 +386,44 @@ const MainDashboard = () => {
     const [agentTab, setAgentTab] = React.useState(defaultTabParam || 'transactions');
     const hasPendingSubmissions = React.useMemo(() => submissions.some(s => s.status === 'Pending'), [submissions]);
     const handleSwitchToMyDemands = React.useCallback(() => setCustomerTab('my-demands'), []);
+
+    // 48hr download-without-RFQ reminder — fires once per session for customers
+    React.useEffect(() => {
+      if (!user || user.role !== 'User') return;
+      const REMINDER_KEY = `rfq-reminder-shown-${user.email}`;
+      if (sessionStorage.getItem(REMINDER_KEY)) return;
+      const fortyEightHrsAgo = Date.now() - (48 * 60 * 60 * 1000);
+      const recentDownloads = downloadHistory.filter((d: any) => d.userId === user.email && d.timestamp >= fortyEightHrsAgo);
+      if (recentDownloads.length === 0) return;
+      const rfqListingIds = new Set(
+        registeredLeads.filter(l => l.customerId === user.email)
+          .flatMap(l => l.providers.flatMap(p => p.properties.map(pr => pr.listingId)))
+      );
+      const unactioned = recentDownloads.filter((d: any) => !rfqListingIds.has(d.listingId));
+      if (unactioned.length === 0) return;
+      sessionStorage.setItem(REMINDER_KEY, '1');
+      fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([{
+          id: `notif-rfq-reminder-${user.email}-${Date.now()}`,
+          type: 'new_activity',
+          title: 'Ready to Request for Quote?',
+          message: `You downloaded ${unactioned.length} listing${unactioned.length > 1 ? 's' : ''} recently without a Request for Quote. Visit your shortlist to send in one click.`,
+          href: '/dashboard?tab=my-shortlist',
+          recipientEmail: user.email,
+          timestamp: new Date().toISOString(),
+          triggeredBy: 'system',
+          isRead: false,
+        }]),
+      }).catch(() => {});
+      fetch('/api/send-rfq-reminder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail: user.email, userName: user.userName, downloadCount: unactioned.length, shortlistUrl: 'https://lease.orsone.app/dashboard?tab=my-shortlist' }),
+      }).catch(() => {});
+    }, [user, downloadHistory, registeredLeads]);
+
     React.useEffect(() => {
       if (logNewDemand || editDemandId) { setCustomerTab('log-demand'); }
       else if (propertyMatchDemandId) { setProviderTab('submit-match'); setAdminTab('submit-match'); }
