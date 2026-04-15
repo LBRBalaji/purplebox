@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown, AlertTriangle, History, Info, Edit, UserPlus } from 'lucide-react';
+import { Building, HandCoins, HardHat, ListChecks, MapPin, PlusCircle, Save, Trash2, Home, Power, Droplets, ShieldCheck, User, FolderArchive, FileSymlink, DollarSign, Calendar, Users, Share, FileText, FileSignature, TrendingUp, Notebook, Download, Warehouse, ChevronsUpDown, AlertTriangle, History, Info, Edit, UserPlus, Printer } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, TableFooter } from './ui/table';
 import { Textarea } from './ui/textarea';
@@ -25,6 +25,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collap
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { ScrollArea } from './ui/scroll-area';
+import { StakeholderInvite } from './stakeholder-invite';
 
 // All term sheet sections from the lease term sheet template
 const TERM_SHEET_SECTIONS = [
@@ -717,11 +718,8 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
         alert("Minutes of Meeting finalized. Check the console for the data object that would be shared/stored.");
     };
     
-    const handleDraftMoU = () => {
-        const agreedTerms = form.getValues();
-        console.log("Drafting MoU based on these agreed terms:", agreedTerms);
-        alert("MoU draft initiated. Check the console for the data that would be used to generate the document.");
-    };
+    const [showMoU, setShowMoU] = React.useState(false);
+    const handleDraftMoU = () => setShowMoU(true);
 
     const handlePrint = () => {
         const originalTitle = document.title;
@@ -748,8 +746,8 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                     </CardDescription>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                     <Button type="button" variant="outline" onClick={handlePrint}>
-                                        <Download className="mr-2 h-4 w-4" /> Download as PDF
+                                     <Button type="button" variant="outline" onClick={handlePrint} style={{borderRadius:0}}>
+                                        <Printer className="mr-2 h-4 w-4" /> Print Term Sheet
                                     </Button>
                                     {canEdit && (
                                         <>
@@ -829,17 +827,24 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                     )}
                                 />
                             </div>
-                             <div className="flex items-center gap-2 justify-end pt-4 no-print">
-                                <Button type="button" variant="outline" onClick={handleDraftMoU}><FileSignature className="mr-2 h-4 w-4" /> Draft MoU</Button>
-                                {canEdit && (
+                             <div className="space-y-4 pt-4">
+                                {/* Stakeholder Invite */}
+                                <div className="no-print">
+                                  <p className="text-xs font-bold mb-2 uppercase tracking-wider" style={{color:'hsl(259 15% 55%)'}}>Share for Review</p>
+                                  <StakeholderInvite lead={lead} />
+                                </div>
+                                <div className="flex items-center gap-2 justify-end no-print">
+                                  <Button type="button" variant="outline" onClick={handleDraftMoU} style={{borderRadius:0}}><FileSignature className="mr-2 h-4 w-4" /> View MoU Draft</Button>
+                                  {canEdit && (
                                     <>
-                                        <Button type="button" variant="outline" onClick={handleFinalizeMoM}>
-                                            <Share className="mr-2 h-4 w-4" /> Finalize as MoM
-                                        </Button>
-                                        <Button type="submit" variant="secondary"><Save className="mr-2 h-4 w-4" /> Save Draft</Button>
+                                      <Button type="button" variant="outline" onClick={handleFinalizeMoM} style={{borderRadius:0}}>
+                                        <Share className="mr-2 h-4 w-4" /> Finalize as MoM
+                                      </Button>
+                                      <Button type="submit" variant="secondary" style={{borderRadius:0}}><Save className="mr-2 h-4 w-4" /> Save Draft</Button>
                                     </>
-                                )}
-                            </div>
+                                  )}
+                                </div>
+                              </div>
                         </CardFooter>
                     </Card>
                 </form>
@@ -848,6 +853,84 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                 <span>Transaction ID: {lead.id}</span>
                 <span>Transaction Facilitator: <a href="https://www.lakshmibalajio2o.com" target="_blank" rel="noopener noreferrer">ORS-ONE</a></span>
             </div>
+
+            {/* MoU Draft Modal */}
+            {showMoU && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 no-print" style={{background:'rgba(30,21,55,0.7)'}}>
+                <div className="w-full max-w-2xl max-h-screen overflow-y-auto" style={{background:'#fff',boxShadow:'0 8px 40px rgba(97,65,172,0.2)'}}>
+                  <div className="px-6 py-4 flex items-center justify-between" style={{background:'linear-gradient(135deg,#1e1537,#3b2870)'}}>
+                    <div>
+                      <p className="text-sm font-bold text-white">Draft Memorandum of Understanding</p>
+                      <p className="text-xs mt-0.5" style={{color:'rgba(255,255,255,0.5)'}}>Transaction ID: {lead.id} · For review only — not legally binding until executed</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => { const orig=document.title; document.title=`ORS-ONE_MoU_Draft_${lead.id}`; window.print(); document.title=orig; }}
+                        className="flex items-center gap-1.5 text-xs font-bold px-3 py-2" style={{background:'rgba(255,255,255,0.15)',color:'#fff',borderRadius:0}}>
+                        <Printer className="h-3.5 w-3.5" /> Print MoU
+                      </button>
+                      <button onClick={() => setShowMoU(false)} className="text-xs font-bold px-3 py-2" style={{background:'rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.7)',borderRadius:0}}>Close</button>
+                    </div>
+                  </div>
+                  <div className="p-6 space-y-5 text-sm" style={{color:'#1e1537',lineHeight:1.8}}>
+                    <div className="text-center pb-4" style={{borderBottom:'1px solid hsl(259 30% 90%)'}}>
+                      <p className="text-base font-bold">MEMORANDUM OF UNDERSTANDING</p>
+                      <p className="text-xs mt-1" style={{color:'#888'}}>Draft — Subject to Review and Execution</p>
+                      <p className="text-xs" style={{color:'#888'}}>{new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}</p>
+                    </div>
+                    <p><strong>This Memorandum of Understanding ("MoU")</strong> is entered into between the parties as identified in Transaction ID <strong>{lead.id}</strong> managed on the ORS-ONE platform (lease.orsone.app), operated by Lakshmi Balaji ORS Private Limited.</p>
+                    <div>
+                      <p className="font-bold mb-2">1. Parties</p>
+                      <p><strong>Tenant/Customer:</strong> {lead.leadName} ({lead.leadEmail})</p>
+                      {lead.providers.map((p, i) => (
+                        <p key={i}><strong>Landlord/Developer:</strong> {p.providerEmail}</p>
+                      ))}
+                      {(lead as any).brokerName && <p><strong>Transaction Partner:</strong> {(lead as any).brokerName}</p>}
+                    </div>
+                    <div>
+                      <p className="font-bold mb-2">2. Property</p>
+                      <p>{lead.requirementsSummary}</p>
+                    </div>
+                    <div>
+                      <p className="font-bold mb-2">3. Commercial Terms</p>
+                      <p>The commercial terms agreed upon between the parties are as documented in the Commercial Term Sheet maintained on the ORS-ONE platform under Transaction ID <strong>{lead.id}</strong>. Those terms form an integral part of this MoU.</p>
+                    </div>
+                    <div>
+                      <p className="font-bold mb-2">4. Intent</p>
+                      <p>Both parties confirm their intent to enter into a formal Lease Agreement based on the agreed commercial terms. This MoU does not constitute a binding lease agreement and is subject to execution of a formal agreement.</p>
+                    </div>
+                    <div>
+                      <p className="font-bold mb-2">5. Brokerage</p>
+                      {(lead as any).brokerName && (lead as any).brokerAcknowledged
+                        ? <p>The Landlord/Developer has formally acknowledged that industry standard brokerage is payable to <strong>{(lead as any).brokerName}</strong> upon successful execution of the Lease Agreement. This acknowledgement was recorded on {(lead as any).brokerAcknowledgedAt ? new Date((lead as any).brokerAcknowledgedAt).toLocaleDateString('en-IN') : 'the ORS-ONE platform'}.</p>
+                        : <p>Brokerage terms to be confirmed by the respective parties prior to execution.</p>}
+                    </div>
+                    <div>
+                      <p className="font-bold mb-2">6. Facilitation</p>
+                      <p>This transaction is facilitated by ORS-ONE, a platform operated by Lakshmi Balaji ORS Private Limited. ORS-ONE is not a party to the lease agreement and assumes no liability for the terms agreed between the parties.</p>
+                    </div>
+                    <div className="pt-6 grid grid-cols-2 gap-8" style={{borderTop:'1px solid hsl(259 30% 88%)'}}>
+                      <div className="space-y-8">
+                        <div>
+                          <p className="text-xs font-bold mb-1" style={{color:'#888'}}>TENANT / CUSTOMER</p>
+                          <div className="h-12 border-b" style={{borderColor:'hsl(259 30% 85%)'}} />
+                          <p className="text-xs mt-1" style={{color:'#888'}}>{lead.leadName}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-8">
+                        <div>
+                          <p className="text-xs font-bold mb-1" style={{color:'#888'}}>LANDLORD / DEVELOPER</p>
+                          <div className="h-12 border-b" style={{borderColor:'hsl(259 30% 85%)'}} />
+                          <p className="text-xs mt-1" style={{color:'#888'}}>{lead.providers[0]?.providerEmail}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-center pt-4" style={{color:'#aaa',borderTop:'1px solid hsl(259 30% 90%)'}}>
+                      Generated on ORS-ONE · lease.orsone.app · Lakshmi Balaji ORS Private Limited · Transaction ID: {lead.id}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
         </div>
     );
 }

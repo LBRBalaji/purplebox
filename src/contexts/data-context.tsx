@@ -126,11 +126,14 @@ export type OffPlatformProperty = {
 export type DealInvitee = {
   name: string;
   email: string;
-  role: 'Customer' | 'Developer' | 'Agent';
+  role: 'Customer' | 'Developer' | 'Agent' | 'Stakeholder';
+  roleDescription?: string;   // e.g. "Legal Counsel", "Finance Team", "Bank Representative"
   token: string;
   invitedAt: string;
+  invitedBy?: string;         // email of the person who invited
   lastAccessedAt?: string;
   registered?: boolean;
+  accessType?: 'edit' | 'readonly';  // stakeholders always 'readonly'
 };
 
 export type RegisteredLead = {

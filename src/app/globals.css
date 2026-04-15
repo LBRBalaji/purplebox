@@ -117,8 +117,30 @@ body {
     background: white;
   }
 
-  header, footer, .no-print {
+  header, footer, .no-print, button, [role="button"] {
     display: none !important;
+  }
+
+  /* Suppress all interactive controls */
+  input, textarea, select, [data-radix-collection-item] {
+    border: 1px solid #ccc !important;
+    background: transparent !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* ORS-ONE watermark on every page */
+  .printable-container::before {
+    content: 'ORS-ONE CONFIDENTIAL — For Review Only';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 48px;
+    font-weight: 900;
+    color: rgba(97, 65, 172, 0.06);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 9999;
   }
 
   main {
