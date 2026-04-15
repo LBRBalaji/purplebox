@@ -647,7 +647,7 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead, prima
 
 export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
     const { user } = useAuth();
-    const { getNegotiationBoard, updateNegotiationBoard } = useData();
+    const { getNegotiationBoard, updateNegotiationBoard, addTransactionActivity } = useData();
     
     const canEdit = true;
 
@@ -707,15 +707,37 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
     };
     
     const handleGenerateFollowUp = () => {
-        const lastSession = form.getValues().sessions[form.getValues().sessions.length - 1];
-        console.log("Generating follow-up based on last session:", lastSession);
-        alert("Check console for follow-up data. This would be a new session in a real implementation.");
-    }
-    
+        // Add a new blank session as the follow-up, pre-dated to today
+        appendSession({
+            date: new Date().toISOString(),
+            customerAttendees: form.getValues().sessions[form.getValues().sessions.length - 1]?.customerAttendees || [],
+            providerAttendees: form.getValues().sessions[form.getValues().sessions.length - 1]?.providerAttendees || [],
+            facilitatorAttendees: form.getValues().sessions[form.getValues().sessions.length - 1]?.facilitatorAttendees || [],
+            sections: [],
+        });
+        // Scroll to the new session
+        setTimeout(() => {
+            const lastSession = document.querySelectorAll('[data-session-index]');
+            lastSession[lastSession.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    };
+
+    const [showMoMConfirm, setShowMoMConfirm] = React.useState(false);
     const handleFinalizeMoM = () => {
-        const momData = form.getValues();
-        console.log("Finalized Minutes of Meeting:", momData);
-        alert("Minutes of Meeting finalized. Check the console for the data object that would be shared/stored.");
+        // Save the current board state as finalised and log as activity
+        form.handleSubmit((data) => {
+            updateNegotiationBoard(lead.id, data);
+            addTransactionActivity({
+                leadId: lead.id,
+                activityType: 'Lead Acknowledged',
+                details: {
+                    message: `Minutes of Meeting finalised by ${user?.companyName || user?.userName}. ${data.sessions.length} session(s) recorded with ${data.actionableItems?.length || 0} actionable item(s).`,
+                },
+                createdBy: user?.email || '',
+            });
+            setShowMoMConfirm(true);
+            setTimeout(() => setShowMoMConfirm(false), 3500);
+        })();
     };
     
     const [showMoU, setShowMoU] = React.useState(false);
@@ -827,6 +849,12 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                     )}
                                 />
                             </div>
+                             {showMoMConfirm && (
+                              <div className="flex items-center gap-2 px-4 py-3 no-print" style={{background:'#f0fdf4',border:'1px solid #bbf7d0'}}>
+                                <svg width="14" height="14" fill="none" stroke="#15803d" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                                <p className="text-xs font-semibold" style={{color:'#15803d'}}>Minutes of Meeting saved and logged to the Activity Record.</p>
+                              </div>
+                            )}
                              <div className="space-y-4 pt-4">
                                 {/* Stakeholder Invite */}
                                 <div className="no-print">
