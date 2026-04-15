@@ -203,7 +203,7 @@ export default function ListingDetailPage() {
     const router = useRouter();
     const { user, users, isLoading: isAuthLoading } = useAuth();
     const { toast } = useToast();
-    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest, addRegisteredLead, registeredLeads, addTransactionActivity } = useData();
+    const { listings, logDownload, logListingView, isLoading: isDataLoading, generalShortlist, toggleGeneralShortlist, isShortlistLoading, addLayoutRequest, addRegisteredLead, registeredLeads, addTransactionActivity, transactionActivities } = useData();
     const [listing, setListing] = React.useState<ListingSchema | null>(null);
     const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
     const [pendingAction, setPendingAction] = React.useState<(() => void) | null>(null);
@@ -368,7 +368,8 @@ export default function ListingDetailPage() {
         );
     }, [user, listing, registeredLeads]);
 
-    const hasRequestedQuote = justRequestedQuote || !!quoteRequestLead;
+    const hasRequestedQuote = justRequestedQuote || !!(quoteRequestLead && 
+        transactionActivities?.some((a: any) => a.leadId === quoteRequestLead?.id && a.activityType === 'Quote Requested'));
 
     const executeDownload = React.useCallback(() => {
         if (!listing) return;
@@ -430,18 +431,12 @@ export default function ListingDetailPage() {
             
             XLSX.writeFile(workbook, filename, { bookType: "csv" });
 
-            // File delivered — mark done
+            // File delivered
             setPendingDownload(false);
             toast({
                 title: 'Specs Downloaded',
-                description: `Specs for ${listing.listingId} saved. Send a Request for Quote to get accurate commercial terms from the developer.`,
+                description: `Specs for ${listing.listingId} saved.`,
             });
-
-        setPendingDownload(false);
-        toast({
-            title: 'Specs Downloaded',
-            description: `Specs for ${listing.listingId} saved. Send a Request for Quote to get accurate commercial terms from the developer.`,
-        });
     }, [listing, toast]);
 
     const handleDownloadRequest = () => {
@@ -846,7 +841,7 @@ export default function ListingDetailPage() {
                                 onClick={() => {
                                     setShowRfqNudge(false);
                                     executeDownload();
-                                    if (!hasRequestedQuote) handleGetQuote();
+                                    handleGetQuote();
                                 }}
                                 className="w-full text-left px-4 py-4 transition-all hover:opacity-95"
                                 style={{background:'#6141ac',borderRadius:0}}>
