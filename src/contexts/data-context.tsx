@@ -1307,9 +1307,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   
   const toggleGeneralShortlist = useCallback((listingId: string) => {
       setIsShortlistLoading(true);
-      const newShortlist = generalShortlist.includes(listingId)
-        ? generalShortlist.filter(id => id !== listingId)
-        : [...generalShortlist, listingId];
+      const isAdding = !generalShortlist.includes(listingId);
+      const newShortlist = isAdding
+        ? [...generalShortlist, listingId]
+        : generalShortlist.filter(id => id !== listingId);
       
       setGeneralShortlist(newShortlist);
       try {
@@ -1317,8 +1318,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
       } catch (error) {
           console.error("Could not write to localStorage", error);
       }
-      setTimeout(() => setIsShortlistLoading(false), 300); // Simulate async save
-  }, [generalShortlist]);
+
+      // TP4 — Shortlist signal: notify developer in-app (soft signal, no email)
+      if (isAdding && authUser?.role === 'User') {
+        const listing = listings.find(l => l.listingId === listingId);
+        if (listing?.developerId && listing.developerId !== authUser.email) {
+          addNotification({
+            id: `shortlist-${authUser.email}-${listingId}-${Date.now()}`,
+            type: 'new_lead_for_provider',
+            title: `Listing Shortlisted: ${listingId}`,
+            message: `A customer from ${authUser.companyName || 'a company'} has shortlisted your listing ${listingId} (${listing.location?.split(',')[0]}). This is an early interest signal — they may send a Request for Quote soon.`,
+            href: `/dashboard?tab=prospects`,
+            recipientEmail: listing.developerId,
+            timestamp: new Date().toISOString(),
+            triggeredBy: authUser.email,
+          });
+        }
+      }
+
+      setTimeout(() => setIsShortlistLoading(false), 300);
+  }, [generalShortlist, authUser, listings, addNotification]);
 
   const openChat = (chat: ChatSubmission) => {
       const threadId = `chat-${chat.demandId}-${chat.providerEmail}`;
