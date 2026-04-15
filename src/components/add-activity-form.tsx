@@ -256,7 +256,7 @@ export function AddActivityForm({ leadId, onAddActivity, existingActivities = []
       {quoteAlreadyLogged && (
         <div className="mx-6 mb-0 px-4 py-2.5 rounded-none flex items-center gap-2" style={{background:'hsl(259 44% 96%)',border:'1px solid hsl(259 44% 82%)'}}>
           <svg width="14" height="14" fill="none" stroke="#6141ac" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          <p className="text-xs font-semibold" style={{color:'#6141ac'}}>Formal quote request already logged — the developer has been notified.</p>
+          <p className="text-xs font-semibold" style={{color:'#6141ac'}}>Request for Quote already sent — the developer has been notified.</p>
         </div>
       )}
       <CardContent>
@@ -271,7 +271,7 @@ export function AddActivityForm({ leadId, onAddActivity, existingActivities = []
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
-                      {quoteAlreadyLogged ? null : <SelectItem value="Quote Requested">Request Formal Quote</SelectItem>}
+                      {quoteAlreadyLogged ? null : <SelectItem value="Quote Requested">Request for Quote</SelectItem>}
                       <SelectItem value="Site Visit Request">Site Visit Request</SelectItem>
                       <SelectItem value="Site Visit Update">Site Visit Update</SelectItem>
                       <SelectItem value="Customer Feedback">Customer Feedback</SelectItem>

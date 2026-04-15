@@ -444,7 +444,7 @@ export default function LeadDetailPage() {
     { key: 'mou',         label: 'MoU',              done: hasMoU,         sub: 'Finalised' },
   ] : [
     { key: 'chat',        label: 'Chat',        done: true,           sub: 'Connected' },
-    { key: 'rfq',         label: 'Get Quote',   done: hasQuote,       sub: 'Formal RFQ' },
+    { key: 'rfq',         label: 'Request for Quote', done: hasQuote, sub: 'RFQ' },
     { key: 'sitevisit',   label: 'Site Visit',  done: siteVisitDone,  sub: 'Inspected' },
     { key: 'negotiation', label: 'Negotiation', done: hasNegotiation, sub: 'Terms Agreed' },
     { key: 'fitout',      label: 'Fit-Out',     done: hasFitOut,      sub: 'Requirements' },

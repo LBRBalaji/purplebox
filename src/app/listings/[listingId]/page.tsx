@@ -401,8 +401,8 @@ export default function ListingDetailPage() {
                 'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
                 'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
                 'Access Road': listing.siteSpecifications.typeOfRoad,
-                'Rent (per Sq. Ft.)': listing.rentPerSqFt || 'Contact for details',
-                'Security Deposit (Months)': listing.rentalSecurityDeposit || 'Contact for details',
+                'Rent (per Sq. Ft.)': listing.rentPerSqFt ? `₹${listing.rentPerSqFt}/sft` : 'Request for Quote',
+                'Security Deposit (Months)': listing.rentalSecurityDeposit ? `${listing.rentalSecurityDeposit} months` : 'Request for Quote',
                 'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
                 'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
                 'Roof Type': listing.buildingSpecifications.roofType,
@@ -730,7 +730,7 @@ export default function ListingDetailPage() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-center text-center">
-                                            <span className="text-2xl font-bold">Price on Request</span>
+                                            <span className="text-2xl font-bold" style={{color:"#6141ac"}}>Request for Quote</span>
                                         </div>
                                         <Separator/>
                                         <DetailRow label="Construction Progress" value={listing.constructionProgress} />
@@ -740,7 +740,7 @@ export default function ListingDetailPage() {
                                      {hasRequestedQuote ? (
                                         <div className="w-full text-center space-y-2">
                                             <p className="text-sm font-semibold text-green-600 flex items-center justify-center gap-2">
-                                                <Check className="h-4 w-4" /> Commercials Requested
+                                                <Check className="h-4 w-4" /> Request for Quote Sent
                                             </p>
                                             <Button asChild variant="outline" className="w-full">
                                                 <Link href={`/dashboard/leads/${quoteRequestLead?.id}`}>

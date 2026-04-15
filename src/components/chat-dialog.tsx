@@ -345,7 +345,7 @@ export function ChatPanel({
                 className="w-full mb-3 py-2 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all hover:opacity-90"
                 style={{background:'hsl(259 44% 94%)',color:'#6141ac',border:'1px solid hsl(259 44% 82%)'}}>
                 <svg width="14" height="14" fill="none" stroke="#6141ac" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-                Request Formal Quote — Get Accurate Commercial Terms from Developer
+                Request for Quote
             </button>
         )}
         {uploadProgress !== null && <Progress value={uploadProgress} className="mb-2 h-1" />}

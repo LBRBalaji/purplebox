@@ -416,7 +416,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                                 </FormControl>
                                 <div className="flex items-center space-x-2 pt-1">
                                     <Checkbox id="rent-get-quote" checked={field.value === 'Get Quote'} onCheckedChange={(checked) => field.onChange(checked ? 'Get Quote' : undefined)} />
-                                    <label htmlFor="rent-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Get Quote"</label>
+                                    <label htmlFor="rent-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Request for Quote"</label>
                                 </div>
                                 <FormMessage />
                             </FormItem>
@@ -436,7 +436,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                                 </FormControl>
                                 <div className="flex items-center space-x-2 pt-1">
                                     <Checkbox id="deposit-get-quote" checked={field.value === 'Get Quote'} onCheckedChange={(checked) => field.onChange(checked ? 'Get Quote' : undefined)} />
-                                    <label htmlFor="deposit-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Get Quote"</label>
+                                    <label htmlFor="deposit-get-quote" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Set to "Request for Quote"</label>
                                 </div>
                                 <FormMessage />
                             </FormItem>

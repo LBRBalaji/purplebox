@@ -49,7 +49,7 @@ export function GeneralShortlist() {
                           </div>
                           <div>
                           <p className="text-muted-foreground">Rent</p>
-                          <p className="font-medium">₹{listing.rentPerSqFt || '??'}/sft</p>
+                          <p className="font-medium">{listing.rentPerSqFt ? `₹${listing.rentPerSqFt}/sft` : 'Request for Quote'}</p>
                           </div>
                       </div>
                       </CardContent>

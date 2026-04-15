@@ -130,7 +130,7 @@ function DownloadBar() {
                 'Location': l.location,
                 'Size (Sq. Ft.)': l.sizeSqFt,
                 'Availability': l.availabilityDate,
-                'Rent (per Sq. Ft.)': l.rentPerSqFt || 'Contact for details',
+                'Rent (per Sq. Ft.)': l.rentPerSqFt ? `₹${l.rentPerSqFt}/sft` : 'Request for Quote',
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);

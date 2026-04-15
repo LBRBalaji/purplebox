@@ -546,7 +546,7 @@ const MainDashboard = () => {
                         </div>
                         {hasProposal && (
                           <div className="mt-2 pt-2 flex gap-4" style={{borderTop:'1px solid hsl(259 30% 91%)'}}>
-                            <span className="text-xs" style={{color:'#aaa'}}>₹{provider.properties[0].rentPerSft}/sft</span>
+                            <span className="text-xs" style={{color:'#aaa'}}>{provider.properties[0].rentPerSft ? `₹${provider.properties[0].rentPerSft}/sft` : 'RFQ'}</span>
                             <span className="text-xs" style={{color:'#aaa'}}>{provider.properties[0].actualChargeableArea?.toLocaleString()} sft</span>
                             <span className="text-xs font-semibold" style={{color:'#6141ac'}}>Open Workspace →</span>
                           </div>
