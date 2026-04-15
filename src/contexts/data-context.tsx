@@ -877,6 +877,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const getDownloadLimits = useCallback((user: User, listingsToDownload: ListingSchema[]) => {
+    // Demo account — no limits
+    if (user.email === 'balajispillai@gmail.com') return { allowed: true, message: 'Unlimited access.' };
     const todayStart = startOfDay(new Date()).getTime();
     const domain = getEmailDomain(user.email);
     const INDIVIDUAL_LIMIT = 5;
@@ -1125,7 +1127,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
 
   const toggleSelectedForDownload = useCallback((listing: ListingSchema): { limitReached: boolean } => {
-    if (selectedForDownload.length >= 5 && !selectedForDownload.some(item => item.listingId === listing.listingId)) {
+    if (authUser?.email !== 'balajispillai@gmail.com' && selectedForDownload.length >= 5 && !selectedForDownload.some(item => item.listingId === listing.listingId)) {
       return { limitReached: true };
     }
 

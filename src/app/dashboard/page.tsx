@@ -447,7 +447,8 @@ const MainDashboard = () => {
       const myDownloads = downloadHistory.filter((d: any) => d.userId === user?.email);
       const todayStart = new Date(); todayStart.setHours(0,0,0,0);
       const downloadsToday = myDownloads.filter((d: any) => d.timestamp >= todayStart.getTime()).length;
-      const downloadLimit = 5;
+      const isDemo = user?.email === 'balajispillai@gmail.com';
+      const downloadLimit = isDemo ? Infinity : 5;
       const myLeads = registeredLeads.filter((l: any) => l.customerId === user?.email);
       const activeTransaction = myLeads.find((l: any) => {
         const p = l.providers?.[0];
@@ -497,7 +498,7 @@ const MainDashboard = () => {
           {/* KPI row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: 'Downloads Today', value: downloadsToday, sub: downloadsToday >= downloadLimit ? 'Limit reached' : `${downloadLimit - downloadsToday} remaining`, alert: downloadsToday >= downloadLimit },
+              { label: 'Downloads Today', value: isDemo ? '∞' : downloadsToday, sub: isDemo ? 'Unlimited access' : (downloadsToday >= downloadLimit ? 'Limit reached' : `${downloadLimit - downloadsToday} remaining`), alert: !isDemo && downloadsToday >= downloadLimit },
               { label: 'Shortlisted', value: shortlistCount, sub: 'Saved for review', alert: false },
               { label: 'Active Transactions', value: myLeads.length, sub: myLeads.length > 0 ? 'In progress' : 'None yet', good: myLeads.length > 0 },
               { label: 'Open Chats', value: unreadChatCount > 0 ? `${unreadChatCount}` : '—', sub: unreadChatCount > 0 ? `${unreadChatCount} unread` : 'All caught up', alert: unreadChatCount > 0 },
