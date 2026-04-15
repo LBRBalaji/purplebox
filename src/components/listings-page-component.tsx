@@ -222,9 +222,11 @@ function ListingCard({ listing, isSelected, onSelectionChange, onShortlist, isSh
 function DownloadBar() {
     const { user } = useAuth();
     const { toast } = useToast();
-    const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
+    const { selectedForDownload, logDownload, clearSelectedForDownload, addRegisteredLead, addTransactionActivity } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isOtpOpen, setIsOtpOpen] = useState(false);
+    const [showRfqNudge, setShowRfqNudge] = useState(false);
+    const ORS_ADMIN = 'balaji@lakshmibalajio2o.com';
 
     if (selectedForDownload.length === 0) {
         return null;
@@ -238,11 +240,8 @@ function DownloadBar() {
         })
     }
     
-    const proceedWithDownload = () => {
-        if (!user) return; // Should not happen if terms are accepted, but as a safeguard.
-        const { success } = logDownload(user, selectedForDownload);
-        if (success) {
-            const dataToExport = selectedForDownload.map(l => ({
+    const executeDownload = (listings: typeof selectedForDownload) => {
+        const dataToExport = listings.map(l => ({
                 'Property ID': l.listingId,
                 'Listing Name': l.name || '-',
                 'Location': l.location || '-',
@@ -257,8 +256,8 @@ function DownloadBar() {
                 'Total Chargeable Area (Sq. Ft.)': l.area?.totalChargeableArea || '-',
                 'Temp Controlled Area (Sq. Ft.)': l.area?.tempControlledArea || '-',
                 'Non-Temp Controlled Area (Sq. Ft.)': l.area?.nonTempControlledArea || '-',
-                'Rent per Sq. Ft. (Rs.)': l.rentPerSqFt || 'Get Quote',
-                'Security Deposit': l.rentalSecurityDeposit || 'Get Quote',
+                'Commercials': 'Request for Quote',
+                'Click to Request Quote': `=HYPERLINK("https://lease.orsone.app/listings/${l.listingId}","Request for Quote — Click Here")`,
                 'Availability / Possession': l.availabilityDate || '-',
                 'Construction Progress': l.constructionProgress || '-',
                 'Building Type': Array.isArray(l.buildingSpecifications?.buildingType) ? l.buildingSpecifications.buildingType.join(', ') : '-',
@@ -309,16 +308,64 @@ function DownloadBar() {
             const ss = now.getSeconds().toString().padStart(2, '0');
             const filename = `ORS-ONE_Selected_Listings_${yyyy}-${mm}-${dd}_${hh}${min}${ss}.csv`;
             
-            XLSX.writeFile(workbook, filename, { bookType: "csv" });
+            XLSX.writeFile(workbook, filename, { bookType: 'csv' });
+            toast({ title: 'Specs Downloaded', description: `${listings.length} listing${listings.length > 1 ? 's' : ''} exported. Use the clickable links in the file to send a Request for Quote to each developer.` });
+            clearSelectedForDownload();
+            setShowRfqNudge(false);
+    };
 
-            toast({
-                title: "Download Started",
-                description: `${selectedForDownload.length} listing(s) have been exported. This counts as one download for today.`
+    const sendBulkRFQ = (listings: typeof selectedForDownload) => {
+        if (!user) return;
+        listings.forEach(listing => {
+            const dealId = `LDR-QUOTE-${Date.now()}-${listing.listingId}`;
+            const devEmail = listing.developerId || ORS_ADMIN;
+            addRegisteredLead({
+                id: dealId,
+                customerId: user.email,
+                leadName: user.companyName,
+                leadContact: user.userName,
+                leadEmail: user.email,
+                leadPhone: user.phone || '',
+                requirementsSummary: `Request for Quote: ${listing.listingId} — ${listing.name || listing.location?.split(',')[0]}`,
+                registeredBy: user.email,
+                providers: [{ providerEmail: devEmail, properties: [{ listingId: listing.listingId, status: 'Pending' as const }] }],
+                isO2OCollaborator: true,
+            } as any, user.email);
+            addTransactionActivity({
+                leadId: dealId,
+                activityType: 'Quote Requested',
+                details: { message: `${user.companyName} submitted a Request for Quote for listing ${listing.listingId}.` },
+                createdBy: user.email,
             });
-             clearSelectedForDownload();
-        }
-    }
+            if (devEmail !== ORS_ADMIN) {
+                fetch('/api/notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([{
+                        id: `notif-rfq-${dealId}`,
+                        type: 'new_lead_for_provider',
+                        title: `Request for Quote: ${listing.listingId}`,
+                        message: `${user.companyName} submitted a Request for Quote for listing ${listing.listingId}. Please respond with commercial terms.`,
+                        href: `/dashboard/leads/${dealId}?tab=activity`,
+                        recipientEmail: devEmail,
+                        timestamp: new Date().toISOString(),
+                        triggeredBy: user.email,
+                        isRead: false,
+                    }]),
+                }).catch(() => {});
+            }
+        });
+    };
 
+    // Called after OTP verified — intercept here, show RFQ nudge BEFORE delivering file
+    const proceedWithDownload = () => {
+        if (!user) return;
+        const { success } = logDownload(user, selectedForDownload);
+        if (success) {
+            setShowRfqNudge(true); // File delivered only after user makes a choice
+            return;
+        }
+    };
 
     const handleDownload = () => {
         if (!user) {
@@ -358,6 +405,44 @@ function DownloadBar() {
             </div>
             <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} onLoginSuccess={handleLoginSuccess}/>
             <EmailOtpDialog isOpen={isOtpOpen} onOpenChange={setIsOtpOpen} email={user?.email || ""} onVerified={proceedWithDownload} />
+
+            {/* RFQ Interception Modal — shown after OTP, before file delivery */}
+            {showRfqNudge && selectedForDownload.length > 0 && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(30,21,55,0.75)'}}>
+                    <div className="w-full max-w-md" style={{background:'#fff',boxShadow:'0 8px 40px rgba(97,65,172,0.25)'}}>
+                        <div className="px-6 py-4" style={{background:'linear-gradient(135deg,#1e1537,#3b2870)'}}>
+                            <p className="text-sm font-bold text-white">{selectedForDownload.length} Listing{selectedForDownload.length > 1 ? 's' : ''} — Specs Ready</p>
+                            <p className="text-xs mt-1" style={{color:'rgba(255,255,255,0.55)'}}>
+                                Before we deliver your file — would you like to send a Request for Quote to the developer{selectedForDownload.length > 1 ? 's' : ''}?
+                            </p>
+                        </div>
+                        <div className="px-6 py-5 space-y-3">
+                            <div className="px-4 py-3 text-xs" style={{background:'hsl(259 44% 96%)',border:'1px solid hsl(259 44% 82%)'}}>
+                                <p className="font-semibold mb-1" style={{color:'#6141ac'}}>What is a Request for Quote?</p>
+                                <p style={{color:'hsl(259 15% 45%)',lineHeight:1.6}}>The specs file has technical data only — no commercial terms. An RFQ notifies each developer directly. They respond with <strong>current rent, deposit and lease terms</strong> in your Transaction Workspace.</p>
+                            </div>
+                            <button
+                                onClick={() => { executeDownload(selectedForDownload); sendBulkRFQ(selectedForDownload); }}
+                                className="w-full text-left px-4 py-4"
+                                style={{background:'#6141ac',borderRadius:0}}>
+                                <p className="text-sm font-bold text-white">Send Request for Quote + Download Specs</p>
+                                <p className="text-xs mt-0.5" style={{color:'rgba(255,255,255,0.65)'}}>Each developer notified individually. Your file downloads now. Recommended.</p>
+                            </button>
+                            <button
+                                onClick={() => executeDownload(selectedForDownload)}
+                                className="w-full text-left px-4 py-3"
+                                style={{background:'hsl(259 30% 96%)',border:'1px solid hsl(259 30% 88%)',borderRadius:0}}>
+                                <p className="text-sm font-semibold" style={{color:'#1e1537'}}>Download Specs Only</p>
+                                <p className="text-xs mt-0.5" style={{color:'hsl(259 15% 55%)'}}>Skip for now. You can send RFQs from your shortlist anytime.</p>
+                            </button>
+                            <button onClick={() => setShowRfqNudge(false)}
+                                className="w-full text-xs font-medium py-1.5" style={{color:'hsl(259 15% 55%)'}}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

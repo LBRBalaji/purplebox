@@ -92,10 +92,11 @@ function ListingCard({ listing, isSelected, onSelectionChange }: { listing: List
 function DownloadBar() {
     const { user } = useAuth();
     const { toast } = useToast();
-    const { selectedForDownload, logDownload, clearSelectedForDownload } = useData();
+    const { selectedForDownload, logDownload, clearSelectedForDownload, addTransactionActivity, addRegisteredLead, registeredLeads } = useData();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [showRfqNudge, setShowRfqNudge] = useState(false);
 
-    if (selectedForDownload.length === 0) {
+    if (selectedForDownload.length === 0 && !showRfqNudge) {
         return null;
     }
     
@@ -107,61 +108,89 @@ function DownloadBar() {
         })
     }
 
+    const executeBulkDownload = () => {
+        const dataToExport = selectedForDownload.map(l => ({
+            'Property ID': l.listingId,
+            'Name': l.name,
+            'Location': l.location,
+            'Size (Sq. Ft.)': l.sizeSqFt,
+            'Availability': l.availabilityDate,
+            'Commercials': 'Request for Quote',
+            'Click to Request Quote': `=HYPERLINK("https://lease.orsone.app/listings/${l.listingId}","Request for Quote")`,
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        XLSX.utils.sheet_add_aoa(worksheet, [[], ["Powered by ORS-ONE | Building Transaction Ready Assets"]], { origin: -1 });
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Listings");
+        const now = new Date();
+        const ts = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+        XLSX.writeFile(workbook, `ORS-ONE_Listings_${ts}.csv`, { bookType: 'csv' });
+        toast({ title: 'Specs Downloaded', description: `${selectedForDownload.length} listing${selectedForDownload.length > 1 ? 's' : ''} exported. Use the links in the file to send a Request for Quote.` });
+        clearSelectedForDownload();
+        setShowRfqNudge(false);
+    };
+
+    const sendBulkRFQ = () => {
+        if (!user) return;
+        const ORS_ADMIN = 'balaji@lakshmibalajio2o.com';
+        selectedForDownload.forEach(listing => {
+            const dealId = `LDR-QUOTE-${Date.now()}-${listing.listingId}`;
+            const devEmail = listing.developerId || ORS_ADMIN;
+            addRegisteredLead({
+                id: dealId,
+                customerId: user.email,
+                leadName: user.companyName,
+                leadContact: user.userName,
+                leadEmail: user.email,
+                leadPhone: user.phone || '',
+                requirementsSummary: `Request for Quote: ${listing.listingId} — ${listing.name || listing.location?.split(',')[0]}`,
+                registeredBy: user.email,
+                providers: [{ providerEmail: devEmail, properties: [{ listingId: listing.listingId, status: 'Pending' as const }] }],
+                isO2OCollaborator: true,
+            } as any, user.email);
+            addTransactionActivity({
+                leadId: dealId,
+                activityType: 'Quote Requested',
+                details: { message: `${user.companyName} submitted a Request for Quote for listing ${listing.listingId} at ${listing.location?.split(',')[0] || listing.location}.` },
+                createdBy: user.email,
+            });
+            if (devEmail !== ORS_ADMIN) {
+                fetch('/api/notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([{
+                        id: `notif-rfq-bulk-${dealId}`,
+                        type: 'new_lead_for_provider',
+                        title: `Request for Quote: ${listing.listingId}`,
+                        message: `${user.companyName} submitted a Request for Quote for ${listing.listingId} at ${listing.location?.split(',')[0]}. Please respond with commercial terms.`,
+                        href: `/dashboard/leads/${dealId}?tab=activity`,
+                        recipientEmail: devEmail,
+                        timestamp: new Date().toISOString(),
+                        triggeredBy: user.email,
+                        isRead: false,
+                    }]),
+                }).catch(() => {});
+            }
+        });
+    };
+
     const handleDownload = () => {
         if (!user) {
             setIsLoginOpen(true);
             return;
         }
-
         if (user.role !== 'User') {
-            toast({
-                variant: 'destructive',
-                title: 'Download Not Available',
-                description: 'Only Customer accounts can download listings.'
-            });
+            toast({ variant: 'destructive', title: 'Download Not Available', description: 'Only Customer accounts can download listings.' });
             return;
         }
-
-        const { success } = logDownload(user!.email!);
+        const { success, limitReached } = logDownload(user, selectedForDownload);
         if (success) {
-            const dataToExport = selectedForDownload.map(l => ({
-                'Property ID': l.listingId,
-                'Name': l.name,
-                'Location': l.location,
-                'Size (Sq. Ft.)': l.sizeSqFt,
-                'Availability': l.availabilityDate,
-                'Rent (per Sq. Ft.)': l.rentPerSqFt ? `₹${l.rentPerSqFt}/sft` : 'Request for Quote',
-            }));
-
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            
-            // Add branding
-            const footer = [
-                [], // Empty row for spacing
-                ["Powered by ORS-ONE | Building Transaction Ready Assets"]
-            ];
-            XLSX.utils.sheet_add_aoa(worksheet, footer, { origin: -1 });
-
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Listings");
-
-            const now = new Date();
-            const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
-            const filename = `Lakshmi_Balaji_O2O_Selected_Listings_${timestamp}.csv`;
-            
-            XLSX.writeFile(workbook, filename, { bookType: "csv" });
-
-            toast({
-                title: "Download Started",
-                description: `${selectedForDownload.length} listing(s) have been exported. This counts as one download for today.`
-            });
-             clearSelectedForDownload();
-        } else {
-             toast({
-                variant: 'destructive',
-                title: 'Download Limit Reached',
-                description: `You've reached your daily download limit. Your access refreshes tomorrow. Explore our Premium plans for higher limits.`
-            });
+            // Intercept — show RFQ nudge BEFORE file delivery
+            setShowRfqNudge(true);
+            return;
+        }
+        if (limitReached) {
+            toast({ variant: 'destructive', title: 'Download Limit Reached', description: `You've reached your daily download limit. Your access refreshes tomorrow.` });
         }
     }
 
