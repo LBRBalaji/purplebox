@@ -212,6 +212,7 @@ export default function ListingDetailPage() {
     const [currentIndex, setCurrentIndex] = React.useState(-1);
     const [justRequestedQuote, setJustRequestedQuote] = React.useState(false);
     const [showRfqNudge, setShowRfqNudge] = React.useState(false);
+    const [pendingDownload, setPendingDownload] = React.useState(false);
 
     const isLoading = isAuthLoading || isDataLoading;
 
@@ -369,26 +370,8 @@ export default function ListingDetailPage() {
 
     const hasRequestedQuote = justRequestedQuote || !!quoteRequestLead;
 
-    const handleDownloadRequest = () => {
-        if (!user) {
-            setPendingAction(() => handleDownloadRequest);
-            setIsLoginDialogOpen(true);
-            return;
-        }
-
-        if (user.role !== 'User') {
-             toast({
-                title: "Download Not Applicable",
-                description: "Only customer accounts can download listing details.",
-                variant: 'destructive',
-            });
-            return;
-        }
-
+    const executeDownload = React.useCallback(() => {
         if (!listing) return;
-        const { success, limitReached } = logDownload(user, [listing]);
-        
-        if (success) {
             const dataToExport = [{
                 'Property ID': listing.listingId,
                 'Name': listing.name,
@@ -401,8 +384,8 @@ export default function ListingDetailPage() {
                 'Natural Light/Ventilation': listing.buildingSpecifications.naturalLightingAndVentilation,
                 'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
                 'Access Road': listing.siteSpecifications.typeOfRoad,
-                'Commercials': 'Request for Quote — visit listing page',
-                'Request for Quote (URL)': `https://lease.orsone.app/listings/${listing.listingId}`,
+                'Commercials': 'Request for Quote',
+                'Click to Request Quote': `=HYPERLINK("https://lease.orsone.app/listings/${listing.listingId}","Click here to Request for Quote")`,
                 'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
                 'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
                 'Roof Type': listing.buildingSpecifications.roofType,
@@ -447,14 +430,46 @@ export default function ListingDetailPage() {
             
             XLSX.writeFile(workbook, filename, { bookType: "csv" });
 
+            // File delivered — mark done
+            setPendingDownload(false);
             toast({
-                title: "Specs Downloaded",
-                description: `Technical specs for ${listing.listingId} downloaded. These are indicative — request a formal quote for accurate commercial terms.`,
+                title: 'Specs Downloaded',
+                description: `Specs for ${listing.listingId} saved. Send a Request for Quote to get accurate commercial terms from the developer.`,
             });
-            setTimeout(() => setShowRfqNudge(true), 1200);
-            // Show RFQ nudge after download
-            setTimeout(() => setShowRfqNudge(true), 1500);
+
+        setPendingDownload(false);
+        toast({
+            title: 'Specs Downloaded',
+            description: `Specs for ${listing.listingId} saved. Send a Request for Quote to get accurate commercial terms from the developer.`,
+        });
+    }, [listing, toast]);
+
+    const handleDownloadRequest = () => {
+        if (!user) {
+            setPendingAction(() => handleDownloadRequest);
+            setIsLoginDialogOpen(true);
+            return;
         }
+
+        if (user.role !== 'User') {
+             toast({
+                title: "Download Not Applicable",
+                description: "Only customer accounts can download listing details.",
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        if (!listing) return;
+        const { success, limitReached } = logDownload(user, [listing]);
+        
+        if (success) {
+            // Intercept: show RFQ nudge BEFORE delivering the file
+            setPendingDownload(true);
+            setShowRfqNudge(true);
+            return;
+        }
+
 
         if (limitReached) {
              toast({
@@ -801,46 +816,68 @@ export default function ListingDetailPage() {
             <LoginDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={handleLoginSuccess} />
             {listing && <LayoutRequestDialog isOpen={isLayoutRequestOpen} onOpenChange={setIsLayoutRequestOpen} listingId={listing.listingId} listingName={listing.name || `Warehouse in ${listing.location}`} onSubmit={addLayoutRequest} />}
 
-            {/* RFQ Nudge Modal — shown after download */}
-            {showRfqNudge && !hasRequestedQuote && (
-                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{background:'rgba(30,21,55,0.6)'}}>
-                    <div className="w-full max-w-md rounded-2xl p-6 space-y-4" style={{background:'#fff',boxShadow:'0 8px 40px rgba(97,65,172,0.18)'}}>
-                        <div className="flex items-start gap-3">
-                            <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:'hsl(259 44% 94%)'}}>
-                                <svg width="20" height="20" fill="none" stroke="#6141ac" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+            {/* Pre-download RFQ interception modal */}
+            {showRfqNudge && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(30,21,55,0.75)'}}>
+                    <div className="w-full max-w-md space-y-0" style={{background:'#fff',boxShadow:'0 8px 40px rgba(97,65,172,0.25)'}}>
+
+                        {/* Header */}
+                        <div className="px-6 py-4" style={{background:'linear-gradient(135deg,#1e1537,#3b2870)'}}>
+                            <div className="flex items-center gap-3">
+                                <svg width="18" height="18" fill="none" stroke="#9b7ee0" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+                                <p className="text-sm font-bold text-white">{listing?.name || listing?.listingId} — Specs Ready</p>
                             </div>
-                            <div>
-                                <p className="font-bold text-sm" style={{color:'#1e1537'}}>Get Accurate Commercial Terms</p>
-                                <p className="text-xs mt-1" style={{color:'hsl(259 15% 50%)',lineHeight:1.6}}>
-                                    The specs you downloaded are indicative. Request a formal quote from the developer to get <strong>current rent, deposit and lease terms</strong> directly for this property.
+                            <p className="text-xs mt-1.5" style={{color:'rgba(255,255,255,0.55)'}}>
+                                Before we deliver your file — would you like to send a Request for Quote to the developer?
+                            </p>
+                        </div>
+
+                        {/* Body */}
+                        <div className="px-6 py-5 space-y-4">
+                            <div className="px-4 py-3 text-xs" style={{background:'hsl(259 44% 96%)',border:'1px solid hsl(259 44% 82%)'}}>
+                                <p className="font-semibold mb-1" style={{color:'#6141ac'}}>What is a Request for Quote?</p>
+                                <p style={{color:'hsl(259 15% 45%)',lineHeight:1.6}}>
+                                    The specs file has technical data only — no commercial terms. Sending an RFQ notifies the developer directly and they respond with <strong>current rent, deposit and lease period</strong> in your Transaction Workspace.
                                 </p>
                             </div>
-                        </div>
-                        <div className="rounded-xl p-3" style={{background:'hsl(259 44% 97%)',border:'1px solid hsl(259 44% 88%)'}}>
-                            <p className="text-xs font-semibold" style={{color:'#6141ac'}}>What happens next?</p>
-                            <ul className="mt-1.5 space-y-1 text-xs" style={{color:'hsl(259 15% 45%)'}}>
-                                <li>→ Developer receives your request and responds with rent, deposit and lease terms</li>
-                                <li>→ All communication tracked in your Transaction Workspace</li>
-                                <li>→ Schedule a site visit, negotiate terms, finalise MoU — all in one place</li>
-                            </ul>
-                        </div>
-                        <div className="flex gap-3">
+
+                            {/* Option 1 — RFQ + Download */}
                             <button
-                                onClick={() => { setShowRfqNudge(false); handleGetQuote(); }}
-                                className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
-                                style={{background:'#6141ac'}}>
-                                Request Formal Quote
+                                onClick={() => {
+                                    setShowRfqNudge(false);
+                                    executeDownload();
+                                    if (!hasRequestedQuote) handleGetQuote();
+                                }}
+                                className="w-full text-left px-4 py-4 transition-all hover:opacity-95"
+                                style={{background:'#6141ac',borderRadius:0}}>
+                                <p className="text-sm font-bold text-white">Send Request for Quote + Download Specs</p>
+                                <p className="text-xs mt-0.5" style={{color:'rgba(255,255,255,0.65)'}}>
+                                    Developer is notified immediately. Your file downloads now. Recommended.
+                                </p>
                             </button>
+
+                            {/* Option 2 — Download only */}
                             <button
-                                onClick={() => setShowRfqNudge(false)}
-                                className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                                style={{background:'hsl(259 30% 93%)',color:'hsl(259 15% 45%)'}}>
-                                Later
+                                onClick={() => {
+                                    setShowRfqNudge(false);
+                                    executeDownload();
+                                }}
+                                className="w-full text-left px-4 py-3 transition-all"
+                                style={{background:'hsl(259 30% 96%)',border:'1px solid hsl(259 30% 88%)',borderRadius:0}}>
+                                <p className="text-sm font-semibold" style={{color:'#1e1537'}}>Download Specs Only</p>
+                                <p className="text-xs mt-0.5" style={{color:'hsl(259 15% 55%)'}}>
+                                    Skip for now. You can send an RFQ from your shortlist or the listing page anytime.
+                                </p>
+                            </button>
+
+                            <button onClick={() => { setShowRfqNudge(false); setPendingDownload(false); }}
+                                className="w-full text-xs font-medium py-1.5" style={{color:'hsl(259 15% 55%)'}}>
+                                Cancel
                             </button>
                         </div>
-                        <p className="text-xs text-center" style={{color:'hsl(259 15% 65%)'}}>No cost. Connects you directly for this property.</p>
                     </div>
                 </div>
+            
             )}
         </>
     );
