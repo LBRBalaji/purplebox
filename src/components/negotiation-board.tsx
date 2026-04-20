@@ -694,11 +694,17 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                 customerAttendees: [{ name: lead.leadContact, title: 'Lead' }],
                 providerAttendees: [],
                 facilitatorAttendees: [],
+                sections: defaultSections,
              };
+             // Use appendSession (not form.reset) so useFieldArray internal state is correct
              form.reset({
                 ...form.getValues(),
-                sessions: [defaultSession] as any
-            });
+                sessions: [],
+                actionableItems: [],
+                overallRemarks: '',
+             });
+             // Defer to next tick so useFieldArray is initialised before appending
+             setTimeout(() => appendSession(defaultSession as any), 0);
         }
     }, [lead.id, primaryListing, getNegotiationBoard, form, lead.leadContact]);
 
