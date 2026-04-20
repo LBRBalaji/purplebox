@@ -213,113 +213,99 @@ WareHouse Origin
     }, 500);
   };
 
-  return (
-    <Card className="flex flex-col">
-      <CardHeader>
-        <CardTitle>{demand.demandId}</CardTitle>
-        <div className="text-sm text-muted-foreground">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="secondary" className="flex items-center gap-1.5">
-              {demand.operationType === 'Manufacturing' ? <Factory className="h-3 w-3" /> : <Building className="h-3 w-3" />}
-              {demand.operationType}
-            </Badge>
-            {demand.buildingType && <Badge variant="outline" className="flex items-center gap-1.5"><Building className="h-3 w-3" />{demand.buildingType}</Badge>}
-            {demand.optionals?.crane?.required && <Badge variant="outline" className="flex items-center gap-1.5"><Construction className="h-3 w-3" />Crane</Badge>}
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4 flex-grow">
-        <div className="text-sm">
-          <p className="font-semibold">Location:</p>
-          <p>{demand.locationName || demand.location} (within {demand.radius}km)</p>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="font-semibold">Size:</p>
-            <p>{demand.size.toLocaleString()} sq. ft.</p>
-          </div>
-          <div>
-            <p className="font-semibold">Readiness:</p>
-            <p>{demand.readiness}</p>
-          </div>
-        </div>
-        {demand.description && (
-          <div className="text-sm space-y-1 pt-2">
-            <p className="font-semibold flex items-center gap-1.5"><Info className="h-4 w-4" /> Description:</p>
-            <p className="text-muted-foreground text-xs pl-1 line-clamp-3">{demand.description}</p>
-          </div>
-        )}
-        {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
-            <div className="text-sm space-y-2 pt-2">
-              <p className="font-semibold flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Priorities:</p>
-              <div className="flex flex-wrap gap-1.5 pl-1">
-                {demand.preferences.nonCompromisable.map(item => <Badge key={item} variant="outline" className="font-normal">{priorityLabels[item] || item}</Badge>)}
-              </div>
-            </div>
-        )}
-        {potentialMatches.length > 0 && (
-          <div className="text-sm space-y-2 pt-4 mt-4 border-t border-dashed">
-              <p className="font-semibold flex items-center gap-1.5 text-green-700"><Target className="h-4 w-4"/> Potential Match Found in Your Listings!</p>
-              <p className="text-xs text-muted-foreground pl-1">Your listing is within the location radius. Review and click to submit.</p>
-              <div className="flex flex-wrap gap-1.5 pl-1 pt-2">
-                <TooltipProvider>
-                    {potentialMatches.map(match => (
-                        <Tooltip key={match.listingId} delayDuration={0}>
-                            <TooltipTrigger asChild>
-                                <Badge variant="secondary" className="border-green-300 cursor-pointer text-green-800 bg-green-100 hover:bg-green-200" onClick={() => handleSubmitMatch(demand.demandId)}>
-                                  <MapPin className="h-3 w-3 mr-1.5" />
-                                  {match.name}
-                                </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Click to submit your listing "{match.name}" against this demand.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    ))}
-                </TooltipProvider>
-              </div>
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex-col items-stretch gap-2">
-        {/* ORS-ONE TP badge */}
-        {isOrsoneTP && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl mb-1" style={{background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.3)'}}>
-            <Handshake className="h-3.5 w-3.5 flex-shrink-0" style={{color:'#0f7c5f'}} />
-            <p className="text-xs font-bold" style={{color:'#0f7c5f'}}>ORS-ONE Transaction Partner — Brokerage applies on closure</p>
-          </div>
-        )}
+  const readinessColor: Record<string, {bg:string;text:string}> = {
+    'Immediate':         {bg:'#e1f5ee', text:'#0f6e56'},
+    'Within 45 Days':    {bg:'#faeeda', text:'#854f0b'},
+    'Within 90 Days':    {bg:'#faeeda', text:'#854f0b'},
+    'More than 90 Days': {bg:'#f0edfb', text:'#3b2870'},
+    'BTS':               {bg:'#e6f1fb', text:'#185fa5'},
+  };
+  const rc = readinessColor[demand.readiness] || {bg:'#f0edfb',text:'#3b2870'};
 
-        {/* Match button — enabled only for TP demands, for providers */}
+  const specs: [string,string|undefined][] = [
+    ['Size', `${demand.size?.toLocaleString()} sft`],
+    ['Operation', demand.operationType],
+    demand.ceilingHeight ? ['Eave height', `≥ ${demand.ceilingHeight} ${demand.ceilingHeightUnit || 'ft'}`] : ['Building', demand.buildingType || '—'],
+    demand.docks ? ['Docks', `${demand.docks} min`] : demand.powerMin ? ['Power', `${demand.powerMin}–${demand.powerMax ?? '?'} kVA`] : ['Radius', `${demand.radius} km`],
+  ];
+
+  return (
+    <div style={{background:'#fff',border:'0.5px solid hsl(259 30% 88%)',borderRadius:0,display:'flex',flexDirection:'column'}}>
+
+      {/* Header */}
+      <div style={{padding:'14px 16px 10px'}}>
+        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8,marginBottom:8}}>
+          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+            <span style={{background:'#f0edfb',color:'#6141ac',fontSize:11,fontWeight:600,padding:'2px 8px'}}>{demand.operationType}</span>
+            <span style={{background:rc.bg,color:rc.text,fontSize:11,fontWeight:600,padding:'2px 8px'}}>{demand.readiness}</span>
+            {isOrsoneTP && <span style={{background:'#e1f5ee',color:'#0f6e56',fontSize:11,fontWeight:600,padding:'2px 8px'}}>ORS-ONE TP</span>}
+            {demand.buildingType && <span style={{background:'hsl(259 30% 96%)',color:'hsl(259 15% 45%)',fontSize:11,fontWeight:500,padding:'2px 8px'}}>{demand.buildingType}</span>}
+          </div>
+        </div>
+        <p style={{fontSize:15,fontWeight:700,color:'#1e1537',margin:'0 0 3px'}}>
+          {demand.size?.toLocaleString()} sft · {demand.locationName || demand.location?.split(',')[0] || 'India'}
+        </p>
+        <p style={{fontSize:12,color:'hsl(259 15% 55%)',margin:0}}>
+          Within {demand.radius} km · {demand.createdAt ? new Date(demand.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : 'recently'}
+        </p>
+      </div>
+
+      {/* Specs grid */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1,margin:'0 16px 10px',border:'0.5px solid hsl(259 30% 90%)'}}>
+        {specs.map(([label, value]) => (
+          <div key={label} style={{background:'hsl(259 44% 97%)',padding:'7px 10px'}}>
+            <p style={{fontSize:11,color:'hsl(259 15% 55%)',margin:'0 0 1px'}}>{label}</p>
+            <p style={{fontSize:13,fontWeight:500,color:'#1e1537',margin:0}}>{value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Priority tags */}
+      {demand.preferences?.nonCompromisable && demand.preferences.nonCompromisable.length > 0 && (
+        <div style={{padding:'0 16px 10px',display:'flex',flexWrap:'wrap',gap:5}}>
+          {demand.preferences.nonCompromisable.map(item => (
+            <span key={item} style={{fontSize:11,color:'hsl(259 15% 45%)',background:'hsl(259 30% 96%)',border:'0.5px solid hsl(259 30% 86%)',padding:'2px 7px'}}>{priorityLabels[item] || item}</span>
+          ))}
+        </div>
+      )}
+
+      {/* Geo-match banner for developer */}
+      {potentialMatches.length > 0 && (
+        <div style={{margin:'0 16px 10px',padding:'8px 10px',background:'#f0fdf4',border:'0.5px solid #bbf7d0'}}>
+          <p style={{fontSize:11,fontWeight:700,color:'#15803d',margin:'0 0 4px'}}>
+            <Target className="h-3 w-3" style={{display:'inline',marginRight:4}} />
+            {potentialMatches.length} listing{potentialMatches.length>1?'s':''} in your inventory match this location
+          </p>
+          <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+            {potentialMatches.map(m => (
+              <button key={m.listingId} onClick={() => { setSelectedListingId(m.listingId); handleSubmitMatch(); }}
+                style={{fontSize:11,background:'#dcfce7',color:'#15803d',border:'0.5px solid #86efac',padding:'2px 8px',borderRadius:0,cursor:'pointer'}}>
+                {m.listingId} — {m.name || m.location?.split(',')[0]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Description */}
+      {demand.description && (
+        <p style={{fontSize:12,color:'hsl(259 15% 50%)',padding:'0 16px 10px',lineHeight:1.6,margin:0}}>{demand.description}</p>
+      )}
+
+      {/* Footer */}
+      <div style={{marginTop:'auto',padding:'10px 16px',borderTop:'0.5px solid hsl(259 30% 90%)',display:'flex',gap:8}}>
         {isProvider ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="w-full">
-                  <Button
-                    className="w-full"
-                    disabled={!isOrsoneTP}
-                    onClick={handleSubmitMatch}
-                    style={isOrsoneTP ? {background:'#6141ac'} : {}}
-                  >
-                    <Handshake className="mr-2 h-4 w-4" />
-                    Submit My Listing as Match
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              {!isOrsoneTP && (
-                <TooltipContent>
-                  <p>Direct engagement — not facilitated by ORS-ONE</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
+          <button onClick={handleSubmitMatch} disabled={!isOrsoneTP}
+            style={{flex:1,padding:'9px 0',fontSize:13,fontWeight:700,color:'#fff',background: isOrsoneTP ? '#6141ac' : 'hsl(259 30% 80%)',borderRadius:0,cursor: isOrsoneTP ? 'pointer' : 'not-allowed',border:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+            <Handshake className="h-4 w-4" /> Submit Matching Listing
+          </button>
         ) : (
-          <Button onClick={() => handleCirculateDemand(demand)} variant="outline" className="w-full">
-            <Mail className="mr-2 h-4 w-4" /> Circulate to Providers
-          </Button>
+          <button onClick={() => handleCirculateDemand(demand)}
+            style={{flex:1,padding:'9px 0',fontSize:13,fontWeight:600,color:'#6141ac',background:'hsl(259 44% 96%)',border:'0.5px solid hsl(259 44% 82%)',borderRadius:0,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+            <Mail className="h-4 w-4" /> Circulate to Providers
+          </button>
         )}
-      </CardFooter>
+      </div>
 
       {/* Brokerage Acknowledgement Dialog */}
       {showBrokerageDialog && (
