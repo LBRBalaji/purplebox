@@ -763,79 +763,215 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
         setPdfGenerating(true);
         try {
             const { default: jsPDF } = await import('jspdf');
-            const { default: html2canvas } = await import('html2canvas');
-            const element = document.querySelector('.printable-content') as HTMLElement;
-            if (!element) { setPdfGenerating(false); return; }
+            const data = form.getValues();
+            const now = new Date();
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pageW = 210; const pageH = 297;
+            const mL = 14; const mR = 14; const col2 = 110; const col3 = 155; const col4 = 185;
+            const usableW = pageW - mL - mR;
+            let y = 0;
 
-            // Temporarily show hidden print-only elements
-            const printOnlyEls = document.querySelectorAll<HTMLElement>('.print-header, .print-footer');
-            printOnlyEls.forEach(el => el.style.display = 'block');
-            const noPrintEls = document.querySelectorAll<HTMLElement>('.no-print');
-            noPrintEls.forEach(el => el.style.display = 'none');
+            const checkPage = (needed = 8) => {
+                if (y + needed > pageH - 16) { pdf.addPage(); y = 28; drawPageHeader(); }
+            };
 
-            const canvas = await html2canvas(element, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                windowWidth: 900,
+            const drawPageHeader = () => {
+                pdf.setFillColor(30, 21, 55);
+                pdf.rect(0, 0, pageW, 20, 'F');
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(11); pdf.setFont('helvetica', 'bold');
+                pdf.text('ORS-ONE — Commercial Term Sheet', mL, 13);
+                pdf.setFontSize(7); pdf.setFont('helvetica', 'normal');
+                pdf.text(`Transaction: ${lead.id}  ·  ${now.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}`, pageW - mR, 13, { align: 'right' });
+                pdf.setTextColor(155, 126, 224);
+                pdf.setFontSize(7);
+                pdf.text('Lakshmi Balaji ORS Private Limited · lease.orsone.app', mL, 18);
+            };
+
+            drawPageHeader();
+            y = 26;
+
+            // ── Parties ──────────────────────────────────────────────────────
+            pdf.setFillColor(244, 242, 251);
+            pdf.rect(mL, y, usableW, 7, 'F');
+            pdf.setTextColor(30, 21, 55); pdf.setFontSize(9); pdf.setFont('helvetica', 'bold');
+            pdf.text('PARTIES & PROPERTY', mL + 3, y + 5);
+            y += 10;
+
+            const partyRows = [
+                ['Customer', lead.leadName || lead.leadContact || '—'],
+                ['Developer', lead.providers?.[0]?.providerEmail || '—'],
+                ['Property', primaryListing ? `${primaryListing.listingId} · ${primaryListing.location?.split(',')[0] || ''}` : '—'],
+                ['Transaction ID', lead.id],
+            ];
+            partyRows.forEach(([label, value]) => {
+                checkPage(7);
+                pdf.setFontSize(8); pdf.setFont('helvetica', 'bold'); pdf.setTextColor(97, 65, 172);
+                pdf.text(label, mL + 2, y + 4);
+                pdf.setFont('helvetica', 'normal'); pdf.setTextColor(30, 21, 55);
+                pdf.text(String(value), mL + 45, y + 4);
+                pdf.setDrawColor(220, 214, 240); pdf.line(mL, y + 6, pageW - mR, y + 6);
+                y += 7;
+            });
+            y += 4;
+
+            // ── Sessions ─────────────────────────────────────────────────────
+            (data.sessions || []).forEach((session: any, si: number) => {
+                checkPage(12);
+                // Session header
+                pdf.setFillColor(30, 21, 55);
+                pdf.rect(mL, y, usableW, 9, 'F');
+                pdf.setTextColor(255, 255, 255); pdf.setFontSize(9); pdf.setFont('helvetica', 'bold');
+                const sessionDate = session.date ? new Date(session.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '';
+                pdf.text(`Negotiation Session ${si + 1}  ·  ${sessionDate}${session.venue ? '  ·  ' + session.venue : ''}`, mL + 3, y + 6);
+                y += 12;
+
+                // Attendees
+                const attRows: [string, string][] = [];
+                (session.customerAttendees || []).forEach((a: any) => attRows.push(['Customer', `${a.name || ''}${a.title ? ' · ' + a.title : ''}`]));
+                (session.providerAttendees || []).forEach((a: any) => attRows.push(['Provider', `${a.name || ''}${a.title ? ' · ' + a.title : ''}`]));
+                (session.facilitatorAttendees || []).forEach((a: any) => attRows.push(['Facilitator', `${a.name || ''}${a.title ? ' · ' + a.title : ''}`]));
+                if (attRows.length > 0) {
+                    checkPage(6);
+                    pdf.setFontSize(7); pdf.setFont('helvetica', 'bold'); pdf.setTextColor(97, 65, 172);
+                    pdf.text('ATTENDEES', mL + 2, y + 4); y += 6;
+                    attRows.forEach(([role, name]) => {
+                        checkPage(6);
+                        pdf.setFont('helvetica', 'bold'); pdf.setFontSize(7.5); pdf.setTextColor(80, 80, 80);
+                        pdf.text(role, mL + 2, y + 4);
+                        pdf.setFont('helvetica', 'normal'); pdf.setTextColor(30, 21, 55);
+                        pdf.text(name, mL + 28, y + 4);
+                        pdf.setDrawColor(235, 230, 248); pdf.line(mL, y + 6, pageW - mR, y + 6);
+                        y += 6;
+                    });
+                    y += 3;
+                }
+
+                // Sections
+                (session.sections || []).forEach((section: any) => {
+                    if (!section.fields || section.fields.length === 0) return;
+                    checkPage(14);
+
+                    // Section header
+                    pdf.setFillColor(235, 230, 248);
+                    pdf.rect(mL, y, usableW, 7, 'F');
+                    pdf.setTextColor(30, 21, 55); pdf.setFontSize(8.5); pdf.setFont('helvetica', 'bold');
+                    pdf.text(section.title || '', mL + 3, y + 5);
+                    y += 9;
+
+                    // Column headers
+                    pdf.setFillColor(248, 246, 253);
+                    pdf.rect(mL, y, usableW, 6, 'F');
+                    pdf.setFontSize(6.5); pdf.setFont('helvetica', 'bold'); pdf.setTextColor(97, 65, 172);
+                    pdf.text('FIELD', mL + 2, y + 4);
+                    pdf.text('AGREED TERMS / VALUE', col2, y + 4);
+                    pdf.text('PROPOSED BY', col3, y + 4);
+                    pdf.text('STATUS', col4, y + 4);
+                    y += 7;
+
+                    section.fields.forEach((field: any) => {
+                        const val = String(field.agreedTerms?.current ?? '');
+                        const proposedBy = String(field.proposedBy?.current ?? '');
+                        const status = String(field.status?.current ?? '');
+                        const label = String(field.label || '');
+
+                        // Wrap long values
+                        const maxValW = col3 - col2 - 4;
+                        const valLines = pdf.splitTextToSize(val || '—', maxValW);
+                        const rowH = Math.max(7, valLines.length * 4.5 + 3);
+
+                        checkPage(rowH + 1);
+
+                        // Alternating row bg
+                        pdf.setFillColor(252, 251, 255);
+                        pdf.rect(mL, y, usableW, rowH, 'F');
+
+                        pdf.setFontSize(7.5); pdf.setFont('helvetica', 'bold'); pdf.setTextColor(50, 40, 80);
+                        const labelLines = pdf.splitTextToSize(label, col2 - mL - 6);
+                        pdf.text(labelLines, mL + 2, y + 4.5);
+
+                        pdf.setFont('helvetica', 'normal'); pdf.setTextColor(30, 21, 55);
+                        pdf.text(valLines, col2, y + 4.5);
+
+                        pdf.setTextColor(80, 80, 80);
+                        pdf.text(proposedBy || '—', col3, y + 4.5);
+
+                        // Status badge color
+                        const statusColors: Record<string, [number,number,number]> = {
+                            'Agreed': [34, 197, 94], 'Pending': [251, 191, 36],
+                            'Reserved For Discussion': [147, 51, 234], 'Rejected': [239, 68, 68],
+                        };
+                        const sc = statusColors[status] || [150, 150, 150];
+                        pdf.setTextColor(...sc);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(status || '—', col4, y + 4.5);
+
+                        pdf.setDrawColor(230, 224, 248); pdf.line(mL, y + rowH, pageW - mR, y + rowH);
+                        y += rowH;
+                    });
+                    y += 4;
+                });
+                y += 6;
             });
 
-            // Restore
-            printOnlyEls.forEach(el => el.style.display = '');
-            noPrintEls.forEach(el => el.style.display = '');
+            // ── Actionable Items ─────────────────────────────────────────────
+            if (data.actionableItems && data.actionableItems.length > 0) {
+                checkPage(14);
+                pdf.setFillColor(30, 21, 55);
+                pdf.rect(mL, y, usableW, 9, 'F');
+                pdf.setTextColor(255, 255, 255); pdf.setFontSize(9); pdf.setFont('helvetica', 'bold');
+                pdf.text('ACTIONABLE ITEMS', mL + 3, y + 6);
+                y += 12;
 
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-            const pageW = 210; const pageH = 297; const margin = 12;
-            const usableW = pageW - margin * 2;
-            const imgH = (canvas.height * usableW) / canvas.width;
+                pdf.setFillColor(248, 246, 253);
+                pdf.rect(mL, y, usableW, 6, 'F');
+                pdf.setFontSize(6.5); pdf.setFont('helvetica', 'bold'); pdf.setTextColor(97, 65, 172);
+                pdf.text('ACTION ITEM', mL + 2, y + 4);
+                pdf.text('RESPONSIBILITY', 80, y + 4);
+                pdf.text('DUE DATE', 130, y + 4);
+                pdf.text('STATUS', 165, y + 4);
+                y += 7;
 
-            // Header
-            pdf.setFillColor(30, 21, 55);
-            pdf.rect(0, 0, pageW, 18, 'F');
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(13);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text('ORS-ONE — Commercial Term Sheet', margin, 12);
-            pdf.setFontSize(8);
-            pdf.setFont('helvetica', 'normal');
-            const now = new Date();
-            pdf.text(`Transaction ID: ${lead.id}  ·  Generated: ${now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`, pageW - margin, 12, { align: 'right' });
-
-            // Content — paginate if tall
-            let yPos = 22;
-            let remaining = imgH;
-            const contentH = pageH - yPos - 16; // leave space for footer
-
-            let page = 0;
-            while (remaining > 0) {
-                if (page > 0) { pdf.addPage(); yPos = 12; }
-                const sliceH = Math.min(remaining, contentH);
-                const srcY = page * (canvas.height * contentH / imgH);
-                const srcH = sliceH * canvas.height / imgH;
-
-                // Create a slice canvas
-                const sliceCanvas = document.createElement('canvas');
-                sliceCanvas.width = canvas.width;
-                sliceCanvas.height = Math.round(srcH);
-                const ctx = sliceCanvas.getContext('2d')!;
-                ctx.drawImage(canvas, 0, srcY, canvas.width, Math.round(srcH), 0, 0, canvas.width, Math.round(srcH));
-                const sliceData = sliceCanvas.toDataURL('image/png');
-                pdf.addImage(sliceData, 'PNG', margin, yPos, usableW, sliceH);
-
-                remaining -= sliceH;
-                page++;
+                data.actionableItems.forEach((item: any) => {
+                    checkPage(8);
+                    pdf.setFontSize(7.5); pdf.setFont('helvetica', 'normal'); pdf.setTextColor(30, 21, 55);
+                    const itemLines = pdf.splitTextToSize(item.item || '', 60);
+                    pdf.text(itemLines, mL + 2, y + 4);
+                    pdf.text(item.responsibility || '', 80, y + 4);
+                    pdf.text(item.schedule ? new Date(item.schedule).toLocaleDateString('en-IN') : '', 130, y + 4);
+                    pdf.setTextColor(97, 65, 172); pdf.setFont('helvetica', 'bold');
+                    pdf.text(item.status || '', 165, y + 4);
+                    pdf.setDrawColor(230, 224, 248); pdf.line(mL, y + 7, pageW - mR, y + 7);
+                    y += 8;
+                });
+                y += 4;
             }
 
-            // Footer on last page
-            const lastY = pageH - 8;
-            pdf.setFillColor(244, 242, 251);
-            pdf.rect(0, lastY - 6, pageW, 10, 'F');
-            pdf.setTextColor(97, 65, 172);
-            pdf.setFontSize(7);
-            pdf.setFont('helvetica', 'normal');
-            pdf.text('Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app  ·  Building Transaction Ready Assets', pageW / 2, lastY, { align: 'center' });
+            // ── Overall Remarks ──────────────────────────────────────────────
+            if (data.overallRemarks) {
+                checkPage(20);
+                pdf.setFillColor(244, 242, 251);
+                pdf.rect(mL, y, usableW, 7, 'F');
+                pdf.setTextColor(30, 21, 55); pdf.setFontSize(8.5); pdf.setFont('helvetica', 'bold');
+                pdf.text('OVERALL REMARKS', mL + 3, y + 5);
+                y += 10;
+                pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8); pdf.setTextColor(50, 50, 50);
+                const remarkLines = pdf.splitTextToSize(data.overallRemarks, usableW - 6);
+                pdf.text(remarkLines, mL + 3, y);
+                y += remarkLines.length * 4.5 + 6;
+            }
+
+            // ── Footer on every page ─────────────────────────────────────────
+            const totalPages = (pdf as any).internal.getNumberOfPages();
+            for (let p = 1; p <= totalPages; p++) {
+                pdf.setPage(p);
+                pdf.setFillColor(30, 21, 55);
+                pdf.rect(0, pageH - 10, pageW, 10, 'F');
+                pdf.setTextColor(155, 126, 224); pdf.setFontSize(6.5); pdf.setFont('helvetica', 'normal');
+                pdf.text('Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app  ·  Building Transaction Ready Assets', pageW / 2, pageH - 4, { align: 'center' });
+                pdf.setTextColor(200, 190, 230);
+                pdf.text(`Page ${p} of ${totalPages}`, pageW - mR, pageH - 4, { align: 'right' });
+            }
 
             const ts = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
             pdf.save(`ORS-ONE_TermSheet_${lead.id}_${ts}.pdf`);
