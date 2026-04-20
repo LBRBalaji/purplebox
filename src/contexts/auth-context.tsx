@@ -154,8 +154,8 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
       return;
     }
 
-    // Developers may use personal email — block only for Customer/Agent roles
-    if (details.role !== 'Warehouse Developer' && isPersonalEmail) {
+    // Developers and Agents may use personal email — block only for Customer role
+    if (details.role !== 'Warehouse Developer' && details.role !== 'Agent' && isPersonalEmail) {
       toast({ variant: 'destructive', title: 'Invalid Email', description: 'Please use your official company email.' });
       return;
     }
