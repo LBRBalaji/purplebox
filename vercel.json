@@ -10,15 +10,7 @@
   "crons": [
     {
       "path": "/api/engagement-jobs?job=all",
-      "schedule": "30 2 * * *"
-    },
-    {
-      "path": "/api/engagement-jobs?job=rfq_nudge",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/engagement-jobs?job=site_visit",
-      "schedule": "0 3 * * *"
+      "schedule": "0 2 * * *"
     }
   ]
 }
