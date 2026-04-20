@@ -491,29 +491,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setNotifications(prev => {
         const newNotification = { ...notification, isRead: false };
         const updatedNotifications = [newNotification, ...prev];
+        // persistNotifications calls /api/notifications POST which fires emails server-side (single path)
         persistNotifications(updatedNotifications);
-        // Fire email via the notifications API — it handles dedup + email sending server-side
-        // This ensures emails fire even for stale closure scenarios
-        if (notification.recipientEmail) {
-          const allUsers = Object.values(users || {}) as any[];
-          const recipient = allUsers.find((u: any) => u.email === notification.recipientEmail);
-          if (recipient?.emailNotifications !== false) {
-            fetch('/api/send-notification-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: notification.recipientEmail,
-                userName: recipient?.userName || '',
-                title: notification.title,
-                message: notification.message || '',
-                href: notification.href || '/dashboard',
-              }),
-            }).catch(() => {});
-          }
-        }
         return updatedNotifications;
     });
-  }, [persistNotifications, users]);
+  }, [persistNotifications]);
 
   const setNotificationsFromWatcher = useCallback((notifs: Notification[]) => {
     setNotifications(notifs);
@@ -719,18 +701,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
         
         const uniqueParticipants = Array.from(participants).filter(p => p !== newActivity.createdBy);
 
-        uniqueParticipants.forEach(participantEmail => {
-            addNotification({
-                id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
-                type: 'new_activity',
-                title: `Update on Transaction: ${lead.id}`,
-                message: `${users[newActivity.createdBy]?.userName || 'System'} logged: ${newActivity.activityType}`,
-                href: `/dashboard/leads/${lead.id}`,
-                recipientEmail: participantEmail,
-                timestamp: newActivity.createdAt,
-                triggeredBy: newActivity.createdBy
-            });
-        });
+        // Skip 'Lead Registered' — addRegisteredLead fires its own dedicated notification below
+        // Skip 'Quote Requested' — listing page fires its own dedicated notification
+        // This prevents duplicate emails on those two events
+        const skipTypes = ['Lead Registered', 'Quote Requested'];
+        if (!skipTypes.includes(newActivity.activityType)) {
+          const actorName = (users as any)[newActivity.createdBy]?.companyName || (users as any)[newActivity.createdBy]?.userName || 'A transaction participant';
+          const activityMsg = newActivity.details?.message || `${newActivity.activityType} logged by ${actorName}.`;
+          uniqueParticipants.forEach(participantEmail => {
+              addNotification({
+                  id: `notif-${newActivity.createdAt}-${participantEmail}-${Math.random()}`,
+                  type: 'new_activity',
+                  title: `${newActivity.activityType}: Transaction ${lead.id}`,
+                  message: activityMsg,
+                  href: `/dashboard/leads/${lead.id}?tab=activity`,
+                  recipientEmail: participantEmail,
+                  timestamp: newActivity.createdAt,
+                  triggeredBy: newActivity.createdBy
+              });
+          });
+        }
     }
   }, [persistActivities, registeredLeads, addNotification, users]);
 
@@ -761,7 +751,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
              addNotification({
                 id: `notif-${Date.now()}-${admin.email}-${Math.random()}`,
                 type: 'new_lead_for_provider',
-                title: `New Broking Lead: ${newLead.leadName}`,
+                title: `New Lead: ${newLead.leadName}`,
                 message: `Registered by ${users[newLead.registeredBy]?.userName || userEmail}. Needs provider assignment.`,
                 href: `/dashboard/transactions`,
                 recipientEmail: admin.email,
