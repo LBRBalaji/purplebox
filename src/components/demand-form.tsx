@@ -134,7 +134,7 @@ const PriorityToggle = ({ form, field }: { form: UseFormReturn<DemandSchema>, fi
     );
 }
 
-export function DemandForm({ onDemandLogged }: { onDemandLogged: () => void }) {
+export function DemandForm({ onDemandLogged, isAdminMode }: { onDemandLogged: () => void; isAdminMode?: boolean }) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { demands, addDemand, updateDemand } = useData();

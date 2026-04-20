@@ -231,6 +231,7 @@ type DataContextType = {
 
   demands: DemandSchema[];
   addDemand: (demand: Omit<DemandSchema, 'createdAt'>, userEmail?: string) => void;
+  deleteDemand: (demandId: string) => void;
   updateDemand: (demand: DemandSchema) => void;
   submissions: Submission[];
   addSubmission: (submission: Omit<Submission, 'status' | 'submissionId'>, userEmail?: string) => void;
@@ -798,6 +799,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const newDemands = prevDemands.map((demand) =>
             demand.demandId === updatedDemand.demandId ? updatedDemand : demand
         );
+        persistDemands(newDemands);
+        return newDemands;
+    });
+  }, [persistDemands]);
+
+  const deleteDemand = useCallback((demandId: string) => {
+    setDemands(prevDemands => {
+        const newDemands = prevDemands.filter(d => d.demandId !== demandId);
         persistDemands(newDemands);
         return newDemands;
     });
@@ -1434,7 +1443,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   return (
     <DataContext.Provider value={{ 
         listings, addListing, updateListing, updateListingStatus, listingAnalytics, logListingView,
-        demands, addDemand, updateDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading,
+        demands, addDemand, updateDemand, deleteDemand, submissions, addSubmission, updateSubmissionStatus, shortlistedItems, toggleShortlist, clearNewSubmissions, lastEvent, agentLeads, addAgentLead, updateAgentLeadStatus, isLoading,
         downloadHistory,
         logDownload,
         selectedForDownload,

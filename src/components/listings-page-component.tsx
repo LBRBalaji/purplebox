@@ -20,6 +20,8 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { LoginDialog } from './login-dialog';
 import { LimitExceededDialog } from './limit-exceeded-dialog';
+import { DemandList } from './demand-list';
+import { DemandForm } from './demand-form';
 import { Badge } from './ui/badge';
 import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -475,6 +477,7 @@ export function ListingsPage() {
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
+  const [activeView, setActiveView] = useState<'listings' | 'demands'>('listings');
 
   const approvedListings = useMemo(() => {
     // Fisher-Yates shuffle algorithm
@@ -796,6 +799,36 @@ export function ListingsPage() {
                      </ul>
                 </div>
             </Alert>
+            {/* View toggle — Listings / Demands */}
+            <div className="flex items-center gap-0 mb-6 border-b" style={{borderColor:'hsl(259 30% 88%)'}}>
+              <button
+                onClick={() => setActiveView('listings')}
+                className="px-6 py-3 text-sm font-bold transition-all"
+                style={{
+                  borderBottom: activeView === 'listings' ? '2px solid #6141ac' : '2px solid transparent',
+                  color: activeView === 'listings' ? '#6141ac' : 'hsl(259 15% 55%)',
+                  background: 'transparent',
+                }}>
+                Listings
+              </button>
+              <button
+                onClick={() => setActiveView('demands')}
+                className="px-6 py-3 text-sm font-bold transition-all"
+                style={{
+                  borderBottom: activeView === 'demands' ? '2px solid #6141ac' : '2px solid transparent',
+                  color: activeView === 'demands' ? '#6141ac' : 'hsl(259 15% 55%)',
+                  background: 'transparent',
+                }}>
+                Demands
+              </button>
+            </div>
+
+            {activeView === 'demands' && (
+              <div className="pb-12">
+                <DemandList />
+              </div>
+            )}
+
             <div className="mb-8 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
                 <div className="w-full">
                     <h2 className="text-2xl font-bold font-headline tracking-tight">Use our advanced filters to find the perfect Warehouse, Temperature Controlled Warehouses, 3PL Operated Warehouse and Industrial Buildings for your needs.</h2>
@@ -881,7 +914,7 @@ export function ListingsPage() {
                     </div>
                 </div>
             </div>
-            {renderContent()}
+            {activeView === 'listings' && renderContent()}
         </div>
     </main>
      <DownloadBar />

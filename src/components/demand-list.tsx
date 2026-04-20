@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction, Lightbulb, MapPin, Target, Handshake, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction, Lightbulb, MapPin, Target, Handshake, AlertCircle, CheckCircle2, Trash2 } from 'lucide-react';
 import { useData } from '@/contexts/data-context';
 import type { DemandSchema, ListingSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
@@ -397,17 +397,52 @@ WareHouse Origin
 
 
 export function DemandList() {
-  const { demands } = useData();
+  const { demands, deleteDemand } = useData();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
+  const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null);
+
+  const handleDelete = (demandId: string) => {
+    deleteDemand(demandId);
+    setConfirmDeleteId(null);
+    toast({ title: 'Demand Deleted', description: `Demand ${demandId} has been removed.` });
+  };
 
   return (
-    <div className="mt-8">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold font-headline tracking-tight">Active Demands</h2>
-        <p className="text-muted-foreground mt-2">Review new demands, circulate them to providers, or submit a match directly.</p>
+    <div className="mt-4">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Active Demands</h2>
+          <p className="text-muted-foreground mt-1 text-sm">{demands.length} demand{demands.length !== 1 ? 's' : ''} · Review, circulate to providers, or submit a match.</p>
+        </div>
       </div>
       {demands.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {demands.map((demand) => <DemandCard key={demand.demandId} demand={demand}/> )}
+          {demands.map((demand) => (
+            <div key={demand.demandId} className="relative">
+              <DemandCard demand={demand}/>
+              {isAdmin && (
+                <div className="absolute top-3 right-3">
+                  {confirmDeleteId === demand.demandId ? (
+                    <div className="flex items-center gap-1 bg-white border border-red-200 rounded px-2 py-1 shadow-sm">
+                      <span className="text-xs text-red-600 font-medium">Delete?</span>
+                      <button onClick={() => handleDelete(demand.demandId)}
+                        className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded">Yes</button>
+                      <button onClick={() => setConfirmDeleteId(null)}
+                        className="text-xs font-medium text-gray-500 px-1">No</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirmDeleteId(demand.demandId)}
+                      className="p-1.5 rounded bg-white border border-gray-200 hover:border-red-300 hover:text-red-500 transition-colors shadow-sm"
+                      title="Delete demand">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       ) : (
         <Card className="text-center p-12">

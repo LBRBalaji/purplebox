@@ -43,7 +43,7 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
 }: { 
   providerTab: string; setProviderTab: (t: string) => void; propertyMatchDemandId: string | null; user: any 
 }) {
-  const { listings, listingAnalytics, registeredLeads, transactionActivities, unreadChatCount } = useData();
+  const { listings, listingAnalytics, registeredLeads, transactionActivities, unreadChatCount, demands } = useData();
   const { users } = useAuth();
 
   const myListings = React.useMemo(() =>
@@ -706,12 +706,16 @@ const MainDashboard = () => {
             </div>
           </div>
           <Tabs value={agentTab} onValueChange={setAgentTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
+                <TabsTrigger value="create-demand">Create Demand</TabsTrigger>
                 <TabsTrigger value="my-shortlist">My Shortlist</TabsTrigger>
             </TabsList>
             <TabsContent value="transactions">
                 <TransactionsPage />
+            </TabsContent>
+            <TabsContent value="create-demand">
+                <DemandForm onDemandLogged={() => setAgentTab('transactions')} isAdminMode />
             </TabsContent>
             <TabsContent value="my-shortlist">
                 <GeneralShortlist />
@@ -749,6 +753,7 @@ const MainDashboard = () => {
       const adminTabs = [
         { value: 'all-listings', label: 'All Listings', icon: Building2 },
         { value: 'all-demands', label: 'All Demands', icon: ListChecks },
+        { value: 'create-demand', label: 'Create Demand', icon: FileText },
         { value: 'engagement-jobs', label: 'Engagement Jobs', icon: Zap },
       ];
 
@@ -877,7 +882,7 @@ const MainDashboard = () => {
             {[
               { label: 'Manage Users', sub: `${pendingUsers.length} pending`, href: '/dashboard/manage-users', alert: pendingUsers.length > 0 },
               { label: 'All Listings', sub: `${approvedListings.length} active`, href: '#listings', alert: false },
-              { label: 'All Demands', sub: `${allLeads.length} active`, href: '#demands', alert: false },
+              { label: 'All Demands', sub: `${demands.length} active`, href: '#demands', alert: false },
               { label: 'Analytics', sub: 'Views & downloads', href: '/dashboard/analytics', alert: false },
             ].map((nav, i) => (
               <a key={i} href={nav.href}
@@ -910,6 +915,7 @@ const MainDashboard = () => {
             <div className="p-4">
               {adminTab === 'all-listings' && <AdminListings />}
               {adminTab === 'all-demands' && <DemandList />}
+              {adminTab === 'create-demand' && <DemandForm onDemandLogged={() => setAdminTab('all-demands')} isAdminMode />}
               {adminTab === 'engagement-jobs' && <EngagementJobsPanel />}
             </div>
           </div>

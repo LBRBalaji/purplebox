@@ -61,7 +61,7 @@ export default function SignupPage() {
 
   const handleSendOtp = async () => {
     if (!formData.email) { setOtpError('Please enter your email first.'); return; }
-    if (formData.role !== 'Warehouse Developer' && isPersonalEmail(formData.email)) { setOtpError('Please use your official company email address.'); return; }
+    if (formData.role !== 'Warehouse Developer' && formData.role !== 'Agent' && isPersonalEmail(formData.email)) { setOtpError('Please use your official company email address.'); return; }
     setOtpLoading(true); setOtpError('');
     try {
       const res = await fetch('/api/send-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: formData.email }) });
@@ -227,7 +227,7 @@ export default function SignupPage() {
                 </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email {formData.role === 'User' ? <span className="text-xs text-muted-foreground">(official company email only)</span> : formData.role === 'Warehouse Developer' ? <span className="text-xs text-muted-foreground">(any email accepted)</span> : null}</Label>
+              <Label htmlFor="email">Email {formData.role === 'User' ? <span className="text-xs text-muted-foreground">(official company email only)</span> : (formData.role === 'Warehouse Developer' || formData.role === 'Agent') ? <span className="text-xs text-muted-foreground">(any email accepted)</span> : null}</Label>
               <div className="flex gap-2">
                 <Input id="email" type="email" placeholder="you@yourcompany.com" required onChange={e => { handleChange(e); setOtpSent(false); setOtpVerified(false); setOtpError(''); }} value={formData.email} disabled={otpVerified} className="flex-1" />
                 {(formData.role === 'User' || formData.role === 'Warehouse Developer') && !otpVerified && (
