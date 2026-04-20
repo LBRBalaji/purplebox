@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
-import { ShieldCheck, Printer, ArrowRight, FileText, HardHat, Eye } from 'lucide-react';
+import { ShieldCheck, Printer, ArrowRight, FileText, HardHat, Eye, Download } from 'lucide-react';
 import Link from 'next/link';
 import { NegotiationBoard } from '@/components/negotiation-board';
 import { TenantImprovementsSheet } from '@/components/tenant-improvements-sheet';
@@ -16,6 +16,48 @@ export default function StakeholderViewPage() {
   const { registeredLeads, listings } = useData();
 
   const [activeTab, setActiveTab] = React.useState<'termsheet' | 'fitout'>('termsheet');
+  const [pdfGenerating, setPdfGenerating] = React.useState(false);
+
+  const handleDownloadPDF = async () => {
+    setPdfGenerating(true);
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const { default: html2canvas } = await import('html2canvas');
+      const element = document.querySelector('.printable-content') as HTMLElement
+        || document.getElementById('term-sheet-content') as HTMLElement;
+      if (!element) { setPdfGenerating(false); return; }
+      const noPrint = document.querySelectorAll<HTMLElement>('.no-print');
+      noPrint.forEach(el => el.style.display = 'none');
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      noPrint.forEach(el => el.style.display = '');
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = 210; const margin = 12; const usableW = pageW - margin * 2;
+      const imgH = (canvas.height * usableW) / canvas.width;
+      const pageH = 297; const contentH = pageH - 30;
+      pdf.setFillColor(30, 21, 55); pdf.rect(0, 0, pageW, 18, 'F');
+      pdf.setTextColor(255, 255, 255); pdf.setFontSize(12); pdf.setFont('helvetica', 'bold');
+      pdf.text('ORS-ONE — Commercial Term Sheet (Read-Only Copy)', margin, 12);
+      pdf.setFontSize(7); pdf.setFont('helvetica', 'normal');
+      pdf.text(`${invitee?.roleDescription || invitee?.role || 'Stakeholder'}: ${invitee?.name || ''}  ·  ${new Date().toLocaleDateString('en-IN')}`, pageW - margin, 12, { align: 'right' });
+      let yPos = 22; let remaining = imgH; let page = 0;
+      while (remaining > 0) {
+        if (page > 0) { pdf.addPage(); yPos = 12; }
+        const sliceH = Math.min(remaining, contentH);
+        const srcY = page * (canvas.height * contentH / imgH);
+        const srcH = sliceH * canvas.height / imgH;
+        const sc = document.createElement('canvas');
+        sc.width = canvas.width; sc.height = Math.round(srcH);
+        sc.getContext('2d')!.drawImage(canvas, 0, srcY, canvas.width, Math.round(srcH), 0, 0, canvas.width, Math.round(srcH));
+        pdf.addImage(sc.toDataURL('image/png'), 'PNG', margin, yPos, usableW, sliceH);
+        remaining -= sliceH; page++;
+      }
+      pdf.setFillColor(244, 242, 251); pdf.rect(0, pageH - 10, pageW, 10, 'F');
+      pdf.setTextColor(97, 65, 172); pdf.setFontSize(7);
+      pdf.text('Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app  ·  Read-Only Stakeholder Copy', pageW / 2, pageH - 4, { align: 'center' });
+      pdf.save(`ORS-ONE_TermSheet_${lead?.id || 'deal'}_${invitee?.name?.replace(/\s+/g,'_') || 'stakeholder'}.pdf`);
+    } catch(e) { console.error('PDF error:', e); }
+    setPdfGenerating(false);
+  };
   const [loading, setLoading] = React.useState(true);
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
   const [invitee, setInvitee] = React.useState<any>(null);
@@ -104,6 +146,11 @@ export default function StakeholderViewPage() {
               style={{background:'hsl(259 44% 94%)',color:'#6141ac',borderRadius:0}}>
               <Printer className="h-3.5 w-3.5" /> Print
             </button>
+            <button onClick={handleDownloadPDF} disabled={pdfGenerating}
+              className="flex items-center gap-1.5 text-xs font-bold px-3 py-2"
+              style={{background:'#6141ac',color:'#fff',borderRadius:0}}>
+              <Download className="h-3.5 w-3.5" />{pdfGenerating ? 'Generating...' : 'Download PDF'}
+            </button>
             <Link href="/signup" className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 text-white"
               style={{background:'#6141ac',borderRadius:0}}>
               Create Account <ArrowRight className="h-3.5 w-3.5" />
@@ -175,7 +222,7 @@ export default function StakeholderViewPage() {
           <div className="p-5" style={{background:'#fff'}}>
             {/* Wrap in read-only overlay for stakeholders */}
             <div style={{pointerEvents: isStakeholder ? 'none' : 'auto', userSelect: isStakeholder ? 'none' : 'auto'}}>
-              {activeTab === 'termsheet' && <NegotiationBoard lead={lead} primaryListing={primaryListing} />}
+              {activeTab === 'termsheet' && <div id="term-sheet-content"><NegotiationBoard lead={lead} primaryListing={primaryListing} /></div>}
               {activeTab === 'fitout' && <TenantImprovementsSheet leadId={lead.id} />}
             </div>
           </div>

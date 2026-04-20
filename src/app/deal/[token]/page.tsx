@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { NegotiationBoard } from '@/components/negotiation-board';
 import { TenantImprovementsSheet } from '@/components/tenant-improvements-sheet';
-import { ShieldCheck, Download, FileText, HardHat, ArrowRight, Clock, CheckCircle, Building2 } from 'lucide-react';
+import { ShieldCheck, Download, FileText, HardHat, ArrowRight, Clock, CheckCircle, Building2, Printer } from 'lucide-react';
 import Link from 'next/link';
 import type { RegisteredLead } from '@/contexts/data-context';
 import type { ListingSchema } from '@/lib/schema';
@@ -21,6 +21,50 @@ export default function DealMagicLinkPage() {
   const token = params.token as string;
 
   const [activeTab, setActiveTab] = React.useState<'overview' | 'termsheet' | 'fitout'>('overview');
+  const [pdfGenerating, setPdfGenerating] = React.useState(false);
+
+  const handleDownloadPDF = async () => {
+    setPdfGenerating(true);
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const { default: html2canvas } = await import('html2canvas');
+      const element = document.querySelector('.printable-content') as HTMLElement
+        || document.querySelector('[data-pdf-content]') as HTMLElement
+        || document.getElementById('term-sheet-content') as HTMLElement;
+      if (!element) { setPdfGenerating(false); return; }
+      const noPrint = document.querySelectorAll<HTMLElement>('.no-print');
+      noPrint.forEach(el => el.style.display = 'none');
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      noPrint.forEach(el => el.style.display = '');
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = 210; const margin = 12; const usableW = pageW - margin * 2;
+      const imgH = (canvas.height * usableW) / canvas.width;
+      const pageH = 297; const contentH = pageH - 30;
+      pdf.setFillColor(30, 21, 55);
+      pdf.rect(0, 0, pageW, 18, 'F');
+      pdf.setTextColor(255, 255, 255); pdf.setFontSize(12); pdf.setFont('helvetica', 'bold');
+      pdf.text('ORS-ONE — Commercial Term Sheet', margin, 12);
+      pdf.setFontSize(7); pdf.setFont('helvetica', 'normal');
+      pdf.text(`Deal ID: ${lead?.id || ''}  ·  ${new Date().toLocaleDateString('en-IN')}`, pageW - margin, 12, { align: 'right' });
+      let yPos = 22; let remaining = imgH; let page = 0;
+      while (remaining > 0) {
+        if (page > 0) { pdf.addPage(); yPos = 12; }
+        const sliceH = Math.min(remaining, contentH);
+        const srcY = page * (canvas.height * contentH / imgH);
+        const srcH = sliceH * canvas.height / imgH;
+        const sc = document.createElement('canvas');
+        sc.width = canvas.width; sc.height = Math.round(srcH);
+        sc.getContext('2d')!.drawImage(canvas, 0, srcY, canvas.width, Math.round(srcH), 0, 0, canvas.width, Math.round(srcH));
+        pdf.addImage(sc.toDataURL('image/png'), 'PNG', margin, yPos, usableW, sliceH);
+        remaining -= sliceH; page++;
+      }
+      pdf.setFillColor(244, 242, 251); pdf.rect(0, pageH - 10, pageW, 10, 'F');
+      pdf.setTextColor(97, 65, 172); pdf.setFontSize(7);
+      pdf.text('Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app', pageW / 2, pageH - 4, { align: 'center' });
+      pdf.save(`ORS-ONE_TermSheet_${lead?.id || 'deal'}_${new Date().toISOString().slice(0,10)}.pdf`);
+    } catch(e) { console.error('PDF error:', e); }
+    setPdfGenerating(false);
+  };
   const [inviteeData, setInviteeData] = React.useState<any>(null);
   const [lead, setLead] = React.useState<RegisteredLead | null>(null);
   const [loading, setLoading] = React.useState(true);

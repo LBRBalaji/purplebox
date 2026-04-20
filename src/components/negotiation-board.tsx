@@ -747,9 +747,96 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
         const originalTitle = document.title;
         const now = new Date();
         const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
-        document.title = `MoM_${lead.id}_Lakshmi_Balaji_O2O_${timestamp}`;
+        document.title = `TermSheet_${lead.id}_ORS-ONE_${timestamp}`;
         window.print();
         document.title = originalTitle;
+    };
+
+    const [pdfGenerating, setPdfGenerating] = React.useState(false);
+    const handleDownloadPDF = async () => {
+        setPdfGenerating(true);
+        try {
+            const { default: jsPDF } = await import('jspdf');
+            const { default: html2canvas } = await import('html2canvas');
+            const element = document.querySelector('.printable-content') as HTMLElement;
+            if (!element) { setPdfGenerating(false); return; }
+
+            // Temporarily show hidden print-only elements
+            const printOnlyEls = document.querySelectorAll<HTMLElement>('.print-header, .print-footer');
+            printOnlyEls.forEach(el => el.style.display = 'block');
+            const noPrintEls = document.querySelectorAll<HTMLElement>('.no-print');
+            noPrintEls.forEach(el => el.style.display = 'none');
+
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+                windowWidth: 900,
+            });
+
+            // Restore
+            printOnlyEls.forEach(el => el.style.display = '');
+            noPrintEls.forEach(el => el.style.display = '');
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pageW = 210; const pageH = 297; const margin = 12;
+            const usableW = pageW - margin * 2;
+            const imgH = (canvas.height * usableW) / canvas.width;
+
+            // Header
+            pdf.setFillColor(30, 21, 55);
+            pdf.rect(0, 0, pageW, 18, 'F');
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(13);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('ORS-ONE — Commercial Term Sheet', margin, 12);
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'normal');
+            const now = new Date();
+            pdf.text(`Transaction ID: ${lead.id}  ·  Generated: ${now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`, pageW - margin, 12, { align: 'right' });
+
+            // Content — paginate if tall
+            let yPos = 22;
+            let remaining = imgH;
+            const contentH = pageH - yPos - 16; // leave space for footer
+
+            let page = 0;
+            while (remaining > 0) {
+                if (page > 0) { pdf.addPage(); yPos = 12; }
+                const sliceH = Math.min(remaining, contentH);
+                const srcY = page * (canvas.height * contentH / imgH);
+                const srcH = sliceH * canvas.height / imgH;
+
+                // Create a slice canvas
+                const sliceCanvas = document.createElement('canvas');
+                sliceCanvas.width = canvas.width;
+                sliceCanvas.height = Math.round(srcH);
+                const ctx = sliceCanvas.getContext('2d')!;
+                ctx.drawImage(canvas, 0, srcY, canvas.width, Math.round(srcH), 0, 0, canvas.width, Math.round(srcH));
+                const sliceData = sliceCanvas.toDataURL('image/png');
+                pdf.addImage(sliceData, 'PNG', margin, yPos, usableW, sliceH);
+
+                remaining -= sliceH;
+                page++;
+            }
+
+            // Footer on last page
+            const lastY = pageH - 8;
+            pdf.setFillColor(244, 242, 251);
+            pdf.rect(0, lastY - 6, pageW, 10, 'F');
+            pdf.setTextColor(97, 65, 172);
+            pdf.setFontSize(7);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app  ·  Building Transaction Ready Assets', pageW / 2, lastY, { align: 'center' });
+
+            const ts = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+            pdf.save(`ORS-ONE_TermSheet_${lead.id}_${ts}.pdf`);
+        } catch (e) {
+            console.error('PDF generation error:', e);
+        }
+        setPdfGenerating(false);
     };
 
     return (
@@ -769,7 +856,10 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                 </div>
                                 <div className="flex items-center gap-2">
                                      <Button type="button" variant="outline" onClick={handlePrint} style={{borderRadius:0}}>
-                                        <Printer className="mr-2 h-4 w-4" /> Print Term Sheet
+                                        <Printer className="mr-2 h-4 w-4" /> Print
+                                    </Button>
+                                    <Button type="button" variant="outline" onClick={handleDownloadPDF} disabled={pdfGenerating} style={{borderRadius:0,background:'#6141ac',color:'#fff',borderColor:'#6141ac'}}>
+                                        <Download className="mr-2 h-4 w-4" /> {pdfGenerating ? 'Generating...' : 'Download PDF'}
                                     </Button>
                                     {canEdit && (
                                         <>
