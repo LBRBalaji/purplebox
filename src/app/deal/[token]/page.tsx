@@ -298,7 +298,7 @@ export default function DealMagicLinkPage() {
                     You can edit and annotate this term sheet. All changes are versioned. <strong>Download is available after registration.</strong>
                   </p>
                 </div>
-                <NegotiationBoard lead={lead} primaryListing={primaryListing} />
+                <NegotiationBoard lead={lead} primaryListing={primaryListing} hideDownload={true} />
               </div>
             )}
 

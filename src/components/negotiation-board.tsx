@@ -645,7 +645,7 @@ const NegotiationSession = ({ sessionIndex, onRemove, canEdit, form, lead, prima
     );
 }
 
-export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLead, primaryListing: ListingSchema | null }) {
+export function NegotiationBoard({ lead, primaryListing, hideDownload }: { lead: RegisteredLead, primaryListing: ListingSchema | null, hideDownload?: boolean }) {
     const { user } = useAuth();
     const { getNegotiationBoard, updateNegotiationBoard, addTransactionActivity } = useData();
     
@@ -1000,9 +1000,11 @@ export function NegotiationBoard({ lead, primaryListing }: { lead: RegisteredLea
                                      <Button type="button" variant="outline" onClick={handlePrint} style={{borderRadius:0}}>
                                         <Printer className="mr-2 h-4 w-4" /> Print
                                     </Button>
+                                    {!hideDownload && (
                                     <Button type="button" variant="outline" onClick={handleDownloadPDF} disabled={pdfGenerating} style={{borderRadius:0,background:'#6141ac',color:'#fff',borderColor:'#6141ac'}}>
                                         <Download className="mr-2 h-4 w-4" /> {pdfGenerating ? 'Generating...' : 'Download PDF'}
                                     </Button>
+                                    )}
                                     {canEdit && (
                                         <>
                                             <Button type="button" variant="outline" onClick={handleGenerateFollowUp}>
