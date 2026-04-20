@@ -148,7 +148,7 @@ export function ApprovalQueue() {
                                             <TableRow key={listing.listingId}>
                                                 <TableCell className="font-medium">{listing.name}</TableCell>
                                                 <TableCell>{listing.location}</TableCell>
-                                                <TableCell>{listing.sizeSqFt.toLocaleString()}</TableCell>
+                                                <TableCell>{(listing.sizeSqFt ?? 0).toLocaleString()}</TableCell>
                                                 <TableCell>{provider?.companyName || 'N/A'}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
