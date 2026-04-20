@@ -28,7 +28,7 @@ export function ApprovalQueue() {
         setPendingListings(pending);
     }, [listings]);
 
-    const pendingUsers = Object.values(users).filter(u => u.status === 'pending');
+    const pendingUsers = Object.values(users || {}).filter(u => u.status === 'pending');
 
     const handleListingStatus = (listingId: string, newStatus: ListingStatus) => {
         updateListingStatus(listingId, newStatus);
@@ -143,7 +143,7 @@ export function ApprovalQueue() {
                                     </TableHeader>
                                     <TableBody>
                                         {pendingListings.map(listing => {
-                                            const provider = users[listing.developerId];
+                                            const provider = listing.developerId ? (users || {})[listing.developerId] : undefined;
                                             return (
                                             <TableRow key={listing.listingId}>
                                                 <TableCell className="font-medium">{listing.name}</TableCell>
