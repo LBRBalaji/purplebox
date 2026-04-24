@@ -162,7 +162,15 @@ export function OrsTransactManager() {
                   {l.lease_area_as_advertised_in_sq_ft ? Number(l.lease_area_as_advertised_in_sq_ft).toLocaleString() : l.lease_area_range_in_sq_ft || '—'}
                 </p>
                 <div style={{ display: 'flex', gap: 4 }}>
-                  <button onClick={() => setEditing(l)}
+                  <button onClick={() => {
+                    // Use startTransition to defer the 205-field form render
+                    // preventing React error #300 during the list re-render
+                    if (typeof React.startTransition === 'function') {
+                      React.startTransition(() => setEditing(l));
+                    } else {
+                      setTimeout(() => setEditing(l), 0);
+                    }
+                  }}
                     title="Edit listing"
                     style={{ padding: '4px 7px', background: 'hsl(259 44% 94%)', border: '0.5px solid hsl(259 44% 80%)', cursor: 'pointer', borderRadius: 0, color: '#6141ac' }}>
                     <Edit2 style={{ width: 11, height: 11 }} />

@@ -82,7 +82,10 @@ export function OrsTransactAdminForm({ existing, onSaved, onCancel }: Props) {
     setSaving(false);
   };
 
-  const filledCount = ORS_TRANSACT_FIELDS.filter(f => values[f.key]?.trim()).length;
+  const filledCount = React.useMemo(
+    () => ORS_TRANSACT_FIELDS.filter(f => values[f.key]?.trim()).length,
+    [values]
+  );
   const totalCount = ORS_TRANSACT_FIELDS.length;
 
   return (
