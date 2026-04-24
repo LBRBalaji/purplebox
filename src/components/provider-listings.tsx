@@ -31,7 +31,8 @@ import { Input } from './ui/input';
 
 
 function ProviderListingCard({ listing, onStatusChange, onEdit, isAdmin }: { listing: ListingSchema, onStatusChange: (status: ListingStatus) => void, onEdit: (listing: ListingSchema) => void, isAdmin: boolean }) {
-  const { listingAnalytics } = useData();
+  const { listingAnalytics, updateListing } = useData();
+  const { toast } = useToast();
   const analytics = listingAnalytics.find(a => a.listingId === listing.listingId);
   const statusConfig: Record<ListingStatus, { text: string; className: string, icon: React.ElementType }> = {
     approved: { text: "Approved", className: "bg-green-100 text-green-800", icon: CircleCheck },

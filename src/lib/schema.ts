@@ -103,6 +103,9 @@ export const listingSchema = z.object({
   // Documents & Media
   documents: z.array(documentSchema).optional(),
 
+  // ORS Transact Dual Mode
+  dualMode: z.boolean().optional().default(false),
+
   // Internal Developer/Project Details
   developerName: z.string().optional(),
   developerContactName: z.string().optional(),
