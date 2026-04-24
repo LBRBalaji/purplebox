@@ -56,12 +56,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  reactStrictMode: false,
   experimental: {
     serverActions: {
       bodySizeLimit: '20mb',
     },
-    // This is the new configuration to allow cross-origin requests in development.
-
   },
 };
 
