@@ -1,10 +1,13 @@
 
 'use client';
-import { ListingsPage } from "@/components/listings-page-component";
 
+import * as React from 'react';
+import { ListingsPage } from '@/components/listings-page-component';
 
-export default function Listings() {
+export default function LandingPage() {
   return (
-    <ListingsPage />
+    <div className="flex-grow flex flex-col">
+        <ListingsPage />
+    </div>
   );
 }

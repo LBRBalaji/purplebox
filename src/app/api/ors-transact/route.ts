@@ -35,7 +35,13 @@ export async function GET(req: NextRequest) {
       return true;
     });
 
-    return NextResponse.json({ listings: filtered, count: filtered.length, page });
+    // Get total count efficiently
+    let total = filtered.length;
+    try {
+      const countSnap = await getDb().collection(COLLECTION).count().get();
+      total = countSnap.data().count;
+    } catch {}
+    return NextResponse.json({ listings: filtered, count: filtered.length, total, page });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

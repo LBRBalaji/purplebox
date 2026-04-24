@@ -499,9 +499,26 @@ export function ListingsPage() {
 
   const inventoryCount = approvedListings.length;
   const totalInventorySize = useMemo(() =>
-      approvedListings.reduce((sum, listing) => sum + listing.sizeSqFt, 0),
+      approvedListings.reduce((sum, listing) => sum + (listing.sizeSqFt || 0), 0),
     [approvedListings]
   );
+
+  // ORS Transact count — fetched once on mount, independent of Firestore loading
+  const [orsTransactCount, setOrsTransactCount] = useState<number | null>(null);
+  const [orsTransactSize, setOrsTransactSize] = useState<number>(0);
+  useEffect(() => {
+    // Use static known value for instant render, refresh in background
+    setOrsTransactCount(9422);
+    fetch('/api/ors-transact?page=1')
+      .then(r => r.json())
+      .then(d => {
+        // API returns total count if available
+        if (d.total) setOrsTransactCount(d.total);
+      })
+      .catch(() => {}); // silent fail — static value is fine
+  }, []);
+
+  const totalListingCount = inventoryCount + (orsTransactCount || 0);
   
   // Function to format large numbers into a more readable format (e.g., 1.5M)
   const formatSize = (size: number) => {
@@ -761,12 +778,12 @@ export function ListingsPage() {
                 
                  <div className="mt-8 flex items-center justify-center gap-4 md:gap-8 text-center animate-in fade-in-0 duration-1000">
                     <div className="text-center">
-                        {isDataLoading ? <Skeleton className="h-9 w-12 mx-auto" /> : <p className="text-2xl md:text-3xl font-bold text-primary">{inventoryCount}</p>}
+                        <p className="text-2xl md:text-3xl font-bold text-primary">{totalListingCount.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground tracking-wider">WAREHOUSES</p>
                     </div>
                     <Separator orientation="vertical" className="h-10" />
                     <div className="text-center">
-                         {isDataLoading ? <Skeleton className="h-9 w-20 mx-auto" /> : <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>}
+                        {isDataLoading ? <Skeleton className="h-9 w-20 mx-auto" /> : <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>}
                         <p className="text-xs text-muted-foreground tracking-wider">SQ. FT. LISTED</p>
                     </div>
                 </div>
