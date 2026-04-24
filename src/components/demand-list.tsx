@@ -377,8 +377,8 @@ WareHouse Origin
           </div>
         </div>
       )}
-    </Card>
-  )
+    </div>
+  );
 }
 
 
