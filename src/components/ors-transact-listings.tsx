@@ -160,28 +160,27 @@ export function OrsTransactListings() {
       </div>
 
       {/* Filters — row 2: dropdowns */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8, marginBottom: 16 }}>
         <select value={facilityType} onChange={e => setFacilityType(e.target.value)}
-          style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0 }}>
+          style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0, width: '100%' }}>
           <option value="">All facility types</option>
           {FACILITY_TYPES.map(t => <option key={t}>{t}</option>)}
         </select>
 
         <select value={state} onChange={e => setState(e.target.value)}
-          style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0 }}>
+          style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0, width: '100%' }}>
           <option value="">All states</option>
           {states.map(s => <option key={s}>{s}</option>)}
         </select>
 
-        {/* Locality Circle — appears when state selected or always */}
         <select value={locality} onChange={e => setLocality(e.target.value)}
-          style={{ fontSize: 12, padding: '7px 10px', border: `0.5px solid ${locality ? '#6141ac' : 'hsl(259 30% 85%)'}`, background: 'var(--color-background-primary)', color: locality ? '#6141ac' : 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0, fontWeight: locality ? 600 : 400 }}>
+          style={{ fontSize: 12, padding: '7px 10px', border: `0.5px solid ${locality ? '#6141ac' : 'hsl(259 30% 85%)'}`, background: 'var(--color-background-primary)', color: locality ? '#6141ac' : 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0, fontWeight: locality ? 600 : 400, width: '100%' }}>
           <option value="">Locality Circle</option>
           {localities.map(l => <option key={l}>{l}</option>)}
         </select>
 
         <select value={sizeRange} onChange={e => setSizeRange(e.target.value)}
-          style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0 }}>
+          style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0, width: '100%' }}>
           <option value="">All sizes</option>
           {SIZE_RANGES.map(r => <option key={`${r.min}-${r.max}`} value={`${r.min}-${r.max}`}>{r.label}</option>)}
         </select>
@@ -207,7 +206,7 @@ export function OrsTransactListings() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 8, borderTop: '0.5px solid hsl(259 30% 90%)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 8, borderTop: '0.5px solid hsl(259 30% 90%)', flexWrap: 'wrap' }}>
               {/* Prev */}
               <button onClick={() => load(page - 1)} disabled={page === 1} style={btnStyle(false, page === 1)}>
                 <ChevronLeft style={{ width: 14, height: 14 }} />
@@ -224,7 +223,7 @@ export function OrsTransactListings() {
                 <ChevronRight style={{ width: 14, height: 14 }} />
               </button>
 
-              <span style={{ fontSize: 11, color: 'hsl(259 15% 55%)', marginLeft: 8 }}>
+              <span style={{ fontSize: 11, color: 'hsl(259 15% 55%)', marginLeft: 4, textAlign: 'center', width: '100%', marginTop: 4 }}>
                 Page {page} of {totalPages.toLocaleString()} · {total.toLocaleString()} listings
               </span>
             </div>

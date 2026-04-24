@@ -3,7 +3,7 @@ import { OrsTransactListings } from '@/components/ors-transact-listings';
 export default function OrsTransactPage() {
   return (
     <main className="min-h-screen" style={{background:'hsl(259 30% 96%)'}}>
-      <div style={{background:'linear-gradient(135deg,#1e1537,#3b2870)',padding:'32px 24px 28px'}}>
+      <div style={{background:'linear-gradient(135deg,#1e1537,#3b2870)',padding:'24px 16px 20px'}}>
         <div className="max-w-6xl mx-auto">
           <p style={{fontSize:11,fontWeight:600,color:'hsl(259 44% 70%)',letterSpacing:'.08em',textTransform:'uppercase',margin:'0 0 6px'}}>
             ORS Transact
@@ -16,7 +16,7 @@ export default function OrsTransactPage() {
           </p>
         </div>
       </div>
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-3 md:px-6 py-6">
         <OrsTransactListings />
       </div>
     </main>

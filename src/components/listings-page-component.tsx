@@ -768,15 +768,26 @@ export function ListingsPage() {
                 <p className="mt-2 text-lg font-semibold text-primary">Search-Select-Download</p>
                 <p className="mt-1 text-base text-accent">Warehouse-Technical-Compliance-Commercials, in a single Excel</p>
                 
-                 <div className="mt-8 flex items-center justify-center gap-4 md:gap-8 text-center animate-in fade-in-0 duration-1000">
-                    <div className="text-center">
-                        <p className="text-2xl md:text-3xl font-bold text-primary">{totalListingCount.toLocaleString()}</p>
-                        <p className="text-xs text-muted-foreground tracking-wider">WAREHOUSES</p>
+                 <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 max-w-2xl mx-auto animate-in fade-in-0 duration-1000">
+                    <div className="text-center px-3 py-3 rounded-lg bg-primary/5 border border-primary/10">
+                        <p className="text-2xl md:text-3xl font-bold text-primary">{inventoryCount}</p>
+                        <p className="text-xs text-muted-foreground tracking-wider mt-1">Direct Deal</p>
+                        <p className="text-xs text-muted-foreground/70">Warehouses</p>
                     </div>
-                    <Separator orientation="vertical" className="h-10" />
-                    <div className="text-center">
-                        <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalSize)}</p>
-                        <p className="text-xs text-muted-foreground tracking-wider">SQ. FT. LISTED</p>
+                    <div className="text-center px-3 py-3 rounded-lg bg-primary/5 border border-primary/10">
+                        <p className="text-2xl md:text-3xl font-bold text-primary">{ORS_TRANSACT_COUNT.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground tracking-wider mt-1">ORS Transact</p>
+                        <p className="text-xs text-muted-foreground/70">Warehouses</p>
+                    </div>
+                    <div className="text-center px-3 py-3 rounded-lg bg-primary/5 border border-primary/10">
+                        <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>
+                        <p className="text-xs text-muted-foreground tracking-wider mt-1">Direct Deal</p>
+                        <p className="text-xs text-muted-foreground/70">Sq. Ft. Listed</p>
+                    </div>
+                    <div className="text-center px-3 py-3 rounded-lg bg-primary/5 border border-primary/10">
+                        <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(ORS_TRANSACT_SIZE_SQF)}</p>
+                        <p className="text-xs text-muted-foreground tracking-wider mt-1">ORS Transact</p>
+                        <p className="text-xs text-muted-foreground/70">Sq. Ft. Listed</p>
                     </div>
                 </div>
 
@@ -813,10 +824,10 @@ export function ListingsPage() {
                 </div>
             </Alert>
             {/* View toggle — Listings / Demands / ORS Transact */}
-            <div className="flex items-center gap-0 mb-6 border-b" style={{borderColor:'hsl(259 30% 88%)'}}>
+            <div className="flex items-center gap-0 mb-6 border-b overflow-x-auto" style={{borderColor:'hsl(259 30% 88%)',WebkitOverflowScrolling:'touch'}}>
               <button
                 onClick={() => setActiveView('listings')}
-                className="px-6 py-3 text-sm font-bold transition-all"
+                className="px-4 md:px-6 py-3 text-sm font-bold transition-all whitespace-nowrap flex-shrink-0"
                 style={{
                   borderBottom: activeView === 'listings' ? '2px solid #6141ac' : '2px solid transparent',
                   color: activeView === 'listings' ? '#6141ac' : 'hsl(259 15% 55%)',
@@ -826,7 +837,7 @@ export function ListingsPage() {
               </button>
               <button
                 onClick={() => setActiveView('demands')}
-                className="px-6 py-3 text-sm font-bold transition-all"
+                className="px-4 md:px-6 py-3 text-sm font-bold transition-all whitespace-nowrap flex-shrink-0"
                 style={{
                   borderBottom: activeView === 'demands' ? '2px solid #6141ac' : '2px solid transparent',
                   color: activeView === 'demands' ? '#6141ac' : 'hsl(259 15% 55%)',
@@ -836,7 +847,7 @@ export function ListingsPage() {
               </button>
               <button
                 onClick={() => setActiveView('ors-transact')}
-                className="px-6 py-3 text-sm font-bold transition-all flex items-center gap-2"
+                className="px-4 md:px-6 py-3 text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap flex-shrink-0"
                 style={{
                   borderBottom: activeView === 'ors-transact' ? '2px solid #6141ac' : '2px solid transparent',
                   color: activeView === 'ors-transact' ? '#6141ac' : 'hsl(259 15% 55%)',
