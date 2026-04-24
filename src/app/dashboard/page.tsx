@@ -25,6 +25,7 @@ import { DeveloperTeamDashboard } from '@/components/developer-team-dashboard';
 import { StaffDashboard } from '@/components/staff-dashboard';
 import { DemandList } from '@/components/demand-list';
 import { OrsTransactImport } from '@/components/ors-transact-import';
+import { OrsTransactRoleManager } from '@/components/ors-transact-role-manager';
 import { CustomerSubleaseListings } from '@/components/customer-sublease-listings';
 import { ListingForm } from '@/components/listing-form';
 

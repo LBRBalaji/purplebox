@@ -273,7 +273,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
   };
   
    const onInvalidSubmit = (errors: FieldErrors<ListingSchema>) => {
-    console.log("Form Errors:", errors);
+    
     const errorFields = Object.keys(errors);
     toast({
         variant: 'destructive',

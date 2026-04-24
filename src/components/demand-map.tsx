@@ -117,10 +117,10 @@ function AutocompleteAndMap() {
                     setValue("locationName", latLngString, { shouldValidate: true, shouldDirty: true });
                     setSelectedPlace(null);
                 },
-                (error) => alert("Could not retrieve your location.")
+                (error) => console.error("Could not retrieve your location.")
             );
         } else {
-            alert("Geolocation is not supported by your browser.");
+            console.error("Geolocation is not supported by your browser.");
         }
     }, [setValue]);
 

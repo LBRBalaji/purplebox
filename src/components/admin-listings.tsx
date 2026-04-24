@@ -490,7 +490,7 @@ export function AdminListings() {
   const handleStatusChange = (listingId: string, status: ListingStatus) => { updateListingStatus(listingId,status); toast({title:'Status Updated',description:`"${listingId}" → ${status}`}); };
   const handleDownloadReport = () => {
     const from=dateRange?.from; const to=dateRange?.to;
-    if(!from||!to){alert('Please select a valid date range.');return;}
+    if(!from||!to){console.warn('Please select a valid date range.');return;}
     const locationStats: Record<string,{totalViews:number;totalDownloads:number;count:number}> = {};
     listings.forEach(listing => {
       const analytics=listingAnalytics.find(a=>a.listingId===listing.listingId); if(!analytics)return;
