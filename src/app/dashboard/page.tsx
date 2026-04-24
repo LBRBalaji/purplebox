@@ -13,7 +13,7 @@ import { ApprovalQueue } from '@/components/approval-queue';
 import { useData } from '@/contexts/data-context';
 import { ProviderListings } from '@/components/provider-listings';
 import { ProspectsTab } from '@/components/prospects-tab';
-import { Building2, Eye, Download, TrendingUp, Users, ShieldCheck, CheckCircle2, AlertCircle, Scaling, MessageSquare, FileSignature, LayoutDashboard, ListChecks, UserPlus, ChevronRight, Zap, FileText } from 'lucide-react';
+import { Building2, Eye, Download, TrendingUp, Users, ShieldCheck, CheckCircle2, AlertCircle, Scaling, MessageSquare, FileSignature, LayoutDashboard, ListChecks, UserPlus, ChevronRight, Zap, FileText , Upload} from 'lucide-react';
 import Link from 'next/link';
 import { ProviderLeads } from '@/components/provider-leads';
 import { CustomerTransactions } from '@/components/customer-transactions';
@@ -24,6 +24,7 @@ import { CompanyAdminDashboard } from '@/components/company-admin-dashboard';
 import { DeveloperTeamDashboard } from '@/components/developer-team-dashboard';
 import { StaffDashboard } from '@/components/staff-dashboard';
 import { DemandList } from '@/components/demand-list';
+import { OrsTransactImport } from '@/components/ors-transact-import';
 import { CustomerSubleaseListings } from '@/components/customer-sublease-listings';
 import { ListingForm } from '@/components/listing-form';
 
@@ -754,6 +755,8 @@ const MainDashboard = () => {
         { value: 'all-listings', label: 'All Listings', icon: Building2 },
         { value: 'all-demands', label: 'All Demands', icon: ListChecks },
         { value: 'create-demand', label: 'Create Demand', icon: FileText },
+        { value: 'ors-transact-import', label: 'ORS Transact Import', icon: Upload },
+        { value: 'ors-transact-roles', label: 'ORS Transact Roles', icon: Users },
         { value: 'engagement-jobs', label: 'Engagement Jobs', icon: Zap },
       ];
 
@@ -916,6 +919,8 @@ const MainDashboard = () => {
               {adminTab === 'all-listings' && <AdminListings />}
               {adminTab === 'all-demands' && <DemandList />}
               {adminTab === 'create-demand' && <DemandForm onDemandLogged={() => setAdminTab('all-demands')} isAdminMode />}
+              {adminTab === 'ors-transact-import' && <OrsTransactImport />}
+              {adminTab === 'ors-transact-roles' && <OrsTransactRoleManager />}
               {adminTab === 'engagement-jobs' && <EngagementJobsPanel />}
             </div>
           </div>
