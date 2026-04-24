@@ -35,15 +35,33 @@ export async function GET(req: NextRequest) {
     // Return distinct values for filter dropdowns
     if (url.searchParams.get('meta') === 'states') {
       const snap = await getDb().collection(COLLECTION).select('state').get();
-      const states = [...new Set(snap.docs.map((d: any) => d.data().state).filter(Boolean))].sort();
+      const VALID_STATE_RE = /^[A-Za-z][A-Za-z\s]{2,30}$/;
+      const INVALID_STATES = new Set(['india', 'null', 'park town', 'india.']);
+      const states = [...new Set(
+        snap.docs
+          .map((d: any) => (d.data().state || '').trim())
+          .filter(s => s && VALID_STATE_RE.test(s) && !INVALID_STATES.has(s.toLowerCase()))
+      )].sort();
       return NextResponse.json({ states });
     }
     if (url.searchParams.get('meta') === 'localities') {
       const stateFilter = url.searchParams.get('state') || '';
-      let q: any = getDb().collection(COLLECTION).select('locality_circle');
-      if (stateFilter) q = q.where('state', '==', stateFilter);
+      let q: any = getDb().collection(COLLECTION).select('locality_circle', 'state');
+      // When state selected, also include records with blank state (common in this dataset)
       const snap = await q.get();
-      const localities = [...new Set(snap.docs.map((d: any) => d.data().locality_circle).filter(Boolean))].sort();
+      const VALID_LOC_RE = /^[A-Za-z][A-Za-z\s\-]{1,40}$/;
+      const INVALID_LOCS = new Set(['india', 'null', 'maintenance staff']);
+      const localities = [...new Set(
+        snap.docs
+          .filter((d: any) => {
+            if (!stateFilter) return true;
+            const s = (d.data().state || '').trim().toLowerCase();
+            // Match exact state OR blank state (data quality issue in source)
+            return s === stateFilter.toLowerCase() || s === '' || s === 'null';
+          })
+          .map((d: any) => (d.data().locality_circle || '').trim())
+          .filter(l => l && VALID_LOC_RE.test(l) && !INVALID_LOCS.has(l.toLowerCase()))
+      )].sort();
       return NextResponse.json({ localities });
     }
 

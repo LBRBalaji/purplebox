@@ -23,27 +23,26 @@ function ConfirmModal({ listing, onClose }: { listing: OrsTransactListing; onClo
     if (!user) return;
     setSubmitting(true);
     try {
-      const leadId = `ORS-TR-${Date.now()}`;
+      const enquiryId = `ORS-TR-${Date.now()}`;
       const location = [listing.city_location, listing.district, listing.state].filter(hasVal).join(', ');
-      const size = listing.lease_area_as_advertised_in_sq_ft || listing.lease_area_range_in_sq_ft || '—';
+      const size = listing.lease_area_as_advertised_in_sq_ft
+        ? `${Number(listing.lease_area_as_advertised_in_sq_ft).toLocaleString()} sft`
+        : listing.lease_area_range_in_sq_ft || '—';
 
-      // Create transaction workspace lead
-      await fetch('/api/registered-leads', {
+      // Store enquiry in dedicated collection (does not touch registered-leads)
+      await fetch('/api/ors-transact-enquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: leadId,
-          customerId: user.email,
-          leadName: user.companyName || user.userName,
-          leadContact: user.userName,
-          leadEmail: user.email,
-          leadPhone: user.phone || '',
-          requirementsSummary: `ORS Transact availability confirmation request — ${listing.ors_property_id} · ${listing.facility_type || 'Facility'} · ${location} · ${size} sft`,
-          registeredBy: user.email,
-          providers: [{ providerEmail: 'balaji@lakshmibalajio2o.com', properties: [{ listingId: listing.ors_property_id, status: 'Pending' }] }],
-          isO2OCollaborator: true,
-          isOrsTransact: true,
-          orsTransactId: listing.ors_property_id,
+          id: enquiryId,
+          orsPropertyId: listing.ors_property_id,
+          facilityType: listing.facility_type || '',
+          location,
+          size,
+          customerEmail: user.email,
+          customerName: user.companyName || user.userName,
+          customerPhone: user.phone || '',
+          status: 'Pending',
           createdAt: new Date().toISOString(),
         }),
       });
@@ -53,11 +52,11 @@ function ConfirmModal({ listing, onClose }: { listing: OrsTransactListing; onClo
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify([{
-          id: `ors-tr-admin-${leadId}`,
+          id: `ors-tr-admin-${enquiryId}`,
           type: 'new_lead_for_provider',
           title: `ORS Transact Availability Request — ${listing.ors_property_id}`,
-          message: `${user.companyName || user.userName} (${user.email} · ${user.phone || 'no phone'}) has requested availability confirmation for ${listing.ors_property_id} — ${listing.facility_type || 'Facility'} at ${location}, ${size} sft. Transaction workspace created: ${leadId}.`,
-          href: `/dashboard/leads/${leadId}?tab=activity`,
+          message: `${user.companyName || user.userName} (${user.email} · ${user.phone || 'no phone'}) has requested availability confirmation for ${listing.ors_property_id} — ${listing.facility_type || 'Facility'} at ${location}, ${size} sft. Transaction workspace created: ${enquiryId}.`,
+          href: `/dashboard/leads/${enquiryId}?tab=activity`,
           recipientEmail: 'balaji@lakshmibalajio2o.com',
           timestamp: new Date().toISOString(),
           triggeredBy: user.email,
@@ -70,7 +69,7 @@ function ConfirmModal({ listing, onClose }: { listing: OrsTransactListing; onClo
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify([{
-          id: `ors-tr-caller-${leadId}`,
+          id: `ors-tr-caller-${enquiryId}`,
           type: 'new_activity',
           title: `Availability Check Required — ${listing.ors_property_id}`,
           message: `Please verify current availability for ORS Property ${listing.ors_property_id} · ${listing.facility_type || 'Facility'} · ${location} · ${size} sft. Update the ORS Transact record once confirmed.`,
