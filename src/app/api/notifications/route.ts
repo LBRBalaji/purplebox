@@ -84,19 +84,23 @@ export async function POST(request: NextRequest) {
       }
     } catch {}
 
-    // Also fetch users to check emailNotifications preference
-    const usersSnap = await getDb().collection(USERS_COLLECTION).get();
-    const usersMap: Record<string, any> = {};
-    usersSnap.forEach(doc => { const d = doc.data(); if (d.email) usersMap[d.email.toLowerCase()] = d; });
-
     // Send emails for new notifications only
+    // Fetch user preferences individually (targeted) instead of full collection read
     for (const notif of newNotifs) {
-      if (!notif?.id || existingIds.has(notif.id)) continue; // already exists — skip
+      if (!notif?.id || existingIds.has(notif.id)) continue;
       if (!notif.recipientEmail || notif.isRead) continue;
 
-      const recipient = usersMap[notif.recipientEmail?.toLowerCase()];
-      // Skip if user explicitly opted out
-      if (recipient?.emailNotifications === false) continue;
+      // Targeted single-doc read instead of fetching all users
+      let emailNotificationsEnabled = true;
+      try {
+        const userDocs = await getDb().collection(USERS_COLLECTION)
+          .where('email', '==', notif.recipientEmail.toLowerCase()).limit(1).get();
+        if (!userDocs.empty) {
+          const userData = userDocs.docs[0].data();
+          emailNotificationsEnabled = userData.emailNotifications !== false;
+        }
+      } catch {}
+      if (!emailNotificationsEnabled) continue;
 
       // Build subject from type
       const subject = buildSubject(notif);
