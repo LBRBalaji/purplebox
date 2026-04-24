@@ -81,26 +81,31 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const total = docs.length;
+    const filteredTotal = docs.length;
 
-    // Shuffle with daily seed (random order, consistent within a day)
-    const shuffled = seededShuffle(docs, seed);
-
-    // Paginate
-    const totalPages = Math.ceil(total / PAGE_SIZE);
-    const start = (page - 1) * PAGE_SIZE;
-    const pageData = shuffled.slice(start, start + PAGE_SIZE);
-
-    // Get overall collection count for the counter
-    let collectionTotal = total;
+    // Get true collection total from Firestore aggregate count (fast, no doc reads)
+    let collectionTotal = 9420; // static fallback
     try {
       const countSnap = await getDb().collection(COLLECTION).count().get();
       collectionTotal = countSnap.data().count;
     } catch {}
 
+    // For display: if no filters active, use collectionTotal (accurate)
+    // If filters active, use filteredTotal (subset)
+    const hasFilters = !!(facilityType || state || district || locality || sizeMin || sizeMax || search);
+    const displayTotal = hasFilters ? filteredTotal : collectionTotal;
+
+    // Shuffle with session seed
+    const shuffled = seededShuffle(docs, seed);
+
+    // Paginate
+    const totalPages = Math.max(1, Math.ceil(displayTotal / PAGE_SIZE));
+    const start = (page - 1) * PAGE_SIZE;
+    const pageData = shuffled.slice(start, start + PAGE_SIZE);
+
     return NextResponse.json({
       listings: pageData,
-      total,
+      total: displayTotal,
       collectionTotal,
       page,
       totalPages,
