@@ -13,7 +13,7 @@ import { ApprovalQueue } from '@/components/approval-queue';
 import { useData } from '@/contexts/data-context';
 import { ProviderListings } from '@/components/provider-listings';
 import { ProspectsTab } from '@/components/prospects-tab';
-import { Building2, Eye, Download, TrendingUp, Users, ShieldCheck, CheckCircle2, AlertCircle, Scaling, MessageSquare, FileSignature, LayoutDashboard, ListChecks, UserPlus, ChevronRight, Zap, FileText , Upload} from 'lucide-react';
+import { Building2, Eye, Download, TrendingUp, Users, ShieldCheck, CheckCircle2, AlertCircle, Scaling, MessageSquare, FileSignature, LayoutDashboard, ListChecks, UserPlus, ChevronRight, Zap, FileText, Upload, Plus} from 'lucide-react';
 import Link from 'next/link';
 import { ProviderLeads } from '@/components/provider-leads';
 import { CustomerTransactions } from '@/components/customer-transactions';
