@@ -387,8 +387,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const endpointMask: boolean[] = [
     // 0  listings
     true,
-    // 1  demands
-    isLoggedIn,
+    // 1  demands — public (visible on /demands without login)
+    true,
     // 2  submissions
     isDeveloper || isAdmin,
     // 3  agent-leads

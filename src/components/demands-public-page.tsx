@@ -20,7 +20,7 @@ function buildShareText(demand: DemandSchema) {
   return `Warehouse Demand: ${size} sft near ${loc} (${demand.readiness}) — ORS-ONE`;
 }
 function buildShareUrl(demand: DemandSchema) {
-  return `https://lease.orsone.app/demands#${demand.demandId}`;
+  return `https://lease.orsone.app/demands`;
 }
 
 function SharePanel({ demand, onClose }: { demand: DemandSchema; onClose: () => void }) {
