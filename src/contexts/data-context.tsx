@@ -5,6 +5,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type NegotiationBoardSchema, type AcknowledgmentDetails, type LayoutRequestData, type CommunityPost, type ShareHistoryEntry } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
+import { db } from '@/lib/firebase';
+import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, startOfDay } from 'date-fns';
 import type { ChatSubmission } from '@/components/chat-dialog';
@@ -391,8 +393,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     isDeveloper || isAdmin,
     // 3  agent-leads
     isAgent || isAdmin,
-    // 4  listing-analytics — only for developer/admin, skip on first load (lazy)
-    (isDeveloper || isAdmin) && !isLoading,
+    // 4  listing-analytics — LAZY: fetched on-demand in analytics pages
+    false,
     // 5  registered-leads
     isLoggedIn,
     // 6  transaction-activities
@@ -407,22 +409,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
     isDeveloper || isAdmin,
     // 11 download-acknowledgments
     isAdmin,
-    // 12 download-history
-    isCustomer || isAdmin,
-    // 13 view-history
-    isAdmin,
+    // 12 download-history — LAZY: analytics pages only
+    false,
+    // 13 view-history — LAZY: analytics pages only
+    false,
     // 14 layout-requests
     isAdmin,
-    // 15 chat-messages
-    isLoggedIn,
-    // 16 notifications
-    isLoggedIn,
+    // 15 chat-messages — REALTIME: handled by onSnapshot below
+    false,
+    // 16 notifications — REALTIME: handled by onSnapshot below
+    false,
     // 17 typing-status
     isLoggedIn,
-    // 18 community-posts
-    true,
-    // 19 share-history
-    isAdmin,
+    // 18 community-posts — LAZY: /community pages only
+    false,
+    // 19 share-history — LAZY: analytics pages only
+    false,
   ];
 
   const endpoints = ALL_ENDPOINTS.filter((_, i) => endpointMask[i]);
@@ -498,6 +500,80 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
   }, [fetchData, authUser?.email]); // re-run on login/logout
+
+  // ── Tier 3: Firestore real-time listeners ───────────────────────────────────
+  // notifications — real-time, all logged-in users
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    // Listen to notifications collection, ordered by doc index
+    const colRef = collection(db, 'notifications');
+    const unsubscribe = onSnapshot(colRef,
+      (snap) => {
+        try {
+          const allNumeric = snap.docs.every(d => d.id.match(/^[0-9]+$/));
+          let data: any[];
+          if (allNumeric) {
+            data = snap.docs
+              .sort((a, b) => Number(a.id) - Number(b.id))
+              .map(d => d.data());
+          } else {
+            data = snap.docs.map(d => d.data());
+          }
+          setNotifications(prev => {
+            if (prev.length === data.length && JSON.stringify(prev) === JSON.stringify(data)) return prev;
+            return data;
+          });
+        } catch {}
+      },
+      (err) => console.error('Notifications listener error:', err)
+    );
+    return () => unsubscribe();
+  }, [isLoggedIn]);
+
+  // chat-messages — real-time, all logged-in users
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const colRef = collection(db, 'chat-messages');
+    const unsubscribe = onSnapshot(colRef,
+      (snap) => {
+        try {
+          const data: Record<string, any> = {};
+          snap.docs.forEach(d => { data[d.id] = d.data(); });
+          setChatMessages(prev => {
+            if (JSON.stringify(prev) === JSON.stringify(data)) return prev;
+            return data;
+          });
+        } catch {}
+      },
+      (err) => console.error('Chat messages listener error:', err)
+    );
+    return () => unsubscribe();
+  }, [isLoggedIn]);
+
+  // ── Tier 2: Lazy fetch — call when navigating to a section that needs it ────
+  // Idempotent: re-fetching same endpoint just refreshes the data
+  const LAZY_SETTER_MAP: Record<string, (data: any) => void> = {
+    'listing-analytics': setListingAnalytics,
+    'download-history': setDownloadHistory,
+    'view-history': setViewHistory,
+    'community-posts': setCommunityPosts,
+    'share-history': setShareHistory,
+  };
+  const [loadedLazy, setLoadedLazy] = React.useState<Set<string>>(new Set());
+
+  const fetchLazy = useCallback(async (endpoint: string) => {
+    if (!LAZY_SETTER_MAP[endpoint]) return;
+    try {
+      const res = await fetch(`/api/${endpoint}`);
+      if (!res.ok) return;
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : null;
+      if (data !== null) {
+        LAZY_SETTER_MAP[endpoint](data);
+        setLoadedLazy(prev => new Set([...prev, endpoint]));
+      }
+    } catch {}
+  }, []);
 
   const persistData = useCallback(async (endpoint: string, data: any, entityName: string) => {
     try {
@@ -1526,7 +1602,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         getNegotiationBoard,
         updateNegotiationBoard,
         generalShortlist,
-        toggleGeneralShortlist,
+        toggleGeneralShortlist, fetchLazy,
         isShortlistLoading,
         aboutUsContent,
         updateAboutUsContent,

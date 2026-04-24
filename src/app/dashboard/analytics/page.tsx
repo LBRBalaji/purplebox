@@ -57,7 +57,14 @@ function groupByDay(items: any[], getDate: (i: any) => Date, days = 30) {
 
 export default function AnalyticsHubPage() {
   const { user, users } = useAuth();
-  const { listings, listingAnalytics, demands, registeredLeads, downloadHistory, communityPosts } = useData();
+  const { listings, listingAnalytics, demands, registeredLeads, downloadHistory, communityPosts, fetchLazy } = useData();
+
+  // Tier 2: lazy load analytics collections on mount
+  React.useEffect(() => {
+    fetchLazy('listing-analytics');
+    fetchLazy('download-history');
+    fetchLazy('community-posts');
+  }, [fetchLazy]);
   const router = useRouter();
 
   React.useEffect(() => {

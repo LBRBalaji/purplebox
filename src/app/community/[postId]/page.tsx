@@ -127,7 +127,10 @@ export default function CommunityPostPage() {
     const { postId } = useParams();
     const router = useRouter();
     const { user, users, isLoading: isAuthLoading } = useAuth();
-    const { communityPosts, addCommunityComment, isLoading: isDataLoading } = useData();
+    const { communityPosts, addCommunityComment, isLoading: isDataLoading, fetchLazy } = useData();
+
+    // Tier 2: lazy load community posts on mount
+    React.useEffect(() => { fetchLazy('community-posts'); }, [fetchLazy]);
     const { toast } = useToast();
     const [comment, setComment] = React.useState('');
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);

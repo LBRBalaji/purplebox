@@ -117,7 +117,13 @@ const SharerRow = ({ rank, name, company, count, max }: { rank: number; name: st
 
 export default function CommunityAnalyticsPage() {
   const { user: currentUser, users } = useAuth();
-  const { communityPosts, isLoading, shareHistory } = useData();
+  const { communityPosts, isLoading, shareHistory, fetchLazy } = useData();
+
+  // Tier 2: lazy load community collections on mount
+  React.useEffect(() => {
+    fetchLazy('community-posts');
+    fetchLazy('share-history');
+  }, [fetchLazy]);
   const router = useRouter();
   const hasAccess = currentUser?.role === 'SuperAdmin' || currentUser?.role === 'O2O';
 

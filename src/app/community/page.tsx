@@ -254,7 +254,10 @@ const TabBtn = ({ active, onClick, icon: Icon, label, count }: { active: boolean
 );
 function CommunityPageInner() {
   const { user, isLoading: authLoading } = useAuth();
-  const { communityPosts, isLoading: dataLoading, deleteCommunityPost } = useData();
+  const { communityPosts, isLoading: dataLoading, deleteCommunityPost, fetchLazy } = useData();
+
+  // Tier 2: lazy load community posts on mount
+  React.useEffect(() => { fetchLazy('community-posts'); }, [fetchLazy]);
   const searchParams = useSearchParams();
   const [loginOpen, setLoginOpen] = React.useState(false);
   const [formOpen, setFormOpen] = React.useState(false);

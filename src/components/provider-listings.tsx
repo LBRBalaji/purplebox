@@ -268,7 +268,10 @@ function StatCard({ title, value, icon: Icon }: { title: string, value: string, 
 
 export function ProviderListings() {
   const { user } = useAuth();
-  const { listings, addListing, updateListing, updateListingStatus, listingAnalytics } = useData();
+  const { listings, addListing, updateListing, updateListingStatus, listingAnalytics, fetchLazy } = useData();
+
+  // Tier 2: lazy load listing analytics when developer opens My Listings
+  React.useEffect(() => { fetchLazy('listing-analytics'); }, [fetchLazy]);
   const [myListings, setMyListings] = React.useState<ListingSchema[]>([]);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [selectedListing, setSelectedListing] = React.useState<ListingSchema | null>(null);

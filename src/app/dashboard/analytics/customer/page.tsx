@@ -133,7 +133,13 @@ const LeaderRow = ({ rank, company, views, downloads, demands, score }: { rank: 
 );
 export default function CustomerAnalyticsPage() {
   const { user: currentUser, users } = useAuth();
-  const { demands, viewHistory, downloadHistory, listings, isLoading, registeredLeads, layoutRequests, transactionActivities, negotiationBoards } = useData();
+  const { demands, viewHistory, downloadHistory, listings, isLoading, registeredLeads, layoutRequests, transactionActivities, negotiationBoards, fetchLazy } = useData();
+
+  // Tier 2: lazy load heavy analytics collections on mount
+  React.useEffect(() => {
+    fetchLazy('download-history');
+    fetchLazy('view-history');
+  }, [fetchLazy]);
   const router = useRouter();
   const [selectedCompany, setSelectedCompany] = React.useState('all');
   const [activityLimit, setActivityLimit] = React.useState(10);
