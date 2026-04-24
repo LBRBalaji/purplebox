@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { OrsTransactCard } from './ors-transact-card';
 import type { OrsTransactListing } from '@/lib/ors-transact-schema';
 
@@ -13,146 +13,219 @@ const SIZE_RANGES = [
   { label: 'Above 1,00,000 sft', min: 100001, max: 9999999 },
 ];
 
+// Daily seed — changes every day so page gets a fresh random order
+const DAILY_SEED = Math.floor(Date.now() / 86400000);
+
 export function OrsTransactListings() {
   const [listings, setListings] = React.useState<OrsTransactListing[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [hasMore, setHasMore] = React.useState(true);
-  const [cursor, setCursor] = React.useState<string | null>(null);
-  const [search, setSearch] = React.useState('');
-  const [facilityType, setFacilityType] = React.useState('');
-  const [sizeRange, setSizeRange] = React.useState('');
-  const [state, setState] = React.useState('');
-  const [states, setStates] = React.useState<string[]>([]);
+  const [page, setPage] = React.useState(1);
+  const [totalPages, setTotalPages] = React.useState(1);
+  const [total, setTotal] = React.useState(0);
 
-  const buildParams = (cur?: string | null) => {
-    const p = new URLSearchParams();
-    if (facilityType) p.set('facilityType', facilityType);
-    if (state) p.set('state', state);
+  // Filters
+  const [search, setSearch] = React.useState('');
+  const [searchInput, setSearchInput] = React.useState(''); // controlled input, committed on Enter/blur
+  const [facilityType, setFacilityType] = React.useState('');
+  const [state, setState] = React.useState('');
+  const [locality, setLocality] = React.useState('');
+  const [sizeRange, setSizeRange] = React.useState('');
+
+  // Dropdown options — loaded once
+  const [states, setStates] = React.useState<string[]>([]);
+  const [localities, setLocalities] = React.useState<string[]>([]);
+
+  // Load states on mount
+  React.useEffect(() => {
+    fetch('/api/ors-transact?meta=states')
+      .then(r => r.json())
+      .then(d => setStates(d.states || []))
+      .catch(() => {});
+  }, []);
+
+  // Load localities when state changes
+  React.useEffect(() => {
+    setLocality('');
+    if (!state) { setLocalities([]); return; }
+    fetch(`/api/ors-transact?meta=localities&state=${encodeURIComponent(state)}`)
+      .then(r => r.json())
+      .then(d => setLocalities(d.localities || []))
+      .catch(() => {});
+  }, [state]);
+
+  const buildParams = (p: number) => {
+    const params = new URLSearchParams({ page: String(p), seed: String(DAILY_SEED) });
+    if (facilityType) params.set('facilityType', facilityType);
+    if (state) params.set('state', state);
+    if (locality) params.set('locality', locality);
+    if (search) params.set('search', search);
     if (sizeRange) {
       const r = SIZE_RANGES.find(x => `${x.min}-${x.max}` === sizeRange);
-      if (r) { p.set('sizeMin', String(r.min)); p.set('sizeMax', String(r.max)); }
+      if (r) { params.set('sizeMin', String(r.min)); params.set('sizeMax', String(r.max)); }
     }
-    if (cur) p.set('cursor', cur);
-    return p.toString();
+    return params.toString();
   };
 
-  const load = React.useCallback(async (reset = false) => {
+  const load = React.useCallback(async (p: number) => {
     setLoading(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     try {
-      const res = await fetch(`/api/ors-transact?${buildParams(reset ? null : cursor)}`);
+      const res = await fetch(`/api/ors-transact?${buildParams(p)}`);
       const data = await res.json();
-      const raw: OrsTransactListing[] = data.listings || [];
-
-      // Client-side search
-      const filtered = search.trim()
-        ? raw.filter(l => [l.ors_property_id, l.city_location, l.district, l.state, l.locality_circle, l.facility_type]
-            .some(v => v?.toLowerCase().includes(search.toLowerCase())))
-        : raw;
-
-      if (reset) {
-        setListings(filtered);
-        // Build state list from first batch
-        const stateSet = new Set<string>(raw.map(l => l.state).filter(Boolean));
-        if (stateSet.size) setStates(Array.from(stateSet).sort());
-      } else {
-        setListings(prev => [...prev, ...filtered]);
-      }
-      setCursor(data.nextCursor || null);
-      setHasMore(raw.length === 50);
-    } catch { setHasMore(false); }
+      setListings(data.listings || []);
+      setTotal(data.total || 0);
+      setTotalPages(data.totalPages || 1);
+      setPage(p);
+    } catch {}
     setLoading(false);
-  }, [facilityType, state, sizeRange, cursor, search]);
+  }, [facilityType, state, locality, sizeRange, search]);
 
-  React.useEffect(() => { load(true); }, [facilityType, state, sizeRange]);
+  // Reload page 1 when any filter changes
+  React.useEffect(() => { load(1); }, [facilityType, state, locality, sizeRange, search]);
 
-  const activeFilters = [facilityType, state, sizeRange].filter(Boolean).length;
+  const commitSearch = () => { setSearch(searchInput); };
+  const clearAll = () => {
+    setSearchInput(''); setSearch(''); setFacilityType('');
+    setState(''); setLocality(''); setSizeRange('');
+  };
+  const activeFilters = [facilityType, state, locality, sizeRange, search].filter(Boolean).length;
+
+  // Pagination pages to show
+  const pageNumbers = React.useMemo(() => {
+    const pages: (number | '...')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (page > 3) pages.push('...');
+      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
+      if (page < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  }, [page, totalPages]);
+
+  const btnStyle = (active: boolean, disabled = false): React.CSSProperties => ({
+    padding: '6px 10px',
+    fontSize: 12,
+    fontWeight: active ? 600 : 400,
+    background: active ? '#6141ac' : 'var(--color-background-primary)',
+    color: active ? '#fff' : disabled ? 'hsl(259 15% 70%)' : 'var(--color-text-primary)',
+    border: `0.5px solid ${active ? '#6141ac' : 'hsl(259 30% 85%)'}`,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    borderRadius: 0,
+    minWidth: 34,
+  });
 
   return (
     <div>
-      {/* Section intro */}
+      {/* Header */}
       <div style={{ marginBottom: 16, paddingBottom: 14, borderBottom: '0.5px solid hsl(259 30% 88%)' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
           <div>
             <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--color-text-primary)', margin: '0 0 3px' }}>ORS Transact Listings</h2>
             <p style={{ fontSize: 12, color: 'hsl(259 15% 50%)', margin: 0 }}>
-              Warehouse and industrial properties transacted directly through ORS-ONE. Contact ORS to confirm availability and proceed.
+              Warehouse and industrial properties transacted directly through ORS-ONE.
             </p>
           </div>
-          {!loading && (
-            <span style={{ fontSize: 12, color: 'hsl(259 15% 55%)', flexShrink: 0 }}>
-              {listings.length.toLocaleString()} listings
-            </span>
-          )}
+          <span style={{ fontSize: 12, color: 'hsl(259 15% 55%)', flexShrink: 0 }}>
+            {loading ? '—' : `${total.toLocaleString()} listings`}
+          </span>
         </div>
       </div>
 
-      {/* Filters */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        {/* Search */}
-        <div style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', gap: 8, background: 'var(--color-background-primary)', border: '0.5px solid hsl(259 30% 85%)', padding: '7px 10px' }}>
+      {/* Filters — row 1: search + clear */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+        <div style={{ flex: '1 1 220px', display: 'flex', alignItems: 'center', gap: 8, background: 'var(--color-background-primary)', border: '0.5px solid hsl(259 30% 85%)', padding: '7px 10px' }}>
           <Search style={{ width: 13, height: 13, color: 'hsl(259 15% 55%)', flexShrink: 0 }} />
           <input
-            value={search} onChange={e => setSearch(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && load(true)}
-            placeholder="Search city, district, ORS ID..."
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && commitSearch()}
+            onBlur={commitSearch}
+            placeholder="Search city, district, locality, ORS ID..."
             style={{ flex: 1, fontSize: 12, outline: 'none', background: 'transparent', color: 'var(--color-text-primary)', border: 'none' }} />
-          {search && (
-            <button onClick={() => { setSearch(''); load(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'hsl(259 15% 55%)', padding: 0, lineHeight: 1 }}>
+          {searchInput && (
+            <button onClick={() => { setSearchInput(''); setSearch(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'hsl(259 15% 55%)', padding: 0 }}>
               <X style={{ width: 12, height: 12 }} />
             </button>
           )}
         </div>
+        {activeFilters > 0 && (
+          <button onClick={clearAll} style={{ fontSize: 11, color: 'hsl(259 15% 50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3, padding: '0 6px' }}>
+            <X style={{ width: 11, height: 11 }} /> Clear all ({activeFilters})
+          </button>
+        )}
+      </div>
 
-        {/* Facility type */}
+      {/* Filters — row 2: dropdowns */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
         <select value={facilityType} onChange={e => setFacilityType(e.target.value)}
           style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0 }}>
           <option value="">All facility types</option>
           {FACILITY_TYPES.map(t => <option key={t}>{t}</option>)}
         </select>
 
-        {/* State */}
         <select value={state} onChange={e => setState(e.target.value)}
           style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0 }}>
           <option value="">All states</option>
           {states.map(s => <option key={s}>{s}</option>)}
         </select>
 
-        {/* Size range */}
+        {/* Locality Circle — appears when state selected or always */}
+        <select value={locality} onChange={e => setLocality(e.target.value)}
+          style={{ fontSize: 12, padding: '7px 10px', border: `0.5px solid ${locality ? '#6141ac' : 'hsl(259 30% 85%)'}`, background: 'var(--color-background-primary)', color: locality ? '#6141ac' : 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0, fontWeight: locality ? 600 : 400 }}>
+          <option value="">Locality Circle</option>
+          {localities.map(l => <option key={l}>{l}</option>)}
+        </select>
+
         <select value={sizeRange} onChange={e => setSizeRange(e.target.value)}
           style={{ fontSize: 12, padding: '7px 10px', border: '0.5px solid hsl(259 30% 85%)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', cursor: 'pointer', borderRadius: 0 }}>
           <option value="">All sizes</option>
           {SIZE_RANGES.map(r => <option key={`${r.min}-${r.max}`} value={`${r.min}-${r.max}`}>{r.label}</option>)}
         </select>
-
-        {activeFilters > 0 && (
-          <button onClick={() => { setFacilityType(''); setState(''); setSizeRange(''); setSearch(''); }}
-            style={{ fontSize: 11, color: 'hsl(259 15% 50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3, padding: '0 4px' }}>
-            <X style={{ width: 11, height: 11 }} /> Clear ({activeFilters})
-          </button>
-        )}
       </div>
 
       {/* Grid */}
-      {loading && listings.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '48px 0', color: 'hsl(259 15% 55%)' }}>
-          <p style={{ fontSize: 13 }}>Loading ORS Transact listings...</p>
+      {loading ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} style={{ background: 'hsl(259 44% 97%)', border: '0.5px solid hsl(259 30% 90%)', height: 200, animation: 'pulse 1.5s ease-in-out infinite' }} />
+          ))}
         </div>
       ) : listings.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '48px 0', background: 'var(--color-background-primary)', border: '0.5px solid hsl(259 30% 88%)' }}>
           <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)', margin: '0 0 4px' }}>No listings match your filters</p>
-          <p style={{ fontSize: 12, color: 'hsl(259 15% 55%)', margin: 0 }}>Try adjusting the filters above</p>
+          <p style={{ fontSize: 12, color: 'hsl(259 15% 55%)', margin: 0 }}>Try adjusting the filters or clear search</p>
         </div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 24 }}>
             {listings.map(l => <OrsTransactCard key={l.id || l.ors_property_id} listing={l} />)}
           </div>
-          {hasMore && (
-            <div style={{ textAlign: 'center', marginTop: 20 }}>
-              <button onClick={() => load(false)} disabled={loading}
-                style={{ padding: '9px 28px', background: 'hsl(259 44% 94%)', color: '#6141ac', fontSize: 12, fontWeight: 600, border: '0.5px solid hsl(259 44% 80%)', cursor: loading ? 'not-allowed' : 'pointer', borderRadius: 0 }}>
-                {loading ? 'Loading...' : 'Load more'}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 8, borderTop: '0.5px solid hsl(259 30% 90%)' }}>
+              {/* Prev */}
+              <button onClick={() => load(page - 1)} disabled={page === 1} style={btnStyle(false, page === 1)}>
+                <ChevronLeft style={{ width: 14, height: 14 }} />
               </button>
+
+              {pageNumbers.map((p, i) =>
+                p === '...'
+                  ? <span key={`ellipsis-${i}`} style={{ padding: '6px 4px', fontSize: 12, color: 'hsl(259 15% 55%)' }}>…</span>
+                  : <button key={p} onClick={() => load(p as number)} style={btnStyle(p === page)}>{p}</button>
+              )}
+
+              {/* Next */}
+              <button onClick={() => load(page + 1)} disabled={page === totalPages} style={btnStyle(false, page === totalPages)}>
+                <ChevronRight style={{ width: 14, height: 14 }} />
+              </button>
+
+              <span style={{ fontSize: 11, color: 'hsl(259 15% 55%)', marginLeft: 8 }}>
+                Page {page} of {totalPages.toLocaleString()} · {total.toLocaleString()} listings
+              </span>
             </div>
           )}
         </>
