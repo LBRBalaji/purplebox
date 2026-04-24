@@ -386,6 +386,7 @@ export function DemandList() {
   const { demands, deleteDemand } = useData();
   const { user } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null);
 
@@ -408,22 +409,31 @@ export function DemandList() {
           {demands.map((demand) => (
             <div key={demand.demandId} className="relative">
               <DemandCard demand={demand}/>
-              {isAdmin && (
-                <div className="absolute top-3 right-3">
-                  {confirmDeleteId === demand.demandId ? (
-                    <div className="flex items-center gap-1 bg-white border border-red-200 rounded px-2 py-1 shadow-sm">
-                      <span className="text-xs text-red-600 font-medium">Delete?</span>
-                      <button onClick={() => handleDelete(demand.demandId)}
-                        className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded">Yes</button>
-                      <button onClick={() => setConfirmDeleteId(null)}
-                        className="text-xs font-medium text-gray-500 px-1">No</button>
-                    </div>
-                  ) : (
-                    <button onClick={() => setConfirmDeleteId(demand.demandId)}
-                      className="p-1.5 rounded bg-white border border-gray-200 hover:border-red-300 hover:text-red-500 transition-colors shadow-sm"
-                      title="Delete demand">
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+              {/* Edit: visible to creator or admin */}
+              {(isAdmin || user?.email === demand.userEmail) && (
+                <div className="absolute top-3 right-3 flex gap-1">
+                  <button
+                    onClick={() => router.push(`/dashboard?editDemandId=${demand.demandId}`)}
+                    className="p-1.5 rounded bg-white border border-gray-200 hover:border-purple-400 hover:text-purple-600 transition-colors shadow-sm"
+                    title="Edit demand">
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  {isAdmin && (
+                    confirmDeleteId === demand.demandId ? (
+                      <div className="flex items-center gap-1 bg-white border border-red-200 rounded px-2 py-1 shadow-sm">
+                        <span className="text-xs text-red-600 font-medium">Delete?</span>
+                        <button onClick={() => handleDelete(demand.demandId)}
+                          className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded">Yes</button>
+                        <button onClick={() => setConfirmDeleteId(null)}
+                          className="text-xs font-medium text-gray-500 px-1">No</button>
+                      </div>
+                    ) : (
+                      <button onClick={() => setConfirmDeleteId(demand.demandId)}
+                        className="p-1.5 rounded bg-white border border-gray-200 hover:border-red-300 hover:text-red-500 transition-colors shadow-sm"
+                        title="Delete demand">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )
                   )}
                 </div>
               )}

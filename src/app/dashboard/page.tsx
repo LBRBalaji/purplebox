@@ -430,7 +430,15 @@ const MainDashboard = () => {
     }, [user, downloadHistory, registeredLeads]);
 
     React.useEffect(() => {
-      if (logNewDemand || editDemandId) { setCustomerTab('log-demand'); }
+      if (logNewDemand || editDemandId) {
+        if (isAdmin || isO2OManager) {
+          setAdminTab('create-demand');
+        } else if (isAgent) {
+          setAgentTab('create-demand');
+        } else {
+          setCustomerTab('log-demand');
+        }
+      }
       else if (propertyMatchDemandId) { setProviderTab('submit-match'); setAdminTab('submit-match'); }
       else if (defaultTabParam) {
         if (isProvider) setProviderTab(defaultTabParam);
