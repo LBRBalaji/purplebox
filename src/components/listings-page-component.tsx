@@ -478,7 +478,10 @@ export function ListingsPage() {
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   const [limitExceededLocation, setLimitExceededLocation] = useState<string | null>(null);
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
-  const [activeView, setActiveView] = useState<'listings' | 'demands' | 'ors-transact'>('listings');
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const [activeView, setActiveView] = useState<'listings' | 'demands' | 'ors-transact'>(
+    (searchParams?.get('view') as any) || 'listings'
+  );
 
   const approvedListings = useMemo(() => {
     // Fisher-Yates shuffle algorithm
@@ -800,7 +803,7 @@ export function ListingsPage() {
                      </ul>
                 </div>
             </Alert>
-            {/* View toggle — Listings / Demands */}
+            {/* View toggle — Listings / Demands / ORS Transact */}
             <div className="flex items-center gap-0 mb-6 border-b" style={{borderColor:'hsl(259 30% 88%)'}}>
               <button
                 onClick={() => setActiveView('listings')}
