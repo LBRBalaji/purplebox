@@ -214,7 +214,16 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
           {user && !isSuperAdmin && <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" />}
           {isProvider && <NavItem href="/dashboard?tab=my-listings" icon={List} label="My Listings" />}
-          {!isProvider && <NavItem href="/" icon={List} label="Browse Listings" />}
+          {!isProvider && (
+            <>
+              <div className="pt-2 pb-1 px-4">
+                <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Listings</p>
+              </div>
+              <NavItem href="/listings" icon={List} label="Browse Listings" />
+              <NavItem href="/ors-transact" icon={Zap} label="ORS Transact Listings" />
+              <NavItem href="/demands" icon={ListChecks} label="Warehouse Demands" />
+            </>
+          )}
           {isSuperAdmin ? (
             <NavItem href="/map-search" icon={Map} label="Map Search" />
           ) : (
