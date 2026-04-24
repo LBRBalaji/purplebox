@@ -27,6 +27,7 @@ import { DemandList } from '@/components/demand-list';
 import { OrsTransactImport } from '@/components/ors-transact-import';
 import { OrsTransactRoleManager } from '@/components/ors-transact-role-manager';
 import { OrsTransactAdminForm } from '@/components/ors-transact-admin-form';
+import { OrsTransactManager } from '@/components/ors-transact-manager';
 import { CustomerSubleaseListings } from '@/components/customer-sublease-listings';
 import { ListingForm } from '@/components/listing-form';
 
@@ -757,6 +758,7 @@ const MainDashboard = () => {
         { value: 'all-listings', label: 'All Listings', icon: Building2 },
         { value: 'all-demands', label: 'All Demands', icon: ListChecks },
         { value: 'create-demand', label: 'Create Demand', icon: FileText },
+        { value: 'ors-transact-manage', label: 'Manage ORS Listings', icon: Building2 },
         { value: 'ors-transact-new', label: 'New ORS Listing', icon: Plus },
         { value: 'ors-transact-import', label: 'ORS Transact Import', icon: Upload },
         { value: 'ors-transact-roles', label: 'ORS Transact Roles', icon: Users },
@@ -922,6 +924,7 @@ const MainDashboard = () => {
               {adminTab === 'all-listings' && <AdminListings />}
               {adminTab === 'all-demands' && <DemandList />}
               {adminTab === 'create-demand' && <DemandForm onDemandLogged={() => setAdminTab('all-demands')} isAdminMode />}
+              {adminTab === 'ors-transact-manage' && <OrsTransactManager />}
               {adminTab === 'ors-transact-new' && (
                 <OrsTransactAdminForm onSaved={() => setAdminTab('engagement-jobs')} onCancel={() => setAdminTab('all-listings')} />
               )}
