@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction, Lightbulb, MapPin, Target, Handshake, AlertCircle, CheckCircle2, Trash2 } from 'lucide-react';
+import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction, Lightbulb, MapPin, Target, Handshake, AlertCircle, CheckCircle2, Trash2, Pencil } from 'lucide-react';
 import { useData } from '@/contexts/data-context';
 import type { DemandSchema, ListingSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
