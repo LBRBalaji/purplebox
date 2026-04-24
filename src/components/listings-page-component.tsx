@@ -768,27 +768,25 @@ export function ListingsPage() {
                 <p className="mt-2 text-lg font-semibold text-primary">Search-Select-Download</p>
                 <p className="mt-1 text-base text-accent">Warehouse-Technical-Compliance-Commercials, in a single Excel</p>
                 
-                 <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 max-w-2xl mx-auto animate-in fade-in-0 duration-1000">
-                    <div className="text-center px-3 py-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <p className="text-2xl md:text-3xl font-bold text-primary">{inventoryCount}</p>
-                        <p className="text-xs text-muted-foreground tracking-wider mt-1">Direct Deal</p>
-                        <p className="text-xs text-muted-foreground/70">Warehouses</p>
-                    </div>
-                    <div className="text-center px-3 py-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <p className="text-2xl md:text-3xl font-bold text-primary">{ORS_TRANSACT_COUNT.toLocaleString()}</p>
-                        <p className="text-xs text-muted-foreground tracking-wider mt-1">ORS Transact</p>
-                        <p className="text-xs text-muted-foreground/70">Warehouses</p>
-                    </div>
-                    <div className="text-center px-3 py-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>
-                        <p className="text-xs text-muted-foreground tracking-wider mt-1">Direct Deal</p>
-                        <p className="text-xs text-muted-foreground/70">Sq. Ft. Listed</p>
-                    </div>
-                    <div className="text-center px-3 py-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(ORS_TRANSACT_SIZE_SQF)}</p>
-                        <p className="text-xs text-muted-foreground tracking-wider mt-1">ORS Transact</p>
-                        <p className="text-xs text-muted-foreground/70">Sq. Ft. Listed</p>
-                    </div>
+                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto animate-in fade-in-0 duration-1000">
+                    {/* Direct Deal tile */}
+                    <a href="/listings"
+                      className="group block text-center px-5 py-4 rounded-none border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer no-underline">
+                      <p className="text-3xl md:text-4xl font-black text-primary leading-none">{inventoryCount}</p>
+                      <p className="text-xs font-bold text-primary/80 tracking-widest uppercase mt-1">Direct Deal</p>
+                      <p className="text-xs text-muted-foreground mt-1">{formatSize(totalInventorySize)} sft listed</p>
+                      <p className="text-xs text-muted-foreground/60 mt-1.5 leading-relaxed">Transact directly with the warehouse developer</p>
+                      <p className="text-xs font-semibold text-primary mt-2 group-hover:underline">Browse listings →</p>
+                    </a>
+                    {/* ORS Transact tile */}
+                    <a href="/ors-transact"
+                      className="group block text-center px-5 py-4 rounded-none border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer no-underline">
+                      <p className="text-3xl md:text-4xl font-black text-primary leading-none">{ORS_TRANSACT_COUNT.toLocaleString()}</p>
+                      <p className="text-xs font-bold text-primary/80 tracking-widest uppercase mt-1">ORS Transact</p>
+                      <p className="text-xs text-muted-foreground mt-1">{formatSize(ORS_TRANSACT_SIZE_SQF)} sft listed</p>
+                      <p className="text-xs text-muted-foreground/60 mt-1.5 leading-relaxed">ORS-ONE facilitates the full leasing transaction</p>
+                      <p className="text-xs font-semibold text-primary mt-2 group-hover:underline">Explore listings →</p>
+                    </a>
                 </div>
 
             </div>
