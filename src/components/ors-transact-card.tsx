@@ -283,7 +283,7 @@ export function OrsTransactCard({ listing }: { listing: OrsTransactListing }) {
             <a href="/login"
               style={{ width: '100%', padding: '9px 0', background: 'hsl(259 44% 94%)', color: '#6141ac', fontSize: 12, fontWeight: 600, border: '0.5px solid hsl(259 44% 80%)', cursor: 'pointer', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, textDecoration: 'none' }}>
               <LogIn style={{ width: 13, height: 13 }} />
-              Login to Confirm Availability
+              Request to Confirm Availability
             </a>
           )}
         </div>
