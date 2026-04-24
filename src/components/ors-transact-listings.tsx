@@ -74,9 +74,13 @@ export function OrsTransactListings() {
       const res = await fetch(`/api/ors-transact?${buildParams(p)}`);
       const data = await res.json();
       setListings(data.listings || []);
-      // Use collectionTotal when no filters active (most accurate)
-      setTotal(data.total || 9420);
-      setTotalPages(data.totalPages || 1);
+      // When no filters: always show full collection count (9420)
+      // When filters active: show filtered count from API
+      const hasActiveFilters = !!(facilityType || state || locality || sizeRange || search);
+      setTotal(hasActiveFilters ? (data.total || 0) : 9420);
+      // Pages: when unfiltered use full count for page calculation
+      const countForPages = hasActiveFilters ? (data.total || 0) : 9420;
+      setTotalPages(Math.max(1, Math.ceil(countForPages / 24)));
       setPage(p);
     } catch {}
     setLoading(false);
