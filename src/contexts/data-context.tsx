@@ -505,13 +505,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   // notifications — handled by NotificationWatcher component (watches doc '0')
   // Do NOT add a second listener here — it causes React error #300
 
-  // chat-messages — real-time listener on doc '0' (same structure as API)
+  // chat-messages — real-time listener on doc '0'
   useEffect(() => {
     if (!isLoggedIn) return;
     const docRef = doc(db, 'chat-messages', '0');
     const unsubscribe = onSnapshot(docRef,
       (snap) => {
-        setTimeout(() => {
+        queueMicrotask(() => {
           try {
             if (!snap.exists()) return;
             const data = snap.data() || {};
@@ -520,7 +520,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
               return data;
             });
           } catch {}
-        }, 0);
+        });
       },
       (err) => console.error('Chat messages listener error:', err)
     );
