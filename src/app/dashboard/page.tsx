@@ -368,7 +368,7 @@ const ProviderDashboard = React.memo(function ProviderDashboard({
 
 const MainDashboard = () => {
     const { user, users } = useAuth();
-    const { submissions, downloadHistory, registeredLeads, unreadChatCount, generalShortlist, listings } = useData();
+    const { submissions, downloadHistory, registeredLeads, unreadChatCount, generalShortlist, listings, demands } = useData();
     const searchParams = useSearchParams();
     const router = useRouter();
     const defaultTabParam = searchParams.get('tab');
