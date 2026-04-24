@@ -6,7 +6,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useCa
 import { type DemandSchema, type ListingSchema, type TenantImprovementsSheet, type NegotiationBoardSchema, type AcknowledgmentDetails, type LayoutRequestData, type CommunityPost, type ShareHistoryEntry } from '@/lib/schema';
 import { type User, useAuth } from './auth-context';
 import { db } from '@/lib/firebase';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, startOfDay } from 'date-fns';
 import type { ChatSubmission } from '@/components/chat-dialog';
@@ -415,10 +415,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     false,
     // 14 layout-requests
     isAdmin,
-    // 15 chat-messages — REALTIME: handled by onSnapshot below
-    false,
-    // 16 notifications — REALTIME: handled by onSnapshot below
-    false,
+    // 15 chat-messages — initial fetch via polling; real-time updates via onSnapshot
+    isLoggedIn,
+    // 16 notifications — initial fetch via polling; real-time updates via NotificationWatcher
+    isLoggedIn,
     // 17 typing-status
     isLoggedIn,
     // 18 community-posts — LAZY: /community pages only
@@ -502,47 +502,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [fetchData, authUser?.email]); // re-run on login/logout
 
   // ── Tier 3: Firestore real-time listeners ───────────────────────────────────
-  // notifications — real-time, all logged-in users
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    // Listen to notifications collection, ordered by doc index
-    const colRef = collection(db, 'notifications');
-    const unsubscribe = onSnapshot(colRef,
-      (snap) => {
-        // setTimeout defers state update out of any active render cycle
-        setTimeout(() => {
-          try {
-            const allNumeric = snap.docs.every((d: any) => d.id.match(/^[0-9]+$/));
-            let data: any[];
-            if (allNumeric) {
-              data = snap.docs
-                .sort((a: any, b: any) => Number(a.id) - Number(b.id))
-                .map((d: any) => d.data());
-            } else {
-              data = snap.docs.map((d: any) => d.data());
-            }
-            setNotifications(prev => {
-              if (prev.length === data.length && JSON.stringify(prev) === JSON.stringify(data)) return prev;
-              return data;
-            });
-          } catch {}
-        }, 0);
-      },
-      (err) => console.error('Notifications listener error:', err)
-    );
-    return () => unsubscribe();
-  }, [isLoggedIn]);
+  // notifications — handled by NotificationWatcher component (watches doc '0')
+  // Do NOT add a second listener here — it causes React error #300
 
-  // chat-messages — real-time, all logged-in users
+  // chat-messages — real-time listener on doc '0' (same structure as API)
   useEffect(() => {
     if (!isLoggedIn) return;
-    const colRef = collection(db, 'chat-messages');
-    const unsubscribe = onSnapshot(colRef,
+    const docRef = doc(db, 'chat-messages', '0');
+    const unsubscribe = onSnapshot(docRef,
       (snap) => {
         setTimeout(() => {
           try {
-            const data: Record<string, any> = {};
-            snap.docs.forEach((d: any) => { data[d.id] = d.data(); });
+            if (!snap.exists()) return;
+            const data = snap.data() || {};
             setChatMessages(prev => {
               if (JSON.stringify(prev) === JSON.stringify(data)) return prev;
               return data;
