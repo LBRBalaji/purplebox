@@ -503,22 +503,14 @@ export function ListingsPage() {
     [approvedListings]
   );
 
-  // ORS Transact count — fetched once on mount, independent of Firestore loading
-  const [orsTransactCount, setOrsTransactCount] = useState<number | null>(null);
-  const [orsTransactSize, setOrsTransactSize] = useState<number>(0);
-  useEffect(() => {
-    // Use static known value for instant render, refresh in background
-    setOrsTransactCount(9422);
-    fetch('/api/ors-transact?page=1')
-      .then(r => r.json())
-      .then(d => {
-        // API returns total count if available
-        if (d.total) setOrsTransactCount(d.total);
-      })
-      .catch(() => {}); // silent fail — static value is fine
-  }, []);
+  // ORS Transact stats — static known values from the imported CSV
+  // Count: 9,420 records · Size: 242,874,496 sft (242.87M)
+  // These are rendered immediately — no async wait
+  const ORS_TRANSACT_COUNT = 9420;
+  const ORS_TRANSACT_SIZE_SQF = 242874496;
 
-  const totalListingCount = inventoryCount + (orsTransactCount || 0);
+  const totalListingCount = inventoryCount + ORS_TRANSACT_COUNT;
+  const totalSize = totalInventorySize + ORS_TRANSACT_SIZE_SQF;
   
   // Function to format large numbers into a more readable format (e.g., 1.5M)
   const formatSize = (size: number) => {
@@ -783,7 +775,7 @@ export function ListingsPage() {
                     </div>
                     <Separator orientation="vertical" className="h-10" />
                     <div className="text-center">
-                        {isDataLoading ? <Skeleton className="h-9 w-20 mx-auto" /> : <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalInventorySize)}</p>}
+                        <p className="text-2xl md:text-3xl font-bold text-primary">{formatSize(totalSize)}</p>
                         <p className="text-xs text-muted-foreground tracking-wider">SQ. FT. LISTED</p>
                     </div>
                 </div>
