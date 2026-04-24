@@ -13,10 +13,11 @@ const SIZE_RANGES = [
   { label: 'Above 1,00,000 sft', min: 100001, max: 9999999 },
 ];
 
-// Daily seed — changes every day so page gets a fresh random order
-const DAILY_SEED = Math.floor(Date.now() / 86400000);
+// Session seed — generated once per page load, stable while browsing, different every visit
 
 export function OrsTransactListings() {
+  // Session seed: random on mount, never changes during the session
+  const sessionSeed = React.useRef(Math.floor(Math.random() * 2147483647));
   const [listings, setListings] = React.useState<OrsTransactListing[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [page, setPage] = React.useState(1);
@@ -54,7 +55,7 @@ export function OrsTransactListings() {
   }, [state]);
 
   const buildParams = (p: number) => {
-    const params = new URLSearchParams({ page: String(p), seed: String(DAILY_SEED) });
+    const params = new URLSearchParams({ page: String(p), seed: String(sessionSeed.current) });
     if (facilityType) params.set('facilityType', facilityType);
     if (state) params.set('state', state);
     if (locality) params.set('locality', locality);

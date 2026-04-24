@@ -69,8 +69,7 @@ export function AboutUsContent() {
               India's dedicated marketplace for industrial warehouse leasing — connecting developers, tenants and brokers on one transparent platform.
             </p>
           </div>
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto border-t border-primary/10 pt-12">
-            <Stat value="68+" label="Verified Listings" />
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto border-t border-primary/10 pt-12">
             <Stat value="20+" label="Years of Domain Expertise" />
             <Stat value="3.5M+" label="Sq Ft Transacted" />
             <Stat value="1" label="Platform. All Stakeholders." />

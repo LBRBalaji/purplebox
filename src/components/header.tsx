@@ -45,7 +45,7 @@ const ListingsDropdown = ({ isSuperAdmin }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild><DropTrigger isActive={isActive}><List className="h-3.5 w-3.5" /> Listings <ChevronDown className="h-3 w-3" /></DropTrigger></DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuItem asChild><Link href="/"><List className="mr-2 h-4 w-4" /> Browse Listings</Link></DropdownMenuItem>
+        <DropdownMenuItem asChild><Link href="/listings"><List className="mr-2 h-4 w-4" /> Browse Listings</Link></DropdownMenuItem>
         <DropdownMenuItem asChild><Link href="/demands"><ListChecks className="mr-2 h-4 w-4" /> Warehouse Demands</Link></DropdownMenuItem>
         <DropdownMenuItem asChild><Link href="/ors-transact"><Zap className="mr-2 h-4 w-4" /> ORS Transact Listings</Link></DropdownMenuItem>
         {isSuperAdmin ? (
