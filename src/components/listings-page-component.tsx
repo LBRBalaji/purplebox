@@ -23,7 +23,6 @@ import { LimitExceededDialog } from './limit-exceeded-dialog';
 import { DemandList } from './demand-list';
 import { DemandForm } from './demand-form';
 import { OrsTransactListings } from './ors-transact-listings';
-import { ModeBadge } from './ors-transact-card';
 import { Badge } from './ui/badge';
 import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -827,12 +826,11 @@ export function ListingsPage() {
                 onClick={() => setActiveView('ors-transact')}
                 className="px-6 py-3 text-sm font-bold transition-all flex items-center gap-2"
                 style={{
-                  borderBottom: activeView === 'ors-transact' ? '2px solid #0f6e56' : '2px solid transparent',
-                  color: activeView === 'ors-transact' ? '#0f6e56' : 'hsl(259 15% 55%)',
+                  borderBottom: activeView === 'ors-transact' ? '2px solid #6141ac' : '2px solid transparent',
+                  color: activeView === 'ors-transact' ? '#6141ac' : 'hsl(259 15% 55%)',
                   background: 'transparent',
                 }}>
                 ORS Transact
-                <span style={{fontSize:9,fontWeight:700,background:'#0f6e56',color:'#fff',padding:'1px 5px'}}>NEW</span>
               </button>
             </div>
 
@@ -844,12 +842,6 @@ export function ListingsPage() {
 
             {activeView === 'ors-transact' && (
               <div className="pb-12">
-                <div style={{marginBottom:16}}>
-                  <h2 style={{fontSize:20,fontWeight:700,color:'#0a3d2e',margin:'0 0 4px'}}>ORS Transact Listings</h2>
-                  <p style={{fontSize:13,color:'hsl(160 20% 45%)',margin:0}}>
-                    Warehouse and industrial properties managed directly by ORS-ONE. No developer brokerage — transact through ORS.
-                  </p>
-                </div>
                 <OrsTransactListings />
               </div>
             )}
