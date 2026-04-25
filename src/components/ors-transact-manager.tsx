@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Search, Edit2, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Edit2, Trash2, X, ChevronLeft, ChevronRight, Archive } from 'lucide-react';
 import { OrsTransactAdminForm } from './ors-transact-admin-form';
 import { useToast } from '@/hooks/use-toast';
 import type { OrsTransactListing } from '@/lib/ors-transact-schema';
@@ -25,6 +25,7 @@ export function OrsTransactManager() {
   const [editing, setEditing] = React.useState<OrsTransactListing | null>(null);
   const [confirmDelete, setConfirmDelete] = React.useState<string | null>(null);
   const [deleting, setDeleting] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<'active' | 'archived'>('active');
 
   // ── All effects and callbacks — always called regardless of editing state ──
   React.useEffect(() => {
@@ -37,6 +38,7 @@ export function OrsTransactManager() {
   const load = React.useCallback(async (p: number) => {
     setLoading(true);
     const params = new URLSearchParams({ page: String(p), seed: '1' });
+    if (viewMode === 'archived') params.set('archived', 'true');
     if (search) params.set('search', search);
     if (facilityFilter) params.set('facilityType', facilityFilter);
     if (stateFilter) params.set('state', stateFilter);
@@ -51,7 +53,7 @@ export function OrsTransactManager() {
     setLoading(false);
   }, [search, facilityFilter, stateFilter]);
 
-  React.useEffect(() => { load(1); }, [search, facilityFilter, stateFilter]);
+  React.useEffect(() => { load(1); }, [search, facilityFilter, stateFilter, viewMode]);
 
   // ── All memos — always called regardless of editing state ──
   // Rule: useMemo must never be placed after a conditional return
@@ -115,8 +117,17 @@ export function OrsTransactManager() {
             <div>
               <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>ORS Transact Listings</p>
               <p style={{ fontSize: 12, color: 'hsl(259 15% 50%)', margin: '2px 0 0' }}>
-                {loading ? '—' : `${total.toLocaleString()} listings`}
+                {loading ? '—' : `${total.toLocaleString()} ${viewMode === 'archived' ? 'archived' : 'active'} listings`}
               </p>
+            </div>
+            {/* Active / Archived toggle */}
+            <div style={{ display: 'flex', gap: 0 }}>
+              {(['active', 'archived'] as const).map(m => (
+                <button key={m} onClick={() => setViewMode(m)}
+                  style={{ padding: '6px 14px', fontSize: 12, fontWeight: 500, cursor: 'pointer', background: viewMode === m ? '#6141ac' : 'hsl(259 44% 96%)', color: viewMode === m ? '#fff' : 'hsl(259 15% 45%)', border: '0.5px solid hsl(259 44% 82%)', borderLeft: m === 'active' ? '0.5px solid hsl(259 44% 82%)' : 'none' }}>
+                  {m === 'active' ? 'Active' : '🗄 Archived'}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -187,12 +198,35 @@ export function OrsTransactManager() {
                         : l.lease_area_range_in_sq_ft || '—'}
                     </p>
                     <div style={{ display: 'flex', gap: 4 }}>
-                      <button
-                        onClick={() => setEditing(l)}
-                        title="Edit listing"
-                        style={{ padding: '4px 7px', background: 'hsl(259 44% 94%)', border: '0.5px solid hsl(259 44% 80%)', cursor: 'pointer', borderRadius: 0, color: '#6141ac' }}>
-                        <Edit2 style={{ width: 11, height: 11 }} />
-                      </button>
+                      {viewMode === 'archived' ? (
+                        <button
+                          onClick={async () => {
+                            await fetch('/api/ors-transact', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({...l, isArchived: false}) });
+                            toast({ title: 'Listing Restored' }); load(page);
+                          }}
+                          title="Restore listing"
+                          style={{ padding: '4px 7px', background: '#f0fdf4', border: '0.5px solid #86efac', cursor: 'pointer', borderRadius: 0, color: '#15803d', fontSize: 11, fontWeight: 600 }}>
+                          Restore
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setEditing(l)}
+                          title="Edit listing"
+                          style={{ padding: '4px 7px', background: 'hsl(259 44% 94%)', border: '0.5px solid hsl(259 44% 80%)', cursor: 'pointer', borderRadius: 0, color: '#6141ac' }}>
+                          <Edit2 style={{ width: 11, height: 11 }} />
+                        </button>
+                      )}
+                      {viewMode === 'active' && (
+                        <button
+                          onClick={async () => {
+                            await fetch('/api/ors-transact', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({...l, isArchived: true}) });
+                            toast({ title: 'Listing Archived' }); load(page);
+                          }}
+                          title="Archive listing"
+                          style={{ padding: '4px 7px', background: 'hsl(42 40% 96%)', border: '0.5px solid hsl(42 30% 82%)', cursor: 'pointer', borderRadius: 0, color: '#92400e' }}>
+                          <Archive style={{ width: 11, height: 11 }} />
+                        </button>
+                      )}
                       {confirmDelete === (l.id || l.ors_property_id) ? (
                         <div style={{ display: 'flex', gap: 2 }}>
                           <button onClick={() => handleDelete(l.id || l.ors_property_id)} disabled={deleting}

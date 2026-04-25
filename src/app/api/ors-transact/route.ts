@@ -66,9 +66,15 @@ export async function GET(req: NextRequest) {
     }
 
     // ── Main query ──────────────────────────────────────────────────────────
+    const archived = url.searchParams.get('archived') === 'true';
     let q: any = getDb().collection(COLLECTION);
 
-    // Apply Firestore equality filters (these use indexes efficiently)
+    // By default exclude archived listings; pass ?archived=true to get archived only
+    if (archived) {
+      q = q.where('isArchived', '==', true);
+    } else {
+      q = q.where('isArchived', '!=', true); // includes records where field is missing
+    }
     if (facilityType) q = q.where('facility_type', '==', facilityType);
     if (state) q = q.where('state', '==', state);
     if (district) q = q.where('district', '==', district);
