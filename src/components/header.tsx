@@ -253,7 +253,8 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
               <div className="pt-2 pb-1 px-4">
                 <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Admin</p>
               </div>
-              <NavItem href="/dashboard/approval" icon={ClipboardCheck} label="Approval Queue" />
+              <NavItem href="/dashboard" icon={LayoutDashboard} label="Command Centre" />
+              <NavItem href="/dashboard/operations" icon={Settings} label="Operations Console" />
               <NavItem href="/dashboard/manage-users" icon={Users} label="Manage Users" />
               <NavItem href="/dashboard/analytics" icon={BarChart} label="Analytics" />
               <NavItem href="/dashboard/settings" icon={Settings} label="Settings" />
@@ -335,7 +336,7 @@ export function Header() {
                 <ToolsDropdown />
                 <MoreDropdown />
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
-                {isSuperAdmin && null /* Manage is now in the Admin sidebar */}
+                {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
               </>
             )}
           </nav>
