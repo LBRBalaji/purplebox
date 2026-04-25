@@ -112,7 +112,8 @@ const ManageDropdown = ({ isSuperAdmin }) => {
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="text-xs text-muted-foreground">Operations</DropdownMenuLabel>
         <DropdownMenuItem asChild><Link href="/dashboard/transactions"><Briefcase className="mr-2 h-4 w-4" /> Broking Transactions</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" /> Platform Oversight</Link></DropdownMenuItem>
+        <DropdownMenuItem asChild><Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" /> Command Centre</Link></DropdownMenuItem>
+        <DropdownMenuItem asChild><Link href="/dashboard/operations"><Settings className="mr-2 h-4 w-4" /> Operations Console</Link></DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

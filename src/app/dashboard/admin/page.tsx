@@ -2,46 +2,87 @@
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Building2, ListChecks, FileText, Upload, Users, Zap, Plus, TrendingUp, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import {
+  Building2, Users, TrendingUp, ChevronRight, CheckCircle2,
+  LayoutDashboard, Settings, AlertTriangle, Zap, FileText
+} from 'lucide-react';
 import Link from 'next/link';
-import { DemandForm } from '@/components/demand-form';
-import { DemandList } from '@/components/demand-list';
-import { AdminListings } from '@/components/admin-listings';
-import { ApprovalQueue } from '@/components/approval-queue';
-import { OrsTransactImport } from '@/components/ors-transact-import';
-import { OrsTransactRoleManager } from '@/components/ors-transact-role-manager';
-import { OrsTransactAdminForm } from '@/components/ors-transact-admin-form';
-import { OrsTransactManager } from '@/components/ors-transact-manager';
-import { EngagementJobsPanel } from '@/components/engagement-jobs-panel';
-import { GeneralShortlist } from '@/components/general-shortlist';
-import { ProviderLeads } from '@/components/provider-leads';
 
+// ── Shared sidebar used by both admin pages ───────────────────────────────────
+const NAV_GROUPS = [
+  {
+    group: 'Platform',
+    items: [
+      { label: 'Approval Queue', href: '/dashboard/operations?section=approval-queue', alert: true },
+      { label: 'All Listings', href: '/dashboard/operations?section=all-listings' },
+      { label: 'All Demands', href: '/dashboard/operations?section=all-demands' },
+      { label: 'Create Demand', href: '/dashboard/operations?section=create-demand' },
+      { label: 'All Leads', href: '/dashboard/operations?section=all-leads' },
+    ],
+  },
+  {
+    group: 'ORS Transact',
+    items: [
+      { label: 'Manage Listings', href: '/dashboard/operations?section=ors-transact-manage' },
+      { label: 'New Listing', href: '/dashboard/operations?section=ors-transact-new' },
+      { label: 'Import', href: '/dashboard/operations?section=ors-transact-import' },
+      { label: 'Role Permissions', href: '/dashboard/operations?section=ors-transact-roles' },
+    ],
+  },
+  {
+    group: 'Automation',
+    items: [
+      { label: 'Engagement Jobs', href: '/dashboard/operations?section=engagement-jobs' },
+    ],
+  },
+];
+
+function AdminSidebar({ active }: { active: 'dashboard' | 'operations' }) {
+  return (
+    <div style={{ width: 200, flexShrink: 0, background: 'hsl(259 30% 97%)', borderRight: '0.5px solid hsl(259 30% 90%)', display: 'flex', flexDirection: 'column', minHeight: '100vh', padding: '16px 8px' }}>
+      {/* Top nav */}
+      <div style={{ marginBottom: 16 }}>
+        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', background: active === 'dashboard' ? '#f0edfb' : 'transparent', color: active === 'dashboard' ? '#6141ac' : 'hsl(259 15% 45%)', fontWeight: active === 'dashboard' ? 700 : 500, fontSize: 12 }}>
+          <LayoutDashboard style={{ width: 13, height: 13 }} /> Command Centre
+        </Link>
+        <Link href="/dashboard/operations" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', background: active === 'operations' ? '#f0edfb' : 'transparent', color: active === 'operations' ? '#6141ac' : 'hsl(259 15% 45%)', fontWeight: active === 'operations' ? 700 : 500, fontSize: 12, marginTop: 2 }}>
+          <Settings style={{ width: 13, height: 13 }} /> Operations
+        </Link>
+      </div>
+
+      <div style={{ height: '0.5px', background: 'hsl(259 30% 88%)', marginBottom: 12 }} />
+
+      {/* Section nav */}
+      {NAV_GROUPS.map(g => (
+        <div key={g.group} style={{ marginBottom: 12 }}>
+          <p style={{ fontSize: 9, fontWeight: 700, color: 'hsl(259 15% 55%)', letterSpacing: '.08em', textTransform: 'uppercase', padding: '0 10px 5px' }}>{g.group}</p>
+          {g.items.map(item => (
+            <Link key={item.label} href={item.href}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', borderRadius: 6, textDecoration: 'none', color: 'hsl(259 15% 45%)', fontSize: 12, fontWeight: 500 }}>
+              {item.label}
+              {(item as any).alert && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', marginLeft: 'auto', flexShrink: 0 }} />}
+            </Link>
+          ))}
+        </div>
+      ))}
+
+      <div style={{ marginTop: 'auto', padding: '12px 10px 0', borderTop: '0.5px solid hsl(259 30% 88%)' }}>
+        <Link href="/dashboard/analytics" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', textDecoration: 'none', color: 'hsl(259 15% 45%)', fontSize: 12 }}>
+          <TrendingUp style={{ width: 13, height: 13 }} /> Analytics
+        </Link>
+        <Link href="/dashboard/manage-users" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', textDecoration: 'none', color: 'hsl(259 15% 45%)', fontSize: 12 }}>
+          <Users style={{ width: 13, height: 13 }} /> Manage Users
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ── Command Centre (main dashboard) ──────────────────────────────────────────
 export default function AdminDashboard() {
   const { user, users } = useAuth();
   const { listings, demands, registeredLeads, submissions } = useData();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const defaultTab = searchParams.get('tab') || 'approval-queue';
-  const editDemandId = searchParams.get('editDemandId');
-
-  const [tab, setTab] = React.useState(editDemandId ? 'create-demand' : defaultTab);
-  const [editingDemandId, setEditingDemandId] = React.useState<string | null>(editDemandId || null);
-
-  // Switch to create-demand tab in place, no URL navigation, no scroll jump
-  const handleEditDemand = React.useCallback((demandId: string) => {
-    setEditingDemandId(demandId);
-    setTab('create-demand');
-    // Scroll to the tab panel smoothly
-    setTimeout(() => {
-      document.getElementById('admin-tab-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-  }, []);
-
-  React.useEffect(() => {
-    if (editDemandId) setTab('create-demand');
-    else if (defaultTab) setTab(defaultTab);
-  }, [editDemandId, defaultTab]);
 
   const allUsers = Object.values(users || {}) as any[];
   const pendingUsers = allUsers.filter(u => u.status === 'pending');
@@ -50,229 +91,179 @@ export default function AdminDashboard() {
   const customers = approvedUsers.filter(u => u.role === 'User');
   const approvedListings = listings.filter(l => l.status === 'approved');
   const pendingListings = listings.filter(l => l.status === 'pending');
-  const hasPendingSubmissions = submissions.some(s => s.status === 'Pending');
+  const hasPending = pendingListings.length > 0 || pendingUsers.length > 0;
   const leadsWithProposal = registeredLeads.filter(l => l.providers?.some((p: any) => p.properties?.[0]?.rentPerSft !== undefined));
+  const totalSqFt = approvedListings.reduce((s, l) => s + (l.sizeSqFt || 0), 0);
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
-  const pendingApprovals = [
-    ...pendingListings.map(l => ({ type: 'listing', id: l.listingId, name: l.name || l.listingId, sub: `${l.location?.split(',')[0]} · ${l.sizeSqFt?.toLocaleString()} sft`, badge: l.listingType === 'Sublease' ? 'Sublease' : 'Listing' })),
-    ...pendingUsers.map(u => ({ type: 'user', id: u.email, name: u.companyName || u.userName, sub: `${u.role} · ${u.email}`, badge: u.role === 'Warehouse Developer' ? 'Developer' : 'Customer' })),
+  const pendingItems = [
+    ...pendingListings.map(l => ({ name: l.name || l.listingId, sub: `${l.location?.split(',')[0]} · ${l.sizeSqFt?.toLocaleString()} sft`, badge: l.listingType === 'Sublease' ? 'Sublease' : 'Listing', badgeColor: { bg: '#f0edfb', text: '#6141ac' } })),
+    ...pendingUsers.map(u => ({ name: u.companyName || u.userName, sub: `${u.role} · ${u.email}`, badge: u.role === 'Warehouse Developer' ? 'Developer' : 'Customer', badgeColor: u.role === 'Warehouse Developer' ? { bg: '#eff6ff', text: '#1d4ed8' } : { bg: '#f0fdf4', text: '#15803d' } })),
   ].slice(0, 6);
 
   const pipeline = [
-    { label: 'Chat', count: registeredLeads.length, color: '#3b82f6' },
-    { label: 'Proposal', count: leadsWithProposal.length, color: '#6141ac' },
-    { label: 'Negotiation', count: Math.floor(leadsWithProposal.length * 0.6), color: '#6141ac' },
-    { label: 'Fit-Out', count: Math.floor(leadsWithProposal.length * 0.3), color: '#8b5cf6' },
-    { label: 'MoU', count: Math.floor(leadsWithProposal.length * 0.1), color: '#22c55e' },
+    { label: 'Chat', count: registeredLeads.length, pct: 100 },
+    { label: 'Proposal', count: leadsWithProposal.length, pct: Math.round((leadsWithProposal.length / Math.max(registeredLeads.length, 1)) * 100) },
+    { label: 'Negotiation', count: Math.floor(leadsWithProposal.length * 0.6), pct: Math.round((leadsWithProposal.length * 0.6 / Math.max(registeredLeads.length, 1)) * 100) },
+    { label: 'Fit-Out', count: Math.floor(leadsWithProposal.length * 0.3), pct: Math.round((leadsWithProposal.length * 0.3 / Math.max(registeredLeads.length, 1)) * 100) },
+    { label: 'MoU', count: Math.floor(leadsWithProposal.length * 0.1), pct: Math.round((leadsWithProposal.length * 0.1 / Math.max(registeredLeads.length, 1)) * 100) },
   ];
-  const maxPipe = Math.max(...pipeline.map(p => p.count), 1);
 
-  const tabGroups = [
-    {
-      group: 'Platform',
-      tabs: [
-        { value: 'approval-queue', label: 'Approval Queue', icon: CheckCircle2 },
-        { value: 'all-listings', label: 'Listings', icon: Building2 },
-        { value: 'all-demands', label: 'Demands', icon: ListChecks },
-        { value: 'create-demand', label: 'Create Demand', icon: FileText },
-        { value: 'all-leads', label: 'All Leads', icon: Users },
-        { value: 'my-shortlist', label: 'Shortlist', icon: Building2 },
-      ],
-    },
-    {
-      group: 'ORS Transact',
-      tabs: [
-        { value: 'ors-transact-manage', label: 'Manage Listings', icon: Building2 },
-        { value: 'ors-transact-new', label: 'New Listing', icon: Plus },
-        { value: 'ors-transact-import', label: 'Import', icon: Upload },
-        { value: 'ors-transact-roles', label: 'Roles', icon: Users },
-      ],
-    },
-    {
-      group: 'Automation',
-      tabs: [
-        { value: 'engagement-jobs', label: 'Engagement Jobs', icon: Zap },
-      ],
-    },
+  const kpis = [
+    { label: 'Active Listings', value: approvedListings.length, sub: pendingListings.length > 0 ? `${pendingListings.length} pending review` : 'All approved', alert: pendingListings.length > 0 },
+    { label: 'Registered Users', value: approvedUsers.length, sub: `${developers.length} developers · ${customers.length} customers`, alert: pendingUsers.length > 0, alertSub: pendingUsers.length > 0 ? `${pendingUsers.length} awaiting approval` : undefined },
+    { label: 'Active Deals', value: registeredLeads.length, sub: `${leadsWithProposal.length} with proposal`, good: registeredLeads.length > 0 },
+    { label: 'Sq.Ft Listed', value: totalSqFt >= 1000000 ? `${(totalSqFt / 1000000).toFixed(1)}M` : totalSqFt.toLocaleString(), sub: 'Direct deal listings', neutral: true },
   ];
-  const allTabs = tabGroups.flatMap(g => g.tabs);
-  const activeGroup = tabGroups.find(g => g.tabs.some(t => t.value === tab));
 
   return (
-    <div className="space-y-4 mb-6">
-      {/* Welcome strip */}
-      <div className="rounded-none p-6 flex items-center justify-between flex-wrap gap-4"
-        style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
-        <div>
-          <h2 className="text-xl font-bold text-white">ORS-ONE Admin Console</h2>
-          <p className="text-sm mt-1" style={{color:'rgba(255,255,255,.5)'}}>{user?.userName} · SuperAdmin · Building Transaction Ready Assets</p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {pendingApprovals.length > 0 && (
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{background:'rgba(245,158,11,.18)',color:'#f59e0b',border:'1px solid rgba(245,158,11,.3)'}}>
-              {pendingApprovals.length} pending approval{pendingApprovals.length > 1 ? 's' : ''}
-            </span>
-          )}
-          <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{background:'rgba(255,255,255,.1)',color:'rgba(255,255,255,.8)',border:'1px solid rgba(255,255,255,.15)'}}>
-            {new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}
-          </span>
-        </div>
-      </div>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'hsl(259 30% 96%)' }}>
+      <AdminSidebar active="dashboard" />
 
-      {/* KPI row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: 'Active Listings', value: approvedListings.length, sub: pendingListings.length > 0 ? `${pendingListings.length} pending review` : 'All approved', alert: pendingListings.length > 0 },
-          { label: 'Registered Users', value: approvedUsers.length, sub: pendingUsers.length > 0 ? `${pendingUsers.length} pending approval` : `${developers.length} dev · ${customers.length} cust`, alert: pendingUsers.length > 0 },
-          { label: 'Active Deals', value: registeredLeads.length, sub: `${leadsWithProposal.length} with proposal`, good: registeredLeads.length > 0 },
-          { label: 'Total Sq.Ft', value: approvedListings.reduce((s, l) => s + (l.sizeSqFt || 0), 0) >= 1000000 ? (approvedListings.reduce((s, l) => s + (l.sizeSqFt || 0), 0) / 1000000).toFixed(1) + 'M' : approvedListings.reduce((s, l) => s + (l.sizeSqFt || 0), 0).toLocaleString(), sub: 'Across active listings', good: false },
-        ].map((kpi, i) => (
-          <div key={i} className="rounded-2xl p-4" style={{background:'#fff', border: (kpi as any).alert ? '1px solid #fde68a' : '1px solid hsl(259 30% 91%)', borderTop: (kpi as any).alert ? '3px solid #f59e0b' : (kpi as any).good ? '3px solid #22c55e' : '3px solid transparent'}}>
-            <p className="text-2xl font-bold" style={{color:'#1e1537',letterSpacing:'-0.5px'}}>{kpi.value}</p>
-            <p className="text-xs font-medium mt-1" style={{color:'#888',textTransform:'uppercase',letterSpacing:'.4px'}}>{kpi.label}</p>
-            <p className="text-xs mt-1" style={{color: (kpi as any).alert ? '#d97706' : '#aaa'}}>{kpi.sub}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Approval queue + Deal pipeline */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-2xl p-5" style={{background:'#fff',border:'1px solid hsl(259 30% 91%)'}}>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-bold" style={{color:'#1e1537'}}>
-              Approval Queue
-              {pendingApprovals.length > 0 && <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'#fef9c3',color:'#92400e'}}>{pendingApprovals.length}</span>}
-            </p>
-            <a href="/dashboard/manage-users" className="text-xs font-semibold flex items-center gap-1" style={{color:'#6141ac'}}>Manage Users <ChevronRight className="h-3 w-3"/></a>
-          </div>
-          {pendingApprovals.length === 0 ? (
-            <div className="text-center py-8">
-              <CheckCircle2 className="h-8 w-8 mx-auto mb-2" style={{color:'#22c55e'}}/>
-              <p className="text-sm font-semibold" style={{color:'#1e1537'}}>All clear</p>
-              <p className="text-xs" style={{color:'#aaa'}}>No pending approvals</p>
+      <div style={{ flex: 1, padding: '28px 28px 48px', overflow: 'auto' }}>
+        {/* Header */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1e1537', margin: 0 }}>{greeting}, {user?.userName?.split(' ')[0]}</h1>
+              <p style={{ fontSize: 13, color: 'hsl(259 15% 50%)', marginTop: 3 }}>ORS-ONE · SuperAdmin · {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
             </div>
-          ) : (
-            <div className="space-y-1">
-              {pendingApprovals.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl" style={{background:'hsl(259 30% 98%)'}}>
-                  <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0" style={{background:'hsl(259 44% 90%)',color:'#6141ac'}}>{(item.name||'').slice(0,2).toUpperCase()}</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate" style={{color:'#1e1537'}}>{item.name}</p>
-                    <p className="text-xs truncate" style={{color:'#aaa'}}>{item.sub}</p>
-                  </div>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={item.badge==='Listing'?{background:'#f0edfb',color:'#6141ac'}:item.badge==='Sublease'?{background:'#fef9c3',color:'#92400e'}:item.badge==='Developer'?{background:'#eff6ff',color:'#1d4ed8'}:{background:'#f0fdf4',color:'#15803d'}}>{item.badge}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="rounded-2xl p-5" style={{background:'#fff',border:'1px solid hsl(259 30% 91%)'}}>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-bold" style={{color:'#1e1537'}}>Deal Pipeline</p>
-            <TrendingUp className="h-4 w-4" style={{color:'#6141ac'}}/>
-          </div>
-          <div className="space-y-3">
-            {pipeline.map((p, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className="text-xs font-medium w-20 flex-shrink-0" style={{color:'#888'}}>{p.label}</span>
-                <div className="flex-1 h-6 rounded-lg overflow-hidden" style={{background:'hsl(259 30% 96%)'}}>
-                  <div className="h-full rounded-lg flex items-center px-2 transition-all" style={{width:`${Math.max((p.count/maxPipe)*100,p.count>0?12:0)}%`,background:p.color}}>
-                    {p.count > 0 && <span className="text-xs font-bold text-white">{p.count}</span>}
-                  </div>
-                </div>
-                <span className="text-xs font-bold w-4 text-right flex-shrink-0" style={{color:'#1e1537'}}>{p.count}</span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 pt-4 grid grid-cols-3 gap-2" style={{borderTop:'1px solid hsl(259 30% 91%)'}}>
-            {[{label:'Developers',value:developers.length,color:'#eff6ff',text:'#1d4ed8'},{label:'Customers',value:customers.length,color:'#f0fdf4',text:'#15803d'},{label:'Active Leads',value:registeredLeads.length,color:'#f0edfb',text:'#6141ac'}].map((s,i)=>(
-              <div key={i} className="rounded-xl p-3 text-center" style={{background:s.color}}>
-                <p className="text-base font-bold" style={{color:s.text}}>{s.value}</p>
-                <p className="text-xs mt-0.5" style={{color:'#aaa'}}>{s.label}</p>
-              </div>
-            ))}
+            {hasPending && (
+              <Link href="/dashboard/operations?section=approval-queue"
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: '#fff', border: '1px solid #fde68a', borderRadius: 8, textDecoration: 'none', fontSize: 12, fontWeight: 700, color: '#92400e' }}>
+                <AlertTriangle style={{ width: 13, height: 13 }} />
+                {pendingListings.length + pendingUsers.length} pending approval{pendingListings.length + pendingUsers.length > 1 ? 's' : ''}
+              </Link>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Quick nav */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: 'Manage Users', sub: `${pendingUsers.length} pending`, href: '/dashboard/manage-users', alert: pendingUsers.length > 0 },
-          { label: 'All Listings', sub: `${approvedListings.length} active`, onClick: () => setTab('all-listings'), alert: false },
-          { label: 'All Demands', sub: `${demands.length} active`, onClick: () => setTab('all-demands'), alert: false },
-          { label: 'Analytics', sub: 'Views & downloads', href: '/dashboard/analytics', alert: false },
-        ].map((nav, i) => (
-          <a key={i} href={(nav as any).href || '#'}
-            onClick={(nav as any).onClick ? (e) => { e.preventDefault(); (nav as any).onClick(); } : undefined}
-            className="rounded-2xl p-4 flex flex-col gap-1 cursor-pointer transition-all hover:shadow-sm"
-            style={{background:'#fff', border: nav.alert ? '1px solid #fde68a' : '1px solid hsl(259 30% 91%)'}}>
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-bold" style={{color:'#1e1537'}}>{nav.label}</p>
-              <ChevronRight className="h-4 w-4" style={{color:'#aaa'}}/>
-            </div>
-            <p className="text-xs" style={{color: nav.alert ? '#d97706' : '#aaa'}}>{nav.sub}</p>
-          </a>
-        ))}
-      </div>
-
-      {/* Tab panel — grouped sidebar nav + content */}
-      <div className="rounded-2xl overflow-hidden" style={{border:'1px solid hsl(259 30% 91%)',display:'flex',minHeight:520}}>
-        {/* Left sidebar navigation */}
-        <div style={{width:200,flexShrink:0,background:'hsl(259 30% 97%)',borderRight:'1px solid hsl(259 30% 91%)',padding:'12px 0'}}>
-          {tabGroups.map(group => (
-            <div key={group.group} style={{marginBottom:8}}>
-              <p style={{fontSize:9,fontWeight:700,color:'hsl(259 15% 60%)',letterSpacing:'.08em',textTransform:'uppercase',padding:'6px 16px 4px'}}>
-                {group.group}
-              </p>
-              {group.tabs.map(t => (
-                <button key={t.value} onClick={() => setTab(t.value)}
-                  style={{
-                    width:'100%', display:'flex', alignItems:'center', gap:8,
-                    padding:'8px 16px', border:'none', cursor:'pointer', textAlign:'left',
-                    background: tab === t.value ? '#fff' : 'transparent',
-                    color: tab === t.value ? '#6141ac' : 'hsl(259 15% 45%)',
-                    fontWeight: tab === t.value ? 700 : 500,
-                    fontSize:12,
-                    borderLeft: tab === t.value ? '3px solid #6141ac' : '3px solid transparent',
-                  }}>
-                  <t.icon style={{width:13,height:13,flexShrink:0}} />
-                  {t.label}
-                  {t.value === 'approval-queue' && hasPendingSubmissions && <span style={{width:7,height:7,borderRadius:'50%',background:'#ef4444',marginLeft:'auto',flexShrink:0}} />}
-                </button>
-              ))}
+        {/* KPIs */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+          {kpis.map((kpi, i) => (
+            <div key={i} style={{
+              background: '#fff', borderRadius: 12, padding: '16px 18px',
+              border: kpi.alert ? '1px solid #fde68a' : '0.5px solid hsl(259 30% 90%)',
+              borderTop: kpi.alert ? '3px solid #f59e0b' : kpi.good ? '3px solid #22c55e' : '3px solid transparent',
+            }}>
+              <p style={{ fontSize: 26, fontWeight: 700, color: '#1e1537', margin: 0, letterSpacing: '-0.5px' }}>{kpi.value}</p>
+              <p style={{ fontSize: 11, fontWeight: 600, color: 'hsl(259 15% 55%)', textTransform: 'uppercase', letterSpacing: '.04em', margin: '5px 0 3px' }}>{kpi.label}</p>
+              {kpi.alertSub
+                ? <p style={{ fontSize: 11, color: '#d97706', margin: 0 }}>{kpi.alertSub}</p>
+                : <p style={{ fontSize: 11, color: 'hsl(259 15% 60%)', margin: 0 }}>{kpi.sub}</p>}
             </div>
           ))}
         </div>
-        <div id="admin-tab-panel" style={{flex:1,padding:16,overflow:"auto"}}>
-          {/* Section header */}
-          {(() => {
-            const currentTab = allTabs.find(t => t.value === tab);
-            const currentGroup = tabGroups.find(g => g.tabs.some(t => t.value === tab));
-            return currentTab ? (
-              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:16,paddingBottom:12,borderBottom:'0.5px solid hsl(259 30% 90%)'}}>
-                <div style={{width:28,height:28,borderRadius:8,background:'hsl(259 44% 94%)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                  <currentTab.icon style={{width:14,height:14,color:'#6141ac'}} />
+
+        {/* Main grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+          {/* Approval queue */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: '18px 20px', border: '0.5px solid hsl(259 30% 90%)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#1e1537', margin: 0 }}>Approval Queue</p>
+                {pendingItems.length > 0 && <span style={{ fontSize: 11, fontWeight: 700, background: '#fef9c3', color: '#92400e', padding: '1px 7px', borderRadius: 10 }}>{pendingItems.length}</span>}
+              </div>
+              <Link href="/dashboard/manage-users" style={{ fontSize: 11, fontWeight: 600, color: '#6141ac', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 3 }}>Manage Users <ChevronRight style={{ width: 12, height: 12 }} /></Link>
+            </div>
+            {pendingItems.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '24px 0' }}>
+                <CheckCircle2 style={{ width: 32, height: 32, color: '#22c55e', margin: '0 auto 8px' }} />
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#1e1537', margin: 0 }}>All clear</p>
+                <p style={{ fontSize: 12, color: 'hsl(259 15% 55%)', margin: '3px 0 0' }}>No pending approvals</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {pendingItems.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 8, background: 'hsl(259 30% 98%)' }}>
+                    <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'hsl(259 44% 90%)', color: '#6141ac', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, flexShrink: 0 }}>{item.name.slice(0, 2).toUpperCase()}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#1e1537', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</p>
+                      <p style={{ fontSize: 11, color: 'hsl(259 15% 55%)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.sub}</p>
+                    </div>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, flexShrink: 0, background: item.badgeColor.bg, color: item.badgeColor.text }}>{item.badge}</span>
+                  </div>
+                ))}
+                <Link href="/dashboard/operations?section=approval-queue"
+                  style={{ display: 'block', textAlign: 'center', padding: '8px', fontSize: 12, fontWeight: 600, color: '#6141ac', background: 'hsl(259 44% 96%)', borderRadius: 8, textDecoration: 'none', marginTop: 4 }}>
+                  View all in Operations →
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Deal pipeline */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: '18px 20px', border: '0.5px solid hsl(259 30% 90%)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#1e1537', margin: 0 }}>Deal Pipeline</p>
+              <TrendingUp style={{ width: 15, height: 15, color: '#6141ac' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+              {pipeline.map((p, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 11, color: 'hsl(259 15% 55%)', width: 72, flexShrink: 0 }}>{p.label}</span>
+                  <div style={{ flex: 1, height: 22, background: 'hsl(259 30% 96%)', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${Math.max(p.pct, p.count > 0 ? 8 : 0)}%`, background: i === 0 ? '#3b82f6' : '#6141ac', display: 'flex', alignItems: 'center', paddingLeft: 8, transition: 'width .3s' }}>
+                      {p.count > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>{p.count}</span>}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#1e1537', width: 24, textAlign: 'right', flexShrink: 0 }}>{p.count}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, paddingTop: 14, borderTop: '0.5px solid hsl(259 30% 90%)' }}>
+              {[{ label: 'Developers', value: developers.length, bg: '#eff6ff', text: '#1d4ed8' }, { label: 'Customers', value: customers.length, bg: '#f0fdf4', text: '#15803d' }, { label: 'Active Leads', value: registeredLeads.length, bg: '#f0edfb', text: '#6141ac' }].map((s, i) => (
+                <div key={i} style={{ background: s.bg, borderRadius: 8, padding: '10px', textAlign: 'center' }}>
+                  <p style={{ fontSize: 18, fontWeight: 700, color: s.text, margin: 0 }}>{s.value}</p>
+                  <p style={{ fontSize: 11, color: s.text, opacity: 0.7, margin: '2px 0 0' }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick actions */}
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: 'hsl(259 15% 55%)', letterSpacing: '.06em', textTransform: 'uppercase', marginBottom: 10 }}>Quick Actions</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+            {[
+              { label: 'Manage Users', sub: `${pendingUsers.length} pending`, href: '/dashboard/manage-users', icon: Users, alert: pendingUsers.length > 0 },
+              { label: 'All Listings', sub: `${approvedListings.length} active`, href: '/dashboard/operations?section=all-listings', icon: Building2, alert: false },
+              { label: 'All Demands', sub: `${demands.length} active`, href: '/dashboard/operations?section=all-demands', icon: FileText, alert: false },
+              { label: 'Engagement Jobs', sub: 'Automate outreach', href: '/dashboard/operations?section=engagement-jobs', icon: Zap, alert: false },
+            ].map((nav, i) => (
+              <Link key={i} href={nav.href}
+                style={{ background: '#fff', borderRadius: 10, padding: '14px 16px', border: nav.alert ? '1px solid #fde68a' : '0.5px solid hsl(259 30% 90%)', textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 8, transition: 'box-shadow .15s' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 7, background: 'hsl(259 44% 94%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <nav.icon style={{ width: 13, height: 13, color: '#6141ac' }} />
                 </div>
                 <div>
-                  <p style={{fontSize:14,fontWeight:700,color:'#1e1537',margin:0}}>{currentTab.label}</p>
-                  <p style={{fontSize:11,color:'hsl(259 15% 55%)',margin:0}}>{currentGroup?.group}</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#1e1537', margin: 0 }}>{nav.label}</p>
+                  <p style={{ fontSize: 11, color: nav.alert ? '#d97706' : 'hsl(259 15% 55%)', margin: '2px 0 0' }}>{nav.sub}</p>
                 </div>
-              </div>
-            ) : null;
-          })()}
-          {tab === 'approval-queue' && <ApprovalQueue />}
-          {tab === 'all-listings' && <AdminListings />}
-          {tab === 'all-demands' && <DemandList onEdit={handleEditDemand} />}
-          {tab === 'create-demand' && <DemandForm onDemandLogged={() => { setTab('all-demands'); setEditingDemandId(null); }} isAdminMode editDemandId={editingDemandId || undefined} />}
-          {tab === 'all-leads' && <ProviderLeads />}
-          {tab === 'my-shortlist' && <GeneralShortlist />}
-          {tab === 'ors-transact-manage' && <OrsTransactManager />}
-          {tab === 'ors-transact-new' && <OrsTransactAdminForm onSaved={() => setTab('ors-transact-manage')} onCancel={() => setTab('ors-transact-manage')} />}
-          {tab === 'ors-transact-import' && <OrsTransactImport />}
-          {tab === 'ors-transact-roles' && <OrsTransactRoleManager />}
-          {tab === 'engagement-jobs' && <EngagementJobsPanel />}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* ORS Transact summary */}
+        <div style={{ background: '#1e1537', borderRadius: 12, padding: '18px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.4)', letterSpacing: '.06em', textTransform: 'uppercase', margin: 0 }}>ORS Transact</p>
+            <p style={{ fontSize: 18, fontWeight: 700, color: '#fff', margin: '4px 0 3px' }}>9,420 inventory listings</p>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', margin: 0 }}>242.9M sft · Managed directly by ORS-ONE</p>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Link href="/dashboard/operations?section=ors-transact-manage"
+              style={{ padding: '8px 16px', background: 'rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 12, fontWeight: 600, border: '1px solid rgba(255,255,255,.15)' }}>
+              Manage Listings
+            </Link>
+            <Link href="/ors-transact" target="_blank"
+              style={{ padding: '8px 16px', background: '#6141ac', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 12, fontWeight: 600 }}>
+              Public View ↗
+            </Link>
+          </div>
         </div>
       </div>
     </div>

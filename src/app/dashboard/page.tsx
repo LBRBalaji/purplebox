@@ -93,6 +93,16 @@ export default function DashboardPage() {
     return <p className="text-muted-foreground text-sm p-8">Dashboard not available for your role.</p>;
   };
 
+  const isAdminLayout = role === 'SuperAdmin';
+
+  if (isAdminLayout) {
+    return (
+      <React.Suspense fallback={<div className="flex items-center justify-center h-48 p-8"><p className="text-muted-foreground text-sm">Loading...</p></div>}>
+        <AdminDashboard />
+      </React.Suspense>
+    );
+  }
+
   return (
     <main className="container mx-auto p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
