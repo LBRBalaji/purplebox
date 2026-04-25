@@ -359,6 +359,45 @@ function PublicDemandCard({ demand }: { demand: DemandSchema }) {
         </p>
       </div>
 
+      {/* Location map — Static Maps API circle showing demand radius */}
+      {demand.location && demand.location.includes(',') && (() => {
+        const [lat, lng] = demand.location.split(',').map(Number);
+        if (isNaN(lat) || isNaN(lng)) return null;
+        const radius = demand.radius || 10;
+        // Build circle path for Static Maps API
+        // Approximate circle using 20-point polygon
+        const toRad = (d: number) => d * Math.PI / 180;
+        const R = 6371; // earth radius km
+        const points = Array.from({ length: 20 }, (_, i) => {
+          const angle = (i / 20) * 2 * Math.PI;
+          const dLat = (radius / R) * (180 / Math.PI) * Math.cos(angle);
+          const dLng = (radius / R) * (180 / Math.PI) * Math.sin(angle) / Math.cos(toRad(lat));
+          return `${(lat + dLat).toFixed(5)},${(lng + dLng).toFixed(5)}`;
+        });
+        const circlePath = points.concat(points[0]).join('|');
+        // Zoom level based on radius
+        const zoom = radius <= 5 ? 13 : radius <= 10 ? 12 : radius <= 20 ? 11 : radius <= 40 ? 10 : 9;
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+        const mapUrl = apiKey
+          ? `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=400x160&scale=2&maptype=roadmap&markers=color:purple%7Csize:small%7C${lat},${lng}&path=color:0x6141acCC%7Cweight:2%7Cfillcolor:0x6141ac33%7C${circlePath}&key=${apiKey}&style=feature:all%7Celement:labels.text%7Cvisibility:simplified&style=feature:poi%7Cvisibility:off`
+          : '';
+        if (!mapUrl) return null;
+        return (
+          <div style={{margin:'0 0 0 0',overflow:'hidden',borderBottom:'0.5px solid hsl(259 30% 90%)',position:'relative'}}>
+            <img
+              src={mapUrl}
+              alt={`Map showing ${demand.locationName || 'location'} within ${radius} km radius`}
+              style={{width:'100%',height:130,objectFit:'cover',display:'block'}}
+              loading="lazy"
+            />
+            {/* Radius badge overlay */}
+            <div style={{position:'absolute',bottom:8,left:8,background:'rgba(30,21,55,0.82)',color:'#fff',fontSize:10,fontWeight:600,padding:'3px 8px',letterSpacing:'.02em'}}>
+              {demand.locationName || 'Selected location'} · {radius} km radius
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Specs grid */}
       <div className="grid grid-cols-2 gap-px mx-4 mb-3" style={{border:'0.5px solid hsl(259 30% 90%)'}}>
         {[

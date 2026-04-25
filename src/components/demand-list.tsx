@@ -250,6 +250,35 @@ WareHouse Origin
         </p>
       </div>
 
+      {/* Location map */}
+      {demand.location && demand.location.includes(',') && (() => {
+        const [lat, lng] = demand.location.split(',').map(Number);
+        if (isNaN(lat) || isNaN(lng)) return null;
+        const radius = demand.radius || 10;
+        const toRad = (d: number) => d * Math.PI / 180;
+        const R = 6371;
+        const points = Array.from({length:20},(_,i) => {
+          const a = (i/20)*2*Math.PI;
+          const dLat = (radius/R)*(180/Math.PI)*Math.cos(a);
+          const dLng = (radius/R)*(180/Math.PI)*Math.sin(a)/Math.cos(toRad(lat));
+          return `${(lat+dLat).toFixed(5)},${(lng+dLng).toFixed(5)}`;
+        });
+        const circlePath = points.concat(points[0]).join('|');
+        const zoom = radius<=5?13:radius<=10?12:radius<=20?11:radius<=40?10:9;
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+        if (!apiKey) return null;
+        const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=400x140&scale=2&maptype=roadmap&markers=color:purple%7Csize:small%7C${lat},${lng}&path=color:0x6141acCC%7Cweight:2%7Cfillcolor:0x6141ac33%7C${circlePath}&key=${apiKey}&style=feature:poi%7Cvisibility:off`;
+        return (
+          <div style={{overflow:'hidden',borderTop:'0.5px solid hsl(259 30% 90%)',borderBottom:'0.5px solid hsl(259 30% 90%)',position:'relative',margin:'0 0 0 0'}}>
+            <img src={mapUrl} alt="Location radius map"
+              style={{width:'100%',height:120,objectFit:'cover',display:'block'}} loading="lazy" />
+            <div style={{position:'absolute',bottom:6,left:8,background:'rgba(30,21,55,0.8)',color:'#fff',fontSize:10,fontWeight:600,padding:'2px 7px'}}>
+              {demand.locationName || 'Location'} · {radius} km radius
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Specs grid */}
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1,margin:'0 16px 10px',border:'0.5px solid hsl(259 30% 90%)'}}>
         {specs.map(([label, value]) => (
