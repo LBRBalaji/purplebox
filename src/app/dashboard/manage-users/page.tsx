@@ -5,6 +5,7 @@ import { DataGovernance } from "@/components/data-governance";
 import { UserList } from "@/components/user-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StaffManagement } from '@/components/staff-management';
+import { AdminSidebar } from '@/components/admin-sidebar';
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import * as React from 'react';

@@ -11,6 +11,7 @@ import { PlusCircle, Save, Settings, Trash2, KeyRound, Eye, EyeOff, Bell, Shield
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { AdminSidebar } from '@/components/admin-sidebar';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
@@ -251,5 +252,6 @@ export default function PlatformSettingsPage() {
         )}
       </div>
     </main>
+    </div>
   );
 }

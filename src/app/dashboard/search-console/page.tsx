@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import type { ListingSchema, DemandSchema } from '@/lib/schema';
 import type { User } from '@/contexts/auth-context';
 import Link from 'next/link';
+import { AdminSidebar } from '@/components/admin-sidebar';
 import { Building, ClipboardList, Search, User as UserIcon, X, ArrowRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
@@ -163,7 +164,9 @@ export default function SearchConsolePage() {
     }
 
     return (
-        <main className="container mx-auto p-4 md:p-8">
+        <div style={{display:'flex',minHeight:'100vh',background:'hsl(259 30% 96%)'}}>
+        <AdminSidebar />
+        <main style={{flex:1,overflow:'auto'}} className="container mx-auto p-4 md:p-8">
             <div className="max-w-4xl mx-auto">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold font-headline tracking-tight">Admin Search Console</h1>
@@ -235,5 +238,6 @@ export default function SearchConsolePage() {
 
             </div>
         </main>
+        </div>
     );
 }

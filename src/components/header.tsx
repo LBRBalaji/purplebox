@@ -335,7 +335,7 @@ export function Header() {
                 <ToolsDropdown />
                 <MoreDropdown />
                 {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
-                {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
+                {isSuperAdmin && null /* Manage is now in the Admin sidebar */}
               </>
             )}
           </nav>
