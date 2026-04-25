@@ -26,6 +26,17 @@ export default function AdminDashboard() {
   const editDemandId = searchParams.get('editDemandId');
 
   const [tab, setTab] = React.useState(editDemandId ? 'create-demand' : defaultTab);
+  const [editingDemandId, setEditingDemandId] = React.useState<string | null>(editDemandId || null);
+
+  // Switch to create-demand tab in place, no URL navigation, no scroll jump
+  const handleEditDemand = React.useCallback((demandId: string) => {
+    setEditingDemandId(demandId);
+    setTab('create-demand');
+    // Scroll to the tab panel smoothly
+    setTimeout(() => {
+      document.getElementById('admin-tab-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }, []);
 
   React.useEffect(() => {
     if (editDemandId) setTab('create-demand');
@@ -56,19 +67,36 @@ export default function AdminDashboard() {
   ];
   const maxPipe = Math.max(...pipeline.map(p => p.count), 1);
 
-  const tabs = [
-    { value: 'approval-queue', label: 'Approval Queue', icon: CheckCircle2 },
-    { value: 'all-listings', label: 'All Listings', icon: Building2 },
-    { value: 'all-demands', label: 'All Demands', icon: ListChecks },
-    { value: 'create-demand', label: 'Create Demand', icon: FileText },
-    { value: 'all-leads', label: 'All Leads', icon: Users },
-    { value: 'my-shortlist', label: 'Shortlist', icon: Building2 },
-    { value: 'ors-transact-manage', label: 'Manage ORS Listings', icon: Building2 },
-    { value: 'ors-transact-new', label: 'New ORS Listing', icon: Plus },
-    { value: 'ors-transact-import', label: 'ORS Transact Import', icon: Upload },
-    { value: 'ors-transact-roles', label: 'ORS Transact Roles', icon: Users },
-    { value: 'engagement-jobs', label: 'Engagement Jobs', icon: Zap },
+  const tabGroups = [
+    {
+      group: 'Platform',
+      tabs: [
+        { value: 'approval-queue', label: 'Approval Queue', icon: CheckCircle2 },
+        { value: 'all-listings', label: 'Listings', icon: Building2 },
+        { value: 'all-demands', label: 'Demands', icon: ListChecks },
+        { value: 'create-demand', label: 'Create Demand', icon: FileText },
+        { value: 'all-leads', label: 'All Leads', icon: Users },
+        { value: 'my-shortlist', label: 'Shortlist', icon: Building2 },
+      ],
+    },
+    {
+      group: 'ORS Transact',
+      tabs: [
+        { value: 'ors-transact-manage', label: 'Manage Listings', icon: Building2 },
+        { value: 'ors-transact-new', label: 'New Listing', icon: Plus },
+        { value: 'ors-transact-import', label: 'Import', icon: Upload },
+        { value: 'ors-transact-roles', label: 'Roles', icon: Users },
+      ],
+    },
+    {
+      group: 'Automation',
+      tabs: [
+        { value: 'engagement-jobs', label: 'Engagement Jobs', icon: Zap },
+      ],
+    },
   ];
+  const allTabs = tabGroups.flatMap(g => g.tabs);
+  const activeGroup = tabGroups.find(g => g.tabs.some(t => t.value === tab));
 
   return (
     <div className="space-y-4 mb-6">
@@ -189,24 +217,55 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Tab bar */}
-      <div className="rounded-2xl overflow-hidden" style={{border:'1px solid hsl(259 30% 91%)'}}>
-        <div className="flex overflow-x-auto" style={{background:'hsl(259 30% 96%)'}}>
-          {tabs.map(t => (
-            <button key={t.value} onClick={() => setTab(t.value)}
-              className="flex items-center justify-center gap-1.5 py-3 px-3 text-xs font-semibold transition-all whitespace-nowrap flex-shrink-0"
-              style={tab === t.value ? {background:'#fff',color:'#6141ac',borderBottom:'2px solid #6141ac'} : {background:'transparent',color:'#888',borderBottom:'2px solid transparent'}}>
-              <t.icon className="h-3.5 w-3.5"/>
-              {t.label}
-              {t.value === 'approval-queue' && hasPendingSubmissions && <span className="h-2 w-2 rounded-full bg-red-500 animate-ping ml-1"/>}
-            </button>
+      {/* Tab panel — grouped sidebar nav + content */}
+      <div className="rounded-2xl overflow-hidden" style={{border:'1px solid hsl(259 30% 91%)',display:'flex',minHeight:520}}>
+        {/* Left sidebar navigation */}
+        <div style={{width:200,flexShrink:0,background:'hsl(259 30% 97%)',borderRight:'1px solid hsl(259 30% 91%)',padding:'12px 0'}}>
+          {tabGroups.map(group => (
+            <div key={group.group} style={{marginBottom:8}}>
+              <p style={{fontSize:9,fontWeight:700,color:'hsl(259 15% 60%)',letterSpacing:'.08em',textTransform:'uppercase',padding:'6px 16px 4px'}}>
+                {group.group}
+              </p>
+              {group.tabs.map(t => (
+                <button key={t.value} onClick={() => setTab(t.value)}
+                  style={{
+                    width:'100%', display:'flex', alignItems:'center', gap:8,
+                    padding:'8px 16px', border:'none', cursor:'pointer', textAlign:'left',
+                    background: tab === t.value ? '#fff' : 'transparent',
+                    color: tab === t.value ? '#6141ac' : 'hsl(259 15% 45%)',
+                    fontWeight: tab === t.value ? 700 : 500,
+                    fontSize:12,
+                    borderLeft: tab === t.value ? '3px solid #6141ac' : '3px solid transparent',
+                  }}>
+                  <t.icon style={{width:13,height:13,flexShrink:0}} />
+                  {t.label}
+                  {t.value === 'approval-queue' && hasPendingSubmissions && <span style={{width:7,height:7,borderRadius:'50%',background:'#ef4444',marginLeft:'auto',flexShrink:0}} />}
+                </button>
+              ))}
+            </div>
           ))}
         </div>
-        <div className="p-4">
+        <div id="admin-tab-panel" style={{flex:1,padding:16,overflow:"auto"}}>
+          {/* Section header */}
+          {(() => {
+            const currentTab = allTabs.find(t => t.value === tab);
+            const currentGroup = tabGroups.find(g => g.tabs.some(t => t.value === tab));
+            return currentTab ? (
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:16,paddingBottom:12,borderBottom:'0.5px solid hsl(259 30% 90%)'}}>
+                <div style={{width:28,height:28,borderRadius:8,background:'hsl(259 44% 94%)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <currentTab.icon style={{width:14,height:14,color:'#6141ac'}} />
+                </div>
+                <div>
+                  <p style={{fontSize:14,fontWeight:700,color:'#1e1537',margin:0}}>{currentTab.label}</p>
+                  <p style={{fontSize:11,color:'hsl(259 15% 55%)',margin:0}}>{currentGroup?.group}</p>
+                </div>
+              </div>
+            ) : null;
+          })()}
           {tab === 'approval-queue' && <ApprovalQueue />}
           {tab === 'all-listings' && <AdminListings />}
-          {tab === 'all-demands' && <DemandList />}
-          {tab === 'create-demand' && <DemandForm onDemandLogged={() => setTab('all-demands')} isAdminMode />}
+          {tab === 'all-demands' && <DemandList onEdit={handleEditDemand} />}
+          {tab === 'create-demand' && <DemandForm onDemandLogged={() => { setTab('all-demands'); setEditingDemandId(null); }} isAdminMode editDemandId={editingDemandId || undefined} />}
           {tab === 'all-leads' && <ProviderLeads />}
           {tab === 'my-shortlist' && <GeneralShortlist />}
           {tab === 'ors-transact-manage' && <OrsTransactManager />}

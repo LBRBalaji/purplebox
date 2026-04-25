@@ -382,7 +382,11 @@ WareHouse Origin
 }
 
 
-export function DemandList() {
+interface DemandListProps {
+  onEdit?: (demandId: string) => void; // optional — if provided, used instead of router.push
+}
+
+export function DemandList({ onEdit }: DemandListProps = {}) {
   const { demands, deleteDemand } = useData();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -413,7 +417,7 @@ export function DemandList() {
               {(isAdmin || user?.email === demand.userEmail) && (
                 <div className="absolute top-3 right-3 flex gap-1">
                   <button
-                    onClick={() => router.push(`/dashboard?editDemandId=${demand.demandId}`)}
+                    onClick={() => onEdit ? onEdit(demand.demandId) : router.push(`/dashboard?editDemandId=${demand.demandId}`)}
                     className="p-1.5 rounded bg-white border border-gray-200 hover:border-purple-400 hover:text-purple-600 transition-colors shadow-sm"
                     title="Edit demand">
                     <Pencil className="h-3.5 w-3.5" />

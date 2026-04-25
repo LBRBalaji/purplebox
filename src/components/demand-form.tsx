@@ -134,7 +134,7 @@ const PriorityToggle = ({ form, field }: { form: UseFormReturn<DemandSchema>, fi
     );
 }
 
-export function DemandForm({ onDemandLogged, isAdminMode }: { onDemandLogged: () => void; isAdminMode?: boolean }) {
+export function DemandForm({ onDemandLogged, isAdminMode, editDemandId: editDemandIdProp }: { onDemandLogged: () => void; isAdminMode?: boolean; editDemandId?: string }) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { demands, addDemand, updateDemand } = useData();
@@ -146,7 +146,7 @@ export function DemandForm({ onDemandLogged, isAdminMode }: { onDemandLogged: ()
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const editDemandId = searchParams.get('editDemandId');
+  const editDemandId = editDemandIdProp || searchParams.get('editDemandId');
   const isEditMode = !!editDemandId;
 
   const [isEssentialsOpen, setIsEssentialsOpen] = React.useState(isEditMode);
