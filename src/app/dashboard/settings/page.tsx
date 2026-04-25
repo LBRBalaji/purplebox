@@ -120,7 +120,9 @@ export default function PlatformSettingsPage() {
   if (isLoading) return null;
 
   return (
-    <main className="container mx-auto p-4 md:p-8">
+    <div style={{display:'flex',minHeight:'100vh',background:'hsl(259 30% 96%)'}}>
+      <AdminSidebar />
+      <main className="container mx-auto p-4 md:p-8" style={{flex:1,overflow:'auto'}}>
       <div className="max-w-4xl mx-auto space-y-8">
         <div>
           <h2 className="text-3xl font-bold font-headline tracking-tight flex items-center gap-3"><Settings /> Settings</h2>
@@ -251,7 +253,7 @@ export default function PlatformSettingsPage() {
           </Card>
         )}
       </div>
-    </main>
+      </main>
     </div>
   );
 }
