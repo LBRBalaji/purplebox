@@ -205,6 +205,14 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
             <span className="text-xs font-bold px-1.5 rounded" style={{background:'hsl(259 44% 30%)',color:'#c5b8e8',fontSize:'9px'}}>Beta</span>
           </div>
           <p className="text-xs text-white/50">Building Transaction Ready Assets</p>
+          <a
+            href="https://orsone.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-white/40 hover:text-white transition-colors"
+          >
+            &#x2190; orsone.app
+          </a>
           {user && (
             <div className="mt-4 pt-4 border-t border-white/10">
               <p className="text-sm font-semibold text-white">{user.userName}</p>
@@ -310,6 +318,16 @@ export function Header() {
             </div>
             <p className="text-xs text-muted-foreground leading-none">Building Transaction Ready Assets</p>
           </Link>
+
+          <a
+            href="https://orsone.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex flex-shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors border border-border rounded px-2 py-1"
+            title="Back to ORS-ONE home"
+          >
+            ← orsone.app
+          </a>
 
           <nav className="hidden md:flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
             {isLoading ? (
