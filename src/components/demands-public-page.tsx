@@ -379,7 +379,7 @@ function PublicDemandCard({ demand }: { demand: DemandSchema }) {
         const zoom = radius <= 5 ? 13 : radius <= 10 ? 12 : radius <= 20 ? 11 : radius <= 40 ? 10 : 9;
         const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
         const mapUrl = apiKey
-          ? `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=400x160&scale=2&maptype=roadmap&markers=color:purple%7Csize:small%7C${lat},${lng}&path=color:0x6141acCC%7Cweight:2%7Cfillcolor:0x6141ac33%7C${circlePath}&key=${apiKey}&style=feature:all%7Celement:labels.text%7Cvisibility:simplified&style=feature:poi%7Cvisibility:off`
+          ? `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=600x220&scale=2&maptype=roadmap&markers=color:purple%7Csize:small%7C${lat},${lng}&path=color:0x6141acCC%7Cweight:2%7Cfillcolor:0x6141ac33%7C${circlePath}&key=${apiKey}&style=feature:all%7Celement:labels.text%7Cvisibility:simplified&style=feature:poi%7Cvisibility:off`
           : '';
         if (!mapUrl) return null;
         return (
@@ -387,7 +387,7 @@ function PublicDemandCard({ demand }: { demand: DemandSchema }) {
             <img
               src={mapUrl}
               alt={`Map showing ${demand.locationName || 'location'} within ${radius} km radius`}
-              style={{width:'100%',height:130,objectFit:'cover',display:'block'}}
+              style={{width:'100%',height:180,objectFit:'cover',display:'block'}}
               loading="lazy"
             />
             {/* Radius badge overlay */}

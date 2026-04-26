@@ -264,14 +264,14 @@ WareHouse Origin
           return `${(lat+dLat).toFixed(5)},${(lng+dLng).toFixed(5)}`;
         });
         const circlePath = points.concat(points[0]).join('|');
-        const zoom = radius<=5?13:radius<=10?12:radius<=20?11:radius<=40?10:9;
+        const zoom = radius<=5?12:radius<=10?11:radius<=20?10:radius<=40?9:8;
         const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
         if (!apiKey) return null;
-        const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=400x140&scale=2&maptype=roadmap&markers=color:purple%7Csize:small%7C${lat},${lng}&path=color:0x6141acCC%7Cweight:2%7Cfillcolor:0x6141ac33%7C${circlePath}&key=${apiKey}&style=feature:poi%7Cvisibility:off`;
+        const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=600x200&scale=2&maptype=roadmap&markers=color:purple%7Csize:small%7C${lat},${lng}&path=color:0x6141acCC%7Cweight:2%7Cfillcolor:0x6141ac33%7C${circlePath}&key=${apiKey}&style=feature:poi%7Cvisibility:off`;
         return (
           <div style={{overflow:'hidden',borderTop:'0.5px solid hsl(259 30% 90%)',borderBottom:'0.5px solid hsl(259 30% 90%)',position:'relative',margin:'0 0 0 0'}}>
             <img src={mapUrl} alt="Location radius map"
-              style={{width:'100%',height:120,objectFit:'cover',display:'block'}} loading="lazy" />
+              style={{width:'100%',height:170,objectFit:'cover',display:'block'}} loading="lazy" />
             <div style={{position:'absolute',bottom:6,left:8,background:'rgba(30,21,55,0.8)',color:'#fff',fontSize:10,fontWeight:600,padding:'2px 7px'}}>
               {demand.locationName || 'Location'} · {radius} km radius
             </div>
