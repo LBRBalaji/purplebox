@@ -201,7 +201,7 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
       <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
         <div className="bg-primary p-5">
           <div className="flex items-center gap-1.5 mb-1">
-            <img src="/ors-one-wordmark.png" alt="ORS-ONE" style={{height:28,width:'auto',objectFit:'contain',filter:'brightness(10)'}} />
+            <span className="text-lg font-bold text-white">ORS-ONE</span>
             <span className="text-xs font-bold px-1.5 rounded" style={{background:'hsl(259 44% 30%)',color:'#c5b8e8',fontSize:'9px'}}>Beta</span>
           </div>
           <p className="text-xs text-white/50">Building Transaction Ready Assets</p>
@@ -311,9 +311,12 @@ export function Header() {
 
           <MobileMenu user={user} logout={logout} onLoginClick={() => setIsLoginOpen(true)} isSuperAdmin={isSuperAdmin} />
 
-          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0 flex items-center gap-2">
-            <img src="/ors-one-wordmark.png" alt="ORS-ONE" style={{height:32,width:'auto',objectFit:'contain'}} />
-            <span className="text-xs font-bold px-1.5 py-0.5" style={{background:'hsl(259 44% 94%)',color:'#6141ac',fontSize:'9px',letterSpacing:'.04em'}}>Beta</span>
+          <Link href={user ? "/dashboard" : "/"} className="flex-shrink-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-lg font-bold text-primary">ORS-ONE</span>
+              <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{background:'hsl(259 44% 94%)',color:'#6141ac',fontSize:'9px'}}>Beta</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-none">Building Transaction Ready Assets</p>
           </Link>
 
           <a
