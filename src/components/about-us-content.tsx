@@ -53,27 +53,177 @@ const StakeholderCard = ({ label, icon: Icon, points, color }) => (
   </div>
 );
 
+const VIDEO_CLIPS = [
+  {
+    id: 'clip-a',
+    label: 'Clip A — Instant Download',
+    youtubeId: 'l7j_Cjs9c24',
+    title: 'Warehouse-Technical-Compliance-Commercials, in a single Excel',
+    desc: 'Search for a warehouse, filter by corridor, and download the complete Technical Excel in one click. The #1 requirement identified in our market study.',
+  },
+  {
+    id: 'clip-b',
+    label: 'Clip B — One Connect',
+    youtubeId: 'FVnvTYpESrI',
+    title: 'Registering an Off-Platform Deal on ORS-ONE',
+    desc: 'List excess warehouse space of Logistics Players and Manufacturers directly on the platform.',
+  },
+  {
+    id: 'clip-c',
+    label: 'Clip C — Build Transaction',
+    youtubeId: 'm4kQF4LZPXA',
+    title: 'Negotiation Board, Term Sheet & TI Tracker',
+    desc: 'Negotiation Board, Commercial Term Sheet creation, and the Tenant Improvement (Fit-Out) tracker — all in one workspace.',
+  },
+  {
+    id: 'walkthrough',
+    label: 'Full Walkthrough (2:45)',
+    youtubeId: 'hm6gBairx-M',
+    title: 'Complete Platform Walkthrough',
+    desc: 'End-to-end walkthrough of ORS-ONE — from sourcing to possession.',
+  },
+];
+
+function VideoTabs() {
+  const [active, setActive] = React.useState('clip-a');
+  const clip = VIDEO_CLIPS.find(v => v.id === active)!;
+  return (
+    <div>
+      {/* Tab buttons */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {VIDEO_CLIPS.map(v => (
+          <button key={v.id} onClick={() => setActive(v.id)}
+            style={{
+              padding:'7px 14px', fontSize:12, fontWeight:600, cursor:'pointer', borderRadius:0,
+              background: active === v.id ? '#6141ac' : 'rgba(255,255,255,.07)',
+              color: active === v.id ? '#fff' : 'rgba(255,255,255,.5)',
+              border: active === v.id ? '0.5px solid #6141ac' : '0.5px solid rgba(255,255,255,.1)',
+            }}>
+            {active === v.id && <span style={{marginRight:6}}>●</span>}{v.label}
+          </button>
+        ))}
+      </div>
+      {/* Video embed */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr',gap:16}} className="md:grid-cols-3">
+        <div className="md:col-span-2" style={{background:'#000',aspectRatio:'16/9',position:'relative'}}>
+          <iframe
+            key={clip.youtubeId}
+            width="100%" height="100%"
+            src={`https://www.youtube.com/embed/${clip.youtubeId}?si=autoplay&rel=0`}
+            title={clip.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{position:'absolute',inset:0,width:'100%',height:'100%',border:'none'}}
+          />
+        </div>
+        <div style={{padding:'0 0 0 8px'}}>
+          <p style={{fontSize:14,fontWeight:700,color:'#fff',marginBottom:8,lineHeight:1.4}}>{clip.title}</p>
+          <p style={{fontSize:13,color:'rgba(255,255,255,.5)',lineHeight:1.6,marginBottom:16}}>{clip.desc}</p>
+          <div style={{display:'flex',flexDirection:'column',gap:6}}>
+            {VIDEO_CLIPS.filter(v => v.id !== active).map(v => (
+              <button key={v.id} onClick={() => setActive(v.id)}
+                style={{textAlign:'left',padding:'8px 10px',background:'rgba(255,255,255,.05)',border:'0.5px solid rgba(255,255,255,.1)',cursor:'pointer',borderRadius:0}}>
+                <p style={{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.6)',margin:0}}>{v.label}</p>
+                <p style={{fontSize:11,color:'rgba(255,255,255,.35)',margin:'2px 0 0',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{v.title}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AboutUsContent() {
   return (
     <div className="flex-grow flex flex-col font-sans bg-background">
-      <section className="bg-secondary/50 py-24 md:py-32 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, #6141ac 0%, transparent 60%), radial-gradient(circle at 80% 20%, #5B3FA8 0%, transparent 50%)' }} />
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-4xl mx-auto text-center">
+      <section className="py-16 md:py-24" style={{background:'hsl(259 30% 97%)'}}>
+        <div className="container mx-auto px-4">
 
-            <h1 className="text-4xl md:text-6xl font-black text-foreground leading-tight mb-6">
-              Building Transaction
-              <span className="block text-primary">Ready Assets.</span>
-            </h1>
-            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-              India's dedicated marketplace for industrial warehouse leasing — connecting developers, tenants and brokers on one transparent platform.
-            </p>
+          {/* Top label */}
+          <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color:'hsl(259 15% 55%)'}}>lease.orsone.app</p>
+
+          {/* Headline */}
+          <h1 className="text-4xl md:text-5xl font-black mb-4" style={{color:'#1e1537',letterSpacing:'-0.5px',lineHeight:1.1}}>
+            Warehouse &amp; Industrial Building<br className="hidden md:block" /> Sourcing Platform
+          </h1>
+
+          {/* Category pill */}
+          <div className="inline-flex items-center mb-5">
+            <span className="text-xs font-bold tracking-widest uppercase px-3 py-1" style={{background:'#6141ac',color:'#fff',letterSpacing:'.08em'}}>Industrial</span>
           </div>
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto border-t border-primary/10 pt-12">
-            <Stat value="20+" label="Years of Domain Expertise" />
-            <Stat value="3.5M+" label="Sq Ft Transacted" />
-            <Stat value="1" label="Platform. All Stakeholders." />
+
+          {/* Quote */}
+          <blockquote className="border-l-4 pl-4 mb-6 max-w-2xl" style={{borderColor:'#6141ac'}}>
+            <p className="text-base italic" style={{color:'#1e1537'}}>"Warehouse supply and developers are accessible to a limited few. ORS-ONE makes them aggregated and accessible to everyone."</p>
+          </blockquote>
+
+          {/* Description */}
+          <p className="text-sm leading-relaxed mb-10 max-w-2xl" style={{color:'hsl(259 15% 40%)'}}>
+            From first search to possession — a structured, end-to-end transaction system for warehouse and industrial buildings. Start sourcing instantly. Get a quote. Build professional term sheets. Execute MoUs. Track tenant improvements. Take possession.
+          </p>
+
+          {/* Transaction flow */}
+          <div className="mb-12">
+            <p className="text-xs font-bold tracking-widest uppercase mb-5" style={{color:'hsl(259 15% 55%)'}}>Source to Possession — The Complete Transaction Flow</p>
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+              {[
+                {n:'1', title:'Instant Sourcing', body:'Access aggregated warehouse supply and complete technical data immediately.'},
+                {n:'2', title:'Get Quote', body:'Connect directly with developers. Receive commercial terms at your dashboard.'},
+                {n:'3', title:'Build Term Sheets', body:'Generate professional commercial term sheets using our structured system.'},
+                {n:'4', title:'Execute MoU', body:'Finalise agreements within a unified virtual transaction board.'},
+                {n:'5', title:'Track TI', body:'Monitor site readiness and tenant improvement progress in real time.'},
+                {n:'6', title:'Take Possession', body:'Close the gap between signing the lease and starting operations.'},
+              ].map((step) => (
+                <div key={step.n} className="p-4" style={{background:'#fff',border:'0.5px solid hsl(259 30% 88%)'}}>
+                  <div className="w-7 h-7 flex items-center justify-center text-xs font-black text-white mb-3" style={{background:'#1e1537',borderRadius:0}}>
+                    {step.n}
+                  </div>
+                  <p className="text-sm font-bold mb-1" style={{color:'#1e1537'}}>{step.title}</p>
+                  <p className="text-xs leading-relaxed" style={{color:'hsl(259 15% 50%)'}}>{step.body}</p>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Category tiles */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0" style={{border:'0.5px solid hsl(259 30% 88%)'}}>
+            {/* Direct Deal */}
+            <div className="p-6" style={{background:'#fff',borderRight:'0.5px solid hsl(259 30% 88%)'}}>
+              <p className="text-3xl font-black mb-1" style={{color:'#1e1537'}}>10.4M</p>
+              <p className="text-xs mb-4" style={{color:'hsl(259 15% 55%)'}}>sq ft — Direct Deal</p>
+              <p className="text-lg font-bold mb-2" style={{color:'#1e1537'}}>Direct Deal</p>
+              <p className="text-sm leading-relaxed mb-5" style={{color:'hsl(259 15% 45%)'}}>Browse verified listings and negotiate directly with developers on your terms.</p>
+              <a href="/listings" className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2" style={{border:'1.5px solid #1e1537',color:'#1e1537',textDecoration:'none'}}>Browse Listings →</a>
+            </div>
+            {/* ORS Transact */}
+            <div className="p-6" style={{background:'#1e1537',borderRight:'0.5px solid hsl(259 30% 30%)'}}>
+              <p className="text-3xl font-black mb-1" style={{color:'#fff'}}>242.9M</p>
+              <p className="text-xs mb-4" style={{color:'rgba(255,255,255,.5)'}}>sq ft — ORS Transact</p>
+              <p className="text-lg font-bold mb-2" style={{color:'#fff'}}>ORS Transact</p>
+              <p className="text-sm leading-relaxed mb-5" style={{color:'rgba(255,255,255,.6)'}}>Facilitated transaction management from quote to keys. ORS manages the full process.</p>
+              <a href="/ors-transact" className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2" style={{background:'#6141ac',color:'#fff',textDecoration:'none'}}>Explore Pipeline →</a>
+            </div>
+            {/* Stats */}
+            <div className="p-6 flex flex-col justify-center" style={{background:'#fff'}}>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-2xl font-black" style={{color:'#1e1537'}}>20+</p>
+                  <p className="text-xs leading-tight mt-1" style={{color:'hsl(259 15% 55%)'}}>Years domain expertise</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-black" style={{color:'#1e1537'}}>3.5M+</p>
+                  <p className="text-xs leading-tight mt-1" style={{color:'hsl(259 15% 55%)'}}>Sq ft transacted</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-black" style={{color:'#1e1537'}}>242.9M</p>
+                  <p className="text-xs leading-tight mt-1" style={{color:'hsl(259 15% 55%)'}}>Sq ft aggregated</p>
+                </div>
+              </div>
+              <a href="https://lease.orsone.app" className="text-xs font-semibold mt-6 inline-flex items-center gap-1" style={{color:'#6141ac',textDecoration:'none'}}>Open lease.orsone.app →</a>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -153,6 +303,22 @@ export function AboutUsContent() {
             <TimelineItem year="2019" title="Six Years of Deep Market Study" body="Conducted extensive research from 2010 to 2024. The finding was clear: the market does not want a database of aggregated warehouse supplies. It needs a marketplace — to source, engage and transact." accent="#6141ac" />
             <TimelineItem year="2025" title="ORS-ONE — The Marketplace is Born" body="Launched lease.orsone.app — India's dedicated warehouse leasing marketplace. Built on 20 years of domain expertise, 15 years of market study, and the lessons of Followprop." accent="#6141ac" />
           </div>
+        </div>
+      </section>
+
+      {/* Video section */}
+      <section className="py-16 md:py-20" style={{background:'#0d0d0d'}}>
+        <div className="container mx-auto px-4">
+          <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{color:'#6141ac',letterSpacing:'.1em'}}>● Platform in Action</p>
+          <h2 className="text-3xl md:text-4xl font-black mb-3" style={{color:'#fff'}}>
+            See ORS-ONE <span style={{color:'#6141ac'}}>Live.</span>
+          </h2>
+          <p className="text-sm mb-8 max-w-lg" style={{color:'rgba(255,255,255,.5)'}}>
+            Three moments that show you exactly how the platform works — sourcing a warehouse, finding a family connection, and building a transaction.
+          </p>
+
+          {/* Tab selector */}
+          <VideoTabs />
         </div>
       </section>
 
