@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
-import { CheckCircle2, TrendingUp, Building2, Users, FileText, Zap, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, TrendingUp, Building2, Users, FileText, Zap, AlertTriangle, ListChecks } from 'lucide-react';
 import Link from 'next/link';
 import { AdminSidebar } from '@/components/admin-sidebar';
 
