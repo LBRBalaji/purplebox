@@ -227,6 +227,37 @@ export function AboutUsContent() {
         </div>
       </section>
 
+      {/* Auto-run video strip — directly below hero */}
+      <section style={{background:'#0d0d0d',padding:'0'}}>
+        <div style={{maxWidth:'100%',margin:0}}>
+          {/* Playlist chain: m4kQF4LZPXA → FVnvTYpESrI → hm6gBairx-M → l7j_Cjs9c24 */}
+          <div style={{position:'relative',width:'100%',paddingBottom:'42%',background:'#000'}}>
+            <iframe
+              src="https://www.youtube.com/embed/m4kQF4LZPXA?playlist=FVnvTYpESrI,hm6gBairx-M,l7j_Cjs9c24&autoplay=1&mute=1&loop=1&rel=0&modestbranding=1&controls=1&si=MT3U8hYp7R2m39iC"
+              title="ORS-ONE Platform in Action"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              style={{position:'absolute',inset:0,width:'100%',height:'100%',border:'none'}}
+            />
+          </div>
+          {/* Clip labels strip */}
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',background:'#111'}}>
+            {[
+              {n:'01', title:'Negotiation Board', sub:'Term Sheet & TI Tracker'},
+              {n:'02', title:'Off-Platform Deal', sub:'Register on ORS-ONE'},
+              {n:'03', title:'List Excess Space', sub:'Logistics & Manufacturers'},
+              {n:'04', title:'Single Excel', sub:'Technical · Compliance · Commercials'},
+            ].map((c,i) => (
+              <div key={i} style={{padding:'10px 14px',borderRight:i<3?'0.5px solid rgba(255,255,255,.08)':'none'}}>
+                <p style={{fontSize:9,fontWeight:700,color:'#6141ac',letterSpacing:'.08em',margin:'0 0 2px'}}>{c.n}</p>
+                <p style={{fontSize:12,fontWeight:600,color:'rgba(255,255,255,.85)',margin:'0 0 1px'}}>{c.title}</p>
+                <p style={{fontSize:11,color:'rgba(255,255,255,.4)',margin:0}}>{c.sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-20 bg-card">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
