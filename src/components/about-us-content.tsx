@@ -387,22 +387,6 @@ export function AboutUsContent() {
         </div>
       </section>
 
-      {/* Video section */}
-      <section className="py-16 md:py-20" style={{background:'#0d0d0d'}}>
-        <div className="container mx-auto px-4">
-          <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{color:'#6141ac',letterSpacing:'.1em'}}>● Platform in Action</p>
-          <h2 className="text-3xl md:text-4xl font-black mb-3" style={{color:'#fff'}}>
-            See ORS-ONE <span style={{color:'#6141ac'}}>Live.</span>
-          </h2>
-          <p className="text-sm mb-8 max-w-lg" style={{color:'rgba(255,255,255,.5)'}}>
-            Three moments that show you exactly how the platform works — sourcing a warehouse, finding a family connection, and building a transaction.
-          </p>
-
-          {/* Tab selector */}
-          <VideoTabs />
-        </div>
-      </section>
-
       <section className="py-20" style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-black mb-4" style={{color:'#ffffff'}}>Ready to <span style={{color:'#c5b8e8'}}>Reach the Market?</span></h2>
