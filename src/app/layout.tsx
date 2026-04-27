@@ -17,7 +17,16 @@ import { GlobalChatWidget } from '@/components/global-chat';
 
 export const metadata: Metadata = {
   title: 'ORS-ONE: Building Transaction Ready Assets',
-  description: 'Building Transaction Ready Assets',
+  description: 'Warehouse & Industrial Building Sourcing Platform — Sourcing Simplified.',
+  icons: {
+    icon: [
+      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    shortcut: '/favicon-32.png',
+  },
 };
 
 const inter = Inter({
