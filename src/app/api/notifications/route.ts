@@ -32,7 +32,7 @@ export async function GET() {
 
 async function sendEmail(to: string, subject: string, title: string, message: string, href: string) {
   if (!process.env.RESEND_API_KEY) return;
-  const link = href?.startsWith('http') ? href : 'https://lease.orsone.app' + (href || '/dashboard');
+  const link = href?.startsWith('http') ? href : 'https://orsone.app' + (href || '/dashboard');
   try {
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -57,7 +57,7 @@ async function sendEmail(to: string, subject: string, title: string, message: st
     </div>
     <p style="color:#888;font-size:11px;text-align:center;margin-top:16px;">You are receiving this because you are a participant in this transaction on ORS-ONE.</p>
   </div>
-  <p style="color:#bbb;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · lease.orsone.app</p>
+  <p style="color:#bbb;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · orsone.app</p>
 </div>`,
       }),
     });

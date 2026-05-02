@@ -200,7 +200,7 @@ export function AboutUsContent() {
         <div className="container mx-auto px-4">
 
           {/* Top label */}
-          <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color:'hsl(259 15% 55%)'}}>lease.orsone.app</p>
+          <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{color:'hsl(259 15% 55%)'}}>orsone.app</p>
 
           {/* Headline */}
           <h1 className="text-4xl md:text-5xl font-black mb-4" style={{color:'#1e1537',letterSpacing:'-0.5px',lineHeight:1.1}}>
@@ -279,7 +279,7 @@ export function AboutUsContent() {
                   <p className="text-xs leading-tight mt-1" style={{color:'hsl(259 15% 55%)'}}>Sq ft aggregated</p>
                 </div>
               </div>
-              <a href="https://lease.orsone.app" className="text-xs font-semibold mt-6 inline-flex items-center gap-1" style={{color:'#6141ac',textDecoration:'none'}}>Open lease.orsone.app →</a>
+              <a href="https://lakshmibalajio2o.com" className="text-xs font-semibold mt-6 inline-flex items-center gap-1" style={{color:'#6141ac',textDecoration:'none'}}>Open orsone.app →</a>
             </div>
           </div>
 
@@ -382,7 +382,7 @@ export function AboutUsContent() {
             <TimelineItem year="2002" title="Lakshmi Balaji Realty — The Foundation" body="Started real estate broking specialising in industrial buildings and warehouse leasing in Chennai. Over 20+ years, successfully completed lease of over 3.5 million sq ft across Tamil Nadu." accent="#6141ac" />
             <TimelineItem year="2014" title="Followprop — First Digital Attempt" body="Built and operated Followprop — an online platform aggregating 8,000+ warehouses with detailed field inspection reports. A pioneering effort that taught us what the market truly responds to." accent="#6141ac" />
             <TimelineItem year="2019" title="Six Years of Deep Market Study" body="Conducted extensive research from 2010 to 2024. The finding was clear: the market does not want a database of aggregated warehouse supplies. It needs a marketplace — to source, engage and transact." accent="#6141ac" />
-            <TimelineItem year="2025" title="ORS-ONE — The Marketplace is Born" body="Launched lease.orsone.app — India's dedicated warehouse leasing marketplace. Built on 20 years of domain expertise, 15 years of market study, and the lessons of Followprop." accent="#6141ac" />
+            <TimelineItem year="2025" title="ORS-ONE — The Marketplace is Born" body="Launched orsone.app — India's dedicated warehouse leasing marketplace. Built on 20 years of domain expertise, 15 years of market study, and the lessons of Followprop." accent="#6141ac" />
           </div>
         </div>
       </section>
@@ -399,7 +399,7 @@ export function AboutUsContent() {
               <Link href="/signup">Become a Transaction Partner <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
-          <p className="text-xs mt-10" style={{color:'rgba(255,255,255,0.35)'}}>Lakshmi Balaji ORS Private Limited · lease.orsone.app · Building Transaction Ready Assets</p>
+          <p className="text-xs mt-10" style={{color:'rgba(255,255,255,0.35)'}}>Lakshmi Balaji ORS Private Limited · orsone.app · Building Transaction Ready Assets</p>
         </div>
       </section>
     </div>

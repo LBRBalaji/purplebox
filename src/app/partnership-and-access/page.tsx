@@ -15,7 +15,7 @@ export default function PartnershipAndAccessPage() {
 
         <div className="rounded-2xl p-8 mb-8" style={{background:'linear-gradient(135deg,#1e1537 0%,#2d1f52 60%,#3b2870 100%)'}}>
           <p className="text-base leading-relaxed" style={{color:'rgba(255,255,255,0.8)',lineHeight:1.8}}>
-            Drawing on two decades of specialized experience in the industrial sector, <span style={{color:'#fff',fontWeight:600}}>lease.orsone.app</span> has been developed to facilitate a more efficient exchange between market participants. As a dedicated Digital Transaction Platform, it provides a structured environment for Brokers, Clients, and Developers to manage the professional lifecycle of warehouse leasing.
+            Drawing on two decades of specialized experience in the industrial sector, <span style={{color:'#fff',fontWeight:600}}>orsone.app</span> has been developed to facilitate a more efficient exchange between market participants. As a dedicated Digital Transaction Platform, it provides a structured environment for Brokers, Clients, and Developers to manage the professional lifecycle of warehouse leasing.
           </p>
         </div>
 

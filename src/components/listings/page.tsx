@@ -116,7 +116,7 @@ function DownloadBar() {
             'Size (Sq. Ft.)': l.sizeSqFt,
             'Availability': l.availabilityDate,
             'Commercials': 'Request for Quote',
-            'Click to Request Quote': `=HYPERLINK("https://lease.orsone.app/listings/${l.listingId}","Request for Quote")`,
+            'Click to Request Quote': `=HYPERLINK("https://orsone.app/listings/${l.listingId}","Request for Quote")`,
         }));
         const worksheet = XLSX.utils.json_to_sheet(dataToExport);
         XLSX.utils.sheet_add_aoa(worksheet, [[], ["Powered by ORS-ONE | Building Transaction Ready Assets"]], { origin: -1 });

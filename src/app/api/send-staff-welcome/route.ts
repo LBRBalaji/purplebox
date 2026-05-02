@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         <h3 style="color:#6141ac;font-size:16px;font-weight:900;margin:0 0 16px;">Your Assigned Work: Create New Listings</h3>
         <table style="width:100%;border-collapse:collapse;">
           ${[
-            ['Step 1', 'Login', 'Go to <a href="https://lease.orsone.app" style="color:#6141ac;">lease.orsone.app</a> and sign in with your email and temporary password.'],
+            ['Step 1', 'Login', 'Go to <a href="https://lakshmibalajio2o.com" style="color:#6141ac;">orsone.app</a> and sign in with your email and temporary password.'],
             ['Step 2', 'Your Dashboard', 'You will land on your Staff Dashboard. Click the <strong>+ Create New Listing</strong> button at the top right.'],
             ['Step 3', 'Select Developer', 'A form will open. At the top select the developer from the dropdown (e.g. Ejaz Nathani — Welspun One).'],
             ['Step 4', 'Fill the Listing', 'Complete all listing details — location, size, specifications, photos, certifications and commercial terms. Be thorough.'],
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         <div style="background:#f8f6ff;border:1px solid #e0d8f8;border-radius:10px;padding:18px;margin-bottom:20px;">
           <p style="font-size:11px;font-weight:700;color:#9b7ee0;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 12px;">Login Credentials</p>
           <table style="width:100%;border-collapse:collapse;">
-            <tr><td style="padding:6px 0;color:#888;font-size:13px;width:140px;">Platform</td><td style="padding:6px 0;font-size:13px;"><a href="https://lease.orsone.app" style="color:#6141ac;font-weight:700;">lease.orsone.app</a></td></tr>
+            <tr><td style="padding:6px 0;color:#888;font-size:13px;width:140px;">Platform</td><td style="padding:6px 0;font-size:13px;"><a href="https://lakshmibalajio2o.com" style="color:#6141ac;font-weight:700;">orsone.app</a></td></tr>
             <tr><td style="padding:6px 0;color:#888;font-size:13px;">Email</td><td style="padding:6px 0;font-size:13px;font-weight:700;color:#1a1a1a;">${email}</td></tr>
             <tr><td style="padding:6px 0;color:#888;font-size:13px;">Temporary Password</td><td style="padding:6px 0;font-size:15px;font-weight:900;color:#6141ac;letter-spacing:2px;">${password}</td></tr>
             <tr><td style="padding:6px 0;color:#888;font-size:13px;">Your Role</td><td style="padding:6px 0;font-size:13px;font-weight:700;color:#1a1a1a;">${staffRole}</td></tr>
@@ -85,14 +85,14 @@ export async function POST(req: NextRequest) {
         ${workflowSection}
 
         <div style="text-align:center;margin:24px 0 16px;">
-          <a href="https://lease.orsone.app" style="background:#6141ac;color:#fff;padding:12px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">Login to ORS-ONE</a>
+          <a href="https://lakshmibalajio2o.com" style="background:#6141ac;color:#fff;padding:12px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">Login to ORS-ONE</a>
         </div>
 
         <div style="background:#f4f6f9;border-radius:8px;padding:14px;font-size:12px;color:#888;text-align:center;">
           For any queries contact <a href="mailto:balaji@lakshmibalajio2o.com" style="color:#6141ac;">balaji@lakshmibalajio2o.com</a> or +91 98410 98170
         </div>
       </div>
-      <p style="color:#6B7E92;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · ORS-ONE · lease.orsone.app</p>
+      <p style="color:#6B7E92;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · ORS-ONE · orsone.app</p>
     </div>`;
 
     const res = await fetch('https://api.resend.com/emails', {

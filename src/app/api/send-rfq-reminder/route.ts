@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     </div>
     <p style="color:#aaa;font-size:11px;text-align:center;margin:0;">No cost to you. Brokerage is always on the developer's side.</p>
   </div>
-  <p style="color:#bbb;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · lease.orsone.app</p>
+  <p style="color:#bbb;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · orsone.app</p>
 </div>`,
       }),
     });

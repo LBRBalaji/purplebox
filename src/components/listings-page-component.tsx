@@ -260,7 +260,7 @@ function DownloadBar() {
                 'Temp Controlled Area (Sq. Ft.)': l.area?.tempControlledArea || '-',
                 'Non-Temp Controlled Area (Sq. Ft.)': l.area?.nonTempControlledArea || '-',
                 'Commercials': 'Request for Quote',
-                'Click to Request Quote': `=HYPERLINK("https://lease.orsone.app/listings/${l.listingId}","Request for Quote — Click Here")`,
+                'Click to Request Quote': `=HYPERLINK("https://orsone.app/listings/${l.listingId}","Request for Quote — Click Here")`,
                 'Availability / Possession': l.availabilityDate || '-',
                 'Construction Progress': l.constructionProgress || '-',
                 'Building Type': Array.isArray(l.buildingSpecifications?.buildingType) ? l.buildingSpecifications.buildingType.join(', ') : '-',
@@ -287,7 +287,7 @@ function DownloadBar() {
                 'Property Tax': l.certificatesAndApprovals?.propertyTax ? 'Yes' : 'No',
                 'Description': l.description || '-',
                 'Additional Information': l.additionalInformation || '-',
-                'Listed on ORS-ONE': 'lease.orsone.app',
+                'Listed on ORS-ONE': 'orsone.app',
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);

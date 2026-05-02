@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
-const BASE = 'https://lease.orsone.app';
+const BASE = 'https://orsone.app';
 const FROM = 'ORS-ONE <noreply@lakshmibalajio2o.com>';
 
 async function sendEmail(to: string, subject: string, html: string) {
@@ -21,7 +21,7 @@ async function sendEmail(to: string, subject: string, html: string) {
 }
 
 function wrap(title: string, body: string, ctaText: string, ctaHref: string) {
-  return `<div style="font-family:Arial,sans-serif;max-width:540px;margin:0 auto;padding:32px;background:#f4f2fb;"><div style="background:linear-gradient(135deg,#1e1537,#3b2870);padding:20px;text-align:center;margin-bottom:24px;"><h1 style="color:#fff;margin:0;font-size:20px;">ORS-ONE</h1><p style="color:#9b7ee0;margin:6px 0 0;font-size:12px;">Building Transaction Ready Assets</p></div><div style="background:#fff;padding:28px;border:1px solid #e8e2f5;"><h2 style="color:#1e1537;font-size:16px;margin:0 0 12px;">${title}</h2>${body}<div style="text-align:center;margin:24px 0;"><a href="${ctaHref}" style="background:#6141ac;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold;font-size:14px;display:inline-block;">${ctaText} →</a></div><p style="color:#aaa;font-size:11px;text-align:center;">Lakshmi Balaji ORS Private Limited · lease.orsone.app</p></div></div>`;
+  return `<div style="font-family:Arial,sans-serif;max-width:540px;margin:0 auto;padding:32px;background:#f4f2fb;"><div style="background:linear-gradient(135deg,#1e1537,#3b2870);padding:20px;text-align:center;margin-bottom:24px;"><h1 style="color:#fff;margin:0;font-size:20px;">ORS-ONE</h1><p style="color:#9b7ee0;margin:6px 0 0;font-size:12px;">Building Transaction Ready Assets</p></div><div style="background:#fff;padding:28px;border:1px solid #e8e2f5;"><h2 style="color:#1e1537;font-size:16px;margin:0 0 12px;">${title}</h2>${body}<div style="text-align:center;margin:24px 0;"><a href="${ctaHref}" style="background:#6141ac;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold;font-size:14px;display:inline-block;">${ctaText} →</a></div><p style="color:#aaa;font-size:11px;text-align:center;">Lakshmi Balaji ORS Private Limited · orsone.app</p></div></div>`;
 }
 
 async function getAll(path: string) {
