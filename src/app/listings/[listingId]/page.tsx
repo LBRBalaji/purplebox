@@ -386,7 +386,7 @@ export default function ListingDetailPage() {
                 'Inside Flooring': listing.siteSpecifications.typeOfFlooringInside,
                 'Access Road': listing.siteSpecifications.typeOfRoad,
                 'Commercials': 'Request for Quote',
-                'Click to Request Quote': `=HYPERLINK("https://orsone.app/listings/${listing.listingId}","Click here to Request for Quote")`,
+                'Click to Request Quote': `=HYPERLINK("https://lease.orsone.app/listings/${listing.listingId}","Click here to Request for Quote")`,
                 'Crane Support Structure': listing.buildingSpecifications.craneSupportStructureAvailable ? 'Yes' : 'No',
                 'Crane Available': listing.buildingSpecifications.craneAvailable ? 'Yes' : 'No',
                 'Roof Type': listing.buildingSpecifications.roofType,

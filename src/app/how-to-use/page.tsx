@@ -157,7 +157,7 @@ export default function HowToUsePage() {
           </div>
           <h1 className="text-3xl font-black text-foreground mb-3">How To Use ORS-ONE</h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            A step-by-step guide to getting the most out of your developer account on orsone.app
+            A step-by-step guide to getting the most out of your developer account on lease.orsone.app
           </p>
         </div>
 

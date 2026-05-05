@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
             <p style="color:#92400e;font-size:12px;margin:0;">Action required: Call or email customer to confirm availability, then update the ORS Transact record.</p>
           </div>
         </div>
-        <p style="color:#bbb;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · orsone.app</p>
+        <p style="color:#bbb;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · lease.orsone.app</p>
       </div>`
     );
 

@@ -297,7 +297,7 @@ function DownloadBar() {
                 'Property Tax': l.certificatesAndApprovals?.propertyTax ? 'Yes' : 'No',
                 'Description': l.description || '-',
                 'Additional Information': l.additionalInformation || '-',
-                'Listed on ORS-ONE': 'orsone.app',
+                'Listed on ORS-ONE': 'lease.orsone.app',
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);

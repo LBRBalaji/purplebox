@@ -60,7 +60,7 @@ export default function DealMagicLinkPage() {
       }
       pdf.setFillColor(244, 242, 251); pdf.rect(0, pageH - 10, pageW, 10, 'F');
       pdf.setTextColor(97, 65, 172); pdf.setFontSize(7);
-      pdf.text('Lakshmi Balaji ORS Private Limited  ·  orsone.app', pageW / 2, pageH - 4, { align: 'center' });
+      pdf.text('Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app', pageW / 2, pageH - 4, { align: 'center' });
       pdf.save(`ORS-ONE_TermSheet_${lead?.id || 'deal'}_${new Date().toISOString().slice(0,10)}.pdf`);
     } catch(e) { console.error('PDF error:', e); }
     setPdfGenerating(false);

@@ -785,7 +785,7 @@ export function NegotiationBoard({ lead, primaryListing, hideDownload }: { lead:
                 pdf.text(`Transaction: ${lead.id}  ·  ${now.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}`, pageW - mR, 13, { align: 'right' });
                 pdf.setTextColor(155, 126, 224);
                 pdf.setFontSize(7);
-                pdf.text('Lakshmi Balaji ORS Private Limited · orsone.app', mL, 18);
+                pdf.text('Lakshmi Balaji ORS Private Limited · lease.orsone.app', mL, 18);
             };
 
             drawPageHeader();
@@ -968,7 +968,7 @@ export function NegotiationBoard({ lead, primaryListing, hideDownload }: { lead:
                 pdf.setFillColor(30, 21, 55);
                 pdf.rect(0, pageH - 10, pageW, 10, 'F');
                 pdf.setTextColor(155, 126, 224); pdf.setFontSize(6.5); pdf.setFont('helvetica', 'normal');
-                pdf.text('Lakshmi Balaji ORS Private Limited  ·  orsone.app  ·  Building Transaction Ready Assets', pageW / 2, pageH - 4, { align: 'center' });
+                pdf.text('Lakshmi Balaji ORS Private Limited  ·  lease.orsone.app  ·  Building Transaction Ready Assets', pageW / 2, pageH - 4, { align: 'center' });
                 pdf.setTextColor(200, 190, 230);
                 pdf.text(`Page ${p} of ${totalPages}`, pageW - mR, pageH - 4, { align: 'right' });
             }
@@ -1139,7 +1139,7 @@ export function NegotiationBoard({ lead, primaryListing, hideDownload }: { lead:
                       <p className="text-xs mt-1" style={{color:'#888'}}>Draft — Subject to Review and Execution</p>
                       <p className="text-xs" style={{color:'#888'}}>{new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}</p>
                     </div>
-                    <p><strong>This Memorandum of Understanding ("MoU")</strong> is entered into between the parties as identified in Transaction ID <strong>{lead.id}</strong> managed on the ORS-ONE platform (orsone.app), operated by Lakshmi Balaji ORS Private Limited.</p>
+                    <p><strong>This Memorandum of Understanding ("MoU")</strong> is entered into between the parties as identified in Transaction ID <strong>{lead.id}</strong> managed on the ORS-ONE platform (lease.orsone.app), operated by Lakshmi Balaji ORS Private Limited.</p>
                     <div>
                       <p className="font-bold mb-2">1. Parties</p>
                       <p><strong>Tenant/Customer:</strong> {lead.leadName} ({lead.leadEmail})</p>
@@ -1187,7 +1187,7 @@ export function NegotiationBoard({ lead, primaryListing, hideDownload }: { lead:
                       </div>
                     </div>
                     <p className="text-xs text-center pt-4" style={{color:'#aaa',borderTop:'1px solid hsl(259 30% 90%)'}}>
-                      Generated on ORS-ONE · orsone.app · Lakshmi Balaji ORS Private Limited · Transaction ID: {lead.id}
+                      Generated on ORS-ONE · lease.orsone.app · Lakshmi Balaji ORS Private Limited · Transaction ID: {lead.id}
                     </p>
                   </div>
                 </div>
