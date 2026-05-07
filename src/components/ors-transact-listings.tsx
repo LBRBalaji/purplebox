@@ -20,26 +20,33 @@ const SIZE_RANGES = [
   { label: '2,00,000 sft and above', min: 200000, max: 9999999 },
 ];
 
+// Validate Indian mobile number — must start with 6,7,8,9 (not landlines like 44xx)
+function isIndianMobile(digits: string): boolean {
+  const d = digits.replace(/\D/g, '');
+  // 10-digit: starts with 6,7,8,9
+  if (d.length === 10 && /^[6-9]/.test(d)) return true;
+  // 12-digit with 91 prefix: 91 + starts with 6,7,8,9
+  if (d.length === 12 && d.startsWith('91') && /^[6-9]/.test(d.slice(2))) return true;
+  return false;
+}
+
 // Build WhatsApp message for a listing
 function buildWhatsAppUrl(listing: OrsTransactListing): string | null {
-  // Try mobile first, then contact numbers
-  const phone = (
-    listing.for_site_visit_contact_persons_mobile ||
-    listing.contact_number_as_advertised_1 ||
-    listing.contact_number_as_advertised_2 ||
-    listing.contact_number_as_advertised_3 ||
-    listing.for_site_visit_contact_persons_site_phone ||
-    ''
-  ).toString().replace(/\D/g, '');
+  // Try all available numbers, pick first valid Indian mobile
+  const candidates = [
+    listing.for_site_visit_contact_persons_mobile,
+    listing.contact_number_as_advertised_1,
+    listing.contact_number_as_advertised_2,
+    listing.contact_number_as_advertised_3,
+    listing.for_site_visit_contact_persons_site_phone,
+  ].map(v => (v || '').toString().replace(/\D/g, ''))
+   .filter(isIndianMobile);
 
-  if (!phone || phone.length < 7) return null;
+  if (candidates.length === 0) return null;
+  const phone = candidates[0];
 
-  // Normalise Indian numbers — add 91 if needed
-  const normalised = phone.startsWith('91') && phone.length === 12
-    ? phone
-    : phone.length === 10
-      ? `91${phone}`
-      : phone;
+  // Normalise to 12-digit with 91 prefix
+  const normalised = phone.length === 10 ? `91${phone}` : phone;
 
   const location = [listing.city_location, listing.district, listing.state].filter(Boolean).join(', ');
   const size = listing.lease_area_as_advertised_in_sq_ft
@@ -106,7 +113,7 @@ function WhatsAppPanel({ selected, listings, onClose }: {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ fontSize: 12, fontWeight: 600, color: '#1e1537', margin: 0 }}>{l.ors_property_id}</p>
                         <p style={{ fontSize: 11, color: 'hsl(259 15% 55%)', margin: '1px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {[l.city_location, l.district].filter(Boolean).join(', ')} · {phone}
+                          {[l.city_location, l.district].filter(Boolean).join(', ')} · 📱 {phone}
                         </p>
                       </div>
                       <a href={url} target="_blank" rel="noopener noreferrer"
