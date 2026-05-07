@@ -84,9 +84,21 @@ export async function GET(req: NextRequest) {
     const snapshot = await q.get();
     let docs: any[] = snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() }));
 
-    // Size filter in-memory
-    if (sizeMin || sizeMax) {
-      docs = docs.filter(d => {
+    // Size filter — multi-range OR logic via sizeRanges, single range via sizeMin/sizeMax
+    const sizeRanges = url.searchParams.get('sizeRanges') || '';
+    if (sizeRanges) {
+      const ranges = sizeRanges.split(',').map((k: string) => {
+        const [mn, mx] = k.split('-').map(Number);
+        return { min: mn, max: mx };
+      }).filter((r: any) => !isNaN(r.min) && !isNaN(r.max));
+      if (ranges.length > 0) {
+        docs = docs.filter((d: any) => {
+          const sz = Number(d.lease_area_as_advertised_in_sq_ft) || 0;
+          return ranges.some((r: any) => sz >= r.min && sz <= r.max);
+        });
+      }
+    } else if (sizeMin || sizeMax) {
+      docs = docs.filter((d: any) => {
         const sz = Number(d.lease_area_as_advertised_in_sq_ft) || 0;
         if (sizeMin && sz < Number(sizeMin)) return false;
         if (sizeMax && sz > Number(sizeMax)) return false;
@@ -115,7 +127,7 @@ export async function GET(req: NextRequest) {
 
     // For display: if no filters active, use collectionTotal (accurate)
     // If filters active, use filteredTotal (subset)
-    const hasFilters = !!(facilityType || state || district || locality || sizeMin || sizeMax || search);
+    const hasFilters = !!(facilityType || state || district || locality || sizeMin || sizeMax || sizeRanges || search);
     const displayTotal = hasFilters ? filteredTotal : collectionTotal;
 
     // Shuffle with session seed
