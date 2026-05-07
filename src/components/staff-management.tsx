@@ -20,6 +20,8 @@ const ALL_PRIVILEGES = [
   { id: 'view_analytics', label: 'View Analytics' },
   { id: 'data_governance', label: 'Data Governance Tools' },
   { id: 'manage_users_readonly', label: 'View Users (Read Only)' },
+  { id: 'ors_transact_contacts', label: 'ORS Transact — View Contact Details' },
+  { id: 'ors_transact_full', label: 'ORS Transact — Full Access (View + Edit Contacts)' },
 ];
 
 export function StaffManagement() {

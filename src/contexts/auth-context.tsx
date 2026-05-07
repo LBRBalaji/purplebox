@@ -221,13 +221,21 @@ const competitorKeywords = ['realtor', 'realty', 'real estate', 'cbre', 'jll', '
   };const addUser = async (details: NewUser) => {
     const email = details.email.toLowerCase();
     try {
-      await createUserWithEmailAndPassword(auth, email, details.password);
-      const newUser: User = { ...details, email, status: 'pending', createdAt: new Date().toISOString() };
-      await setDoc(doc(db, 'users', email), newUser);
+      // Use server-side Admin SDK API — does NOT sign in as the new user
+      // This prevents the auto-logout bug where createUserWithEmailAndPassword
+      // would switch the Firebase Auth session to the newly created user
+      const res = await fetch('/api/create-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...details, email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create user');
       await fetchUsers();
-      await sendPasswordResetEmail(auth, email);
-    } catch (error) {
-      toast({ variant: 'destructive', title: 'Failed to add user', description: 'Could not create user account.' });
+      // Send password reset so new user can set their own password
+      try { await sendPasswordResetEmail(auth, email); } catch {}
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Failed to add user', description: error.message || 'Could not create user account.' });
     }
   };
 

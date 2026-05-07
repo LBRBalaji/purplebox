@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { Search, Edit2, Trash2, X, ChevronLeft, ChevronRight, Archive } from 'lucide-react';
 import { OrsTransactAdminForm } from './ors-transact-admin-form';
+import { OrsTransactContactPanel } from './ors-transact-contact-panel';
 import { useToast } from '@/hooks/use-toast';
 import type { OrsTransactListing } from '@/lib/ors-transact-schema';
 
@@ -99,6 +100,10 @@ export function OrsTransactManager() {
             style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#6141ac', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 16 }}>
             <ChevronLeft style={{ width: 14, height: 14 }} /> Back to listings
           </button>
+          {/* Contact panel — shown at top for quick access */}
+          <div style={{ marginBottom: 16 }}>
+            <OrsTransactContactPanel listing={editing} onUpdated={() => load(page)} />
+          </div>
           <OrsTransactAdminForm
             existing={editing}
             onSaved={() => {
