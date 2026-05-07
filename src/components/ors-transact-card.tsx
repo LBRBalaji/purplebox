@@ -6,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import type { OrsTransactListing } from '@/lib/ors-transact-schema';
 import { ORS_TRANSACT_FIELDS, GROUP_LABELS } from '@/lib/ors-transact-schema';
 import { OrsTransactContactPanel } from './ors-transact-contact-panel';
-import { ORS_TRANSACT_FIELDS } from '@/lib/ors-transact-schema';
 
 function hasVal(v: any): boolean {
   if (v === null || v === undefined) return false;
