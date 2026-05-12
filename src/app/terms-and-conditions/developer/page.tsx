@@ -17,13 +17,13 @@ export default function DeveloperTermsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl font-bold font-headline tracking-tight">Terms and Conditions — Property Developers</CardTitle>
-            <p className="text-muted-foreground">Last Updated: 31 March 2026 · Lakshmi Balaji ORS Private Limited</p>
+            <p className="text-muted-foreground">Last Updated: 31 March 2026 · Lakshmi Balaji Realty</p>
             <p className="text-muted-foreground mt-2">These Terms apply to you as a Property Developer (Provider) using ORS-ONE. Please read them carefully before signing up.</p>
           </CardHeader>
           <CardContent className="space-y-8">
 
             <Section title="1. About ORS-ONE">
-              <p>ORS-ONE is a warehouse leasing marketplace operated by Lakshmi Balaji ORS Private Limited. We help property developers reach verified business customers looking for warehouse space across India.</p>
+              <p>ORS-ONE is a warehouse leasing marketplace operated by Lakshmi Balaji Realty. We help property developers reach verified business customers looking for warehouse space across India.</p>
             </Section>
 
             <Separator />
@@ -68,7 +68,7 @@ export default function DeveloperTermsPage() {
             </Section>
 
             <Section title="8. Limitation of Liability">
-              <p>ORS-ONE is a facilitating marketplace and is not responsible for the outcome of transactions between you and customers. To the fullest extent permitted by law, Lakshmi Balaji ORS Private Limited shall not be liable for any indirect or consequential damages arising from your use of this platform.</p>
+              <p>ORS-ONE is a facilitating marketplace and is not responsible for the outcome of transactions between you and customers. To the fullest extent permitted by law, Lakshmi Balaji Realty shall not be liable for any indirect or consequential damages arising from your use of this platform.</p>
             </Section>
 
             <Section title="9. Platform Moderation">

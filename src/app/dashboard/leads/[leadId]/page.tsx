@@ -240,7 +240,7 @@ function BrokerageAckPrompt({ lead, brokerName, transactionMode }: { lead: any; 
         <div className="px-4 py-3 text-xs leading-relaxed" style={{background:'hsl(259 30% 97%)',border:'1px solid hsl(259 30% 90%)'}}>
           {transactionMode === 'agent'
             ? `${brokerName} is the appointed agent/broker for this transaction. Industry standard brokerage is payable to ${brokerName} upon successful deal closure.`
-            : `ORS-ONE (Lakshmi Balaji ORS Private Limited) is the Transaction Partner facilitating this deal. Industry standard brokerage is payable to ORS-ONE upon successful deal closure.`}
+            : `ORS-ONE (Lakshmi Balaji Realty) is the Transaction Partner facilitating this deal. Industry standard brokerage is payable to ORS-ONE upon successful deal closure.`}
         </div>
         <label className="flex items-start gap-3 cursor-pointer">
           <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)}

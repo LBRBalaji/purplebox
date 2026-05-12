@@ -155,7 +155,7 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
         <div style={{ width: 26, height: 26, background: '#6141ac', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>SA</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 11, fontWeight: 600, color: '#1e1537', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Super Admin</p>
-          <p style={{ fontSize: 10, color: 'hsl(259 15% 55%)', margin: 0 }}>Lakshmi Balaji ORS</p>
+          <p style={{ fontSize: 10, color: 'hsl(259 15% 55%)', margin: 0 }}>Lakshmi Balaji Realty</p>
         </div>
       </div>
     </div>

@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
           For any queries contact <a href="mailto:balaji@lakshmibalajio2o.com" style="color:#6141ac;">balaji@lakshmibalajio2o.com</a> or +91 98410 98170
         </div>
       </div>
-      <p style="color:#6B7E92;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · ORS-ONE · lease.orsone.app</p>
+      <p style="color:#6B7E92;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji Realty · ORS-ONE · lease.orsone.app</p>
     </div>`;
 
     const res = await fetch('https://api.resend.com/emails', {

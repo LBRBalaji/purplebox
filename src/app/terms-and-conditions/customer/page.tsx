@@ -17,7 +17,7 @@ export default function CustomerTermsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl font-bold font-headline tracking-tight">Terms and Conditions — Customers</CardTitle>
-            <p className="text-muted-foreground">Last Updated: 31 March 2026 · Lakshmi Balaji ORS Private Limited</p>
+            <p className="text-muted-foreground">Last Updated: 31 March 2026 · Lakshmi Balaji Realty</p>
             <p className="text-muted-foreground mt-2">These Terms apply to you as a Customer (Tenant) using ORS-ONE. Please read them carefully before signing up.</p>
           </CardHeader>
           <CardContent className="space-y-8">
@@ -71,7 +71,7 @@ export default function CustomerTermsPage() {
             </Section>
 
             <Section title="9. Limitation of Liability">
-              <p>ORS-ONE is a facilitating marketplace. We are not a party to agreements made between you and developers. To the fullest extent permitted by law, Lakshmi Balaji ORS Private Limited shall not be liable for any indirect or consequential damages arising from your use of this platform.</p>
+              <p>ORS-ONE is a facilitating marketplace. We are not a party to agreements made between you and developers. To the fullest extent permitted by law, Lakshmi Balaji Realty shall not be liable for any indirect or consequential damages arising from your use of this platform.</p>
             </Section>
 
             <Section title="10. Governing Law">

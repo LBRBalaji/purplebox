@@ -57,7 +57,7 @@ async function sendEmail(to: string, subject: string, title: string, message: st
     </div>
     <p style="color:#888;font-size:11px;text-align:center;margin-top:16px;">You are receiving this because you are a participant in this transaction on ORS-ONE.</p>
   </div>
-  <p style="color:#bbb;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · lease.orsone.app</p>
+  <p style="color:#bbb;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji Realty · lease.orsone.app</p>
 </div>`,
       }),
     });

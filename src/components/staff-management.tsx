@@ -58,7 +58,7 @@ export function StaffManagement() {
           email: form.email,
           userName: form.userName,
           phone: form.phone,
-          companyName: 'Lakshmi Balaji ORS Private Limited',
+          companyName: 'Lakshmi Balaji Realty',
           role: 'O2O',
           password: 'ORS@' + Math.random().toString(36).slice(2, 8).toUpperCase(),
           status: 'approved',

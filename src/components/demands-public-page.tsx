@@ -273,7 +273,7 @@ function MatchDialog({ demand, onClose }: { demand: DemandSchema; onClose: () =>
           {demand.isOrsoneTP && (
             <div className="px-4 py-3 text-xs" style={{background:'hsl(259 44% 96%)',border:'1px solid hsl(259 44% 84%)'}}>
               <p style={{color:'hsl(259 15% 40%)',lineHeight:1.7}}>
-                This demand is facilitated by <strong style={{color:'#1e1537'}}>ORS-ONE as Official Transaction Partner</strong>. Industry standard brokerage is payable to Lakshmi Balaji ORS Private Limited upon successful deal closure.
+                This demand is facilitated by <strong style={{color:'#1e1537'}}>ORS-ONE as Official Transaction Partner</strong>. Industry standard brokerage is payable to Lakshmi Balaji Realty upon successful deal closure.
               </p>
             </div>
           )}

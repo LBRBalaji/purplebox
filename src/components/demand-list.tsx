@@ -387,7 +387,7 @@ WareHouse Origin
               <input type="checkbox" checked={brokerageAgreed} onChange={e => setBrokerageAgreed(e.target.checked)}
                 className="mt-0.5 h-4 w-4 accent-purple-600" />
               <span className="text-xs" style={{color:'#1e1537',lineHeight:1.6}}>
-                I, <strong>{user?.userName}</strong> ({user?.companyName}), formally acknowledge that industry standard brokerage is payable to Lakshmi Balaji ORS Private Limited upon successful deal closure for demand <strong>{demand.demandId}</strong>.
+                I, <strong>{user?.userName}</strong> ({user?.companyName}), formally acknowledge that industry standard brokerage is payable to Lakshmi Balaji Realty upon successful deal closure for demand <strong>{demand.demandId}</strong>.
               </span>
             </label>
 
