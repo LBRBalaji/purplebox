@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
   LayoutDashboard, CheckCircle2, Building2, ListChecks, Users, Plus,
-  Zap, Search, Monitor, Plus, Upload, Shield, UserCheck,
+  Zap, Search, Monitor, Upload, Shield, UserCheck,
   RefreshCw, Database, BarChart2, TrendingUp, Globe, MessageSquare,
   Settings, ChevronRight
 } from 'lucide-react';
