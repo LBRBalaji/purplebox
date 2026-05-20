@@ -475,6 +475,8 @@ function PublicDemandCard({ demand }: { demand: DemandSchema }) {
 // ── Main page ────────────────────────────────────────────────────────────────
 export function DemandsPublicPage() {
   const { demands } = useData();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   const [search, setSearch] = React.useState('');
   const [opFilter, setOpFilter] = React.useState<'all' | 'Warehousing' | 'Manufacturing'>('all');
   const [readinessFilter, setReadinessFilter] = React.useState('all');
@@ -497,10 +499,21 @@ export function DemandsPublicPage() {
       <div style={{background:'linear-gradient(135deg,#1e1537,#3b2870)'}}>
         <div className="max-w-6xl mx-auto px-4 py-12">
           <p className="text-xs font-bold mb-2" style={{color:'#9b7ee0',letterSpacing:'0.08em',textTransform:'uppercase'}}>Active Warehouse Demands</p>
-          <h1 className="text-3xl font-bold text-white mb-3">Match Your Listing to a Customer</h1>
-          <p className="text-sm max-w-xl" style={{color:'rgba(255,255,255,0.55)'}}>
-            Verified customers are actively looking for warehouse and industrial space. If your listing matches, submit it directly — ORS-ONE connects both parties.
-          </p>
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-3">Match Your Listing to a Customer</h1>
+              <p className="text-sm max-w-xl" style={{color:'rgba(255,255,255,0.55)'}}>
+                Verified customers are actively looking for warehouse and industrial space. If your listing matches, submit it directly — ORS-ONE connects both parties.
+              </p>
+            </div>
+            {isAdmin && (
+              <a href="/dashboard/operations?section=create-demand"
+                style={{display:'flex',alignItems:'center',gap:6,padding:'9px 16px',background:'#6141ac',color:'#fff',textDecoration:'none',fontSize:13,fontWeight:700,flexShrink:0,marginTop:4}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Demand
+              </a>
+            )}
+          </div>
         </div>
       </div>
 

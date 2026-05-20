@@ -69,7 +69,7 @@ Could you please confirm the current status of this warehouse?
 
 Please reply with the option number.
 
-Team Lakshmi Balaji Realty
+Team ORS-ONE - A *Lakshmi Balaji Realty Platform*.
 https://www.orsone.app/`;
 
   return `https://wa.me/${normalised}?text=${encodeURIComponent(msg)}`;
