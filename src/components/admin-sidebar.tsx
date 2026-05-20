@@ -3,7 +3,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
-  LayoutDashboard, CheckCircle2, Building2, ListChecks, Users,
+  LayoutDashboard, CheckCircle2, Building2, ListChecks, Users, Plus,
   Zap, Search, Monitor, Plus, Upload, Shield, UserCheck,
   RefreshCw, Database, BarChart2, TrendingUp, Globe, MessageSquare,
   Settings, ChevronRight
@@ -35,6 +35,7 @@ export const ADMIN_NAV: NavGroup[] = [
       { label: 'Approval Queue', icon: CheckCircle2, href: '/dashboard/operations', section: 'approval-queue', alert: true },
       { label: 'All Listings', icon: Building2, href: '/dashboard/operations', section: 'all-listings' },
       { label: 'All Demands', icon: ListChecks, href: '/dashboard/operations', section: 'all-demands' },
+      { label: '+ Add Demand', icon: Plus, href: '/dashboard/operations', section: 'create-demand' },
       { label: 'All Leads', icon: Users, href: '/dashboard/operations', section: 'all-leads' },
       { label: 'Engagement Jobs', icon: Zap, href: '/dashboard/operations', section: 'engagement-jobs' },
       { label: 'Search Console', icon: Search, href: '/dashboard/search-console' },
