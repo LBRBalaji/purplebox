@@ -14,6 +14,7 @@ import { OrsTransactManager } from '@/components/ors-transact-manager';
 import { EngagementJobsPanel } from '@/components/engagement-jobs-panel';
 import { GeneralShortlist } from '@/components/general-shortlist';
 import { ProviderLeads } from '@/components/provider-leads';
+import { Plus } from 'lucide-react';
 
 function SectionHeader({ section, onAddDemand }: { section: string; onAddDemand?: () => void }) {
   const allItems = ADMIN_NAV.flatMap(g => g.items.map(i => ({ ...i, group: g.group })));
