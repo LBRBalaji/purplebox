@@ -46,7 +46,7 @@ export const listingSchema = z.object({
   // Availability & Progress
   availabilityDate: z.string().min(1, "Possession Readiness is required."),
   constructionProgress: z.string().optional(),
-  warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse']).optional(),
+  warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse', 'FTWZ - Free Trade Warehouse', 'Custom Bonded Warehouse']).optional(),
 
   // Area
   area: z.object({
@@ -144,7 +144,7 @@ export const GenerateListingDescriptionInputSchema = z.object({
   location: z.string().describe('The geographical location of the property.'),
   sizeSqFt: z.coerce.number().describe('The size of the property in square feet.'),
   availabilityDate: z.string().describe('The readiness of the property for occupancy (e.g., "Ready for Occupancy").'),
-  warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse']).optional().describe('The warehouse model (e.g., Non-Temperature Controlled).'),
+  warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse', 'FTWZ - Free Trade Warehouse', 'Custom Bonded Warehouse']).optional().describe('The warehouse model (e.g., Non-Temperature Controlled).'),
   rentPerSqFt: z.number().optional().describe('The rent per square foot.'),
   buildingType: z.array(z.string()).optional().describe('The type of building (e.g., ["PEB", "RCC"]).'),
   roofType: z.string().optional().describe("The material and type of the roof."),
@@ -259,7 +259,7 @@ export const createPropertySchema = (demand?: DemandSchema) => {
         size: z.coerce.number({invalid_type_error: "Size is required"}).positive("Size must be a positive number"),
         floor: z.enum(['Ground', 'First Floor', 'Multi-Floor']),
         readinessToOccupy: z.enum(['Immediate', 'Within 45 Days', 'Within 90 Days', 'More than 90 Days', 'BTS']),
-        warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse']),
+        warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse', 'FTWZ - Free Trade Warehouse', 'Custom Bonded Warehouse']),
         buildingType: z.enum(['PEB', 'RCC']).optional(),
         safety: z.string().min(1, "Safety details are required"),
         ceilingHeight: z.coerce.number({invalid_type_error: "Ceiling height is required"}).positive("Ceiling height must be a positive number"),
@@ -527,22 +527,68 @@ export type ShareHistoryEntry = z.infer<typeof shareHistoryEntrySchema>;
 
 // Site Options — internal warehouse sourcing/curation inventory.
 // Each record either mirrors an existing ORS-ONE listing (linkedListingId set)
-// or represents a warehouse sourced informally and not yet a full listing.
+// or carries its own details snapshot for a warehouse sourced informally and
+// not yet a full listing. The "details" shape intentionally mirrors the real
+// listing form fields so linked and manually-sourced sites compare cleanly
+// later in a Transaction Docket.
+export const siteOptionDetailsSchema = z.object({
+  location: z.string().min(1, 'Location is required.'),
+  sizeSqFt: z.coerce.number().positive('Size must be a positive number.'),
+  availabilityDate: z.string().optional(),
+  constructionProgress: z.string().optional(),
+  warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse', 'FTWZ - Free Trade Warehouse', 'Custom Bonded Warehouse']).optional(),
+  rentPerSqFt: asOptionalField(z.union([z.coerce.number().positive(), z.literal('Get Quote')])),
+  rentalSecurityDeposit: asOptionalField(z.union([z.coerce.number().positive(), z.literal('Get Quote')])),
+  area: z.object({
+    plinthArea: asOptionalField(z.coerce.number()),
+    mezzanineArea1: asOptionalField(z.coerce.number()),
+    mezzanineArea2: asOptionalField(z.coerce.number()),
+    canopyArea: asOptionalField(z.coerce.number()),
+    driversRestRoomArea: asOptionalField(z.coerce.number()),
+    totalChargeableArea: asOptionalField(z.coerce.number()),
+    tempControlledArea: asOptionalField(z.coerce.number()),
+    nonTempControlledArea: asOptionalField(z.coerce.number()),
+  }).optional(),
+  buildingSpecifications: z.object({
+    buildingType: z.array(z.string()).optional(),
+    numberOfDocksAndShutters: asOptionalField(z.coerce.number()),
+    internalLighting: z.string().optional(),
+    warehouseLayoutAvailable: z.boolean().optional(),
+    craneSupportStructureAvailable: z.boolean().optional(),
+    craneAvailable: z.boolean().optional(),
+    roofType: z.enum(['Galvalume', 'RCC', 'ACC']).optional(),
+    eveHeightMeters: asOptionalField(z.coerce.number()),
+    roofInsulation: z.enum(['Insulated', 'Non-Insulated']).optional(),
+    ventilation: z.enum(['Turbo', 'Ridge']).optional(),
+    louvers: z.boolean().optional(),
+  }).optional(),
+  siteSpecifications: z.object({
+    typeOfFlooringInside: z.enum(['FM2', 'VDF-RCC', 'RCC', 'PCC']).optional(),
+    typeOfRoad: z.enum(['Tar', 'RCC', 'PCC', 'Gravel']).optional(),
+  }).optional(),
+  certificatesAndApprovals: z.object({
+    parkApproval: z.boolean().default(false),
+    buildingApproval: z.boolean().default(false),
+    fireLicense: z.boolean().default(false),
+    fireNOC: z.boolean().default(false),
+    buildingInsurance: z.boolean().default(false),
+    pcbForAir: z.boolean().default(false),
+    pcbForWater: z.boolean().default(false),
+    propertyTax: z.boolean().default(false),
+  }).optional(),
+  documents: z.array(documentSchema).optional(),
+  description: z.string().optional(),
+  additionalInformation: z.string().optional(),
+});
+export type SiteOptionDetails = z.infer<typeof siteOptionDetailsSchema>;
+
 export const siteOptionSchema = z.object({
   siteOptionId: z.string(),
   linkedListingId: z.string().optional(),
-  location: z.string().min(1, 'Location is required.'),
-  warehouseType: z.enum(['Standalone', 'Multi-tenant', 'Built-to-suit', 'Cold storage']).default('Standalone'),
-  sizeSqFt: z.coerce.number().positive('Size must be a positive number.'),
-  transactionType: z.enum(['Lease', 'Sale']).default('Lease'),
-  rentPerSqFt: asOptionalField(z.coerce.number()),
-  saleRatePerSqFt: asOptionalField(z.coerce.number()),
-  clearHeightMeters: asOptionalField(z.coerce.number()),
-  dockDoors: asOptionalField(z.coerce.number()),
-  fireNocStatus: z.enum(['In place', 'Pending', 'Not applicable']).optional(),
+  details: siteOptionDetailsSchema,
   demandIds: z.array(z.string()).optional().default([]),
   sourceNotes: z.string().optional(),
-  status: z.enum(['active', 'archived']).default('active'),
+  siteStatus: z.enum(['active', 'archived']).default('active'),
   sourcedBy: z.string().optional(),
   createdAt: z.string().datetime().optional(),
   createdBy: z.string().optional(),

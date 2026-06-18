@@ -44,7 +44,7 @@ export function useSiteOptions() {
   }, [fetchSiteOptions]);
 
   const archiveSiteOption = React.useCallback(async (siteOptionId: string) => {
-    await updateSiteOption(siteOptionId, { status: 'archived' });
+    await updateSiteOption(siteOptionId, { siteStatus: 'archived' });
   }, [updateSiteOption]);
 
   return { siteOptions, isLoading, addSiteOption, updateSiteOption, archiveSiteOption, refetch: fetchSiteOptions };

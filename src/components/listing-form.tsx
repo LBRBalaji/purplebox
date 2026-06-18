@@ -521,6 +521,8 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                                         <SelectItem value="Temperature Controlled">Temperature Controlled</SelectItem>
                                         <SelectItem value="Temp & Non-Temp Controlled">Temp & Non-Temp Controlled</SelectItem>
                                         <SelectItem value="3PL Operated Warehouse">3PL Operated Warehouse</SelectItem>
+                                        <SelectItem value="FTWZ - Free Trade Warehouse">FTWZ - Free Trade Warehouse</SelectItem>
+                                        <SelectItem value="Custom Bonded Warehouse">Custom Bonded Warehouse</SelectItem>
                                     </SelectContent></Select><FormMessage /></FormItem>
                                 )} />
                                 {warehouseModel === 'Temp & Non-Temp Controlled' && (
