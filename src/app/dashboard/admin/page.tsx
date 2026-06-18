@@ -150,11 +150,12 @@ export default function AdminDashboard() {
         {/* Quick nav */}
         <div style={{ marginBottom: 20 }}>
           <p style={{ fontSize: 10, fontWeight: 700, color: 'hsl(259 15% 55%)', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: 10 }}>Quick actions</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'hsl(259 30% 88%)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 1, background: 'hsl(259 30% 88%)' }}>
             {[
               { label: 'Manage Users', sub: `${pendingUsers.length} pending`, href: '/dashboard/manage-users', icon: Users, warn: pendingUsers.length > 0 },
               { label: 'All Listings', sub: `${approvedListings.length} active`, href: '/dashboard/operations?section=all-listings', icon: Building2 },
               { label: 'All Demands', sub: `${demands.length} active`, href: '/dashboard/operations?section=all-demands', icon: ListChecks },
+              { label: 'Create Demand', sub: 'Add a new demand', href: '/dashboard/operations?section=create-demand', icon: FileText },
               { label: 'Engagement Jobs', sub: 'Automate outreach', href: '/dashboard/operations?section=engagement-jobs', icon: Zap },
             ].map((nav, i) => (
               <Link key={i} href={nav.href}

@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
               This is a computer-generated receipt. For queries, contact balaji@lakshmibalajio2o.com
             </div>
           </div>
-          <p style="color:#6B7E92;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji ORS Private Limited · ORS-ONE</p>
+          <p style="color:#6B7E92;font-size:11px;text-align:center;margin-top:16px;">Lakshmi Balaji Realty · ORS-ONE</p>
         </div>`,
       }),
     });

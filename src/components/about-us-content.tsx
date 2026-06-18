@@ -399,7 +399,7 @@ export function AboutUsContent() {
               <Link href="/signup">Become a Transaction Partner <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
-          <p className="text-xs mt-10" style={{color:'rgba(255,255,255,0.35)'}}>Lakshmi Balaji ORS Private Limited · lease.orsone.app · Building Transaction Ready Assets</p>
+          <p className="text-xs mt-10" style={{color:'rgba(255,255,255,0.35)'}}>Lakshmi Balaji Realty · lease.orsone.app · Building Transaction Ready Assets</p>
         </div>
       </section>
     </div>

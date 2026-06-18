@@ -20,6 +20,8 @@ const ALL_PRIVILEGES = [
   { id: 'view_analytics', label: 'View Analytics' },
   { id: 'data_governance', label: 'Data Governance Tools' },
   { id: 'manage_users_readonly', label: 'View Users (Read Only)' },
+  { id: 'ors_transact_contacts', label: 'ORS Transact — View Contact Details' },
+  { id: 'ors_transact_full', label: 'ORS Transact — Full Access (View + Edit Contacts)' },
 ];
 
 export function StaffManagement() {
@@ -56,7 +58,7 @@ export function StaffManagement() {
           email: form.email,
           userName: form.userName,
           phone: form.phone,
-          companyName: 'Lakshmi Balaji ORS Private Limited',
+          companyName: 'Lakshmi Balaji Realty',
           role: 'O2O',
           password: 'ORS@' + Math.random().toString(36).slice(2, 8).toUpperCase(),
           status: 'approved',

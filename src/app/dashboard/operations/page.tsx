@@ -14,21 +14,30 @@ import { OrsTransactManager } from '@/components/ors-transact-manager';
 import { EngagementJobsPanel } from '@/components/engagement-jobs-panel';
 import { GeneralShortlist } from '@/components/general-shortlist';
 import { ProviderLeads } from '@/components/provider-leads';
+import { Plus } from 'lucide-react';
 
-function SectionHeader({ section }: { section: string }) {
+function SectionHeader({ section, onAddDemand }: { section: string; onAddDemand?: () => void }) {
   const allItems = ADMIN_NAV.flatMap(g => g.items.map(i => ({ ...i, group: g.group })));
   const current = allItems.find(i => i.section === section || (!i.section && i.href?.endsWith(section)));
   if (!current) return null;
   const Icon = current.icon;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, paddingBottom: 14, borderBottom: '0.5px solid hsl(259 30% 90%)' }}>
-      <div style={{ width: 30, height: 30, background: 'hsl(259 44% 94%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <Icon style={{ width: 14, height: 14, color: '#6141ac' }} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, paddingBottom: 14, borderBottom: '0.5px solid hsl(259 30% 90%)', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 30, height: 30, background: 'hsl(259 44% 94%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Icon style={{ width: 14, height: 14, color: '#6141ac' }} />
+        </div>
+        <div>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#1e1537', margin: 0 }}>{current.label}</p>
+          <p style={{ fontSize: 11, color: 'hsl(259 15% 55%)', margin: 0 }}>{current.group}</p>
+        </div>
       </div>
-      <div>
-        <p style={{ fontSize: 14, fontWeight: 700, color: '#1e1537', margin: 0 }}>{current.label}</p>
-        <p style={{ fontSize: 11, color: 'hsl(259 15% 55%)', margin: 0 }}>{current.group}</p>
-      </div>
+      {section === 'all-demands' && (
+        <button onClick={() => onAddDemand?.()}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#6141ac', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, borderRadius: 0 }}>
+          <Plus style={{ width: 13, height: 13 }} /> Add Demand
+        </button>
+      )}
     </div>
   );
 }
@@ -70,7 +79,7 @@ export default function OperationsPage() {
       <AdminSidebar pendingCount={pendingCount} />
 
       <div id="ops-content" style={{ flex: 1, padding: '24px 28px 56px', overflow: 'auto' }}>
-        <SectionHeader section={section} />
+        <SectionHeader section={section} onAddDemand={() => go('create-demand')} />
         <div>
           {section === 'approval-queue' && <ApprovalQueue />}
           {section === 'all-listings' && <AdminListings />}

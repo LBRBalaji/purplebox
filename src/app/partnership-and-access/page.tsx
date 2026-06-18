@@ -89,7 +89,7 @@ export default function PartnershipAndAccessPage() {
             <p className="text-xs" style={{color:'#aaa'}}>
               Questions? Contact <a href="mailto:balaji@lakshmibalajio2o.com" style={{color:'#6141ac',textDecoration:'underline'}}>balaji@lakshmibalajio2o.com</a>
             </p>
-            <p className="text-xs mt-2" style={{color:'#ccc'}}>Lakshmi Balaji ORS Private Limited · Building Transaction Ready Assets</p>
+            <p className="text-xs mt-2" style={{color:'#ccc'}}>Lakshmi Balaji Realty · Building Transaction Ready Assets</p>
           </div>
         </div>
       </div>

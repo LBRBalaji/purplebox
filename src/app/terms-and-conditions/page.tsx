@@ -32,7 +32,7 @@ export default function TermsAndConditionsPage() {
           <CardContent className="space-y-8">
 
             <Section title="1. About ORS-ONE">
-              <p>ORS-ONE is a warehouse leasing marketplace operated by Lakshmi Balaji ORS Private Limited. Our platform connects customers looking for warehouse space with property developers who have space available. We also facilitate transactions through our team of professionals.</p>
+              <p>ORS-ONE is a warehouse leasing marketplace operated by Lakshmi Balaji Realty. Our platform connects customers looking for warehouse space with property developers who have space available. We also facilitate transactions through our team of professionals.</p>
             </Section>
 
             <Separator />
@@ -73,11 +73,11 @@ export default function TermsAndConditionsPage() {
             </Section>
 
             <Section title="8. Limitation of Liability">
-              <p>To the fullest extent permitted by law, Lakshmi Balaji ORS Private Limited, its promoters, directors, and employees shall not be liable for any indirect or consequential damages arising from your use of this platform. ORS-ONE is a facilitating marketplace and is not a party to agreements made between users.</p>
+              <p>To the fullest extent permitted by law, Lakshmi Balaji Realty, its promoters, directors, and employees shall not be liable for any indirect or consequential damages arising from your use of this platform. ORS-ONE is a facilitating marketplace and is not a party to agreements made between users.</p>
             </Section>
 
             <Section title="9. Intellectual Property">
-              <p>All content, design, and features of ORS-ONE are the exclusive property of Lakshmi Balaji ORS Private Limited. Reproduction or distribution of platform content without written permission is prohibited.</p>
+              <p>All content, design, and features of ORS-ONE are the exclusive property of Lakshmi Balaji Realty. Reproduction or distribution of platform content without written permission is prohibited.</p>
             </Section>
 
             <Section title="10. Governing Law">

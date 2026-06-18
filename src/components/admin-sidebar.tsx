@@ -3,8 +3,8 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
-  LayoutDashboard, CheckCircle2, Building2, ListChecks, Users,
-  Zap, Search, Monitor, Plus, Upload, Shield, UserCheck,
+  LayoutDashboard, CheckCircle2, Building2, ListChecks, Users, Plus,
+  Zap, Search, Monitor, Upload, Shield, UserCheck,
   RefreshCw, Database, BarChart2, TrendingUp, Globe, MessageSquare,
   Settings, ChevronRight
 } from 'lucide-react';
@@ -35,6 +35,7 @@ export const ADMIN_NAV: NavGroup[] = [
       { label: 'Approval Queue', icon: CheckCircle2, href: '/dashboard/operations', section: 'approval-queue', alert: true },
       { label: 'All Listings', icon: Building2, href: '/dashboard/operations', section: 'all-listings' },
       { label: 'All Demands', icon: ListChecks, href: '/dashboard/operations', section: 'all-demands' },
+      { label: '+ Add Demand', icon: Plus, href: '/dashboard/operations', section: 'create-demand' },
       { label: 'All Leads', icon: Users, href: '/dashboard/operations', section: 'all-leads' },
       { label: 'Engagement Jobs', icon: Zap, href: '/dashboard/operations', section: 'engagement-jobs' },
       { label: 'Search Console', icon: Search, href: '/dashboard/search-console' },
@@ -155,7 +156,7 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
         <div style={{ width: 26, height: 26, background: '#6141ac', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>SA</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 11, fontWeight: 600, color: '#1e1537', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Super Admin</p>
-          <p style={{ fontSize: 10, color: 'hsl(259 15% 55%)', margin: 0 }}>Lakshmi Balaji ORS</p>
+          <p style={{ fontSize: 10, color: 'hsl(259 15% 55%)', margin: 0 }}>Lakshmi Balaji Realty</p>
         </div>
       </div>
     </div>

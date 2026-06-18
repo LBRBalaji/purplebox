@@ -1,10 +1,11 @@
 'use client';
 import * as React from 'react';
-import { MapPin, Building2, ArrowRight, AlertTriangle, LogIn } from 'lucide-react';
+import { MapPin, Building2, ArrowRight, AlertTriangle, LogIn, ChevronDown, ExternalLink, X, Phone, User } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import type { OrsTransactListing } from '@/lib/ors-transact-schema';
-import { ORS_TRANSACT_FIELDS } from '@/lib/ors-transact-schema';
+import { ORS_TRANSACT_FIELDS, GROUP_LABELS } from '@/lib/ors-transact-schema';
+import { OrsTransactContactPanel } from './ors-transact-contact-panel';
 
 function hasVal(v: any): boolean {
   if (v === null || v === undefined) return false;
@@ -178,10 +179,81 @@ function ConfirmModal({ listing, onClose }: { listing: OrsTransactListing; onClo
   );
 }
 
+// ── Admin Detail Drawer ──────────────────────────────────────────────────────
+function AdminDetailDrawer({ listing, onClose }: { listing: OrsTransactListing; onClose: () => void }) {
+  // All populated public + level-2 fields grouped
+  const grouped = React.useMemo(() => {
+    const groups: Record<string, { label: string; value: string }[]> = {};
+    ORS_TRANSACT_FIELDS.forEach(f => {
+      const v = listing[f.key];
+      if (!v || String(v).trim() === '' || String(v).toLowerCase() === 'null') return;
+      const g = f.group;
+      if (!groups[g]) groups[g] = [];
+      groups[g].push({ label: f.label, value: String(v) });
+    });
+    return groups;
+  }, [listing]);
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex' }}>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{ flex: 1, background: 'rgba(30,21,55,0.5)' }} />
+      {/* Drawer */}
+      <div style={{ width: '100%', maxWidth: 520, background: '#fff', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+        {/* Header */}
+        <div style={{ background: '#1e1537', padding: '14px 18px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+              <span style={{ fontSize: 10, fontWeight: 600, background: 'hsl(259 44% 14%)', color: 'hsl(259 44% 88%)', padding: '2px 8px', letterSpacing: '.05em' }}>ORS Transact</span>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,.4)' }}>{listing.ors_property_id}</span>
+            </div>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', margin: '0 0 2px' }}>{listing.facility_type || 'Facility'} · {listing.city_location || listing.district}</p>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,.45)', margin: 0 }}>{[listing.locality_circle, listing.district, listing.state].filter(Boolean).join(' · ')}</p>
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <a href={`/dashboard/operations?section=ors-transact-manage`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,.7)', textDecoration: 'none', padding: '4px 8px', border: '0.5px solid rgba(255,255,255,.2)' }}>
+              <ExternalLink style={{ width: 11, height: 11 }} /> Edit in Operations
+            </a>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.5)', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: 4 }}>✕</button>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
+          {/* Contact panel — admin only */}
+          <div style={{ marginBottom: 16 }}>
+            <OrsTransactContactPanel listing={listing} />
+          </div>
+
+          {/* All populated fields grouped */}
+          {Object.entries(grouped).map(([group, fields]) => (
+            <div key={group} style={{ marginBottom: 14 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#6141ac', letterSpacing: '.06em', textTransform: 'uppercase', margin: '0 0 8px', paddingBottom: 4, borderBottom: '0.5px solid hsl(259 30% 90%)' }}>
+                {GROUP_LABELS[group as keyof typeof GROUP_LABELS] || group}
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                {fields.map(f => (
+                  <div key={f.label} style={{ display: 'flex', gap: 8, padding: '4px 0', borderBottom: '0.5px solid hsl(259 30% 95%)' }}>
+                    <span style={{ flex: '0 0 180px', fontSize: 11, color: 'hsl(259 15% 55%)', lineHeight: 1.5 }}>{f.label}</span>
+                    <span style={{ flex: 1, fontSize: 11, fontWeight: 500, color: '#1e1537', lineHeight: 1.5 }}>{f.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── ORS Transact Card ─────────────────────────────────────────────────────────
 export function OrsTransactCard({ listing }: { listing: OrsTransactListing }) {
   const { user } = useAuth();
   const [showModal, setShowModal] = React.useState(false);
+  const [showDetail, setShowDetail] = React.useState(false);
+  const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
 
   const facilityType = listing.facility_type;
   const city = listing.city_location;
@@ -269,6 +341,16 @@ export function OrsTransactCard({ listing }: { listing: OrsTransactListing }) {
           </div>
         </div>
 
+        {/* Admin: Detailed View button */}
+        {isAdmin && (
+          <div style={{ padding: '0 14px 6px' }}>
+            <button onClick={() => setShowDetail(true)}
+              style={{ width: '100%', padding: '7px 0', background: 'hsl(259 44% 96%)', color: '#6141ac', fontSize: 11, fontWeight: 600, border: '0.5px solid hsl(259 44% 80%)', cursor: 'pointer', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+              <ChevronDown style={{ width: 12, height: 12 }} /> Detailed View
+            </button>
+          </div>
+        )}
+
         {/* CTA */}
         <div style={{ padding: '0 14px 12px' }}>
           {user ? (
@@ -289,6 +371,7 @@ export function OrsTransactCard({ listing }: { listing: OrsTransactListing }) {
       </div>
 
       {showModal && <ConfirmModal listing={listing} onClose={() => setShowModal(false)} />}
+      {showDetail && <AdminDetailDrawer listing={listing} onClose={() => setShowDetail(false)} />}
     </>
   );
 }
