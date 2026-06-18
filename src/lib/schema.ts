@@ -524,3 +524,28 @@ export const shareHistoryEntrySchema = z.object({
   timestamp: z.string().datetime(),
 });
 export type ShareHistoryEntry = z.infer<typeof shareHistoryEntrySchema>;
+
+// Site Options — internal warehouse sourcing/curation inventory.
+// Each record either mirrors an existing ORS-ONE listing (linkedListingId set)
+// or represents a warehouse sourced informally and not yet a full listing.
+export const siteOptionSchema = z.object({
+  siteOptionId: z.string(),
+  linkedListingId: z.string().optional(),
+  location: z.string().min(1, 'Location is required.'),
+  warehouseType: z.enum(['Standalone', 'Multi-tenant', 'Built-to-suit', 'Cold storage']).default('Standalone'),
+  sizeSqFt: z.coerce.number().positive('Size must be a positive number.'),
+  transactionType: z.enum(['Lease', 'Sale']).default('Lease'),
+  rentPerSqFt: asOptionalField(z.coerce.number()),
+  saleRatePerSqFt: asOptionalField(z.coerce.number()),
+  clearHeightMeters: asOptionalField(z.coerce.number()),
+  dockDoors: asOptionalField(z.coerce.number()),
+  fireNocStatus: z.enum(['In place', 'Pending', 'Not applicable']).optional(),
+  demandIds: z.array(z.string()).optional().default([]),
+  sourceNotes: z.string().optional(),
+  status: z.enum(['active', 'archived']).default('active'),
+  sourcedBy: z.string().optional(),
+  createdAt: z.string().datetime().optional(),
+  createdBy: z.string().optional(),
+  updatedAt: z.string().datetime().optional(),
+});
+export type SiteOptionSchema = z.infer<typeof siteOptionSchema>;

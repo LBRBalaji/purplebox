@@ -49,6 +49,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             router.push('/dashboard');
         }
 
+        // Site Options is for Admins and O2O Managers only
+        if (pathname.startsWith('/dashboard/site-options') && !isAdmin) {
+            router.push('/dashboard');
+        }
+
         // Transactions page is for Admins, O2O Managers and all Agents
         if (pathname.startsWith('/dashboard/transactions') && !isSuperAdmin && !isO2OManager && !isAgent) {
             router.push('/dashboard');

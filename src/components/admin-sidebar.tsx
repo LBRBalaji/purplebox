@@ -6,7 +6,7 @@ import {
   LayoutDashboard, CheckCircle2, Building2, ListChecks, Users, Plus,
   Zap, Search, Monitor, Upload, Shield, UserCheck,
   RefreshCw, Database, BarChart2, TrendingUp, Globe, MessageSquare,
-  Settings, ChevronRight
+  Settings, ChevronRight, Warehouse
 } from 'lucide-react';
 
 interface NavItem {
@@ -39,6 +39,12 @@ export const ADMIN_NAV: NavGroup[] = [
       { label: 'All Leads', icon: Users, href: '/dashboard/operations', section: 'all-leads' },
       { label: 'Engagement Jobs', icon: Zap, href: '/dashboard/operations', section: 'engagement-jobs' },
       { label: 'Search Console', icon: Search, href: '/dashboard/search-console' },
+    ],
+  },
+  {
+    group: 'Sourcing',
+    items: [
+      { label: 'Site Options', icon: Warehouse, href: '/dashboard/site-options' },
     ],
   },
   {
