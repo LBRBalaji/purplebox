@@ -529,3 +529,57 @@ export type ShareHistoryEntry = z.infer<typeof shareHistoryEntrySchema>;
 
 // Site Options sourced listings use ListingSchema with status === 'sourced'.
 // No separate schema needed — see src/hooks/use-site-options.ts.
+
+// ── Transaction Docket ────────────────────────────────────────────────────────
+// A client-facing comparison of multiple warehouse options, built from the
+// Site Options inventory. Shareable via a no-login token link.
+
+export const docketParamSchema = z.object({
+  paramId: z.string(),
+  label: z.string(),
+  groupLabel: z.string(),
+  level: z.union([z.literal(1), z.literal(2)]),
+  order: z.number(),
+});
+export type DocketParam = z.infer<typeof docketParamSchema>;
+
+export const docketContactSchema = z.object({
+  name: z.string().optional(),
+  representing: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+});
+
+export const transactionDocketSchema = z.object({
+  docketId: z.string(),
+  title: z.string().min(1, 'Title is required.'),
+  clientName: z.string().min(1, 'Client name is required.'),
+  clientCompany: z.string().optional(),
+  clientEmail: z.string().email().optional(),
+  demandId: z.string().optional(),
+  siteIds: z.array(z.string()),
+  params: z.array(docketParamSchema),
+  cellData: z.record(z.string()).default({}),
+  cellFlags: z.record(z.enum(['red', 'yellow'])).default({}),
+  siteStatuses: z.record(z.string()).default({}),
+  statusHistory: z.array(z.object({
+    listingId: z.string(),
+    level: z.number(),
+    from: z.string().optional(),
+    to: z.string(),
+    by: z.enum(['admin', 'client']),
+    at: z.string(),
+  })).default([]),
+  stage: z.union([z.literal(1), z.literal(2)]).default(1),
+  shareToken: z.string(),
+  contacts: z.object({
+    accountOwner: docketContactSchema.optional(),
+    transactionPartner: docketContactSchema.optional(),
+    coPartners: z.array(docketContactSchema).default([]),
+  }).default({}),
+  archived: z.boolean().default(false),
+  createdBy: z.string().optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+});
+export type TransactionDocket = z.infer<typeof transactionDocketSchema>;
