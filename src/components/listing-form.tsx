@@ -52,6 +52,7 @@ type ListingFormProps = {
   onSubmit: (data: ListingSchema) => void;
   locationCircles?: LocationCircle[];
   initialIntent?: 'approve';
+  sourcedMode?: boolean; // When true: hides dev picker, defaults status to 'sourced', adjusts title
 };
 
 const buildingTypes = [
@@ -95,7 +96,7 @@ async function uploadFiles(files: File[]): Promise<UploadResult[]> {
 }
 
 
-export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationCircles = [], initialIntent }: ListingFormProps) {
+export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationCircles = [], initialIntent, sourcedMode = false }: ListingFormProps) {
   const { user, users } = useAuth();
   const { toast } = useToast();
   const isEditMode = !!listing;
@@ -126,7 +127,7 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
       const defaultValues = isEditMode && listing ? 
             {...listing, plan: listing.plan || 'Free', documents: listing.documents || []} : 
             {
-              status: 'pending' as const,
+              status: (sourcedMode ? 'sourced' : 'pending') as 'sourced' | 'pending',
               developerId: (canCreateForDeveloper && selectedDeveloperId) ? selectedDeveloperId : user?.email || '',
               listingId: `LST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
               plan: 'Free' as const,
@@ -340,14 +341,20 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
             }}
         >
           <DialogHeader>
-            <DialogTitle>{isEditMode ? 'Edit Warehouse Listing' : 'Create a New Warehouse Listing'}</DialogTitle>
+            <DialogTitle>
+              {sourcedMode
+                ? (isEditMode ? 'Edit site option' : 'Add to site inventory')
+                : (isEditMode ? 'Edit Warehouse Listing' : 'Create a New Warehouse Listing')}
+            </DialogTitle>
             <DialogDescription>
-              {isEditMode ? 'Update the details for this listing.' : 'Fill out the form to create a new warehouse listing for admin approval.'}
+              {sourcedMode
+                ? (isEditMode ? 'Update the details for this sourced site.' : 'Capture the full warehouse details for your internal sourcing inventory.')
+                : (isEditMode ? 'Update the details for this listing.' : 'Fill out the form to create a new warehouse listing for admin approval.')}
             </DialogDescription>
           </DialogHeader>
             <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmitWrapper, onInvalidSubmit)}>
-              {canCreateForDeveloper && !listing && (
+              {!sourcedMode && canCreateForDeveloper && !listing && (
                 <div className="px-6 pt-4 pb-2">
                   <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
                     <label className="text-xs font-bold text-primary uppercase tracking-wide mb-2 block">Creating on behalf of Developer</label>

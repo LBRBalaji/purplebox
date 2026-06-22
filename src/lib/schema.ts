@@ -20,7 +20,7 @@ export const listingSchema = z.object({
   // System Metadata
   listingId: z.string(),
   developerId: z.string(), // references userId
-  status: z.enum(['pending', 'approved', 'rejected', 'leased', 'draft', 'pending_consent']),
+  status: z.enum(['pending', 'approved', 'rejected', 'leased', 'draft', 'pending_consent', 'sourced']),
   plan: z.enum(['Free', 'Paid_Premium']).optional().default('Paid_Premium'),
   listingType: z.enum(['Owner', 'Sublease']).optional().default('Owner'),
   createdAt: z.string().datetime().optional(),
@@ -114,6 +114,8 @@ export const listingSchema = z.object({
   developerWebsite: z.string().url().optional(),
   projectName: z.string().optional(),
   siteDetails: z.string().optional(),
+  // Sourced listing demand links — only set on status==='sourced' records from Site Options
+  demandIds: z.array(z.string()).optional(),
   // This is a temporary field to pass admin status to the refinement
   isAdmin: z.boolean().optional(),
 }).superRefine((data, ctx) => {
@@ -525,73 +527,5 @@ export const shareHistoryEntrySchema = z.object({
 });
 export type ShareHistoryEntry = z.infer<typeof shareHistoryEntrySchema>;
 
-// Site Options — internal warehouse sourcing/curation inventory.
-// Each record either mirrors an existing ORS-ONE listing (linkedListingId set)
-// or carries its own details snapshot for a warehouse sourced informally and
-// not yet a full listing. The "details" shape intentionally mirrors the real
-// listing form fields so linked and manually-sourced sites compare cleanly
-// later in a Transaction Docket.
-export const siteOptionDetailsSchema = z.object({
-  location: z.string().min(1, 'Location is required.'),
-  sizeSqFt: z.coerce.number().positive('Size must be a positive number.'),
-  availabilityDate: z.string().optional(),
-  constructionProgress: z.string().optional(),
-  warehouseModel: z.enum(['Non-Temperature Controlled', 'Temperature Controlled', 'Temp & Non-Temp Controlled', '3PL Operated Warehouse', 'FTWZ - Free Trade Warehouse', 'Custom Bonded Warehouse']).optional(),
-  rentPerSqFt: asOptionalField(z.union([z.coerce.number().positive(), z.literal('Get Quote')])),
-  rentalSecurityDeposit: asOptionalField(z.union([z.coerce.number().positive(), z.literal('Get Quote')])),
-  area: z.object({
-    plinthArea: asOptionalField(z.coerce.number()),
-    mezzanineArea1: asOptionalField(z.coerce.number()),
-    mezzanineArea2: asOptionalField(z.coerce.number()),
-    canopyArea: asOptionalField(z.coerce.number()),
-    driversRestRoomArea: asOptionalField(z.coerce.number()),
-    totalChargeableArea: asOptionalField(z.coerce.number()),
-    tempControlledArea: asOptionalField(z.coerce.number()),
-    nonTempControlledArea: asOptionalField(z.coerce.number()),
-  }).optional(),
-  buildingSpecifications: z.object({
-    buildingType: z.array(z.string()).optional(),
-    numberOfDocksAndShutters: asOptionalField(z.coerce.number()),
-    internalLighting: z.string().optional(),
-    warehouseLayoutAvailable: z.boolean().optional(),
-    craneSupportStructureAvailable: z.boolean().optional(),
-    craneAvailable: z.boolean().optional(),
-    roofType: z.enum(['Galvalume', 'RCC', 'ACC']).optional(),
-    eveHeightMeters: asOptionalField(z.coerce.number()),
-    roofInsulation: z.enum(['Insulated', 'Non-Insulated']).optional(),
-    ventilation: z.enum(['Turbo', 'Ridge']).optional(),
-    louvers: z.boolean().optional(),
-  }).optional(),
-  siteSpecifications: z.object({
-    typeOfFlooringInside: z.enum(['FM2', 'VDF-RCC', 'RCC', 'PCC']).optional(),
-    typeOfRoad: z.enum(['Tar', 'RCC', 'PCC', 'Gravel']).optional(),
-  }).optional(),
-  certificatesAndApprovals: z.object({
-    parkApproval: z.boolean().default(false),
-    buildingApproval: z.boolean().default(false),
-    fireLicense: z.boolean().default(false),
-    fireNOC: z.boolean().default(false),
-    buildingInsurance: z.boolean().default(false),
-    pcbForAir: z.boolean().default(false),
-    pcbForWater: z.boolean().default(false),
-    propertyTax: z.boolean().default(false),
-  }).optional(),
-  documents: z.array(documentSchema).optional(),
-  description: z.string().optional(),
-  additionalInformation: z.string().optional(),
-});
-export type SiteOptionDetails = z.infer<typeof siteOptionDetailsSchema>;
-
-export const siteOptionSchema = z.object({
-  siteOptionId: z.string(),
-  linkedListingId: z.string().optional(),
-  details: siteOptionDetailsSchema,
-  demandIds: z.array(z.string()).optional().default([]),
-  sourceNotes: z.string().optional(),
-  siteStatus: z.enum(['active', 'archived']).default('active'),
-  sourcedBy: z.string().optional(),
-  createdAt: z.string().datetime().optional(),
-  createdBy: z.string().optional(),
-  updatedAt: z.string().datetime().optional(),
-});
-export type SiteOptionSchema = z.infer<typeof siteOptionSchema>;
+// Site Options sourced listings use ListingSchema with status === 'sourced'.
+// No separate schema needed — see src/hooks/use-site-options.ts.
