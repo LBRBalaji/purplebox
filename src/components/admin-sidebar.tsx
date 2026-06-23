@@ -117,7 +117,9 @@ const S = {
   } as React.CSSProperties,
 };
 
-export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
+// Inner component reads useSearchParams — must always be inside a Suspense boundary.
+// Next.js App Router throws if useSearchParams() is called outside Suspense during navigation.
+function AdminSidebarInner({ pendingCount = 0 }: { pendingCount?: number }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentSection = searchParams.get('section') || searchParams.get('tab') || '';
@@ -198,5 +200,19 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// Public export — wraps the inner component in Suspense so useSearchParams()
+// never causes "missing Suspense boundary" crashes during Next.js navigation.
+const SidebarFallback = (
+  <div style={{ width: 196, flexShrink: 0, background: 'hsl(259 30% 97%)', borderRight: '0.5px solid hsl(259 30% 90%)', minHeight: '100vh' }} />
+);
+
+export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
+  return (
+    <React.Suspense fallback={SidebarFallback}>
+      <AdminSidebarInner pendingCount={pendingCount} />
+    </React.Suspense>
   );
 }
