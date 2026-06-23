@@ -79,6 +79,13 @@ export default function DocketBuilderPage() {
   // Rich text toolbar
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
+  // Docket Summary
+  const [summaryOpen, setSummaryOpen] = React.useState(false);
+  const [hiddenSites, setHiddenSites] = React.useState<Set<string>>(new Set());
+
+  // Contacts
+  const [contacts, setContacts] = React.useState<TransactionDocket['contacts']>({ coPartners: [] });
+
   React.useEffect(() => {
     if (!docket) return;
 
@@ -139,6 +146,7 @@ export default function DocketBuilderPage() {
     setGeneralDocs(docket.generalDocuments || []);
     setSiteDocs(docket.siteDocuments || {});
     setTasks(docket.tasks || []);
+    setContacts(docket.contacts || { coPartners: [] });
   }, [docket?.docketId]);
 
   const sites = React.useMemo(() =>
@@ -216,6 +224,24 @@ export default function DocketBuilderPage() {
     setAddSiteSearch('');
     setAddingSites(false);
     toast({ title: `${pendingSiteIds.length} site${pendingSiteIds.length > 1 ? 's' : ''} added` });
+  };
+
+  // ── Remove site from docket ───────────────────────────────────────────────
+  const removeSite = async (listingId: string) => {
+    if (!docket || !confirm('Remove this site from the docket? Its cell data will also be deleted.')) return;
+    const newIds = docket.siteIds.filter(id => id !== listingId);
+    const newCells = Object.fromEntries(Object.entries(cellData).filter(([k]) => !k.includes(`__${listingId}`)));
+    const newFlags = Object.fromEntries(Object.entries(cellFlags).filter(([k]) => !k.includes(`__${listingId}`)));
+    setCellData(newCells);
+    setCellFlags(newFlags as any);
+    await save({ siteIds: newIds, cellData: newCells, cellFlags: newFlags });
+    toast({ title: 'Site removed' });
+  };
+
+  // ── Save contacts ─────────────────────────────────────────────────────────
+  const saveContacts = async (updated: TransactionDocket['contacts']) => {
+    setContacts(updated);
+    await save({ contacts: updated });
   };
 
   const save = async (updates: Partial<TransactionDocket>) => {
@@ -409,6 +435,135 @@ export default function DocketBuilderPage() {
           </Button>
         </div>
 
+        {/* ── Docket Summary (collapsed by default) ──────────────────── */}
+        {(() => {
+          const visibleSites = sites.filter(s => !hiddenSites.has(s.listingId));
+          const siteFlagMap = (lid: string) => ({
+            red: Object.entries(cellFlags).some(([k,v]) => k.includes(`__${lid}`) && v === 'red'),
+            yellow: Object.entries(cellFlags).some(([k,v]) => k.includes(`__${lid}`) && v === 'yellow'),
+          });
+          const clean = sites.filter(s => { const f = siteFlagMap(s.listingId); return !f.red && !f.yellow; }).length;
+          const moderate = sites.filter(s => { const f = siteFlagMap(s.listingId); return !f.red && f.yellow; }).length;
+          const critical = sites.filter(s => siteFlagMap(s.listingId).red).length;
+          const selected = sites.filter(s => siteStatuses[`${s.listingId}__L1`]==='Selected'||siteStatuses[`${s.listingId}__L2`]==='Selected').length;
+          const rejected = sites.filter(s => siteStatuses[`${s.listingId}__L1`]==='Rejected'||siteStatuses[`${s.listingId}__L2`]==='Rejected').length;
+
+          return (
+            <div style={{ borderBottom:'0.5px solid hsl(259 30% 90%)', background:'#fff' }}>
+              <button onClick={()=>setSummaryOpen(o=>!o)}
+                style={{ width:'100%', display:'flex', alignItems:'center', gap:8, padding:'10px 20px', background:'none', border:'none', cursor:'pointer', textAlign:'left' }}>
+                <span style={{ fontSize:9, fontWeight:800, letterSpacing:'.1em', color:'hsl(259 15% 55%)', textTransform:'uppercase' }}>● Docket Summary</span>
+                <span style={{ marginLeft:'auto', fontSize:11, color:'hsl(259 15% 60%)' }}>{summaryOpen ? '▴' : '▾'}</span>
+              </button>
+
+              {summaryOpen && (
+                <div style={{ padding:'0 20px 16px' }}>
+                  {/* Stats */}
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))', gap:8, marginBottom:14 }}>
+                    {[
+                      { label:'Sites Offered', val:sites.length, sub:`${sites.filter(s=>s.sizeSqFt).reduce((a,s)=>{const max=(s as any).offeredSizeMax||s.sizeSqFt||0;return a+max;},0).toLocaleString('en-IN')} sft total`, color:'#1e1537' },
+                      { label:'Clean / No Risk', val:clean, color:'#166534' },
+                      { label:'Moderate Risk', val:moderate, color:'#854d0e' },
+                      { label:'Critical Risk', val:critical, color:'#b91c1c' },
+                      { label:'Selected', val:selected, color:'#166534' },
+                      { label:'Rejected', val:rejected, color:'hsl(259 15% 55%)' },
+                    ].map(s=>(
+                      <div key={s.label} style={{ border:'0.5px solid hsl(259 30% 88%)', borderRadius:8, padding:'10px 12px' }}>
+                        <p style={{ fontSize:22, fontWeight:900, color:s.color, margin:0, lineHeight:1 }}>{s.val}</p>
+                        <p style={{ fontSize:9, fontWeight:700, letterSpacing:'.08em', color:'hsl(259 15% 55%)', textTransform:'uppercase', margin:'5px 0 0' }}>{s.label}</p>
+                        {s.sub&&<p style={{ fontSize:10, color:'hsl(259 15% 65%)', margin:'2px 0 0' }}>{s.sub}</p>}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Site Overview table */}
+                  <div style={{ marginBottom:14 }}>
+                    <p style={{ fontSize:9, fontWeight:800, letterSpacing:'.1em', color:'hsl(259 15% 55%)', textTransform:'uppercase', margin:'0 0 6px' }}>Site Overview</p>
+                    <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
+                      <thead>
+                        <tr style={{ background:'hsl(259 30% 97%)' }}>
+                          {['Site', 'Village / Location', 'Size', 'Risk', 'Status'].map(h=>(
+                            <th key={h} style={{ padding:'6px 10px', textAlign:'left', fontWeight:600, fontSize:10, color:'hsl(259 15% 55%)', border:'0.5px solid hsl(259 30% 90%)' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sites.map((site,i)=>{
+                          const f = siteFlagMap(site.listingId);
+                          const curStatus = siteStatuses[`${site.listingId}__L1`] || 'Not Decided';
+                          return (
+                            <tr key={site.listingId} style={{ borderBottom:'0.5px solid hsl(259 30% 92%)' }}>
+                              <td style={{ padding:'6px 10px', fontFamily:'monospace', fontSize:10, color:'#6141ac' }}>
+                                Site {i+1}<br/>{site.listingId}
+                              </td>
+                              <td style={{ padding:'6px 10px', fontWeight:600 }}>{site.location}</td>
+                              <td style={{ padding:'6px 10px', fontSize:11, color:'hsl(259 15% 55%)' }}>
+                                {((site as any).offeredSizeMax||site.sizeSqFt||0).toLocaleString('en-IN')} sft
+                              </td>
+                              <td style={{ padding:'6px 10px' }}>
+                                {f.red ? <span style={{ fontSize:10, padding:'1px 6px', borderRadius:4, background:'#fee2e2', color:'#b91c1c', fontWeight:700 }}>⚠ Critical</span>
+                                  : f.yellow ? <span style={{ fontSize:10, padding:'1px 6px', borderRadius:4, background:'#fef9c3', color:'#854d0e', fontWeight:700 }}>⚠ Moderate</span>
+                                  : <span style={{ fontSize:10, padding:'1px 6px', borderRadius:4, background:'#dcfce7', color:'#166534', fontWeight:700 }}>✓ Clean</span>}
+                              </td>
+                              <td style={{ padding:'6px 10px' }}>
+                                <select value={curStatus} onChange={e=>changeStatus(site.listingId,1,e.target.value)}
+                                  style={{ fontSize:11, border:'0.5px solid hsl(259 30% 82%)', borderRadius:4, padding:'3px 6px', width:'100%',
+                                    color:curStatus==='Selected'?'#166534':curStatus==='Rejected'?'#b91c1c':'#1e1537' }}>
+                                  {SITE_STATUS_OPTIONS.map(o=><option key={o}>{o}</option>)}
+                                </select>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Contacts */}
+                  <div>
+                    <p style={{ fontSize:9, fontWeight:800, letterSpacing:'.1em', color:'hsl(259 15% 55%)', textTransform:'uppercase', margin:'0 0 8px' }}>Contact Details</p>
+                    <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:12 }}>
+                      {(['accountOwner','transactionPartner'] as const).map(role=>{
+                        const label = role==='accountOwner' ? 'Account Owner' : 'Account Transaction Partner';
+                        const val = contacts?.[role] || {};
+                        return (
+                          <div key={role} style={{ border:'0.5px solid hsl(259 30% 88%)', borderRadius:8, padding:12 }}>
+                            <p style={{ fontSize:9, fontWeight:800, letterSpacing:'.08em', color:'#6141ac', textTransform:'uppercase', margin:'0 0 8px' }}>{label}</p>
+                            {(['name','representing','phone','email'] as const).map(f=>(
+                              <div key={f} style={{ marginBottom:6 }}>
+                                <p style={{ fontSize:9, color:'hsl(259 15% 55%)', margin:'0 0 2px', textTransform:'uppercase', letterSpacing:'.05em' }}>{f}</p>
+                                <input value={(val as any)[f]||''} onChange={e=>saveContacts({ ...contacts, [role]: { ...val, [f]: e.target.value } })}
+                                  placeholder={f==='name'?'Full name':f==='email'?'name@example.com':f==='phone'?'+91':f}
+                                  style={{ width:'100%', fontSize:12, border:'0.5px solid hsl(259 30% 85%)', borderRadius:4, padding:'4px 8px', outline:'none', boxSizing:'border-box' }}/>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {(contacts?.coPartners||[]).map((cp,i)=>(
+                      <div key={i} style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr) auto', gap:6, marginTop:6, alignItems:'end' }}>
+                        {(['name','representing','phone','email'] as const).map(f=>(
+                          <input key={f} value={(cp as any)[f]||''} onChange={e=>{
+                            const updated = (contacts?.coPartners||[]).map((p,pi)=>pi===i?{...p,[f]:e.target.value}:p);
+                            saveContacts({ ...contacts, coPartners: updated });
+                          }} placeholder={f} style={{ fontSize:11, border:'0.5px solid hsl(259 30% 85%)', borderRadius:4, padding:'4px 8px' }}/>
+                        ))}
+                        <button onClick={()=>{const updated=(contacts?.coPartners||[]).filter((_,pi)=>pi!==i);saveContacts({...contacts,coPartners:updated});}}
+                          style={{ background:'none', border:'none', cursor:'pointer', color:'#b91c1c', fontSize:16, padding:0 }}>×</button>
+                      </div>
+                    ))}
+                    <button onClick={()=>saveContacts({ ...contacts, coPartners: [...(contacts?.coPartners||[]), { name:'',representing:'',phone:'',email:'' }] })}
+                      style={{ fontSize:11, color:'#6141ac', background:'none', border:'none', cursor:'pointer', marginTop:8, padding:0 }}>
+                      + Add Transaction Co-Partner
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
         {/* Scrollable body */}
         <div style={{flex:1,overflow:'auto',padding:'20px 20px 60px'}}>
 
@@ -439,14 +594,32 @@ export default function DocketBuilderPage() {
                   <th style={{...th,width:220,maxWidth:220,position:'sticky',left:0,zIndex:3}}>Parameter</th>
                   {sites.map(site=>{
                     const fc=flagCount(site.listingId);
+                    const hidden=hiddenSites.has(site.listingId);
                     return (
-                      <th key={site.listingId} style={th}>
-                        <div style={{fontFamily:'monospace',fontSize:11,fontWeight:700,color:'#1e1537'}}>{site.listingId}</div>
-                        <div style={{fontSize:11,color:'hsl(259 15% 55%)',marginTop:2}}>{site.location}</div>
+                      <th key={site.listingId} style={{...th,opacity:hidden?0.4:1}}>
+                        <div style={{fontFamily:'monospace',fontSize:11,fontWeight:700,color:'#6141ac'}}>{site.listingId}</div>
+                        <div style={{fontSize:12,fontWeight:700,color:'#1e1537',marginTop:2}}>{site.location}</div>
                         {fc>0&&<span style={{display:'inline-block',marginTop:4,fontSize:10,padding:'1px 6px',borderRadius:4,background:'#fee2e2',color:'#b91c1c',fontWeight:700}}>{fc} flag{fc>1?'s':''}</span>}
+                        <div style={{display:'flex',gap:8,marginTop:6,alignItems:'center'}}>
+                          <button onClick={()=>setHiddenSites(s=>{const n=new Set(s);n.has(site.listingId)?n.delete(site.listingId):n.add(site.listingId);return n;})}
+                            style={{fontSize:10,color:'hsl(259 15% 50%)',background:'none',border:'none',cursor:'pointer',padding:0}}>
+                            {hidden?'+ Show':'– Hide'}
+                          </button>
+                          <button onClick={()=>removeSite(site.listingId)}
+                            style={{fontSize:10,color:'#b91c1c',background:'none',border:'1px solid #fca5a5',borderRadius:4,padding:'1px 6px',cursor:'pointer'}}>
+                            Remove
+                          </button>
+                        </div>
                       </th>
                     );
                   })}
+                  {/* + Site column */}
+                  <th style={{...th,width:64,minWidth:64,textAlign:'center'}}>
+                    <button onClick={()=>{setShowAddSites(true);setPendingSiteIds([]);setAddSiteSearch('');}}
+                      style={{fontSize:12,fontWeight:700,color:'#fff',background:'#6141ac',border:'none',borderRadius:6,padding:'6px 12px',cursor:'pointer',whiteSpace:'nowrap'}}>
+                      + Site
+                    </button>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -483,7 +656,7 @@ export default function DocketBuilderPage() {
                             )}
                           </div>
                         </td>
-                        {sites.map(site=>{
+                        {sites.filter(s=>!hiddenSites.has(s.listingId)).map(site=>{
                           const key=cellKey(param.paramId,site.listingId);
                           const flag=cellFlags[key];
                           const isEditing=editingCell===key;
@@ -529,6 +702,7 @@ export default function DocketBuilderPage() {
                             </td>
                           );
                         })}
+                        <td style={{...td,background:'hsl(259 30% 98%)',minWidth:64,width:64}}/>
                       </tr>
                     ))}
 
@@ -557,7 +731,7 @@ export default function DocketBuilderPage() {
                 {/* Status row */}
                 <tr style={{background:'hsl(259 44% 97%)'}}>
                   <td style={{...rowLabel,fontWeight:700,color:'#1e1537',background:'hsl(259 44% 97%)'}}>Status — Level {activeLevel}</td>
-                  {sites.map(site=>{
+                  {sites.filter(s=>!hiddenSites.has(s.listingId)).map(site=>{
                     const sk=`${site.listingId}__L${activeLevel}`;
                     const cur=siteStatuses[sk]||'Not Decided';
                     return (
@@ -570,6 +744,7 @@ export default function DocketBuilderPage() {
                       </td>
                     );
                   })}
+                  <td style={{...td,background:'hsl(259 44% 97%)',minWidth:64,width:64}}/>
                 </tr>
 
                 {/* + Add new section */}
@@ -764,34 +939,61 @@ export default function DocketBuilderPage() {
       {showAddSites && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center'}}
           onClick={e=>{if(e.target===e.currentTarget){setShowAddSites(false);setPendingSiteIds([]);}}}>
-          <div style={{background:'#fff',borderRadius:12,padding:24,width:480,maxHeight:'80vh',display:'flex',flexDirection:'column',gap:14}}>
+          <div style={{background:'#fff',borderRadius:12,padding:24,width:520,maxHeight:'85vh',display:'flex',flexDirection:'column',gap:14}}>
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
               <p style={{fontWeight:700,fontSize:15,color:'#1e1537',margin:0}}>Add sites to docket</p>
               <button onClick={()=>{setShowAddSites(false);setPendingSiteIds([]);}} style={{background:'none',border:'none',cursor:'pointer'}}><X style={{width:16,height:16}}/></button>
             </div>
             <p style={{fontSize:12,color:'hsl(259 15% 55%)',margin:0}}>
-              Currently {docket.siteIds.length} site{docket.siteIds.length!==1?'s':''} in this docket. Select additional sites to add.
+              Currently {docket.siteIds.length} site{docket.siteIds.length!==1?'s':''} in this docket. Select additional sites below.
             </p>
             <div style={{position:'relative'}}>
               <Search style={{position:'absolute',left:10,top:10,width:14,height:14,color:'#aaa'}}/>
               <Input placeholder="Search by ID or location…" value={addSiteSearch} onChange={e=>setAddSiteSearch(e.target.value)} style={{paddingLeft:32,height:36,fontSize:13}}/>
             </div>
-            <div style={{flex:1,overflow:'auto',border:'0.5px solid hsl(259 30% 88%)',borderRadius:8,maxHeight:280}}>
-              {filteredToAdd.length === 0 ? (
+            <div style={{flex:1,overflow:'auto',maxHeight:340}}>
+              {/* Site Options (sourced) — shown first, prominently */}
+              {filteredToAdd.filter(s=>s.status==='sourced').length > 0 && (
+                <div style={{marginBottom:8}}>
+                  <p style={{fontSize:10,fontWeight:800,letterSpacing:'.08em',color:'#6141ac',textTransform:'uppercase',margin:'0 0 4px',padding:'0 2px'}}>
+                    From Site Options (sourced inventory)
+                  </p>
+                  {filteredToAdd.filter(s=>s.status==='sourced').map(s=>(
+                    <label key={s.listingId} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 12px',borderRadius:8,border:'0.5px solid hsl(259 44% 88%)',marginBottom:4,cursor:'pointer',background:'hsl(259 44% 98%)'}}>
+                      <Checkbox checked={pendingSiteIds.includes(s.listingId)} onCheckedChange={()=>setPendingSiteIds(ids=>ids.includes(s.listingId)?ids.filter(i=>i!==s.listingId):[...ids,s.listingId])}/>
+                      <div>
+                        <span style={{fontFamily:'monospace',fontSize:11,color:'#6141ac',marginRight:6}}>{s.listingId}</span>
+                        <span style={{fontWeight:600,color:'#1e1537'}}>{s.location}</span>
+                        {s.sizeSqFt&&<span style={{color:'hsl(259 15% 55%)',marginLeft:6,fontSize:11}}>{s.sizeSqFt.toLocaleString('en-IN')} sft</span>}
+                        <span style={{marginLeft:6,fontSize:10,padding:'1px 5px',borderRadius:4,background:'#FAEEDA',color:'#854F0B'}}>Site Options</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+              {/* Marketplace (approved) listings */}
+              {filteredToAdd.filter(s=>s.status==='approved').length > 0 && (
+                <div>
+                  <p style={{fontSize:10,fontWeight:800,letterSpacing:'.08em',color:'hsl(259 15% 55%)',textTransform:'uppercase',margin:'0 0 4px',padding:'0 2px'}}>
+                    From Marketplace (approved listings)
+                  </p>
+                  {filteredToAdd.filter(s=>s.status==='approved').map(s=>(
+                    <label key={s.listingId} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 12px',borderRadius:8,border:'0.5px solid hsl(259 30% 88%)',marginBottom:4,cursor:'pointer'}}>
+                      <Checkbox checked={pendingSiteIds.includes(s.listingId)} onCheckedChange={()=>setPendingSiteIds(ids=>ids.includes(s.listingId)?ids.filter(i=>i!==s.listingId):[...ids,s.listingId])}/>
+                      <div>
+                        <span style={{fontFamily:'monospace',fontSize:11,color:'hsl(259 15% 55%)',marginRight:6}}>{s.listingId}</span>
+                        <span style={{fontWeight:600,color:'#1e1537'}}>{s.location}</span>
+                        {s.sizeSqFt&&<span style={{color:'hsl(259 15% 55%)',marginLeft:6,fontSize:11}}>{s.sizeSqFt.toLocaleString('en-IN')} sft</span>}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+              {filteredToAdd.length === 0 && (
                 <p style={{padding:16,fontSize:12,color:'hsl(259 15% 60%)',textAlign:'center'}}>
                   {availableToAdd.length === 0 ? 'All available sites are already in this docket.' : 'No sites match your search.'}
                 </p>
-              ) : filteredToAdd.map(s => (
-                <label key={s.listingId} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 12px',borderBottom:'0.5px solid hsl(259 30% 92%)',cursor:'pointer',fontSize:13}}>
-                  <Checkbox checked={pendingSiteIds.includes(s.listingId)} onCheckedChange={()=>setPendingSiteIds(ids=>ids.includes(s.listingId)?ids.filter(i=>i!==s.listingId):[...ids,s.listingId])}/>
-                  <div>
-                    <span style={{fontFamily:'monospace',fontSize:11,color:'#6141ac',marginRight:6}}>{s.listingId}</span>
-                    <span style={{color:'#1e1537'}}>{s.location}</span>
-                    {s.sizeSqFt&&<span style={{color:'hsl(259 15% 55%)',marginLeft:6,fontSize:11}}>{s.sizeSqFt.toLocaleString('en-IN')} sft</span>}
-                    {s.status==='sourced'&&<span style={{marginLeft:6,fontSize:10,padding:'1px 5px',borderRadius:4,background:'#FAEEDA',color:'#854F0B'}}>Sourced</span>}
-                  </div>
-                </label>
-              ))}
+              )}
             </div>
             {pendingSiteIds.length > 0 && (
               <p style={{fontSize:11,color:'#6141ac',margin:0}}>{pendingSiteIds.length} site{pendingSiteIds.length!==1?'s':''} selected</p>
