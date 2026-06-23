@@ -135,6 +135,30 @@ export default function DocketBuilderPage() {
     (docket?.siteIds || []).map(id => siteOptions.find(s => s.listingId === id)).filter(Boolean) as ListingSchema[],
     [docket?.siteIds, siteOptions]);
 
+  // Refresh Leasable Area (L1_area) cells whenever sites resolve —
+  // ensures the min–max range is shown even on dockets created before this update.
+  React.useEffect(() => {
+    if (!docket || sites.length === 0) return;
+    let updated = { ...cellData };
+    let changed = false;
+    sites.forEach(site => {
+      const key = `L1_area__${site.listingId}`;
+      const min = (site as any).offeredSizeMin;
+      const max = (site as any).offeredSizeMax;
+      const total = site.sizeSqFt;
+      let range = '';
+      if (min && max) range = `${Number(min).toLocaleString('en-IN')} – ${Number(max).toLocaleString('en-IN')} sft`;
+      else if (max) range = `${Number(max).toLocaleString('en-IN')} sft`;
+      else if (total) range = `${Number(total).toLocaleString('en-IN')} sft`;
+      if (range && updated[key] !== range) { updated[key] = range; changed = true; }
+    });
+    if (changed) {
+      setCellData(updated);
+      updateDocket(docket.docketId, { cellData: updated, updatedAt: new Date().toISOString() });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sites.map(s => s.listingId).join(','), docket?.docketId]);
+
   const save = async (updates: Partial<TransactionDocket>) => {
     if (!docket) return;
     setSaving(true);

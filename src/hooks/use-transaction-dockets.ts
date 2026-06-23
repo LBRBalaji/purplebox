@@ -52,8 +52,18 @@ export function autoFillCellsFromListing(listing: ListingSchema, paramIds: strin
   const key = (p: string) => `${p}__${listing.listingId}`;
   if (paramIds.includes('L1_type') && listing.warehouseModel)
     cells[key('L1_type')] = listing.warehouseModel;
-  if (paramIds.includes('L1_area') && listing.sizeSqFt)
-    cells[key('L1_area')] = listing.sizeSqFt.toLocaleString() + ' sft';
+  // Leasable Area: show min–max range if partition details exist, else total size
+  if (paramIds.includes('L1_area')) {
+    const min = listing.offeredSizeMin;
+    const max = listing.offeredSizeMax;
+    const total = listing.sizeSqFt;
+    if (min && max)
+      cells[key('L1_area')] = `${min.toLocaleString('en-IN')} – ${max.toLocaleString('en-IN')} sft`;
+    else if (max)
+      cells[key('L1_area')] = `${max.toLocaleString('en-IN')} sft`;
+    else if (total)
+      cells[key('L1_area')] = `${total.toLocaleString('en-IN')} sft`;
+  }
   if (paramIds.includes('L1_height') && listing.buildingSpecifications?.eveHeightMeters)
     cells[key('L1_height')] = listing.buildingSpecifications.eveHeightMeters + ' m';
   if (paramIds.includes('L1_docks') && listing.buildingSpecifications?.numberOfDocksAndShutters)
