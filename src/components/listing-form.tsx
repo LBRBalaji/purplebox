@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from './ui/input';
 import { listingSchema, type ListingSchema, type Document } from '@/lib/schema';
+import { sqFtHelperText } from '@/lib/utils';
 import {
   Select,
   SelectContent,
@@ -391,7 +392,24 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                             <FormItem><FormLabel>Location</FormLabel><FormControl><Input {...field} value={field.value ?? ''} placeholder="e.g. Oragadam, Chennai" /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="sizeSqFt" render={({ field }) => (
-                            <FormItem><FormLabel>Total Size for Listing (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
+                            <FormItem>
+                              <FormLabel>Total Size for Listing (Sq. Ft.)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  inputMode="numeric"
+                                  {...field}
+                                  value={field.value ?? ''}
+                                  onChange={e => {
+                                    const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                                    field.onChange(cleaned === '' ? undefined : +cleaned);
+                                  }}
+                                  placeholder="e.g. 1,50,000"
+                                />
+                              </FormControl>
+                              {field.value && <p className="text-xs text-muted-foreground mt-1">{sqFtHelperText(+field.value)}</p>}
+                              <FormMessage />
+                            </FormItem>
                         )} />
                     </div>
 
@@ -406,8 +424,11 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                           <FormItem>
                             <FormLabel className="text-xs font-semibold">Actual Full Warehouse Size (SFT)</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 500000" className="h-9 text-sm" />
+                              <Input type="text" inputMode="numeric" {...field} value={field.value ?? ''}
+                                onChange={e => { const c = e.target.value.replace(/[^0-9]/g,''); field.onChange(c===''?undefined:+c); }}
+                                placeholder="e.g. 5,00,000" className="h-9 text-sm" />
                             </FormControl>
+                            {field.value && <p className="text-xs text-muted-foreground">{sqFtHelperText(+field.value)}</p>}
                             <p className="text-xs text-muted-foreground">Total size of the building</p>
                             <FormMessage />
                           </FormItem>
@@ -416,8 +437,11 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                           <FormItem>
                             <FormLabel className="text-xs font-semibold">Offered Size — Minimum (SFT)</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 20000" className="h-9 text-sm" />
+                              <Input type="text" inputMode="numeric" {...field} value={field.value ?? ''}
+                                onChange={e => { const c = e.target.value.replace(/[^0-9]/g,''); field.onChange(c===''?undefined:+c); }}
+                                placeholder="e.g. 20,000" className="h-9 text-sm" />
                             </FormControl>
+                            {field.value && <p className="text-xs text-muted-foreground">{sqFtHelperText(+field.value)}</p>}
                             <p className="text-xs text-muted-foreground">Smallest partition available</p>
                             <FormMessage />
                           </FormItem>
@@ -426,8 +450,11 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                           <FormItem>
                             <FormLabel className="text-xs font-semibold">Offered Size — Maximum (SFT)</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" className="h-9 text-sm" />
+                              <Input type="text" inputMode="numeric" {...field} value={field.value ?? ''}
+                                onChange={e => { const c = e.target.value.replace(/[^0-9]/g,''); field.onChange(c===''?undefined:+c); }}
+                                placeholder="e.g. 4,00,000" className="h-9 text-sm" />
                             </FormControl>
+                            {field.value && <p className="text-xs text-muted-foreground">{sqFtHelperText(+field.value)}</p>}
                             <p className="text-xs text-muted-foreground">Largest partition available</p>
                             <FormMessage />
                           </FormItem>
