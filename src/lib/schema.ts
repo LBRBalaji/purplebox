@@ -36,6 +36,12 @@ export const listingSchema = z.object({
   locationCircle: z.string().optional(), // New field for location grouping
   latLng: z.string().optional(),
   sizeSqFt: z.coerce.number().positive("Size must be a positive number."),
+  // Partition / split-box fields — when the developer owns a larger warehouse
+  // and is willing to lease a portion of it. actualFullSizeSqFt is the total
+  // building size; offeredSizeMin/Max is the range they'll partition to.
+  actualFullSizeSqFt: asOptionalField(z.coerce.number().positive()),
+  offeredSizeMin: asOptionalField(z.coerce.number().positive()),
+  offeredSizeMax: asOptionalField(z.coerce.number().positive()),
   description: z.string().optional(),
   additionalInformation: z.string().optional(),
   

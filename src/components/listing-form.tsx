@@ -138,6 +138,9 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
               name: '',
               location: '',
               sizeSqFt: undefined,
+              actualFullSizeSqFt: undefined,
+              offeredSizeMin: undefined,
+              offeredSizeMax: undefined,
               description: '',
               rentPerSqFt: undefined,
               rentalSecurityDeposit: undefined,
@@ -390,6 +393,46 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                         <FormField control={form.control} name="sizeSqFt" render={({ field }) => (
                             <FormItem><FormLabel>Total Size for Listing (Sq. Ft.)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" /></FormControl><FormMessage /></FormItem>
                         )} />
+                    </div>
+
+                    {/* Partition / split-box fields */}
+                    <div className="p-4 border rounded-md space-y-3" style={{ background: 'hsl(259 30% 98%)', borderColor: 'hsl(259 30% 86%)' }}>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Partition / Box-Split Details</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Fill this if the developer owns a larger warehouse and is willing to partition and offer a portion of it.</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField control={form.control} name="actualFullSizeSqFt" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-semibold">Actual Full Warehouse Size (SFT)</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 500000" className="h-9 text-sm" />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground">Total size of the building</p>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name="offeredSizeMin" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-semibold">Offered Size — Minimum (SFT)</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 20000" className="h-9 text-sm" />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground">Smallest partition available</p>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name="offeredSizeMax" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-semibold">Offered Size — Maximum (SFT)</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} placeholder="e.g. 150000" className="h-9 text-sm" />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground">Largest partition available</p>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                      </div>
                     </div>
                   </div>
                   
