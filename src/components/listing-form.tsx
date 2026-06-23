@@ -797,6 +797,69 @@ export function ListingForm({ isOpen, onOpenChange, listing, onSubmit, locationC
                       />
                     </div>
                   </div>
+                  {/* Owner / Lessor Details — sourced sites only, internal */}
+                  {sourcedMode && (
+                    <div className="space-y-4">
+                      <div>
+                        <FormLabel className="text-lg font-semibold">Owner / Lessor Details</FormLabel>
+                        <p className="text-xs text-muted-foreground mt-1">Internal only — never visible to clients or on the public listing.</p>
+                      </div>
+                      <div className="p-4 border rounded-md space-y-4" style={{ background: 'hsl(259 30% 98%)', borderColor: 'hsl(259 30% 86%)' }}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField control={form.control} name="developerName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-xs font-semibold">Owner / Company Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} value={field.value ?? ''} placeholder="e.g. Chennai Warehousing Pvt Ltd" className="h-9 text-sm" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          <FormField control={form.control} name="developerContactName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-xs font-semibold">Contact Person Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} value={field.value ?? ''} placeholder="e.g. Mr. Ramesh Kumar" className="h-9 text-sm" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          <FormField control={form.control} name="developerMobile"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-xs font-semibold">Mobile</FormLabel>
+                                <FormControl>
+                                  <Input {...field} value={field.value ?? ''} placeholder="e.g. +91 98400 00000" className="h-9 text-sm" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          <FormField control={form.control} name="developerEmail"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-xs font-semibold">Email</FormLabel>
+                                <FormControl>
+                                  <Input {...field} value={field.value ?? ''} placeholder="owner@example.com" className="h-9 text-sm" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                        </div>
+                        <FormField control={form.control} name="siteDetails"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-semibold">Sourcing Notes <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                              <FormControl>
+                                <Textarea {...field} value={field.value ?? ''} placeholder="How was this site sourced? Any context about the owner, terms discussed, introductions made, etc." className="text-sm min-h-20" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                      </div>
+                    </div>
+                  )}
                   <Separator/>
 
                   {/* Admin Only: Location Circle */}
