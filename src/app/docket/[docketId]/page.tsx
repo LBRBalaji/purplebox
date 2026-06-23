@@ -76,8 +76,8 @@ export default function PublicDocketPage() {
 
   const flagCount = (lid: string) => Object.entries(docket?.cellFlags || {}).filter(([k,v]) => k.includes(`__${lid}`) && v).length;
   const td: React.CSSProperties = { padding: '10px 12px', border: '0.5px solid hsl(259 30% 92%)', verticalAlign: 'top', fontSize: 13, minWidth: 180 };
-  const rowLabel: React.CSSProperties = { padding: '10px 12px', border: '0.5px solid hsl(259 30% 92%)', fontSize: 12, color: 'hsl(259 15% 45%)', background: 'hsl(259 30% 98%)', whiteSpace: 'nowrap', position: 'sticky', left: 0, minWidth: 220 };
-  const groupTh: React.CSSProperties = { padding: '8px 12px', fontSize: 11, fontWeight: 700, color: '#6141ac', textTransform: 'uppercase' as const, letterSpacing: '.06em', background: 'hsl(259 44% 96%)', border: '0.5px solid hsl(259 30% 90%)', position: 'sticky', left: 0 };
+  const rowLabel: React.CSSProperties = { padding: '10px 12px', border: '0.5px solid hsl(259 30% 92%)', fontSize: 12, color: 'hsl(259 15% 45%)', background: 'hsl(259 30% 98%)', whiteSpace: 'normal', wordBreak: 'break-word', position: 'sticky', left: 0, width: 220, maxWidth: 220, minWidth: 160 };
+  const groupTh: React.CSSProperties = { padding: '8px 12px', fontSize: 11, fontWeight: 700, color: '#6141ac', textTransform: 'uppercase' as const, letterSpacing: '.06em', background: 'hsl(259 44% 96%)', border: '0.5px solid hsl(259 30% 90%)', position: 'sticky', left: 0, width: 220, maxWidth: 220 };
 
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'hsl(259 30% 96%)' }}>
@@ -162,7 +162,7 @@ export default function PublicDocketPage() {
           <table style={{ borderCollapse:'collapse', width:'100%' }}>
             <thead>
               <tr>
-                <th style={{ padding:'12px', background:'hsl(259 30% 97%)', border:'0.5px solid hsl(259 30% 88%)', textAlign:'left', fontSize:12, fontWeight:600, color:'hsl(259 15% 55%)', position:'sticky', left:0, minWidth:220 }}>Parameter</th>
+                <th style={{ padding:'12px', background:'hsl(259 30% 97%)', border:'0.5px solid hsl(259 30% 88%)', textAlign:'left', fontSize:12, fontWeight:600, color:'hsl(259 15% 55%)', position:'sticky', left:0, width:220, maxWidth:220, minWidth:160 }}>Parameter</th>
                 {sites.map(site=>{
                   const fc = flagCount(site.listingId);
                   return (
