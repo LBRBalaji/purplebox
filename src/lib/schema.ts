@@ -540,6 +540,9 @@ export const docketParamSchema = z.object({
   groupLabel: z.string(),
   level: z.union([z.literal(1), z.literal(2)]),
   order: z.number(),
+  // paramType: 'dropdown' cells show a <select> when edited; default is free text
+  paramType: z.enum(['text', 'dropdown']).optional(),
+  dropdownOptions: z.array(z.string()).optional(),
 });
 export type DocketParam = z.infer<typeof docketParamSchema>;
 
@@ -549,6 +552,22 @@ export const docketContactSchema = z.object({
   email: z.string().optional(),
   phone: z.string().optional(),
 });
+
+export const docketDocSchema = z.object({
+  label: z.string(),
+  url: z.string(),
+});
+
+export const docketTaskSchema = z.object({
+  taskId: z.string(),
+  title: z.string(),
+  owner: z.string().optional(),
+  dueDate: z.string().optional(),
+  priority: z.enum(['high', 'medium', 'low']).default('medium'),
+  status: z.enum(['todo', 'in-progress', 'review', 'done', 'blocked']).default('todo'),
+  notes: z.string().optional(),
+});
+export type DocketTask = z.infer<typeof docketTaskSchema>;
 
 export const transactionDocketSchema = z.object({
   docketId: z.string(),
@@ -577,6 +596,12 @@ export const transactionDocketSchema = z.object({
     transactionPartner: docketContactSchema.optional(),
     coPartners: z.array(docketContactSchema).default([]),
   }).default({}),
+  // Documents
+  clientDocuments: z.array(docketDocSchema).default([]),
+  generalDocuments: z.array(docketDocSchema).default([]),
+  siteDocuments: z.record(z.array(docketDocSchema)).default({}),
+  // Tasks
+  tasks: z.array(docketTaskSchema).default([]),
   archived: z.boolean().default(false),
   createdBy: z.string().optional(),
   createdAt: z.string().datetime().optional(),
