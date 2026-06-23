@@ -24,6 +24,17 @@ export function useSiteOptions() {
   }, []);
 
   React.useEffect(() => {
+    // Auto-migrate any entries from the old site-options collection on first load.
+    // Runs silently in the background — idempotent, safe to call every time.
+    fetch('/api/admin-migrate-site-options?confirm=migrate')
+      .then(r => r.json())
+      .then(result => {
+        if (result.migrated > 0) {
+          console.info(`[Site Options] Auto-migrated ${result.migrated} entry/entries from old collection.`);
+          fetchListings(); // refresh to show newly migrated entries
+        }
+      })
+      .catch(() => {}); // silent — never surface migration errors to the user
     fetchListings();
     const interval = setInterval(fetchListings, 60000);
     return () => clearInterval(interval);
