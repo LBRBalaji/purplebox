@@ -71,7 +71,57 @@ export default function DocketBuilderPage() {
 
   React.useEffect(() => {
     if (!docket) return;
-    setLocalParams(docket.params || []);
+
+    // ── Auto-migrate old dockets ────────────────────────────────────────────
+    // Dockets created before the June 2026 param update carry stale params
+    // (Ownership type present, no LEASE TERMS section). Detect and fix silently.
+    let params = [...(docket.params || [])];
+    let migrated = false;
+
+    // 1. Remove stale Ownership type param if present
+    const ownershipIdx = params.findIndex(p => p.paramId === 'L1_ownership');
+    if (ownershipIdx !== -1) {
+      params.splice(ownershipIdx, 1);
+      migrated = true;
+    }
+
+    // 2. Rename stale label keys to current labels
+    const renames: Record<string, string> = {
+      'L1_distance': 'Distance From Client Location-if any',
+      'L1_access':   'Approach Road Access for 40 Feet Container Movement',
+      'L1_area':     'Leasable Area (SFT)',
+      'L1_docks':    'Docks Ratio',
+    };
+    params = params.map(p => {
+      if (renames[p.paramId] && p.label !== renames[p.paramId]) {
+        migrated = true;
+        return { ...p, label: renames[p.paramId] };
+      }
+      return p;
+    });
+
+    // 3. Add LEASE TERMS params if the section is missing entirely
+    const hasLeaseSec = params.some(p => p.paramId === 'L1_possession');
+    if (!hasLeaseSec) {
+      const POSSESSION_OPTS = ['Ready To Occupy', 'In 1 Month', 'In 3 Months', 'Under Construction', 'BTS - Built To Suit'];
+      const baseOrder = Math.max(...params.filter(p => p.level === 1).map(p => p.order), 6);
+      params.push(
+        { paramId: 'L1_possession',        label: 'Warehouse Possession',                    groupLabel: 'Lease Terms', level: 1, order: baseOrder + 1, paramType: 'dropdown', dropdownOptions: POSSESSION_OPTS },
+        { paramId: 'L1_quoted_rent',        label: 'Quoted Rent (Per SFT/Per Month)',          groupLabel: 'Lease Terms', level: 1, order: baseOrder + 2 },
+        { paramId: 'L1_security_deposit',   label: 'Rental Security Deposit (Number of Months)', groupLabel: 'Lease Terms', level: 1, order: baseOrder + 3 },
+        { paramId: 'L1_rental_escalation',  label: 'Rental Escalation',                       groupLabel: 'Lease Terms', level: 1, order: baseOrder + 4 },
+      );
+      migrated = true;
+    }
+
+    setLocalParams(params);
+
+    // Persist the migration immediately so it's fixed for good
+    if (migrated) {
+      updateDocket(docket.docketId, { params, updatedAt: new Date().toISOString() });
+    }
+    // ───────────────────────────────────────────────────────────────────────
+
     setCellData(docket.cellData || {});
     setCellFlags(docket.cellFlags || {});
     setSiteStatuses(docket.siteStatuses || {});
