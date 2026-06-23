@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { HelpCircle, LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ListChecks, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck, PlusCircle, Zap, Handshake, FileText } from 'lucide-react';
+import { HelpCircle, LogOut, Map, LogIn, LayoutDashboard, BarChart, List, ListChecks, ChevronDown, Calculator, Settings, Bell, Info, BookOpen, Users, Briefcase, Search as SearchIcon, Sparkles, ClipboardCheck, PlusCircle, Zap, Handshake, FileText, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/login-dialog';
 import { usePathname } from 'next/navigation';
@@ -37,6 +37,27 @@ const DropTrigger = React.forwardRef(({ children, isActive, ...props }, ref) => 
   </button>
 ));
 DropTrigger.displayName = 'DropTrigger';
+
+// Admin-only: stripped-down view of the public-facing site (Browse + Demands only).
+// Map Search and Compare Listings moved to Labs sidebar.
+const AdminPublicSiteDropdown = () => {
+  const pathname = usePathname();
+  const isActive = pathname === '/listings' || pathname.startsWith('/demands');
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <DropTrigger isActive={isActive}>
+          <Globe className="h-3.5 w-3.5" /> Public Site <ChevronDown className="h-3 w-3" />
+        </DropTrigger>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-52">
+        <DropdownMenuLabel className="text-xs text-muted-foreground">View as visitor</DropdownMenuLabel>
+        <DropdownMenuItem asChild><Link href="/listings"><List className="mr-2 h-4 w-4" /> Browse Listings</Link></DropdownMenuItem>
+        <DropdownMenuItem asChild><Link href="/demands"><ListChecks className="mr-2 h-4 w-4" /> Warehouse Demands</Link></DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 const ListingsDropdown = ({ isSuperAdmin }) => {
   const pathname = usePathname();
@@ -221,51 +242,66 @@ const MobileMenu = ({ user, logout, onLoginClick, isSuperAdmin }: { user: any, l
           )}
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
-          {user && !isSuperAdmin && <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" />}
-          {isProvider && <NavItem href="/dashboard?tab=my-listings" icon={List} label="My Listings" />}
-          {!isProvider && (
+          {(isSuperAdmin || isO2O) ? (
+            // Admin/O2O mobile: direct links, sidebar handles the rest
             <>
               <div className="pt-2 pb-1 px-4">
-                <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Listings</p>
+                <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Deal Flow</p>
+              </div>
+              <NavItem href="/dashboard" icon={LayoutDashboard} label="Command Centre" />
+              <NavItem href="/register-deal" icon={FileText} label="Register a Deal" />
+              <div className="pt-2 pb-1 px-4">
+                <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Public Site</p>
               </div>
               <NavItem href="/listings" icon={List} label="Browse Listings" />
-              <NavItem href="/ors-transact" icon={Zap} label="ORS Transact Listings" />
               <NavItem href="/demands" icon={ListChecks} label="Warehouse Demands" />
-            </>
-          )}
-          {isSuperAdmin ? (
-            <NavItem href="/map-search" icon={Map} label="Map Search" />
-          ) : (
-            <div className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-400 cursor-not-allowed">
-              <span className="flex items-center gap-3"><Map className="h-4 w-4" /> Map Search</span>
-              <Badge variant="outline" className="text-xs py-0 px-1" style={{background:"hsl(259 44% 94%)",color:"#6141ac",border:"1px solid hsl(259 44% 80%)"}}>Soon</Badge>
-            </div>
-          )}
-          <div className="pt-2 pb-1 px-4">
-            <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Tools</p>
-          </div>
-          <NavItem href="/roi-calculator" icon={Calculator} label="ROI Calculator" />
-          <NavItem href="/commercial-calculator" icon={Calculator} label="Commercial Calculator" />
-          <NavItem href="/registration-calculator" icon={Calculator} label="Registration Calculator" />
-          <div className="pt-2 pb-1 px-4">
-            <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Explore</p>
-          </div>
-          <NavItem href="/resources" icon={BookOpen} label="Resources" />
-          <NavItem href="/how-to-use" icon={HelpCircle} label="How To Use" />
-          <NavItem href="/about-us" icon={Info} label="About Us" />
-          <NavItem href="/community" icon={Users} label="Community" />
-          <NavItem href="/partnership-and-access" icon={Handshake} label="Partnership & Access" />
-          {user && <NavItem href="/register-deal" icon={FileText} label="Register a Deal" />}
-          {(isSuperAdmin || isO2O) && (
-            <>
+              <div className="pt-2 pb-1 px-4">
+                <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Tools</p>
+              </div>
+              <NavItem href="/roi-calculator" icon={Calculator} label="ROI Calculator" />
+              <NavItem href="/commercial-calculator" icon={Calculator} label="Commercial Calculator" />
+              <NavItem href="/registration-calculator" icon={Calculator} label="Registration Calculator" />
               <div className="pt-2 pb-1 px-4">
                 <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Admin</p>
               </div>
-              <NavItem href="/dashboard" icon={LayoutDashboard} label="Command Centre" />
               <NavItem href="/dashboard/operations" icon={Settings} label="Operations Console" />
               <NavItem href="/dashboard/manage-users" icon={Users} label="Manage Users" />
-              <NavItem href="/dashboard/analytics" icon={BarChart} label="Analytics" />
               <NavItem href="/dashboard/settings" icon={Settings} label="Settings" />
+            </>
+          ) : (
+            // All other roles: full mobile nav unchanged
+            <>
+              {user && !isSuperAdmin && <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" />}
+              {isProvider && <NavItem href="/dashboard?tab=my-listings" icon={List} label="My Listings" />}
+              {!isProvider && (
+                <>
+                  <div className="pt-2 pb-1 px-4">
+                    <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Listings</p>
+                  </div>
+                  <NavItem href="/listings" icon={List} label="Browse Listings" />
+                  <NavItem href="/ors-transact" icon={Zap} label="ORS Transact Listings" />
+                  <NavItem href="/demands" icon={ListChecks} label="Warehouse Demands" />
+                </>
+              )}
+              <div className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-400 cursor-not-allowed">
+                <span className="flex items-center gap-3"><Map className="h-4 w-4" /> Map Search</span>
+                <Badge variant="outline" className="text-xs py-0 px-1" style={{background:"hsl(259 44% 94%)",color:"#6141ac",border:"1px solid hsl(259 44% 80%)"}}>Soon</Badge>
+              </div>
+              <div className="pt-2 pb-1 px-4">
+                <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Tools</p>
+              </div>
+              <NavItem href="/roi-calculator" icon={Calculator} label="ROI Calculator" />
+              <NavItem href="/commercial-calculator" icon={Calculator} label="Commercial Calculator" />
+              <NavItem href="/registration-calculator" icon={Calculator} label="Registration Calculator" />
+              <div className="pt-2 pb-1 px-4">
+                <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Explore</p>
+              </div>
+              <NavItem href="/resources" icon={BookOpen} label="Resources" />
+              <NavItem href="/how-to-use" icon={HelpCircle} label="How To Use" />
+              <NavItem href="/about-us" icon={Info} label="About Us" />
+              <NavItem href="/community" icon={Users} label="Community" />
+              <NavItem href="/partnership-and-access" icon={Handshake} label="Partnership & Access" />
+              {user && <NavItem href="/register-deal" icon={FileText} label="Register a Deal" />}
             </>
           )}
         </div>
@@ -335,26 +371,38 @@ export function Header() {
                 <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-4 w-20" />
               </div>
-            ) : (
+            ) : (isSuperAdmin || isO2O) ? (
+              // Admin/O2O: clean header — sidebar handles all navigation
               <>
-                {user && !isSuperAdmin && (
-                  <NavLink href="/dashboard" title="Your personal workspace — manage listings, track leads, view analytics, and handle all transaction activity."><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
+                <AdminPublicSiteDropdown />
+                <ToolsDropdown />
+                <Link
+                  href="/register-deal"
+                  className="text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors hover:text-primary"
+                  style={{ color: '#6141ac' }}
+                  title="Register an off-platform deal to use Commercial Term Sheet, Fit-Out tools and MoU drafting.">
+                  <FileText className="h-3.5 w-3.5" /> Register a Deal
+                </Link>
+              </>
+            ) : (
+              // All other roles: full public navigation unchanged
+              <>
+                {user && (
+                  <NavLink href="/dashboard" title="Your personal workspace."><LayoutDashboard className="h-3.5 w-3.5" /> Dashboard</NavLink>
                 )}
                 <ListingsDropdown isSuperAdmin={isSuperAdmin} />
-              {isProvider && (
-                <Link href="/dashboard?tab=my-listings&createNew=true" title="Create a new warehouse listing. Goes to SuperAdmin for approval before going live on the marketplace." className="flex items-center gap-1.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-4 py-2 whitespace-nowrap" style={{borderRadius:0}}>
-                  <PlusCircle className="h-3.5 w-3.5" /> New Listing
-                </Link>
-              )}
-              {isCustomer && (
-                <Link href="/dashboard?tab=my-sublease&createNew=true" title="Have unused warehouse space? List it as a sublease. Other businesses can find and lease your excess space directly." className="flex items-center gap-1.5 text-sm font-semibold text-white transition-colors px-4 py-2 whitespace-nowrap" style={{background:'#6141ac',borderRadius:0}}>
-                  <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
-                </Link>
-              )}
+                {isProvider && (
+                  <Link href="/dashboard?tab=my-listings&createNew=true" title="Create a new warehouse listing." className="flex items-center gap-1.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-4 py-2 whitespace-nowrap" style={{borderRadius:0}}>
+                    <PlusCircle className="h-3.5 w-3.5" /> New Listing
+                  </Link>
+                )}
+                {isCustomer && (
+                  <Link href="/dashboard?tab=my-sublease&createNew=true" title="List excess warehouse space as a sublease." className="flex items-center gap-1.5 text-sm font-semibold text-white transition-colors px-4 py-2 whitespace-nowrap" style={{background:'#6141ac',borderRadius:0}}>
+                    <PlusCircle className="h-3.5 w-3.5" /> List Excess Space
+                  </Link>
+                )}
                 <ToolsDropdown />
                 <MoreDropdown />
-                {(isSuperAdmin || isO2O) && <AnalyticsDropdown />}
-                {isSuperAdmin && <ManageDropdown isSuperAdmin={isSuperAdmin} />}
               </>
             )}
           </nav>

@@ -50,15 +50,6 @@ export const ADMIN_NAV: NavGroup[] = [
     ],
   },
   {
-    group: 'Reports',
-    items: [
-      { label: 'Analytics Hub',        icon: BarChart2,     href: '/dashboard/analytics' },
-      { label: 'Listings Performance', icon: TrendingUp,    href: '/dashboard/analytics/listings-performance' },
-      { label: 'Customer Engagement',  icon: Users,         href: '/dashboard/analytics/customer' },
-      { label: 'Platform Traffic',     icon: Globe,         href: '/dashboard/analytics/traffic' },
-    ],
-  },
-  {
     group: 'Users & Access',
     items: [
       { label: 'Platform Users',  icon: Users,     href: '/dashboard/manage-users', section: 'users' },
@@ -80,11 +71,17 @@ export const ADMIN_NAV: NavGroup[] = [
     muted: true,
     collapsible: true,
     items: [
-      { label: 'ORS Transact — Listings', icon: Monitor,  href: '/dashboard/operations', section: 'ors-transact-manage' },
-      { label: 'ORS Transact — New',      icon: Plus,     href: '/dashboard/operations', section: 'ors-transact-new' },
-      { label: 'ORS Transact — Import',   icon: Upload,   href: '/dashboard/operations', section: 'ors-transact-import' },
-      { label: 'ORS Transact — Roles',    icon: Shield,   href: '/dashboard/operations', section: 'ors-transact-roles' },
+      { label: 'Analytics Hub',           icon: BarChart2,     href: '/dashboard/analytics' },
+      { label: 'Listings Performance',    icon: TrendingUp,    href: '/dashboard/analytics/listings-performance' },
+      { label: 'Customer Engagement',     icon: Users,         href: '/dashboard/analytics/customer' },
+      { label: 'Platform Traffic',        icon: Globe,         href: '/dashboard/analytics/traffic' },
       { label: 'Community Analytics',     icon: MessageSquare, href: '/dashboard/analytics/community' },
+      { label: 'Map Search',              icon: Search,        href: '/map-search' },
+      { label: 'Compare Listings',        icon: BarChart2,     href: '/listing-comparison' },
+      { label: 'ORS Transact — Listings', icon: Monitor,       href: '/dashboard/operations', section: 'ors-transact-manage' },
+      { label: 'ORS Transact — New',      icon: Plus,          href: '/dashboard/operations', section: 'ors-transact-new' },
+      { label: 'ORS Transact — Import',   icon: Upload,        href: '/dashboard/operations', section: 'ors-transact-import' },
+      { label: 'ORS Transact — Roles',    icon: Shield,        href: '/dashboard/operations', section: 'ors-transact-roles' },
     ],
   },
   {

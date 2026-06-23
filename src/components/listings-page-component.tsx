@@ -778,7 +778,8 @@ export function ListingsPage() {
                       <p className="text-xs text-muted-foreground/60 mt-1.5 leading-relaxed">Transact directly with the warehouse developer</p>
                       <p className="text-xs font-semibold text-primary mt-2 group-hover:underline">Browse listings →</p>
                     </a>
-                    {/* ORS Transact tile */}
+                    {/* ORS Transact tile — hidden for admin/O2O, sidebar Labs section covers it */}
+                    {user?.role !== 'SuperAdmin' && user?.role !== 'O2O' && (
                     <a href="/ors-transact"
                       className="group block text-center px-5 py-4 rounded-none border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer no-underline">
                       <p className="text-3xl md:text-4xl font-black text-primary leading-none">{ORS_TRANSACT_COUNT.toLocaleString()}</p>
@@ -787,6 +788,7 @@ export function ListingsPage() {
                       <p className="text-xs text-muted-foreground/60 mt-1.5 leading-relaxed">ORS-ONE facilitates the full leasing transaction</p>
                       <p className="text-xs font-semibold text-primary mt-2 group-hover:underline">Explore listings →</p>
                     </a>
+                    )}
                 </div>
 
             </div>
