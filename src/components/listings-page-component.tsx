@@ -28,6 +28,105 @@ import { type ListingSchema, type Document } from '@/lib/schema';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { EmailOtpDialog } from './email-otp-dialog';
 import { useRouter } from 'next/navigation';
+
+// ── StatsSection: premium animated stats strip ────────────────────────────────
+// Separate component so React hooks (useCountUp) work at the call-site level.
+type StatsSectionProps = {
+  inventoryCount: number; totalInventorySize: number; uniqueLocations: number;
+  pendingCount: number; orsTransactCount: number; orsTransactSize: number;
+  isAdmin: boolean; formatSize: (n: number) => string;
+  useCountUp: (target: number, duration?: number) => number;
+};
+
+function StatsSection({ inventoryCount, totalInventorySize, uniqueLocations, pendingCount, orsTransactCount, orsTransactSize, isAdmin, formatSize, useCountUp }: StatsSectionProps) {
+  const animInventory   = useCountUp(inventoryCount);
+  const animSize        = useCountUp(totalInventorySize);
+  const animLocations   = useCountUp(uniqueLocations);
+  const animPending     = useCountUp(pendingCount);
+  const animOrsCount    = useCountUp(orsTransactCount, 1800);
+  const animOrsSize     = useCountUp(orsTransactSize,  1800);
+
+  const cell = (val: React.ReactNode, label: string, sub: string, last = false) => (
+    <div style={{
+      flex: 1, textAlign: 'center', padding: '28px 20px',
+      borderRight: last ? 'none' : '1px solid rgba(255,255,255,0.08)',
+    }}>
+      <p style={{ fontSize: 'clamp(28px,4vw,48px)', fontWeight: 900, color: '#fff', lineHeight: 1, margin: '0 0 8px', letterSpacing: '-0.02em' }}>{val}</p>
+      <p style={{ fontSize: 11, fontWeight: 700, color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '.1em', margin: '0 0 4px' }}>{label}</p>
+      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', margin: 0 }}>{sub}</p>
+    </div>
+  );
+
+  const strip = (children: React.ReactNode) => (
+    <div style={{
+      position: 'relative', overflow: 'hidden', borderRadius: 20, marginTop: 32,
+      background: 'linear-gradient(135deg, #1e1537 0%, #2a1b5c 50%, #1e1537 100%)',
+      boxShadow: '0 20px 60px rgba(30,21,55,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
+    }}>
+      {/* Dot-grid texture */}
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+      {/* Top shimmer line */}
+      <div style={{ position: 'absolute', top: 0, left: '10%', right: '10%', height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)' }} />
+      <div style={{ position: 'relative', display: 'flex', flexWrap: 'wrap' }}>{children}</div>
+    </div>
+  );
+
+  if (isAdmin) {
+    return strip(<>
+      {cell(animInventory.toLocaleString(),              'Active Listings',  'approved & live')}
+      {cell(formatSize(animSize) + ' sft',               'Area Listed',      'across all warehouses')}
+      {cell(animLocations,                               'Locations',        'cities & industrial parks')}
+      {cell(
+        <span style={{ color: pendingCount > 0 ? '#fbbf24' : '#fff' }}>{animPending}</span>,
+        'Pending Review', 'awaiting approval', true
+      )}
+    </>);
+  }
+
+  // Public view: left = Direct Deal, right = ORS Transact, split by a divider
+  return strip(<>
+    <a href="/listings" style={{ flex: 1, minWidth: 240, textDecoration: 'none', display: 'block', cursor: 'pointer' }}
+       className="group">
+      <div style={{ padding: '32px 28px 28px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Building2 style={{ width: 16, height: 16, color: '#a78bfa' }} />
+          </div>
+          <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.12)', padding: '3px 9px', borderRadius: 999 }}>Direct Deal</span>
+        </div>
+        <p style={{ fontSize: 'clamp(44px,6vw,72px)', fontWeight: 900, color: '#fff', lineHeight: 1, margin: '0 0 6px', letterSpacing: '-0.03em' }}>{animInventory}</p>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#a78bfa', margin: '0 0 4px' }}>{formatSize(animSize)} sft listed</p>
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', margin: '0 0 20px', lineHeight: 1.6 }}>Transact directly with the warehouse developer</p>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#a78bfa', borderBottom: '1px solid transparent' }}
+             className="group-hover:border-purple-400 transition-all">
+          Browse listings <ArrowRight style={{ width: 13, height: 13 }} className="group-hover:translate-x-1 transition-transform" />
+        </div>
+      </div>
+    </a>
+
+    {/* Vertical divider */}
+    <div style={{ width: 1, background: 'rgba(255,255,255,0.08)', margin: '24px 0', flexShrink: 0 }} />
+
+    <a href="/ors-transact" style={{ flex: 1, minWidth: 240, textDecoration: 'none', display: 'block', cursor: 'pointer' }}
+       className="group">
+      <div style={{ padding: '32px 28px 28px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Zap style={{ width: 16, height: 16, color: '#c4b5fd' }} />
+          </div>
+          <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.12)', padding: '3px 9px', borderRadius: 999 }}>ORS Transact</span>
+        </div>
+        <p style={{ fontSize: 'clamp(44px,6vw,72px)', fontWeight: 900, color: '#fff', lineHeight: 1, margin: '0 0 6px', letterSpacing: '-0.03em' }}>{animOrsCount.toLocaleString()}</p>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#c4b5fd', margin: '0 0 4px' }}>{formatSize(animOrsSize)} sft listed</p>
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', margin: '0 0 20px', lineHeight: 1.6 }}>ORS-ONE facilitates the full leasing transaction</p>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#c4b5fd', borderBottom: '1px solid transparent' }}
+             className="group-hover:border-purple-300 transition-all">
+          Explore listings <ArrowRight style={{ width: 13, height: 13 }} className="group-hover:translate-x-1 transition-transform" />
+        </div>
+      </div>
+    </a>
+  </>);
+}
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Skeleton } from './ui/skeleton';
 import { Label } from './ui/label';
@@ -497,6 +596,25 @@ export function ListingsPage() {
     return shuffle(allListings.filter(l => l.status === 'approved'));
   }, [allListings]);
 
+  // Animated count-up — easeOutExpo, 1.4 s duration
+  function useCountUp(target: number, duration = 1400) {
+    const [val, setVal] = React.useState(0);
+    React.useEffect(() => {
+      if (!target) return;
+      let raf: number;
+      const start = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min((now - start) / duration, 1);
+        const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+        setVal(Math.round(eased * target));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
+    }, [target]);
+    return val;
+  }
+
   const inventoryCount = approvedListings.length;
   const totalInventorySize = useMemo(() =>
       approvedListings.reduce((sum, listing) => sum + (listing.sizeSqFt || 0), 0),
@@ -778,88 +896,18 @@ export function ListingsPage() {
                 <p className="mt-2 text-lg font-semibold text-primary">Search-Select-Download</p>
                 <p className="mt-1 text-base text-accent">Warehouse-Technical-Compliance-Commercials, in a single Excel</p>
                 
-                {/* ── Premium stats section ───────────────────────────────── */}
-                {(user?.role === 'SuperAdmin' || user?.role === 'O2O') ? (
-                  /* Admin view: 4-stat horizontal strip */
-                  <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto animate-in fade-in-0 duration-700">
-                    {[
-                      { value: inventoryCount.toString(), label: 'Active Listings', sub: 'approved & live', color: '#6141ac', bg: 'hsl(259 44% 96%)' },
-                      { value: `${formatSize(totalInventorySize)}`, label: 'Sq Ft Listed', sub: 'across all warehouses', color: '#0c447c', bg: '#e6f1fb' },
-                      { value: uniqueLocations.toString(), label: 'Locations', sub: 'cities & industrial parks', color: '#166534', bg: '#f0fdf4' },
-                      { value: pendingCount.toString(), label: 'Pending Review', sub: 'awaiting approval', color: pendingCount > 0 ? '#854d0e' : '#6141ac', bg: pendingCount > 0 ? '#fef9c3' : 'hsl(259 44% 96%)' },
-                    ].map(stat => (
-                      <div key={stat.label} style={{ background: stat.bg, border: `1px solid ${stat.color}22`, borderRadius: 16, padding: '18px 16px', textAlign: 'center' }}>
-                        <p style={{ fontSize: 32, fontWeight: 900, color: stat.color, lineHeight: 1, margin: 0 }}>{stat.value}</p>
-                        <p style={{ fontSize: 11, fontWeight: 700, color: stat.color, textTransform: 'uppercase', letterSpacing: '.06em', marginTop: 6 }}>{stat.label}</p>
-                        <p style={{ fontSize: 10, color: stat.color + '99', marginTop: 3 }}>{stat.sub}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  /* Public view: premium dark gradient tiles */
-                  <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto animate-in fade-in-0 duration-700">
-
-                    {/* Direct Deal tile */}
-                    <a href="/listings" className="group no-underline" style={{ display: 'block' }}>
-                      <div style={{
-                        position: 'relative', overflow: 'hidden', borderRadius: 20, padding: '28px 24px',
-                        background: 'linear-gradient(135deg, #1e1537 0%, #3b2870 60%, #6141ac 100%)',
-                        boxShadow: '0 8px 32px rgba(97,65,172,0.25)',
-                        transition: 'transform .2s, box-shadow .2s',
-                      }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 16px 48px rgba(97,65,172,0.35)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 32px rgba(97,65,172,0.25)'; }}>
-                        {/* dot grid overlay */}
-                        <div style={{ position: 'absolute', inset: 0, opacity: .07, backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
-                        <div style={{ position: 'relative' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-                            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <Building2 style={{ width: 20, height: 20, color: '#fff' }} />
-                            </div>
-                            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,.15)', padding: '3px 8px', borderRadius: 999 }}>Direct Deal</span>
-                          </div>
-                          <p style={{ fontSize: 52, fontWeight: 900, color: '#fff', lineHeight: 1, margin: '0 0 4px' }}>{inventoryCount}</p>
-                          <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', margin: '0 0 10px' }}>{formatSize(totalInventorySize)} sft listed</p>
-                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, margin: '0 0 20px' }}>Transact directly with the warehouse developer</p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
-                            Browse listings
-                            <ArrowRight style={{ width: 14, height: 14, transition: 'transform .2s' }} className="group-hover:translate-x-1" />
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-
-                    {/* ORS Transact tile — hidden for admin/O2O */}
-                    <a href="/ors-transact" className="group no-underline" style={{ display: 'block' }}>
-                      <div style={{
-                        position: 'relative', overflow: 'hidden', borderRadius: 20, padding: '28px 24px',
-                        background: '#fff',
-                        border: '1.5px solid hsl(259 30% 88%)',
-                        boxShadow: '0 4px 20px rgba(97,65,172,0.08)',
-                        transition: 'transform .2s, box-shadow .2s, border-color .2s',
-                      }}
-                        onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = 'translateY(-3px)'; d.style.boxShadow = '0 12px 40px rgba(97,65,172,0.18)'; d.style.borderColor = '#6141ac55'; }}
-                        onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = ''; d.style.boxShadow = '0 4px 20px rgba(97,65,172,0.08)'; d.style.borderColor = 'hsl(259 30% 88%)'; }}>
-                        <div style={{ position: 'absolute', top: 0, right: 0, width: 120, height: 120, borderRadius: '0 20px 0 120px', background: 'hsl(259 44% 96%)' }} />
-                        <div style={{ position: 'relative' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-                            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'hsl(259 44% 94%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <Zap style={{ width: 20, height: 20, color: '#6141ac' }} />
-                            </div>
-                            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#6141ac', background: 'hsl(259 44% 94%)', padding: '3px 8px', borderRadius: 999 }}>ORS Transact</span>
-                          </div>
-                          <p style={{ fontSize: 52, fontWeight: 900, color: '#1e1537', lineHeight: 1, margin: '0 0 4px' }}>{ORS_TRANSACT_COUNT.toLocaleString()}</p>
-                          <p style={{ fontSize: 13, fontWeight: 600, color: 'hsl(259 15% 55%)', margin: '0 0 10px' }}>{formatSize(ORS_TRANSACT_SIZE_SQF)} sft listed</p>
-                          <p style={{ fontSize: 12, color: 'hsl(259 15% 65%)', lineHeight: 1.6, margin: '0 0 20px' }}>ORS-ONE facilitates the full leasing transaction</p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#6141ac' }}>
-                            Explore listings
-                            <ArrowRight style={{ width: 14, height: 14, transition: 'transform .2s' }} className="group-hover:translate-x-1" />
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-                  </div>
-                )}
+                {/* ── Premium stats strip ─────────────────────────────────── */}
+                <StatsSection
+                  inventoryCount={inventoryCount}
+                  totalInventorySize={totalInventorySize}
+                  uniqueLocations={uniqueLocations}
+                  pendingCount={pendingCount}
+                  orsTransactCount={ORS_TRANSACT_COUNT}
+                  orsTransactSize={ORS_TRANSACT_SIZE_SQF}
+                  isAdmin={user?.role === 'SuperAdmin' || user?.role === 'O2O'}
+                  formatSize={formatSize}
+                  useCountUp={useCountUp}
+                />
 
             </div>
              <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
