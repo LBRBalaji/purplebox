@@ -503,6 +503,16 @@ export function ListingsPage() {
     [approvedListings]
   );
 
+  // Admin-only stats
+  const pendingCount = useMemo(() =>
+    allListings.filter(l => l.status === 'pending').length,
+    [allListings]
+  );
+  const uniqueLocations = useMemo(() =>
+    new Set(approvedListings.map(l => l.location?.split(',')[0]?.trim()).filter(Boolean)).size,
+    [approvedListings]
+  );
+
   // ORS Transact stats — static known values from the imported CSV
   // Count: 9,420 records · Size: 242,874,496 sft (242.87M)
   // These are rendered immediately — no async wait
@@ -768,28 +778,88 @@ export function ListingsPage() {
                 <p className="mt-2 text-lg font-semibold text-primary">Search-Select-Download</p>
                 <p className="mt-1 text-base text-accent">Warehouse-Technical-Compliance-Commercials, in a single Excel</p>
                 
-                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto animate-in fade-in-0 duration-1000">
+                {/* ── Premium stats section ───────────────────────────────── */}
+                {(user?.role === 'SuperAdmin' || user?.role === 'O2O') ? (
+                  /* Admin view: 4-stat horizontal strip */
+                  <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto animate-in fade-in-0 duration-700">
+                    {[
+                      { value: inventoryCount.toString(), label: 'Active Listings', sub: 'approved & live', color: '#6141ac', bg: 'hsl(259 44% 96%)' },
+                      { value: `${formatSize(totalInventorySize)}`, label: 'Sq Ft Listed', sub: 'across all warehouses', color: '#0c447c', bg: '#e6f1fb' },
+                      { value: uniqueLocations.toString(), label: 'Locations', sub: 'cities & industrial parks', color: '#166534', bg: '#f0fdf4' },
+                      { value: pendingCount.toString(), label: 'Pending Review', sub: 'awaiting approval', color: pendingCount > 0 ? '#854d0e' : '#6141ac', bg: pendingCount > 0 ? '#fef9c3' : 'hsl(259 44% 96%)' },
+                    ].map(stat => (
+                      <div key={stat.label} style={{ background: stat.bg, border: `1px solid ${stat.color}22`, borderRadius: 16, padding: '18px 16px', textAlign: 'center' }}>
+                        <p style={{ fontSize: 32, fontWeight: 900, color: stat.color, lineHeight: 1, margin: 0 }}>{stat.value}</p>
+                        <p style={{ fontSize: 11, fontWeight: 700, color: stat.color, textTransform: 'uppercase', letterSpacing: '.06em', marginTop: 6 }}>{stat.label}</p>
+                        <p style={{ fontSize: 10, color: stat.color + '99', marginTop: 3 }}>{stat.sub}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  /* Public view: premium dark gradient tiles */
+                  <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto animate-in fade-in-0 duration-700">
+
                     {/* Direct Deal tile */}
-                    <a href="/listings"
-                      className="group block text-center px-5 py-4 rounded-none border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer no-underline">
-                      <p className="text-3xl md:text-4xl font-black text-primary leading-none">{inventoryCount}</p>
-                      <p className="text-xs font-bold text-primary/80 tracking-widest uppercase mt-1">Direct Deal</p>
-                      <p className="text-xs text-muted-foreground mt-1">{formatSize(totalInventorySize)} sft listed</p>
-                      <p className="text-xs text-muted-foreground/60 mt-1.5 leading-relaxed">Transact directly with the warehouse developer</p>
-                      <p className="text-xs font-semibold text-primary mt-2 group-hover:underline">Browse listings →</p>
+                    <a href="/listings" className="group no-underline" style={{ display: 'block' }}>
+                      <div style={{
+                        position: 'relative', overflow: 'hidden', borderRadius: 20, padding: '28px 24px',
+                        background: 'linear-gradient(135deg, #1e1537 0%, #3b2870 60%, #6141ac 100%)',
+                        boxShadow: '0 8px 32px rgba(97,65,172,0.25)',
+                        transition: 'transform .2s, box-shadow .2s',
+                      }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 16px 48px rgba(97,65,172,0.35)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 32px rgba(97,65,172,0.25)'; }}>
+                        {/* dot grid overlay */}
+                        <div style={{ position: 'absolute', inset: 0, opacity: .07, backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+                        <div style={{ position: 'relative' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Building2 style={{ width: 20, height: 20, color: '#fff' }} />
+                            </div>
+                            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,.15)', padding: '3px 8px', borderRadius: 999 }}>Direct Deal</span>
+                          </div>
+                          <p style={{ fontSize: 52, fontWeight: 900, color: '#fff', lineHeight: 1, margin: '0 0 4px' }}>{inventoryCount}</p>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', margin: '0 0 10px' }}>{formatSize(totalInventorySize)} sft listed</p>
+                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, margin: '0 0 20px' }}>Transact directly with the warehouse developer</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
+                            Browse listings
+                            <ArrowRight style={{ width: 14, height: 14, transition: 'transform .2s' }} className="group-hover:translate-x-1" />
+                          </div>
+                        </div>
+                      </div>
                     </a>
-                    {/* ORS Transact tile — hidden for admin/O2O, sidebar Labs section covers it */}
-                    {user?.role !== 'SuperAdmin' && user?.role !== 'O2O' && (
-                    <a href="/ors-transact"
-                      className="group block text-center px-5 py-4 rounded-none border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer no-underline">
-                      <p className="text-3xl md:text-4xl font-black text-primary leading-none">{ORS_TRANSACT_COUNT.toLocaleString()}</p>
-                      <p className="text-xs font-bold text-primary/80 tracking-widest uppercase mt-1">ORS Transact</p>
-                      <p className="text-xs text-muted-foreground mt-1">{formatSize(ORS_TRANSACT_SIZE_SQF)} sft listed</p>
-                      <p className="text-xs text-muted-foreground/60 mt-1.5 leading-relaxed">ORS-ONE facilitates the full leasing transaction</p>
-                      <p className="text-xs font-semibold text-primary mt-2 group-hover:underline">Explore listings →</p>
+
+                    {/* ORS Transact tile — hidden for admin/O2O */}
+                    <a href="/ors-transact" className="group no-underline" style={{ display: 'block' }}>
+                      <div style={{
+                        position: 'relative', overflow: 'hidden', borderRadius: 20, padding: '28px 24px',
+                        background: '#fff',
+                        border: '1.5px solid hsl(259 30% 88%)',
+                        boxShadow: '0 4px 20px rgba(97,65,172,0.08)',
+                        transition: 'transform .2s, box-shadow .2s, border-color .2s',
+                      }}
+                        onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = 'translateY(-3px)'; d.style.boxShadow = '0 12px 40px rgba(97,65,172,0.18)'; d.style.borderColor = '#6141ac55'; }}
+                        onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = ''; d.style.boxShadow = '0 4px 20px rgba(97,65,172,0.08)'; d.style.borderColor = 'hsl(259 30% 88%)'; }}>
+                        <div style={{ position: 'absolute', top: 0, right: 0, width: 120, height: 120, borderRadius: '0 20px 0 120px', background: 'hsl(259 44% 96%)' }} />
+                        <div style={{ position: 'relative' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'hsl(259 44% 94%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Zap style={{ width: 20, height: 20, color: '#6141ac' }} />
+                            </div>
+                            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#6141ac', background: 'hsl(259 44% 94%)', padding: '3px 8px', borderRadius: 999 }}>ORS Transact</span>
+                          </div>
+                          <p style={{ fontSize: 52, fontWeight: 900, color: '#1e1537', lineHeight: 1, margin: '0 0 4px' }}>{ORS_TRANSACT_COUNT.toLocaleString()}</p>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: 'hsl(259 15% 55%)', margin: '0 0 10px' }}>{formatSize(ORS_TRANSACT_SIZE_SQF)} sft listed</p>
+                          <p style={{ fontSize: 12, color: 'hsl(259 15% 65%)', lineHeight: 1.6, margin: '0 0 20px' }}>ORS-ONE facilitates the full leasing transaction</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#6141ac' }}>
+                            Explore listings
+                            <ArrowRight style={{ width: 14, height: 14, transition: 'transform .2s' }} className="group-hover:translate-x-1" />
+                          </div>
+                        </div>
+                      </div>
                     </a>
-                    )}
-                </div>
+                  </div>
+                )}
 
             </div>
              <Alert className="mb-8 bg-primary/5 border-primary/20 p-6 rounded-lg grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
