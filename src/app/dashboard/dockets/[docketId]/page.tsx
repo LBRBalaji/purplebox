@@ -3,12 +3,13 @@ import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { useSiteOptions } from '@/hooks/use-site-options';
-import { useTransactionDockets, SITE_STATUS_OPTIONS, POSSESSION_OPTIONS, renderRichText } from '@/hooks/use-transaction-dockets';
+import { useTransactionDockets, SITE_STATUS_OPTIONS, POSSESSION_OPTIONS, renderRichText, autoFillCellsFromListing } from '@/hooks/use-transaction-dockets';
 import { useToast } from '@/hooks/use-toast';
 import { AdminSidebar } from '@/components/admin-sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Copy, Check, Flag, Plus, Trash2, Pencil, X, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, Copy, Check, Plus, Trash2, Pencil, X, ChevronDown, ChevronUp, ExternalLink, Search } from 'lucide-react';
 import type { TransactionDocket, DocketParam, DocketTask, ListingSchema } from '@/lib/schema';
 
 const FLAG_COLORS: Record<string, string> = { red: '#fee2e2', yellow: '#fef9c3' };
@@ -68,6 +69,15 @@ export default function DocketBuilderPage() {
   const [taskForm, setTaskForm] = React.useState({ title:'', owner:'', dueDate:'', priority:'medium' as DocketTask['priority'], status:'todo' as DocketTask['status'], notes:'' });
   const [copiedLink, setCopiedLink] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
+
+  // Add Sites
+  const [showAddSites, setShowAddSites] = React.useState(false);
+  const [addSiteSearch, setAddSiteSearch] = React.useState('');
+  const [pendingSiteIds, setPendingSiteIds] = React.useState<string[]>([]);
+  const [addingSites, setAddingSites] = React.useState(false);
+
+  // Rich text toolbar
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
     if (!docket) return;
@@ -158,6 +168,55 @@ export default function DocketBuilderPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sites.map(s => s.listingId).join(','), docket?.docketId]);
+
+  // ── Rich text toolbar ─────────────────────────────────────────────────────
+  const applyFormat = (type: 'bold' | 'bullet' | 'number') => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = editValue.slice(start, end);
+    let replacement = '';
+    if (type === 'bold') {
+      replacement = `**${selected || 'bold text'}**`;
+    } else if (type === 'bullet') {
+      replacement = (selected || 'item').split('\n').map(l => `- ${l}`).join('\n');
+    } else {
+      replacement = (selected || 'item').split('\n').map((l, i) => `${i + 1}. ${l}`).join('\n');
+    }
+    const newValue = editValue.slice(0, start) + replacement + editValue.slice(end);
+    setEditValue(newValue);
+    requestAnimationFrame(() => {
+      if (el) { el.setSelectionRange(start, start + replacement.length); el.focus(); }
+    });
+  };
+
+  // ── Add Sites to existing docket ──────────────────────────────────────────
+  const availableToAdd = siteOptions.filter(s => !docket?.siteIds.includes(s.listingId));
+  const filteredToAdd = addSiteSearch
+    ? availableToAdd.filter(s =>
+        s.listingId.toLowerCase().includes(addSiteSearch.toLowerCase()) ||
+        s.location.toLowerCase().includes(addSiteSearch.toLowerCase()))
+    : availableToAdd;
+
+  const handleAddSites = async () => {
+    if (!docket || pendingSiteIds.length === 0) return;
+    setAddingSites(true);
+    const newSiteIds = [...docket.siteIds, ...pendingSiteIds];
+    const paramIds = localParams.map(p => p.paramId);
+    const newCellData = { ...cellData };
+    pendingSiteIds.forEach(id => {
+      const listing = siteOptions.find(s => s.listingId === id);
+      if (listing) Object.assign(newCellData, autoFillCellsFromListing(listing, paramIds));
+    });
+    setCellData(newCellData);
+    await save({ siteIds: newSiteIds, cellData: newCellData });
+    setPendingSiteIds([]);
+    setShowAddSites(false);
+    setAddSiteSearch('');
+    setAddingSites(false);
+    toast({ title: `${pendingSiteIds.length} site${pendingSiteIds.length > 1 ? 's' : ''} added` });
+  };
 
   const save = async (updates: Partial<TransactionDocket>) => {
     if (!docket) return;
@@ -341,6 +400,9 @@ export default function DocketBuilderPage() {
             <p style={{fontSize:11,color:'hsl(259 15% 55%)',margin:0}}>{docket.clientName}{docket.clientCompany?` · ${docket.clientCompany}`:''} · {sites.length} site{sites.length!==1?'s':''}</p>
           </div>
           {saving&&<span style={{fontSize:11,color:'#6141ac'}}>Saving…</span>}
+          <Button onClick={()=>{setShowAddSites(true);setPendingSiteIds([]);setAddSiteSearch('');}} variant="outline" size="sm" style={{gap:4}}>
+            <Plus style={{width:12,height:12}}/> Add sites
+          </Button>
           <Button onClick={copyShareLink} variant="outline" size="sm" style={{gap:4,borderColor:'#6141ac',color:'#6141ac'}}>
             {copiedLink?<Check style={{width:12,height:12}}/>:<Copy style={{width:12,height:12}}/>}
             {copiedLink?'Copied':'Share with client'}
@@ -439,10 +501,22 @@ export default function DocketBuilderPage() {
                                     {(param.dropdownOptions||POSSESSION_OPTIONS).map(o=><option key={o}>{o}</option>)}
                                   </select>
                                 ) : (
-                                  <textarea autoFocus value={editValue} onChange={e=>setEditValue(e.target.value)}
-                                    onBlur={commitEdit}
-                                    onKeyDown={e=>{if(e.key==='Escape')setEditingCell(null);if(e.key==='Enter'&&e.metaKey)commitEdit();}}
-                                    style={{width:'100%',minHeight:56,fontSize:12,border:'1px solid #6141ac',borderRadius:4,padding:4,resize:'vertical',outline:'none'}}/>
+                                  <div>
+                                    <div style={{display:'flex',gap:3,marginBottom:4}}>
+                                      {[{label:'B',type:'bold'},{label:'•',type:'bullet'},{label:'1.',type:'number'}].map(btn=>(
+                                        <button key={btn.type} type="button"
+                                          onMouseDown={e=>{e.preventDefault();applyFormat(btn.type as any);}}
+                                          style={{padding:'2px 6px',fontSize:11,fontWeight:btn.type==='bold'?700:400,border:'0.5px solid hsl(259 30% 80%)',borderRadius:3,background:'hsl(259 30% 97%)',cursor:'pointer',color:'#1e1537'}}>
+                                          {btn.label}
+                                        </button>
+                                      ))}
+                                      <span style={{fontSize:10,color:'hsl(259 15% 65%)',marginLeft:2,alignSelf:'center'}}>⌘↵ to save</span>
+                                    </div>
+                                    <textarea ref={textareaRef} autoFocus value={editValue} onChange={e=>setEditValue(e.target.value)}
+                                      onBlur={commitEdit}
+                                      onKeyDown={e=>{if(e.key==='Escape')setEditingCell(null);if(e.key==='Enter'&&e.metaKey)commitEdit();}}
+                                      style={{width:'100%',minHeight:56,fontSize:12,border:'1px solid #6141ac',borderRadius:4,padding:4,resize:'vertical',outline:'none'}}/>
+                                  </div>
                                 )
                               ) : (
                                 <div style={{minHeight:24,lineHeight:1.5}}>
@@ -685,6 +759,52 @@ export default function DocketBuilderPage() {
 
       {/* hover-reveal CSS for param edit buttons */}
       <style>{`tr:hover .param-edit-btn { opacity: 1 !important; }`}</style>
+
+      {/* ── Add Sites modal ──────────────────────────────────────────── */}
+      {showAddSites && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center'}}
+          onClick={e=>{if(e.target===e.currentTarget){setShowAddSites(false);setPendingSiteIds([]);}}}>
+          <div style={{background:'#fff',borderRadius:12,padding:24,width:480,maxHeight:'80vh',display:'flex',flexDirection:'column',gap:14}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <p style={{fontWeight:700,fontSize:15,color:'#1e1537',margin:0}}>Add sites to docket</p>
+              <button onClick={()=>{setShowAddSites(false);setPendingSiteIds([]);}} style={{background:'none',border:'none',cursor:'pointer'}}><X style={{width:16,height:16}}/></button>
+            </div>
+            <p style={{fontSize:12,color:'hsl(259 15% 55%)',margin:0}}>
+              Currently {docket.siteIds.length} site{docket.siteIds.length!==1?'s':''} in this docket. Select additional sites to add.
+            </p>
+            <div style={{position:'relative'}}>
+              <Search style={{position:'absolute',left:10,top:10,width:14,height:14,color:'#aaa'}}/>
+              <Input placeholder="Search by ID or location…" value={addSiteSearch} onChange={e=>setAddSiteSearch(e.target.value)} style={{paddingLeft:32,height:36,fontSize:13}}/>
+            </div>
+            <div style={{flex:1,overflow:'auto',border:'0.5px solid hsl(259 30% 88%)',borderRadius:8,maxHeight:280}}>
+              {filteredToAdd.length === 0 ? (
+                <p style={{padding:16,fontSize:12,color:'hsl(259 15% 60%)',textAlign:'center'}}>
+                  {availableToAdd.length === 0 ? 'All available sites are already in this docket.' : 'No sites match your search.'}
+                </p>
+              ) : filteredToAdd.map(s => (
+                <label key={s.listingId} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 12px',borderBottom:'0.5px solid hsl(259 30% 92%)',cursor:'pointer',fontSize:13}}>
+                  <Checkbox checked={pendingSiteIds.includes(s.listingId)} onCheckedChange={()=>setPendingSiteIds(ids=>ids.includes(s.listingId)?ids.filter(i=>i!==s.listingId):[...ids,s.listingId])}/>
+                  <div>
+                    <span style={{fontFamily:'monospace',fontSize:11,color:'#6141ac',marginRight:6}}>{s.listingId}</span>
+                    <span style={{color:'#1e1537'}}>{s.location}</span>
+                    {s.sizeSqFt&&<span style={{color:'hsl(259 15% 55%)',marginLeft:6,fontSize:11}}>{s.sizeSqFt.toLocaleString('en-IN')} sft</span>}
+                    {s.status==='sourced'&&<span style={{marginLeft:6,fontSize:10,padding:'1px 5px',borderRadius:4,background:'#FAEEDA',color:'#854F0B'}}>Sourced</span>}
+                  </div>
+                </label>
+              ))}
+            </div>
+            {pendingSiteIds.length > 0 && (
+              <p style={{fontSize:11,color:'#6141ac',margin:0}}>{pendingSiteIds.length} site{pendingSiteIds.length!==1?'s':''} selected</p>
+            )}
+            <div style={{display:'flex',justifyContent:'flex-end',gap:8}}>
+              <Button variant="outline" onClick={()=>{setShowAddSites(false);setPendingSiteIds([]);}}>Cancel</Button>
+              <Button onClick={handleAddSites} disabled={pendingSiteIds.length===0||addingSites} style={{background:'#6141ac'}}>
+                {addingSites?'Adding…':`Add ${pendingSiteIds.length||''} site${pendingSiteIds.length!==1?'s':''}`}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
