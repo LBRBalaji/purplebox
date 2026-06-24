@@ -86,27 +86,46 @@ export default function PublicDocketPage() {
   // ── Spotlight: find element by data-tour attr, compute position, scroll to it ──
   React.useEffect(() => {
     if (tourStep === null) { setSpotlight(null); setTooltipPos(null); return; }
+
+    // Clear immediately so old spotlight doesn't linger while new one loads
+    setSpotlight(null);
+    setTooltipPos(null);
+
     const target = TOUR_STEPS[tourStep].target;
     const el = document.querySelector(`[data-tour="${target}"]`) as HTMLElement | null;
     if (!el) return;
 
+    // Scroll element into view, then wait for scroll animation to settle
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    const update = () => {
-      const r = el.getBoundingClientRect();
-      const pad = 10;
-      const sp: Rect = { top: r.top - pad, left: r.left - pad, width: r.width + pad * 2, height: r.height + pad * 2 };
-      setSpotlight(sp);
 
-      const tw = Math.min(300, window.innerWidth - 32);
-      const th = 200;
-      const below = r.bottom + th + 16 < window.innerHeight;
-      const tTop = below ? r.bottom + pad + 4 : r.top - th - pad - 4;
+    const t = setTimeout(() => {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return; // not visible
+
+      const pad = 10;
+      setSpotlight({ top: r.top - pad, left: r.left - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+
+      const mobile = window.innerWidth < 640;
+      const tw = mobile ? window.innerWidth - 24 : 300;
+      const th = 250; // generous height estimate
+
+      if (mobile) {
+        // On mobile: always dock to bottom so it never goes off-screen
+        setTooltipPos({ top: window.innerHeight - th - 12, left: 12, below: false });
+        return;
+      }
+
+      // Desktop: prefer below element, fall back to above, then clamp
+      let below = r.bottom + th + 14 < window.innerHeight;
+      let tTop = below ? r.bottom + 14 : r.top - th - 14;
+      // Final clamp — ensure it's always within viewport
+      tTop = Math.max(8, Math.min(tTop, window.innerHeight - th - 8));
       const tLeft = Math.max(12, Math.min(r.left, window.innerWidth - tw - 12));
       setTooltipPos({ top: tTop, left: tLeft, below });
-    };
-    const t = setTimeout(update, 420);
+    }, 620); // 620ms gives smooth scroll time to finish
+
     return () => clearTimeout(t);
-  }, [tourStep]);
+  }, [tourStep]); // isMobile is read from window inside the callback, no stale closure issue
 
   const closeTour = () => {
     setTourStep(null); setSpotlight(null); setTooltipPos(null);
@@ -472,25 +491,27 @@ export default function PublicDocketPage() {
             }}>{tourStep + 1}</div>
           )}
 
-          {/* Tooltip card — appears above or below the highlighted element */}
-          {tooltipPos && (
+          {/* Tooltip card — visible immediately even while spotlight loads */}
+          {tourStep !== null && (tooltipPos || !spotlight) && (
             <div style={{ position:'fixed', zIndex:104,
-              top:tooltipPos.top, left:tooltipPos.left,
+              top: tooltipPos ? tooltipPos.top : window.innerHeight - 262,
+              left: tooltipPos ? tooltipPos.left : 12,
               width: isMobile ? 'calc(100vw - 24px)' : 300,
               background:'#fff', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
-              // No border radius
             }}>
               {/* Header strip */}
               <div style={{ background:'#1e1537', padding:'8px 14px', display:'flex', alignItems:'center', gap:10 }}>
                 <span style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'.1em' }}>STEP {tourStep+1} OF {TOUR_STEPS.length}</span>
                 <div style={{ marginLeft:'auto', display:'flex', gap:4 }}>
                   {TOUR_STEPS.map((_,i)=>(
-                    <div key={i} onClick={e=>{e.stopPropagation();setTourStep(i);}} style={{ width:6, height:6, borderRadius:'50%', cursor:'pointer', background:i===tourStep?'#a78bfa':'rgba(255,255,255,0.2)' }}/>
+                    <div key={i} onClick={e=>{e.stopPropagation();setTourStep(i);}}
+                      style={{ width:6, height:6, borderRadius:'50%', cursor:'pointer', background:i===tourStep?'#a78bfa':'rgba(255,255,255,0.2)' }}/>
                   ))}
                 </div>
               </div>
               {/* Body */}
               <div style={{ padding:'14px 16px 16px' }}>
+                {!spotlight && <p style={{ fontSize:11, color:'#a78bfa', margin:'0 0 6px' }}>↑ Scrolling to element…</p>}
                 <p style={{ fontSize:14, fontWeight:700, color:'#1e1537', margin:'0 0 8px' }}>{TOUR_STEPS[tourStep].title}</p>
                 <p style={{ fontSize:12, color:'#6b7280', lineHeight:1.65, margin:'0 0 14px' }}>{TOUR_STEPS[tourStep].body}</p>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -506,13 +527,15 @@ export default function PublicDocketPage() {
                   </div>
                 </div>
               </div>
-              {/* Arrow pointer */}
-              <div style={{ position:'absolute', width:0, height:0,
-                ...(tooltipPos.below
-                  ? { top:-8, left:20, borderLeft:'8px solid transparent', borderRight:'8px solid transparent', borderBottom:'8px solid #1e1537' }
-                  : { bottom:-8, left:20, borderLeft:'8px solid transparent', borderRight:'8px solid transparent', borderTop:'8px solid #fff' }
-                )
-              }}/>
+              {/* Arrow pointer — only when tooltipPos is known */}
+              {tooltipPos && !isMobile && (
+                <div style={{ position:'absolute', width:0, height:0,
+                  ...(tooltipPos.below
+                    ? { top:-8, left:24, borderLeft:'8px solid transparent', borderRight:'8px solid transparent', borderBottom:'8px solid #1e1537' }
+                    : { bottom:-8, left:24, borderLeft:'8px solid transparent', borderRight:'8px solid transparent', borderTop:'8px solid #fff' }
+                  )
+                }}/>
+              )}
             </div>
           )}
         </>
