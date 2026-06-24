@@ -20,8 +20,8 @@ const flagStyle = (f?: string) => ({
     : { background: 'hsl(259 30% 94%)', color: 'hsl(259 15% 55%)' }),
 } as React.CSSProperties);
 
-const td: React.CSSProperties = { border: '0.5px solid hsl(259 30% 92%)', verticalAlign: 'top', fontSize: 12, minWidth: 160 };
-const th: React.CSSProperties = { padding: '8px 10px', background: 'hsl(259 30% 97%)', border: '0.5px solid hsl(259 30% 88%)', minWidth: 160, textAlign: 'left', position: 'sticky', top: 0, zIndex: 1 };
+const td: React.CSSProperties = { border: '0.5px solid hsl(259 30% 92%)', verticalAlign: 'top', fontSize: 12, width: 220, maxWidth: 220, minWidth: 160 };
+const th: React.CSSProperties = { padding: '8px 10px', background: 'hsl(259 30% 97%)', border: '0.5px solid hsl(259 30% 88%)', width: 220, maxWidth: 220, minWidth: 160, textAlign: 'left', position: 'sticky', top: 0, zIndex: 1 };
 const rowLabel: React.CSSProperties = { padding: '7px 10px', border: '0.5px solid hsl(259 30% 92%)', fontSize: 12, background: 'hsl(259 30% 98%)', position: 'sticky', left: 0, zIndex: 2, width: 220, maxWidth: 220, minWidth: 160, whiteSpace: 'normal', wordBreak: 'break-word' };
 const groupTh: React.CSSProperties = { padding: '5px 10px', fontSize: 10, fontWeight: 700, color: '#6141ac', textTransform: 'uppercase' as const, letterSpacing: '.06em', background: 'hsl(259 44% 96%)', border: '0.5px solid hsl(259 30% 90%)', position: 'sticky', left: 0, width: 220, maxWidth: 220 };
 

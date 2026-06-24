@@ -83,15 +83,15 @@ export function renderRichText(text: string): React.ReactNode {
 
   const flushBullets = () => {
     if (bulletBuf.length) {
-      result.push(React.createElement('ul', { key: `ul${result.length}`, style: { paddingLeft: 16, margin: '2px 0' } },
-        bulletBuf.map((t, i) => React.createElement('li', { key: i, style: { fontSize: 'inherit' } }, parseBold(t)))));
+      result.push(React.createElement('ul', { key: `ul${result.length}`, style: { paddingLeft: 18, margin: '4px 0', listStyleType: 'disc', listStylePosition: 'outside' } },
+        bulletBuf.map((t, i) => React.createElement('li', { key: i, style: { fontSize: 'inherit', display: 'list-item' } }, parseBold(t)))));
       bulletBuf = [];
     }
   };
   const flushNumbers = () => {
     if (numBuf.length) {
-      result.push(React.createElement('ol', { key: `ol${result.length}`, style: { paddingLeft: 16, margin: '2px 0' } },
-        numBuf.map((t, i) => React.createElement('li', { key: i, style: { fontSize: 'inherit' } }, parseBold(t)))));
+      result.push(React.createElement('ol', { key: `ol${result.length}`, style: { paddingLeft: 18, margin: '4px 0', listStyleType: 'decimal' } },
+        numBuf.map((t, i) => React.createElement('li', { key: i, style: { fontSize: 'inherit', display: 'list-item' } }, parseBold(t)))));
       numBuf = [];
     }
   };
