@@ -31,7 +31,7 @@ function generateToken() {
   return Array.from(crypto.getRandomValues(new Uint8Array(24))).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export default function RegisterDealPage() {
+function RegisterDealPageInner() {
   const { user, isLoading } = useAuth();
   const { listings, addRegisteredLead, addTransactionActivity, demands } = useData();
   const { toast } = useToast();
@@ -538,5 +538,13 @@ export default function RegisterDealPage() {
 
       </div>
     </main>
+  );
+}
+
+export default function RegisterDealPage() {
+  return (
+    <React.Suspense fallback={<main className="container mx-auto p-4 md:p-8"><p className="text-sm text-muted-foreground">Loading...</p></main>}>
+      <RegisterDealPageInner />
+    </React.Suspense>
   );
 }
