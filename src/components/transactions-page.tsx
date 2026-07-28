@@ -41,6 +41,7 @@ export function TransactionsPage() {
   return (
     <div className="max-w-7xl mx-auto">
         <div className="mb-8">
+            <button onClick={() => router.back()} style={{display:"inline-flex",alignItems:"center",gap:6,fontSize:13,color:"hsl(259 15% 55%)",background:"none",border:"none",cursor:"pointer",marginBottom:12,padding:0}}>← Back</button>
             <h2 className="text-3xl font-bold font-headline tracking-tight">Transactions</h2>
             <p className="text-muted-foreground mt-2">
               {isAgent

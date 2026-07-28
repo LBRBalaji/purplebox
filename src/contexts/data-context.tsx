@@ -161,6 +161,7 @@ export type RegisteredLead = {
   isOffPlatform?: boolean;
   offPlatformProperty?: OffPlatformProperty;
   invitees?: DealInvitee[];
+  emailInvitesSent?: boolean;        // true once deal invite emails have been dispatched
   dealRegisteredAt?: string;
   // Transaction mode & broker fields
   transactionMode?: 'direct' | 'ors-tp' | 'agent';
@@ -254,9 +255,10 @@ type DataContextType = {
   registeredLeads: RegisteredLead[];
   addRegisteredLead: (lead: Omit<RegisteredLead, 'registeredAt'>, userEmail?: string) => void;
   updateRegisteredLead: (lead: RegisteredLead) => void;
+  deleteRegisteredLeads: (ids: string[]) => void;
   acknowledgeLeadProperties: (leadId: string, providerEmail: string, details: AcknowledgmentDetails) => void;
   transactionActivities: TransactionActivity[];
-  addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => void;
+  addTransactionActivity: (activity: Omit<TransactionActivity, 'activityId' | 'createdAt'>, customCreatedAt?: string) => void;
   getTenantImprovements: (leadId: string) => TenantImprovementsSheet | null;
   updateTenantImprovements: (leadId: string, sheet: TenantImprovementsSheet) => void;
   getNegotiationBoard: (leadId: string) => NegotiationBoardSchema | null;
@@ -783,11 +785,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [persistAgentLeads]);
   
-  const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>) => {
+  const addTransactionActivity = useCallback((activityData: Omit<TransactionActivity, 'activityId' | 'createdAt'>, customCreatedAt?: string) => {
     const newActivity: TransactionActivity = {
         ...activityData,
         activityId: `ACT-${activityData.leadId}-${Date.now()}-${Math.random()}`,
-        createdAt: new Date().toISOString(),
+        createdAt: customCreatedAt || new Date().toISOString(),
     };
 
     setTransactionActivities(prevActivities => {
@@ -1295,7 +1297,40 @@ export function DataProvider({ children }: { children: ReactNode }) {
           return newLeads;
       });
   }, [persistRegisteredLeads]);
-  
+
+  // Hard delete: removes the lead and ALL related data (activities, negotiation board, chat threads)
+  const deleteRegisteredLeads = useCallback((ids: string[]) => {
+    const idSet = new Set(ids);
+    // 1. Remove leads
+    setRegisteredLeads(prev => {
+      const updated = prev.filter(l => !idSet.has(l.id));
+      persistRegisteredLeads(updated);
+      return updated;
+    });
+    // 2. Remove activities for those leads
+    setTransactionActivities(prev => {
+      const updated = prev.filter(a => !idSet.has(a.leadId));
+      persistActivities(updated);
+      return updated;
+    });
+    // 3. Remove negotiation boards for those leads
+    setNegotiationBoards((prev: NegotiationBoardSchema[]) => {
+      const updated = prev.filter((b: NegotiationBoardSchema) => !idSet.has((b as any).leadId));
+      persistNegotiationBoards(updated);
+      return updated;
+    });
+    // 4. Remove chat threads whose keys start with 'chat-{leadId}'
+    setChatMessages(prev => {
+      const updated: Record<string, any[]> = {};
+      for (const [key, msgs] of Object.entries(prev)) {
+        const belongsToDeleted = ids.some(id => key.startsWith(`chat-${id}`));
+        if (!belongsToDeleted) updated[key] = msgs;
+      }
+      persistChatMessages(updated);
+      return updated;
+    });
+  }, [persistRegisteredLeads, persistActivities, persistNegotiationBoards, persistChatMessages]);
+
   const acknowledgeLeadProperties = useCallback((leadId: string, providerEmail: string, ackDetails: AcknowledgmentDetails) => {
     let wasAnyPropertyAcknowledged = false;
     let acknowledgedLead: RegisteredLead | undefined;
@@ -1569,6 +1604,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         registeredLeads,
         addRegisteredLead,
         updateRegisteredLead,
+        deleteRegisteredLeads,
         acknowledgeLeadProperties,
         transactionActivities,
         addTransactionActivity,

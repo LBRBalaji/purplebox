@@ -5,7 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2, Clock, HelpCircle, UserPlus, Search } from 'lucide-react';
+import { Check, Mail, Phone, ThumbsUp, X, ArrowRight, UserCheck, Handshake, Building, Link2, Clock, HelpCircle, UserPlus, Search, Trash2 } from 'lucide-react';
+import { Checkbox } from './ui/checkbox';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import type { RegisteredLead, RegisteredLeadStatus, ListingSchema, RegisteredLeadProperty } from '@/contexts/data-context';
@@ -94,7 +95,7 @@ function AdvancedSearch({ allProviders, allCustomers, onFilterChange }: { allPro
 
 export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'broking' }) {
   const { user, users, isLoading: isAuthLoading } = useAuth();
-  const { registeredLeads, acknowledgeLeadProperties } = useData();
+  const { registeredLeads, acknowledgeLeadProperties, deleteRegisteredLeads } = useData();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -102,6 +103,8 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
   const [expandedLeadId, setExpandedLeadId] = React.useState<string | null>(null);
   const [isAcknowledgeDialogOpen, setIsAcknowledgeDialogOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<any>({});
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   
   const isAgent = user?.role === 'Agent';
   const isAdminOrO2O = user?.role === 'O2O' || user?.role === 'SuperAdmin';
@@ -209,11 +212,56 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
     <>
         <div className="mt-8">
              {isAdminOrO2O && <AdvancedSearch allProviders={allProviders} allCustomers={allCustomers} onFilterChange={setFilters} />}
+            {/* Bulk-delete toolbar — SuperAdmin only */}
+            {user?.role === 'SuperAdmin' && selectedIds.size > 0 && (
+              <div className="flex items-center gap-3 mb-3 px-1">
+                <span className="text-sm text-muted-foreground">{selectedIds.size} selected</span>
+                <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm" className="gap-2">
+                      <Trash2 className="h-4 w-4" /> Delete {selectedIds.size} transaction{selectedIds.size > 1 ? 's' : ''}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Permanently delete {selectedIds.size} transaction{selectedIds.size > 1 ? 's' : ''}?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently remove the selected transaction{selectedIds.size > 1 ? 's' : ''} and all related data — activity logs, negotiation board, and chat messages. This cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={() => {
+                          deleteRegisteredLeads(Array.from(selectedIds));
+                          setSelectedIds(new Set());
+                          toast({ title: `${selectedIds.size} transaction${selectedIds.size > 1 ? 's' : ''} deleted` });
+                        }}>
+                        Delete permanently
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>Clear selection</Button>
+              </div>
+            )}
             <Card>
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                {user?.role === 'SuperAdmin' && (
+                                  <TableHead className="w-10">
+                                    <Checkbox
+                                      checked={myLeads.length > 0 && selectedIds.size === myLeads.length}
+                                      onCheckedChange={(checked) => {
+                                        if (checked) setSelectedIds(new Set(myLeads.map(l => l.id)));
+                                        else setSelectedIds(new Set());
+                                      }}
+                                    />
+                                  </TableHead>
+                                )}
                                 <TableHead>Lead Name</TableHead>
                                 <TableHead>Contact</TableHead>
                                 <TableHead>Requirements Summary</TableHead>
@@ -260,6 +308,20 @@ export function ProviderLeads({ view = 'default' }: { view?: 'default' | 'brokin
                                 return (
                                     <React.Fragment key={lead.id}>
                                     <TableRow>
+                                        {user?.role === 'SuperAdmin' && (
+                                          <TableCell>
+                                            <Checkbox
+                                              checked={selectedIds.has(lead.id)}
+                                              onCheckedChange={(checked) => {
+                                                setSelectedIds(prev => {
+                                                  const next = new Set(prev);
+                                                  checked ? next.add(lead.id) : next.delete(lead.id);
+                                                  return next;
+                                                });
+                                              }}
+                                            />
+                                          </TableCell>
+                                        )}
                                         <TableCell className="font-medium">{lead.isO2OCollaborator && isProvider ? lead.id : lead.leadName}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col gap-1">

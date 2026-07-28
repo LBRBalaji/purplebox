@@ -13,7 +13,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction, Lightbulb, MapPin, Target, Handshake, AlertCircle, CheckCircle2, Trash2, Pencil } from 'lucide-react';
+import { ArrowRight, Mail, Info, ListChecks, Building, Factory, Construction, Lightbulb, MapPin, Target, Handshake, AlertCircle, CheckCircle2, Trash2, Pencil, FileText } from 'lucide-react';
+import Link from 'next/link';
 import { useData } from '@/contexts/data-context';
 import type { DemandSchema, ListingSchema } from '@/lib/schema';
 import { useToast } from '@/hooks/use-toast';
@@ -440,9 +441,9 @@ export function DemandList({ onEdit }: DemandListProps = {}) {
       {demands.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {demands.map((demand) => (
-            <div key={demand.demandId} className="relative">
+            <div key={demand.demandId} className="relative flex flex-col gap-2">
               <DemandCard demand={demand}/>
-              {/* Edit: visible to creator or admin */}
+              {/* Admin actions: Edit, Delete, Register a Deal */}
               {(isAdmin || user?.email === demand.userEmail) && (
                 <div className="absolute top-3 right-3 flex gap-1">
                   <button
@@ -469,6 +470,16 @@ export function DemandList({ onEdit }: DemandListProps = {}) {
                     )
                   )}
                 </div>
+              )}
+              {/* Register a Deal — admin only, links to register-deal pre-filled from this demand */}
+              {isAdmin && (
+                <Link
+                  href={`/register-deal?demandId=${demand.demandId}`}
+                  className="flex items-center justify-center gap-2 py-2 text-xs font-semibold text-white rounded-lg transition-opacity hover:opacity-90"
+                  style={{ background: '#6141ac' }}>
+                  <FileText className="h-3.5 w-3.5" />
+                  Register a Deal for this Demand →
+                </Link>
               )}
             </div>
           ))}

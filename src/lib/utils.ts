@@ -36,7 +36,17 @@ export function toIndianSqFtWords(n: number): string {
 }
 
 /**
- * Full helper text shown below a size field: "4,00,000 sft · 4 Lakh Sq Ft"
+ * Map internal role keys to display labels used across the platform.
+ * Customer → Lessee, Developer/Warehouse Developer → Lessor, Agent → Agent (ORS)
+ */
+export function displayRole(role: string): string {
+  if (role === 'Customer') return 'Lessee';
+  if (role === 'Developer' || role === 'Warehouse Developer') return 'Lessor';
+  if (role === 'Agent') return 'Agent (ORS)';
+  return role;
+}
+
+/**
  * Returns empty string when value is falsy.
  */
 export function sqFtHelperText(n: number | undefined | null): string {

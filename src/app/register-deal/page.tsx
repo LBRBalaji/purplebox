@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { useData } from '@/contexts/data-context';
 import { useToast } from '@/hooks/use-toast';
@@ -8,8 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Building2, Users, FileText, CheckCircle, ArrowRight, ArrowLeft, Search, X } from 'lucide-react';
+import { Building2, Users, FileText, CheckCircle, ArrowRight, ArrowLeft, Search, X, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
+import { displayRole } from '@/lib/utils';
 
 type Step = 1 | 2 | 3 | 4;
 type InviteeRole = 'Customer' | 'Developer' | 'Agent';
@@ -32,17 +33,34 @@ function generateToken() {
 
 export default function RegisterDealPage() {
   const { user, isLoading } = useAuth();
-  const { listings, addRegisteredLead, addTransactionActivity } = useData();
+  const { listings, addRegisteredLead, addTransactionActivity, demands } = useData();
   const { toast } = useToast();
   const router = useRouter();
+  const searchParamsHook = useSearchParams();
+  const prefillDemandId = searchParamsHook.get('demandId');
+  const prefillDemand = prefillDemandId ? demands.find(d => d.demandId === prefillDemandId) : null;
   const [step, setStep] = React.useState<Step>(1);
   const [submitting, setSubmitting] = React.useState(false);
   const [listingSearch, setListingSearch] = React.useState('');
+  const [sendNow, setSendNow] = React.useState(false); // default: Send Later
   const [property, setProperty] = React.useState<PropertyDetails>({
     linkedListingId: '', address: '', area: '', buildingType: 'PEB',
     indicativeRent: '', securityDeposit: '', leasePeriod: '3 years', notes: '',
   });
   const [invitees, setInvitees] = React.useState<Invitee[]>([{ name: '', email: '', role: 'Developer' }]);
+
+  // Pre-fill Lessee (Customer) invitee from linked demand
+  React.useEffect(() => {
+    if (prefillDemand) {
+      setInvitees(prev => {
+        const withoutLessee = prev.filter(i => i.role !== 'Customer');
+        return [
+          { name: prefillDemand.companyName, email: prefillDemand.userEmail, role: 'Customer' as const },
+          ...withoutLessee,
+        ];
+      });
+    }
+  }, [prefillDemand?.demandId]);
 
   React.useEffect(() => {
     if (!isLoading && !user) router.push('/');
@@ -114,6 +132,8 @@ export default function RegisterDealPage() {
         invitees: inviteesWithTokens,
         dealRegisteredAt: new Date().toISOString(),
         isO2OCollaborator: false,
+        emailInvitesSent: sendNow,
+        ...(prefillDemandId ? { demandId: prefillDemandId } : {}),
       };
 
       addRegisteredLead(newLead as any, user!.email);
@@ -126,7 +146,8 @@ export default function RegisterDealPage() {
         createdBy: user!.email,
       });
 
-      // Send email invites
+      // Send email invites only if admin chose to send now
+      if (sendNow) {
       for (const inv of inviteesWithTokens) {
         const magicLink = `${window.location.origin}/deal/${inv.token}`;
         try {
@@ -146,6 +167,7 @@ export default function RegisterDealPage() {
           });
         } catch {}
       }
+      } // end if (sendNow)
 
       setStep(4);
       setTimeout(() => router.push(`/dashboard/leads/${dealId}?tab=negotiation-board`), 2500);
@@ -308,9 +330,23 @@ export default function RegisterDealPage() {
               <div>
                 <p className="text-sm font-bold mb-1" style={{ color: '#1e1537' }}>Step 2 — Invite Other Parties</p>
                 <p className="text-xs" style={{ color: 'hsl(259 15% 55%)' }}>
-                  You are registering as <strong>{myRole}</strong>. Add the other parties — they'll receive a magic link to access the deal workspace without needing to sign up first.
+                  You are registering as <strong>Agent (ORS)</strong>. Add the Lessor and Lessee — they'll receive a magic link to access the deal workspace.
                 </p>
               </div>
+
+              {/* Linked demand reference */}
+              {prefillDemand && (
+                <div className="flex items-start gap-3 p-3 rounded-xl" style={{ background: 'hsl(259 44% 96%)', border: '1px solid hsl(259 44% 85%)' }}>
+                  <ClipboardList className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: '#6141ac' }} />
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: '#6141ac' }}>Linked Demand: {prefillDemand.demandId}</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'hsl(259 15% 55%)' }}>
+                      {prefillDemand.companyName} · {prefillDemand.operationType} · {prefillDemand.size?.toLocaleString('en-IN')} sft · {prefillDemand.location}
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: 'hsl(259 15% 65%)' }}>Lessee pre-filled from demand. You can edit if needed.</p>
+                  </div>
+                </div>
+              )}
 
               {/* Initiator info */}
               <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(259 44% 96%)', border: '1px solid hsl(259 44% 86%)' }}>
@@ -319,7 +355,7 @@ export default function RegisterDealPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold" style={{ color: '#1e1537' }}>{user?.companyName || user?.userName}</p>
-                  <p className="text-xs" style={{ color: '#6141ac' }}>You · {myRole} (Registered)</p>
+                  <p className="text-xs" style={{ color: '#6141ac' }}>You · Agent (ORS) (Registered)</p>
                 </div>
               </div>
 
@@ -339,7 +375,9 @@ export default function RegisterDealPage() {
                         <Label className="text-xs font-semibold">Role</Label>
                         <select value={inv.role} onChange={e => setInvitees(invitees.map((x, idx) => idx === i ? { ...x, role: e.target.value as InviteeRole } : x))}
                           className="mt-1 w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
-                          {(['Customer', 'Developer', 'Agent'] as InviteeRole[]).map(r => <option key={r}>{r}</option>)}
+                          {(['Customer', 'Developer', 'Agent'] as InviteeRole[]).map(r => (
+                            <option key={r} value={r}>{displayRole(r)}</option>
+                          ))}
                         </select>
                       </div>
                       <div>
@@ -408,7 +446,7 @@ export default function RegisterDealPage() {
                     {invitees.filter(i => i.name && i.email).map((inv, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <div className="h-4 w-4 rounded-full flex-shrink-0" style={{ background: 'hsl(259 44% 88%)', border: '1px dashed #6141ac' }} />
-                        <p className="text-sm" style={{ color: '#1e1537' }}><strong>{inv.name}</strong> — {inv.role} (invite pending)</p>
+                        <p className="text-sm" style={{ color: '#1e1537' }}><strong>{inv.name}</strong> — {displayRole(inv.role)} (invite pending)</p>
                       </div>
                     ))}
                   </div>
@@ -439,9 +477,32 @@ export default function RegisterDealPage() {
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
                 <Button onClick={handleSubmit} disabled={submitting} style={{ background: '#6141ac' }}>
-                  {submitting ? 'Registering...' : 'Register Deal & Send Invites'}
+                  {submitting ? 'Registering...' : sendNow ? 'Register Deal & Send Invites' : 'Register Deal (Send Invites Later)'}
                   {!submitting && <ArrowRight className="ml-2 h-4 w-4" />}
                 </Button>
+              </div>
+
+              {/* Email toggle */}
+              <div className="flex items-center justify-between rounded-lg p-3" style={{ background: 'hsl(259 30% 97%)', border: '1px solid hsl(259 30% 88%)' }}>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e1537' }}>Send email invites immediately</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'hsl(259 15% 55%)' }}>
+                    {sendNow ? 'Invites will be sent to all parties on registration.' : 'You can send invites later from the lead detail page.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSendNow(v => !v)}
+                  style={{
+                    width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0,
+                    background: sendNow ? '#6141ac' : 'hsl(259 30% 80%)',
+                    position: 'relative', transition: 'background .2s',
+                  }}>
+                  <span style={{
+                    position: 'absolute', top: 3, width: 18, height: 18, borderRadius: '50%', background: '#fff',
+                    transition: 'left .2s', left: sendNow ? 23 : 3,
+                  }}/>
+                </button>
               </div>
             </>
           )}

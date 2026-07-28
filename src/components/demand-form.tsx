@@ -137,6 +137,7 @@ const PriorityToggle = ({ form, field }: { form: UseFormReturn<DemandSchema>, fi
 export function DemandForm({ onDemandLogged, isAdminMode, editDemandId: editDemandIdProp }: { onDemandLogged: () => void; isAdminMode?: boolean; editDemandId?: string }) {
   const { toast } = useToast();
   const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'SuperAdmin' || user?.role === 'O2O';
   const { demands, addDemand, updateDemand } = useData();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isGenerating, setIsGenerating] = React.useState(false);
@@ -223,15 +224,19 @@ export function DemandForm({ onDemandLogged, isAdminMode, editDemandId: editDema
 
   React.useEffect(() => {
     if (user && !isEditMode) {
-      form.reset({
-        ...form.getValues(),
-        companyName: user.companyName,
-        userName: user.userName,
-        userEmail: user.email,
-        userPhone: user.phone,
-      });
+      if (!isSuperAdmin) {
+        // Regular users: auto-fill from their own account details
+        form.reset({
+          ...form.getValues(),
+          companyName: user.companyName,
+          userName: user.userName,
+          userEmail: user.email,
+          userPhone: user.phone,
+        });
+      }
+      // SuperAdmin/O2O: leave fields blank — ORS enters the Lessee's details manually
     }
-  }, [user, form, isEditMode]);
+  }, [user, form, isEditMode, isSuperAdmin]);
 
   React.useEffect(() => {
     // Check for pre-fill data from map search
@@ -854,12 +859,54 @@ export function DemandForm({ onDemandLogged, isAdminMode, editDemandId: editDema
             </Card>
             <div className="lg:col-span-1 space-y-6">
               <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><User className="w-5 h-5 text-primary" /> User Details</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5 text-primary" />
+                    {isSuperAdmin ? 'Lessee Details' : 'User Details'}
+                  </CardTitle>
+                  {isSuperAdmin && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Enter the customer's details manually. This demand is being created by ORS on their behalf.
+                    </p>
+                  )}
+                </CardHeader>
                 <CardContent className="space-y-4">
-                  <FormField control={form.control} name="companyName" render={({ field }) => (<FormItem><FormLabel>Company Name</FormLabel><FormControl><Input {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userName" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userPhone" render={({ field }) => (<FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="userEmail" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} disabled /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="companyName" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{isSuperAdmin ? 'Lessee Company Name' : 'Company Name'}</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={!isSuperAdmin} placeholder={isSuperAdmin ? "Enter lessee's company name" : undefined} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="userName" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{isSuperAdmin ? 'Lessee Contact Person' : 'User Name'}</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={!isSuperAdmin} placeholder={isSuperAdmin ? "Contact person name" : undefined} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="userPhone" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={!isSuperAdmin} placeholder={isSuperAdmin ? "+91 98400 00000" : undefined} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="userEmail" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" {...field} disabled={!isSuperAdmin} placeholder={isSuperAdmin ? "lessee@company.com" : undefined} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
                 </CardContent>
               </Card>
             </div>
